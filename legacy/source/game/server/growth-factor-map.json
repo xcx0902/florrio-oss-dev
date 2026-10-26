@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/growth-factor.mjs",
+  "implementationSha256": "288e64c28a38440bf067f241c8dbf9d360c6efbf8e0cd49a0e5be07e8887d522",
+  "factory": "createGrowthFactorHook",
+  "functionIds": [
+    262
+  ],
+  "functions": [
+    {
+      "id": 262,
+      "name": "growthFactor",
+      "originalSymbol": "function_262",
+      "signature": " (type $t33) (param $p0 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 61731
+        },
+        "source": {
+          "path": "source/game/server/growth-factor.mjs",
+          "line": 17
+        },
+        "test": "test/server-growth-factor.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Repeated-squaring evaluation of 1.06**exponent for a signed integer exponent; negative exponents return the reciprocal."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-growth-factor.test.mjs",
+    "report": "reports/server-growth-factor-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 16,
+    "completeLinearMemoryChecks": 1,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 16,
+    "trappingComparisons": 0,
+    "comparison": "Sixteen exponents from -64 to 1024, including zero and both signs, compare exact f64 result bits and the stack pointer. The function is verified read-only.",
+    "limitations": [
+      "The exponent is i32; values outside the i32 range are not representable at the call boundary.",
+      "Ledger: 209 server bodies recovered and 525 remain machine code."
+    ]
+  }
+}

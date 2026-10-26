@@ -1,0 +1,408 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/affine-sampler.mjs",
+  "implementationSha256": "5ea3f7017ce1887a8d7f55a082ab4fd9942505aa98d5ace2b4d4beedf5756b8a",
+  "factory": "createAffineSamplerHooks",
+  "functionIds": [
+    663,
+    743,
+    965,
+    966,
+    967,
+    968,
+    2108,
+    2113,
+    2129,
+    2133,
+    2146,
+    2150,
+    2167,
+    2188,
+    2204
+  ],
+  "functions": [
+    {
+      "id": 663,
+      "name": "affineSampler663",
+      "originalSymbol": "function_663",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 90034
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 116
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "red/blue swap from low bytes"
+    },
+    {
+      "id": 743,
+      "name": "affineSampler743",
+      "originalSymbol": "function_743",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 118839
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 117
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "identity"
+    },
+    {
+      "id": 965,
+      "name": "affineSampler965",
+      "originalSymbol": "function_965",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 218946
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 118
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "drops high byte, shift-merge"
+    },
+    {
+      "id": 966,
+      "name": "affineSampler966",
+      "originalSymbol": "function_966",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 219131
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 119
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "logical shift right 8"
+    },
+    {
+      "id": 967,
+      "name": "affineSampler967",
+      "originalSymbol": "function_967",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 219303
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 120
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "mask to 24 bits"
+    },
+    {
+      "id": 968,
+      "name": "affineSampler968",
+      "originalSymbol": "function_968",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 219475
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 132
+        },
+        "test": "test/client-affine-scale.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "nearest sampler with optional per-channel scale from bytes 60..62 when flags bit 0 is set"
+    },
+    {
+      "id": 2108,
+      "name": "affineChannelSampler2108",
+      "originalSymbol": "function_2108",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 550847
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 152
+        },
+        "test": "test/client-affine-channels.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "nearest sampler with A,R,G,B channel output; flags bit 0 scales low bytes by 62/61/60, bit 1 scales the high byte by 63"
+    },
+    {
+      "id": 2113,
+      "name": "affineSampler2113",
+      "originalSymbol": "function_2113",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 551949
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 121
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "byte reversal"
+    },
+    {
+      "id": 2129,
+      "name": "affineChannelSampler2129",
+      "originalSymbol": "function_2129",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 556357
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 153
+        },
+        "test": "test/client-affine-channels.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "nearest sampler with R,G,B,A channel output; flags bit 0 scales low bytes by 62/61/60, bit 1 scales the high byte by 63"
+    },
+    {
+      "id": 2133,
+      "name": "affineSampler2133",
+      "originalSymbol": "function_2133",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 557435
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 122
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "swap red/blue keep alpha"
+    },
+    {
+      "id": 2146,
+      "name": "affineChannelSampler2146",
+      "originalSymbol": "function_2146",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 561167
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 154
+        },
+        "test": "test/client-affine-channels.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "nearest sampler with G,R,A,B channel output; flags bit 0 scales low bytes by 62/61/60, bit 1 scales the high byte by 63"
+    },
+    {
+      "id": 2150,
+      "name": "affineSampler2150",
+      "originalSymbol": "function_2150",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 562245
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 123
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "rotate/merge"
+    },
+    {
+      "id": 2167,
+      "name": "affineChannelSampler2167",
+      "originalSymbol": "function_2167",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 566688
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 155
+        },
+        "test": "test/client-affine-channels.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "nearest sampler with B,G,R,A channel output; flags bit 0 scales low bytes by 62/61/60, bit 1 scales the high byte by 63"
+    },
+    {
+      "id": 2188,
+      "name": "affineSampler2188",
+      "originalSymbol": "function_2188",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 572272
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 124
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "swap red/blue force alpha"
+    },
+    {
+      "id": 2204,
+      "name": "affineSampler2204",
+      "originalSymbol": "function_2204",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 576514
+        },
+        "source": {
+          "path": "source/game/client/affine-sampler.mjs",
+          "line": 125
+        },
+        "test": "test/client-affine-sampler.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "force alpha"
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-affine-sampler.test.mjs test/client-affine-scale.test.mjs test/client-affine-channels.test.mjs",
+    "report": "reports/client-affine-sampler-tests.tap, reports/client-affine-scale-tests.tap and reports/client-affine-channels-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 656,
+    "trappingComparisons": 150,
+    "completeLinearMemoryChecks": 656,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 656,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 15,
+      "boundary": 15,
+      "edges": 120,
+      "scale": 0,
+      "channels": 0
+    },
+    "argumentRows": [
+      "4x4 samples with 16.16 steps and a 32-byte source stride",
+      "the same descriptor shifted by four bytes",
+      "five zeroed descriptors",
+      "five addresses at 0x3ffffff",
+      "eight width/row dimensions against four step sizes",
+      "40 scaled 968 samples with flags 0/1/2/3/0xffffffff and five byte-60..62 triples",
+      "116 channel-permutation samples across four ids, five flags values and five byte-60..63 factor sets"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. Width or row count zero traps with the native divide-by-zero error; the ten transforms differ only at the store. The separate scale test exercises 968 with descriptor bytes 60..62 and flag bit 0. The channel test exercises 2108/2129/2146/2167 with all flag/factor combinations.",
+    "limitations": [
+      "Widths 0-5 and row counts 0-4 cover empty, odd and square cases.",
+      "Steps 1/2/4/7 exercise carries at 65536.",
+      "No row exercises a negative width or step.",
+      "These fifteen functions are part of the 4,245 client functions; the ledger has 347 client bodies recovered and 3,898 remain machine code."
+    ]
+  }
+}

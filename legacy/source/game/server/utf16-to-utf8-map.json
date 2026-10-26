@@ -1,0 +1,53 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/utf16-to-utf8.mjs",
+  "implementationSha256": "61bf8c39c3dfc8d137b4ef012443e9e85dace72d7e17f4f8e87af1029bb98c13",
+  "factory": "createUtf16ToUtf8Hook",
+  "functionIds": [
+    485
+  ],
+  "functions": [
+    {
+      "id": 485,
+      "name": "transcodeUtf16ToUtf8",
+      "originalSymbol": "function_485",
+      "signature": " (type $t14) (param i32 i32 i32 i32 i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 117516
+        },
+        "source": {
+          "path": "source/game/server/utf16-to-utf8.mjs",
+          "line": 50
+        },
+        "test": "test/server-utf16-to-utf8.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "UTF-16LE to UTF-8 transcoder: returns 0 at source end, 1 on truncation or insufficient destination capacity (checked before writing), 2 for invalid/unpaired surrogates; writes final source/destination cursors through out-pointers and mirrors the original stack-frame cursor words."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-utf16-to-utf8.test.mjs",
+    "report": "reports/server-utf16-to-utf8-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 776,
+    "completeLinearMemoryChecks": 776,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 776,
+    "trappingComparisons": 0,
+    "comparison": "BMP samples, all high/low surrogate pair classes, unpaired/reversed surrogates, destination capacities 0..4, every truncation prefix, multi-unit and random sequences compare return, both out-cursors, frame words, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds pointers and source cursor beyond end are not enumerated.",
+      "Non-ASCII BMP units are sampled, not all 65,536.",
+      "Ledger: 252 server bodies recovered and 482 remain machine code."
+    ]
+  }
+}

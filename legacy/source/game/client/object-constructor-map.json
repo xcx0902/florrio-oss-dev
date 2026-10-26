@@ -1,0 +1,67 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/object-constructor.mjs",
+  "implementationSha256": "6cae931af2135490f587c1a0543136590a21c00890e0626d7254f4d078e9a08f",
+  "factory": "createObjectConstructorHooks",
+  "functionIds": [
+    384
+  ],
+  "functions": [
+    {
+      "id": 384,
+      "name": "constructAndRelinkObject",
+      "originalSymbol": "function_384",
+      "signature": " (type $t4) (param $p0 i32) (param $p1 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 8071
+        },
+        "source": {
+          "path": "source/game/client/object-constructor.mjs",
+          "line": 43
+        },
+        "test": "test/client-object-constructor.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-object-constructor.test.mjs",
+    "report": "reports/client-object-constructor-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 14,
+    "trappingComparisons": 1,
+    "completeLinearMemoryChecks": 14,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 14,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 0,
+      "boundary": 1,
+      "edges": 0
+    },
+    "argumentRows": [
+      "disjoint source and destination with fixed fields",
+      "the destination shifted by four bytes",
+      "zeros",
+      "addresses at 0x3ffffff",
+      "six list-relink cases and four destination overlaps"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. The 100-byte initialization, field copies, unlink/insert path and final `p1+96 = -1` execute in the original order.",
+    "limitations": [
+      "List cases cover both neighbors, one neighbor, head membership and a foreign head.",
+      "Destination overlaps 0/1/4/20 bytes exercise ordering between initialization and copy.",
+      "The zero case uses disjoint zeroed source/destination with an empty list.",
+      "This function is part of the 4,245 client functions; the ledger has 318 client bodies recovered and 3,927 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/errno-category.mjs",
+  "implementationSha256": "51e978b903d55aeb4b3d7ed0d1b6888a2e39b10ea7b5c111d16fe3f8fe96770c",
+  "factory": "createErrnoCategoryHook",
+  "functionIds": [
+    295
+  ],
+  "functions": [
+    {
+      "id": 295,
+      "name": "errnoCategory",
+      "originalSymbol": "function_295",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        82
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/errno-category.mjs",
+          "line": 14
+        },
+        "test": "test/server-errno-category.test.mjs"
+      },
+      "originalDirectDependencies": [
+        82
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Saves errno through 82, restores the previous errno and returns the category flag."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-errno-category.test.mjs",
+    "report": "reports/server-errno-category-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 3,
+    "trappingComparisons": 0,
+    "comparison": "Three errno values compare result, stack and memory outside the dead frame.",
+    "limitations": [
+      "Errno save helper 82 remains machine code. Ledger: 496 server bodies recovered and 238 remain machine code."
+    ]
+  }
+}

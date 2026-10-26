@@ -1,0 +1,133 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "evidence": {
+    "path": "reports/evidence/sp_server-wasm.json.gz",
+    "id": "ev_438a6ba007bd81cd8cd53601c7b9bd0293c17a4ea3c261bf7b63b3c36f2122b9",
+    "operation": "inspect_wasm_artifact",
+    "provider": "wabt@1.0.42"
+  },
+  "scope": "Entire original server function43 reconstructed as high-level JavaScript against the original shared-memory ABI. This module replaces one real function body; it does not delegate to original function43.",
+  "coverage": {
+    "hooks": 1,
+    "factory": "createDamageHooks",
+    "noOwnOriginalDelegation": true,
+    "originalScratchFrameBytes": 160,
+    "differentialValidation": {
+      "command": "node --test test/server-damage.test.mjs",
+      "testCases": 12,
+      "oracleComparisons": 881,
+      "comparedMemoryBytesPerOracle": 67108864,
+      "comparesReturnValues": true,
+      "comparesStackPointer": true,
+      "comparesHostCalls": true,
+      "comparesExceptionsAndPartiallyModifiedState": true,
+      "includesCapturedPlayerSpawn": true
+    },
+    "limitations": [
+      "Dependencies listed below remain explicit runtime calls and may still execute original machine code until their owning modules replace them.",
+      "Differential validation is bounded evidence, not a proof over every input, malformed pointer alias, corrupt intrusive list, allocator exhaustion or indirect callback.",
+      "The labels health, loadout, pickup and attacker are inferred from instruction dataflow and catalog use; unresolved component fields retain numeric offsets.",
+      "No claim is made that this single module completes the full client/server reconstruction."
+    ]
+  },
+  "functions": [
+    {
+      "id": 43,
+      "name": "damage",
+      "source": "source/game/server/damage.mjs",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "f32",
+          "i32"
+        ],
+        "results": []
+      },
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 7793,
+          "endLine": 13853
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 2293,
+          "endLine": 3952
+        }
+      },
+      "directDependencies": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        20,
+        21,
+        26,
+        31,
+        32,
+        34,
+        35,
+        44,
+        47,
+        57,
+        64,
+        65,
+        74,
+        77,
+        78,
+        84,
+        96,
+        97,
+        130,
+        147,
+        148,
+        214,
+        215,
+        219,
+        268,
+        269,
+        280,
+        424,
+        426
+      ],
+      "inlinedOriginalHelperSemantics": [
+        {
+          "id": 425,
+          "purpose": "Player lost-inventory count dirty marking; original call is expressed by the shared local mark helper."
+        }
+      ],
+      "indirectSignatures": [
+        {
+          "parameters": [
+            "i32"
+          ],
+          "results": [],
+          "purpose": "Hit-message virtual destructor."
+        },
+        {
+          "parameters": [
+            "i32",
+            "i32",
+            "i32"
+          ],
+          "results": [],
+          "purpose": "Petal death callback."
+        }
+      ],
+      "restoredBehavior": [
+        "Health gates, world damage flag, tracked subtraction and negative clamp.",
+        "Cactus/thorn reflection through active slots and ownership, with packed recursion options.",
+        "Coalesced hit messages, unsigned entity ordering, rotated IDs, reference counts and queued message growth.",
+        "Death clock/flags, collision/death marking and replicated-property cache invalidation.",
+        "Player loadout and backpack grouping, minstd_rand shuffle, retention/loss and rare conversion.",
+        "Pickup allocation from maximum-address free heaps or 128-slot chunks; entity/component registration, drop position/velocity, lifetime and multi-drop radial impulses.",
+        "Legendary uniqueness through active loadouts and world pickups.",
+        "Reward credit, lifetime teardown, recursive child health loss or deferred removal, petal death virtual callback.",
+        "Final player ownership validation, source attribution handle relinking, death score/level and short/heap killer-name copying."
+      ]
+    }
+  ]
+}

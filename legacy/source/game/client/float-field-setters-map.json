@@ -1,0 +1,124 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/float-field-setters.mjs",
+  "implementationSha256": "aa99cdba66e7315bc9ad2c94e4e0dc26025ad0c3326f4c9608649290c5170f9e",
+  "factory": "createFloatFieldSetterHooks",
+  "functionIds": [
+    772,
+    1982,
+    2306,
+    2307
+  ],
+  "functions": [
+    {
+      "id": 772,
+      "name": "parseAndJoinDouble",
+      "originalSymbol": "function_772",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/float-field-setters.mjs",
+          "line": 24
+        },
+        "test": "test/client-float-field-setters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        731,
+        810
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Builds a 16-byte frame through 731 and joins the halves through 810."
+    },
+    {
+      "id": 1982,
+      "name": "setFloatField1982",
+      "originalSymbol": "function_1982",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/float-field-setters.mjs",
+          "line": 16
+        },
+        "test": "test/client-float-field-setters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        810
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Stores a default or parsed float at offset 100/96, or joins two halves through 810."
+    },
+    {
+      "id": 2306,
+      "name": "setFloatField2306",
+      "originalSymbol": "function_2306",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/float-field-setters.mjs",
+          "line": 16
+        },
+        "test": "test/client-float-field-setters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        984
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Stores a default or parsed float at offset 100/96, or joins two halves through 810."
+    },
+    {
+      "id": 2307,
+      "name": "setFloatField2307",
+      "originalSymbol": "function_2307",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/float-field-setters.mjs",
+          "line": 16
+        },
+        "test": "test/client-float-field-setters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        984
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Stores a default or parsed float at offset 100/96, or joins two halves through 810."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-float-field-setters.test.mjs",
+    "report": "reports/client-float-field-setters-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 7,
+    "completeLinearMemoryChecks": 6,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Default and parsed text cases for both setters plus two double joins compare complete memory; 772 compares its 16-byte frame and value.",
+    "limitations": [
+      "772 is compared on its frame rather than all of memory because it allocates native stack scratch. Ledger: 618 client and 507 server bodies recovered."
+    ]
+  }
+}

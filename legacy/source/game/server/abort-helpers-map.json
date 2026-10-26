@@ -1,0 +1,75 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/abort-helpers.mjs",
+  "implementationSha256": "4a38305d70b3aba80df0087eab099bf68e22fc625f9ae1ee5d32dd470e8e3027",
+  "factory": "createAbortHelperHooks",
+  "functionIds": [
+    42,
+    58
+  ],
+  "functions": [
+    {
+      "id": 42,
+      "name": "abortNow",
+      "originalSymbol": "function_42",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abort-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-abort-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        5
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Calls the abort import and traps."
+    },
+    {
+      "id": 58,
+      "name": "abortViaHelper",
+      "originalSymbol": "function_58",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abort-helpers.mjs",
+          "line": 13
+        },
+        "test": "test/server-abort-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        42
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Delegates to 42 and traps."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-abort-helpers.test.mjs",
+    "report": "reports/server-abort-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 2,
+    "comparison": "Both helpers trap and leave identical complete memory.",
+    "limitations": [
+      "Ledger: 468 server bodies recovered and 266 remain machine code."
+    ]
+  }
+}

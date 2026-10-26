@@ -1,0 +1,77 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/soft-compare.mjs",
+  "implementationSha256": "da99f72fdecf3a4790e15131188e567d70d38e246571dbec640ec2fd5bec9932",
+  "factory": "createSoftCompareHooks",
+  "functionIds": [
+    563,
+    811
+  ],
+  "functions": [
+    {
+      "id": 563,
+      "name": "compare128",
+      "originalSymbol": "function_563",
+      "signature": " (type $t71) (param $p0 i64) (param $p1 i64) (param $p2 i64) (param $p3 i64) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 53502
+        },
+        "source": {
+          "path": "source/game/client/soft-compare.mjs",
+          "line": 26
+        },
+        "test": "test/client-soft-compare.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "compare two 128-bit values"
+    },
+    {
+      "id": 811,
+      "name": "compare128To64",
+      "originalSymbol": "function_811",
+      "signature": " (type $t88) (param $p0 i64) (param $p1 i64) (param $p2 i64) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 171431
+        },
+        "source": {
+          "path": "source/game/client/soft-compare.mjs",
+          "line": 45
+        },
+        "test": "test/client-soft-compare.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "compare a 128-bit value with a 64-bit word"
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-soft-compare.test.mjs",
+    "report": "reports/client-soft-compare-tests.tap",
+    "testGroups": 2,
+    "pass": 2,
+    "fail": 0,
+    "oracleComparisons": 4816,
+    "trappingComparisons": 0,
+    "completeLinearMemoryChecks": 4816,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4816,
+    "comparison": "Every comparison asserts the i32 result, all 67,108,864 bytes of linear memory, and the stack pointer. The matrix covers 40x40 low/high word pairs for 563 and 120x24 word pairs for 811, including NaN, infinite, signed-zero and random words.",
+    "limitations": [
+      "The helpers compare raw word pairs; callers own any type conversion.",
+      "No row traps because both functions only inspect their arguments.",
+      "These two functions are part of the 4,245 client functions; the ledger has 332 client bodies recovered and 3,913 remain machine code."
+    ]
+  }
+}

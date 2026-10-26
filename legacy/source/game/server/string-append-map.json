@@ -1,0 +1,54 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-append.mjs",
+  "implementationSha256": "3f827590b9863d58c643131a2bbaee6a6734cdfb520b16829ed89e675c71a531",
+  "factory": "createStringAppendHook",
+  "functionIds": [
+    317
+  ],
+  "functions": [
+    {
+      "id": 317,
+      "name": "appendString",
+      "originalSymbol": "function_317",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 74716
+        },
+        "source": {
+          "path": "source/game/server/string-append.mjs",
+          "line": 15
+        },
+        "test": "test/server-string-append.test.mjs"
+      },
+      "originalDirectDependencies": [
+        75,
+        173
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Short capacity 10 or long capacity (+8 & 0x7fffffff)-1; fitting data copies through 75, advances +4/+11 and terminates; growth calls 173 with (capacity,delta,size,size,0,count,data)."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-append.test.mjs",
+    "report": "reports/server-string-append-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 12,
+    "completeLinearMemoryChecks": 12,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 12,
+    "trappingComparisons": 0,
+    "comparison": "4 sizes x 3 appends staying inside the short capacity compare result, complete memory and stack pointer.",
+    "limitations": [
+      "The growth path delegates to 173 with the native argument order, but allocator bookkeeping bytes differ from the shipped allocator state and are not included in the byte comparison.",
+      "Ledger: 374 server bodies recovered and 360 remain machine code."
+    ]
+  }
+}

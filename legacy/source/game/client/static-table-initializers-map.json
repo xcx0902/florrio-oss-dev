@@ -1,0 +1,189 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/static-table-initializers.mjs",
+  "implementationSha256": "97f83fe5c708b2f232e1d0c112ce2709155d11754c11deef3740be8453374d2d",
+  "factory": "createStaticTableInitializerHooks",
+  "functionIds": [
+    1840,
+    1841,
+    1842,
+    1856,
+    1857,
+    1858
+  ],
+  "functions": [
+    {
+      "id": 1840,
+      "name": "initializeStaticTable1840",
+      "originalSymbol": "function_1840",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-table-initializers.mjs",
+          "line": 8
+        },
+        "test": "test/client-static-table-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        389,
+        396
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of a static string table."
+    },
+    {
+      "id": 1841,
+      "name": "initializeStaticTable1841",
+      "originalSymbol": "function_1841",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-table-initializers.mjs",
+          "line": 8
+        },
+        "test": "test/client-static-table-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        389,
+        396
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of a static string table."
+    },
+    {
+      "id": 1842,
+      "name": "initializeStaticTable1842",
+      "originalSymbol": "function_1842",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-table-initializers.mjs",
+          "line": 8
+        },
+        "test": "test/client-static-table-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        389,
+        396
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of a static string table."
+    },
+    {
+      "id": 1856,
+      "name": "initializeStaticTable1856",
+      "originalSymbol": "function_1856",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-table-initializers.mjs",
+          "line": 8
+        },
+        "test": "test/client-static-table-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        389,
+        397
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of a static string table."
+    },
+    {
+      "id": 1857,
+      "name": "initializeStaticTable1857",
+      "originalSymbol": "function_1857",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-table-initializers.mjs",
+          "line": 8
+        },
+        "test": "test/client-static-table-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        389,
+        397
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of a static string table."
+    },
+    {
+      "id": 1858,
+      "name": "initializeStaticTable1858",
+      "originalSymbol": "function_1858",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-table-initializers.mjs",
+          "line": 8
+        },
+        "test": "test/client-static-table-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        389,
+        397
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of a static string table."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-static-table-initializers.test.mjs",
+    "report": "reports/client-static-table-initializers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 12,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Each initializer runs in fresh native and recovered instances with the outer flag forced to 0 and 1, comparing the returned table pointer and both guard flags.",
+    "limitations": [
+      "Allocator addresses differ, so table contents are not byte-compared. Ledger: 604 client and 507 server bodies recovered."
+    ]
+  }
+}

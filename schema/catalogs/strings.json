@@ -1,0 +1,614 @@
+{
+  "schema": 1,
+  "source": {
+    "artifact": "web/sp_server.wasm",
+    "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+    "evidence": {
+      "constructorFunctionIndex": 279,
+      "entityDefinitionFunctionIndex": 103,
+      "petalRecordStride": 52,
+      "entityRecordStride": 116,
+      "unknownFieldNamesAreOffsets": true
+    },
+    "extractedBy": "source/semantic/extract-catalogs.mjs"
+  },
+  "count": 99,
+  "strings": [
+    {
+      "key": "petal.0.name",
+      "value": "None",
+      "kind": "name"
+    },
+    {
+      "key": "petal.0.description.0",
+      "value": "",
+      "kind": "description"
+    },
+    {
+      "key": "petal.1.name",
+      "value": "Basic",
+      "kind": "name"
+    },
+    {
+      "key": "petal.1.description.0",
+      "value": "A nice petal, not too strong but not too weak",
+      "kind": "description"
+    },
+    {
+      "key": "petal.2.name",
+      "value": "Fast",
+      "kind": "name"
+    },
+    {
+      "key": "petal.2.description.0",
+      "value": "Weaker than most petals, but recharges very quickly",
+      "kind": "description"
+    },
+    {
+      "key": "petal.3.name",
+      "value": "Heavy",
+      "kind": "name"
+    },
+    {
+      "key": "petal.3.description.0",
+      "value": "Very resilient and deals more damage, but recharges very slowly",
+      "kind": "description"
+    },
+    {
+      "key": "petal.4.name",
+      "value": "Rock",
+      "kind": "name"
+    },
+    {
+      "key": "petal.4.description.0",
+      "value": "Extremely durable, but takes a long time to recharge",
+      "kind": "description"
+    },
+    {
+      "key": "petal.5.name",
+      "value": "Square",
+      "kind": "name"
+    },
+    {
+      "key": "petal.5.description.0",
+      "value": "This shape... it looks familiar...",
+      "kind": "description"
+    },
+    {
+      "key": "petal.6.name",
+      "value": "Rose",
+      "kind": "name"
+    },
+    {
+      "key": "petal.6.description.0",
+      "value": "Its healing properties are amazing. Not so good at combat though",
+      "kind": "description"
+    },
+    {
+      "key": "petal.7.name",
+      "value": "Stinger",
+      "kind": "name"
+    },
+    {
+      "key": "petal.7.description.0",
+      "value": "It really hurts, but it's very fragile",
+      "kind": "description"
+    },
+    {
+      "key": "petal.8.name",
+      "value": "Iris",
+      "kind": "name"
+    },
+    {
+      "key": "petal.8.description.0",
+      "value": "Very poisonous, but takes a little while to do its work",
+      "kind": "description"
+    },
+    {
+      "key": "petal.9.name",
+      "value": "Wing",
+      "kind": "name"
+    },
+    {
+      "key": "petal.9.description.0",
+      "value": "It comes and goes",
+      "kind": "description"
+    },
+    {
+      "key": "petal.10.name",
+      "value": "Missile",
+      "kind": "name"
+    },
+    {
+      "key": "petal.10.description.0",
+      "value": "You can actually shoot this one",
+      "kind": "description"
+    },
+    {
+      "key": "petal.11.name",
+      "value": "Peas",
+      "kind": "name"
+    },
+    {
+      "key": "petal.11.description.0",
+      "value": "4 in 1 deal",
+      "kind": "description"
+    },
+    {
+      "key": "petal.12.description.0",
+      "value": "4 in 1 deal, now with a secret ingredient: poison",
+      "kind": "description"
+    },
+    {
+      "key": "petal.13.name",
+      "value": "Cactus",
+      "kind": "name"
+    },
+    {
+      "key": "petal.13.description.0",
+      "value": "Not very strong, but somehow increases your maximum health",
+      "kind": "description"
+    },
+    {
+      "key": "petal.14.name",
+      "value": "Faster",
+      "kind": "name"
+    },
+    {
+      "key": "petal.14.description.0",
+      "value": "It's so light it makes your other petals spin faster",
+      "kind": "description"
+    },
+    {
+      "key": "petal.15.description.0",
+      "value": "Extremely powerful rose, almost unheard of",
+      "kind": "description"
+    },
+    {
+      "key": "petal.16.name",
+      "value": "Twin",
+      "kind": "name"
+    },
+    {
+      "key": "petal.16.description.0",
+      "value": "Why stop at one? Why not TWO?!",
+      "kind": "description"
+    },
+    {
+      "key": "petal.17.name",
+      "value": "Triplet",
+      "kind": "name"
+    },
+    {
+      "key": "petal.17.description.0",
+      "value": "How about THREE?!",
+      "kind": "description"
+    },
+    {
+      "key": "petal.18.name",
+      "value": "Bubble",
+      "kind": "name"
+    },
+    {
+      "key": "petal.18.description.0",
+      "value": "You can right click to pop it and propel your flower",
+      "kind": "description"
+    },
+    {
+      "key": "petal.19.name",
+      "value": "Pollen",
+      "kind": "name"
+    },
+    {
+      "key": "petal.19.description.0",
+      "value": "Asthmatics beware",
+      "kind": "description"
+    },
+    {
+      "key": "petal.20.name",
+      "value": "Dandelion",
+      "kind": "name"
+    },
+    {
+      "key": "petal.20.description.0",
+      "value": "Its interesting properties prevent healing effects on affected units",
+      "kind": "description"
+    },
+    {
+      "key": "petal.21.description.0",
+      "value": "Increases your maximum health and makes your flower toxic",
+      "kind": "description"
+    },
+    {
+      "key": "petal.21.description.1",
+      "value": "Enemies hit by your flower will get poisoned",
+      "kind": "description"
+    },
+    {
+      "key": "petal.22.name",
+      "value": "Egg",
+      "kind": "name"
+    },
+    {
+      "key": "petal.22.description.0",
+      "value": "Something interesting might pop out of this",
+      "kind": "description"
+    },
+    {
+      "key": "petal.25.name",
+      "value": "Antennae",
+      "kind": "name"
+    },
+    {
+      "key": "petal.25.description.0",
+      "value": "Allows your flower to sense foes farther away",
+      "kind": "description"
+    },
+    {
+      "key": "petal.26.name",
+      "value": "Heaviest",
+      "kind": "name"
+    },
+    {
+      "key": "petal.26.description.0",
+      "value": "This thing is so heavy that nothing gets in the way",
+      "kind": "description"
+    },
+    {
+      "key": "petal.28.name",
+      "value": "Yin Yang",
+      "kind": "name"
+    },
+    {
+      "key": "petal.28.description.0",
+      "value": "This mysterious petal reverses the rotation direction of your petals",
+      "kind": "description"
+    },
+    {
+      "key": "petal.29.name",
+      "value": "Web",
+      "kind": "name"
+    },
+    {
+      "key": "petal.29.description.0",
+      "value": "It's really sticky",
+      "kind": "description"
+    },
+    {
+      "key": "petal.31.name",
+      "value": "Honey",
+      "kind": "name"
+    },
+    {
+      "key": "petal.31.description.0",
+      "value": "This is so sticky it slows down whatever it hits",
+      "kind": "description"
+    },
+    {
+      "key": "petal.32.name",
+      "value": "Leaf",
+      "kind": "name"
+    },
+    {
+      "key": "petal.32.description.0",
+      "value": "Gathers energy from the sun to heal your flower passively",
+      "kind": "description"
+    },
+    {
+      "key": "petal.35.description.0",
+      "value": "Something incredibly rare and useless",
+      "kind": "description"
+    },
+    {
+      "key": "petal.36.name",
+      "value": "Salt",
+      "kind": "name"
+    },
+    {
+      "key": "petal.36.description.0",
+      "value": "Reflects some of the damage you take back to the flower that dealt it",
+      "kind": "description"
+    },
+    {
+      "key": "petal.36.description.1",
+      "value": "Does not stack with itself",
+      "kind": "description"
+    },
+    {
+      "key": "petal.37.name",
+      "value": "Rice",
+      "kind": "name"
+    },
+    {
+      "key": "petal.37.description.0",
+      "value": "Spawns instantly, but not very strong",
+      "kind": "description"
+    },
+    {
+      "key": "petal.38.name",
+      "value": "Corn",
+      "kind": "name"
+    },
+    {
+      "key": "petal.38.description.0",
+      "value": "Takes a long time to spawn, but has a lot of health",
+      "kind": "description"
+    },
+    {
+      "key": "entity.0.description.0",
+      "value": "???",
+      "kind": "description"
+    },
+    {
+      "key": "entity.1.description.0",
+      "value": "A rock. It doesn't do much.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.2.name",
+      "value": "Boulder",
+      "kind": "name"
+    },
+    {
+      "key": "entity.2.description.0",
+      "value": "A bigger rock. It doesn't do much either.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.3.description.0",
+      "value": "Avoid touching it, it hurts.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.4.name",
+      "value": "Ladybug",
+      "kind": "name"
+    },
+    {
+      "key": "entity.4.description.0",
+      "value": "Cute and harmless.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.5.name",
+      "value": "Massive Ladybug",
+      "kind": "name"
+    },
+    {
+      "key": "entity.5.description.0",
+      "value": "This one is really big, but still cute.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.6.name",
+      "value": "Bee",
+      "kind": "name"
+    },
+    {
+      "key": "entity.6.description.0",
+      "value": "It stings. Don't touch it.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.7.name",
+      "value": "Baby Ant",
+      "kind": "name"
+    },
+    {
+      "key": "entity.7.description.0",
+      "value": "Weak and defenseless, but big dreams.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.8.name",
+      "value": "Worker Ant",
+      "kind": "name"
+    },
+    {
+      "key": "entity.8.description.0",
+      "value": "It's a bit temperamental, probably from working all the time.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.9.name",
+      "value": "Soldier Ant",
+      "kind": "name"
+    },
+    {
+      "key": "entity.9.description.0",
+      "value": "It's got wings and it's ready to use them.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.10.name",
+      "value": "Queen Ant",
+      "kind": "name"
+    },
+    {
+      "key": "entity.10.description.0",
+      "value": "You must have done something really bad if she's chasing you.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.11.name",
+      "value": "Ant Hole",
+      "kind": "name"
+    },
+    {
+      "key": "entity.11.description.0",
+      "value": "Ants go in, and come out. Can't explain that.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.12.name",
+      "value": "Beetle",
+      "kind": "name"
+    },
+    {
+      "key": "entity.12.description.0",
+      "value": "It's hungry and flowers are its favorite meal.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.13.name",
+      "value": "Massive Beetle",
+      "kind": "name"
+    },
+    {
+      "key": "entity.13.description.0",
+      "value": "Someone overfed this one, you might be next.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.14.name",
+      "value": "Hornet",
+      "kind": "name"
+    },
+    {
+      "key": "entity.14.description.0",
+      "value": "These aren't quite as nice as the little bees.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.15.name",
+      "value": "Centipede",
+      "kind": "name"
+    },
+    {
+      "key": "entity.15.description.0",
+      "value": "It's just there doing its thing.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.17.name",
+      "value": "Evil Centipede",
+      "kind": "name"
+    },
+    {
+      "key": "entity.17.description.0",
+      "value": "This one loves flowers.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.20.description.0",
+      "value": "Cute and harmless... if left unprovoked.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.21.description.0",
+      "value": "Shiny, cute and mostly harmless.",
+      "kind": "description"
+    },
+    {
+      "key": "entity.22.name",
+      "value": "Spider",
+      "kind": "name"
+    },
+    {
+      "key": "entity.22.description.0",
+      "value": "Spooky.",
+      "kind": "description"
+    }
+  ],
+  "lookup": {
+    "petal.0.name": "None",
+    "petal.0.description.0": "",
+    "petal.1.name": "Basic",
+    "petal.1.description.0": "A nice petal, not too strong but not too weak",
+    "petal.2.name": "Fast",
+    "petal.2.description.0": "Weaker than most petals, but recharges very quickly",
+    "petal.3.name": "Heavy",
+    "petal.3.description.0": "Very resilient and deals more damage, but recharges very slowly",
+    "petal.4.name": "Rock",
+    "petal.4.description.0": "Extremely durable, but takes a long time to recharge",
+    "petal.5.name": "Square",
+    "petal.5.description.0": "This shape... it looks familiar...",
+    "petal.6.name": "Rose",
+    "petal.6.description.0": "Its healing properties are amazing. Not so good at combat though",
+    "petal.7.name": "Stinger",
+    "petal.7.description.0": "It really hurts, but it's very fragile",
+    "petal.8.name": "Iris",
+    "petal.8.description.0": "Very poisonous, but takes a little while to do its work",
+    "petal.9.name": "Wing",
+    "petal.9.description.0": "It comes and goes",
+    "petal.10.name": "Missile",
+    "petal.10.description.0": "You can actually shoot this one",
+    "petal.11.name": "Peas",
+    "petal.11.description.0": "4 in 1 deal",
+    "petal.12.description.0": "4 in 1 deal, now with a secret ingredient: poison",
+    "petal.13.name": "Cactus",
+    "petal.13.description.0": "Not very strong, but somehow increases your maximum health",
+    "petal.14.name": "Faster",
+    "petal.14.description.0": "It's so light it makes your other petals spin faster",
+    "petal.15.description.0": "Extremely powerful rose, almost unheard of",
+    "petal.16.name": "Twin",
+    "petal.16.description.0": "Why stop at one? Why not TWO?!",
+    "petal.17.name": "Triplet",
+    "petal.17.description.0": "How about THREE?!",
+    "petal.18.name": "Bubble",
+    "petal.18.description.0": "You can right click to pop it and propel your flower",
+    "petal.19.name": "Pollen",
+    "petal.19.description.0": "Asthmatics beware",
+    "petal.20.name": "Dandelion",
+    "petal.20.description.0": "Its interesting properties prevent healing effects on affected units",
+    "petal.21.description.0": "Increases your maximum health and makes your flower toxic",
+    "petal.21.description.1": "Enemies hit by your flower will get poisoned",
+    "petal.22.name": "Egg",
+    "petal.22.description.0": "Something interesting might pop out of this",
+    "petal.25.name": "Antennae",
+    "petal.25.description.0": "Allows your flower to sense foes farther away",
+    "petal.26.name": "Heaviest",
+    "petal.26.description.0": "This thing is so heavy that nothing gets in the way",
+    "petal.28.name": "Yin Yang",
+    "petal.28.description.0": "This mysterious petal reverses the rotation direction of your petals",
+    "petal.29.name": "Web",
+    "petal.29.description.0": "It's really sticky",
+    "petal.31.name": "Honey",
+    "petal.31.description.0": "This is so sticky it slows down whatever it hits",
+    "petal.32.name": "Leaf",
+    "petal.32.description.0": "Gathers energy from the sun to heal your flower passively",
+    "petal.35.description.0": "Something incredibly rare and useless",
+    "petal.36.name": "Salt",
+    "petal.36.description.0": "Reflects some of the damage you take back to the flower that dealt it",
+    "petal.36.description.1": "Does not stack with itself",
+    "petal.37.name": "Rice",
+    "petal.37.description.0": "Spawns instantly, but not very strong",
+    "petal.38.name": "Corn",
+    "petal.38.description.0": "Takes a long time to spawn, but has a lot of health",
+    "entity.0.description.0": "???",
+    "entity.1.description.0": "A rock. It doesn't do much.",
+    "entity.2.name": "Boulder",
+    "entity.2.description.0": "A bigger rock. It doesn't do much either.",
+    "entity.3.description.0": "Avoid touching it, it hurts.",
+    "entity.4.name": "Ladybug",
+    "entity.4.description.0": "Cute and harmless.",
+    "entity.5.name": "Massive Ladybug",
+    "entity.5.description.0": "This one is really big, but still cute.",
+    "entity.6.name": "Bee",
+    "entity.6.description.0": "It stings. Don't touch it.",
+    "entity.7.name": "Baby Ant",
+    "entity.7.description.0": "Weak and defenseless, but big dreams.",
+    "entity.8.name": "Worker Ant",
+    "entity.8.description.0": "It's a bit temperamental, probably from working all the time.",
+    "entity.9.name": "Soldier Ant",
+    "entity.9.description.0": "It's got wings and it's ready to use them.",
+    "entity.10.name": "Queen Ant",
+    "entity.10.description.0": "You must have done something really bad if she's chasing you.",
+    "entity.11.name": "Ant Hole",
+    "entity.11.description.0": "Ants go in, and come out. Can't explain that.",
+    "entity.12.name": "Beetle",
+    "entity.12.description.0": "It's hungry and flowers are its favorite meal.",
+    "entity.13.name": "Massive Beetle",
+    "entity.13.description.0": "Someone overfed this one, you might be next.",
+    "entity.14.name": "Hornet",
+    "entity.14.description.0": "These aren't quite as nice as the little bees.",
+    "entity.15.name": "Centipede",
+    "entity.15.description.0": "It's just there doing its thing.",
+    "entity.17.name": "Evil Centipede",
+    "entity.17.description.0": "This one loves flowers.",
+    "entity.20.description.0": "Cute and harmless... if left unprovoked.",
+    "entity.21.description.0": "Shiny, cute and mostly harmless.",
+    "entity.22.name": "Spider",
+    "entity.22.description.0": "Spooky."
+  }
+}

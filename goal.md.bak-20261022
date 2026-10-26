@@ -1,0 +1,1016 @@
+# Legacy Florr 语义重建：目标与实施计划
+
+> 状态：执行中（阶段 0 parity 基线完成；阶段 1 schema/catalogs 完成；阶段 2 C++/TS 骨架、spawn/input、快照协议、花瓣/玩家基础域、AI/碰撞层/状态效果/归属、原始快照 health 映射已建立；本轮补齐 AI family 参数、quadtree 遍历顺序与 cached bounds、area effects/effect payload、Peas deferred launch、message refcount/known gate、death score/level/child recursion、pickup intrusive list、loadout handle/pending/timer/epoch 布局、完整 1015 字段 opt-in framing、dense native component-pointer 判定、event 9/14 渲染与 8 个新客户端 Canvas2D 基线；本轮进一步对齐了初始种群 RNG（2 次 init 抽签 + 22 物种组件/behavior 抽签）、866 个 spawnEntity/直方图/最终 RNG、玩家出生点与输入加速度，`parity:server` 8/8、`parity:client` 8/8、`test:client` 46/46；`server-state-trace` 4/8 countMatch（boot-menu/garden-idle/move/equip 通过），剩余 4 个场景各差 1 个实体，根因是 Bee wave 轨迹约 1.6 单位偏移导致的边界碰撞时序；本轮已修复多 message 输入解码/逐 message 序列门、最新 angle/strength、每 tick 玩家冲量与加速度语义、玩家接触伤害 25、`maxHealth*dt/240000` 回复、spawn 时掉落附着（死亡不再重掷 RNG）与花瓣 owner 位置生成；尚未达到整局等价）
+> 最近更新：见本文第 18 节“当前成果快照”；8 个原始基准场景、server trace、schema 生成、C++ core 与 TS 客户端骨架已落地；本轮新增 `tests/parity/next/` 的 8 个新客户端确定性场景，以及引擎端 AI/effects/attribution/loadout/snapshot 新测试；见 `docs/parity.md`、`reference/manifest.json`、`schema/README.md`、`docs/semantics/`。
+> 目标平台：纯 Web
+> 验收口径：行为等价 + 渲染结果不变（允许字体抗锯齿等实现差异）
+> 本文档只描述目标、决策、架构、阶段、门禁与验收，不包含时间线。
+
+---
+
+## 1. 总目标
+
+把当前“WAT + JS 逐函数替换”的逆向工程，推进为一个**可长期维护的语义重建工程**：
+
+1. 用 **C++20** 重建服务端与共享游戏规则；
+2. 用 **TypeScript + Canvas2D** 重建 Web 客户端；
+3. 用原 wasm / WAT / 原 JS 作为 **oracle 和参考实现**，证明新实现行为等价；
+4. 最终交付一个纯 Web、可继续开发、可调试、可测试的游戏，而不是一堆按 wasm 函数编号组织的翻译代码。
+
+核心判断：
+
+> 内存布局是原实现的细节，不是新工程的架构。新代码按领域组织，不按 wasm 函数编号组织。
+
+---
+
+## 2. 已确定的关键决策
+
+| 决策 | 结论 |
+| --- | --- |
+| 是否接受行为等价 | **接受**。不要求 C++ 编译出的 wasm 与原文件逐字节一致 |
+| 目标平台 | **纯 Web**，浏览器直接运行 |
+| 客户端渲染 | **Canvas2D**，不改成 WebGL 场景渲染 |
+| 服务端 | C++20 编译为 wasm，运行在 Web Worker |
+| 客户端 | TypeScript + Canvas2D，负责网络、状态、插值、输入、渲染、UI |
+| 共享规则 | 服务端模拟、伤害、生成、碰撞等放在 C++ core |
+| 未完成的 JS | **保留、冻结，不再继续用 JS 补函数** |
+| 已完成的 JS | 作为可执行规格和差分 oracle，不直接机械翻译成 C++ |
+| 原 wasm/WAT | 永久保留，作为最高事实来源 |
+| 原始工程类名 | 不追求还原；按领域重新命名，保留证据和置信度 |
+| 最终渲染 | 以 Canvas2D 命令 trace + 截图 diff 保证“看起来和玩起来不变” |
+
+### 2.1 为什么是 Canvas2D
+
+原客户端游戏主体绘制走的是 Canvas2D 桥，而不是 WebGL 场景渲染：
+
+- `source/javascript/client.js` 中存在 `canvasContexts`、`Path2D`；
+- `ASM_CONSTS` 136300–138582 提供 `canvasSave`、`canvasSetTransform`、`canvasFill`、`canvasStroke`、`canvasArc`、`canvasFillText`、`canvasDrawImage` 等桥接；
+- `source/game/client/render-frame.mjs`、`drawing-primitives.mjs`、`text.mjs` 等恢复代码也是按 Canvas2D 命令组织的。
+
+因此新客户端使用 TypeScript + Canvas2D，最容易做到视觉一致；改用 WebGL 会显著增加 parity 难度。
+
+---
+
+## 3. 成功标准
+
+### 3.1 功能标准
+
+- 新 C++ server + 原版 client 能完成一局单人游戏；
+- 新 C++ server + 新 TS client 能完成一局单人游戏；
+- 移动、攻击、防御、装备、怪物生成、伤害、死亡、掉落、重开均正常；
+- 固定随机种子、固定输入序列下，服务端状态可复现；
+- 协议与原始 worker 消息兼容。
+
+### 3.2 可维护性标准
+
+- `engine/src` 与 `client/src` 中不出现 `264876`、`8551040` 这类魔法地址；
+- 偏移只存在于 `schema/` 和生成的访问器中；
+- 所有关键结构有 schema、`static_assert` 或运行时校验；
+- 游戏数据（花瓣、实体、生成规则、字符串）从数据文件加载；
+- 代码按 `World / Entity / Petal / Damage / Spawn / Snapshot` 等领域组织；
+- 不把 vtable thunk、析构、locale/string 等 ABI 噪声当作业务代码手写。
+
+### 3.3 渲染标准
+
+- 相同场景、相同状态、相同 viewport/DPR/字体下：
+  - Canvas2D 命令 trace 的 op 顺序、颜色、alpha、线宽、变换一致；
+  - 截图 diff 在约定阈值内；
+  - 布局、颜色、形状、动画、UI 无可见差异；
+  - 字体抗锯齿、浏览器光栅化差异允许被 mask。
+
+### 3.4 回归标准
+
+- `reference` 构建仍然逐字节可重建；
+- 现有函数级 oracle 测试继续通过；
+- 新 server trace、canvas trace、截图 diff 全部纳入 CI；
+- 删除任何 reference 资产前，必须有对应的 parity 证据。
+
+---
+
+## 4. 非目标
+
+以下事情明确不做：
+
+1. **不追求还原原作者的 C++ 类名、变量名、目录结构**。符号已被剥离，只能从行为和字符串推断。
+2. **不追求 C++ 编译产物与原 wasm 字节一致**。只做行为等价。
+3. **不继续逐函数补 JS**。923 个客户端 + 222 个服务端剩余函数不再用 JS 实现。
+4. **不逐个翻译 vtable thunk、析构、locale、iostream、std::string 等 ABI 函数**。C++ 编译器/标准库负责这些。
+5. **不从 `clientFrame` 开始逐指令翻译**。它是 106,810 条指令、2,097 个直接调用的高度内联函数，应作为调用图和阶段清单使用。
+6. **不先做渲染器再做游戏逻辑**。先 server，后 client，最后视觉打磨。
+7. **不把 Canvas2D 改成 WebGL 场景渲染**。保持原绘制模型，降低 parity 风险。
+8. **不在没有 trace 的情况下重写大模块**。每个域必须有行为基准。
+9. **不删除 `web/`、`upstream/`、WAT、原始 JS、reports、现有测试**。它们是 oracle。
+
+---
+
+## 5. 当前基线
+
+### 5.1 函数规模
+
+按 `reports/wasm/manifest.json`：
+
+| 模块 | 函数数 | 导入数 |
+| --- | ---: | ---: |
+| client | 4,245 | 361 |
+| sp_server | 734 | 14 |
+| 合计 | 4,979 | 375 |
+
+按当前 `reports/build.json`：
+
+| 模块 | 已替换为 JS | 仍为机器码 |
+| --- | ---: | ---: |
+| client | 3,334 | 911 |
+| sp_server | 516 | 218 |
+| 合计 | 3,850 | 1,129 |
+
+> 口径：以上数字直接取自 `reports/build.json` 的 `recoveredFunctions.length` 与
+> `remainingMachineFunctions`（2026-10-21 基线），并由
+> `node tools/reference-manifest.mjs` 写入 `reference/manifest.json`。
+> `reports/RECONSTRUCTION.md` 的“覆盖统计”表用的是另一个量（“已迁入高层执行的
+> 函数”与“仍有机器级实现的函数”），与这里的“已替换/仍为机器码”不是同一口径；
+> 引用剩余工作时统一以 `build.json` 为准。
+
+### 5.2 客户端“已恢复”函数的构成
+
+客户端 3,334 个已替换函数中，按实现模块名粗略分类：
+
+- 2,452 个是 vtable 相关 thunk（约 73.5%）；
+- 133 个是析构/清理；
+- 176 个是 forwarder/adapter/wrapper；
+- 83 个是 leaf/straight-line；
+- 约 490 个是其他逻辑。
+
+分类由 `reports/build.json` 的 `source` 字段启发式统计，只用于说明数量级；
+精确分类需要按 WAT 证据逐项审计。
+
+这说明：**JS 恢复数量被 ABI 噪声放大了**。C++ 重建中，这些 thunk/析构应当由编译器生成，不应手写。
+
+### 5.3 重点难点
+
+- `clientFrame`（client 1095）：106,810 条指令、2,097 个直接调用、933 个已恢复被调函数；
+- `sp_server` 的 `malloc`、`free`、`memcpy`、`memset` 等库函数仍很大；
+- 客户端 434 个剩余函数超过 300 条指令；
+- 服务端剩余函数中也有多个 3,000+ 指令的大函数。
+
+结论：不能按函数逐个硬啃，必须按领域纵切 + 场景 trace。
+
+---
+
+## 6. 资产保留策略
+
+### 6.1 保留清单
+
+| 资产 | 处理 | 原因 |
+| --- | --- | --- |
+| `source/wasm/client.wat` | 永久保留 | 最高事实来源，可逐字节重建 |
+| `source/wasm/sp_server.wat` | 永久保留 | 同上 |
+| `web/`、`upstream/` | 冻结 | reference build、浏览器对照 |
+| `source/javascript/client.js` | 冻结 | Emscripten 胶水、Canvas2D 桥参考 |
+| `source/javascript/sp_server.js` | 冻结 | worker 消息协议参考 |
+| `source/game/**/*.mjs` | 冻结 | 可执行规格、差分参考 |
+| `source/runtime/registry.mjs` | 仅 reference build | 新工程不再使用 registry |
+| `source/semantic/*` | 保留 | 已提取的目录、字符串、行为记录 |
+| `source/decompiled/*` | 保留 | 控制流/字段交叉参考 |
+| `reports/*` | 保留 | 证据、函数清单、测试记录 |
+| `test/helpers/oracle-harness.mjs` | 保留并扩展 | 函数级差分基础 |
+| `web/debug-hooks.js` | 保留并扩展 | Canvas2D trace 注入点 |
+
+### 6.2 未完成 JS 的定位
+
+未完成的 923 + 222 个函数：
+
+- **不删除**：它们是当前可玩版本的一部分，也是行为参考；
+- **不继续用 JS 实现**：不再新增 `source/game` 语义模块；
+- **不机械翻译**：不把 `damage.mjs` 里的偏移表达式直接抄成 C++ 指针运算；
+- **只作为证据**：用于写 `docs/semantics/*.md`、设计 schema、构造测试用例；
+- **最终归档**：新实现覆盖某域后，把对应 JS 移到 `legacy/js/`，保留测试引用。
+
+一句话：**未完成的 JS 是证据，不是债务。**
+
+---
+
+## 7. 目标架构
+
+```
+原 wasm/WAT ──(oracle / trace)──> parity tests
+      │
+      └──(探针 / dcmp / strings)──> schema + semantics docs
+                                      │
+                                      ▼
+                         C++20 core (server + rules)
+                                      │
+                              wasm + worker shim
+                                      │
+                                      ▼
+                         TypeScript Canvas2D client
+```
+
+### 7.1 C++ core
+
+职责：
+
+- 世界与实体模型；
+- 服务端 tick；
+- 输入协议；
+- 生成、移动、碰撞、AI；
+- 花瓣、伤害、死亡、掉落；
+- 快照序列化；
+- 确定性 RNG、固定步长、浮点行为。
+
+不负责：
+
+- DOM、Canvas、浏览器事件；
+- UI 布局；
+- 字体加载；
+- 音频输出；
+- 网络 worker 的 JS 侧消息循环。
+
+### 7.2 TypeScript client
+
+职责：
+
+- 启动、canvas、DPR/resize；
+- worker 通信；
+- 快照解码；
+- 实体表、插值、相机；
+- 输入（鼠标/键盘/触屏）；
+- Canvas2D 绘制；
+- UI/菜单/tooltip；
+- 音频（如需要）；
+- parity trace 输出。
+
+不负责：
+
+- 权威游戏规则；
+- 服务端生成/伤害计算；
+- 协议字节布局（由 schema 生成类型）。
+
+### 7.3 共享契约
+
+- `schema/protocol.yaml`：worker 消息、输入包、输出包、快照；
+- `schema/layout/*.yaml`：World/Entity/Component 字段；
+- `schema/catalogs/*.json`：花瓣、实体、生成规则、字符串；
+- 代码生成：C++ 头文件、TS 类型、Markdown 文档。
+
+---
+
+## 8. 目标仓库结构
+
+不立即移动现有目录，先新增：
+
+```
+engine/                         # 新 C++20 核心
+  CMakeLists.txt
+  include/engine/
+    abi.h
+    core/f32.hpp
+    core/vec2.hpp
+    core/rng.hpp
+    model/world.hpp
+    model/entity.hpp
+    net/protocol.hpp
+  src/
+    core/
+    model/
+    sim/
+      spawn.cpp
+      movement.cpp
+      collision.cpp
+      petals.cpp
+      damage.cpp
+      effects.cpp
+      tick.cpp
+    net/
+    wasm/
+  tests/
+    unit/
+    trace/
+
+client/                         # 新 TypeScript 客户端
+  package.json
+  src/
+    main.ts
+    net/worker.ts
+    net/protocol.ts
+    state/snapshot.ts
+    state/world.ts
+    state/interpolation.ts
+    input/pointer.ts
+    input/keyboard.ts
+    input/touch.ts
+    render/canvas2d/context.ts
+    render/canvas2d/path.ts
+    render/canvas2d/text.ts
+    render/canvas2d/sprites.ts
+    render/world.ts
+    render/ui.ts
+    audio/
+  public/
+    server-worker.js
+  tests/
+
+schema/
+  protocol.yaml
+  layout/
+    world.yaml
+    entity.yaml
+    components.yaml
+  catalogs/
+    petals.json
+    entities.json
+    spawn-rules.json
+    strings.json
+
+tools/
+  domain-map.mjs
+  layout-probe.mjs
+  gen-contracts.mjs
+  parity/
+    run-scenario.mjs
+    canvas-trace.js
+    server-trace.mjs
+    screenshot-diff.mjs
+    trace-diff.mjs
+
+tests/
+  parity/
+    scenarios/
+    golden/
+  reference/                    # 现有测试的 reference 分组
+  engine/                       # C++ 测试入口
+
+reference/
+  README.md
+  manifest.json                 # 哈希、构建、测试基线
+
+docs/
+  semantics/
+  adr/
+  parity.md
+```
+
+最终切换后，再把旧目录移入 `legacy/`：
+
+```
+legacy/
+  js/
+  runtime/
+  game/
+  reports/        # 或保留在顶层
+```
+
+---
+
+## 9. 实施阶段
+
+### 阶段 0：冻结参考，建立 parity 基础设施
+
+#### 任务
+
+1. 给当前 commit 打 tag：`reference-<date>`。
+2. 新增 `reference/manifest.json`：
+   - `web/client.wasm`、`web/sp_server.wasm` 的 SHA-256；
+   - `dist/`、`dist-readable/` 的构建哈希；
+   - 当前通过的测试列表；
+   - 当前 `build.json` 的函数统计。
+3. 新增 `reference/README.md`，声明该目录/构建只用于对照，不再修改。
+4. 实现 `tools/parity/canvas-trace.js`：
+   - 包装 `HTMLCanvasElement.prototype.getContext`；
+   - 包装 `CanvasRenderingContext2D` 的绘制方法；
+   - 包装 `Path2D` 的路径方法；
+   - 记录 `canvasContexts` 的创建/销毁；
+   - 输出稳定 JSON：`{frame, ops:[{op, args}]}`。
+5. 实现 `tools/parity/run-scenario.mjs`：
+   - Playwright 启动 Chromium；
+   - 固定 viewport 1280×720、DPR 1；
+   - 等 `document.fonts.ready`；
+   - 用 Playwright clock 或注入假时钟固定 `performance.now` / `Date.now` / `requestAnimationFrame`；
+   - 注入固定输入序列；
+   - 等待固定帧数；
+   - 导出 Canvas2D trace、截图、server trace。
+6. 定义基准场景：
+   - `boot-menu`：加载到主菜单；
+   - `garden-idle`：进入花园，不操作；
+   - `move`：固定方向移动 N 帧；
+   - `attack`：固定角度攻击；
+   - `equip`：装备/卸下花瓣；
+   - `damage`：被怪物攻击、血量变化；
+   - `death`：死亡/重生；
+   - `spawn`：特定怪物生成。
+7. 实现 `tools/parity/server-trace.mjs`：
+   - 加载原 `sp_server.wasm`；
+   - 调 `init`；
+   - 按固定 dt 调 `think`；
+   - 注入固定 `send` 字节；
+   - 每个 tick 导出实体数、类型、位置、血量、花瓣、RNG 状态、输出包。
+8. 建立 `tests/parity/golden/`，保存 trace 与截图。
+
+#### 交付物
+
+- `reference/manifest.json`；
+- `canvas-trace.js`；
+- `run-scenario.mjs`；
+- `server-trace.mjs`；
+- 8 个基准场景的 golden trace + 截图；
+- `docs/parity.md`。
+
+#### 门禁
+
+一条命令能重放 `garden-idle`，得到稳定的 Canvas2D trace、截图和 server trace。
+
+---
+
+### 阶段 1：契约与 schema
+
+#### 任务
+
+1. 写 `schema/protocol.yaml`：
+   - worker 消息：`funcName`、`callbackId`、`finalResponse`；
+   - 输入包：XOR key、varint、命令号、字段；
+   - 输出包：长度、内联/堆载荷、队列格式；
+   - 快照：实体字段、组件 ID、事件类型。
+2. 写 `schema/layout/*.yaml`：
+   - `World`；
+   - `Entity`；
+   - `Petal`；
+   - `ComponentStore`；
+   - 空间索引；
+   - 配置/会话。
+3. 实现 `tools/layout-probe.mjs`：
+   - 加载原 server；
+   - 跑初始化/生成；
+   - dump 已知全局、实体记录、花瓣记录；
+   - 与 `source/semantic/server-catalogs.json` 对照；
+   - 输出候选字段偏移与置信度。
+4. 实现 `tools/gen-contracts.mjs`：
+   - 从 YAML 生成 C++ struct + `static_assert`；
+   - 生成 TS interface；
+   - 生成 Markdown 字段文档。
+5. 把 `server-catalogs.json` / `client-catalogs.json` 拆成 `schema/catalogs/*.json`：
+   - 39 个花瓣；
+   - 23 个实体；
+   - 20 条生成规则；
+   - 字符串/描述。
+6. 定义 C ABI：`engine/include/engine/abi.h`。
+
+#### 交付物
+
+- `schema/protocol.yaml`；
+- `schema/layout/*.yaml`；
+- `schema/catalogs/*.json`；
+- 生成的 C++/TS 类型；
+- `docs/protocol.md`；
+- `layout-probe` 报告。
+
+#### 门禁
+
+- schema 能生成 C++/TS；
+- `layout-probe` 打印出的花瓣/实体数据与 `server-catalogs.json` 一致；
+- 协议字段有明确的字节级定义。
+
+---
+
+### 阶段 2：C++ 服务端
+
+服务端 734 个函数、516 个已恢复，范围小、协议可测，作为第一个完整目标。
+
+#### 2.1 核心基础
+
+`engine/src/core/`：
+
+- `f32.hpp`：显式 float 转换，禁止隐式 double 收缩；
+- `vec2.hpp`：位置、速度、角度；
+- `rng.hpp`：复刻 Park–Miller 状态与调用顺序；
+- `fixed_step.hpp`：20 Hz server tick；
+- `pool.hpp`：实体池/句柄；
+- `byte_reader.hpp` / `byte_writer.hpp`：varint、XOR、边界检查；
+- `error.hpp`：错误码，不用异常跨 wasm 边界。
+
+编译选项：
+
+- `-ffp-contract=off`；
+- 禁用 `-ffast-math`；
+- `-fno-exceptions`（或统一错误码）；
+- `-Wall -Wextra -Werror`；
+- 固定 emsdk 版本并记录。
+
+#### 2.2 模型层
+
+`engine/src/model/`：
+
+- `Catalog`：花瓣、实体、生成规则、字符串；
+- `Entity`：类型、变换、血量、组件；
+- `ComponentStore`：按组件 ID 的稠密存储；
+- `World`：实体池、空间索引、RNG、时钟、输出队列；
+- `Handle`：实体 ID + 版本，替代裸指针。
+
+原则：领域代码中不出现原始内存偏移；偏移只在 schema 生成的访问器中。
+
+#### 2.3 协议层
+
+`engine/src/net/`：
+
+- `InputReader`：XOR、varint、命令分发；
+- `SnapshotWriter`：实体/组件/事件序列化；
+- `OutputQueue`：内联/堆载荷、flush；
+- `WorkerApi`：`init/send/think/flush`。
+
+先做字节级测试，不接游戏逻辑。
+
+#### 2.4 模拟层，按域推进
+
+| 顺序 | 域 | 关键内容 | 验收 |
+| --- | --- | --- | --- |
+| 1 | 启动/目录 | `init`、39 花瓣、23 实体、20 生成规则 | 数据与原版逐字段一致 |
+| 2 | 世界/实体 | 实体池、组件、变换、父子关系 | 空世界 tick 快照一致 |
+| 3 | 输入/协议 | 移动、攻击、装备、丢弃 | 字节级一致 |
+| 4 | 生成/移动 | 玩家、怪物、花瓣、掉落 | 固定种子生成序列一致 |
+| 5 | 战斗 | 伤害、反伤、治疗、死亡、击杀归属 | 血量/死亡/掉落一致 |
+| 6 | AI/碰撞 | 仇恨、四叉树、碰撞过滤 | 固定场景位置/目标一致 |
+| 7 | tick/输出 | 效果、超时、快照、flush | 1000 tick trace 一致 |
+
+#### 2.5 Worker shim
+
+新增 `client/public/server-worker.js`，保持与原 `sp_server.js` 相同协议：
+
+```js
+onmessage = ({ data }) => {
+  const fn = Module["_" + data.funcName];
+  // 1. 把 data.data 复制到 wasm malloc 缓冲区
+  // 2. 调用 fn
+  // 3. 从输出队列读包
+  // 4. postMessage({ callbackId, finalResponse, data })
+};
+```
+
+必须支持：
+
+- `sp_server_init`；
+- `sp_server_send`；
+- `sp_server_think`；
+- `sp_server_flush`；
+- 临时/最终响应；
+- `callbackId` 匹配；
+- 输入缓冲区复用与 transfer。
+
+#### 2.6 服务端验收
+
+- 新 C++ server + 原版 client 能完成一局单人游戏；
+- 移动、攻击、怪物生成、死亡、掉落、重开正常；
+- 固定场景 server trace 与原版一致；
+- 协议字节级测试通过；
+- 空世界 1000 tick trace 一致；
+- 生成/战斗场景 trace 一致。
+
+---
+
+### 阶段 3：TypeScript 客户端
+
+#### 3.1 壳与启动
+
+`client/src/main.ts`：
+
+- 创建 canvas；
+- 处理 DPR/resize；
+- 加载 Ubuntu 字体，等 `document.fonts.ready`；
+- 加载 loading/menu；
+- 启动 worker；
+- 主循环：固定逻辑 tick + `requestAnimationFrame` 渲染。
+
+#### 3.2 传输与状态
+
+- `net/worker.ts`：与原 `sp_server.js` 相同的消息接口；
+- `net/protocol.ts`：由 schema 生成；
+- `state/snapshot.ts`：实体/组件/事件解码；
+- `state/world.ts`：实体表、插值、相机、本地玩家；
+- `state/interpolation.ts`：位置/角度插值、父子变换；
+- `state/prediction.ts`：先不做；server-authoritative 稳定后再加。
+
+#### 3.3 输入与相机
+
+- 鼠标移动、左键攻击、右键防御；
+- 键盘移动/快捷键；
+- 触屏摇杆；
+- 相机缩放/跟随；
+- 昵称输入、聊天/菜单。
+
+#### 3.4 Canvas2D 渲染器
+
+实现与原桥接层同构的 `Canvas2DContext`：
+
+```ts
+interface Canvas2DContext {
+  save(): void;
+  restore(): void;
+  setTransform(a, b, c, d, e, f): void;
+  beginPath(): void;
+  closePath(): void;
+  rect(x, y, w, h): void;
+  moveTo(x, y): void;
+  lineTo(x, y): void;
+  quadraticCurveTo(cx, cy, x, y): void;
+  bezierCurveTo(c1x, c1y, c2x, c2y, x, y): void;
+  arc(x, y, r, start, end, ccw): void;
+  ellipse(x, y, rx, ry, rotation, start, end, ccw): void;
+  fill(): void;
+  stroke(): void;
+  clip(): void;
+  fillRect(x, y, w, h): void;
+  strokeRect(x, y, w, h): void;
+  clearRect(x, y, w, h): void;
+  setFillRgb(r, g, b): void;
+  setStrokeRgb(r, g, b): void;
+  setGlobalAlpha(a): void;
+  setLineWidth(w): void;
+  fillText(text, x, y): void;
+  strokeText(text, x, y): void;
+  measureText(text): { width: number };
+  drawImage(...): void;
+}
+```
+
+绘制阶段顺序：
+
+1. 背景/网格/arena 边界；
+2. 地面掉落/阴影；
+3. 实体（花、花瓣、怪物、子弹）；
+4. 血条、名字、状态图标；
+5. 粒子/伤害数字/屏幕效果；
+6. UI（背包、槽位、按钮、tooltip）；
+7. 菜单/加载/错误。
+
+复用原版策略：
+
+- 离屏 canvas 缓存文字/精灵；
+- `Path2D` 或等价路径缓存；
+- 同样的 RGB 取整、alpha、线宽、字体大小；
+- 同样的相机变换和裁剪；
+- 同样的颜色/材质常量。
+
+#### 3.5 渲染 parity 工具
+
+- **命令级**：新客户端输出 `DrawList`，与 reference 的 Canvas2D trace 做 diff：
+  - 浮点容差 `1e-4`；
+  - 允许 `measureText` 因字体栅格化略有差异；
+  - 要求 op 顺序、颜色、alpha、线宽、变换一致。
+- **像素级**：Playwright 截图，SSIM/像素 diff：
+  - 固定 viewport/DPR/字体；
+  - 文本抗锯齿差异用 mask；
+  - 目标不是 100% 像素相同，而是布局/颜色/形状/动画一致。
+
+#### 3.6 客户端验收
+
+- 新 client + 新 server 能完成一局；
+- 8 个基准场景的 Canvas2D trace 通过；
+- 截图 diff 在阈值内；
+- 60 FPS，无明显 GC 卡顿；
+- 移动端触控可用（至少基本可玩）。
+
+---
+
+### 阶段 4：切换与归档
+
+#### 4.1 双构建
+
+```
+dist/          # reference，保持原版
+dist-next/     # 新 C++ server + TS client
+```
+
+切换方式：
+
+- 独立页面 `next.html`；
+- 或 `index.html?engine=next`；
+- 内部默认 next，reference 保留。
+
+#### 4.2 归档 JS
+
+当某域被 C++/TS 完全覆盖：
+
+1. 从 `dist-next` 构建中移除对应 JS 模块；
+2. 把模块移到 `legacy/js/`；
+3. 保留 `tests/parity` 里的引用；
+4. 不删除 WAT、原始 `web/`、`reports/`。
+
+#### 4.3 CI
+
+必须同时跑：
+
+```sh
+npm run test:reference     # 原版 WAT 重建 + 现有差分
+npm run test:engine        # C++ 单元测试（native）
+npm run build:engine:wasm  # wasm 构建
+npm run test:parity        # server trace + canvas trace + screenshots
+npm run test:client        # TS 单元测试
+```
+
+#### 4.4 切换验收
+
+- `dist-next` 是默认入口；
+- reference 仍可构建、可玩；
+- 生产构建不再包含 `source/game` 的语义 JS；
+- 所有 parity 测试稳定通过。
+
+---
+
+## 10. 领域工作分解
+
+### 10.1 服务端
+
+| 顺序 | 域 | 主要函数/证据 | 关键交付 |
+| --- | --- | --- | --- |
+| 1 | 启动/目录 | `279`、`656`、`server-catalogs.json` | Catalog、World 初始化 |
+| 2 | 协议 | `655`、`657`、`388` | InputReader/OutputQueue |
+| 3 | 世界/实体 | `144`、`410`、`393` | Entity/ComponentStore |
+| 4 | 生成/移动 | `144`、`654` 相关阶段 | Spawn/Movement |
+| 5 | 花瓣/战斗 | `43`、`602`、`683` 等 | Petal/Damage/Death |
+| 6 | AI/碰撞 | `162`、`163`、`167` | 空间索引/目标选择 |
+| 7 | tick/输出 | `654`、`657` | 完整 20 Hz 模拟 |
+
+### 10.2 客户端
+
+| 顺序 | 域 | 主要函数/证据 | 关键交付 |
+| --- | --- | --- | --- |
+| 1 | 启动/菜单 | `main`、`clientFrame` 启动阶段 | 壳、字体、canvas |
+| 2 | 传输/快照 | `1015`、`1013` | 协议、快照解码 |
+| 3 | 世界状态 | `409`、`672`、`705` | 实体表、插值、相机 |
+| 4 | 输入 | `762`、`421` | 鼠标/键盘/触屏 |
+| 5 | 世界渲染 | `760`、`763`、`1040`、`1044` | Canvas2D 实体绘制 |
+| 6 | UI/文本 | `392`、`556`、`587` | 背包、tooltip、文字 |
+| 7 | 效果/音频/移动端 | `690`、`1100` 等 | 粒子、眼睛、触控 |
+
+> 函数 ID 只作为证据，不作为代码组织单位。
+
+---
+
+## 11. 测试与 parity 策略
+
+### 11.1 测试层级
+
+1. **单元测试**：C++ core / TS 纯函数；
+2. **函数级 oracle**：现有 `compareCases`，比较返回值位模式、陷阱、栈指针、内存哈希；
+3. **协议测试**：字节级输入/输出；
+4. **服务端场景 trace**：固定种子 + 固定输入，逐 tick 对比；
+5. **客户端 Canvas2D trace**：固定状态 + 固定帧，对比绘制命令；
+6. **截图 diff**：固定 viewport/DPR/字体，对比像素；
+7. **集成测试**：原 client + 新 server；新 client + 新 server。
+
+### 11.2 确定性要求
+
+- 固定 server tick：20 Hz；
+- 固定 RNG：复刻 Park–Miller 状态与调用顺序；
+- 固定时钟：测试中注入假时钟；
+- 浮点：`-ffp-contract=off`、禁用 fast-math、显式 `f32`；
+- 输入：固定序列；
+- 渲染：固定 viewport/DPR/字体/动画帧。
+
+### 11.3 视觉差异处理
+
+- 文本抗锯齿：允许 mask；
+- 字体加载：等 `document.fonts.ready`；
+- Canvas2D 实现差异：命令级优先，像素级次要；
+- 动画：固定帧号，不用真实时间。
+
+---
+
+## 12. 每个功能的执行模板
+
+不要按“函数”推进，按“功能纵切”推进：
+
+1. **写规格**：`docs/semantics/<feature>.md`
+   - 输入、状态、公式、边界、随机性、时序；
+   - 证据：函数 ID、WAT 行、dcmp、探针结果。
+2. **定 schema**：字段/枚举/协议。
+3. **先写测试**：单元测试 + 场景 trace。
+4. **实现**：C++ 或 TS，禁止魔法偏移。
+5. **对比**：server trace / canvas trace / 截图。
+6. **重构**：命名、拆分、文档。
+7. **门禁**：通过后才进入下一个功能。
+
+每个功能至少要有：
+
+- 正常路径；
+- 边界值；
+- 陷阱/错误路径（若适用）；
+- 固定种子复现；
+- 原实现对照证据。
+
+---
+
+## 13. 验收清单
+
+### 13.1 代码质量
+
+- [ ] `engine/src` 和 `client/src` 中搜索不到 `264876`、`8551040` 这类魔法地址。
+- [ ] 所有结构体有 `static_assert` 或 schema 校验。
+- [ ] 39 个花瓣、23 个实体、20 条生成规则从数据文件加载。
+- [ ] 协议字段有 YAML 定义和生成代码。
+- [ ] 领域代码不依赖 `runtime.call(id, ...)`。
+- [ ] 不包含手写的 vtable thunk/析构/locale/string 函数。
+
+### 13.2 功能
+
+- [ ] 原版 client + 新 server 完成一局。
+- [ ] 新 client + 新 server 完成一局。
+- [ ] 移动、攻击、防御、装备、生成、伤害、死亡、掉落、重开正常。
+- [ ] 固定种子下服务端状态可复现。
+
+### 13.3 渲染
+
+- [ ] 8 个基准场景 Canvas2D trace 通过。
+- [ ] 截图 diff 在阈值内。
+- [ ] 字体/DPR/resize 行为一致。
+- [ ] 粒子/伤害数字/UI 无明显差异。
+
+### 13.4 构建与回归
+
+- [ ] `dist-next` 不包含 `source/game` 语义 JS。
+- [ ] `dist` reference 仍逐字节可重建。
+- [ ] 现有函数级 oracle 测试通过。
+- [ ] CI 同时跑 reference、engine、parity、client。
+
+---
+
+## 14. 风险与缓解
+
+| 风险 | 影响 | 缓解 |
+| --- | --- | --- |
+| 视觉 parity 难 | 用户感知“游戏变了” | Canvas2D 命令 trace 优先；截图 diff；同字体/同 DPR；固定帧 |
+| 浮点差异 | 位置/伤害偏移 | 固定步长、`f32` 包装、禁用 fast-math、`-ffp-contract=off` |
+| RNG 差异 | 生成序列不同 | 复刻 Park–Miller 状态与调用顺序；固定种子 trace |
+| 协议不兼容 | 原 client 连不上 | 字节级测试；worker shim 保持原消息格式 |
+| 范围蔓延 | 长期无法交付 | 按域纵切；每域有门禁；先 server 后 client |
+| 浏览器自动化不稳定 | parity 测试 flaky | 固定时钟/视口/DPR；命令 trace 为主，截图为辅 |
+| C++/wasm 调试困难 | 开发效率低 | 核心先 native 测试；再 wasm；保留 source map/日志 |
+| 性能回退 | 帧率下降 | C++ core；Canvas2D 同原版；性能预算与 profiling |
+| 误把未知字段当已知 | 隐性错误 | schema 标注 confidence；未知字段保留 `unknown_0x...` |
+
+---
+
+## 15. 待确认事项
+
+执行前需要最终确认：
+
+1. **截图 diff 阈值**：先建立 baseline，再定 SSIM/像素阈值；文本抗锯齿是否统一 mask。
+2. **客户端预测**：第一版是否只做 server-authoritative + 插值，还是必须复刻本地预测手感。
+3. **音频 parity**：是否要求音效/音乐与原版一致，还是第一版静音/简化。
+4. **浏览器矩阵**：Chrome/Firefox/Safari 的最低版本与移动端范围。
+5. **reference 保留周期**：`dist/` 是否长期作为可切换 fallback，还是 parity 完成后只保留源码。
+6. **是否保留全 C++ 客户端选项**：当前选 TS + Canvas2D；若未来要桌面版，同一 core 接 SDL3。
+
+---
+
+## 16. 参考文件
+
+- `README.md`：项目总览、本地运行方式；
+- `source/README.md`：WAT/JS 恢复源码入口；
+- `reports/RECONSTRUCTION.md`：重建范围与统计；
+- `reports/wasm/manifest.json`：模块函数/导入/导出；
+- `reports/wasm/*-functions.json`：函数清单、调用数、指令数；
+- `reports/remaining-functions.json`：剩余函数；
+- `reports/server-behavior.md`：服务端协议/行为观察；
+- `source/semantic/server-catalogs.json`：花瓣/实体/生成规则；
+- `source/semantic/client-catalogs.json`：客户端目录；
+- `source/decompiled/`：反编译伪代码；
+- `source/javascript/client.js`：Canvas2D 桥、Emscripten 运行时；
+- `source/javascript/sp_server.js`：worker 消息协议；
+- `test/helpers/oracle-harness.mjs`：函数级差分；
+- `web/debug.html`、`web/debug-hooks.js`：浏览器诊断入口。
+
+---
+
+## 17. 执行原则
+
+1. **WAT 是最高事实来源。**
+2. **行为等价优先于字节一致。**
+3. **领域优先于函数编号。**
+4. **schema 优先于魔法偏移。**
+5. **数据驱动优先于硬编码。**
+6. **确定性优先于“看起来差不多”。**
+7. **reference 永不破坏。**
+8. **纵向切片优先于大爆炸重写。**
+9. **未知字段保持未知，不编造语义。**
+10. **先写测试，再写实现。**
+11. **不继续投资未完成的 JS。**
+12. **不删除任何尚未被 parity 覆盖的 reference 资产。**
+
+---
+
+## 18. 当前成果快照
+
+> 这是实现进度记录，不是完成声明。函数级基线仍为 `reports/build.json` 的 3,850 已替换 / 1,129 仍为机器码；本节的 C++/TS 工作是领域重建，不改变该 JS 函数计数口径。
+
+### 18.1 验证状态（轻量门禁）
+
+| 命令 | 结果 |
+| --- | --- |
+| `npm run test:engine` | 通过（67 个测试函数；新增 AI family/quadtree/bounds、area effects/deferred、attribution/death/pickup、loadout exact layout、full field framing、dense live values 用例） |
+| `npm run build:engine:wasm` | 通过（156,912 bytes；sha256 `64979c90…`） |
+| `npm run test:client` | 46/46 通过（含 event 9/11/14、native component-pointer dense、wasm 自动人口/玩家快照/group152 门控/sparse clamp） |
+| `npm run test:reference` | 通过，`issues: []`，3,850/1,129 基线不变 |
+| `npm run catalogs:drops:verify` | 通过，102/102 掉落项 0 mismatch |
+| `npm run parity:client` | 8/8 新客户端场景通过，`deterministic: true`，digest/截图一致 |
+| `npm run test:light` | 通过（含 `parity:client`，8/8 场景） |
+
+按用户约束，未运行完整 `npm test`、319 项 JS oracle 或高 CPU 长测试；这些仍是最终验收前必须补跑的门禁。
+
+### 18.2 C++ 服务端与共享规则
+
+已落地：
+
+- `World`/`EntityPool`：16,384 槽、generation handle、FIFO 复用、初始化 generation LCG。
+- tick：阻尼移动、花瓣轨道加速度、掉落拾取、接触伤害、生命 <= 0 回收、drop 寿命、按面积补充人口。
+- 生成：19 个物种 defaults、Rock/Boulder/Cactus 动态半径、spawn band 选择/空位重试、显式 `populate_world`、按面积目标 `replenish_population`（120/120/119/120/119/119/40/40）；Ant Hole 按 3 Baby/2 Worker/1 Soldier 顺序生成子体并挂入 owner/children；Centipede 头生成 9 段链（1% 概率 49 段），每段 owner 指向前一段。
+- 空间：`SpatialQuery` + `QuadTree`（插入/删除/更新/查询/清理，精确 AABB/flag/距离谓词）。
+- 输入：opcode 0/2/3/4/5/6/7/8/10/12/13 解码；序列 gate；opcode 12 输入状态；opcode 6 默认/配置玩家生成；opcode 8/10 loadout 操作；opcode 3 suicide 将玩家生命置零并由 tick 回收。
+- 玩家：`PlayerConfig` 默认 radius 25 / health 100 / contact damage 60；`PlayerProfile` 等级、经验、16 槽 inventory、lost 列表；等级阈值 `floor(1.06^(level-1)*level)+3`；0.00005 稀有初始花瓣；opcode 6 无显式配置时走 `spawn_player_default`；等级分段 spawn band；输入加速度 + `0.992^dt` 阻尼 + `125*(1-0.992^dt)` 位移；死亡后 opcode 6 重生并恢复 retained 装备；opcode 8 discard 校验等级容量、发放 rarity XP、写入 16 槽 backpack FIFO 并清理花瓣；opcode 10 swap 校验槽位并迁移花瓣 slot。
+- 花瓣：39 行 combat 数据（碰撞半径/伤害/生命）、轨道档位 Default/Basic/Fast/Heavy/Rock/Iris/Heaviest、Wing 波动轨道、按输入实时切换半径、owner/slot/instance、销毁后按 catalog 充能并重生、Rose 10 秒治疗（10/22/3.5）、多实例按 `instance*2π/count` 分布、flag41 第二环（Rose 24 半径 11）。
+- 伤害/死亡：接触分离 + 双方 contact damage；petal 死亡充能；mob 掉落 roll + 经验；player 死亡 retain/lost（含 16 槽 backpack FIFO）+ pickup；drop 32/42/52/62/62 秒寿命。
+- 数据：23 行 entity drop table、39 行 petal defaults、19 行 entity spawn defaults、39 行 petal combat、23 行 finalized drop chances。
+- 本轮增量：Cactus 动态半径/生命；Ant Hole 子体顺序；opcode 8/10 的 backpack/XP/花瓣清理与 slot 迁移；多实例 `instance*2π/count` 与 Rose 第二环；dense group -27 补齐字段 44/51；19 个 dense group 的 negative ordinal 映射；group 152 基础字段按 `flags & 64` 门控；sparse field >63 按原版 clamp 到 field 1。
+- AI/target selection：`AiState`、`target_eligible`（arena/range/health/owner leash/controlling root）、`alert_nearby`、`find_target`（player → aggressive mob → nearest，经 quadtree circle 查询）、`find_pickup_recipient`（strict 70 单位）、deterministic idle/return movement；`alert_to_attacker` 改为原版 426 的本地目标赋值 + callback 传播；普通物种 spawn 时启用 AI，Rock/Boulder/Cactus/Ant Hole 保持静止。
+- AI family：`configure_ladybug`（普通/巨大/dark/shiny 变体）、`configure_ant`（baby/worker/soldier/queen、随机 turn scale、soldier range 300/400）、`configure_centipede`（普通/evil/head/segment、rare 1%）、`configure_beetle`（普通/巨大）写入 health/radius/contact/speed/range/leash/turn/spawn-protection 字段；Queen Ant 与 segment 记录在 19 行 spawn-default 探针之外，由 family initializer 补全。
+- 空间：`QuadTree::query_at` 按原版 0,2,1,3（NW/SW/NE/SE）遍历；`SpatialQuery::query_box/query_circle` 复用 quadtree；`collision_bounds` 按原版 167 memoize 本体圆 + attached children 的并集，`invalidate_bounds` 沿 owner 链失效。
+- 碰撞层：30 层 flag/threshold/side 过滤器 `count_matching_layers`，`layers_collide` 接入接触 pass；支持 `ignore_ranges` 与 side selector 的 bit 6 选择。
+- 状态效果：`Effect` 8 槽、poison DoT（`intensity * min(dt, remaining) * 0.001`）、heal-block、slow（加速缩放）、三 bit effect flags；Iris/Peas/Cactus/Dandelion/Honey/Web 命中回调、Peas 4 分裂、Egg 1000/2500 ms 孵化、Cactus incoming poison。
+- Effect payload/area：`EffectPayload` shared ownership/refcount；`World::replace_area_effect` 按原版 271 在目标 effect 向量中替换/追加/移除 payload；`update_area_effects` 执行过期清理、dead prune、`owner ± scale` 方框 quadtree 查询、排序 diff、attach/detach 与 target 列表重建；`update_effects` 每个 shared payload 每 tick 只推进一次。
+- Peas deferred：四子体在 `sqrt(72)` 半径生成，parent 消耗，children lifetime 1000 ms，`schedule_deferred_launch(now+1ms, phase, children)`；`run_deferred_launches` 按原版 272 施加 `1.4` 位置 + `0.6` 速度径向脉冲。
+- 归属：`World::record_hit` 按 target+epoch+tick 合并 hit，携带 `epoch`/`refcount`/`known`；未进入 sorted known-entity 列表的 target 先进入 `pending_hit_events_`，`flush_pending_hits` 在可见后移出；`last_attacker`/killer name；player 死亡写 `last_death_score`/`last_death_level`，按 24 个 loadout handle 递归伤害/清理；mob 死亡增加 experience 与 loadout score；rarity-5 legendary 去重改为扫描 `World::pickups()` intrusive list。
+- Pickup list：`register_pickup`/`unregister_pickup` 维护 `Entity::pickup_prev/next`、`pickup_listed` 与 `World::pickups()`；`spawn_loot_drop` 注册，`World::destroy` 注销。
+- Loadout：`restore_from_profile` 恢复 active slots、`change_slot_type`（original 125：三 handle 清零、pending 字节、timer 清零、replication/slot epoch）、`create_equipped_petal`（original 397）、`swap` 迁移 handle/pending/timer/epoch、`advance` 推进 per-instance pending timer、pickup 满槽后进入 16 槽 backpack FIFO。
+
+### 18.3 快照与协议
+
+已落地：
+
+- original snapshot 写入器：bare、mask、sparse、dense（flags 52/55/54/62/126）。
+- 19 个 dense group 的字段/写入路径，含 group 72、-16、-27（含 44/51）、152 extended；byte-only 多组合并 entry。
+- 63 个字段类型（byte/float/interpolated/string/varint/reference/bit/angle/double/array）的 writer/decoder 覆盖。
+- original header（type/sequence/reliableAck/deletes/updates/events）、delete block、event block。
+- WorkerApi：sequence、pending deletes/events、`init` 清理、死亡删除、外部 per-handle dense 值表、`set_snapshot_group`/`set_snapshot_byte`/typed setters、group 72 auto position。
+- 本轮新增 `domain_snapshot_bytes`：type-1 header + 每实体 mask entry（fields 2 species、5 x、8 raw angle、24 y、26 domain kind、31 variant、53 health、55 maxHealth）+ coalesced hit 的 opcode-11/opcode-14 event + opcode-9 chat；`sp_server_think` 已切换到该路径。mask 组件为 1（transform）/2（entity definition）/20（health）/21（angle）。
+- `WorkerApi::set_full_field_framing(true)` 通过既有 writer 逐条写出 sparse field 1..63（byte/float/interpolated/string/varint/reference/bit/angle/double/array），`test_full_field_framing` 断言 update 数 >100；compact 子集仍是 live 默认。
+- `domain_snapshot_bytes` 现在在 compact 记录后追加 `write_dense_values`：19 个 dense group、byte-only 组和 mask/angle fallback 只要配置了 `set_snapshot_*`/`set_snapshot_groups` 就进入 live 包；`test_domain_dense_live_values` 断言 group 56 追加为第 2 个 update。
+- 新增 `default_dense_groups_`（默认 true）：没有显式 setter 值的实体自动追加 group 52/56/116/120 的派生值（flags、health/maxHealth、angle/radius）。`set_default_dense_groups(false)` 可回到 compact-only；`test_default_dense_groups` 断言 compact + 1 条合并 dense update 与关闭后的缩短包。
+- health/maxHealth 证据：`source/game/client/entity-snapshot.mjs` 的 `floatFields` 将 field 53/55 映射到 constructor 458 offsets 8/12；`schema/protocol.yaml` 新增 `fieldComponents`。field 26 为有文档的 transitional domain-kind 扩展，species 仍在 field 2。
+- `snapshot_bytes` 仍为固定 skeleton 记录（含 health/maxHealth/level），作为 fallback；`original_snapshot_bytes` 保留给显式 dense/setter 测试路径。
+
+### 18.4 TypeScript 客户端
+
+已落地：
+
+- `SkeletonSnapshotDecoder`、`OriginalBareSnapshotDecoder`（bare/mask/sparse + dense plans/present）、`DenseGroupDecoder`、`DenseByteGroupDecoder`、`DenseFloatGroupDecoder`、`DenseStringGroupDecoder`、`DenseGroup52Decoder`、`DensePlanDecoder`、`CompositeSnapshotDecoder`；`OriginalBareSnapshotDecoder` 现在维护 `componentPointers`（mask/ordinal 声明的原生 component pointer 代理）并按 pointer 判定 dense group，旧 `presentFor` callback 保留给测试；group 152 extended 按 `flags & 64`。
+- `SnapshotEvent` 解码 opcode 9（chat string）、11（entity-time handle）、14（visual handle+index）；`WorldState` 保存最近 8 条 chat 与 180 ms visual hit index；`drawHud` 绘制 chat，`drawWorld` 绘制 hit ring。
+- `window.__florr` 暴露 `freeze/resume/setSnapshot`，供 `tools/parity/run-client-scenario.mjs` 注入确定性实体表并录制 8 个新客户端场景。
+- `DENSE_GROUP_SPECS` 覆盖 19 组；`FIELD_COMPONENTS` 覆盖 63 个字段到 constructor/offset 的投影。
+- `EntitySnapshot.components[constructor][offset]` 字段投影；dense/float/byte/varint/reference/string/bit/dense-byte 记录合并。
+- `WorldState.apply`（skeleton 权威替换）与 `applyPartial`（original 稀疏合并）：本轮新增 health/maxHealth/kind/speciesId 合并，`healthKnown`/`maxHealthKnown` 区分“字段缺失”与真实 0。
+- field 5/24 → `entity.x/y`；field 8/dense angle → radians；dense field 8 raw 保留；field 2 → `speciesId`；field 26 → `kind`/`typeId`；field 53/55 → `health`/`maxHealth`。
+- `main.ts` 将 `OriginalBareSnapshotDecoder` 放在 Composite 首位，skeleton 作为 fallback；original 走 `applyPartial`，skeleton 走 `apply`；发送 opcode 6 生成玩家、每 50 ms 发送 opcode 12 指针方向/按钮、相机跟随 kind 1、HUD 读取投影后的 health、死亡 1 秒后自动重发 opcode 6。
+
+### 18.5 文档
+
+已新增/更新：
+
+- `docs/semantics/snapshot.md`：framing、dense、presence、字段映射、合并、angle/position。
+- `docs/semantics/collision.md`：quadtree/SpatialQuery。
+- `docs/semantics/spawn.md`：生成、显式人口。
+- `docs/semantics/catalog.md`：drop table、petal defaults、combat/drop 派生数据。
+- `docs/semantics/damage.md`：伤害与死亡回收。
+- `docs/semantics/petals.md`：轨道、充能槽、掉落/拾取。
+- `docs/semantics/player.md`：默认值、spawn band、profile/等级、loadout、阻尼移动。
+- `docs/semantics/loot.md`：掉落概率、retain/lost、pickup 寿命。
+- `docs/semantics/input.md`：客户端 XOR/varint 编码、opcode 6/12。
+- `docs/semantics/ai.md`：target eligibility、alert、find target/pickup、family profiles、0,2,1,3 quadtree、cached bounds、AI 移动与 open 边界。
+- `docs/semantics/effects.md`：poison/heal-block/slow、petal 回调、Peas/Egg/Web、shared payload、area effects、deferred launch。
+- `docs/semantics/attribution.md`：hit epoch/refcount/known gate、killer name、death score/level、child recursion、pickup intrusive list、legendary 去重。
+- `docs/semantics/loadout.md`：active slot 恢复、change_slot_type/create_equipped_petal、handle/pending/timer/epoch 布局、backpack 溢出。
+- `docs/parity.md`：新增 6.1 新客户端 8 场景基线。
+- `docs/semantics/tick.md`：域 tick 顺序、simulation-tick 证据与 open 阶段。
+
+### 18.6 明确未完成
+
+- `reports/build.json` 的 1,129 个剩余机器码函数未在本轮减少；C++/TS 重建不等于函数级替换。
+- AI 的 species attack callback（AI+144）与 behavior-modifier vtable 仍未复现；family 参数、目标门控、guard wander、lead prediction、wave/sine/drift locomotion、0,2,1,3 遍历顺序与 cached bounds 已实现。
+- 初始种群已对齐：`sp_server_init` 从 `285456437` 起算，先经 original 102 消耗 2 次初始化抽签，再进入 797 个父实体/69 个子实体的生成；22 个默认物种的组件抽签数与 `configure_*` 抽签数全部与原 wasm 一致。原生探针从 `2065629805` 起跑得到 866 次 `spawnEntity`、直方图 `1:148, 2:61, 3:118, 4:124, 6:66, 7:13, 8:9, 9:11, 12:91, 13:2, 14:39, 15:9, 16:69, 20:20, 21:2, 22:84`、最终 RNG `787621659`，前 12 个物种序列与原 wasm 完全一致。
+- 碰撞层过滤器已按 30 层域模型实现并接入接触 pass；原始 side-slot 的精确 19 个 spatial offset、pair 顺序副作用与组件指针失效路径未逐位复现。
+- 效果域的 `EffectPayload` 保留 ownership/refcount/共享 target 语义，但不是原始字节级 vtable/allocator 地址；poison intensity 仍以 petal damage 作为域近似。Web tag 的 collision radius 50、health 5、physics/score/tag/effect-area 标志、packet epoch 与 50-unit slow area 已实现；原始 tag 的字节级组件地址仍开放。
+- attribution 的 4124-byte message 对象、原始 virtual destructor 地址与 packet-cache 失效路径未逐位复现；domain 版本保留 epoch/refcount/known gate/death score/child recursion/pickup list 语义。
+- 客户端 dense present 使用 mask/ordinal 声明的 `componentPointers` 代理，未实例化原版 30 组件原生表；field 26 仍是 transitional domain-kind 扩展，不是原版字段语义。
+- `set_full_field_framing` 覆盖 sparse field 1..63；19 个 dense group 的 live 外部值表已通过 `write_dense_values` 接入 `domain_snapshot_bytes`，但只有显式 setter/`set_snapshot_groups` 配置的组才会出现在 live 包，默认 compact 记录仍不含 dense 组。
+- Ant Hole 子体/Centipede 链已按数量、owner、predecessor、`spawn_band=255` 与顺序生成；Ant Hole 143 的 0.25 单位速度散射与 Centipede rare/初始角 RNG 顺序已实现，逐物种 configure RNG 次数仍需核对。
+- Loadout 的 handle/pending/timer/epoch 域布局、reserve slot 循环（original cycleInventory）与 packet-cache epoch invalidation 已实现；原始 function 85 的两张 per-id cache 表内容仍开放。
+- 新客户端 8 个 Canvas2D 场景已建立确定性基线，但不是与原 JS 客户端逐像素等价；原客户端 `tests/parity/golden/*` 仍是最终视觉门禁。
+- 完整 `npm test` 已补跑：692 项中 690 通过，2 项失败（`client-span-blend-additive` 的 42 个 mode 内存 diff、`server-wide-string-constructor` 的 allocator/global 内存 diff）。这两项直接比较 `web/client.wasm`/`web/sp_server.wasm` 的完整内存，属于既有 JS 逆向 oracle 的独立问题，不由本轮 C++ engine 改动引入；在修复前最终验收仍为“未完成”。
+- 原始客户端 `test:parity` 已补跑：8/8 场景 Canvas2D digest/截图与 server-trace 包序列全部通过。
+- `server-state-trace.mjs` 目前 8 个场景中 7 个 `countMatch` 通过：`boot-menu`、`garden-idle`、`move`、`equip`、`attack`、`damage`、`spawn`；仅 `death` 仍有 41/249 个 tick 的实体数差 1–2（主要从 8800 ms 起）。death 场景持续向右移动时，原 wasm 在 5900 ms 让一枚 Basic 花瓣被静止 Rock 挤压归零、6900 ms 回收；C++ 侧已补上“移动中花瓣被 Rock 挤压”规则并用 1000 ms 尸体计时对齐了 5900→6900，但后续玩家死亡/多枚花瓣与补充时序仍有差异。该差异不再影响其余 7 个场景。
+- 本轮接触/死亡模型的关键修复：mob/mob 只分离不伤害；按 `collision_radius²` 质量加权分离并施加法向弹性冲量；physics `+50` 一次性标记整对跳过；idle 花瓣只被 aggressive mob 伤害，移动中的玩家可把花瓣挤在静止 Rock 上造成伤害；mob 尸体保留 1 s、花瓣尸体按攻击/挤压分别保留 800/1000 ms，且人口补充在尸体清扫之前运行，从而复现 `attack`/`spawn` 的单 tick 实体数凹陷。`same_root` 对 mob/mob 返回同一 manager root，修复 Beetle/Spider/Ladybug 互相选目标；Hornet 在 `configureBehavior` 前补抽 `function_102(0,1)` 决定 ±0.4 攻击速度，39 只 Hornet 的 AI 角与首 tick 运动已逐位一致；tick 时钟改为系统运行前推进到目标时刻，匹配原始 `readClock` 语义。
+- 玩家出生点与原 wasm 逐位一致（`garden-idle` 1500 ms：`-24870.875, -918.9522094726562`），输入/移动速度序列逐 tick 一致；`garden-idle` 玩家位置在 2450 ms 前逐位一致，后续因碰撞推挤出现小幅差异。`tests/parity/engine/report.json` 记录现状。
+
+### 18.7 下一步优先级
+
+1. ✅ Centipede/Ant Hole 的 rare/初始角/143 速度散射、`spawn_band=255` 与 band 几何已实现；逐物种组件/`configure_*` RNG 消耗次数已逐位核对并与原 wasm 一致。
+2. ⏳ `tools/parity/server-state-trace.mjs` 已把 `parity:engine-state` 提升到 7/8 `countMatch`（仅 `death` 未过），并修复了输入/移动/回复/掉落模型、mob/mob 碰撞、质量加权分离、花瓣攻击门控、尸体保留与单 tick 补充顺序、Hornet 初始化抽签、mob manager root 与 tick 时钟相位。剩余 `death` 的差异集中在 8800 ms 之后（41/249 tick，差 1–2 个实体），涉及玩家死亡后的花瓣清理/补充时序；5900 ms 的 Rock 挤压命中已对齐。下一步需逐 tick 对齐玩家死亡分支与多枚花瓣的回收顺序。
+3. ✅ Web tag 的 collision/score/tag/effect-area/packet epoch 副作用已实现；剩余是 effect vtable 的字节级地址/allocator 证据。
+4. ✅ loadout reserve slots（cycleInventory）与 packet-cache epoch invalidation 已实现；剩余是 function 85 的 per-id cache 表内容。
+5. ⏳ 最终验收前运行完整 `npm test`、319 项 JS oracle、原始客户端 server-trace/Canvas2D parity 与截图 diff；在此之前保持“未完成”状态。本轮已确认：`test:engine` 全通过（已把 9 项旧断言更新为尸体保留/±0.4 Hornet 语义）、`test:client` 46/46、`test:reference` 通过（3,850/1,129，issues `[]`）、`catalogs:drops:verify` 102/102、`parity:client` 8/8、`parity:server` 8/8、`parity:engine-state` 7/8 `countMatch`。按用户要求未重复运行既有 JS 逆向 oracle 长测；两项已知的 `npm test` 内存 diff（`client-span-blend-additive`、`server-wide-string-constructor`）仍属独立 oracle 问题。

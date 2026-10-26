@@ -1,0 +1,125 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/object-initializers.mjs",
+  "implementationSha256": "3cd42179c83b1722a0f14c47cdf39a859096571fe1fd246165711e05fb66d82f",
+  "factory": "createObjectInitializerHooks",
+  "functionIds": [
+    1023,
+    1990,
+    2303,
+    2312
+  ],
+  "functions": [
+    {
+      "id": 1023,
+      "name": "objectInitializer1023",
+      "originalSymbol": "function_1023",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-initializers.mjs",
+          "line": 9
+        },
+        "test": "test/client-object-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        909
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Initialises a parser, emits a diagnostic request, clears a config flag or validates a descriptor."
+    },
+    {
+      "id": 1990,
+      "name": "objectInitializer1990",
+      "originalSymbol": "function_1990",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-initializers.mjs",
+          "line": 9
+        },
+        "test": "test/client-object-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        402
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Initialises a parser, emits a diagnostic request, clears a config flag or validates a descriptor."
+    },
+    {
+      "id": 2303,
+      "name": "objectInitializer2303",
+      "originalSymbol": "function_2303",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-initializers.mjs",
+          "line": 9
+        },
+        "test": "test/client-object-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        415,
+        983
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Initialises a parser, emits a diagnostic request, clears a config flag or validates a descriptor."
+    },
+    {
+      "id": 2312,
+      "name": "objectInitializer2312",
+      "originalSymbol": "function_2312",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-initializers.mjs",
+          "line": 9
+        },
+        "test": "test/client-object-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        996,
+        402
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Initialises a parser, emits a diagnostic request, clears a config flag or validates a descriptor."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-object-initializers.test.mjs",
+    "report": "reports/client-object-initializers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "One zero fixture per function compares result, stack pointer and complete memory.",
+    "limitations": [
+      "Non-empty config strings and active-logging paths are not exercised. Ledger: 678 client and 512 server bodies recovered."
+    ]
+  }
+}

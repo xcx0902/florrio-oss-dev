@@ -1,0 +1,75 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/time-converters.mjs",
+  "implementationSha256": "4f076b8d7c5b5468e7017de381fe3eba0b5c985f69832c0767d8d7ba6b961619",
+  "factory": "createTimeConverterHooks",
+  "functionIds": [
+    868,
+    871
+  ],
+  "functions": [
+    {
+      "id": 868,
+      "name": "convertTwoDigitYear868",
+      "originalSymbol": "function_868",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/time-converters.mjs",
+          "line": 9
+        },
+        "test": "test/client-time-converters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        500
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Parses a time and stores the full year unless bit 4 is set."
+    },
+    {
+      "id": 871,
+      "name": "convertTwoDigitYear871",
+      "originalSymbol": "function_871",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/time-converters.mjs",
+          "line": 9
+        },
+        "test": "test/client-time-converters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        501
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Parses a time and stores the full year unless bit 4 is set."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-time-converters.test.mjs",
+    "report": "reports/client-time-converters-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 12,
+    "completeLinearMemoryChecks": 12,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Three year values times two flag states per converter compare result and complete memory.",
+    "limitations": [
+      "Ledger: 650 client and 507 server bodies recovered."
+    ]
+  }
+}

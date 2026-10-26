@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/four-record-sort.mjs",
+  "implementationSha256": "4907acd9efa0b45c5ae06e3f85735ebdc4eb70f655a8b30d2280b5b05442e40f",
+  "factory": "createFourRecordSortHook",
+  "functionIds": [
+    159
+  ],
+  "functions": [
+    {
+      "id": 159,
+      "name": "sortFourRecords",
+      "originalSymbol": "function_159",
+      "signature": " (type $t9) (param i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 33113
+        },
+        "source": {
+          "path": "source/game/server/four-record-sort.mjs",
+          "line": 28
+        },
+        "test": "test/server-four-record-sort.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Three-record insertion network plus fourth-record insertion over referenced 8-byte records, sorted by the f32 key at +4 while carrying the tag at +0; returns actual exchange count."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-four-record-sort.test.mjs",
+    "report": "reports/server-four-record-sort-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 244,
+    "completeLinearMemoryChecks": 244,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 244,
+    "trappingComparisons": 0,
+    "comparison": "All 24 permutations of six key sets (distinct, equal, negative, NaN, infinities, mixed) plus 100 deterministic random record sets compare swap count, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds record pointers are not exercised; the original has no trapping path.",
+      "Ledger: 234 server bodies recovered and 500 remain machine code."
+    ]
+  }
+}

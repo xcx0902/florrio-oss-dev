@@ -1,0 +1,2003 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "scope": "Executable high-level reconstruction of selected actual petal virtual-method bodies. All runtime.call dependencies stay original until independently replaced.",
+  "coverage": {
+    "hooks": 44,
+    "distinctInitializers": 24,
+    "distinctOrbitMethods": 15,
+    "distinctOnHitMethods": 5,
+    "allDistinctPetalVirtualMethods": 57,
+    "limitations": [
+      "Original allocator, clock, libm, replicated-property dirty tracking, generic damage/healing, slot refresh and effect vtables remain dependencies.",
+      "Source original func IDs stay as stable ABI identifiers; names and field meanings are justified by dataflow and catalog roles.",
+      "Peas split behaviors, egg hatching, cactus damage callback and web-hit spawning are not covered by these 44 hooks.",
+      "Differential fixtures cover many valid states and selected malformed pointer/vtable states. They are not an exhaustive proof over all possible overlapping and corrupt memory states."
+    ],
+    "distinctPetalVirtualMethodsOutsideThisModule": [
+      22,
+      98,
+      152,
+      171,
+      281,
+      431,
+      676,
+      681,
+      691,
+      693,
+      719,
+      732,
+      747
+    ],
+    "differentialValidation": {
+      "command": "node --test test/server-petals.test.mjs",
+      "testCases": 9,
+      "oracleComparisons": 2669,
+      "comparedMemoryBytesPerOracle": 67108864,
+      "comparesReturnValues": true,
+      "comparesStackPointer": true,
+      "checksMemoryTraps": true,
+      "checksIndirectSignatureTraps": true
+    }
+  },
+  "functions": [
+    {
+      "id": 119,
+      "name": "basicPetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 25696
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 2407
+        },
+        "catalogEntries": [
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "originalDirectFunctionDependencies": [],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 411,
+      "name": "PeasR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 107992
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 3151
+        },
+        "catalogEntries": [
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 412,
+      "name": "RoseR1PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 108083
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 3177
+        },
+        "catalogEntries": [
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 413,
+      "name": "fastFamilyPetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 108174
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 3203
+        },
+        "catalogEntries": [
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "originalDirectFunctionDependencies": [],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 414,
+      "name": "FastR0PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 108211
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 3218
+        },
+        "catalogEntries": [
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 432,
+      "name": "PeasR4PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 113341
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 4772
+        },
+        "catalogEntries": [
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 433,
+      "name": "BasicR0PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 113432
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 4798
+        },
+        "catalogEntries": [
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 434,
+      "name": "RiceR3PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 113505
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 4821
+        },
+        "catalogEntries": [
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 435,
+      "name": "CornR3PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 113578
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 4844
+        },
+        "catalogEntries": [
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 661,
+      "name": "heavyPetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 197558
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15503
+        },
+        "catalogEntries": [
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "originalDirectFunctionDependencies": [],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 662,
+      "name": "HeavyR0PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 197595
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15518
+        },
+        "catalogEntries": [
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 663,
+      "name": "rockPetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 197668
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15541
+        },
+        "catalogEntries": [
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "originalDirectFunctionDependencies": [],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 664,
+      "name": "RockR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 197705
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15556
+        },
+        "catalogEntries": [
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 665,
+      "name": "RoseR1PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 197778
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15579
+        },
+        "catalogEntries": [
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        17,
+        21,
+        34,
+        43,
+        44,
+        47,
+        95,
+        216
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": "Original effect vtable bodies (destruction or healing-suppression checks) remain live. runtime.indirect preserves the original i32->void / i32->i32 signature checks."
+    },
+    {
+      "id": 666,
+      "name": "IrisR1PetalVirtualSlot4",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 198175
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15703
+        },
+        "catalogEntries": [
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 4
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        14,
+        16,
+        20,
+        21,
+        118
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": "Original effect vtable bodies (destruction or healing-suppression checks) remain live. runtime.indirect preserves the original i32->void / i32->i32 signature checks."
+    },
+    {
+      "id": 667,
+      "name": "IrisR1PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 198450
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15807
+        },
+        "catalogEntries": [
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "originalDirectFunctionDependencies": [],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 668,
+      "name": "IrisR1PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 198487
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15822
+        },
+        "catalogEntries": [
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 669,
+      "name": "WingR2PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 198560
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15845
+        },
+        "catalogEntries": [
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        21,
+        149
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 670,
+      "name": "WingR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 198646
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15880
+        },
+        "catalogEntries": [
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 671,
+      "name": "MissileR2PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 198737
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15906
+        },
+        "catalogEntries": [
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        17,
+        21,
+        34,
+        85,
+        94,
+        164
+      ],
+      "originalHostImports": [
+        {
+          "module": "a",
+          "field": "a",
+          "purpose": "original asm-constant remainder of angle modulo 2π"
+        }
+      ],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 672,
+      "name": "MissileR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 199044
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 15995
+        },
+        "catalogEntries": [
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 680,
+      "name": "PeasR3PetalVirtualSlot4",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 201962
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 16918
+        },
+        "catalogEntries": [
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 4
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        14,
+        16,
+        20,
+        21,
+        118
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": "Original effect vtable bodies (destruction or healing-suppression checks) remain live. runtime.indirect preserves the original i32->void / i32->i32 signature checks."
+    },
+    {
+      "id": 682,
+      "name": "RoseR3PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 204084
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 17595
+        },
+        "catalogEntries": [
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        17,
+        21,
+        34,
+        43,
+        44,
+        47,
+        95,
+        216
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": "Original effect vtable bodies (destruction or healing-suppression checks) remain live. runtime.indirect preserves the original i32->void / i32->i32 signature checks."
+    },
+    {
+      "id": 684,
+      "name": "BubbleR2PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 204485
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 17723
+        },
+        "catalogEntries": [
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        17,
+        21,
+        43
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 685,
+      "name": "BubbleR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 204639
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 17770
+        },
+        "catalogEntries": [
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 686,
+      "name": "PollenR3PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 204728
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 17796
+        },
+        "catalogEntries": [
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        17,
+        21,
+        85
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 687,
+      "name": "PollenR3PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 205001
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 17873
+        },
+        "catalogEntries": [
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 688,
+      "name": "DandelionR2PetalVirtualSlot4",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 205092
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 17899
+        },
+        "catalogEntries": [
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 4
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        14,
+        16,
+        20,
+        21,
+        118
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": "Original effect vtable bodies (destruction or healing-suppression checks) remain live. runtime.indirect preserves the original i32->void / i32->i32 signature checks."
+    },
+    {
+      "id": 689,
+      "name": "DandelionR2PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 205253
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 17958
+        },
+        "catalogEntries": [
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        17,
+        21,
+        34,
+        85,
+        94,
+        164
+      ],
+      "originalHostImports": [
+        {
+          "module": "a",
+          "field": "a",
+          "purpose": "original asm-constant remainder of angle modulo 2π"
+        }
+      ],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 690,
+      "name": "DandelionR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 205572
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 18047
+        },
+        "catalogEntries": [
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 692,
+      "name": "CactusR3PetalVirtualSlot4",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 205934
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 18175
+        },
+        "catalogEntries": [
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 4
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        14,
+        16,
+        20,
+        21,
+        118
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": "Original effect vtable bodies (destruction or healing-suppression checks) remain live. runtime.indirect preserves the original i32->void / i32->i32 signature checks."
+    },
+    {
+      "id": 694,
+      "name": "EggR3PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 206526
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 18387
+        },
+        "catalogEntries": [
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 720,
+      "name": "EggR4PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 213568
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 124
+        },
+        "catalogEntries": [
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 723,
+      "name": "RoseR2PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 213676
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 161
+        },
+        "catalogEntries": [
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        17,
+        21,
+        34,
+        43,
+        44,
+        47,
+        95,
+        216
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": "Original effect vtable bodies (destruction or healing-suppression checks) remain live. runtime.indirect preserves the original i32->void / i32->i32 signature checks."
+    },
+    {
+      "id": 724,
+      "name": "RoseR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 214073
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 285
+        },
+        "catalogEntries": [
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 725,
+      "name": "HeaviestR3PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 214164
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 311
+        },
+        "catalogEntries": [
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "originalDirectFunctionDependencies": [],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 726,
+      "name": "HeaviestR3PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 214201
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 326
+        },
+        "catalogEntries": [
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 727,
+      "name": "StingerR1PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 214278
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 350
+        },
+        "catalogEntries": [
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 728,
+      "name": "YinYangR3PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 214351
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 373
+        },
+        "catalogEntries": [
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 733,
+      "name": "WebR2PetalOrbit",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 215762
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 786
+        },
+        "catalogEntries": [
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        17,
+        21,
+        85
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 734,
+      "name": "WebR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216007
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 859
+        },
+        "catalogEntries": [
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26,
+        21
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 738,
+      "name": "HoneyR2PetalVirtualSlot4",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216109
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 897
+        },
+        "catalogEntries": [
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 4
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        14,
+        16,
+        20,
+        21,
+        118
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": "Original effect vtable bodies (destruction or healing-suppression checks) remain live. runtime.indirect preserves the original i32->void / i32->i32 signature checks."
+    },
+    {
+      "id": 739,
+      "name": "LeafR1PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216270
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 956
+        },
+        "catalogEntries": [
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    },
+    {
+      "id": 740,
+      "name": "CactusR2PetalInitialize",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "source": "source/game/server/petals.mjs",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216343
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 979
+        },
+        "catalogEntries": [
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 2
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 2
+          }
+        ]
+      },
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "originalDirectFunctionDependencies": [
+        18,
+        25,
+        26
+      ],
+      "originalHostImports": [],
+      "originalVirtualDependencies": null
+    }
+  ]
+}

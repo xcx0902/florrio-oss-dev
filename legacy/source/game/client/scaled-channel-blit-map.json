@@ -1,0 +1,53 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/scaled-channel-blit.mjs",
+  "implementationSha256": "47da3ca4aae65ca636d10fafc809cd46246bc241a8c1126e12f3d690e2838058",
+  "factory": "createScaledChannelBlitHooks",
+  "functionIds": [
+    2200
+  ],
+  "functions": [
+    {
+      "id": 2200,
+      "name": "scaledChannelBlit",
+      "originalSymbol": "function_2200",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 575603
+        },
+        "source": {
+          "path": "source/game/client/scaled-channel-blit.mjs",
+          "line": 39
+        },
+        "test": "test/client-scaled-channel-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "16.16 resampling plus optional channel scaling. Flags bit0 scales low/middle/high by +62/+61/+60; bit1 selects the +63 alpha byte, otherwise alpha is 255."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-scaled-channel-blit.test.mjs",
+    "report": "reports/client-scaled-channel-blit-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 60,
+    "completeLinearMemoryChecks": 60,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 60,
+    "trappingComparisons": 0,
+    "comparison": "Every case compares the return value, all 67,108,864 memory bytes and the stack pointer. Coverage: 48 width/row/flag grids and 12 deterministic random descriptors.",
+    "limitations": [
+      "Source and destination rectangles are non-overlapping and in bounds.",
+      "Division by zero and 0x3ffffff descriptors are not exercised.",
+      "Ledger: 355 client bodies recovered and 3,890 remain machine code."
+    ]
+  }
+}

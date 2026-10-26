@@ -1,0 +1,98 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/flag-helpers.mjs",
+  "implementationSha256": "91b4b75d65de9a0c2224110ff2c0141fc7984310b15c87c621a0b3edb75550af",
+  "factory": "createFlagHelperHooks",
+  "functionIds": [
+    2006,
+    2062,
+    2297
+  ],
+  "functions": [
+    {
+      "id": 2006,
+      "name": "probeHostCapability",
+      "originalSymbol": "function_2006",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/flag-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-flag-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Probes host mutex/capability imports and returns 0 or -1."
+    },
+    {
+      "id": 2062,
+      "name": "forwardRecordCallbacks",
+      "originalSymbol": "function_2062",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/flag-helpers.mjs",
+          "line": 21
+        },
+        "test": "test/client-flag-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        945
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards record fields and callback pointers through a 16-byte frame."
+    },
+    {
+      "id": 2297,
+      "name": "writeRowsOrReportStreaming",
+      "originalSymbol": "function_2297",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/flag-helpers.mjs",
+          "line": 33
+        },
+        "test": "test/client-flag-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        706,
+        364
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Writes rows through 706 and reports streaming blocks."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-flag-helpers.test.mjs",
+    "report": "reports/client-flag-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 3,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "One zero fixture per helper with deterministic host imports compares result and complete memory.",
+    "limitations": [
+      "Nonzero capability handles and populated record fields are not exercised. Ledger: 685 client and 512 server bodies recovered."
+    ]
+  }
+}

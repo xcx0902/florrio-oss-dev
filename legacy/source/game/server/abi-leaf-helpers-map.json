@@ -1,0 +1,688 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/abi-leaf-helpers.mjs",
+  "implementationSha256": "992d98ebb12652da61ca93afc31a7a355e4f5529c1149ebae8a2529c3e3254f3",
+  "factory": "createAbiLeafHelperHooks",
+  "functionIds": [
+    76,
+    108,
+    175,
+    176,
+    224,
+    270,
+    293,
+    294,
+    298,
+    335,
+    370,
+    429,
+    449,
+    450,
+    453,
+    462,
+    466,
+    468,
+    493,
+    494,
+    604,
+    627,
+    635,
+    637,
+    638,
+    639,
+    729,
+    730,
+    735,
+    736
+  ],
+  "functions": [
+    {
+      "id": 76,
+      "name": "returnsZero",
+      "originalSymbol": "function_76",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 108,
+      "name": "storeUnpackedMarker",
+      "originalSymbol": "function_108",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 175,
+      "name": "maximumSignedInt",
+      "originalSymbol": "function_175",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 176,
+      "name": "maximumSingleByte",
+      "originalSymbol": "function_176",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 224,
+      "name": "storeAndReportThree",
+      "originalSymbol": "function_224",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 270,
+      "name": "noOperation",
+      "originalSymbol": "function_270",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 293,
+      "name": "returnSecondArgument",
+      "originalSymbol": "function_293",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 294,
+      "name": "storeTwoAndReportThree",
+      "originalSymbol": "function_294",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 298,
+      "name": "reportFour",
+      "originalSymbol": "function_298",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 335,
+      "name": "reportTwo",
+      "originalSymbol": "function_335",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 370,
+      "name": "reportMinusOne",
+      "originalSymbol": "function_370",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 429,
+      "name": "unityScale",
+      "originalSymbol": "function_429",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 449,
+      "name": "abortUnreachable",
+      "originalSymbol": "function_449",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 450,
+      "name": "abortUnreachableWithArgument",
+      "originalSymbol": "function_450",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 453,
+      "name": "selectPositiveOrFallback",
+      "originalSymbol": "function_453",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 462,
+      "name": "clampSignedByte",
+      "originalSymbol": "function_462",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 466,
+      "name": "decodeTable10352",
+      "originalSymbol": "function_466",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 468,
+      "name": "decodeTable11888",
+      "originalSymbol": "function_468",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 493,
+      "name": "loadSignedByteAt9",
+      "originalSymbol": "function_493",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 494,
+      "name": "loadSignedByteAt8",
+      "originalSymbol": "function_494",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 604,
+      "name": "advanceAndStoreSequence",
+      "originalSymbol": "function_604",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 627,
+      "name": "loadWordAt12",
+      "originalSymbol": "function_627",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 635,
+      "name": "reportMinusOne",
+      "originalSymbol": "function_635",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 637,
+      "name": "resetFlagsAndWord",
+      "originalSymbol": "function_637",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 638,
+      "name": "resetFlagsAndWordWithI64",
+      "originalSymbol": "function_638",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 639,
+      "name": "returnSelfPointer",
+      "originalSymbol": "function_639",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 729,
+      "name": "quarterScale",
+      "originalSymbol": "function_729",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 730,
+      "name": "infiniteScale",
+      "originalSymbol": "function_730",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 735,
+      "name": "clearWord",
+      "originalSymbol": "function_735",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 736,
+      "name": "twoThirdsScale",
+      "originalSymbol": "function_736",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/abi-leaf-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-abi-leaf-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-abi-leaf-helpers.test.mjs",
+    "report": "reports/server-abi-leaf-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 90,
+    "completeLinearMemoryChecks": 90,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 90,
+    "trappingComparisons": 6,
+    "comparison": "3 trials per helper compare result or trap type, complete memory and stack pointer.",
+    "limitations": [
+      "449/450 are intentional abort stubs and are compared by trap type.",
+      "Ledger: 315 server bodies recovered and 419 remain machine code."
+    ]
+  }
+}

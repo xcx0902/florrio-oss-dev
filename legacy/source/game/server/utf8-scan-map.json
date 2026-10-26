@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/utf8-scan.mjs",
+  "implementationSha256": "b9b38d7d6f929beceb37f47329ff002147d853de4370bcfa568fa164d0529e56",
+  "factory": "createUtf8ScanHook",
+  "functionIds": [
+    483
+  ],
+  "functions": [
+    {
+      "id": 483,
+      "name": "scanUtf8",
+      "originalSymbol": "function_483",
+      "signature": " (type $t10) (param i32 i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 116951
+        },
+        "source": {
+          "path": "source/game/server/utf8-scan.mjs",
+          "line": 53
+        },
+        "test": "test/server-utf8-scan.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Scans complete UTF-8 sequences from start to end under a UTF-16 code-unit budget and returns bytes consumed; invalid/truncated sequences stop before consumption."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-utf8-scan.test.mjs",
+    "report": "reports/server-utf8-scan-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 965,
+    "completeLinearMemoryChecks": 965,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 965,
+    "trappingComparisons": 0,
+    "comparison": "All 256 single bytes, lead/second/third/fourth class cross-products, every prefix and budgets 0-4 for five strings, budget 0xffffffff and 100 random strings compare return, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds/invalid pointer ranges are not exercised.",
+      "Ledger: 248 server bodies recovered and 487 remain machine code."
+    ]
+  }
+}

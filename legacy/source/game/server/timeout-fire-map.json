@@ -1,0 +1,70 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/timeout-fire.mjs",
+  "implementationSha256": "2582c502c1cd1466a3f55cafe012f5b47694895106ca3e63f0e3895dd3c8ca0e",
+  "factory": "createTimeoutFireHook",
+  "functionIds": [
+    659
+  ],
+  "dependencies": [
+    14,
+    31,
+    32,
+    42
+  ],
+  "functions": [
+    {
+      "id": 659,
+      "name": "cp6TimeoutFire",
+      "originalSymbol": "cp6TimeoutFire",
+      "signature": " (type $t0) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        14,
+        32,
+        42
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 196933
+        },
+        "source": {
+          "path": "source/game/server/timeout-fire.mjs",
+          "line": 158
+        },
+        "test": "test/server-timeout-fire.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14,
+        31,
+        32,
+        42
+      ],
+      "originalIndirectCallSites": 4,
+      "notes": "Lazily initialises the timer registry, hashes the id into a bucket, walks the chain matching hash+id, invokes the callback through vtable slot 6, re-looks up after the callback, unlinks the node, decrements the live count, destroys the callback via slot 4/5 and frees entry+node. Trap behaviour matches for null callbacks and out-of-bounds pointers."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-timeout-fire.test.mjs",
+    "report": "reports/server-timeout-fire-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 11,
+    "completeLinearMemoryChecks": 11,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 11,
+    "trappingComparisons": 2,
+    "comparison": "Eleven registry scenarios: empty, absent key, power-of-two hit, non-power small id, collision, next-node rehash, duplicate id, self-based callback, null callback trap, lazy initialization and out-of-bounds bucket array. Each compares outcome/error constructor and message, complete 67,108,864-byte memory and the stack pointer.",
+    "limitations": [
+      "cxaGuardAcquire returning 0 is not exercised.",
+      "A callback that mutates or rehashes the registry between invocation and removal is implemented but not differentially exercised.",
+      "A chain node equal to the sentinel, node+12==0 and out-of-bounds chain-node pointers are not exercised.",
+      "free 14, guard 31/32 and abort 42 remain native dependencies.",
+      "Ledger: 208 server bodies recovered and 526 remain machine code."
+    ]
+  }
+}

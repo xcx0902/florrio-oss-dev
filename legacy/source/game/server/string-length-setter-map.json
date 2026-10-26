@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-length-setter.mjs",
+  "implementationSha256": "5af3da1009c0f1881fc6ce50f269a6d3013a6bb4690ea2816493a59ca57f7a6b",
+  "factory": "createStringLengthSetterHook",
+  "functionIds": [
+    23
+  ],
+  "functions": [
+    {
+      "id": 23,
+      "name": "setStringLength",
+      "originalSymbol": "function_23",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-length-setter.mjs",
+          "line": 9
+        },
+        "test": "test/server-string-length-setter.test.mjs"
+      },
+      "originalDirectDependencies": [
+        387
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Two-argument forwarder to the resize routine 387."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-length-setter.test.mjs",
+    "report": "reports/server-string-length-setter-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 16,
+    "completeLinearMemoryChecks": 16,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 16,
+    "trappingComparisons": 0,
+    "comparison": "4 current lengths x 4 targets compare complete memory and stack pointer.",
+    "limitations": [
+      "Ledger: 380 server bodies recovered and 354 remain machine code."
+    ]
+  }
+}

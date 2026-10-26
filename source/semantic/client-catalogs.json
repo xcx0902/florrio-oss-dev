@@ -1,0 +1,1206 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "evidence": {
+    "constructorFunctionIndex": 824,
+    "entityDefinitionFunctionIndex": 391,
+    "petalRecordStride": 52,
+    "entityRecordStride": 116,
+    "unknownFieldNamesAreOffsets": true
+  },
+  "petalDefinitions": [
+    {
+      "typeId": 0,
+      "address": 382064,
+      "name": "None",
+      "descriptions": [
+        ""
+      ],
+      "bytesHex": "a43f000001000000b1eb010000000000000000000000000000000000000000000100000000006041000000000000000012000000",
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 18
+    },
+    {
+      "typeId": 1,
+      "address": 382116,
+      "name": "Basic",
+      "descriptions": [
+        "A nice petal, not too strong but not too weak"
+      ],
+      "bytesHex": "234b000001000000683800000000000000000000000000000000000000401c450100000000006041000000000000000011000000",
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 17
+    },
+    {
+      "typeId": 2,
+      "address": 382168,
+      "name": "Fast",
+      "descriptions": [
+        "Weaker than most petals, but recharges very quickly"
+      ],
+      "bytesHex": "951f0000010000002a160000000000000000000000000000000000000000fa430100000000006041000000000000000010000000",
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 16
+    },
+    {
+      "typeId": 3,
+      "address": 382220,
+      "name": "Heavy",
+      "descriptions": [
+        "Very resilient and deals more damage, but recharges very slowly"
+      ],
+      "bytesHex": "5e14000001000000881500000000000000000000000000000000000000e0ab45010000000000604100000000000000000f000000",
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 5500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 15
+    },
+    {
+      "typeId": 4,
+      "address": 382272,
+      "name": "Rock",
+      "descriptions": [
+        "Extremely durable, but takes a long time to recharge"
+      ],
+      "bytesHex": "1937000001000000d34100000000000000000000000000000200000000401c46010000000000604100000000000000000e000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 10000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 14
+    },
+    {
+      "typeId": 5,
+      "address": 382324,
+      "name": "Square",
+      "descriptions": [
+        "This shape... it looks familiar..."
+      ],
+      "bytesHex": "713f000001000000876f00000000000000000000000000000500000000401c45010000000000604100000000000000000d000000",
+      "rarityIndex": 5,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 13
+    },
+    {
+      "typeId": 6,
+      "address": 382376,
+      "name": "Rose",
+      "descriptions": [
+        "Its healing properties are amazing. Not so good at combat though"
+      ],
+      "bytesHex": "ce3e0000010000007a3a00000000000000000000000000000100000000c05a45010000000000604100000000000000000c000000",
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 12
+    },
+    {
+      "typeId": 7,
+      "address": 382428,
+      "name": "Stinger",
+      "descriptions": [
+        "It really hurts, but it's very fragile"
+      ],
+      "bytesHex": "9c30000001000000564000000000000000000000000000000100000000007a45010000000000604100000000000000000b000000",
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 4000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 11
+    },
+    {
+      "typeId": 8,
+      "address": 382480,
+      "name": "Iris",
+      "descriptions": [
+        "Very poisonous, but takes a little while to do its work"
+      ],
+      "bytesHex": "8829000001000000db360000000000000000000000000000010000000080bb45010000000000604100000000000000000a000000",
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 6000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 10
+    },
+    {
+      "typeId": 9,
+      "address": 382532,
+      "name": "Wing",
+      "descriptions": [
+        "It comes and goes"
+      ],
+      "bytesHex": "fb3b000001000000fd2900000000000000000000000000000200000000409c440100000000006041000000000000000009000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1250,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 9
+    },
+    {
+      "typeId": 10,
+      "address": 382584,
+      "name": "Missile",
+      "descriptions": [
+        "You can actually shoot this one"
+      ],
+      "bytesHex": "4e40000001000000a93f00000000000000000000000000000200000000803b450100000000006041000000000000000008000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 8
+    },
+    {
+      "typeId": 11,
+      "address": 382636,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal"
+      ],
+      "bytesHex": "ea2a000001000000a43600000000000000000000000000000200000000007a440100000000006041000000000000000007000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 7
+    },
+    {
+      "typeId": 12,
+      "address": 382688,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal, now with a secret ingredient: poison"
+      ],
+      "bytesHex": "ea2a000001000000143300000000000000000000000000000300000000007a440100000000006041000000000000000006000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 6
+    },
+    {
+      "typeId": 13,
+      "address": 382740,
+      "name": "Cactus",
+      "descriptions": [
+        "Not very strong, but somehow increases your maximum health"
+      ],
+      "bytesHex": "9e25000001000000a33900000000000000000000000000000200000000007a440100000000006041000000000000000005000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 5
+    },
+    {
+      "typeId": 14,
+      "address": 382792,
+      "name": "Faster",
+      "descriptions": [
+        "It's so light it makes your other petals spin faster"
+      ],
+      "bytesHex": "582f000001000000232f0000000000000000000000000000020000000000fa430100000000006041000000000000000004000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 4
+    },
+    {
+      "typeId": 15,
+      "address": 382844,
+      "name": "Rose",
+      "descriptions": [
+        "Extremely powerful rose, almost unheard of"
+      ],
+      "bytesHex": "ce3e000001000000983c00000000000000000000000000000300000000c05a450100000000006041000000000000000003000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 3
+    },
+    {
+      "typeId": 16,
+      "address": 382896,
+      "name": "Twin",
+      "descriptions": [
+        "Why stop at one? Why not TWO?!"
+      ],
+      "bytesHex": "0434000001000000f57a00000000000000000000000000000100000000007a440200000000006041000000000000000013000000",
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 2,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 19
+    },
+    {
+      "typeId": 17,
+      "address": 382948,
+      "name": "Triplet",
+      "descriptions": [
+        "How about THREE?!"
+      ],
+      "bytesHex": "1322000001000000147b00000000000000000000000000000300000000007a440300000000006041000000000000000014000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 20
+    },
+    {
+      "typeId": 18,
+      "address": 383000,
+      "name": "Bubble",
+      "descriptions": [
+        "You can right click to pop it and propel your flower"
+      ],
+      "bytesHex": "cc400000010000009e2e00000000000000000000000000000200000000c05a450100000000006041000000000000000015000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 21
+    },
+    {
+      "typeId": 19,
+      "address": 383052,
+      "name": "Pollen",
+      "descriptions": [
+        "Asthmatics beware"
+      ],
+      "bytesHex": "2b340000010000005f3f00000000000000000000000000000300000000007a440300000000006041000000000000000016000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 22
+    },
+    {
+      "typeId": 20,
+      "address": 383104,
+      "name": "Dandelion",
+      "descriptions": [
+        "Its interesting properties prevent healing effects on affected units"
+      ],
+      "bytesHex": "f63300000100000017260000000000000000000000000000020000000000fa44010000000000304100000000000000001a000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 2000,
+      "instancesPerSlot": 1,
+      "radius": 11,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 26
+    },
+    {
+      "typeId": 21,
+      "address": 383156,
+      "name": "Cactus",
+      "descriptions": [
+        "Increases your maximum health and makes your flower toxic",
+        "Enemies hit by your flower will get poisoned"
+      ],
+      "bytesHex": "9e25000002000000e94a00008047000000000000000000000300000000007a440100000000006041000000000000000019000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 25
+    },
+    {
+      "typeId": 22,
+      "address": 383208,
+      "name": "Egg",
+      "descriptions": [
+        "Something interesting might pop out of this"
+      ],
+      "bytesHex": "3b3c0000010000008d2900000000000000000000000000000300000000007a440100000000006041000000000000000018000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 24
+    },
+    {
+      "typeId": 23,
+      "address": 383260,
+      "name": "Egg",
+      "descriptions": [
+        "Something interesting might pop out of this"
+      ],
+      "bytesHex": "3b3c0000010000008d2900000000000000000000000000000400000000007a440100000000006041000000000000000017000000",
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 23
+    },
+    {
+      "typeId": 24,
+      "address": 383312,
+      "name": "Rose",
+      "descriptions": [
+        "Its healing properties are amazing. Not so good at combat though"
+      ],
+      "bytesHex": "ce3e0000010000007a3a00000000000000000000000000000200000000c05a45030000000000604100010000000030411b000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 1,
+      "field44": 11,
+      "field48": 27
+    },
+    {
+      "typeId": 25,
+      "address": 383364,
+      "name": "Antennae",
+      "descriptions": [
+        "Allows your flower to sense foes farther away"
+      ],
+      "bytesHex": "1645000001000000d91600000000000000000000000000000400000000000000010000000000404101000000000000001c000000",
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flag40": 1,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 28
+    },
+    {
+      "typeId": 26,
+      "address": 383416,
+      "name": "Heaviest",
+      "descriptions": [
+        "This thing is so heavy that nothing gets in the way"
+      ],
+      "bytesHex": "831f000001000000071700000000000000000000000000000300000000409c46010000000000404100000000000000001d000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 20000,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 29
+    },
+    {
+      "typeId": 27,
+      "address": 383468,
+      "name": "Stinger",
+      "descriptions": [
+        "It really hurts, but it's very fragile"
+      ],
+      "bytesHex": "9c30000001000000564000000000000000000000000000000400000000007a45030000000000604100010000000030411e000000",
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 4000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 1,
+      "field44": 11,
+      "field48": 30
+    },
+    {
+      "typeId": 28,
+      "address": 383520,
+      "name": "Yin Yang",
+      "descriptions": [
+        "This mysterious petal reverses the rotation direction of your petals"
+      ],
+      "bytesHex": "003c000001000000bc2800000000000000000000000000000300000000007a440100000000004041000000000000000020000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 32
+    },
+    {
+      "typeId": 29,
+      "address": 383572,
+      "name": "Web",
+      "descriptions": [
+        "It's really sticky"
+      ],
+      "bytesHex": "d54b000001000000981600000000000000000000000000000200000000803b45010000000000604100000000000000001f000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 31
+    },
+    {
+      "typeId": 30,
+      "address": 383624,
+      "name": "Web",
+      "descriptions": [
+        "It's really sticky"
+      ],
+      "bytesHex": "d54b000001000000981600000000000000000000000000000400000000803b450300000000006041000100000000504123000000",
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 1,
+      "field44": 13,
+      "field48": 35
+    },
+    {
+      "typeId": 31,
+      "address": 383676,
+      "name": "Honey",
+      "descriptions": [
+        "This is so sticky it slows down whatever it hits"
+      ],
+      "bytesHex": "ab160000010000005c260000000000000000000000000000020000000080d4440100000000006041000000000000000022000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1700,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 34
+    },
+    {
+      "typeId": 32,
+      "address": 383728,
+      "name": "Leaf",
+      "descriptions": [
+        "Gathers energy from the sun to heal your flower passively"
+      ],
+      "bytesHex": "fe3c0000010000005e1600000000000000000000000000000100000000007a440100000000006041000000000000000021000000",
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 33
+    },
+    {
+      "typeId": 33,
+      "address": 383780,
+      "name": "Cactus",
+      "descriptions": [
+        "Not very strong, but somehow increases your maximum health"
+      ],
+      "bytesHex": "9e25000001000000a33900000000000000000000000000000400000000007a440300000000006041000100000000704129000000",
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 1,
+      "field44": 15,
+      "field48": 41
+    },
+    {
+      "typeId": 34,
+      "address": 383832,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal, now with a secret ingredient: poison"
+      ],
+      "bytesHex": "ea2a000001000000143300000000000000000000000000000400000000007a440100000000006041000000000000000028000000",
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 40
+    },
+    {
+      "typeId": 35,
+      "address": 383884,
+      "name": "Basic",
+      "descriptions": [
+        "Something incredibly rare and useless"
+      ],
+      "bytesHex": "234b000001000000c72600000000000000000000000000000500000000401c450100000000006041000000000000000027000000",
+      "rarityIndex": 5,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 39
+    },
+    {
+      "typeId": 36,
+      "address": 383936,
+      "name": "Salt",
+      "descriptions": [
+        "Reflects some of the damage you take back to the flower that dealt it",
+        "Does not stack with itself"
+      ],
+      "bytesHex": "f22000000200000033210000c73c000000000000000000000200000000401c450100000000006041000000000000000026000000",
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 38
+    },
+    {
+      "typeId": 37,
+      "address": 383988,
+      "name": "Rice",
+      "descriptions": [
+        "Spawns instantly, but not very strong"
+      ],
+      "bytesHex": "fd420000010000003b3b000000000000000000000000000003000000000000000100000000006041000000000000000025000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 37
+    },
+    {
+      "typeId": 38,
+      "address": 384040,
+      "name": "Corn",
+      "descriptions": [
+        "Takes a long time to spawn, but has a lot of health"
+      ],
+      "bytesHex": "0f33000001000000de3900000000000000000000000000000300000000c82f470100000000006041000000000000000024000000",
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 45000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "field48": 36
+    }
+  ],
+  "entityDefinitions": [
+    {
+      "typeId": 0,
+      "address": 384096,
+      "name": "None",
+      "descriptions": [
+        "???"
+      ],
+      "bytesHex": "a43f000001000000615b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000803f",
+      "field24": 0,
+      "field28": 0,
+      "petalTypeIds": [],
+      "field100": 0,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 1,
+      "address": 384212,
+      "name": "Rock",
+      "descriptions": [
+        "A rock. It doesn't do much."
+      ],
+      "bytesHex": "19370000010000001b6a0000000000000000000000000000000000000000803f0300000002000000000000000300000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0000000c1000000010000000000803f",
+      "field24": 0,
+      "field28": 1,
+      "petalTypeIds": [
+        2,
+        3,
+        4
+      ],
+      "field100": 192,
+      "field104": 193,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 2,
+      "address": 384328,
+      "name": "Boulder",
+      "descriptions": [
+        "A bigger rock. It doesn't do much either."
+      ],
+      "bytesHex": "6e310000010000003f680000000000000000000000000000010000000000204103000000030000000000000004000000000000001a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c2000000c3000000010000000000803f",
+      "field24": 1,
+      "field28": 10,
+      "petalTypeIds": [
+        3,
+        4,
+        26
+      ],
+      "field100": 194,
+      "field104": 195,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 3,
+      "address": 384444,
+      "name": "Cactus",
+      "descriptions": [
+        "Avoid touching it, it hurts."
+      ],
+      "bytesHex": "9e25000001000000b665000000000000000000000000000000000000000000400500000007000000000000000a000000000000000d0000000000000015000000000000002100000000000000000000000000000000000000000000000000000000000000c4000000c5000000010000000000803f",
+      "field24": 0,
+      "field28": 2,
+      "petalTypeIds": [
+        7,
+        10,
+        13,
+        21,
+        33
+      ],
+      "field100": 196,
+      "field104": 197,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 4,
+      "address": 384560,
+      "name": "Ladybug",
+      "descriptions": [
+        "Cute and harmless."
+      ],
+      "bytesHex": "f43a0000010000007766000000000000000000000000000000000000000040400500000002000000000000000600000000000000100000000000000009000000000000001200000000000000000000000000000000000000000000000000000000000000c6000000c7000000010000000000803f",
+      "field24": 0,
+      "field28": 3,
+      "petalTypeIds": [
+        2,
+        6,
+        16,
+        9,
+        18
+      ],
+      "field100": 198,
+      "field104": 199,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 5,
+      "address": 384676,
+      "name": "Massive Ladybug",
+      "descriptions": [
+        "This one is really big, but still cute."
+      ],
+      "bytesHex": "ec3a000001000000416b00000000000000000000000000000300000000004842040000000600000000000000120000000000000018000000000000000f000000000000000000000000000000000000000000000000000000000000000000000000000000c9000000c80000000100000000002041",
+      "field24": 3,
+      "field28": 50,
+      "petalTypeIds": [
+        6,
+        18,
+        24,
+        15
+      ],
+      "field100": 201,
+      "field104": 200,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 10
+    },
+    {
+      "typeId": 6,
+      "address": 384792,
+      "name": "Bee",
+      "descriptions": [
+        "It stings. Don't touch it."
+      ],
+      "bytesHex": "4142000001000000cd640000000000000000000000000000000000000000404006000000020000000000000007000000000000001000000000000000090000000000000012000000000000001f0000000000000000000000000000000000000000000000ca000000cb000000010000000000803f",
+      "field24": 0,
+      "field28": 3,
+      "petalTypeIds": [
+        2,
+        7,
+        16,
+        9,
+        18,
+        31
+      ],
+      "field100": 202,
+      "field104": 203,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 7,
+      "address": 384908,
+      "name": "Baby Ant",
+      "descriptions": [
+        "Weak and defenseless, but big dreams."
+      ],
+      "bytesHex": "c020000001000000b1660000000000000000000000000000000000000000803f0500000002000000000000002000000000000000100000000000000011000000000000002500000000000000000000000000000000000000000000000000000000000000cc000000cd000000010000000000803f",
+      "field24": 0,
+      "field28": 1,
+      "petalTypeIds": [
+        2,
+        32,
+        16,
+        17,
+        37
+      ],
+      "field100": 204,
+      "field104": 205,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 8,
+      "address": 385024,
+      "name": "Worker Ant",
+      "descriptions": [
+        "It's a bit temperamental, probably from working all the time."
+      ],
+      "bytesHex": "c920000001000000686c000000000000000000000000000000000000000000400500000002000000000000002000000000000000100000000000000011000000000000002600000000000000000000000000000000000000000000000000000000000000ce000000cf000000010000000000803f",
+      "field24": 0,
+      "field28": 2,
+      "petalTypeIds": [
+        2,
+        32,
+        16,
+        17,
+        38
+      ],
+      "field100": 206,
+      "field104": 207,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 9,
+      "address": 385140,
+      "name": "Soldier Ant",
+      "descriptions": [
+        "It's got wings and it's ready to use them."
+      ],
+      "bytesHex": "d4200000010000004d690000000000000000000000000000010000000000a040050000001000000000000000080000000000000009000000000000000e000000000000001100000000000000000000000000000000000000000000000000000000000000d0000000d1000000010000000000803f",
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        16,
+        8,
+        9,
+        14,
+        17
+      ],
+      "field100": 208,
+      "field104": 209,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 10,
+      "address": 385256,
+      "name": "Queen Ant",
+      "descriptions": [
+        "You must have done something really bad if she's chasing you."
+      ],
+      "bytesHex": "e0200000010000001f630000000000000000000000000000020000000000a04106000000100000000000000009000000000000000e00000000000000110000000000000016000000000000001b0000000000000000000000000000000000000000000000d2000000d3000000010000000000803f",
+      "field24": 2,
+      "field28": 20,
+      "petalTypeIds": [
+        16,
+        9,
+        14,
+        17,
+        22,
+        27
+      ],
+      "field100": 210,
+      "field104": 211,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 11,
+      "address": 385372,
+      "name": "Ant Hole",
+      "descriptions": [
+        "Ants go in, and come out. Can't explain that."
+      ],
+      "bytesHex": "4540000001000000e8640000000000000000000000000000020000000000a0410300000008000000000000000900000000000000160000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d4000000d5000000010000000000803f",
+      "field24": 2,
+      "field28": 20,
+      "petalTypeIds": [
+        8,
+        9,
+        22
+      ],
+      "field100": 212,
+      "field104": 213,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 12,
+      "address": 385488,
+      "name": "Beetle",
+      "descriptions": [
+        "It's hungry and flowers are its favorite meal."
+      ],
+      "bytesHex": "1d400000010000009c690000000000000000000000000000010000000000a0400400000008000000000000000900000000000000240000000000000011000000000000000000000000000000000000000000000000000000000000000000000000000000d6000000d7000000010000000000803f",
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        8,
+        9,
+        36,
+        17
+      ],
+      "field100": 214,
+      "field104": 215,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 13,
+      "address": 385604,
+      "name": "Massive Beetle",
+      "descriptions": [
+        "Someone overfed this one, you might be next."
+      ],
+      "bytesHex": "15400000010000005d63000000000000000000000000000002000000000048420400000008000000000000000900000000000000110000000000000017000000000000000000000000000000000000000000000000000000000000000000000000000000d8000000d9000000010000000000803f",
+      "field24": 2,
+      "field28": 50,
+      "petalTypeIds": [
+        8,
+        9,
+        17,
+        23
+      ],
+      "field100": 216,
+      "field104": 217,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 14,
+      "address": 385720,
+      "name": "Hornet",
+      "descriptions": [
+        "These aren't quite as nice as the little bees."
+      ],
+      "bytesHex": "00220000010000002e6700000000000000000000000000000100000000002041060000000a0000000000000009000000000000001f0000000000000012000000000000001400000000000000190000000000000000000000000000000000000000000000db000000da0000000100000000000040",
+      "field24": 1,
+      "field28": 10,
+      "petalTypeIds": [
+        10,
+        9,
+        31,
+        18,
+        20,
+        25
+      ],
+      "field100": 219,
+      "field104": 218,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 2
+    },
+    {
+      "typeId": 15,
+      "address": 385836,
+      "name": "Centipede",
+      "descriptions": [
+        "It's just there doing its thing."
+      ],
+      "bytesHex": "8142000001000000376a00000000000000000000000000000100000000004040060000000200000000000000200000000000000010000000000000000b000000000000000c00000000000000110000000000000000000000000000000000000000000000dc000000dd000000010000000000803f",
+      "field24": 1,
+      "field28": 3,
+      "petalTypeIds": [
+        2,
+        32,
+        16,
+        11,
+        12,
+        17
+      ],
+      "field100": 220,
+      "field104": 221,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 16,
+      "address": 385952,
+      "name": "Centipede",
+      "descriptions": [
+        "It's just there doing its thing."
+      ],
+      "bytesHex": "8142000001000000376a000000000000000000000000000001000000000040400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000de00000000000000000f0f000000803f",
+      "field24": 1,
+      "field28": 3,
+      "petalTypeIds": [],
+      "field100": 222,
+      "field104": 0,
+      "field108": 0,
+      "field109": 15,
+      "field110": 15,
+      "field112": 1
+    },
+    {
+      "typeId": 17,
+      "address": 386068,
+      "name": "Evil Centipede",
+      "descriptions": [
+        "This one loves flowers."
+      ],
+      "bytesHex": "7c420000010000008a660000000000000000000000000000020000000000a0400400000008000000000000000c00000000000000220000000000000011000000000000000000000000000000000000000000000000000000000000000000000000000000df000000e0000000010000000000803f",
+      "field24": 2,
+      "field28": 5,
+      "petalTypeIds": [
+        8,
+        12,
+        34,
+        17
+      ],
+      "field100": 223,
+      "field104": 224,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 18,
+      "address": 386184,
+      "name": "Evil Centipede",
+      "descriptions": [
+        "This one loves flowers."
+      ],
+      "bytesHex": "7c420000010000008a660000000000000000000000000000020000000000a0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e100000000000000001111000000803f",
+      "field24": 2,
+      "field28": 5,
+      "petalTypeIds": [],
+      "field100": 225,
+      "field104": 0,
+      "field108": 0,
+      "field109": 17,
+      "field110": 17,
+      "field112": 1
+    },
+    {
+      "typeId": 19,
+      "address": 386300,
+      "name": "Square",
+      "descriptions": [
+        "This shape... it looks familiar..."
+      ],
+      "bytesHex": "713f000001000000876f000000000000000000000000000005000000000020410100000005000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e2000000e3000000010000000000803f",
+      "field24": 5,
+      "field28": 10,
+      "petalTypeIds": [
+        5
+      ],
+      "field100": 226,
+      "field104": 227,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 20,
+      "address": 386416,
+      "name": "Ladybug",
+      "descriptions": [
+        "Cute and harmless... if left unprovoked."
+      ],
+      "bytesHex": "f43a000001000000bb6e0000000000000000000000000000010000000000a040060000000f0000000000000018000000000000000900000000000000120000000000000011000000000000001c0000000000000000000000000000000000000000000000e4000000e5000000010000000000803f",
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        15,
+        24,
+        9,
+        18,
+        17,
+        28
+      ],
+      "field100": 228,
+      "field104": 229,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    },
+    {
+      "typeId": 21,
+      "address": 386532,
+      "name": "Ladybug",
+      "descriptions": [
+        "Shiny, cute and mostly harmless."
+      ],
+      "bytesHex": "f43a00000100000056660000000000000000000000000000010000000000a0400600000006000000000000001800000000000000100000000000000009000000000000001200000000000000110000000000000000000000000000000000000000000000e7000000e600000001000000cdcc4c3e",
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        6,
+        24,
+        16,
+        9,
+        18,
+        17
+      ],
+      "field100": 231,
+      "field104": 230,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 0.20000000298023224
+    },
+    {
+      "typeId": 22,
+      "address": 386648,
+      "name": "Spider",
+      "descriptions": [
+        "Spooky."
+      ],
+      "bytesHex": "7631000001000000b8620000000000000000000000000000010000000000a04005000000080000000000000007000000000000000e000000000000001d000000000000001e00000000000000000000000000000000000000000000000000000000000000e8000000e9000000010000000000803f",
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        8,
+        7,
+        14,
+        29,
+        30
+      ],
+      "field100": 232,
+      "field104": 233,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1
+    }
+  ]
+}

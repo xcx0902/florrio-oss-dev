@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/file-seek.mjs",
+  "implementationSha256": "f0b6ae26557f00200fcbc27e102150c72a5d5e0c659942eb9952bd36932a6e1c",
+  "factory": "createFileSeekHook",
+  "functionIds": [
+    645
+  ],
+  "functions": [
+    {
+      "id": 645,
+      "name": "seekDescriptor",
+      "originalSymbol": "function_645",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/file-seek.mjs",
+          "line": 14
+        },
+        "test": "test/server-file-seek.test.mjs"
+      },
+      "originalDirectDependencies": [
+        11
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Calls the seek import (11) with the +60 descriptor and records errors at 8569384."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-file-seek.test.mjs",
+    "report": "reports/server-file-seek-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 3,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 3,
+    "trappingComparisons": 0,
+    "comparison": "Three offset/origin combinations compare result, complete memory and stack.",
+    "limitations": [
+      "Error path is not exercised. Ledger: 443 server bodies recovered and 291 remain machine code."
+    ]
+  }
+}

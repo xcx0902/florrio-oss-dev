@@ -1,0 +1,151 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/clock.mjs",
+  "implementationSha256": "e36aed4ea146851913f2c282a1812819f7eca69c03042fa95af843558da9ee40",
+  "factory": "createClientClockHooks",
+  "functionIds": [
+    369,
+    370,
+    372,
+    554
+  ],
+  "functions": [
+    {
+      "id": 369,
+      "name": "acquireGuard",
+      "originalSymbol": "acquireStaticInitializationGuard",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 4954
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 1341
+        },
+        "test": "test/client-clock.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 370,
+      "name": "releaseGuard",
+      "originalSymbol": "releaseStaticInitializationGuard",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 5034
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 1379
+        },
+        "test": "test/client-clock.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 372,
+      "name": "readClock",
+      "originalSymbol": "function_372",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 5103
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 1407
+        },
+        "test": "test/client-clock.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "acquireStaticInitializationGuard",
+        "emscripten_asm_const_int",
+        "releaseStaticInitializationGuard",
+        "function_2"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 554,
+      "name": "elapsedFromOrigin",
+      "originalSymbol": "function_554",
+      "signature": " (type $t42) (param $p0 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 47005
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0192-0255.dcmp",
+          "line": 78
+        },
+        "test": "test/client-clock.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "acquireStaticInitializationGuard",
+        "emscripten_asm_const_int",
+        "releaseStaticInitializationGuard",
+        "function_2"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "layout": {
+    "clockKind": 7910216,
+    "clockKindGuard": 7910220,
+    "processOriginGuard": 7910224,
+    "frameClockValid": 7922312,
+    "frameClockTimestamp": 7922320,
+    "frameClockGuard": 7922328,
+    "processOriginValid": 7948184,
+    "processOriginTimestamp": 7948192
+  },
+  "hostAbi": [
+    {
+      "module": "a",
+      "field": "a",
+      "address": 141250,
+      "signature": 31967,
+      "name": "supportsPerformanceNow",
+      "result": "i32"
+    },
+    {
+      "module": "a",
+      "field": "c",
+      "address": 141314,
+      "signature": 32528,
+      "name": "getTimestamp",
+      "result": "f64"
+    }
+  ],
+  "validation": {
+    "testGroups": 5,
+    "oracleComparisons": 1436,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true,
+    "hostArgumentBytesCompared": true,
+    "combinedClientRenderTest": "test/client-render-frame.test.mjs"
+  },
+  "limitations": [
+    "Clock support and timestamp remain external browser-host dependencies.",
+    "Four first guard bytes and every second byte are covered; five representative stack overlaps do not prove all arbitrary aliasing states.",
+    "Browser validation is bound to recorded source/artifact hashes; see reports/current-verification.json and reports/runtime/readable.json."
+  ],
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

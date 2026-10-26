@@ -1,0 +1,53 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/atan.mjs",
+  "implementationSha256": "b351421062b20610a79e415555f1bded93aec69b43cd335d3c84030da9cfc347",
+  "factory": "createAtanHooks",
+  "functionIds": [
+    933
+  ],
+  "functions": [
+    {
+      "id": 933,
+      "name": "atan",
+      "originalSymbol": "function_933",
+      "signature": " (type $t24) (param $p0 f64) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 192793
+        },
+        "source": {
+          "path": "source/game/client/atan.mjs",
+          "line": 47
+        },
+        "test": "test/client-atan.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-atan.test.mjs",
+    "report": "reports/client-atan-tests.tap",
+    "testGroups": 2,
+    "pass": 2,
+    "fail": 0,
+    "oracleComparisons": 312,
+    "trappingComparisons": 0,
+    "returnBitChecks": 312,
+    "completeLinearMemoryChecks": 312,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 312,
+    "comparison": "Every comparison asserts the exact float64 bit pattern of the result (or that both results are NaN), all 67,108,864 bytes of linear memory, and the stack pointer. Thresholds, signed zero, subnormals, infinities and 260 pseudo-random bit patterns are covered.",
+    "limitations": [
+      "No row traps because the function only reads immutable table data baked into the JS constants.",
+      "The four-entry atan(hi)/atan(lo) table and eleven polynomial coefficients are literal constants from the original data segment.",
+      "This function is part of the 4,245 client functions; the ledger has 330 client bodies recovered and 3,915 remain machine code."
+    ]
+  }
+}

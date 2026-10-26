@@ -1,0 +1,123 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/small-wrappers.mjs",
+  "implementationSha256": "c805ecbef702c17ff151f521e850dd38b9df4a5803dd1e9c0a00255088c6ab6e",
+  "factory": "createSmallWrapperHooks",
+  "functionIds": [
+    390,
+    412,
+    896,
+    998
+  ],
+  "functions": [
+    {
+      "id": 390,
+      "name": "smallWrapper390",
+      "originalSymbol": "function_390",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-wrappers.mjs",
+          "line": 9
+        },
+        "test": "test/client-small-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        555
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Stores an argument in a 16-byte frame and forwards to the shared helper."
+    },
+    {
+      "id": 412,
+      "name": "smallWrapper412",
+      "originalSymbol": "function_412",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-wrappers.mjs",
+          "line": 9
+        },
+        "test": "test/client-small-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        555
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Stores an argument in a 16-byte frame and forwards to the shared helper."
+    },
+    {
+      "id": 896,
+      "name": "smallWrapper896",
+      "originalSymbol": "function_896",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-wrappers.mjs",
+          "line": 9
+        },
+        "test": "test/client-small-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        744
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Stores an argument in a 16-byte frame and forwards to the shared helper."
+    },
+    {
+      "id": 998,
+      "name": "smallWrapper998",
+      "originalSymbol": "function_998",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-wrappers.mjs",
+          "line": 9
+        },
+        "test": "test/client-small-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        927
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Stores an argument in a 16-byte frame and forwards to the shared helper."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-small-wrappers.test.mjs",
+    "report": "reports/client-small-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Result or trap plus all memory outside a 512-byte window around the frame.",
+    "limitations": [
+      "Transient frame scratch is excluded from the comparison. Ledger: 670 client and 512 server bodies recovered."
+    ]
+  }
+}

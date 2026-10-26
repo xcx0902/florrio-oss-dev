@@ -1,0 +1,77 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/row-channel-blend.mjs",
+  "implementationSha256": "27b559a9a43983941f9f4221552940ccc8f26321a70f7f7287fdc70996b03f7a",
+  "factory": "createRowChannelBlendHooks",
+  "functionIds": [
+    2185,
+    2203
+  ],
+  "functions": [
+    {
+      "id": 2185,
+      "name": "blendRowsCrossedChannels",
+      "originalSymbol": "function_2185",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 571914
+        },
+        "source": {
+          "path": "source/game/client/row-channel-blend.mjs",
+          "line": 41
+        },
+        "test": "test/client-row-channel-blend.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Selector 16 copies with straight RGB and alpha 255; selector 32 saturates destination red with source blue and destination blue with source red; selector 64 multiplies the same crossed pairs; other selectors rewrite the destination."
+    },
+    {
+      "id": 2203,
+      "name": "blendRowsStraightChannels",
+      "originalSymbol": "function_2203",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 576301
+        },
+        "source": {
+          "path": "source/game/client/row-channel-blend.mjs",
+          "line": 42
+        },
+        "test": "test/client-row-channel-blend-straight.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Same row loop as 2185 but selector 16 swaps RGB, while selectors 32/64 use straight destination/source channel pairs."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-row-channel-blend.test.mjs test/client-row-channel-blend-straight.test.mjs",
+    "report": "reports/client-row-channel-blend-tests.tap and reports/client-row-channel-blend-straight-tests.tap",
+    "testGroups": 8,
+    "pass": 8,
+    "fail": 0,
+    "oracleComparisons": 306,
+    "completeLinearMemoryChecks": 306,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 306,
+    "trappingComparisons": 0,
+    "comparison": "Every case compares the return value, all 67,108,864 memory bytes and the stack pointer. Both ids cover 13 selector classes, all widths 0-5 and rows 0-3 across four selectors, and 60 deterministic random descriptors.",
+    "limitations": [
+      "Descriptors and pixel buffers are non-overlapping.",
+      "A 0x3ffffff descriptor is not exercised.",
+      "Ledger: 354 client bodies recovered and 3,891 remain machine code."
+    ]
+  }
+}

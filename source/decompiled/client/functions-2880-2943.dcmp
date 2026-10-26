@@ -1,0 +1,915 @@
+// Reading view only. Rebuild the corresponding .wat, not this pseudocode.
+function function_3241(a:int_ptr, b:int) { // func3241
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66116;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3242(a:int_ptr, b:int_ptr) { // func3242
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66104;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66128;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3243(a:int_ptr, b:int) { // func3243
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 66068;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 66080;
+  c = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66092;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3244(a:int_ptr, b:int) { // func3244
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66056;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function emscripten_sleep(a:int) { // func3245
+  function_1();
+  unreachable;
+}
+
+function function_3246(a:int_ptr, b:int) { // func3246
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66020;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66044;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3247(a:int_ptr, b:int) { // func3247
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66164;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3248(a:int_ptr, b:int_ptr) { // func3248
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66152;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66176;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3249(a:int_ptr, b:int_ptr) { // func3249
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 65960;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 66008;
+  c = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66140;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3250(a:int_ptr, b:int) { // func3250
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 65900;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 65948;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3251(a:int_ptr, b:int) { // func3251
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 65888;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3252(a:int_ptr, b:int) { // func3252
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66248;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3253(a:int_ptr, b:int_ptr) { // func3253
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66236;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66260;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3254(a:int_ptr, b:int) { // func3254
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 66200;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 66212;
+  c = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66224;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3255(a:int_ptr, b:int_ptr) { // func3255
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 65708;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[6] = 65792;
+  c = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[6] = 65876;
+  c = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66188;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function stackAlloc(a:int):int { // func3256
+  a = stack_pointer - a & -16;
+  stack_pointer = a;
+  return a;
+}
+
+function function_3257(a:int_ptr, b:int) { // func3257
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66344;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3258(a:int_ptr, b:int_ptr) { // func3258
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66332;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66356;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3259(a:int_ptr, b:int) { // func3259
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66404;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3260(a:int_ptr, b:int_ptr) { // func3260
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66392;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66416;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3261(a:int_ptr, b:int) { // func3261
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66452;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3262(a:int_ptr, b:int) { // func3262
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66536;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3263(a:int_ptr, b:int_ptr) { // func3263
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66524;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66548;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3264(a:int_ptr, b:int) { // func3264
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 66488;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 66500;
+  c = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66512;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3265(a:int_ptr, b:int) { // func3265
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66476;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3266(a:int_ptr, b:int) { // func3266
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66440;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66464;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3267(a:int_ptr) { // func3267
+  var c:int_ptr;
+  var d:int;
+  a = 7932804[0]:int;
+  if (a) {
+    loop L_b {
+      var b:int_ptr = a[3];
+      a[3] = 0;
+      var e:int = a[0];
+      if (b) {
+        c = b[4];
+        if (c == b) {
+          d = 4;
+          goto B_e;
+        }
+        d = 5;
+        if (eqz(c)) goto B_d;
+        label B_e:
+        call_indirect(c, (c[0])[d]:int);
+        label B_d:
+        free(b);
+      }
+      free(a);
+      a = e;
+      if (a) continue L_b;
+    }
+  }
+  a = 7932796[0]:int;
+  7932796[0]:int = 0;
+  if (a) { free(a) }
+}
+
+function function_3268(a:int_ptr, b:int) { // func3268
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66584;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3269(a:int_ptr, b:int_ptr) { // func3269
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66572;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66596;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3270(a:int_ptr, b:int_ptr) { // func3270
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 66380;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 66428;
+  c = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66560;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3271(a:int_ptr, b:int) { // func3271
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66320;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66368;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3272(a:int_ptr, b:int) { // func3272
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66308;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3273(a:int_ptr, b:int) { // func3273
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66668;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3274(a:int_ptr, b:int_ptr) { // func3274
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66656;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66680;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3275(a:int_ptr, b:int) { // func3275
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66728;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3276(a:int_ptr, b:int_ptr) { // func3276
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66716;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66740;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3277(a:int_ptr, b:int) { // func3277
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66776;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function fireTimeoutCallback(a:int_ptr) { // func3278
+  var d:{ a:int, b:int }
+  var e:int;
+  var g:int;
+  if (7932816[0]:ubyte & 1) goto B_a;
+  if (eqz(acquireStaticInitializationGuard(7932816))) goto B_a;
+  7932804[0]:long@4 = 0L;
+  7932796[0]:long@4 = 0L;
+  7932812[0]:int = 1065353216;
+  releaseStaticInitializationGuard(7932816);
+  label B_a:
+  var b:{ a:int, b:int } = 7932800[0]:int;
+  if (eqz(b)) goto B_c;
+  var c:{ a:int, b:int, c:int, d:int } = 
+    (7932796[0]:int +
+     ((e = {
+             b - 1 & a;
+             if ((d = popcnt(b)) <= 1) goto B_d;
+             a;
+             if (a < b) goto B_d;
+             a % b;
+             label B_d:
+           }) <<
+      2))[0]:int;
+  if (eqz(c)) goto B_c;
+  c = c.a;
+  if (eqz(c)) goto B_c;
+  if (d <= 1) {
+    b = b - 1;
+    loop L_g {
+      if (a != (d = c.b)) {
+        if ((b & d) == e) goto B_h;
+        goto B_c;
+      }
+      if (c.c == a) goto B_e;
+      label B_h:
+      c = c.a;
+      if (c) continue L_g;
+    }
+    goto B_c;
+  }
+  loop L_j {
+    if (a != (d = c.b)) {
+      if (if (b <= d) { d % b } else { d } == e) goto B_k;
+      goto B_c;
+    }
+    if (c.c == a) goto B_e;
+    label B_k:
+    c = c.a;
+    if (c) continue L_j;
+  }
+  goto B_c;
+  label B_e:
+  b = c.d[4]:int;
+  if (eqz(b)) goto B_b;
+  call_indirect(b, b.a[6]:int);
+  e = 7932800[0]:int;
+  if (eqz(e)) goto B_c;
+  var f:{ a:int, b:int } = 7932796[0]:int;
+  b = (f +
+       ((d = {
+               e - 1 & a;
+               if ((g = popcnt(e)) <= 1) goto B_n;
+               a;
+               if (a < e) goto B_n;
+               a % e;
+               label B_n:
+             }) <<
+        2))[0]:int;
+  if (eqz(b)) goto B_c;
+  c = b.a;
+  if (eqz(c)) goto B_c;
+  var h:int = e - 1;
+  if (g <= 1) {
+    loop L_q {
+      if (a != (b = c.b)) {
+        if ((b & h) == d) goto B_r;
+        goto B_c;
+      }
+      if (c.c == a) goto B_o;
+      label B_r:
+      c = c.a;
+      if (c) continue L_q;
+      goto B_c;
+    }
+    unreachable;
+  }
+  loop L_t {
+    if (a != (b = c.b)) {
+      if (if (b >= e) { b % e } else { b } == d) goto B_u;
+      goto B_c;
+    }
+    if (c.c == a) goto B_o;
+    label B_u:
+    c = c.a;
+    if (c) continue L_t;
+  }
+  goto B_c;
+  label B_o:
+  if (g <= 1) {
+    a = a & h;
+    goto B_x;
+  }
+  if (a < e) goto B_x;
+  a = a % e;
+  label B_x:
+  f = f + (a << 2);
+  b = f.a;
+  loop L_z {
+    d = b;
+    b = d.a;
+    if (b != c) continue L_z;
+  }
+  if (d != 7932804) {
+    b = d.b;
+    if (g <= 1) {
+      b = b & h;
+      goto B_ca;
+    }
+    if (b < e) goto B_ca;
+    b = b % e;
+    label B_ca:
+    if (a == b) goto B_aa;
+  }
+  b = c.a;
+  if (b) {
+    b = b.b;
+    if (g <= 1) {
+      b = b & h;
+      goto B_fa;
+    }
+    if (b < e) goto B_fa;
+    b = b % e;
+    label B_fa:
+    if (a == b) goto B_aa;
+  }
+  f.a = 0;
+  label B_aa:
+  d.a =
+    {
+      0;
+      if (eqz(f = c.a)) goto B_ha;
+      b = f.b;
+      if (g <= 1) {
+        b = b & h;
+        goto B_ia;
+      }
+      if (b < e) goto B_ia;
+      b = b % e;
+      label B_ia:
+      f;
+      if (a == b) goto B_ha;
+      (7932796[0]:int)[b]:int = d;
+      c.a;
+      label B_ha:
+    }
+  c.a = 0;
+  7932808[0]:int = 7932808[0]:int - 1;
+  a = c.d;
+  c.d = 0;
+  if (a) {
+    b = a[4];
+    if (b == a) {
+      d = 4;
+      goto B_ma;
+    }
+    d = 5;
+    if (eqz(b)) goto B_la;
+    label B_ma:
+    call_indirect(b, b.a[d]:int);
+    label B_la:
+    free(a);
+  }
+  free(c);
+  label B_c:
+  return ;
+  label B_b:
+  function_406();
+  unreachable;
+}
+
+function function_3279(a:int_ptr, b:int) { // func3279
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66860;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3280(a:int_ptr, b:int_ptr) { // func3280
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66848;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66872;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3281(a:int_ptr, b:int) { // func3281
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 66812;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 66824;
+  c = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66836;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3282(a:int_ptr, b:int) { // func3282
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66800;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3283(a:int_ptr, b:int) { // func3283
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66764;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66788;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3284(a:int_ptr, b:int) { // func3284
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66908;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3285(a:int_ptr, b:int_ptr) { // func3285
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66896;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66920;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3286(a:int_ptr, b:int_ptr) { // func3286
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 66704;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 66752;
+  c = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66884;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3287(a:int_ptr, b:int) { // func3287
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66644;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 66692;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3288(a:int_ptr, b:int) { // func3288
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66632;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3289(a:int_ptr, b:int) { // func3289
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 66980;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3290(a:int_ptr, b:int_ptr) { // func3290
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66968;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 66992;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3291(a:int_ptr, b:int) { // func3291
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 67040;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3292(a:int_ptr, b:int_ptr) { // func3292
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 67028;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 67052;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3293(a:int_ptr, b:int) { // func3293
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 67088;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3294(a:int_ptr, b:int) { // func3294
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 67172;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3295(a:int_ptr, b:int_ptr) { // func3295
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 67160;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 67184;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3296(a:int_ptr, b:int) { // func3296
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 67124;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 67136;
+  c = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 67148;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3297(a:int_ptr, b:int) { // func3297
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 67112;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3298(a:int_ptr, b:int) { // func3298
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 67076;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 67100;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function acceptClipboardText(a:int) { // func3299
+  var d:int;
+  var c:int_ptr = 7944488[0]:int;
+  if (eqz(c)) {
+    function_364(7907, 0);
+    return ;
+  }
+  a = select_if(a, 125873, a);
+  var b:int = c[67];
+  if (b) {
+    call_indirect(c, a, b);
+    return ;
+  }
+  b = c[81];
+  if (b) {
+    call_indirect(b, d4730[3]:int);
+    d4730[4]:int = d4730[4]:int - 1;
+  }
+  d = call_indirect(select_if(1, b = (d = stringLength(a)) + 1, b < d),
+                    d4730[0]:int);
+  if (d) {
+    d4730[4]:int = d4730[4]:int + 1;
+    function_363(d, a, b);
+  }
+  c[81] = d;
+}
+
+function function_3300(a:int_ptr, b:int) { // func3300
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 67220;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_3301(a:int_ptr, b:int_ptr) { // func3301
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 67208;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 67232;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3302(a:int_ptr, b:int_ptr) { // func3302
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 67016;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 67064;
+  c = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 67196;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_3303(a:int_ptr, b:int) { // func3303
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 66956;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 67004;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_3304(a:int_ptr, b:int) { // func3304
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 67304;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+

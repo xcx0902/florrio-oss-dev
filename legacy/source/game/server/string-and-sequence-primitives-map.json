@@ -1,0 +1,182 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-and-sequence-primitives.mjs",
+  "implementationSha256": "f06854348ced6e8bf4f91f1176a206c3c67225fe9fe2d047f34ee969ea9bf588",
+  "factory": "createStringAndSequencePrimitiveHooks",
+  "functionIds": [
+    71,
+    83,
+    126,
+    181,
+    606,
+    608,
+    609
+  ],
+  "functions": [
+    {
+      "id": 71,
+      "name": "resolveStringData",
+      "originalSymbol": "function_71",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-and-sequence-primitives.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-and-sequence-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 83,
+      "name": "recordSeekPosition",
+      "originalSymbol": "function_83",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-and-sequence-primitives.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-and-sequence-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 126,
+      "name": "compareByteStrings",
+      "originalSymbol": "function_126",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-and-sequence-primitives.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-and-sequence-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 181,
+      "name": "reverseWordRange",
+      "originalSymbol": "function_181",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-and-sequence-primitives.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-and-sequence-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 606,
+      "name": "hashWordRange",
+      "originalSymbol": "function_606",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-and-sequence-primitives.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-and-sequence-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 608,
+      "name": "compareWordRanges",
+      "originalSymbol": "function_608",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-and-sequence-primitives.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-and-sequence-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 609,
+      "name": "hashSignedByteRange",
+      "originalSymbol": "function_609",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-and-sequence-primitives.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-and-sequence-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-and-sequence-primitives.test.mjs",
+    "report": "reports/server-string-and-sequence-primitives-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 21,
+    "completeLinearMemoryChecks": 21,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 21,
+    "trappingComparisons": 0,
+    "comparison": "3 trials per primitive compare result, complete memory and stack pointer.",
+    "limitations": [
+      "71 uses 16 bytes of native dead stack scratch, excluded from byte comparison.",
+      "Ledger: 342 server bodies recovered and 392 remain machine code."
+    ]
+  }
+}

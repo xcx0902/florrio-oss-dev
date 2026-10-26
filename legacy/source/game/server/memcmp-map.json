@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/memcmp.mjs",
+  "implementationSha256": "1448e31565f993645400dce32fe231a5541c6d0ce807c070e4bd1a2190619c33",
+  "factory": "createMemcmpHook",
+  "functionIds": [
+    57
+  ],
+  "functions": [
+    {
+      "id": 57,
+      "name": "memcmp",
+      "originalSymbol": "memcmp",
+      "signature": " (type $t4) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 15131
+        },
+        "source": {
+          "path": "source/game/server/memcmp.mjs",
+          "line": 25
+        },
+        "test": "test/server-memcmp.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Unsigned byte-prefix comparison returning left-right at the first mismatch. The shipped loop compares the first byte even for length 0 and can only terminate at a mismatch in that case; the recovered loop reproduces this exactly."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-memcmp.test.mjs",
+    "report": "reports/server-memcmp-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 65,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 65,
+    "trappingComparisons": 0,
+    "comparison": "Lengths 1..16 are crossed with equal prefixes, a difference at every position, and both directions of unsigned byte ordering. The zero-length first-byte-mismatch quirk is compared as well. Every case checks the result and stack pointer; memcmp is read-only.",
+    "limitations": [
+      "The zero-length equal-prefix case is a non-terminating loop in the original and is therefore not executed.",
+      "Ledger: 202 server bodies recovered and 532 remain machine code."
+    ]
+  }
+}

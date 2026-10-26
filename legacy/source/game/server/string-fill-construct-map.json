@@ -1,0 +1,54 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-fill-construct.mjs",
+  "implementationSha256": "08db654d51d80c6211051cbeb70397636fc75bbcc2390db34c79ded8951e6e3e",
+  "factory": "createStringFillConstructHook",
+  "functionIds": [
+    214
+  ],
+  "functions": [
+    {
+      "id": 214,
+      "name": "constructStringFromBytes",
+      "originalSymbol": "function_214",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        173
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-fill-construct.mjs",
+          "line": 14
+        },
+        "test": "test/server-string-fill-construct.test.mjs"
+      },
+      "originalDirectDependencies": [
+        75,
+        173
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "SSO strings copy through 75 with a null terminator; long strings go through 173 with the old size byte."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-fill-construct.test.mjs",
+    "report": "reports/server-string-fill-construct-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 6,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Six lengths compare stored size and payload bytes; heap addresses are allowed to differ.",
+    "limitations": [
+      "Long-string allocator 173 remains machine code and returns instance-specific heap addresses. Ledger: 503 server bodies recovered and 231 remain machine code."
+    ]
+  }
+}

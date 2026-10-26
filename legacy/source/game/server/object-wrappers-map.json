@@ -1,0 +1,161 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/object-wrappers.mjs",
+  "implementationSha256": "49b1dd429e4e3324ea0fdf6fdf71dac7faff60a68f2eff0942f52e5c06a4f144",
+  "factory": "createObjectWrapperHooks",
+  "functionIds": [
+    324,
+    369,
+    451,
+    481,
+    641
+  ],
+  "functions": [
+    {
+      "id": 324,
+      "name": "constructDashString",
+      "originalSymbol": "function_324",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        337
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-wrappers.mjs",
+          "line": 11
+        },
+        "test": "test/server-object-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        337
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Constructs a one-character '-' string through 337."
+    },
+    {
+      "id": 369,
+      "name": "deleteObject241",
+      "originalSymbol": "function_369",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        241
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-wrappers.mjs",
+          "line": 15
+        },
+        "test": "test/server-object-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        241,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 241 then frees the object."
+    },
+    {
+      "id": 451,
+      "name": "deleteObject290",
+      "originalSymbol": "function_451",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        290
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-wrappers.mjs",
+          "line": 19
+        },
+        "test": "test/server-object-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        290,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 290 then frees the object."
+    },
+    {
+      "id": 481,
+      "name": "deleteObject297",
+      "originalSymbol": "function_481",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        297
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-wrappers.mjs",
+          "line": 23
+        },
+        "test": "test/server-object-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        297,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 297 then frees the object."
+    },
+    {
+      "id": 641,
+      "name": "deleteObject242",
+      "originalSymbol": "function_641",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        242
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-wrappers.mjs",
+          "line": 27
+        },
+        "test": "test/server-object-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        242,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 242 then frees the object."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-object-wrappers.test.mjs",
+    "report": "reports/server-object-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 5,
+    "completeLinearMemoryChecks": 5,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 5,
+    "trappingComparisons": 0,
+    "comparison": "Five thin wrappers compare result/trap, complete memory and stack.",
+    "limitations": [
+      "Cleanup helpers 241, 242, 290, 297 and constructor 337 remain machine code. Ledger: 475 server bodies recovered and 259 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/container-end.mjs",
+  "implementationSha256": "b64e442c01572989731b9b26e2273bab2f57b7c1bea3ec1b982ae62b4da55d30",
+  "factory": "createContainerEndHook",
+  "functionIds": [
+    109,
+    111
+  ],
+  "functions": [
+    {
+      "id": 109,
+      "name": "endOfWordContainer",
+      "originalSymbol": "function_109",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 24015
+        },
+        "source": {
+          "path": "source/game/server/container-end.mjs",
+          "line": 47
+        },
+        "test": "test/server-container-end.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Returns data + count*4 for a heap or inline 32-bit container and records the pointer in the stack frame."
+    },
+    {
+      "id": 111,
+      "name": "endOfByteContainer",
+      "originalSymbol": "function_111",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 24135
+        },
+        "source": {
+          "path": "source/game/server/container-end.mjs",
+          "line": 59
+        },
+        "test": "test/server-container-end.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Returns data + count for a heap or inline byte container and records the pointer in the stack frame."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-container-end.test.mjs",
+    "report": "reports/server-container-end-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 20,
+    "completeLinearMemoryChecks": 20,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 20,
+    "trappingComparisons": 0,
+    "comparison": "Two accessors \u00d7 heap/inline storage \u00d7 five counts compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds payload ranges are not exercised.",
+      "Ledger: 237 server bodies recovered and 497 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/global-cleanup.mjs",
+  "implementationSha256": "dec542a32073fd3bf166aefb5ce82b1a46af283549a488314fa702644b881eba",
+  "factory": "createGlobalCleanupHooks",
+  "functionIds": [
+    436,
+    441,
+    646,
+    721
+  ],
+  "functions": [
+    {
+      "id": 436,
+      "name": "releaseGlobalBufferA",
+      "originalSymbol": "function_436",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/global-cleanup.mjs",
+          "line": 23
+        },
+        "test": "test/server-global-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Frees 8555164 and clears 8555156."
+    },
+    {
+      "id": 441,
+      "name": "releaseGlobalBufferB",
+      "originalSymbol": "function_441",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/global-cleanup.mjs",
+          "line": 26
+        },
+        "test": "test/server-global-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Frees 8551052 and clears 8551044."
+    },
+    {
+      "id": 646,
+      "name": "closeDescriptor",
+      "originalSymbol": "function_646",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/global-cleanup.mjs",
+          "line": 29
+        },
+        "test": "test/server-global-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        10
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Closes +60 through fdCloseNoop (import 10)."
+    },
+    {
+      "id": 721,
+      "name": "releaseMember24",
+      "originalSymbol": "function_721",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/global-cleanup.mjs",
+          "line": 32
+        },
+        "test": "test/server-global-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Frees +24 and clears +16..+24."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-global-cleanup.test.mjs",
+    "report": "reports/server-global-cleanup-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Both global buffers and both descriptor/member releases with null pointers; complete memory, result and stack.",
+    "limitations": [
+      "Ledger: 432 server bodies recovered and 302 remain machine code."
+    ]
+  }
+}

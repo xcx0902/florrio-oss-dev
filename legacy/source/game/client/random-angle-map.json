@@ -1,0 +1,236 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/random-angle.mjs",
+  "implementationSha256": "ab7e984409afd126dcb224dc7c58fe99714dd4d35d44296f9312db6e8f525254",
+  "factory": "createRandomAngleHooks",
+  "functionIds": [
+    827,
+    828,
+    834,
+    1489,
+    1500,
+    1511,
+    1576,
+    1674
+  ],
+  "functions": [
+    {
+      "id": 827,
+      "name": "createRandomAngle827",
+      "originalSymbol": "function_827",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 176015
+        },
+        "source": {
+          "path": "source/game/client/random-angle.mjs",
+          "line": 64
+        },
+        "test": "test/client-random-angle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate the 8-byte generator object, store vtable 34296, advance the shared Park–Miller state at 7948176 with Schrage's q=44488/r=3399 decomposition, then store f32 angle (next-1)*pi/2^30."
+    },
+    {
+      "id": 828,
+      "name": "createRandomAngle828",
+      "originalSymbol": "function_828",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 176060
+        },
+        "source": {
+          "path": "source/game/client/random-angle.mjs",
+          "line": 64
+        },
+        "test": "test/client-random-angle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate the 8-byte generator object, store vtable 33420, advance the shared Park–Miller state at 7948176 with Schrage's q=44488/r=3399 decomposition, then store f32 angle (next-1)*pi/2^30."
+    },
+    {
+      "id": 834,
+      "name": "createRandomAngle834",
+      "originalSymbol": "function_834",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 177193
+        },
+        "source": {
+          "path": "source/game/client/random-angle.mjs",
+          "line": 64
+        },
+        "test": "test/client-random-angle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate the 8-byte generator object, store vtable 33724, advance the shared Park–Miller state at 7948176 with Schrage's q=44488/r=3399 decomposition, then store f32 angle (next-1)*pi/2^30."
+    },
+    {
+      "id": 1489,
+      "name": "createRandomAngle1489",
+      "originalSymbol": "function_1489",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 452397
+        },
+        "source": {
+          "path": "source/game/client/random-angle.mjs",
+          "line": 64
+        },
+        "test": "test/client-random-angle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate the 8-byte generator object, store vtable 34340, advance the shared Park–Miller state at 7948176 with Schrage's q=44488/r=3399 decomposition, then store f32 angle (next-1)*pi/2^30."
+    },
+    {
+      "id": 1500,
+      "name": "createRandomAngle1500",
+      "originalSymbol": "function_1500",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 452808
+        },
+        "source": {
+          "path": "source/game/client/random-angle.mjs",
+          "line": 64
+        },
+        "test": "test/client-random-angle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate the 8-byte generator object, store vtable 34384, advance the shared Park–Miller state at 7948176 with Schrage's q=44488/r=3399 decomposition, then store f32 angle (next-1)*pi/2^30."
+    },
+    {
+      "id": 1511,
+      "name": "createRandomAngle1511",
+      "originalSymbol": "function_1511",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 453177
+        },
+        "source": {
+          "path": "source/game/client/random-angle.mjs",
+          "line": 64
+        },
+        "test": "test/client-random-angle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate the 8-byte generator object, store vtable 34252, advance the shared Park–Miller state at 7948176 with Schrage's q=44488/r=3399 decomposition, then store f32 angle (next-1)*pi/2^30."
+    },
+    {
+      "id": 1576,
+      "name": "createRandomAngle1576",
+      "originalSymbol": "function_1576",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 455508
+        },
+        "source": {
+          "path": "source/game/client/random-angle.mjs",
+          "line": 64
+        },
+        "test": "test/client-random-angle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate the 8-byte generator object, store vtable 33988, advance the shared Park–Miller state at 7948176 with Schrage's q=44488/r=3399 decomposition, then store f32 angle (next-1)*pi/2^30."
+    },
+    {
+      "id": 1674,
+      "name": "createRandomAngle1674",
+      "originalSymbol": "function_1674",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 458855
+        },
+        "source": {
+          "path": "source/game/client/random-angle.mjs",
+          "line": 64
+        },
+        "test": "test/client-random-angle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate the 8-byte generator object, store vtable 33332, advance the shared Park–Miller state at 7948176 with Schrage's q=44488/r=3399 decomposition, then store f32 angle (next-1)*pi/2^30."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-random-angle.test.mjs",
+    "report": "reports/client-random-angle-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 40,
+    "completeLinearMemoryChecks": 40,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 40,
+    "trappingComparisons": 0,
+    "comparison": "Five seed states (0, 1, 48271, 182605794, 2147483646) crossed with all eight constructors. Each compares the object pointer, seed/object memory, full 67,108,864 bytes and the stack pointer.",
+    "limitations": [
+      "Allocator 371 remains native at the oracle level.",
+      "Ledger: 437 client bodies recovered and 3,808 remain machine code."
+    ]
+  }
+}

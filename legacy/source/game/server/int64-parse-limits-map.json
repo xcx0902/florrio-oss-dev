@@ -1,0 +1,75 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/int64-parse-limits.mjs",
+  "implementationSha256": "071bd4cef169ec443a907269f3c8b19cac18324078581690fc97d48570df8b01",
+  "factory": "createInt64ParseLimitHooks",
+  "functionIds": [
+    236,
+    352
+  ],
+  "functions": [
+    {
+      "id": 236,
+      "name": "parseInt64LimitMinusOne",
+      "originalSymbol": "function_236",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/int64-parse-limits.mjs",
+          "line": 9
+        },
+        "test": "test/server-int64-parse-limits.test.mjs"
+      },
+      "originalDirectDependencies": [
+        373
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards with limit -1."
+    },
+    {
+      "id": 352,
+      "name": "parseInt64LimitMin",
+      "originalSymbol": "function_352",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/int64-parse-limits.mjs",
+          "line": 12
+        },
+        "test": "test/server-int64-parse-limits.test.mjs"
+      },
+      "originalDirectDependencies": [
+        373
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards with limit INT64_MIN."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-int64-parse-limits.test.mjs",
+    "report": "reports/server-int64-parse-limits-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Two limits x two texts compare result, complete memory and stack.",
+    "limitations": [
+      "373 remains native. Ledger: 421 server bodies recovered and 313 remain machine code."
+    ]
+  }
+}

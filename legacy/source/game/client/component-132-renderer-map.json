@@ -1,0 +1,266 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "retainedEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/component-132-renderer.mjs",
+  "implementationSha256": "786e324e9b070ba88dc244bc52714ad43ed0f39da242784ffbe0fcf0cb43d87d",
+  "factory": "createComponent132RendererHooks",
+  "functionIds": [
+    1040
+  ],
+  "functions": [
+    {
+      "id": 1040,
+      "name": "drawComponent132",
+      "originalSymbol": "function_1040",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 285220,
+          "endLine": 287901
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0640-0703.dcmp",
+          "line": 16533,
+          "endLine": 17331
+        },
+        "source": {
+          "path": "source/game/client/component-132-renderer.mjs",
+          "line": 325
+        },
+        "test": "test/client-component-132-renderer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_372",
+        "function_366",
+        "function_395",
+        "function_410"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "directInternalDependencies": [
+    372,
+    366,
+    395,
+    410
+  ],
+  "staticInternalCallClosure": [
+    366,
+    369,
+    370,
+    372,
+    395,
+    410,
+    1040
+  ],
+  "externalImports": [
+    {
+      "id": 0,
+      "module": "a",
+      "field": "a",
+      "name": "emscripten_asm_const_int"
+    },
+    {
+      "id": 2,
+      "module": "a",
+      "field": "c",
+      "name": "emscripten_asm_const_double"
+    }
+  ],
+  "layout": {
+    "componentOwner": 0,
+    "entityVisualComponent": 136,
+    "visualHitFlag": 56,
+    "visualHitTimestamp": 64,
+    "rendererCurrentTransform": 0,
+    "rendererCachedTransform": 24,
+    "rendererTransformDirty": 48,
+    "rendererLineCap": 49,
+    "rendererLineJoin": 50,
+    "rendererGrayscale": 69,
+    "rendererCanvasContext": 96,
+    "scratchBytes": 1744,
+    "hitClockScratch": 1672,
+    "rendererSavedState": 1676
+  },
+  "stages": [
+    {
+      "name": "applyLocalScale",
+      "sourceLine": 110
+    },
+    {
+      "name": "prepareLineStyle",
+      "sourceLine": 129
+    },
+    {
+      "name": "resolvePalette",
+      "sourceLine": 160
+    },
+    {
+      "name": "drawTriangle",
+      "sourceLine": 254
+    },
+    {
+      "name": "drawClippedEllipse",
+      "sourceLine": 265
+    },
+    {
+      "name": "drawEllipseOutline",
+      "sourceLine": 288
+    },
+    {
+      "name": "drawCurvedDetails",
+      "sourceLine": 301
+    }
+  ],
+  "hostAbi": [
+    {
+      "name": "lineWidth",
+      "address": 138111,
+      "signature": 93028,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "lineJoinRound",
+      "address": 138811,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "lineCapRound",
+      "address": 138730,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "fillRgb",
+      "address": 137186,
+      "signature": 32170,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "strokeRgb",
+      "address": 137456,
+      "signature": 32170,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "beginPath",
+      "address": 136878,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "setTransform",
+      "address": 136414,
+      "signature": 32144,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "moveTo",
+      "address": 137806,
+      "signature": 32166,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "lineTo",
+      "address": 137843,
+      "signature": 32166,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "closePath",
+      "address": 136912,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "ellipse",
+      "address": 138047,
+      "signature": 32191,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "fill",
+      "address": 136661,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "save",
+      "address": 136300,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "clip",
+      "address": 136807,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "restore",
+      "address": 136329,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "stroke",
+      "address": 136732,
+      "signature": 31967,
+      "module": "a",
+      "field": "a"
+    },
+    {
+      "name": "quadraticCurveTo",
+      "address": 137880,
+      "signature": 32160,
+      "module": "a",
+      "field": "a"
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-component-132-renderer.test.mjs",
+    "testGroups": 7,
+    "oracleComparisons": 27,
+    "behaviorCheckpoints": 131,
+    "memoryBytesPerComparison": 67108864,
+    "hostDecodedArgumentsCompared": true,
+    "hostArgumentByteWindow": 80,
+    "returnStackExceptionsAndCompleteMemoryCompared": true,
+    "sourceOnlyIsolatedPatchedAndCombinedPatched": true,
+    "testSourceSha256": "0aba6506a5ac4684068e452260a695389ffe0455d9ea2dbc6c65d864799b0d9b",
+    "report": "reports/client-component-132-renderer-tests.tap",
+    "reportSha256": "47de9e43959272d42043752655d1ba91c93a392d0a17077ca57cfab95a0a08c9",
+    "pass": 7,
+    "fail": 0,
+    "testLog": "reports/tests.tap"
+  },
+  "limitations": [
+    "The exact product identity of entity component132 is unproven; the implementation names its geometry and observed state only.",
+    "Full static internal dependency closure is source-recovered in the active registry at validation time; browser Canvas and clock remain external host dependencies.",
+    "The finite oracle matrix covers real constructors, captured snapshots, representative scratch overlaps, host mutations, sentinels and exceptions; it does not establish every arbitrary malformed or overlapping memory state.",
+    "Registered by the parent task after review and original-WASM differential tests; current build/browser identity is in reports/current-verification.json."
+  ],
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

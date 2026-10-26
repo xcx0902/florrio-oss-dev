@@ -1,0 +1,289 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/entity-renderer.mjs",
+  "implementationSha256": "beb3ab732e889b0b70e4688958f07f7246c1ec029e558640ee96f734b2769741",
+  "factory": "createEntityRendererHooks",
+  "functionIds": [
+    760
+  ],
+  "functions": [
+    {
+      "id": 760,
+      "name": "drawEntity",
+      "originalSymbol": "function_760",
+      "signature": " (type $t83) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 127916
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0384-0447.dcmp",
+          "line": 2273
+        },
+        "source": {
+          "path": "source/game/client/entity-renderer.mjs",
+          "line": 177
+        },
+        "test": "test/client-entity-renderer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_672",
+        "emscripten_asm_const_int",
+        "function_372",
+        "function_705",
+        "function_403",
+        "function_407",
+        "function_760",
+        "function_409",
+        "getEntityDefinition",
+        "acquireStaticInitializationGuard",
+        "function_787",
+        "releaseStaticInitializationGuard",
+        "function_412",
+        "function_1048",
+        "function_557",
+        "free",
+        "function_366",
+        "function_395",
+        "function_373",
+        "function_1100",
+        "function_375",
+        "function_431",
+        "function_427",
+        "function_634",
+        "function_496",
+        "function_455",
+        "function_1131",
+        "function_615",
+        "function_1043",
+        "function_1044",
+        "function_782",
+        "function_1045",
+        "function_614",
+        "function_1040",
+        "function_616",
+        "function_785",
+        "function_1038",
+        "function_1039"
+      ],
+      "originalIndirectCallSites": 4
+    }
+  ],
+  "phases": [
+    {
+      "name": "drawTriangleComponent",
+      "watLine": 128970,
+      "watEndLine": 129733,
+      "description": "Draw the triangle component and its hit-flash colors.",
+      "sourceLine": 205
+    },
+    {
+      "name": "drawCircleComponent",
+      "watLine": 129740,
+      "watEndLine": 130412,
+      "description": "Draw the circle component with its fill and shaded outline.",
+      "sourceLine": 488
+    },
+    {
+      "name": "drawPlayerComponent",
+      "watLine": 130419,
+      "watEndLine": 130607,
+      "description": "Build player appearance parameters and dispatch its renderer.",
+      "sourceLine": 746
+    },
+    {
+      "name": "drawPetalComponent",
+      "watLine": 130614,
+      "watEndLine": 130861,
+      "description": "Create, bind and draw the catalog petal through its original virtual table.",
+      "sourceLine": 814
+    },
+    {
+      "name": "drawSpokedEffectComponent",
+      "watLine": 130868,
+      "watEndLine": 131784,
+      "description": "Build and cache the spoked effect path, then draw its fading image.",
+      "sourceLine": 919
+    },
+    {
+      "name": "drawRenderComponent",
+      "watLine": 128965,
+      "watEndLine": 131908,
+      "description": "Dispatch the first present render component in original priority order.",
+      "sourceLine": 1254
+    },
+    {
+      "name": "isOutsideViewport",
+      "watLine": 127938,
+      "watEndLine": 127989,
+      "description": "Update visual bounds and test the expanded viewport.",
+      "sourceLine": 1344
+    },
+    {
+      "name": "beginEntityDraw",
+      "watLine": 127990,
+      "watEndLine": 128050,
+      "description": "Save the drawing state, read the frame clock and retain the visual update timestamp.",
+      "sourceLine": 1372
+    },
+    {
+      "name": "applyEntityLocalTransform",
+      "watLine": 128051,
+      "watEndLine": 128450,
+      "description": "Interpolate local position, constrain the player and compose translation and rotation.",
+      "sourceLine": 1394
+    },
+    {
+      "name": "applyVisualFade",
+      "watLine": 128451,
+      "watEndLine": 128631,
+      "description": "Apply the flag-controlled visual fade and scale animation.",
+      "sourceLine": 1562
+    },
+    {
+      "name": "drawOwnedChildren",
+      "watLine": 128632,
+      "watEndLine": 128812,
+      "description": "Find the owner range in the entity hash and recursively draw its children.",
+      "sourceLine": 1637
+    },
+    {
+      "name": "trackNearbyEntityDiscovery",
+      "watLine": 128813,
+      "watEndLine": 128964,
+      "description": "Record a newly encountered nearby entity type using its resolved catalog identity.",
+      "sourceLine": 1756
+    },
+    {
+      "name": "restoreEntityDrawingState",
+      "watLine": 131909,
+      "watEndLine": 131953,
+      "description": "Clear the visual update flag and restore the caller drawing state.",
+      "sourceLine": 1826
+    }
+  ],
+  "layout": {
+    "cameraFromState": 2144,
+    "entity": {
+      "circle": 68,
+      "petal": 76,
+      "spokedEffect": 92,
+      "definitionType": 100,
+      "triangle": 108,
+      "health": 116,
+      "transform": 120,
+      "visual": 136,
+      "bounds": 140,
+      "playerInput": 144,
+      "player": 152
+    },
+    "visual": {
+      "flags": 8,
+      "updated": 16,
+      "updateTimestamp": 24,
+      "fadeTimestamp": 40,
+      "hitTimestamp": 56
+    },
+    "renderer": {
+      "matrix": 0,
+      "cachedMatrix": 24,
+      "transformDirty": 48,
+      "alpha": 56,
+      "grayscale": 69,
+      "contextId": 96
+    },
+    "petal": {
+      "type": 8,
+      "cachedRenderer": 20,
+      "catalogBase": 382064,
+      "catalogStride": 52,
+      "catalogFactoryOffset": 48
+    },
+    "ownerIndex": {
+      "buckets": 76,
+      "bucketCount": 80
+    }
+  },
+  "renderPriority": [
+    108,
+    68,
+    152,
+    76,
+    92,
+    84,
+    88,
+    148,
+    104,
+    128,
+    124,
+    132,
+    96,
+    60,
+    64,
+    80
+  ],
+  "virtualCalls": [
+    {
+      "operation": "constructCatalogPetal",
+      "parameters": [],
+      "results": [
+        "i32"
+      ]
+    },
+    {
+      "operation": "destroyPetalRenderer",
+      "vtableOffset": 4,
+      "parameters": [
+        "i32"
+      ],
+      "results": []
+    },
+    {
+      "operation": "bindPetalRenderer",
+      "vtableOffset": 28,
+      "parameters": [
+        "i32",
+        "i32"
+      ],
+      "results": []
+    },
+    {
+      "operation": "renderPetalInstance",
+      "vtableOffset": 32,
+      "parameters": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": []
+    }
+  ],
+  "validation": {
+    "testGroups": 7,
+    "oracleComparisons": 13,
+    "fullMemoryCheckpoints": 274,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true,
+    "capturedPackets": 15,
+    "petalTypes": 38,
+    "petalCheckpoints": 114,
+    "componentBranches": 16,
+    "priorityChecks": 1,
+    "viewportCases": 8,
+    "visualEffectCases": 75,
+    "pointerAndFactoryTraps": 5,
+    "combinedActiveClient": true,
+    "testLog": "reports/tests.tap"
+  },
+  "limitations": [
+    "The complete body760 is recovered; remaining component renderers, math, discovery/string services, allocators and petal virtual functions remain explicit dependencies.",
+    "Unknown render component identities retain numeric entity offsets. The spoked effect is named after observed geometry; no product identity is claimed.",
+    "Host tests compare Canvas calls and state, not browser pixels. Finite packet/fixture cases do not prove every possible object graph or memory alias.",
+    "Browser validation is bound to recorded source/artifact hashes; see reports/current-verification.json and reports/runtime/readable.json."
+  ],
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

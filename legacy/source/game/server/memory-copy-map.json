@@ -1,0 +1,71 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/memory-copy.mjs",
+  "implementationSha256": "62d998da3876309234baf045f62cced79179132c6c82df0a8854a5bb513e6ba4",
+  "factory": "createMemoryCopyHooks",
+  "functionIds": [
+    75,
+    79
+  ],
+  "functions": [
+    {
+      "id": 75,
+      "name": "copyMemory",
+      "originalSymbol": "function_75",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/memory-copy.mjs",
+          "line": 9
+        },
+        "test": "test/server-memory-copy.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Copies count bytes and returns destination."
+    },
+    {
+      "id": 79,
+      "name": "clearThreeWords",
+      "originalSymbol": "function_79",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/memory-copy.mjs",
+          "line": 16
+        },
+        "test": "test/server-memory-copy.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Zeroes three 32-bit words at the record."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-memory-copy.test.mjs",
+    "report": "reports/server-memory-copy-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 5,
+    "completeLinearMemoryChecks": 5,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 5,
+    "trappingComparisons": 0,
+    "comparison": "75: three counts; 79: two initial patterns; complete memory, results and stack.",
+    "limitations": [
+      "Ledger: 425 server bodies recovered and 309 remain machine code."
+    ]
+  }
+}

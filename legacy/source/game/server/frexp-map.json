@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/frexp.mjs",
+  "implementationSha256": "777025267a2cbc1d52a23ff30f283941318ecfeb6a118f9ba2fee770f4a3f7f9",
+  "factory": "createServerFrexpHook",
+  "functionIds": [
+    381
+  ],
+  "functions": [
+    {
+      "id": 381,
+      "name": "frexp",
+      "originalSymbol": "function_381",
+      "signature": " (type $t28) (param $p0 f64) (param $p1 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 87032
+        },
+        "source": {
+          "path": "source/game/server/frexp.mjs",
+          "line": 41
+        },
+        "test": "test/server-frexp.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "IEEE-754 frexp: normals split into fraction and exponent, subnormals scaled by 2^64 and adjusted by -64, signed zero preserved, infinities/NaN returned unchanged."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-frexp.test.mjs",
+    "report": "reports/server-frexp-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 18,
+    "completeLinearMemoryChecks": 18,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 18,
+    "trappingComparisons": 0,
+    "comparison": "Eighteen values cover zero, signed zero, normals, subnormals, max finite, infinities and NaN. Each compares result bits, the stored exponent word, the complete 67,108,864-byte memory image and the stack pointer.",
+    "limitations": [
+      "Exponent write out of bounds would trap in both implementations but is not exercised.",
+      "Ledger: 210 server bodies recovered and 524 remain machine code."
+    ]
+  }
+}

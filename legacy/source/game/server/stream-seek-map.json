@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-seek.mjs",
+  "implementationSha256": "3cacb0fb2571e337724f61f797bf1903e95a223de7e50b439aabb2bfb642c2a5",
+  "factory": "createStreamSeekHook",
+  "functionIds": [
+    622
+  ],
+  "functions": [
+    {
+      "id": 622,
+      "name": "seekStream",
+      "originalSymbol": "function_622",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 133615
+        },
+        "source": {
+          "path": "source/game/server/stream-seek.mjs",
+          "line": 17
+        },
+        "test": "test/server-stream-seek.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Streambuf-style seek: max(+44,+24) position, embedded string at +32, direction 0 origin 0 and directions 1/2 origin current, signed offset bounded by [0,current]; flags 8 moves +12, flags 16 moves +24; result record gets offset+state or -1."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-seek.test.mjs",
+    "report": "reports/server-stream-seek-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 240,
+    "completeLinearMemoryChecks": 240,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 240,
+    "trappingComparisons": 0,
+    "comparison": "3 current positions x 4 directions x 4 flag states x 5 offsets compare complete memory and stack pointer.",
+    "limitations": [
+      "Direction 2 uses the same origin as direction 1, matching the shipped branch table.",
+      "Ledger: 363 server bodies recovered and 371 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-status-equality.mjs",
+  "implementationSha256": "38a316330c9396c2fa6eace335403e4286f3a89dceb3c238708e8ba70a51193e",
+  "factory": "createStreamStatusEqualityHooks",
+  "functionIds": [
+    48,
+    49,
+    363,
+    368
+  ],
+  "functions": [
+    {
+      "id": 48,
+      "name": "wordStatusEqual",
+      "originalSymbol": "function_48",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-status-equality.mjs",
+          "line": 12
+        },
+        "test": "test/server-stream-status-equality.test.mjs"
+      },
+      "originalDirectDependencies": [
+        363
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwarder to 363."
+    },
+    {
+      "id": 49,
+      "name": "byteStatusEqual",
+      "originalSymbol": "function_49",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-status-equality.mjs",
+          "line": 15
+        },
+        "test": "test/server-stream-status-equality.test.mjs"
+      },
+      "originalDirectDependencies": [
+        368
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwarder to 368."
+    },
+    {
+      "id": 363,
+      "name": "compareWordStatus",
+      "originalSymbol": "function_363",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-status-equality.mjs",
+          "line": 18
+        },
+        "test": "test/server-stream-status-equality.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "1 when both 362 statuses agree."
+    },
+    {
+      "id": 368,
+      "name": "compareByteStatus",
+      "originalSymbol": "function_368",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-status-equality.mjs",
+          "line": 21
+        },
+        "test": "test/server-stream-status-equality.test.mjs"
+      },
+      "originalDirectDependencies": [
+        367
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "1 when both 367 statuses agree."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-status-equality.test.mjs",
+    "report": "reports/server-stream-status-equality-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 32,
+    "completeLinearMemoryChecks": 32,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 32,
+    "trappingComparisons": 0,
+    "comparison": "4 routines x 2 left handles x 2 right handles x 2 values compare result, complete memory and stack.",
+    "limitations": [
+      "Empty-area virtual peek paths are not exercised.",
+      "Ledger: 396 server bodies recovered and 338 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/scalbn.mjs",
+  "implementationSha256": "761fd846c4f2d4781e1e57348e6651aef92cc10644ee94fba5a37c5a8a046c85",
+  "factory": "createScalbnHook",
+  "functionIds": [
+    107
+  ],
+  "functions": [
+    {
+      "id": 107,
+      "name": "scalbn",
+      "originalSymbol": "function_107",
+      "signature": " (type $t28) (param $p0 f64) (param $p1 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 23933
+        },
+        "source": {
+          "path": "source/game/server/scalbn.mjs",
+          "line": 19
+        },
+        "test": "test/server-scalbn.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "x*2^n with two-step up/down clamping at 1024/-1023 and 2047/-2045, then an exact exponent-word multiply."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-scalbn.test.mjs",
+    "report": "reports/server-scalbn-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 1008,
+    "completeLinearMemoryChecks": 1,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 1008,
+    "trappingComparisons": 0,
+    "comparison": "Fourteen values including signed zero, subnormal, max, infinities and NaN across broad exponents plus every clamp boundary; raw f64 bits and stack pointer are compared, and the kernel is verified read-only.",
+    "limitations": [
+      "Signalling-NaN payload propagation is covered only by the NaN sample.",
+      "Ledger: 233 server bodies recovered and 501 remain machine code."
+    ]
+  }
+}

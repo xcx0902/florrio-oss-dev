@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/free-block.mjs",
+  "implementationSha256": "1d608cd4d2b72222a786a9b1c71d42f4db7dcc860a3399776752bbb0ee4e0274",
+  "factory": "createFreeBlockHook",
+  "functionIds": [
+    286
+  ],
+  "functions": [
+    {
+      "id": 286,
+      "name": "releaseBlock",
+      "originalSymbol": "function_286",
+      "signature": " (type $t2) (param i32 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 69284
+        },
+        "source": {
+          "path": "source/game/server/free-block.mjs",
+          "line": 202
+        },
+        "test": "test/server-free-block.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "dlmalloc block release: merge previous when PINUSE is clear, absorb/merge next, update top/dv, then insert into a small or tree bin."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-free-block.test.mjs",
+    "report": "reports/server-free-block-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 77,
+    "completeLinearMemoryChecks": 154,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 77,
+    "trappingComparisons": 0,
+    "comparison": "Arena rebuilt by native malloc for each of 77 allocation/free orders; complete memory after frees and after a subsequent native malloc, plus malloc pointer and stack pointer, are compared.",
+    "limitations": [
+      "Double-free, invalid chunks and mmapped chunks are not exercised (the build has no mmap branch).",
+      "Ledger: 242 server bodies recovered and 492 remain machine code."
+    ]
+  }
+}

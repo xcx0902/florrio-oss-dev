@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/wide-float-compare.mjs",
+  "implementationSha256": "59da8331815ba040f06ead05b77a94215b6180607e36b9f445dbf48525251dcb",
+  "factory": "createWideFloatCompareHook",
+  "functionIds": [
+    129
+  ],
+  "functions": [
+    {
+      "id": 129,
+      "name": "compareWideFloats",
+      "originalSymbol": "function_129",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 27256
+        },
+        "source": {
+          "path": "source/game/server/wide-float-compare.mjs",
+          "line": 16
+        },
+        "test": "test/server-wide-float-compare.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "128-bit float ordering with x87 infinity pattern; NaN detection uses high magnitude ==0x7fff800000000000 and nonzero low; lexicographic high-then-low comparison for matching signs and mirrored comparison for opposite signs."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-wide-float-compare.test.mjs",
+    "report": "reports/server-wide-float-compare-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 201,
+    "completeLinearMemoryChecks": 201,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 201,
+    "trappingComparisons": 0,
+    "comparison": "81 special pairs plus 120 pseudo-random word quads compare result and stack pointer.",
+    "limitations": [
+      "Comparisons are call-free and do not mutate memory, so the memory digest is unchanged by construction.",
+      "Ledger: 359 server bodies recovered and 375 remain machine code."
+    ]
+  }
+}

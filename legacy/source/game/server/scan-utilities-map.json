@@ -1,0 +1,116 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/scan-utilities.mjs",
+  "implementationSha256": "1f8daaab5560e210b28f88aefde4da8dd4d318a244bde81496dfd39875044159",
+  "factory": "createScanUtilitiesHook",
+  "functionIds": [
+    231,
+    234,
+    378,
+    380
+  ],
+  "functions": [
+    {
+      "id": 231,
+      "name": "findWord",
+      "originalSymbol": "function_231",
+      "signature": " (type $t4) (param i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 53207
+        },
+        "source": {
+          "path": "source/game/server/scan-utilities.mjs",
+          "line": 29
+        },
+        "test": "test/server-scan-utilities.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "notes": "std::find over a 32-bit word range; returns end when absent."
+    },
+    {
+      "id": 234,
+      "name": "findByte",
+      "originalSymbol": "function_234",
+      "signature": " (type $t4) (param i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 53595
+        },
+        "source": {
+          "path": "source/game/server/scan-utilities.mjs",
+          "line": 41
+        },
+        "test": "test/server-scan-utilities.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "notes": "std::find over a byte range; returns end when absent."
+    },
+    {
+      "id": 378,
+      "name": "boundedStringTerminator",
+      "originalSymbol": "function_378",
+      "signature": " (type $t3) (param i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 86731
+        },
+        "source": {
+          "path": "source/game/server/scan-utilities.mjs",
+          "line": 53
+        },
+        "test": "test/server-scan-utilities.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "notes": "Returns the pointer of the first NUL within the byte limit, or 0; it does not return a length."
+    },
+    {
+      "id": 380,
+      "name": "parseUnsignedDecimal",
+      "originalSymbol": "function_380",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 86999
+        },
+        "source": {
+          "path": "source/game/server/scan-utilities.mjs",
+          "line": 67
+        },
+        "test": "test/server-scan-utilities.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "notes": "Parses leading decimal digits through a pointer-to-pointer cursor with wrapping 32-bit accumulation; stops at the first non-digit."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-scan-utilities.test.mjs",
+    "report": "reports/server-scan-utilities-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 451,
+    "completeLinearMemoryChecks": 451,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 451,
+    "trappingComparisons": 0,
+    "comparison": "Word ranges with present/absent needles, byte ranges across 16 fill patterns, bounded terminator searches and nine decimal cursor inputs; every case compares result, complete 64 MiB memory and the stack pointer.",
+    "limitations": [
+      "Out-of-bounds pointers, self-referential needle pointers and 32-bit decimal overflow are not exercised.",
+      "Ledger: 221 server bodies recovered and 513 remain machine code."
+    ]
+  }
+}

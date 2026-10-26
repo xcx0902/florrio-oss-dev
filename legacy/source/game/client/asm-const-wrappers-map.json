@@ -1,0 +1,335 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/asm-const-wrappers.mjs",
+  "implementationSha256": "b88399bfca1d6dc2c520a5778e2dd2dc18fb3e6224b0ef828f8bcacf1390fb4e",
+  "factory": "createAsmConstWrapperHooks",
+  "functionIds": [
+    2396,
+    2489,
+    2586,
+    2593,
+    2594,
+    2672,
+    3863,
+    4142,
+    4175,
+    4240,
+    4451,
+    4524,
+    2495,
+    2496
+  ],
+  "functions": [
+    {
+      "id": 2396,
+      "name": "asmConstWrapper2396",
+      "originalSymbol": "function_2396",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 2489,
+      "name": "asmConstWrapper2489",
+      "originalSymbol": "function_2489",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 2586,
+      "name": "asmConstWrapper2586",
+      "originalSymbol": "function_2586",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 2593,
+      "name": "asmConstWrapper2593",
+      "originalSymbol": "function_2593",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 2594,
+      "name": "asmConstWrapper2594",
+      "originalSymbol": "function_2594",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 2672,
+      "name": "asmConstWrapper2672",
+      "originalSymbol": "function_2672",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 3863,
+      "name": "asmConstWrapper3863",
+      "originalSymbol": "function_3863",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 4142,
+      "name": "asmConstWrapper4142",
+      "originalSymbol": "function_4142",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 4175,
+      "name": "asmConstWrapper4175",
+      "originalSymbol": "function_4175",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 4240,
+      "name": "asmConstWrapper4240",
+      "originalSymbol": "function_4240",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 4451,
+      "name": "asmConstWrapper4451",
+      "originalSymbol": "function_4451",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 4524,
+      "name": "asmConstWrapper4524",
+      "originalSymbol": "function_4524",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot to host import a.a and ignores -1."
+    },
+    {
+      "id": 2495,
+      "name": "asmConstWrapper2495",
+      "originalSymbol": "function_2495",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 19
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot only when its enable byte is set."
+    },
+    {
+      "id": 2496,
+      "name": "asmConstWrapper2496",
+      "originalSymbol": "function_2496",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-wrappers.mjs",
+          "line": 19
+        },
+        "test": "test/client-asm-const-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards a live global slot only when its enable byte is set."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-asm-const-wrappers.test.mjs",
+    "report": "reports/client-asm-const-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 42,
+    "completeLinearMemoryChecks": 36,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Fourteen wrappers with slot values 0, 7 and -1; enable-gated wrappers run with their enable byte set. Full memory and trap parity are compared.",
+    "limitations": [
+      "Ledger: 650 client and 507 server bodies recovered."
+    ]
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/eye-renderer.mjs",
+  "implementationSha256": "d331aa2ee75e8691df5467204b9345a1e14b479022a262145d2eb147b0b97a55",
+  "factory": "createEyeRendererHooks",
+  "functionIds": [
+    690
+  ],
+  "functions": [
+    {
+      "id": 690,
+      "name": "drawEye",
+      "originalSymbol": "function_690",
+      "signature": " (type $t80) (param $p0 i32) (param $p1 f32) (param $p2 f32) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 103588,
+          "endLine": 105691
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0320-0383.dcmp",
+          "line": 1628
+        },
+        "source": {
+          "path": "source/game/client/eye-renderer.mjs",
+          "line": 85
+        },
+        "test": "test/client-eye-renderer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_366",
+        "function_427",
+        "function_375",
+        "function_431"
+      ],
+      "originalIndirectCallSites": 0,
+      "unrecoveredStaticDependencyIds": [
+        930
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "name": "drawDeadEye",
+      "watLine": 103705,
+      "watEndLine": 104462,
+      "description": "Draw both diagonal strokes for a dead eye.",
+      "sourceLine": 99
+    },
+    {
+      "name": "drawEyeWhite",
+      "watLine": 104465,
+      "watEndLine": 104769,
+      "description": "Expand the vertical eye scale, draw its circular path and fill the eye color.",
+      "sourceLine": 345
+    },
+    {
+      "name": "beginPupilClip",
+      "watLine": 104770,
+      "watEndLine": 104842,
+      "description": "Save the canvas and 64-byte software state, then clip to the eye path.",
+      "sourceLine": 450
+    },
+    {
+      "name": "scalePupilTransform",
+      "watLine": 104843,
+      "watEndLine": 104924,
+      "description": "Scale the pupil coordinate system with the original expanded f32 products.",
+      "sourceLine": 471
+    },
+    {
+      "name": "updatePupilDirection",
+      "watLine": 104925,
+      "watEndLine": 105039,
+      "description": "Smooth the selected eye gaze toward the cosine and sine of the eye angle.",
+      "sourceLine": 505
+    },
+    {
+      "name": "drawPupil",
+      "watLine": 105040,
+      "watEndLine": 105215,
+      "description": "Draw the pupil at its smoothed gaze and fill it with the original light color.",
+      "sourceLine": 547
+    },
+    {
+      "name": "restorePupilState",
+      "watLine": 105216,
+      "watEndLine": 105258,
+      "description": "Restore the saved software drawing state and canvas after the clipped pupil.",
+      "sourceLine": 605
+    },
+    {
+      "name": "drawEyeOutline",
+      "watLine": 105259,
+      "watEndLine": 105585,
+      "description": "Rebuild the eye arc, choose its color and grayscale, then draw the thin outline.",
+      "sourceLine": 619
+    },
+    {
+      "name": "finishEyeScale",
+      "watLine": 105586,
+      "watEndLine": 105667,
+      "description": "Apply the final half scale before restoring the outer affine state.",
+      "sourceLine": 729
+    },
+    {
+      "name": "drawEyeContents",
+      "watLine": 103700,
+      "watEndLine": 105668,
+      "description": "Choose the dead-eye branch or draw the complete clipped pupil and outlined eye.",
+      "sourceLine": 763
+    },
+    {
+      "name": "saveTransformAndTranslate",
+      "watLine": 103595,
+      "watEndLine": 103699,
+      "description": "Save the original affine matrix and translate to the requested eye center.",
+      "sourceLine": 781
+    },
+    {
+      "name": "restoreOriginalTransform",
+      "watLine": 105669,
+      "watEndLine": 105687,
+      "description": "Restore the original matrix in its original write order and mark it dirty.",
+      "sourceLine": 816
+    }
+  ],
+  "dependencies": [
+    {
+      "id": 366,
+      "name": "compareMemory"
+    },
+    {
+      "id": 375,
+      "name": "powF64"
+    },
+    {
+      "id": 427,
+      "name": "cosF32"
+    },
+    {
+      "id": 431,
+      "name": "sinF32"
+    }
+  ],
+  "hostImport": {
+    "module": "a",
+    "name": "a",
+    "result": "i32",
+    "conversion": "ToNumber, then ToInt32; preserves BigInt, Symbol and object conversion failures"
+  },
+  "layout": {
+    "scratchFrameBytes": 1360,
+    "context": {
+      "rendererSlotPointer": 0,
+      "deathBytePointer": 4,
+      "rgbColorPointer": 8,
+      "pupilDirectionsPointer": 12,
+      "appearanceParametersPointer": 16,
+      "deltaPointer": 20
+    },
+    "pupilDirections": {
+      "eyeStride": 8,
+      "x": 0,
+      "y": 4
+    },
+    "appearanceParameters": {
+      "angleF32": 12
+    },
+    "renderer": {
+      "matrix": 0,
+      "cachedMatrix": 24,
+      "transformDirty": 48,
+      "grayscale": 69,
+      "contextId": 96
+    },
+    "scratch": {
+      "originalMatrix": 1336,
+      "savedPupilDrawingState": 1272
+    }
+  },
+  "validation": {
+    "testGroups": 17,
+    "oracleComparisons": 78,
+    "fullMemoryCheckpoints": 578,
+    "memoryBytesPerComparison": 67108864,
+    "capturedPackets": 15,
+    "capturedFrameCheckpoints": 60,
+    "modelFlagActionCombinationsVia1100": 256,
+    "nonfiniteAppearanceCasesVia1100": 64,
+    "directEyeAffineCases": 48,
+    "directGazeCheckpoints": 140,
+    "directGazeCalls": 280,
+    "pointerTrapsVia1100": 3,
+    "directPointerTraps": 8,
+    "hostFaultsVia1100": 16,
+    "directEyeHostFaults": 18,
+    "overlappingMemoryVia1100": 6,
+    "directAliasAndWrapCases": 5,
+    "hostResultConversionCases": 10,
+    "liveHostPointerMutation": true,
+    "reentrantEyeHostCallback": true,
+    "combinedActiveClient": true,
+    "hostEventsIncludeRawArgumentBytes": true,
+    "testCommand": "node --test --test-reporter=tap test/client-eye-renderer.test.mjs",
+    "testLog": "reports/client-eye-renderer.tests.tap",
+    "registration": "Registered in source/runtime/registry.mjs after parent review and passing candidate tests.",
+    "testSourceSha256": "e35e6c3dc819d6e0281e7104bd5d1ef12254d241ac38386ecbb109455e23dd04",
+    "report": "reports/client-eye-renderer.tests.tap",
+    "reportSha256": "25212612a5aca876f16171e3456aa59dfa08e2d5569acdc5ae46effa6dc15135",
+    "pass": 17,
+    "fail": 0
+  },
+  "limitations": [
+    "Complete body690 is recovered without invoking original690 or interpreting instructions. Its four named direct dependencies and the Canvas host remain separate bodies.",
+    "Bodies 375, 427 and 431 are recovered and registered; the transitive closure still contains native 930 large range reduction through 427/431, and the Canvas host remains a separate boundary.",
+    "Finite fixtures compare full shared memory, ordered decoded and raw Canvas ABI records, return conversion failures, exception state and stack. They do not prove all possible arbitrary aliases or browser pixels.",
+    "This subtask leaves registry/build integration to its parent task; the candidate tests patch the actual original690 body and combine it with the active registry."
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after parent review and passing candidate tests."
+}

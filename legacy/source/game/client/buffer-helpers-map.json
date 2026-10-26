@@ -1,0 +1,73 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/buffer-helpers.mjs",
+  "implementationSha256": "9484db8bc926014e6173021fdceb74e23587655d4887bbdc0b02eae7a338de31",
+  "factory": "createBufferHelperHooks",
+  "functionIds": [
+    706,
+    908
+  ],
+  "functions": [
+    {
+      "id": 706,
+      "name": "fillBufferRows",
+      "originalSymbol": "function_706",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/buffer-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-buffer-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        820
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Requests a product and returns whole rows written."
+    },
+    {
+      "id": 908,
+      "name": "randomUint32",
+      "originalSymbol": "function_908",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/buffer-helpers.mjs",
+          "line": 20
+        },
+        "test": "test/client-buffer-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Reads four entropy bytes and aborts on host failure."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-buffer-helpers.test.mjs",
+    "report": "reports/client-buffer-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "A zero buffer fixture and a deterministic entropy import compare result, stack pointer and complete memory.",
+    "limitations": [
+      "The entropy failure branch is not exercised. Ledger: 682 client and 512 server bodies recovered."
+    ]
+  }
+}

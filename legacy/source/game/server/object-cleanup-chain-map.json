@@ -1,0 +1,79 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/object-cleanup-chain.mjs",
+  "implementationSha256": "62b7fb98ec5e1dc69aff9ec289458a57694a2676c3cefefa9771476d216f15b0",
+  "factory": "createObjectCleanupChainHooks",
+  "functionIds": [
+    241,
+    259
+  ],
+  "functions": [
+    {
+      "id": 241,
+      "name": "cleanupPayloadAndReturn",
+      "originalSymbol": "function_241",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        242
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-cleanup-chain.mjs",
+          "line": 11
+        },
+        "test": "test/server-object-cleanup-chain.test.mjs"
+      },
+      "originalDirectDependencies": [
+        259
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 259 on the payload at +8 and returns the object."
+    },
+    {
+      "id": 259,
+      "name": "cleanupPayload",
+      "originalSymbol": "function_259",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        242
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-cleanup-chain.mjs",
+          "line": 16
+        },
+        "test": "test/server-object-cleanup-chain.test.mjs"
+      },
+      "originalDirectDependencies": [
+        242
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 242 and discards its result."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-object-cleanup-chain.test.mjs",
+    "report": "reports/server-object-cleanup-chain-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Both chain functions compare complete memory and stack on zeroed payloads.",
+    "limitations": [
+      "Cleanup 242 remains machine code. Ledger: 477 server bodies recovered and 257 remain machine code."
+    ]
+  }
+}

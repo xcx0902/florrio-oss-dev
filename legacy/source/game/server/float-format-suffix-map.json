@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/float-format-suffix.mjs",
+  "implementationSha256": "65ec27f40aae355be87158ccff95ee2fd140a094513711ece27c37f02054a034",
+  "factory": "createFloatFormatSuffixHook",
+  "functionIds": [
+    178
+  ],
+  "functions": [
+    {
+      "id": 178,
+      "name": "appendFloatFormatSpec",
+      "originalSymbol": "function_178",
+      "signature": " (type $t4) (param i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 37471
+        },
+        "source": {
+          "path": "source/game/server/float-format-suffix.mjs",
+          "line": 39
+        },
+        "test": "test/server-float-format-suffix.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Assembles a printf-style float conversion tail: optional +/#, .* for non-hex styles, payload, then e/f/a/g suffix selected by flags & 260 and case by 0x4000; returns 1 when .* was written."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-float-format-suffix.test.mjs",
+    "report": "reports/server-float-format-suffix-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 1804,
+    "completeLinearMemoryChecks": 1804,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 1804,
+    "trappingComparisons": 0,
+    "comparison": "Every style 0..300 x five flag sets, payload lengths 0..8 x four flag sets, embedded NUL and four destination placements compare return, destination bytes, stack pointer and complete memory hash.",
+    "limitations": [
+      "Out-of-bounds pointers, memory growth and overlapping source/destination are not exercised.",
+      "Ledger: 252 server bodies recovered and 482 remain machine code."
+    ]
+  }
+}

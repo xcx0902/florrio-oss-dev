@@ -1,0 +1,665 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/string-and-object-forwarders.mjs",
+  "implementationSha256": "d05b0a4eced45462f37b465357cc2a8d2d03dd57e914642f9ab096570391f673",
+  "factory": "createStringAndObjectForwarderHooks",
+  "functionIds": [
+    423,
+    471,
+    728,
+    864,
+    927,
+    980,
+    1133,
+    1819,
+    1826,
+    1862,
+    1939,
+    1942,
+    2008,
+    2315,
+    2508,
+    2510,
+    2511,
+    2513,
+    2517,
+    2520,
+    2524,
+    2526,
+    2528,
+    2531,
+    2542,
+    2544
+  ],
+  "functions": [
+    {
+      "id": 423,
+      "name": "forwarder423",
+      "originalSymbol": "function_423",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        459,
+        378
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 471,
+      "name": "forwarder471",
+      "originalSymbol": "function_471",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        453,
+        378
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 728,
+      "name": "forwarder728",
+      "originalSymbol": "function_728",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        673
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 864,
+      "name": "forwarder864",
+      "originalSymbol": "function_864",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        876
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 927,
+      "name": "forwarder927",
+      "originalSymbol": "function_927",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        921
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 980,
+      "name": "forwarder980",
+      "originalSymbol": "function_980",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        730
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 1133,
+      "name": "forwarder1133",
+      "originalSymbol": "function_1133",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        921
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 1819,
+      "name": "forwarder1819",
+      "originalSymbol": "function_1819",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        718
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 1826,
+      "name": "forwarder1826",
+      "originalSymbol": "function_1826",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        718
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 1862,
+      "name": "forwarder1862",
+      "originalSymbol": "function_1862",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        718
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 1939,
+      "name": "forwarder1939",
+      "originalSymbol": "function_1939",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        890
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 1942,
+      "name": "forwarder1942",
+      "originalSymbol": "function_1942",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        647
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2008,
+      "name": "forwarder2008",
+      "originalSymbol": "function_2008",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        364
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2315,
+      "name": "forwarder2315",
+      "originalSymbol": "function_2315",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        364
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2508,
+      "name": "forwarder2508",
+      "originalSymbol": "function_2508",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        678,
+        533
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2510,
+      "name": "forwarder2510",
+      "originalSymbol": "function_2510",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        678,
+        533
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2511,
+      "name": "forwarder2511",
+      "originalSymbol": "function_2511",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        678,
+        533
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2513,
+      "name": "forwarder2513",
+      "originalSymbol": "function_2513",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        678,
+        533
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2517,
+      "name": "forwarder2517",
+      "originalSymbol": "function_2517",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1042,
+        679
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2520,
+      "name": "forwarder2520",
+      "originalSymbol": "function_2520",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1042,
+        679
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2524,
+      "name": "forwarder2524",
+      "originalSymbol": "function_2524",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        680,
+        549
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2526,
+      "name": "forwarder2526",
+      "originalSymbol": "function_2526",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        680,
+        549
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2528,
+      "name": "forwarder2528",
+      "originalSymbol": "function_2528",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        680,
+        549
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2531,
+      "name": "forwarder2531",
+      "originalSymbol": "function_2531",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        680,
+        549
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2542,
+      "name": "forwarder2542",
+      "originalSymbol": "function_2542",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1046,
+        682
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    },
+    {
+      "id": 2544,
+      "name": "forwarder2544",
+      "originalSymbol": "function_2544",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/string-and-object-forwarders.mjs",
+          "line": 14
+        },
+        "test": "test/client-string-and-object-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1046,
+        682
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a length, biases a pointer, forwards a fixed range or threads a derived object into a helper."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-string-and-object-forwarders.test.mjs",
+    "report": "reports/client-string-and-object-forwarders-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 26,
+    "completeLinearMemoryChecks": 26,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 26,
+    "trappingComparisons": 13,
+    "comparison": "Zero-record fixture compares result or trap, stack pointer and complete memory.",
+    "limitations": [
+      "Thirteen slots trap on the zero-record fixture, so their success paths are unexercised. Ledger: 532 client and 507 server bodies recovered."
+    ]
+  }
+}

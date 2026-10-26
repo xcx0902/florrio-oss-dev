@@ -1,0 +1,2860 @@
+{
+  "schema": 1,
+  "source": {
+    "artifact": "web/sp_server.wasm",
+    "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+    "evidence": {
+      "constructorFunctionIndex": 279,
+      "entityDefinitionFunctionIndex": 103,
+      "petalRecordStride": 52,
+      "entityRecordStride": 116,
+      "unknownFieldNamesAreOffsets": true
+    },
+    "extractedBy": "source/semantic/extract-catalogs.mjs"
+  },
+  "count": 39,
+  "petals": [
+    {
+      "typeId": 0,
+      "name": "None",
+      "descriptions": [
+        ""
+      ],
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 18,
+        "functionIndex": 683
+      },
+      "virtualTable": {
+        "address": null,
+        "methods": []
+      },
+      "evidence": {
+        "address": 8545792,
+        "bytesHex": "940c000001000000d411000000000000000000000000000000000000000000000100000000006041000000000000000012000000"
+      }
+    },
+    {
+      "typeId": 1,
+      "name": "Basic",
+      "descriptions": [
+        "A nice petal, not too strong but not too weak"
+      ],
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 17,
+        "functionIndex": 602
+      },
+      "virtualTable": {
+        "address": 5212,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 100,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 101,
+            "functionIndex": 433
+          },
+          {
+            "slot": 3,
+            "tableIndex": 102,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8545844,
+        "bytesHex": "c80d000001000000d50a00000000000000000000000000000000000000401c450100000000006041000000000000000011000000"
+      }
+    },
+    {
+      "typeId": 2,
+      "name": "Fast",
+      "descriptions": [
+        "Weaker than most petals, but recharges very quickly"
+      ],
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 16,
+        "functionIndex": 235
+      },
+      "virtualTable": {
+        "address": 5256,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 108,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 109,
+            "functionIndex": 414
+          },
+          {
+            "slot": 3,
+            "tableIndex": 110,
+            "functionIndex": 413
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8545896,
+        "bytesHex": "83070000010000001f060000000000000000000000000000000000000000fa430100000000006041000000000000000010000000"
+      }
+    },
+    {
+      "typeId": 3,
+      "name": "Heavy",
+      "descriptions": [
+        "Very resilient and deals more damage, but recharges very slowly"
+      ],
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 5500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 15,
+        "functionIndex": 612
+      },
+      "virtualTable": {
+        "address": 5300,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 111,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 112,
+            "functionIndex": 662
+          },
+          {
+            "slot": 3,
+            "tableIndex": 113,
+            "functionIndex": 661
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8545948,
+        "bytesHex": "ba05000001000000da0500000000000000000000000000000000000000e0ab45010000000000604100000000000000000f000000"
+      }
+    },
+    {
+      "typeId": 4,
+      "name": "Rock",
+      "descriptions": [
+        "Extremely durable, but takes a long time to recharge"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 10000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 14,
+        "functionIndex": 614
+      },
+      "virtualTable": {
+        "address": 5344,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 114,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 115,
+            "functionIndex": 664
+          },
+          {
+            "slot": 3,
+            "tableIndex": 116,
+            "functionIndex": 663
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546000,
+        "bytesHex": "d00a000001000000070d00000000000000000000000000000200000000401c46010000000000604100000000000000000e000000"
+      }
+    },
+    {
+      "typeId": 5,
+      "name": "Square",
+      "descriptions": [
+        "This shape... it looks familiar..."
+      ],
+      "rarityIndex": 5,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 13,
+        "functionIndex": 621
+      },
+      "virtualTable": {
+        "address": 5388,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 117,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 101,
+            "functionIndex": 433
+          },
+          {
+            "slot": 3,
+            "tableIndex": 102,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546052,
+        "bytesHex": "880c000001000000201100000000000000000000000000000500000000401c45010000000000604100000000000000000d000000"
+      }
+    },
+    {
+      "typeId": 6,
+      "name": "Rose",
+      "descriptions": [
+        "Its healing properties are amazing. Not so good at combat though"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 12,
+        "functionIndex": 626
+      },
+      "virtualTable": {
+        "address": 5432,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 118,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 119,
+            "functionIndex": 412
+          },
+          {
+            "slot": 3,
+            "tableIndex": 120,
+            "functionIndex": 665
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546104,
+        "bytesHex": "6b0c000001000000760b00000000000000000000000000000100000000c05a45010000000000604100000000000000000c000000"
+      }
+    },
+    {
+      "typeId": 7,
+      "name": "Stinger",
+      "descriptions": [
+        "It really hurts, but it's very fragile"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 4000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 11,
+        "functionIndex": 364
+      },
+      "virtualTable": {
+        "address": 5476,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 121,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 122,
+            "functionIndex": 727
+          },
+          {
+            "slot": 3,
+            "tableIndex": 123,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546156,
+        "bytesHex": "bc09000001000000d90c00000000000000000000000000000100000000007a45010000000000604100000000000000000b000000"
+      }
+    },
+    {
+      "typeId": 8,
+      "name": "Iris",
+      "descriptions": [
+        "Very poisonous, but takes a little while to do its work"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 6000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 10,
+        "functionIndex": 629
+      },
+      "virtualTable": {
+        "address": 5520,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 124,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 125,
+            "functionIndex": 668
+          },
+          {
+            "slot": 3,
+            "tableIndex": 126,
+            "functionIndex": 667
+          },
+          {
+            "slot": 4,
+            "tableIndex": 127,
+            "functionIndex": 666
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546208,
+        "bytesHex": "fc08000001000000980a0000000000000000000000000000010000000080bb45010000000000604100000000000000000a000000"
+      }
+    },
+    {
+      "typeId": 9,
+      "name": "Wing",
+      "descriptions": [
+        "It comes and goes"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1250,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 9,
+        "functionIndex": 634
+      },
+      "virtualTable": {
+        "address": 5604,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 136,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 137,
+            "functionIndex": 670
+          },
+          {
+            "slot": 3,
+            "tableIndex": 138,
+            "functionIndex": 669
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546260,
+        "bytesHex": "f70b0000010000002d0900000000000000000000000000000200000000409c440100000000006041000000000000000009000000"
+      }
+    },
+    {
+      "typeId": 10,
+      "name": "Missile",
+      "descriptions": [
+        "You can actually shoot this one"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 8,
+        "functionIndex": 642
+      },
+      "virtualTable": {
+        "address": 5648,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 139,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 140,
+            "functionIndex": 672
+          },
+          {
+            "slot": 3,
+            "tableIndex": 141,
+            "functionIndex": 671
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546312,
+        "bytesHex": "d10c000001000000990c00000000000000000000000000000200000000803b450100000000006041000000000000000008000000"
+      }
+    },
+    {
+      "typeId": 11,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 7,
+        "functionIndex": 643
+      },
+      "virtualTable": {
+        "address": 5692,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 142,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 143,
+            "functionIndex": 411
+          },
+          {
+            "slot": 3,
+            "tableIndex": 144,
+            "functionIndex": 676
+          },
+          {
+            "slot": 4,
+            "tableIndex": 145,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546364,
+        "bytesHex": "3f09000001000000860a00000000000000000000000000000200000000007a440100000000006041000000000000000007000000"
+      }
+    },
+    {
+      "typeId": 12,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal, now with a secret ingredient: poison"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 6,
+        "functionIndex": 648
+      },
+      "virtualTable": {
+        "address": 5772,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 153,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 154,
+            "functionIndex": 411
+          },
+          {
+            "slot": 3,
+            "tableIndex": 155,
+            "functionIndex": 681
+          },
+          {
+            "slot": 4,
+            "tableIndex": 156,
+            "functionIndex": 680
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546416,
+        "bytesHex": "3f09000001000000180a00000000000000000000000000000300000000007a440100000000006041000000000000000006000000"
+      }
+    },
+    {
+      "typeId": 13,
+      "name": "Cactus",
+      "descriptions": [
+        "Not very strong, but somehow increases your maximum health"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 5,
+        "functionIndex": 384
+      },
+      "virtualTable": {
+        "address": 5852,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 164,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 165,
+            "functionIndex": 740
+          },
+          {
+            "slot": 3,
+            "tableIndex": 166,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 167,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 168,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546468,
+        "bytesHex": "1408000001000000070b00000000000000000000000000000200000000007a440100000000006041000000000000000005000000"
+      }
+    },
+    {
+      "typeId": 14,
+      "name": "Faster",
+      "descriptions": [
+        "It's so light it makes your other petals spin faster"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 4,
+        "functionIndex": 650
+      },
+      "virtualTable": {
+        "address": 5896,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 169,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 170,
+            "functionIndex": 414
+          },
+          {
+            "slot": 3,
+            "tableIndex": 171,
+            "functionIndex": 413
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546520,
+        "bytesHex": "b50900000100000080090000000000000000000000000000020000000000fa430100000000006041000000000000000004000000"
+      }
+    },
+    {
+      "typeId": 15,
+      "name": "Rose",
+      "descriptions": [
+        "Extremely powerful rose, almost unheard of"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 3,
+        "functionIndex": 651
+      },
+      "virtualTable": {
+        "address": 5940,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 172,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 173,
+            "functionIndex": 412
+          },
+          {
+            "slot": 3,
+            "tableIndex": 174,
+            "functionIndex": 682
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546572,
+        "bytesHex": "6b0c000001000000090c00000000000000000000000000000300000000c05a450100000000006041000000000000000003000000"
+      }
+    },
+    {
+      "typeId": 16,
+      "name": "Twin",
+      "descriptions": [
+        "Why stop at one? Why not TWO?!"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 2,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 19,
+        "functionIndex": 235
+      },
+      "virtualTable": {
+        "address": 5256,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 108,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 109,
+            "functionIndex": 414
+          },
+          {
+            "slot": 3,
+            "tableIndex": 110,
+            "functionIndex": 413
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546624,
+        "bytesHex": "580a0000010000005c1100000000000000000000000000000100000000007a440200000000006041000000000000000013000000"
+      }
+    },
+    {
+      "typeId": 17,
+      "name": "Triplet",
+      "descriptions": [
+        "How about THREE?!"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 20,
+        "functionIndex": 235
+      },
+      "virtualTable": {
+        "address": 5256,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 108,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 109,
+            "functionIndex": 414
+          },
+          {
+            "slot": 3,
+            "tableIndex": 110,
+            "functionIndex": 413
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546676,
+        "bytesHex": "04080000010000007b1100000000000000000000000000000300000000007a440300000000006041000000000000000014000000"
+      }
+    },
+    {
+      "typeId": 18,
+      "name": "Bubble",
+      "descriptions": [
+        "You can right click to pop it and propel your flower"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 21,
+        "functionIndex": 598
+      },
+      "virtualTable": {
+        "address": 5984,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 175,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 176,
+            "functionIndex": 685
+          },
+          {
+            "slot": 3,
+            "tableIndex": 177,
+            "functionIndex": 684
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546728,
+        "bytesHex": "000d0000010000004b0900000000000000000000000000000200000000c05a450100000000006041000000000000000015000000"
+      }
+    },
+    {
+      "typeId": 19,
+      "name": "Pollen",
+      "descriptions": [
+        "Asthmatics beware"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 22,
+        "functionIndex": 593
+      },
+      "virtualTable": {
+        "address": 6028,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 178,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 179,
+            "functionIndex": 687
+          },
+          {
+            "slot": 3,
+            "tableIndex": 180,
+            "functionIndex": 686
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546780,
+        "bytesHex": "5d0a000001000000760c00000000000000000000000000000300000000007a440300000000006041000000000000000016000000"
+      }
+    },
+    {
+      "typeId": 20,
+      "name": "Dandelion",
+      "descriptions": [
+        "Its interesting properties prevent healing effects on affected units"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 2000,
+      "instancesPerSlot": 1,
+      "radius": 11,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 26,
+        "functionIndex": 572
+      },
+      "virtualTable": {
+        "address": 6072,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 181,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 182,
+            "functionIndex": 690
+          },
+          {
+            "slot": 3,
+            "tableIndex": 183,
+            "functionIndex": 689
+          },
+          {
+            "slot": 4,
+            "tableIndex": 184,
+            "functionIndex": 688
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546832,
+        "bytesHex": "4a0a0000010000001b080000000000000000000000000000020000000000fa44010000000000304100000000000000001a000000"
+      }
+    },
+    {
+      "typeId": 21,
+      "name": "Cactus",
+      "descriptions": [
+        "Increases your maximum health and makes your flower toxic",
+        "Enemies hit by your flower will get poisoned"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 25,
+        "functionIndex": 579
+      },
+      "virtualTable": {
+        "address": 6156,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 190,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 165,
+            "functionIndex": 740
+          },
+          {
+            "slot": 3,
+            "tableIndex": 166,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 191,
+            "functionIndex": 692
+          },
+          {
+            "slot": 5,
+            "tableIndex": 192,
+            "functionIndex": 691
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546884,
+        "bytesHex": "14080000020000008e0d00005d0d000000000000000000000300000000007a440100000000006041000000000000000019000000"
+      }
+    },
+    {
+      "typeId": 22,
+      "name": "Egg",
+      "descriptions": [
+        "Something interesting might pop out of this"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 24,
+        "functionIndex": 583
+      },
+      "virtualTable": {
+        "address": 6200,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 193,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 194,
+            "functionIndex": 694
+          },
+          {
+            "slot": 3,
+            "tableIndex": 195,
+            "functionIndex": 693
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546936,
+        "bytesHex": "050c000001000000010900000000000000000000000000000300000000007a440100000000006041000000000000000018000000"
+      }
+    },
+    {
+      "typeId": 23,
+      "name": "Egg",
+      "descriptions": [
+        "Something interesting might pop out of this"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 23,
+        "functionIndex": 590
+      },
+      "virtualTable": {
+        "address": 6244,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 196,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 197,
+            "functionIndex": 720
+          },
+          {
+            "slot": 3,
+            "tableIndex": 198,
+            "functionIndex": 719
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8546988,
+        "bytesHex": "050c000001000000010900000000000000000000000000000400000000007a440100000000006041000000000000000017000000"
+      }
+    },
+    {
+      "typeId": 24,
+      "name": "Rose",
+      "descriptions": [
+        "Its healing properties are amazing. Not so good at combat though"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 1,
+        "offset44": 11
+      },
+      "factory": {
+        "tableIndex": 27,
+        "functionIndex": 565
+      },
+      "virtualTable": {
+        "address": 6288,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 199,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 200,
+            "functionIndex": 724
+          },
+          {
+            "slot": 3,
+            "tableIndex": 201,
+            "functionIndex": 723
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547040,
+        "bytesHex": "6b0c000001000000760b00000000000000000000000000000200000000c05a45030000000000604100010000000030411b000000"
+      }
+    },
+    {
+      "typeId": 25,
+      "name": "Antennae",
+      "descriptions": [
+        "Allows your flower to sense foes farther away"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flags": {
+        "offset40": 1,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 28,
+        "functionIndex": 558
+      },
+      "virtualTable": {
+        "address": 6332,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 202,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 101,
+            "functionIndex": 433
+          },
+          {
+            "slot": 3,
+            "tableIndex": 102,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547092,
+        "bytesHex": "540d000001000000a60600000000000000000000000000000400000000000000010000000000404101000000000000001c000000"
+      }
+    },
+    {
+      "typeId": 26,
+      "name": "Heaviest",
+      "descriptions": [
+        "This thing is so heavy that nothing gets in the way"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 20000,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 29,
+        "functionIndex": 552
+      },
+      "virtualTable": {
+        "address": 6376,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 203,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 204,
+            "functionIndex": 726
+          },
+          {
+            "slot": 3,
+            "tableIndex": 205,
+            "functionIndex": 725
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547144,
+        "bytesHex": "7a07000001000000d40600000000000000000000000000000300000000409c46010000000000404100000000000000001d000000"
+      }
+    },
+    {
+      "typeId": 27,
+      "name": "Stinger",
+      "descriptions": [
+        "It really hurts, but it's very fragile"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 4000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 1,
+        "offset44": 11
+      },
+      "factory": {
+        "tableIndex": 30,
+        "functionIndex": 364
+      },
+      "virtualTable": {
+        "address": 5476,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 121,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 122,
+            "functionIndex": 727
+          },
+          {
+            "slot": 3,
+            "tableIndex": 123,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547196,
+        "bytesHex": "bc09000001000000d90c00000000000000000000000000000400000000007a45030000000000604100010000000030411e000000"
+      }
+    },
+    {
+      "typeId": 28,
+      "name": "Yin Yang",
+      "descriptions": [
+        "This mysterious petal reverses the rotation direction of your petals"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 32,
+        "functionIndex": 545
+      },
+      "virtualTable": {
+        "address": 6420,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 206,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 207,
+            "functionIndex": 728
+          },
+          {
+            "slot": 3,
+            "tableIndex": 208,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547248,
+        "bytesHex": "fc0b000001000000b70800000000000000000000000000000300000000007a440100000000004041000000000000000020000000"
+      }
+    },
+    {
+      "typeId": 29,
+      "name": "Web",
+      "descriptions": [
+        "It's really sticky"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 31,
+        "functionIndex": 327
+      },
+      "virtualTable": {
+        "address": 6464,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 209,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 210,
+            "functionIndex": 734
+          },
+          {
+            "slot": 3,
+            "tableIndex": 211,
+            "functionIndex": 733
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 212,
+            "functionIndex": 732
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547300,
+        "bytesHex": "d20d0000010000008d0600000000000000000000000000000200000000803b45010000000000604100000000000000001f000000"
+      }
+    },
+    {
+      "typeId": 30,
+      "name": "Web",
+      "descriptions": [
+        "It's really sticky"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 1,
+        "offset44": 13
+      },
+      "factory": {
+        "tableIndex": 35,
+        "functionIndex": 327
+      },
+      "virtualTable": {
+        "address": 6464,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 209,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 210,
+            "functionIndex": 734
+          },
+          {
+            "slot": 3,
+            "tableIndex": 211,
+            "functionIndex": 733
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 212,
+            "functionIndex": 732
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547352,
+        "bytesHex": "d20d0000010000008d0600000000000000000000000000000400000000803b450300000000006041000100000000504123000000"
+      }
+    },
+    {
+      "typeId": 31,
+      "name": "Honey",
+      "descriptions": [
+        "This is so sticky it slows down whatever it hits"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1700,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 34,
+        "functionIndex": 539
+      },
+      "virtualTable": {
+        "address": 6548,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 217,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 101,
+            "functionIndex": 433
+          },
+          {
+            "slot": 3,
+            "tableIndex": 102,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 218,
+            "functionIndex": 738
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547404,
+        "bytesHex": "a00600000100000060080000000000000000000000000000020000000080d4440100000000006041000000000000000022000000"
+      }
+    },
+    {
+      "typeId": 32,
+      "name": "Leaf",
+      "descriptions": [
+        "Gathers energy from the sun to heal your flower passively"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 33,
+        "functionIndex": 542
+      },
+      "virtualTable": {
+        "address": 6632,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 223,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 224,
+            "functionIndex": 739
+          },
+          {
+            "slot": 3,
+            "tableIndex": 225,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547456,
+        "bytesHex": "530c000001000000530600000000000000000000000000000100000000007a440100000000006041000000000000000021000000"
+      }
+    },
+    {
+      "typeId": 33,
+      "name": "Cactus",
+      "descriptions": [
+        "Not very strong, but somehow increases your maximum health"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 1,
+        "offset44": 15
+      },
+      "factory": {
+        "tableIndex": 41,
+        "functionIndex": 384
+      },
+      "virtualTable": {
+        "address": 5852,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 164,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 165,
+            "functionIndex": 740
+          },
+          {
+            "slot": 3,
+            "tableIndex": 166,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 167,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 168,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547508,
+        "bytesHex": "1408000001000000070b00000000000000000000000000000400000000007a440300000000006041000100000000704129000000"
+      }
+    },
+    {
+      "typeId": 34,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal, now with a secret ingredient: poison"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 40,
+        "functionIndex": 500
+      },
+      "virtualTable": {
+        "address": 6676,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 226,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 227,
+            "functionIndex": 432
+          },
+          {
+            "slot": 3,
+            "tableIndex": 228,
+            "functionIndex": 431
+          },
+          {
+            "slot": 4,
+            "tableIndex": 229,
+            "functionIndex": 747
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547560,
+        "bytesHex": "3f09000001000000180a00000000000000000000000000000400000000007a440100000000006041000000000000000028000000"
+      }
+    },
+    {
+      "typeId": 35,
+      "name": "Basic",
+      "descriptions": [
+        "Something incredibly rare and useless"
+      ],
+      "rarityIndex": 5,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 39,
+        "functionIndex": 509
+      },
+      "virtualTable": {
+        "address": 6756,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 237,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 101,
+            "functionIndex": 433
+          },
+          {
+            "slot": 3,
+            "tableIndex": 102,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547612,
+        "bytesHex": "c80d000001000000910800000000000000000000000000000500000000401c450100000000006041000000000000000027000000"
+      }
+    },
+    {
+      "typeId": 36,
+      "name": "Salt",
+      "descriptions": [
+        "Reflects some of the damage you take back to the flower that dealt it",
+        "Does not stack with itself"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 38,
+        "functionIndex": 519
+      },
+      "virtualTable": {
+        "address": 6800,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 238,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 101,
+            "functionIndex": 433
+          },
+          {
+            "slot": 3,
+            "tableIndex": 102,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547664,
+        "bytesHex": "b207000002000000b7070000380c000000000000000000000200000000401c450100000000006041000000000000000026000000"
+      }
+    },
+    {
+      "typeId": 37,
+      "name": "Rice",
+      "descriptions": [
+        "Spawns instantly, but not very strong"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 37,
+        "functionIndex": 529
+      },
+      "virtualTable": {
+        "address": 6844,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 239,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 240,
+            "functionIndex": 434
+          },
+          {
+            "slot": 3,
+            "tableIndex": 241,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547716,
+        "bytesHex": "4f0d000001000000d10b000000000000000000000000000003000000000000000100000000006041000000000000000025000000"
+      }
+    },
+    {
+      "typeId": 38,
+      "name": "Corn",
+      "descriptions": [
+        "Takes a long time to spawn, but has a lot of health"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 45000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flags": {
+        "offset40": 0,
+        "offset41": 0,
+        "offset44": 0
+      },
+      "factory": {
+        "tableIndex": 36,
+        "functionIndex": 533
+      },
+      "virtualTable": {
+        "address": 6888,
+        "methods": [
+          {
+            "slot": 0,
+            "tableIndex": 99,
+            "functionIndex": 98
+          },
+          {
+            "slot": 1,
+            "tableIndex": 242,
+            "functionIndex": 22
+          },
+          {
+            "slot": 2,
+            "tableIndex": 243,
+            "functionIndex": 435
+          },
+          {
+            "slot": 3,
+            "tableIndex": 244,
+            "functionIndex": 119
+          },
+          {
+            "slot": 4,
+            "tableIndex": 103,
+            "functionIndex": 152
+          },
+          {
+            "slot": 5,
+            "tableIndex": 104,
+            "functionIndex": 281
+          },
+          {
+            "slot": 6,
+            "tableIndex": 105,
+            "functionIndex": 152
+          },
+          {
+            "slot": 7,
+            "tableIndex": 106,
+            "functionIndex": 171
+          },
+          {
+            "slot": 8,
+            "tableIndex": 107,
+            "functionIndex": 152
+          }
+        ]
+      },
+      "evidence": {
+        "address": 8547768,
+        "bytesHex": "130a000001000000420b00000000000000000000000000000300000000c82f470100000000006041000000000000000024000000"
+      }
+    }
+  ]
+}

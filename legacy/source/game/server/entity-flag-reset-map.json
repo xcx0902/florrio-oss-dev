@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/entity-flag-reset.mjs",
+  "implementationSha256": "be14792c7741d51c38e88cf685fb6d9566e6ab6ba5534ae899780c5a43ccfa25",
+  "factory": "createEntityFlagResetHook",
+  "functionIds": [
+    490
+  ],
+  "functions": [
+    {
+      "id": 490,
+      "name": "resetEntityDefinitionFlags",
+      "originalSymbol": "function_490",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118650
+        },
+        "source": {
+          "path": "source/game/server/entity-flag-reset.mjs",
+          "line": 27
+        },
+        "test": "test/server-entity-flag-reset.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Clears 39 flag bytes in the static entity-definition table: 38 records spaced 52 bytes from 8545796 plus the adjacent flag at 8547720; emitted address order is preserved."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-entity-flag-reset.test.mjs",
+    "report": "reports/server-entity-flag-reset-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 64,
+    "completeLinearMemoryChecks": 64,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 64,
+    "trappingComparisons": 0,
+    "comparison": "64 trials with randomized bytes around every cleared address compare return, complete memory and stack pointer.",
+    "limitations": [
+      "Only the 39 statically emitted flag addresses are cleared; neighboring table fields are intentionally untouched.",
+      "Ledger: 256 server bodies recovered and 478 remain machine code."
+    ]
+  }
+}

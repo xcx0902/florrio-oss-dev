@@ -1,0 +1,124 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/registry-and-lookup.mjs",
+  "implementationSha256": "08965a8a639caf2e60352d8b7ec43d2bd6dddf073fe5fab6fede982a12e27838",
+  "factory": "createRegistryAndLookupHooks",
+  "functionIds": [
+    637,
+    943,
+    995,
+    2640
+  ],
+  "functions": [
+    {
+      "id": 637,
+      "name": "registryOrLookup637",
+      "originalSymbol": "function_637",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/registry-and-lookup.mjs",
+          "line": 11
+        },
+        "test": "test/client-registry-and-lookup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        422
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Copies a byte range and returns the destination end pointer."
+    },
+    {
+      "id": 943,
+      "name": "registryOrLookup943",
+      "originalSymbol": "function_943",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/registry-and-lookup.mjs",
+          "line": 11
+        },
+        "test": "test/client-registry-and-lookup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        364
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Reads a validated field from the global registry."
+    },
+    {
+      "id": 995,
+      "name": "registryOrLookup995",
+      "originalSymbol": "function_995",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/registry-and-lookup.mjs",
+          "line": 11
+        },
+        "test": "test/client-registry-and-lookup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        408,
+        365
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Resolves a case-folded key through a linked table."
+    },
+    {
+      "id": 2640,
+      "name": "registryOrLookup2640",
+      "originalSymbol": "function_2640",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/registry-and-lookup.mjs",
+          "line": 11
+        },
+        "test": "test/client-registry-and-lookup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Releases sixteen static buffers through 377."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-registry-and-lookup.test.mjs",
+    "report": "reports/client-registry-and-lookup-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "One zero/empty fixture per function compares result and complete memory.",
+    "limitations": [
+      "Only empty keys and zero records are covered. Ledger: 693 client and 512 server bodies recovered."
+    ]
+  }
+}

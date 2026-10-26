@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/utf8-encode-codepoint.mjs",
+  "implementationSha256": "d7ea90ef278770ed572cdf7923d7850bf84b351367eb9dfd4ae50b17661f8cdd",
+  "factory": "createUtf8EncodeCodepointHook",
+  "functionIds": [
+    124
+  ],
+  "functions": [
+    {
+      "id": 124,
+      "name": "encodeUtf8CodePoint",
+      "originalSymbol": "function_124",
+      "signature": " (type $t3) (param i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 24720
+        },
+        "source": {
+          "path": "source/game/server/utf8-encode-codepoint.mjs",
+          "line": 14
+        },
+        "test": "test/server-utf8-encode-codepoint.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "UTF-8 encoder: zero output returns 1; ASCII and locale-dependent 0xDF80 range one byte; <=0x7FF two bytes; <0xD800 or 0xE000-0xFFFF three; 0x10000-0x10FFFF four; invalid sets error 25 at 8569384 and returns -1."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-utf8-encode-codepoint.test.mjs",
+    "report": "reports/server-utf8-encode-codepoint-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 72,
+    "completeLinearMemoryChecks": 72,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 72,
+    "trappingComparisons": 0,
+    "comparison": "18 code points x locale flag x zero-output path compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Locale-dependent 0xDF80 one-byte range is sampled at 0xDF80/0xDF9F.",
+      "Ledger: 350 server bodies recovered and 384 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/three-word-float-compare.mjs",
+  "implementationSha256": "41f8beee9add8a6db22f491d984c0e5b36ef3a4b2e044e8ea41aaafc725533d4",
+  "factory": "createThreeWordFloatCompareHook",
+  "functionIds": [
+    263
+  ],
+  "functions": [
+    {
+      "id": 263,
+      "name": "compareThreeWordFloat",
+      "originalSymbol": "function_263",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/three-word-float-compare.mjs",
+          "line": 15
+        },
+        "test": "test/server-three-word-float-compare.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Shared low word plus two high words; x87 infinity-pattern unordered test, signed high-word ordering, nonzero low word breaks equal-high ties, returns -1/0/1."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-three-word-float-compare.test.mjs",
+    "report": "reports/server-three-word-float-compare-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 312,
+    "completeLinearMemoryChecks": 312,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 312,
+    "trappingComparisons": 0,
+    "comparison": "192 special triples plus 120 pseudo-random triples compare result and stack pointer.",
+    "limitations": [
+      "Call-free comparison does not mutate memory.",
+      "Ledger: 360 server bodies recovered and 374 remain machine code."
+    ]
+  }
+}

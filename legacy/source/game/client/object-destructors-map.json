@@ -1,0 +1,451 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/object-destructors.mjs",
+  "implementationSha256": "1657a52355b487e9036f430c0fa854f72c8bfabac50471c4319c2b8231e4f2ab",
+  "factory": "createObjectDestructorHooks",
+  "functionIds": [
+    673,
+    726,
+    843,
+    906,
+    1130,
+    1228,
+    1778,
+    1787,
+    1809,
+    1822,
+    1827,
+    1950,
+    1971,
+    1972,
+    2371,
+    2379,
+    2487
+  ],
+  "functions": [
+    {
+      "id": 673,
+      "name": "destroy673",
+      "originalSymbol": "function_673",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        729
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor only."
+    },
+    {
+      "id": 726,
+      "name": "destroy726",
+      "originalSymbol": "function_726",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        646,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 843,
+      "name": "destroy843",
+      "originalSymbol": "function_843",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        715,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 906,
+      "name": "destroy906",
+      "originalSymbol": "function_906",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        728,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1130,
+      "name": "destroy1130",
+      "originalSymbol": "function_1130",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1228,
+      "name": "destroy1228",
+      "originalSymbol": "function_1228",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1778,
+      "name": "destroy1778",
+      "originalSymbol": "function_1778",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        832,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1787,
+      "name": "destroy1787",
+      "originalSymbol": "function_1787",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        833,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1809,
+      "name": "destroy1809",
+      "originalSymbol": "function_1809",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        839,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1822,
+      "name": "destroy1822",
+      "originalSymbol": "function_1822",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        841,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1827,
+      "name": "destroy1827",
+      "originalSymbol": "function_1827",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        842,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1950,
+      "name": "destroy1950",
+      "originalSymbol": "function_1950",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        727,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1971,
+      "name": "destroy1971",
+      "originalSymbol": "function_1971",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        611,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 1972,
+      "name": "destroy1972",
+      "originalSymbol": "function_1972",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        729,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 2371,
+      "name": "destroy2371",
+      "originalSymbol": "function_2371",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        490,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 2379,
+      "name": "destroy2379",
+      "originalSymbol": "function_2379",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1005,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    },
+    {
+      "id": 2487,
+      "name": "destroy2487",
+      "originalSymbol": "function_2487",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        675,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs the destructor and releases the record through 362."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-object-destructors.test.mjs",
+    "report": "reports/client-object-destructors-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 17,
+    "completeLinearMemoryChecks": 17,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 17,
+    "trappingComparisons": 3,
+    "comparison": "Null-record fixture compares result or trap, stack pointer and complete memory; 14 slots take a successful path.",
+    "limitations": [
+      "Only a null record is exercised. Ledger: 549 client and 507 server bodies recovered."
+    ]
+  }
+}

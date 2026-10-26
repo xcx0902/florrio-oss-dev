@@ -1,0 +1,365 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "evidenceId": "ev_438a6ba007bd81cd8cd53601c7b9bd0293c17a4ea3c261bf7b63b3c36f2122b9",
+  "scope": "Ten complete direct simulation phase helpers. Main spServerThink654 remains residual, is absent from functionIds, and has no forwarding or substitute implementation.",
+  "coverage": {
+    "hooks": 10,
+    "factory": "createSimulationHooks",
+    "main654Complete": false,
+    "differentialValidation": {
+      "command": "node --test test/server-simulation.test.mjs",
+      "testCases": 8,
+      "directOracleComparisons": 138,
+      "worldReplaySnapshots": 41,
+      "worldReplayTicks": 40,
+      "comparedMemoryBytesPerOracle": 67108864,
+      "comparesStack": true,
+      "comparesHostCalls": true,
+      "comparesOutgoingPackets": true
+    }
+  },
+  "functions": [
+    {
+      "id": 398,
+      "name": "growHandleVector",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t2) (param $p0 i32) (param $p1 i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 97402,
+          "endLine": 97521
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 2,
+          "endLine": 44
+        }
+      },
+      "originalDirectCalls": [
+        "malloc",
+        "free"
+      ]
+    },
+    {
+      "id": 399,
+      "name": "trackedFamilyByte",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t2) (param $p0 i32) (param $p1 i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 97522,
+          "endLine": 97852
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 46,
+          "endLine": 131
+        }
+      },
+      "originalDirectCalls": [
+        "free",
+        "malloc",
+        "memcpy"
+      ]
+    },
+    {
+      "id": 400,
+      "name": "replenishPopulation",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t15)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 97853,
+          "endLine": 98206
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 133,
+          "endLine": 267
+        }
+      },
+      "originalDirectCalls": [
+        "function_113"
+      ]
+    },
+    {
+      "id": 401,
+      "name": "constrainLinkedEntity",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t0) (param $p0 i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 98207,
+          "endLine": 98501
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 269,
+          "endLine": 357
+        }
+      },
+      "originalDirectCalls": [
+        "function_17",
+        "function_164",
+        "function_34",
+        "emscriptenAsmConstDouble",
+        "function_94",
+        "function_44",
+        "function_47",
+        "function_401"
+      ]
+    },
+    {
+      "id": 402,
+      "name": "trackedPickupByte",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t2) (param $p0 i32) (param $p1 i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 98502,
+          "endLine": 98832
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 359,
+          "endLine": 444
+        }
+      },
+      "originalDirectCalls": [
+        "free",
+        "malloc",
+        "memcpy"
+      ]
+    },
+    {
+      "id": 403,
+      "name": "markArenaCount",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t15)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 98833,
+          "endLine": 98933
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 446,
+          "endLine": 471
+        }
+      },
+      "originalDirectCalls": [
+        "free"
+      ]
+    },
+    {
+      "id": 404,
+      "name": "removeEntity",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t0) (param $p0 i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 98934,
+          "endLine": 99527
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 473,
+          "endLine": 647
+        }
+      },
+      "originalDirectCalls": [
+        "function_424",
+        "function_404",
+        "function_73",
+        "function_170",
+        "free",
+        "function_105",
+        "function_410",
+        "memset"
+      ]
+    },
+    {
+      "id": 406,
+      "name": "eraseMessages",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 99718,
+          "endLine": 99923
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 698,
+          "endLine": 767
+        }
+      },
+      "originalDirectCalls": [
+        "function_35",
+        "free"
+      ]
+    },
+    {
+      "id": 407,
+      "name": "changedStringSlot",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t1) (param $p0 i32) (result i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 99924,
+          "endLine": 100045
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 769,
+          "endLine": 799
+        }
+      },
+      "originalDirectCalls": [
+        "free"
+      ]
+    },
+    {
+      "id": 408,
+      "name": "elapsedFromOrigin",
+      "complete": true,
+      "source": "source/game/server/simulation.mjs",
+      "signature": "(type $t33) (param $p0 i32) (result f64)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 100046,
+          "endLine": 100130
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 801,
+          "endLine": 827
+        }
+      },
+      "originalDirectCalls": [
+        "cxaGuardAcquire",
+        "emscriptenAsmConstInt",
+        "cxaGuardRelease",
+        "emscriptenAsmConstDouble"
+      ]
+    }
+  ],
+  "remainingMainFunction": {
+    "id": 654,
+    "name": "spServerThink",
+    "complete": false,
+    "registered": false,
+    "wat": {
+      "path": "source/wasm/sp_server.wat",
+      "line": 138729,
+      "endLine": 181369
+    },
+    "decompiled": {
+      "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+      "line": 2,
+      "endLine": 10812
+    },
+    "indirectCallSites": 69,
+    "directCalls": [
+      "readClock",
+      "memcmp",
+      "function_407",
+      "function_214",
+      "function_268",
+      "function_408",
+      "free",
+      "malloc",
+      "memcpy",
+      "function_256",
+      "function_403",
+      "function_145",
+      "function_150",
+      "function_43",
+      "function_95",
+      "function_402",
+      "function_198",
+      "function_125",
+      "operatorNewOrAbort",
+      "function_35",
+      "function_17",
+      "function_34",
+      "function_44",
+      "function_47",
+      "function_401",
+      "function_400",
+      "function_168",
+      "function_197",
+      "function_399",
+      "function_78",
+      "function_77",
+      "function_169",
+      "emscriptenAsmConstDouble",
+      "function_149",
+      "function_164",
+      "function_94",
+      "spawnEntity",
+      "function_170",
+      "function_428",
+      "function_196",
+      "function_255",
+      "function_204",
+      "function_42",
+      "function_195",
+      "function_271",
+      "function_194",
+      "function_193",
+      "function_398",
+      "function_84",
+      "createEquippedPetal",
+      "function_216",
+      "function_262",
+      "function_215",
+      "function_18",
+      "function_167",
+      "function_127",
+      "function_264",
+      "function_163",
+      "function_162",
+      "function_396",
+      "function_395",
+      "function_199",
+      "function_406",
+      "memset",
+      "function_192",
+      "function_254",
+      "function_191",
+      "function_102",
+      "function_394",
+      "function_393",
+      "function_105",
+      "function_190",
+      "function_189",
+      "function_404"
+    ]
+  },
+  "limitations": [
+    "The main simulation body is not yet reconstructed. Passing the world replay proves only bounded equivalence of the ten selected helper replacements.",
+    "Explicit runtime dependencies retain their original shared-memory ABI and are not counted as recovered functions here.",
+    "Malformed overlapping buffers, cyclic intrusive lists, allocator exhaustion and every floating-point boundary are not exhaustively validated."
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/vtable-destructors.mjs",
+  "implementationSha256": "bfc0d4c3f375678c4d8a0667df375d29a73bc416217530fe7b25d91559b510c0",
+  "factory": "createVtableDestructorHooks",
+  "functionIds": [
+    292,
+    299,
+    300
+  ],
+  "functions": [
+    {
+      "id": 292,
+      "name": "destroyGuardedBuffer",
+      "originalSymbol": "function_292",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/vtable-destructors.mjs",
+          "line": 18
+        },
+        "test": "test/server-vtable-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Vtable 13388; frees +8 when non-null and +12 non-zero."
+    },
+    {
+      "id": 299,
+      "name": "destroyStringMember12",
+      "originalSymbol": "function_299",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/vtable-destructors.mjs",
+          "line": 25
+        },
+        "test": "test/server-vtable-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Vtable 13488; destroys the string at +12."
+    },
+    {
+      "id": 300,
+      "name": "destroyStringMember16",
+      "originalSymbol": "function_300",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/vtable-destructors.mjs",
+          "line": 30
+        },
+        "test": "test/server-vtable-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Vtable 13528; destroys the string at +16."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-vtable-destructors.test.mjs",
+    "report": "reports/server-vtable-destructors-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 8,
+    "completeLinearMemoryChecks": 8,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 8,
+    "trappingComparisons": 0,
+    "comparison": "Three destructors x two pointer states plus long-string destruction for 299/300; complete memory, result and stack.",
+    "limitations": [
+      "Ledger: 428 server bodies recovered and 306 remain machine code."
+    ]
+  }
+}

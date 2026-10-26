@@ -1,0 +1,131 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/catalog-initializers-2.mjs",
+  "implementationSha256": "e92d124c6a7dc260188f4c035a74a371813e95c13f23b5d788230e19c95598a9",
+  "factory": "createCatalogInitializer2Hooks",
+  "functionIds": [
+    528,
+    530,
+    531
+  ],
+  "functions": [
+    {
+      "id": 528,
+      "name": "getCatalog528",
+      "originalSymbol": "function_528",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        24,
+        28,
+        31,
+        32
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119393
+        },
+        "source": {
+          "path": "source/game/server/catalog-initializers-2.mjs",
+          "line": 12
+        },
+        "test": "test/server-catalog-initializers-2.test.mjs"
+      },
+      "originalDirectDependencies": [
+        24,
+        28,
+        31,
+        32
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Lazy guarded catalog: outer 8570824, inner 8571976, clear 8571952..8571976, 2 string assignments via 28, publish pointer at 8570820."
+    },
+    {
+      "id": 530,
+      "name": "getCatalog530",
+      "originalSymbol": "function_530",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        24,
+        28,
+        31,
+        32
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119454
+        },
+        "source": {
+          "path": "source/game/server/catalog-initializers-2.mjs",
+          "line": 12
+        },
+        "test": "test/server-catalog-initializers-2.test.mjs"
+      },
+      "originalDirectDependencies": [
+        24,
+        28,
+        31,
+        32
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Lazy guarded catalog: outer 8570808, inner 8571904, clear 8571616..8571904, 24 string assignments via 28, publish pointer at 8570804."
+    },
+    {
+      "id": 531,
+      "name": "getCatalog531",
+      "originalSymbol": "function_531",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        24,
+        28,
+        31,
+        32
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119571
+        },
+        "source": {
+          "path": "source/game/server/catalog-initializers-2.mjs",
+          "line": 12
+        },
+        "test": "test/server-catalog-initializers-2.test.mjs"
+      },
+      "originalDirectDependencies": [
+        24,
+        28,
+        31,
+        32
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Lazy guarded catalog: outer 8570792, inner 8571304, clear 8571136..8571304, 14 string assignments via 28, publish pointer at 8570788."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-catalog-initializers-2.test.mjs",
+    "report": "reports/server-catalog-initializers-2-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 72,
+    "completeLinearMemoryChecks": 72,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 72,
+    "trappingComparisons": 0,
+    "comparison": "12 cold and 12 warm trials per catalog compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Guard, clear and string-assignment primitives 24/28/31/32 are native dependencies.",
+      "Guard contention cannot occur in single-threaded tests.",
+      "Ledger: 283 server bodies recovered and 451 remain machine code."
+    ]
+  }
+}

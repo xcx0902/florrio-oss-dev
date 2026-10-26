@@ -1,0 +1,3310 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "evidence": {
+    "constructorFunctionIndex": 279,
+    "entityDefinitionFunctionIndex": 103,
+    "petalRecordStride": 52,
+    "entityRecordStride": 116,
+    "unknownFieldNamesAreOffsets": true
+  },
+  "petalDefinitions": [
+    {
+      "typeId": 0,
+      "address": 8545792,
+      "name": "None",
+      "descriptions": [
+        ""
+      ],
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 18,
+      "factoryFunctionIndex": 683,
+      "virtualTableAddress": null,
+      "virtualMethods": [],
+      "bytesHex": "940c000001000000d411000000000000000000000000000000000000000000000100000000006041000000000000000012000000"
+    },
+    {
+      "typeId": 1,
+      "address": 8545844,
+      "name": "Basic",
+      "descriptions": [
+        "A nice petal, not too strong but not too weak"
+      ],
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 17,
+      "factoryFunctionIndex": 602,
+      "virtualTableAddress": 5212,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 100,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 101,
+          "functionIndex": 433
+        },
+        {
+          "slot": 3,
+          "tableIndex": 102,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "c80d000001000000d50a00000000000000000000000000000000000000401c450100000000006041000000000000000011000000"
+    },
+    {
+      "typeId": 2,
+      "address": 8545896,
+      "name": "Fast",
+      "descriptions": [
+        "Weaker than most petals, but recharges very quickly"
+      ],
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 16,
+      "factoryFunctionIndex": 235,
+      "virtualTableAddress": 5256,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 108,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 109,
+          "functionIndex": 414
+        },
+        {
+          "slot": 3,
+          "tableIndex": 110,
+          "functionIndex": 413
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "83070000010000001f060000000000000000000000000000000000000000fa430100000000006041000000000000000010000000"
+    },
+    {
+      "typeId": 3,
+      "address": 8545948,
+      "name": "Heavy",
+      "descriptions": [
+        "Very resilient and deals more damage, but recharges very slowly"
+      ],
+      "rarityIndex": 0,
+      "rechargeMilliseconds": 5500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 15,
+      "factoryFunctionIndex": 612,
+      "virtualTableAddress": 5300,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 111,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 112,
+          "functionIndex": 662
+        },
+        {
+          "slot": 3,
+          "tableIndex": 113,
+          "functionIndex": 661
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "ba05000001000000da0500000000000000000000000000000000000000e0ab45010000000000604100000000000000000f000000"
+    },
+    {
+      "typeId": 4,
+      "address": 8546000,
+      "name": "Rock",
+      "descriptions": [
+        "Extremely durable, but takes a long time to recharge"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 10000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 14,
+      "factoryFunctionIndex": 614,
+      "virtualTableAddress": 5344,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 114,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 115,
+          "functionIndex": 664
+        },
+        {
+          "slot": 3,
+          "tableIndex": 116,
+          "functionIndex": 663
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "d00a000001000000070d00000000000000000000000000000200000000401c46010000000000604100000000000000000e000000"
+    },
+    {
+      "typeId": 5,
+      "address": 8546052,
+      "name": "Square",
+      "descriptions": [
+        "This shape... it looks familiar..."
+      ],
+      "rarityIndex": 5,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 13,
+      "factoryFunctionIndex": 621,
+      "virtualTableAddress": 5388,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 117,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 101,
+          "functionIndex": 433
+        },
+        {
+          "slot": 3,
+          "tableIndex": 102,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "880c000001000000201100000000000000000000000000000500000000401c45010000000000604100000000000000000d000000"
+    },
+    {
+      "typeId": 6,
+      "address": 8546104,
+      "name": "Rose",
+      "descriptions": [
+        "Its healing properties are amazing. Not so good at combat though"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 12,
+      "factoryFunctionIndex": 626,
+      "virtualTableAddress": 5432,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 118,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 119,
+          "functionIndex": 412
+        },
+        {
+          "slot": 3,
+          "tableIndex": 120,
+          "functionIndex": 665
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "6b0c000001000000760b00000000000000000000000000000100000000c05a45010000000000604100000000000000000c000000"
+    },
+    {
+      "typeId": 7,
+      "address": 8546156,
+      "name": "Stinger",
+      "descriptions": [
+        "It really hurts, but it's very fragile"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 4000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 11,
+      "factoryFunctionIndex": 364,
+      "virtualTableAddress": 5476,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 121,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 122,
+          "functionIndex": 727
+        },
+        {
+          "slot": 3,
+          "tableIndex": 123,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "bc09000001000000d90c00000000000000000000000000000100000000007a45010000000000604100000000000000000b000000"
+    },
+    {
+      "typeId": 8,
+      "address": 8546208,
+      "name": "Iris",
+      "descriptions": [
+        "Very poisonous, but takes a little while to do its work"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 6000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 10,
+      "factoryFunctionIndex": 629,
+      "virtualTableAddress": 5520,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 124,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 125,
+          "functionIndex": 668
+        },
+        {
+          "slot": 3,
+          "tableIndex": 126,
+          "functionIndex": 667
+        },
+        {
+          "slot": 4,
+          "tableIndex": 127,
+          "functionIndex": 666
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "fc08000001000000980a0000000000000000000000000000010000000080bb45010000000000604100000000000000000a000000"
+    },
+    {
+      "typeId": 9,
+      "address": 8546260,
+      "name": "Wing",
+      "descriptions": [
+        "It comes and goes"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1250,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 9,
+      "factoryFunctionIndex": 634,
+      "virtualTableAddress": 5604,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 136,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 137,
+          "functionIndex": 670
+        },
+        {
+          "slot": 3,
+          "tableIndex": 138,
+          "functionIndex": 669
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "f70b0000010000002d0900000000000000000000000000000200000000409c440100000000006041000000000000000009000000"
+    },
+    {
+      "typeId": 10,
+      "address": 8546312,
+      "name": "Missile",
+      "descriptions": [
+        "You can actually shoot this one"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 8,
+      "factoryFunctionIndex": 642,
+      "virtualTableAddress": 5648,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 139,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 140,
+          "functionIndex": 672
+        },
+        {
+          "slot": 3,
+          "tableIndex": 141,
+          "functionIndex": 671
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "d10c000001000000990c00000000000000000000000000000200000000803b450100000000006041000000000000000008000000"
+    },
+    {
+      "typeId": 11,
+      "address": 8546364,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 7,
+      "factoryFunctionIndex": 643,
+      "virtualTableAddress": 5692,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 142,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 143,
+          "functionIndex": 411
+        },
+        {
+          "slot": 3,
+          "tableIndex": 144,
+          "functionIndex": 676
+        },
+        {
+          "slot": 4,
+          "tableIndex": 145,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "3f09000001000000860a00000000000000000000000000000200000000007a440100000000006041000000000000000007000000"
+    },
+    {
+      "typeId": 12,
+      "address": 8546416,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal, now with a secret ingredient: poison"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 6,
+      "factoryFunctionIndex": 648,
+      "virtualTableAddress": 5772,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 153,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 154,
+          "functionIndex": 411
+        },
+        {
+          "slot": 3,
+          "tableIndex": 155,
+          "functionIndex": 681
+        },
+        {
+          "slot": 4,
+          "tableIndex": 156,
+          "functionIndex": 680
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "3f09000001000000180a00000000000000000000000000000300000000007a440100000000006041000000000000000006000000"
+    },
+    {
+      "typeId": 13,
+      "address": 8546468,
+      "name": "Cactus",
+      "descriptions": [
+        "Not very strong, but somehow increases your maximum health"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 5,
+      "factoryFunctionIndex": 384,
+      "virtualTableAddress": 5852,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 164,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 165,
+          "functionIndex": 740
+        },
+        {
+          "slot": 3,
+          "tableIndex": 166,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 167,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 168,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "1408000001000000070b00000000000000000000000000000200000000007a440100000000006041000000000000000005000000"
+    },
+    {
+      "typeId": 14,
+      "address": 8546520,
+      "name": "Faster",
+      "descriptions": [
+        "It's so light it makes your other petals spin faster"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 4,
+      "factoryFunctionIndex": 650,
+      "virtualTableAddress": 5896,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 169,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 170,
+          "functionIndex": 414
+        },
+        {
+          "slot": 3,
+          "tableIndex": 171,
+          "functionIndex": 413
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "b50900000100000080090000000000000000000000000000020000000000fa430100000000006041000000000000000004000000"
+    },
+    {
+      "typeId": 15,
+      "address": 8546572,
+      "name": "Rose",
+      "descriptions": [
+        "Extremely powerful rose, almost unheard of"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 3,
+      "factoryFunctionIndex": 651,
+      "virtualTableAddress": 5940,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 172,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 173,
+          "functionIndex": 412
+        },
+        {
+          "slot": 3,
+          "tableIndex": 174,
+          "functionIndex": 682
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "6b0c000001000000090c00000000000000000000000000000300000000c05a450100000000006041000000000000000003000000"
+    },
+    {
+      "typeId": 16,
+      "address": 8546624,
+      "name": "Twin",
+      "descriptions": [
+        "Why stop at one? Why not TWO?!"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 2,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 19,
+      "factoryFunctionIndex": 235,
+      "virtualTableAddress": 5256,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 108,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 109,
+          "functionIndex": 414
+        },
+        {
+          "slot": 3,
+          "tableIndex": 110,
+          "functionIndex": 413
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "580a0000010000005c1100000000000000000000000000000100000000007a440200000000006041000000000000000013000000"
+    },
+    {
+      "typeId": 17,
+      "address": 8546676,
+      "name": "Triplet",
+      "descriptions": [
+        "How about THREE?!"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 20,
+      "factoryFunctionIndex": 235,
+      "virtualTableAddress": 5256,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 108,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 109,
+          "functionIndex": 414
+        },
+        {
+          "slot": 3,
+          "tableIndex": 110,
+          "functionIndex": 413
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "04080000010000007b1100000000000000000000000000000300000000007a440300000000006041000000000000000014000000"
+    },
+    {
+      "typeId": 18,
+      "address": 8546728,
+      "name": "Bubble",
+      "descriptions": [
+        "You can right click to pop it and propel your flower"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 21,
+      "factoryFunctionIndex": 598,
+      "virtualTableAddress": 5984,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 175,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 176,
+          "functionIndex": 685
+        },
+        {
+          "slot": 3,
+          "tableIndex": 177,
+          "functionIndex": 684
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "000d0000010000004b0900000000000000000000000000000200000000c05a450100000000006041000000000000000015000000"
+    },
+    {
+      "typeId": 19,
+      "address": 8546780,
+      "name": "Pollen",
+      "descriptions": [
+        "Asthmatics beware"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 22,
+      "factoryFunctionIndex": 593,
+      "virtualTableAddress": 6028,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 178,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 179,
+          "functionIndex": 687
+        },
+        {
+          "slot": 3,
+          "tableIndex": 180,
+          "functionIndex": 686
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "5d0a000001000000760c00000000000000000000000000000300000000007a440300000000006041000000000000000016000000"
+    },
+    {
+      "typeId": 20,
+      "address": 8546832,
+      "name": "Dandelion",
+      "descriptions": [
+        "Its interesting properties prevent healing effects on affected units"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 2000,
+      "instancesPerSlot": 1,
+      "radius": 11,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 26,
+      "factoryFunctionIndex": 572,
+      "virtualTableAddress": 6072,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 181,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 182,
+          "functionIndex": 690
+        },
+        {
+          "slot": 3,
+          "tableIndex": 183,
+          "functionIndex": 689
+        },
+        {
+          "slot": 4,
+          "tableIndex": 184,
+          "functionIndex": 688
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "4a0a0000010000001b080000000000000000000000000000020000000000fa44010000000000304100000000000000001a000000"
+    },
+    {
+      "typeId": 21,
+      "address": 8546884,
+      "name": "Cactus",
+      "descriptions": [
+        "Increases your maximum health and makes your flower toxic",
+        "Enemies hit by your flower will get poisoned"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 25,
+      "factoryFunctionIndex": 579,
+      "virtualTableAddress": 6156,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 190,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 165,
+          "functionIndex": 740
+        },
+        {
+          "slot": 3,
+          "tableIndex": 166,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 191,
+          "functionIndex": 692
+        },
+        {
+          "slot": 5,
+          "tableIndex": 192,
+          "functionIndex": 691
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "14080000020000008e0d00005d0d000000000000000000000300000000007a440100000000006041000000000000000019000000"
+    },
+    {
+      "typeId": 22,
+      "address": 8546936,
+      "name": "Egg",
+      "descriptions": [
+        "Something interesting might pop out of this"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 24,
+      "factoryFunctionIndex": 583,
+      "virtualTableAddress": 6200,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 193,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 194,
+          "functionIndex": 694
+        },
+        {
+          "slot": 3,
+          "tableIndex": 195,
+          "functionIndex": 693
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "050c000001000000010900000000000000000000000000000300000000007a440100000000006041000000000000000018000000"
+    },
+    {
+      "typeId": 23,
+      "address": 8546988,
+      "name": "Egg",
+      "descriptions": [
+        "Something interesting might pop out of this"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 23,
+      "factoryFunctionIndex": 590,
+      "virtualTableAddress": 6244,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 196,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 197,
+          "functionIndex": 720
+        },
+        {
+          "slot": 3,
+          "tableIndex": 198,
+          "functionIndex": 719
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "050c000001000000010900000000000000000000000000000400000000007a440100000000006041000000000000000017000000"
+    },
+    {
+      "typeId": 24,
+      "address": 8547040,
+      "name": "Rose",
+      "descriptions": [
+        "Its healing properties are amazing. Not so good at combat though"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3500,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 1,
+      "field44": 11,
+      "factoryTableIndex": 27,
+      "factoryFunctionIndex": 565,
+      "virtualTableAddress": 6288,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 199,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 200,
+          "functionIndex": 724
+        },
+        {
+          "slot": 3,
+          "tableIndex": 201,
+          "functionIndex": 723
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "6b0c000001000000760b00000000000000000000000000000200000000c05a45030000000000604100010000000030411b000000"
+    },
+    {
+      "typeId": 25,
+      "address": 8547092,
+      "name": "Antennae",
+      "descriptions": [
+        "Allows your flower to sense foes farther away"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flag40": 1,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 28,
+      "factoryFunctionIndex": 558,
+      "virtualTableAddress": 6332,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 202,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 101,
+          "functionIndex": 433
+        },
+        {
+          "slot": 3,
+          "tableIndex": 102,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "540d000001000000a60600000000000000000000000000000400000000000000010000000000404101000000000000001c000000"
+    },
+    {
+      "typeId": 26,
+      "address": 8547144,
+      "name": "Heaviest",
+      "descriptions": [
+        "This thing is so heavy that nothing gets in the way"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 20000,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 29,
+      "factoryFunctionIndex": 552,
+      "virtualTableAddress": 6376,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 203,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 204,
+          "functionIndex": 726
+        },
+        {
+          "slot": 3,
+          "tableIndex": 205,
+          "functionIndex": 725
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "7a07000001000000d40600000000000000000000000000000300000000409c46010000000000404100000000000000001d000000"
+    },
+    {
+      "typeId": 27,
+      "address": 8547196,
+      "name": "Stinger",
+      "descriptions": [
+        "It really hurts, but it's very fragile"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 4000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 1,
+      "field44": 11,
+      "factoryTableIndex": 30,
+      "factoryFunctionIndex": 364,
+      "virtualTableAddress": 5476,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 121,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 122,
+          "functionIndex": 727
+        },
+        {
+          "slot": 3,
+          "tableIndex": 123,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "bc09000001000000d90c00000000000000000000000000000400000000007a45030000000000604100010000000030411e000000"
+    },
+    {
+      "typeId": 28,
+      "address": 8547248,
+      "name": "Yin Yang",
+      "descriptions": [
+        "This mysterious petal reverses the rotation direction of your petals"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 12,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 32,
+      "factoryFunctionIndex": 545,
+      "virtualTableAddress": 6420,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 206,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 207,
+          "functionIndex": 728
+        },
+        {
+          "slot": 3,
+          "tableIndex": 208,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "fc0b000001000000b70800000000000000000000000000000300000000007a440100000000004041000000000000000020000000"
+    },
+    {
+      "typeId": 29,
+      "address": 8547300,
+      "name": "Web",
+      "descriptions": [
+        "It's really sticky"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 31,
+      "factoryFunctionIndex": 327,
+      "virtualTableAddress": 6464,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 209,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 210,
+          "functionIndex": 734
+        },
+        {
+          "slot": 3,
+          "tableIndex": 211,
+          "functionIndex": 733
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 212,
+          "functionIndex": 732
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "d20d0000010000008d0600000000000000000000000000000200000000803b45010000000000604100000000000000001f000000"
+    },
+    {
+      "typeId": 30,
+      "address": 8547352,
+      "name": "Web",
+      "descriptions": [
+        "It's really sticky"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 3000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 1,
+      "field44": 13,
+      "factoryTableIndex": 35,
+      "factoryFunctionIndex": 327,
+      "virtualTableAddress": 6464,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 209,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 210,
+          "functionIndex": 734
+        },
+        {
+          "slot": 3,
+          "tableIndex": 211,
+          "functionIndex": 733
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 212,
+          "functionIndex": 732
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "d20d0000010000008d0600000000000000000000000000000400000000803b450300000000006041000100000000504123000000"
+    },
+    {
+      "typeId": 31,
+      "address": 8547404,
+      "name": "Honey",
+      "descriptions": [
+        "This is so sticky it slows down whatever it hits"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 1700,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 34,
+      "factoryFunctionIndex": 539,
+      "virtualTableAddress": 6548,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 217,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 101,
+          "functionIndex": 433
+        },
+        {
+          "slot": 3,
+          "tableIndex": 102,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 218,
+          "functionIndex": 738
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "a00600000100000060080000000000000000000000000000020000000080d4440100000000006041000000000000000022000000"
+    },
+    {
+      "typeId": 32,
+      "address": 8547456,
+      "name": "Leaf",
+      "descriptions": [
+        "Gathers energy from the sun to heal your flower passively"
+      ],
+      "rarityIndex": 1,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 33,
+      "factoryFunctionIndex": 542,
+      "virtualTableAddress": 6632,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 223,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 224,
+          "functionIndex": 739
+        },
+        {
+          "slot": 3,
+          "tableIndex": 225,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "530c000001000000530600000000000000000000000000000100000000007a440100000000006041000000000000000021000000"
+    },
+    {
+      "typeId": 33,
+      "address": 8547508,
+      "name": "Cactus",
+      "descriptions": [
+        "Not very strong, but somehow increases your maximum health"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 3,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 1,
+      "field44": 15,
+      "factoryTableIndex": 41,
+      "factoryFunctionIndex": 384,
+      "virtualTableAddress": 5852,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 164,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 165,
+          "functionIndex": 740
+        },
+        {
+          "slot": 3,
+          "tableIndex": 166,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 167,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 168,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "1408000001000000070b00000000000000000000000000000400000000007a440300000000006041000100000000704129000000"
+    },
+    {
+      "typeId": 34,
+      "address": 8547560,
+      "name": "Peas",
+      "descriptions": [
+        "4 in 1 deal, now with a secret ingredient: poison"
+      ],
+      "rarityIndex": 4,
+      "rechargeMilliseconds": 1000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 40,
+      "factoryFunctionIndex": 500,
+      "virtualTableAddress": 6676,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 226,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 227,
+          "functionIndex": 432
+        },
+        {
+          "slot": 3,
+          "tableIndex": 228,
+          "functionIndex": 431
+        },
+        {
+          "slot": 4,
+          "tableIndex": 229,
+          "functionIndex": 747
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "3f09000001000000180a00000000000000000000000000000400000000007a440100000000006041000000000000000028000000"
+    },
+    {
+      "typeId": 35,
+      "address": 8547612,
+      "name": "Basic",
+      "descriptions": [
+        "Something incredibly rare and useless"
+      ],
+      "rarityIndex": 5,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 39,
+      "factoryFunctionIndex": 509,
+      "virtualTableAddress": 6756,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 237,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 101,
+          "functionIndex": 433
+        },
+        {
+          "slot": 3,
+          "tableIndex": 102,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "c80d000001000000910800000000000000000000000000000500000000401c450100000000006041000000000000000027000000"
+    },
+    {
+      "typeId": 36,
+      "address": 8547664,
+      "name": "Salt",
+      "descriptions": [
+        "Reflects some of the damage you take back to the flower that dealt it",
+        "Does not stack with itself"
+      ],
+      "rarityIndex": 2,
+      "rechargeMilliseconds": 2500,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 38,
+      "factoryFunctionIndex": 519,
+      "virtualTableAddress": 6800,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 238,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 101,
+          "functionIndex": 433
+        },
+        {
+          "slot": 3,
+          "tableIndex": 102,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "b207000002000000b7070000380c000000000000000000000200000000401c450100000000006041000000000000000026000000"
+    },
+    {
+      "typeId": 37,
+      "address": 8547716,
+      "name": "Rice",
+      "descriptions": [
+        "Spawns instantly, but not very strong"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 0,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 37,
+      "factoryFunctionIndex": 529,
+      "virtualTableAddress": 6844,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 239,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 240,
+          "functionIndex": 434
+        },
+        {
+          "slot": 3,
+          "tableIndex": 241,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "4f0d000001000000d10b000000000000000000000000000003000000000000000100000000006041000000000000000025000000"
+    },
+    {
+      "typeId": 38,
+      "address": 8547768,
+      "name": "Corn",
+      "descriptions": [
+        "Takes a long time to spawn, but has a lot of health"
+      ],
+      "rarityIndex": 3,
+      "rechargeMilliseconds": 45000,
+      "instancesPerSlot": 1,
+      "radius": 14,
+      "flag40": 0,
+      "flag41": 0,
+      "field44": 0,
+      "factoryTableIndex": 36,
+      "factoryFunctionIndex": 533,
+      "virtualTableAddress": 6888,
+      "virtualMethods": [
+        {
+          "slot": 0,
+          "tableIndex": 99,
+          "functionIndex": 98
+        },
+        {
+          "slot": 1,
+          "tableIndex": 242,
+          "functionIndex": 22
+        },
+        {
+          "slot": 2,
+          "tableIndex": 243,
+          "functionIndex": 435
+        },
+        {
+          "slot": 3,
+          "tableIndex": 244,
+          "functionIndex": 119
+        },
+        {
+          "slot": 4,
+          "tableIndex": 103,
+          "functionIndex": 152
+        },
+        {
+          "slot": 5,
+          "tableIndex": 104,
+          "functionIndex": 281
+        },
+        {
+          "slot": 6,
+          "tableIndex": 105,
+          "functionIndex": 152
+        },
+        {
+          "slot": 7,
+          "tableIndex": 106,
+          "functionIndex": 171
+        },
+        {
+          "slot": 8,
+          "tableIndex": 107,
+          "functionIndex": 152
+        }
+      ],
+      "bytesHex": "130a000001000000420b00000000000000000000000000000300000000c82f470100000000006041000000000000000024000000"
+    }
+  ],
+  "entityDefinitions": [
+    {
+      "typeId": 0,
+      "address": 8548368,
+      "name": "None",
+      "descriptions": [
+        "???"
+      ],
+      "field24": 0,
+      "field28": 0,
+      "petalTypeIds": [],
+      "field100": 0,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "940c0000010000001a0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000803f"
+    },
+    {
+      "typeId": 1,
+      "address": 8548484,
+      "name": "Rock",
+      "descriptions": [
+        "A rock. It doesn't do much."
+      ],
+      "field24": 0,
+      "field28": 1,
+      "petalTypeIds": [
+        2,
+        3,
+        4
+      ],
+      "field100": 51,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "d00a00000100000054100000000000000000000000000000000000000000803f03000000020000000000000003000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003300000000000000010000000000803f"
+    },
+    {
+      "typeId": 2,
+      "address": 8548600,
+      "name": "Boulder",
+      "descriptions": [
+        "A bigger rock. It doesn't do much either."
+      ],
+      "field24": 1,
+      "field28": 10,
+      "petalTypeIds": [
+        3,
+        4,
+        26
+      ],
+      "field100": 52,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "c409000001000000d00f0000000000000000000000000000010000000000204103000000030000000000000004000000000000001a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003400000000000000010000000000803f"
+    },
+    {
+      "typeId": 3,
+      "address": 8548716,
+      "name": "Cactus",
+      "descriptions": [
+        "Avoid touching it, it hurts."
+      ],
+      "field24": 0,
+      "field28": 2,
+      "petalTypeIds": [
+        7,
+        10,
+        13,
+        21,
+        33
+      ],
+      "field100": 53,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "1408000001000000120f000000000000000000000000000000000000000000400500000007000000000000000a000000000000000d00000000000000150000000000000021000000000000000000000000000000000000000000000000000000000000003500000000000000010000000000803f"
+    },
+    {
+      "typeId": 4,
+      "address": 8548832,
+      "name": "Ladybug",
+      "descriptions": [
+        "Cute and harmless."
+      ],
+      "field24": 0,
+      "field28": 3,
+      "petalTypeIds": [
+        2,
+        6,
+        16,
+        9,
+        18
+      ],
+      "field100": 54,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "c50b000001000000500f0000000000000000000000000000000000000000404005000000020000000000000006000000000000001000000000000000090000000000000012000000000000000000000000000000000000000000000000000000000000003600000000000000010000000000803f"
+    },
+    {
+      "typeId": 5,
+      "address": 8548948,
+      "name": "Massive Ladybug",
+      "descriptions": [
+        "This one is really big, but still cute."
+      ],
+      "field24": 3,
+      "field28": 50,
+      "petalTypeIds": [
+        6,
+        18,
+        24,
+        15
+      ],
+      "field100": 55,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 10,
+      "bytesHex": "bd0b000001000000911000000000000000000000000000000300000000004842040000000600000000000000120000000000000018000000000000000f00000000000000000000000000000000000000000000000000000000000000000000000000000037000000000000000100000000002041"
+    },
+    {
+      "typeId": 6,
+      "address": 8549064,
+      "name": "Bee",
+      "descriptions": [
+        "It stings. Don't touch it."
+      ],
+      "field24": 0,
+      "field28": 3,
+      "petalTypeIds": [
+        2,
+        7,
+        16,
+        9,
+        18,
+        31
+      ],
+      "field100": 56,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "3c0d000001000000c90e0000000000000000000000000000000000000000404006000000020000000000000007000000000000001000000000000000090000000000000012000000000000001f00000000000000000000000000000000000000000000003800000000000000010000000000803f"
+    },
+    {
+      "typeId": 7,
+      "address": 8549180,
+      "name": "Baby Ant",
+      "descriptions": [
+        "Weak and defenseless, but big dreams."
+      ],
+      "field24": 0,
+      "field28": 1,
+      "petalTypeIds": [
+        2,
+        32,
+        16,
+        17,
+        37
+      ],
+      "field100": 57,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "88070000010000007b0f0000000000000000000000000000000000000000803f05000000020000000000000020000000000000001000000000000000110000000000000025000000000000000000000000000000000000000000000000000000000000003900000000000000010000000000803f"
+    },
+    {
+      "typeId": 8,
+      "address": 8549296,
+      "name": "Worker Ant",
+      "descriptions": [
+        "It's a bit temperamental, probably from working all the time."
+      ],
+      "field24": 0,
+      "field28": 2,
+      "petalTypeIds": [
+        2,
+        32,
+        16,
+        17,
+        38
+      ],
+      "field100": 58,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "9107000001000000b9100000000000000000000000000000000000000000004005000000020000000000000020000000000000001000000000000000110000000000000026000000000000000000000000000000000000000000000000000000000000003a00000000000000010000000000803f"
+    },
+    {
+      "typeId": 9,
+      "address": 8549412,
+      "name": "Soldier Ant",
+      "descriptions": [
+        "It's got wings and it's ready to use them."
+      ],
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        16,
+        8,
+        9,
+        14,
+        17
+      ],
+      "field100": 59,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "9c07000001000000fa0f0000000000000000000000000000010000000000a040050000001000000000000000080000000000000009000000000000000e0000000000000011000000000000000000000000000000000000000000000000000000000000003b00000000000000010000000000803f"
+    },
+    {
+      "typeId": 10,
+      "address": 8549528,
+      "name": "Queen Ant",
+      "descriptions": [
+        "You must have done something really bad if she's chasing you."
+      ],
+      "field24": 2,
+      "field28": 20,
+      "petalTypeIds": [
+        16,
+        9,
+        14,
+        17,
+        22,
+        27
+      ],
+      "field100": 60,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "a8070000010000005e0e0000000000000000000000000000020000000000a04106000000100000000000000009000000000000000e00000000000000110000000000000016000000000000001b00000000000000000000000000000000000000000000003c00000000000000010000000000803f"
+    },
+    {
+      "typeId": 11,
+      "address": 8549644,
+      "name": "Ant Hole",
+      "descriptions": [
+        "Ants go in, and come out. Can't explain that."
+      ],
+      "field24": 2,
+      "field28": 20,
+      "petalTypeIds": [
+        8,
+        9,
+        22
+      ],
+      "field100": 61,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "c80c000001000000e40e0000000000000000000000000000020000000000a04103000000080000000000000009000000000000001600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003d00000000000000010000000000803f"
+    },
+    {
+      "typeId": 12,
+      "address": 8549760,
+      "name": "Beetle",
+      "descriptions": [
+        "It's hungry and flowers are its favorite meal."
+      ],
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        8,
+        9,
+        36,
+        17
+      ],
+      "field100": 62,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "c10c00000100000025100000000000000000000000000000010000000000a04004000000080000000000000009000000000000002400000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000003e00000000000000010000000000803f"
+    },
+    {
+      "typeId": 13,
+      "address": 8549876,
+      "name": "Massive Beetle",
+      "descriptions": [
+        "Someone overfed this one, you might be next."
+      ],
+      "field24": 2,
+      "field28": 50,
+      "petalTypeIds": [
+        8,
+        9,
+        17,
+        23
+      ],
+      "field100": 63,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "b90c0000010000009c0e0000000000000000000000000000020000000000484204000000080000000000000009000000000000001100000000000000170000000000000000000000000000000000000000000000000000000000000000000000000000003f00000000000000010000000000803f"
+    },
+    {
+      "typeId": 14,
+      "address": 8549992,
+      "name": "Hornet",
+      "descriptions": [
+        "These aren't quite as nice as the little bees."
+      ],
+      "field24": 1,
+      "field28": 10,
+      "petalTypeIds": [
+        10,
+        9,
+        31,
+        18,
+        20,
+        25
+      ],
+      "field100": 64,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 2,
+      "bytesHex": "fd07000001000000a10f00000000000000000000000000000100000000002041060000000a0000000000000009000000000000001f000000000000001200000000000000140000000000000019000000000000000000000000000000000000000000000040000000000000000100000000000040"
+    },
+    {
+      "typeId": 15,
+      "address": 8550108,
+      "name": "Centipede",
+      "descriptions": [
+        "It's just there doing its thing."
+      ],
+      "field24": 1,
+      "field28": 3,
+      "petalTypeIds": [
+        2,
+        32,
+        16,
+        11,
+        12,
+        17
+      ],
+      "field100": 65,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "450d000001000000701000000000000000000000000000000100000000004040060000000200000000000000200000000000000010000000000000000b000000000000000c000000000000001100000000000000000000000000000000000000000000004100000000000000010000000000803f"
+    },
+    {
+      "typeId": 16,
+      "address": 8550224,
+      "name": "Centipede",
+      "descriptions": [
+        "It's just there doing its thing."
+      ],
+      "field24": 1,
+      "field28": 3,
+      "petalTypeIds": [],
+      "field100": 66,
+      "field104": 0,
+      "field108": 0,
+      "field109": 15,
+      "field110": 15,
+      "field112": 1,
+      "bytesHex": "450d00000100000070100000000000000000000000000000010000000000404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004200000000000000000f0f000000803f"
+    },
+    {
+      "typeId": 17,
+      "address": 8550340,
+      "name": "Evil Centipede",
+      "descriptions": [
+        "This one loves flowers."
+      ],
+      "field24": 2,
+      "field28": 5,
+      "petalTypeIds": [
+        8,
+        12,
+        34,
+        17
+      ],
+      "field100": 67,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "400d000001000000630f0000000000000000000000000000020000000000a0400400000008000000000000000c000000000000002200000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000004300000000000000010000000000803f"
+    },
+    {
+      "typeId": 18,
+      "address": 8550456,
+      "name": "Evil Centipede",
+      "descriptions": [
+        "This one loves flowers."
+      ],
+      "field24": 2,
+      "field28": 5,
+      "petalTypeIds": [],
+      "field100": 68,
+      "field104": 0,
+      "field108": 0,
+      "field109": 17,
+      "field110": 17,
+      "field112": 1,
+      "bytesHex": "400d000001000000630f0000000000000000000000000000020000000000a04000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004400000000000000001111000000803f"
+    },
+    {
+      "typeId": 19,
+      "address": 8550572,
+      "name": "Square",
+      "descriptions": [
+        "This shape... it looks familiar..."
+      ],
+      "field24": 5,
+      "field28": 10,
+      "petalTypeIds": [
+        5
+      ],
+      "field100": 69,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "880c00000100000020110000000000000000000000000000050000000000204101000000050000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004500000000000000010000000000803f"
+    },
+    {
+      "typeId": 20,
+      "address": 8550688,
+      "name": "Ladybug",
+      "descriptions": [
+        "Cute and harmless... if left unprovoked."
+      ],
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        15,
+        24,
+        9,
+        18,
+        17,
+        28
+      ],
+      "field100": 70,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "c50b000001000000f7100000000000000000000000000000010000000000a040060000000f0000000000000018000000000000000900000000000000120000000000000011000000000000001c00000000000000000000000000000000000000000000004600000000000000010000000000803f"
+    },
+    {
+      "typeId": 21,
+      "address": 8550804,
+      "name": "Ladybug",
+      "descriptions": [
+        "Shiny, cute and mostly harmless."
+      ],
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        6,
+        24,
+        16,
+        9,
+        18,
+        17
+      ],
+      "field100": 71,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 0.20000000298023224,
+      "bytesHex": "c50b0000010000002f0f0000000000000000000000000000010000000000a0400600000006000000000000001800000000000000100000000000000009000000000000001200000000000000110000000000000000000000000000000000000000000000470000000000000001000000cdcc4c3e"
+    },
+    {
+      "typeId": 22,
+      "address": 8550920,
+      "name": "Spider",
+      "descriptions": [
+        "Spooky."
+      ],
+      "field24": 1,
+      "field28": 5,
+      "petalTypeIds": [
+        8,
+        7,
+        14,
+        29,
+        30
+      ],
+      "field100": 72,
+      "field104": 0,
+      "field108": 1,
+      "field109": 0,
+      "field110": 0,
+      "field112": 1,
+      "bytesHex": "cc09000001000000560e0000000000000000000000000000010000000000a04005000000080000000000000007000000000000000e000000000000001d000000000000001e000000000000000000000000000000000000000000000000000000000000004800000000000000010000000000803f"
+    }
+  ],
+  "spawnRules": [
+    {
+      "address": 8547824,
+      "weight": 0.5,
+      "regionIds": [
+        0,
+        1
+      ],
+      "entityTypeId": 1,
+      "bytesHex": "0000003f020001000000000000010000"
+    },
+    {
+      "address": 8547840,
+      "weight": 0.009999999776482582,
+      "regionIds": [
+        0,
+        1
+      ],
+      "entityTypeId": 2,
+      "bytesHex": "0ad7233c020001000000000000020000"
+    },
+    {
+      "address": 8547856,
+      "weight": 0.10000000149011612,
+      "regionIds": [
+        4,
+        5,
+        6
+      ],
+      "entityTypeId": 2,
+      "bytesHex": "cdcccc3d030405060000000000020000"
+    },
+    {
+      "address": 8547872,
+      "weight": 0.4000000059604645,
+      "regionIds": [
+        2,
+        3
+      ],
+      "entityTypeId": 3,
+      "bytesHex": "cdcccc3e020203000000000000030000"
+    },
+    {
+      "address": 8547888,
+      "weight": 0.15000000596046448,
+      "regionIds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "entityTypeId": 4,
+      "bytesHex": "9a99193e050001020304000000040000"
+    },
+    {
+      "address": 8547904,
+      "weight": 0.004999999888241291,
+      "regionIds": [
+        2,
+        3
+      ],
+      "entityTypeId": 21,
+      "bytesHex": "0ad7a33b020203000000000000150000"
+    },
+    {
+      "address": 8547920,
+      "weight": 0.00019999999494757503,
+      "regionIds": [
+        0,
+        1
+      ],
+      "entityTypeId": 5,
+      "bytesHex": "17b75139020001000000000000050000"
+    },
+    {
+      "address": 8547936,
+      "weight": 0.10000000149011612,
+      "regionIds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "entityTypeId": 6,
+      "bytesHex": "cdcccc3d040001020300000000060000"
+    },
+    {
+      "address": 8547952,
+      "weight": 0.02500000037252903,
+      "regionIds": [
+        0,
+        1,
+        2
+      ],
+      "entityTypeId": 7,
+      "bytesHex": "cdcccc3c030001020000000000070000"
+    },
+    {
+      "address": 8547968,
+      "weight": 0.02500000037252903,
+      "regionIds": [
+        1,
+        2,
+        3
+      ],
+      "entityTypeId": 8,
+      "bytesHex": "cdcccc3c030102030000000000080000"
+    },
+    {
+      "address": 8547984,
+      "weight": 0.02500000037252903,
+      "regionIds": [
+        2,
+        3,
+        4
+      ],
+      "entityTypeId": 9,
+      "bytesHex": "cdcccc3c030203040000000000090000"
+    },
+    {
+      "address": 8548000,
+      "weight": 0.0020000000949949026,
+      "regionIds": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "entityTypeId": 11,
+      "bytesHex": "6f12033b0503040506070000000b0000"
+    },
+    {
+      "address": 8548016,
+      "weight": 0.10000000149011612,
+      "regionIds": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "entityTypeId": 12,
+      "bytesHex": "cdcccc3d0503040506070000000c0000"
+    },
+    {
+      "address": 8548032,
+      "weight": 0.0020000000949949026,
+      "regionIds": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "entityTypeId": 13,
+      "bytesHex": "6f12033b0503040506070000000d0000"
+    },
+    {
+      "address": 8548048,
+      "weight": 0.10000000149011612,
+      "regionIds": [
+        5,
+        6,
+        7
+      ],
+      "entityTypeId": 14,
+      "bytesHex": "cdcccc3d0305060700000000000e0000"
+    },
+    {
+      "address": 8548064,
+      "weight": 0.10000000149011612,
+      "regionIds": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "entityTypeId": 22,
+      "bytesHex": "cdcccc3d040405060700000000160000"
+    },
+    {
+      "address": 8548080,
+      "weight": 0.10000000149011612,
+      "regionIds": [
+        6,
+        7
+      ],
+      "entityTypeId": 20,
+      "bytesHex": "cdcccc3d020607000000000000140000"
+    },
+    {
+      "address": 8548096,
+      "weight": 0.008999999612569809,
+      "regionIds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "entityTypeId": 15,
+      "bytesHex": "bc74133c0800010203040506070f0000"
+    },
+    {
+      "address": 8548112,
+      "weight": 0.0010000000474974513,
+      "regionIds": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "entityTypeId": 17,
+      "bytesHex": "6f12833a050304050607000000110000"
+    },
+    {
+      "address": 8548128,
+      "weight": 9.999999974752427e-7,
+      "regionIds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "entityTypeId": 19,
+      "bytesHex": "bd378635080001020304050607130000"
+    }
+  ],
+  "packetXorKeyHex": "370d2d2ef765f413c5ceb2967bd8724294369599bf3bac3d90946fe9ecaf4d91985e3017f61bf0234b1d51c6befb127c5375a946767e6acf3044e02bd3c35cc96d68427d1a3c7b3f4acd7968be41b965ccf881d4e3555b576f53b906b0ae65d3b2b8db60d07ae9a3802cb84e5c2af8dd31351005d6025992be39e26840e82566549e2194b07f978f3dfb45303db823d1eddc595da2cd408cea62e2064d495dec6124ffe3866e7604d7f180ac5f3290ff5e383ac89d394276cf23fa8047bc9aeab055e3419a100bcd3288fa29af779ac168e9ea062caf0f9f5061b0747973ec2b87d1ae87d8c130df304702ed0e43ca658e15951ab52beef49e8cb8b43c248ef0"
+}

@@ -1,0 +1,145 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/cleanup-and-config.mjs",
+  "implementationSha256": "c9d4040ff158b794a8edbc8e4fb9fd60ec6b0b254e129f16e330160700d9b2d1",
+  "factory": "createCleanupAndConfigHooks",
+  "functionIds": [
+    600,
+    603,
+    1368,
+    2040,
+    1357
+  ],
+  "functions": [
+    {
+      "id": 600,
+      "name": "cleanupOrConfig600",
+      "originalSymbol": "function_600",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/cleanup-and-config.mjs",
+          "line": 15
+        },
+        "test": "test/client-cleanup-and-config.test.mjs"
+      },
+      "originalDirectDependencies": [
+        364
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Copies two ownership fields after validating the global registry."
+    },
+    {
+      "id": 603,
+      "name": "cleanupOrConfig603",
+      "originalSymbol": "function_603",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/cleanup-and-config.mjs",
+          "line": 15
+        },
+        "test": "test/client-cleanup-and-config.test.mjs"
+      },
+      "originalDirectDependencies": [
+        92
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Converts a 1e-6 count and 1e3 id into a delay; invalid records set errno 28."
+    },
+    {
+      "id": 1368,
+      "name": "cleanupOrConfig1368",
+      "originalSymbol": "function_1368",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/cleanup-and-config.mjs",
+          "line": 15
+        },
+        "test": "test/client-cleanup-and-config.test.mjs"
+      },
+      "originalDirectDependencies": [
+        416
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Releases sixteen static registries through 416."
+    },
+    {
+      "id": 2040,
+      "name": "cleanupOrConfig2040",
+      "originalSymbol": "function_2040",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/cleanup-and-config.mjs",
+          "line": 15
+        },
+        "test": "test/client-cleanup-and-config.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Fills two locale descriptor fields through asm-const strings."
+    },
+    {
+      "id": 1357,
+      "name": "releasePoolBlocks",
+      "originalSymbol": "function_1357",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/cleanup-and-config.mjs",
+          "line": 17
+        },
+        "test": "test/client-cleanup-and-config.test.mjs"
+      },
+      "originalDirectDependencies": [
+        400
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Releases thirty-nine pool blocks through 400."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-cleanup-and-config.test.mjs",
+    "report": "reports/client-cleanup-and-config-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 5,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "One zero/empty fixture per helper compares result, stack pointer and complete memory.",
+    "limitations": [
+      "Only empty records, zeroed registries and empty pool blocks are covered. Ledger: 703 client and 512 server bodies recovered."
+    ]
+  }
+}

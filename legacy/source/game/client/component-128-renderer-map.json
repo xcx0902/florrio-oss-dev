@@ -1,0 +1,356 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/component-128-renderer.mjs",
+  "implementationSha256": "3a6571e90e27d81895321fdd9b5ea6b8612654a536d114cf8e0a6abe62efd435",
+  "factory": "createComponent128RendererHooks",
+  "functionIds": [
+    481,
+    1045
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after parent review and passing candidate tests.",
+  "functions": [
+    {
+      "id": 481,
+      "name": "fillStoredPath",
+      "originalSymbol": "function_481",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 26138,
+          "endLine": 26256
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 3405
+        },
+        "source": {
+          "path": "source/game/client/component-128-renderer.mjs",
+          "line": 629
+        },
+        "test": "test/client-component-128-renderer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_366",
+        "emscripten_asm_const_int"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1045,
+      "name": "drawComponent128",
+      "originalSymbol": "function_1045",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        930
+      ],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 291116,
+          "endLine": 292360
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0640-0703.dcmp",
+          "line": 18333
+        },
+        "source": {
+          "path": "source/game/client/component-128-renderer.mjs",
+          "line": 87
+        },
+        "test": "test/client-component-128-renderer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_431",
+        "function_427",
+        "emscripten_asm_const_int",
+        "function_372",
+        "function_373",
+        "function_455",
+        "function_481"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "phases": [
+    {
+      "name": "resolveRadiusAndPointCount",
+      "watLine": 291123,
+      "watEndLine": 291154,
+      "description": "Read visual radius and derive the unsigned point count.",
+      "sourceLine": 107
+    },
+    {
+      "name": "cacheRoundedPath",
+      "watLine": 291155,
+      "watEndLine": 291311,
+      "description": "Build and close the rounded path once using its lazy handle.",
+      "sourceLine": 131
+    },
+    {
+      "name": "cacheInsetPath",
+      "watLine": 291312,
+      "watEndLine": 291531,
+      "description": "Build the alternating full-radius and inset path once.",
+      "sourceLine": 194
+    },
+    {
+      "name": "resolveFlashColors",
+      "watLine": 291532,
+      "watEndLine": 291929,
+      "description": "Resolve the two independently sampled flash palettes.",
+      "sourceLine": 286
+    },
+    {
+      "name": "configureOutlineStyle",
+      "watLine": 291930,
+      "watEndLine": 291981,
+      "description": "Set stroke width, miter joins and miter limit.",
+      "sourceLine": 431
+    },
+    {
+      "name": "strokeInsetPath",
+      "watLine": 291982,
+      "watEndLine": 292120,
+      "description": "Shade and optionally grayscale the dark palette, then stroke the inset path.",
+      "sourceLine": 452
+    },
+    {
+      "name": "restoreRoundJoin",
+      "watLine": 292121,
+      "watEndLine": 292138,
+      "description": "Return the renderer to round line joins.",
+      "sourceLine": 515
+    },
+    {
+      "name": "setOuterFillColor",
+      "watLine": 292139,
+      "watEndLine": 292210,
+      "description": "Publish the outer fill color, retaining grayscale channel snapshots.",
+      "sourceLine": 525
+    },
+    {
+      "name": "fillAndStrokeRoundedPath",
+      "watLine": 292211,
+      "watEndLine": 292356,
+      "description": "Shade the outer stroke, fill and stroke the rounded path.",
+      "sourceLine": 562
+    }
+  ],
+  "directRuntimeDependencies": [
+    366,
+    372,
+    373,
+    427,
+    431,
+    455
+  ],
+  "unrecoveredDirectRuntimeDependencies": [],
+  "staticDependencyClosure": [
+    {
+      "id": 366,
+      "implementation": "source/game/client/runtime-primitives.mjs"
+    },
+    {
+      "id": 369,
+      "implementation": "source/game/client/clock.mjs"
+    },
+    {
+      "id": 370,
+      "implementation": "source/game/client/clock.mjs"
+    },
+    {
+      "id": 372,
+      "implementation": "source/game/client/clock.mjs"
+    },
+    {
+      "id": 373,
+      "implementation": "source/game/client/runtime-primitives.mjs"
+    },
+    {
+      "id": 427,
+      "implementation": "source/game/client/trig.mjs"
+    },
+    {
+      "id": 431,
+      "implementation": "source/game/client/trig.mjs"
+    },
+    {
+      "id": 455,
+      "implementation": "source/game/client/drawing-primitives.mjs"
+    },
+    {
+      "id": 481,
+      "implementation": "source/game/client/component-128-renderer.mjs"
+    },
+    {
+      "id": 486,
+      "implementation": "source/game/client/trig.mjs"
+    },
+    {
+      "id": 487,
+      "implementation": "source/game/client/trig.mjs"
+    },
+    {
+      "id": 511,
+      "implementation": "source/game/client/math.mjs"
+    },
+    {
+      "id": 929,
+      "implementation": "source/game/client/trig.mjs"
+    },
+    {
+      "id": 930,
+      "implementation": null
+    },
+    {
+      "id": 1045,
+      "implementation": "source/game/client/component-128-renderer.mjs"
+    }
+  ],
+  "hostBridges": {
+    "pathCreateAbi": {
+      "field": "a",
+      "code": "141620",
+      "signature": "31967"
+    },
+    "pathMoveToAbi": {
+      "field": "a",
+      "code": "141801",
+      "signature": "32166"
+    },
+    "pathQuadraticCurveToAbi": {
+      "field": "a",
+      "code": "141918",
+      "signature": "32160"
+    },
+    "pathCloseAbi": {
+      "field": "a",
+      "code": "142027",
+      "signature": "31967"
+    },
+    "pathLineToAbi": {
+      "field": "a",
+      "code": "141835",
+      "signature": "32166"
+    },
+    "canvasSetLineWidthAbi": {
+      "field": "a",
+      "code": "138111",
+      "signature": "93028"
+    },
+    "canvasSetLineJoinMiterAbi": {
+      "field": "a",
+      "code": "138852",
+      "signature": "31967"
+    },
+    "canvasSetMiterLimitAbi": {
+      "field": "a",
+      "code": "138893",
+      "signature": "93028"
+    },
+    "canvasSetStrokeRgbAbi": {
+      "field": "a",
+      "code": "137456",
+      "signature": "32170"
+    },
+    "canvasSetLineJoinRoundAbi": {
+      "field": "a",
+      "code": "138811",
+      "signature": "31967"
+    },
+    "canvasSetFillRgbAbi": {
+      "field": "a",
+      "code": "137186",
+      "signature": "32170"
+    },
+    "canvasSetTransformAbi": {
+      "field": "a",
+      "code": "136414",
+      "signature": "32144"
+    },
+    "canvasFillPathAbi": {
+      "field": "a",
+      "code": "136690",
+      "signature": "32052"
+    }
+  },
+  "abi": {
+    "componentScratchBytes": 400,
+    "storedPathFillScratchBytes": 80,
+    "clockOutputOffset": 384,
+    "component": {
+      "entityPointer": 0,
+      "roundedPathHandle": 8,
+      "roundedPathReady": 12,
+      "insetPathHandle": 16,
+      "insetPathReady": 20
+    },
+    "entity": {
+      "boundsComponent": 140,
+      "visualComponent": 136,
+      "renderComponent": 128
+    },
+    "bounds": {
+      "radius": 8
+    },
+    "visual": {
+      "flashTimestampValid": 56,
+      "flashTimestamp": 64
+    },
+    "renderer": {
+      "affineMatrix": 0,
+      "cachedAffineMatrix": 24,
+      "transformDirty": 48,
+      "lineJoin": 50,
+      "grayscale": 69,
+      "canvasHandle": 96
+    },
+    "storedPathMissingSentinel": -1
+  },
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-component-128-renderer.test.mjs",
+    "report": "reports/client-component-128-renderer.tests.tap",
+    "testSourceSha256": "c17d2a8bd2ad475ab0a14784b65f180fb0b68ff71d29accdc4e1dbfedcffa219",
+    "testGroups": 11,
+    "oraclePairs": 41,
+    "completeMemoryCheckpoints": 201,
+    "memoryBytesPerComparison": 67108864,
+    "combinedRegisteredClientBodyCount": 75,
+    "candidateBodyCount": 2,
+    "comparison": [
+      "Complete linear memory at every stated checkpoint and each final scenario",
+      "Ordered host bridge identity, signatures, argument pointers, decoded values and live ABI bytes",
+      "Exception class/message and partial stack state"
+    ],
+    "branches": [
+      "Actual constructors, captured snapshots and real760 component128 dispatch",
+      "Rounded and inset path initialization, cache reuse and each partial-ready state",
+      "Detached/attached entity, zero/one/two/many point counts, negative and nonfinite radii",
+      "128 flash-validity/timestamp/grayscale/affine cases including nonfinite matrices",
+      "Host path mutations, radius/owner/ready-flag mutations and timestamp validity mutations",
+      "Path callback reentry while only one cache is ready",
+      "Twelve path/Canvas failures, a clock-host failure, pointer traps and component scratch aliases",
+      "Stored-path fill missing sentinel, dirty/equal/changed transforms and handle reload after transform callback",
+      "Stored-path fill host failures, pointer traps and aliases inside its80-byte frame"
+    ],
+    "limitations": [
+      "Finite probes do not prove every arbitrary pointer alias, huge valid point count or hostile host state.",
+      "Canvas Path2D execution and rendered pixels remain outside these local ABI probes.",
+      "The product identity of entity slot128 remains unconfirmed.",
+      "All direct runtime dependencies are recovered; the transitive closure still contains native 930 large range reduction through 427/431, so 1045 is not transitively complete."
+    ],
+    "reportSha256": "11c29e225e347920e12660f5b98a17a4536deedc4d41af54e979cca532da845c",
+    "pass": 11,
+    "fail": 0
+  }
+}

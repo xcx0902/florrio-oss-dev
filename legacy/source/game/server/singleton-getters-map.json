@@ -1,0 +1,139 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/singleton-getters.mjs",
+  "implementationSha256": "0400ba252512c2f9614b63d98648f47d48613c10a1bce847f70a3a9f3a8ac8f7",
+  "factory": "createSingletonGetterHooks",
+  "functionIds": [
+    505,
+    507,
+    510,
+    512
+  ],
+  "functions": [
+    {
+      "id": 505,
+      "name": "singleton8570860",
+      "originalSymbol": "function_505",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        123
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/singleton-getters.mjs",
+          "line": 30
+        },
+        "test": "test/server-singleton-getters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        123
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of static object 8570860 with size 3573."
+    },
+    {
+      "id": 507,
+      "name": "singleton8570828",
+      "originalSymbol": "function_507",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        123
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/singleton-getters.mjs",
+          "line": 31
+        },
+        "test": "test/server-singleton-getters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        123
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of static object 8570828 with size 1861."
+    },
+    {
+      "id": 510,
+      "name": "singleton8570924",
+      "originalSymbol": "function_510",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        123
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/singleton-getters.mjs",
+          "line": 32
+        },
+        "test": "test/server-singleton-getters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        123
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of static object 8570924 with size 2559."
+    },
+    {
+      "id": 512,
+      "name": "singleton8570892",
+      "originalSymbol": "function_512",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        123
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/singleton-getters.mjs",
+          "line": 33
+        },
+        "test": "test/server-singleton-getters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        123
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded construction of static object 8570892 with size 3546."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-singleton-getters.test.mjs",
+    "report": "reports/server-singleton-getters-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Four singleton getters compare result, complete memory and stack.",
+    "limitations": [
+      "Constructor 123 remains machine code. Ledger: 492 server bodies recovered and 242 remain machine code."
+    ]
+  }
+}

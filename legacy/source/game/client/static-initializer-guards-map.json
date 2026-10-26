@@ -1,0 +1,261 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/static-initializer-guards.mjs",
+  "implementationSha256": "0b8acca6ca80824aa5d08d1669e7823df435809c49ecb0112d391ba76bf8a82a",
+  "factory": "createStaticInitializerGuardHooks",
+  "functionIds": [
+    1833,
+    1835,
+    1837,
+    1839,
+    1848,
+    1850,
+    1852,
+    1855,
+    629
+  ],
+  "functions": [
+    {
+      "id": 1833,
+      "name": "staticInitializer1833",
+      "originalSymbol": "function_1833",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    },
+    {
+      "id": 1835,
+      "name": "staticInitializer1835",
+      "originalSymbol": "function_1835",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    },
+    {
+      "id": 1837,
+      "name": "staticInitializer1837",
+      "originalSymbol": "function_1837",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    },
+    {
+      "id": 1839,
+      "name": "staticInitializer1839",
+      "originalSymbol": "function_1839",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    },
+    {
+      "id": 1848,
+      "name": "staticInitializer1848",
+      "originalSymbol": "function_1848",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    },
+    {
+      "id": 1850,
+      "name": "staticInitializer1850",
+      "originalSymbol": "function_1850",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    },
+    {
+      "id": 1852,
+      "name": "staticInitializer1852",
+      "originalSymbol": "function_1852",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    },
+    {
+      "id": 1855,
+      "name": "staticInitializer1855",
+      "originalSymbol": "function_1855",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    },
+    {
+      "id": 629,
+      "name": "staticInitializer629",
+      "originalSymbol": "function_629",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-initializer-guards.mjs",
+          "line": 19
+        },
+        "test": "test/client-static-initializer-guards.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369,
+        370,
+        521
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "One-time static setup guarded by 369/370."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-static-initializer-guards.test.mjs",
+    "report": "reports/client-static-initializer-guards-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 18,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Each guard runs in fresh native and recovered instances with the flag forced to 0 and 1; result and resulting flag bit must match.",
+    "limitations": [
+      "Allocator addresses differ, so only the guard flag and result are compared. Ledger: 597 client and 507 server bodies recovered."
+    ]
+  }
+}

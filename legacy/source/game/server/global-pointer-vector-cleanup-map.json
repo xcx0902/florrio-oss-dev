@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/global-pointer-vector-cleanup.mjs",
+  "implementationSha256": "9a62c8f2e226a2e745391fdb1e17364b86d67b80fb587fa0336b4a1037141f3d",
+  "factory": "createGlobalPointerVectorCleanupHook",
+  "functionIds": [
+    455
+  ],
+  "functions": [
+    {
+      "id": 455,
+      "name": "cleanupPointerVector",
+      "originalSymbol": "function_455",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/global-pointer-vector-cleanup.mjs",
+          "line": 15
+        },
+        "test": "test/server-global-pointer-vector-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Frees vector elements and both backing buffers, clearing their descriptors."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-global-pointer-vector-cleanup.test.mjs",
+    "report": "reports/server-global-pointer-vector-cleanup-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Empty and two-element vectors compare complete allocator memory and stack.",
+    "limitations": [
+      "Ledger: 454 server bodies recovered and 280 remain machine code."
+    ]
+  }
+}

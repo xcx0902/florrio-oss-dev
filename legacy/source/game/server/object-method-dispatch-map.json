@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/object-method-dispatch.mjs",
+  "implementationSha256": "a0805561dec39a4b560ccc489303c7c6306b07f6f8d000db56395f4d4b75b149",
+  "factory": "createObjectMethodDispatchHook",
+  "functionIds": [
+    532
+  ],
+  "functions": [
+    {
+      "id": 532,
+      "name": "invokeObjectMethod",
+      "originalSymbol": "function_532",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119658
+        },
+        "source": {
+          "path": "source/game/server/object-method-dispatch.mjs",
+          "line": 16
+        },
+        "test": "test/server-object-method-dispatch.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Virtual dispatch: object=*(u32*)self, tableIndex=*(u32*)(object+4), table[tableIndex](object) with original type $t0 type checking."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-object-method-dispatch.test.mjs",
+    "report": "reports/server-object-method-dispatch-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 8,
+    "completeLinearMemoryChecks": 8,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 8,
+    "trappingComparisons": 0,
+    "comparison": "8 object payloads dispatch through a live table slot, comparing trap type, complete memory and stack pointer.",
+    "limitations": [
+      "The test discovers a compatible table slot at runtime; non-compatible slots trap in both implementations.",
+      "Ledger: 284 server bodies recovered and 450 remain machine code."
+    ]
+  }
+}

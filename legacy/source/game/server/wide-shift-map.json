@@ -1,0 +1,76 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/wide-shift.mjs",
+  "implementationSha256": "ecd1de046b79237e9cb327deb8e75111ae65b1a673828a6d0842cfcd3c16ad61",
+  "factory": "createWideShiftHook",
+  "functionIds": [
+    55,
+    122
+  ],
+  "functions": [
+    {
+      "id": 55,
+      "name": "shiftLeft128",
+      "originalSymbol": "function_55",
+      "signature": " (type $t21) (param $p0 i32) (param $p1 i64) (param $p2 i64) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 14831
+        },
+        "source": {
+          "path": "source/game/server/wide-shift.mjs",
+          "line": 56
+        },
+        "test": "test/server-wide-shift.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Logical left shift of a 128-bit high:low pair; counts normalised modulo 64, bit 6 moves the low word into the high word and clears the low word."
+    },
+    {
+      "id": 122,
+      "name": "shiftRight128",
+      "originalSymbol": "function_122",
+      "signature": " (type $t21) (param $p0 i32) (param $p1 i64) (param $p2 i64) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 25780
+        },
+        "source": {
+          "path": "source/game/server/wide-shift.mjs",
+          "line": 28
+        },
+        "test": "test/server-wide-shift.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Logical right shift of a 128-bit high:low pair by a count whose low seven bits matter; shift counts are normalised modulo 64 like the hardware shift instructions."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-wide-shift.test.mjs",
+    "report": "reports/server-wide-shift-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 120,
+    "completeLinearMemoryChecks": 120,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 120,
+    "trappingComparisons": 0,
+    "comparison": "Five 128-bit patterns crossed with shifts 0..130, both directions, including 63/64/65/96/127/128.",
+    "limitations": [
+      "Out-of-bounds output pointers are not exercised.",
+      "Ledger: 217 server bodies recovered and 517 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/numeric-wrappers.mjs",
+  "implementationSha256": "5d10aad350abb61d534b547479baa00d3b7ede47425d0471498e5afc5d0c9d8f",
+  "factory": "createNumericWrapperHooks",
+  "functionIds": [
+    1891
+  ],
+  "functions": [
+    {
+      "id": 1891,
+      "name": "cookieFrameWrapper1891",
+      "originalSymbol": "function_1891",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/numeric-wrappers.mjs",
+          "line": 9
+        },
+        "test": "test/client-numeric-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        513
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Places a 64-bit cookie and forwards six arguments plus frame pointers to 513."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-numeric-wrappers.test.mjs",
+    "report": "reports/client-numeric-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 1,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "One zero fixture compares result or trap and all memory outside a 512-byte frame window.",
+    "limitations": [
+      "Transient frame scratch is excluded. Function 775 was dropped because its 64-bit export trampoline rejects BigInt. Ledger: 680 client and 512 server bodies recovered."
+    ]
+  }
+}

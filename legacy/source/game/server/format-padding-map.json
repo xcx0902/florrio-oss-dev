@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/format-padding.mjs",
+  "implementationSha256": "dc11bda8c398097d48540bbea6897060bdd073a2f59ff7088d1ccc2abed4d753",
+  "factory": "createFormatPaddingHook",
+  "functionIds": [
+    63
+  ],
+  "functions": [
+    {
+      "id": 63,
+      "name": "writePadding",
+      "originalSymbol": "function_63",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/format-padding.mjs",
+          "line": 13
+        },
+        "test": "test/server-format-padding.test.mjs"
+      },
+      "originalDirectDependencies": [
+        51
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Writes target-current fill bytes through 51 in 256-byte batches; flags 0x12000 suppress padding."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-format-padding.test.mjs",
+    "report": "reports/server-format-padding-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 8,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 8,
+    "trappingComparisons": 0,
+    "comparison": "Two flag states x four spans compare the full facet output, stack pointer and all memory outside the dead 1 KiB stack window.",
+    "limitations": [
+      "Native 256-byte stack scratch is excluded from byte comparison. Ledger: 444 server bodies recovered and 290 remain machine code."
+    ]
+  }
+}

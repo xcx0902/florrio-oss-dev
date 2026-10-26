@@ -1,0 +1,60 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-copy-constructor.mjs",
+  "implementationSha256": "4864f91e772f1902f82f78d84c335d770e46216acda3a34d456a788ef2c98207",
+  "factory": "createStringCopyConstructorHook",
+  "functionIds": [
+    534
+  ],
+  "functions": [
+    {
+      "id": 534,
+      "name": "copyString",
+      "originalSymbol": "function_534",
+      "signature": " (type $t13) (param i32 i32 i32 i32 i32 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        58,
+        112,
+        121
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119675
+        },
+        "source": {
+          "path": "source/game/server/string-copy-constructor.mjs",
+          "line": 16
+        },
+        "test": "test/server-string-copy-constructor.test.mjs"
+      },
+      "originalDirectDependencies": [
+        58,
+        112,
+        121
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "libc++ string copy constructor: inline short copy; long size<=1 inline byte copy; long size>=2 rounds capacity ((size+4)&~3)-1 (2 maps to 1), allocates cap+1 with 121, copies size+1 with 112; size>=0x3ffffff0 aborts via 58."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-copy-constructor.test.mjs",
+    "report": "reports/server-string-copy-constructor-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 48,
+    "completeLinearMemoryChecks": 48,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 48,
+    "trappingComparisons": 0,
+    "comparison": "48 short/inline/heap cases compare complete memory and stack pointer.",
+    "limitations": [
+      "Allocation 121 and copy 112 are called natively; abort 58 is not exercised because it terminates the instance.",
+      "Ledger: 285 server bodies recovered and 449 remain machine code."
+    ]
+  }
+}

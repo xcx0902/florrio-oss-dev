@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/object-initializer.mjs",
+  "implementationSha256": "0ec1c1c611a2af7ee02ba2f1ee1ba35e5956ddb2dc453d8e349f90bcc9b91003",
+  "factory": "createObjectInitializerHook",
+  "functionIds": [
+    185
+  ],
+  "functions": [
+    {
+      "id": 185,
+      "name": "initializeObject",
+      "originalSymbol": "function_185",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-initializer.mjs",
+          "line": 14
+        },
+        "test": "test/server-object-initializer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        239,
+        259
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Publishes three vtable words, initializes +12 through 239 and cleans the header through 259."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-object-initializer.test.mjs",
+    "report": "reports/server-object-initializer-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 2,
+    "comparison": "Zeroed and 0xff-filled headers compare trap parity, stack and complete memory.",
+    "limitations": [
+      "Both fixture states trap inside 239; the post-239 success path is not exercised. Ledger: 507 server bodies recovered and 227 remain machine code."
+    ]
+  }
+}

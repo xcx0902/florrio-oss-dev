@@ -1,0 +1,286 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/config-io.mjs",
+  "implementationSha256": "c782f7c53a7d3616977ef2ecd8a8c1cfa832e7e2d094e1ca467eac6283775fe0",
+  "factory": "createConfigIoHooks",
+  "functionIds": [
+    1802,
+    1771,
+    1766,
+    2308,
+    2309,
+    2304,
+    2331,
+    1978,
+    1804
+  ],
+  "functions": [
+    {
+      "id": 1802,
+      "name": "componentStatus",
+      "originalSymbol": "function_1802",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 465943
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 40
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        837
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1771,
+      "name": "compareThenMove",
+      "originalSymbol": "function_1771",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 464880
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 46
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        463,
+        711
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1766,
+      "name": "compareThenUpdate",
+      "originalSymbol": "function_1766",
+      "signature": " (type $t13) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32) (param $p4 i32) (param $p5 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 464281
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 51
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        463,
+        712
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2308,
+      "name": "readDefault32",
+      "originalSymbol": "function_2308",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 643926
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 56
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        545
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2309,
+      "name": "readDefault500",
+      "originalSymbol": "function_2309",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 643945
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 63
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        545
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2304,
+      "name": "classifyLiteral",
+      "originalSymbol": "function_2304",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 643822
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 70
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        415
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2331,
+      "name": "clampOption",
+      "originalSymbol": "function_2331",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 645575
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 80
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        545
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1978,
+      "name": "appendScannedBytes",
+      "originalSymbol": "function_1978",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 485814
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 91
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        733,
+        363
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1804,
+      "name": "exchangeStatus",
+      "originalSymbol": "function_1804",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 466049
+        },
+        "source": {
+          "path": "source/game/client/config-io.mjs",
+          "line": 105
+        },
+        "test": "test/client-config-io.test.mjs"
+      },
+      "originalDirectDependencies": [
+        488,
+        837
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-config-io.test.mjs",
+    "report": "reports/client-config-io-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 62,
+    "trappingComparisons": 13,
+    "completeLinearMemoryChecks": 62,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 62,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 5,
+      "boundary": 8,
+      "edges": 0
+    },
+    "dependencies": [
+      363,
+      365,
+      415,
+      463,
+      488,
+      545,
+      711,
+      712,
+      733,
+      837
+    ],
+    "argumentRows": [
+      "component records, zeroed move targets, option strings and scan buffers at 0x100000",
+      "the same records shifted by four bytes and a mismatched component payload",
+      "zeroed records where dependencies trap rather than returning",
+      "addresses at 0x3ffffff minus index",
+      "four option strings plus absence, four appends, and four status states"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. Dependencies execute as the original selected bodies through runtime.call.",
+    "limitations": [
+      "1771 and 1766 exercise the equality and mismatch branches with zeroed records; unusual move-constructor payloads are not enumerated.",
+      "1978 covers zero, one, five, ten and twenty requested bytes; the stored scan extent and the copied length are distinct when the count is smaller.",
+      "1804 covers four global status values plus a missing component.",
+      "2304 compares against the seeded bytes at 16083, not the shipped data segment, because the harness resets linear memory.",
+      "These nine functions are wrappers over recovered dependencies; the ledger has 282 client bodies recovered and 3,963 remain machine code."
+    ]
+  }
+}

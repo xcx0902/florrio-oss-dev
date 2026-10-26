@@ -1,0 +1,533 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/combat.mjs",
+  "factory": "createCombatHooks",
+  "functionIds": [
+    18,
+    25,
+    26,
+    165,
+    167,
+    168,
+    205,
+    208,
+    210,
+    280,
+    426
+  ],
+  "scope": "Complete executable recovered bodies; shared services remain explicit dependencies until separately migrated.",
+  "differentialValidation": {
+    "command": "node --test test/server-combat.test.mjs",
+    "testCases": 7,
+    "comparedMemoryBytesPerOracle": 67108864,
+    "checksReturnStackAndHostCalls": true
+  },
+  "functions": [
+    {
+      "id": 18,
+      "name": "setCurrentHealth",
+      "originalSymbol": "function_18",
+      "signature": " (type $t3) (param $p0 i32) (param $p1 i32) (result i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 4301
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 1241
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 14,
+          "name": "free"
+        },
+        {
+          "id": 16,
+          "name": "malloc"
+        },
+        {
+          "id": 15,
+          "name": "memcpy"
+        },
+        {
+          "id": 280,
+          "name": "function_280"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 25,
+      "name": "setMaximumHealth",
+      "originalSymbol": "function_25",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 4757
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 1388
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 14,
+          "name": "free"
+        },
+        {
+          "id": 16,
+          "name": "malloc"
+        },
+        {
+          "id": 15,
+          "name": "memcpy"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 26,
+      "name": "setCollisionRadius",
+      "originalSymbol": "function_26",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 5088
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 1475
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 14,
+          "name": "free"
+        },
+        {
+          "id": 16,
+          "name": "malloc"
+        },
+        {
+          "id": 15,
+          "name": "memcpy"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 165,
+      "name": "spawnAreaBlocked",
+      "originalSymbol": "function_165",
+      "signature": " (type $t4) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 35679
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 2067
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 165,
+          "name": "function_165"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 167,
+      "name": "collisionBounds",
+      "originalSymbol": "function_167",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 36201
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 2217
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 167,
+          "name": "function_167"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 168,
+      "name": "targetEligible",
+      "originalSymbol": "function_168",
+      "signature": " (type $t3) (param $p0 i32) (param $p1 i32) (result i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 36346
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 2260
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 17,
+          "name": "function_17"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 205,
+      "name": "configureCentipede",
+      "originalSymbol": "function_205",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 45950
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 5282
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 68,
+          "name": "function_68"
+        },
+        {
+          "id": 67,
+          "name": "function_67"
+        },
+        {
+          "id": 18,
+          "name": "function_18"
+        },
+        {
+          "id": 25,
+          "name": "function_25"
+        },
+        {
+          "id": 65,
+          "name": "function_65"
+        },
+        {
+          "id": 64,
+          "name": "function_64"
+        },
+        {
+          "id": 26,
+          "name": "function_26"
+        },
+        {
+          "id": 115,
+          "name": "function_115"
+        },
+        {
+          "id": 114,
+          "name": "function_114"
+        },
+        {
+          "id": 14,
+          "name": "free"
+        },
+        {
+          "id": 16,
+          "name": "malloc"
+        },
+        {
+          "id": 15,
+          "name": "memcpy"
+        },
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 149,
+          "name": "function_149"
+        },
+        {
+          "id": 169,
+          "name": "function_169"
+        },
+        {
+          "id": 165,
+          "name": "function_165"
+        },
+        {
+          "id": 144,
+          "name": "spawnEntity"
+        },
+        {
+          "id": 73,
+          "name": "function_73"
+        },
+        {
+          "id": 422,
+          "name": "function_422"
+        },
+        {
+          "id": 267,
+          "name": "function_267"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 208,
+      "name": "configureAnt",
+      "originalSymbol": "function_208",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 47762
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0192-0255.dcmp",
+          "line": 148
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 14,
+          "name": "free"
+        },
+        {
+          "id": 16,
+          "name": "malloc"
+        },
+        {
+          "id": 15,
+          "name": "memcpy"
+        },
+        {
+          "id": 65,
+          "name": "function_65"
+        },
+        {
+          "id": 64,
+          "name": "function_64"
+        },
+        {
+          "id": 68,
+          "name": "function_68"
+        },
+        {
+          "id": 67,
+          "name": "function_67"
+        },
+        {
+          "id": 18,
+          "name": "function_18"
+        },
+        {
+          "id": 25,
+          "name": "function_25"
+        },
+        {
+          "id": 26,
+          "name": "function_26"
+        },
+        {
+          "id": 115,
+          "name": "function_115"
+        },
+        {
+          "id": 114,
+          "name": "function_114"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 210,
+      "name": "configureLadybug",
+      "originalSymbol": "function_210",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 48821
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0192-0255.dcmp",
+          "line": 441
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 65,
+          "name": "function_65"
+        },
+        {
+          "id": 64,
+          "name": "function_64"
+        },
+        {
+          "id": 68,
+          "name": "function_68"
+        },
+        {
+          "id": 67,
+          "name": "function_67"
+        },
+        {
+          "id": 18,
+          "name": "function_18"
+        },
+        {
+          "id": 25,
+          "name": "function_25"
+        },
+        {
+          "id": 26,
+          "name": "function_26"
+        },
+        {
+          "id": 115,
+          "name": "function_115"
+        },
+        {
+          "id": 114,
+          "name": "function_114"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 280,
+      "name": "markHealthField",
+      "originalSymbol": "function_280",
+      "signature": " (type $t0) (param $p0 i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 67038
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0256-0319.dcmp",
+          "line": 969
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 14,
+          "name": "free"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 426,
+      "name": "alertToAttacker",
+      "originalSymbol": "function_426",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/combat.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 110960
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 4034
+        },
+        "test": "test/server-combat.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 168,
+          "name": "function_168"
+        },
+        {
+          "id": 423,
+          "name": "function_423"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "limitations": [
+    "This module is an increment of the full high-level reconstruction, not a complete standalone server.",
+    "Original direct dependencies describe instruction provenance. Several are inlined in the high-level body; remaining runtime.call and indirect services retain their original ABI.",
+    "Validation is bounded by the actual fixtures and deterministic replay; it is not a proof over every possible memory state."
+  ]
+}

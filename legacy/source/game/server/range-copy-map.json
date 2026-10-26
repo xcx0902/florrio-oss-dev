@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/range-copy.mjs",
+  "implementationSha256": "f8b1148edebe19a377f36c0121a83043fb1bfbc2d377c806d6cbea1d4e2905be",
+  "factory": "createRangeCopyHook",
+  "functionIds": [
+    174
+  ],
+  "functions": [
+    {
+      "id": 174,
+      "name": "copyRange",
+      "originalSymbol": "function_174",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/range-copy.mjs",
+          "line": 9
+        },
+        "test": "test/server-range-copy.test.mjs"
+      },
+      "originalDirectDependencies": [
+        261
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Copies end-start bytes through 261 and returns destination+length."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-range-copy.test.mjs",
+    "report": "reports/server-range-copy-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Four lengths compare result, stack and all memory outside the dead 64-byte stack window.",
+    "limitations": [
+      "Native stack scratch is excluded from byte comparison. Ledger: 455 server bodies recovered and 279 remain machine code."
+    ]
+  }
+}

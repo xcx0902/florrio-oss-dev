@@ -1,0 +1,79 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/particle-record.mjs",
+  "implementationSha256": "e8ec1a7c28b131ab6e455ff073a7ce9aa3c61447b1546770a984383b71a57cda",
+  "factory": "createParticleRecordHooks",
+  "functionIds": [
+    683,
+    1105
+  ],
+  "functions": [
+    {
+      "id": 683,
+      "name": "appendParticleRecord",
+      "originalSymbol": "function_683",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 98485
+        },
+        "source": {
+          "path": "source/game/client/particle-record.mjs",
+          "line": 63
+        },
+        "test": "test/client-particle-record.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Appends a 40-byte record, folds four source floats through swap loops, then updates record fields, a six-float accumulator and two source values."
+    },
+    {
+      "id": 1105,
+      "name": "appendParticleRecordVariant",
+      "originalSymbol": "function_1105",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 426677
+        },
+        "source": {
+          "path": "source/game/client/particle-record.mjs",
+          "line": 161
+        },
+        "test": "test/client-particle-record-variant.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Same record layout as 683 with thresholds 10/0, a 0/10 word pair at +48, and accumulator/source fields 4/12 instead of 0/8."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-particle-record.test.mjs test/client-particle-record-variant.test.mjs",
+    "report": "reports/client-particle-record-tests.tap and reports/client-particle-record-variant-tests.tap",
+    "testGroups": 7,
+    "pass": 7,
+    "fail": 0,
+    "oracleComparisons": 211,
+    "completeLinearMemoryChecks": 211,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 211,
+    "trappingComparisons": 0,
+    "comparison": "Every case checks the return value, all 67,108,864 memory bytes and the stack pointer. 683 covers 20 finite pairs, five counts, special floats and 64 random rows; 1105 covers 20 finite pairs, special floats, four counts and 64 random rows.",
+    "limitations": [
+      "The caller owns the count pointer, record array, source struct and accumulator addresses.",
+      "The swap loops intentionally exit in swapped order for NaN pairs.",
+      "Accumulator updates use compare-and-select, so a NaN candidate keeps the old value.",
+      "Source updates use f32.max and therefore propagate NaN.",
+      "1105 uses thresholds 10/0 and stores 0/10 at +48/+52. Ledger: 349 client bodies recovered and 3,896 remain machine code."
+    ]
+  }
+}

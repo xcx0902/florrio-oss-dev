@@ -1,0 +1,77 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/locale-callbacks.mjs",
+  "implementationSha256": "420133b7db3dfc38e3620fd178f27667afee13639df905ca49e007d6b4f1b09c",
+  "factory": "createLocaleCallbackHooks",
+  "functionIds": [
+    443,
+    444
+  ],
+  "functions": [
+    {
+      "id": 443,
+      "name": "deliverLocaleCallback",
+      "originalSymbol": "function_443",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/locale-callbacks.mjs",
+          "line": 36
+        },
+        "test": "test/server-locale-callbacks.test.mjs"
+      },
+      "originalDirectDependencies": [
+        69,
+        221
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Local delivery through 221 when 69 matches, else virtual vtable+28."
+    },
+    {
+      "id": 444,
+      "name": "deliverLocaleCallbackAlt",
+      "originalSymbol": "function_444",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/locale-callbacks.mjs",
+          "line": 39
+        },
+        "test": "test/server-locale-callbacks.test.mjs"
+      },
+      "originalDirectDependencies": [
+        69,
+        221
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Alias body with the same local/virtual dispatch."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-locale-callbacks.test.mjs",
+    "report": "reports/server-locale-callbacks-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Both aliases take the local 221 path; complete memory and stack are compared.",
+    "limitations": [
+      "Virtual forwarding path is not exercised. Ledger: 446 server bodies recovered and 288 remain machine code."
+    ]
+  }
+}

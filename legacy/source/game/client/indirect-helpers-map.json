@@ -1,0 +1,181 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/indirect-helpers.mjs",
+  "implementationSha256": "3e990d55b302adb87780e22eb71f524ded441a406e2773ff1b16de94521698e5",
+  "factory": "createIndirectHelperHooks",
+  "functionIds": [
+    1859,
+    1949,
+    2019,
+    2025,
+    2033,
+    2056,
+    2345
+  ],
+  "functions": [
+    {
+      "id": 1859,
+      "name": "indirectHelper1859",
+      "originalSymbol": "function_1859",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/indirect-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-indirect-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Loads a vtable slot and forwards the documented arguments."
+    },
+    {
+      "id": 1949,
+      "name": "indirectHelper1949",
+      "originalSymbol": "function_1949",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/indirect-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-indirect-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Loads a vtable slot and forwards the documented arguments."
+    },
+    {
+      "id": 2019,
+      "name": "indirectHelper2019",
+      "originalSymbol": "function_2019",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/indirect-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-indirect-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Loads a vtable slot and forwards the documented arguments."
+    },
+    {
+      "id": 2025,
+      "name": "indirectHelper2025",
+      "originalSymbol": "function_2025",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/indirect-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-indirect-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Loads a vtable slot and forwards the documented arguments."
+    },
+    {
+      "id": 2033,
+      "name": "indirectHelper2033",
+      "originalSymbol": "function_2033",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/indirect-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-indirect-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Loads a vtable slot and forwards the documented arguments."
+    },
+    {
+      "id": 2056,
+      "name": "indirectHelper2056",
+      "originalSymbol": "function_2056",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/indirect-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-indirect-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Loads a vtable slot and forwards the documented arguments."
+    },
+    {
+      "id": 2345,
+      "name": "indirectHelper2345",
+      "originalSymbol": "function_2345",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/indirect-helpers.mjs",
+          "line": 9
+        },
+        "test": "test/client-indirect-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Loads a vtable slot and forwards the documented arguments."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-indirect-helpers.test.mjs",
+    "report": "reports/client-indirect-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 7,
+    "completeLinearMemoryChecks": 7,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Seven zero fixtures compare trap parity, result and complete memory.",
+    "limitations": [
+      "Only null objects/entities are covered. Ledger: 717 client and 512 server bodies recovered."
+    ]
+  }
+}

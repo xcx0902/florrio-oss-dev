@@ -1,0 +1,93 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/refcount-helpers.mjs",
+  "implementationSha256": "104ed408eb88f8c10011e50bf93f0ec66831358fb62e0623db04b984381a0097",
+  "factory": "createRefcountHelperHooks",
+  "functionIds": [
+    35,
+    201,
+    318
+  ],
+  "functions": [
+    {
+      "id": 35,
+      "name": "releaseIntrusiveRef",
+      "originalSymbol": "function_35",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/refcount-helpers.mjs",
+          "line": 19
+        },
+        "test": "test/server-refcount-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Decrements +8 and calls the virtual release at vtable+16 only when it reaches -1 or was zero."
+    },
+    {
+      "id": 201,
+      "name": "releaseControlBlock",
+      "originalSymbol": "function_201",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/refcount-helpers.mjs",
+          "line": 33
+        },
+        "test": "test/server-refcount-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Installs vtable 7924 and releases the control block at +4 through vtable+8 at -1."
+    },
+    {
+      "id": 318,
+      "name": "moveIntrusivePointer",
+      "originalSymbol": "function_318",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/refcount-helpers.mjs",
+          "line": 49
+        },
+        "test": "test/server-refcount-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Moves a pointer from source to destination and forwards the previous pointer to the destination deleter."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-refcount-helpers.test.mjs",
+    "report": "reports/server-refcount-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 7,
+    "completeLinearMemoryChecks": 7,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 7,
+    "trappingComparisons": 0,
+    "comparison": "35: three positive counts; 201: three counts; 318: null source pointer; complete memory, result and stack.",
+    "limitations": [
+      "Virtual release paths are not exercised. Ledger: 442 server bodies recovered and 292 remain machine code."
+    ]
+  }
+}

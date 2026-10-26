@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/byte-move.mjs",
+  "implementationSha256": "24347bc326ca22408903a01afc99ca6154d2939d0dcedc8d5839295186801b6a",
+  "factory": "createByteMoveHook",
+  "functionIds": [
+    261
+  ],
+  "functions": [
+    {
+      "id": 261,
+      "name": "moveBytes",
+      "originalSymbol": "function_261",
+      "signature": " (type $t6) (param i32 i32 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 61630
+        },
+        "source": {
+          "path": "source/game/server/byte-move.mjs",
+          "line": 24
+        },
+        "test": "test/server-byte-move.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Overlap-safe byte move: memcpy for disjoint ranges, backwards copy when the destination lies above the source."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-byte-move.test.mjs",
+    "report": "reports/server-byte-move-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 81,
+    "completeLinearMemoryChecks": 81,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 81,
+    "trappingComparisons": 0,
+    "comparison": "Nine lengths across both overlap directions, same-address, disjoint and zero length compare complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds ranges are not exercised.",
+      "Ledger: 237 server bodies recovered and 497 remain machine code."
+    ]
+  }
+}

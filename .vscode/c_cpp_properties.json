@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "compilerPath": "/opt/homebrew/bin/g++-16"
+        }
+    ],
+    "version": 4
+}

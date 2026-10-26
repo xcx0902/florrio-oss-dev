@@ -1,0 +1,131 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/virtual-base-wrappers.mjs",
+  "implementationSha256": "5799760ca2d4917cf616fa5aa83efe9eddf02c82737a0922129294e4c0f2b7d7",
+  "factory": "createVirtualBaseWrapperHooks",
+  "functionIds": [
+    615,
+    616,
+    630,
+    631
+  ],
+  "functions": [
+    {
+      "id": 615,
+      "name": "deleteVirtualBase238",
+      "originalSymbol": "function_615",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        238
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/virtual-base-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/server-virtual-base-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        238
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 238 on the virtual base."
+    },
+    {
+      "id": 616,
+      "name": "initVirtualBase185",
+      "originalSymbol": "function_616",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        185
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/virtual-base-wrappers.mjs",
+          "line": 20
+        },
+        "test": "test/server-virtual-base-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        185
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 185 on the virtual base and returns it."
+    },
+    {
+      "id": 630,
+      "name": "deleteVirtualBase369",
+      "originalSymbol": "function_630",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        369
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/virtual-base-wrappers.mjs",
+          "line": 24
+        },
+        "test": "test/server-virtual-base-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        369
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 369 on the virtual base."
+    },
+    {
+      "id": 631,
+      "name": "cleanupVirtualBase241",
+      "originalSymbol": "function_631",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        241
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/virtual-base-wrappers.mjs",
+          "line": 28
+        },
+        "test": "test/server-virtual-base-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        241
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 241 on the virtual base and returns it."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-virtual-base-wrappers.test.mjs",
+    "report": "reports/server-virtual-base-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Four wrappers compare result, complete memory and stack.",
+    "limitations": [
+      "Targets 185/238/241/369 remain machine code. Ledger: 484 server bodies recovered and 250 remain machine code."
+    ]
+  }
+}

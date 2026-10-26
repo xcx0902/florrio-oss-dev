@@ -1,0 +1,169 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/composed.mjs",
+  "implementationSha256": "6107b4909fdeda898685b6105c26488ba747b7e15fa99a2cae10b8ed20c8d9ca",
+  "factory": "createComposedHooks",
+  "functionIds": [
+    866,
+    1980,
+    3574,
+    4207,
+    3830
+  ],
+  "functions": [
+    {
+      "id": 866,
+      "name": "initializeHyphenString",
+      "originalSymbol": "function_866",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 182135
+        },
+        "source": {
+          "path": "source/game/client/composed.mjs",
+          "line": 55
+        },
+        "test": "test/client-composed.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_865"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1980,
+      "name": "copyToBufferEnd",
+      "originalSymbol": "function_1980",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 485909
+        },
+        "source": {
+          "path": "source/game/client/composed.mjs",
+          "line": 67
+        },
+        "test": "test/client-composed.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_363"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 3574,
+      "name": "readClockIntoSnapshot",
+      "originalSymbol": "function_3574",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 720671
+        },
+        "source": {
+          "path": "source/game/client/composed.mjs",
+          "line": 79
+        },
+        "test": "test/client-composed.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_372"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 4207,
+      "name": "readClockIfRequested",
+      "originalSymbol": "function_4207",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 760425
+        },
+        "source": {
+          "path": "source/game/client/composed.mjs",
+          "line": 90
+        },
+        "test": "test/client-composed.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_372"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 3830,
+      "name": "elapsedFromTimestamp",
+      "originalSymbol": "function_3830",
+      "signature": " (type $t39) (param $p0 i32) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 735935
+        },
+        "source": {
+          "path": "source/game/client/composed.mjs",
+          "line": 99
+        },
+        "test": "test/client-composed.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_372"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-composed.test.mjs",
+    "report": "reports/client-composed-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 22,
+    "trappingComparisons": 5,
+    "completeLinearMemoryChecks": 22,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 22,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 0,
+      "boundary": 5,
+      "edge": 0
+    },
+    "argumentRows": [
+      "distinct seeded records at 0x100000 + 0x100*index",
+      "the same records shifted by four bytes for overlapping copies",
+      "all-zero arguments",
+      "addresses at 0x3ffffff minus index",
+      "the 3830 invalid-timestamp and 4207 skipped-clock branches"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. The five boundary comparisons all trap. Dependencies 865, 363 and 372 are themselves recovered; the test routes runtime.call to those recovered hooks, while the oracle runs the shipped native bodies.",
+    "limitations": [
+      "The rows are representative rather than exhaustive over buffer capacities, source offsets and clock values.",
+      "The clock host is stubbed to a fixed validity and timestamp; real wall-clock values are not deterministic equality checks.",
+      "The -infinity branch of 3830 is retained from the WAT but is not reachable through the recovered 372 output path, so it is not claimed as browser-observed.",
+      "These five functions are a small part of the 4,067 client functions that remain machine code."
+    ]
+  }
+}

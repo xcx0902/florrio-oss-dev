@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/sine-offset.mjs",
+  "implementationSha256": "976f224ad730f3d448700cff092a70196fed0c27e20f5e73a4a49b293583ec4a",
+  "factory": "createSineOffsetHook",
+  "functionIds": [
+    154
+  ],
+  "functions": [
+    {
+      "id": 154,
+      "name": "sineWithSecondOrderOffset",
+      "originalSymbol": "function_154",
+      "signature": " (type $t49) (param $p0 f64) (param $p1 f64) (param $p2 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 32830
+        },
+        "source": {
+          "path": "source/game/server/sine-offset.mjs",
+          "line": 38
+        },
+        "test": "test/server-sine-offset.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Flag 0 returns sin(x); non-zero adds y*(1-x^2/2). The two paths use opposite signs of the 1/6 term and a specific polynomial association."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-sine-offset.test.mjs",
+    "report": "reports/server-sine-offset-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 50308,
+    "completeLinearMemoryChecks": 12,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 50308,
+    "trappingComparisons": 0,
+    "comparison": "308 fixed inputs plus 50,000 deterministic random cases across both flags compare exact f64 bits and the stack pointer; 12 cases compare complete memory.",
+    "limitations": [
+      "No out-of-range float classifications beyond the random sample were exhaustively enumerated.",
+      "Ledger: 229 server bodies recovered and 505 remain machine code."
+    ]
+  }
+}

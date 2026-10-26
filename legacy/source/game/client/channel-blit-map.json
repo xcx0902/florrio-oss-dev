@@ -1,0 +1,140 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/channel-blit.mjs",
+  "implementationSha256": "5824d4e203fff2ab95e6cde5f7b986ac74bd4755eba52ff18d39c965061b323e",
+  "factory": "createChannelBlitHooks",
+  "functionIds": [
+    2109,
+    2130,
+    2147,
+    2168
+  ],
+  "functions": [
+    {
+      "id": 2109,
+      "name": "channelBlit2109",
+      "originalSymbol": "function_2109",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 551100
+        },
+        "source": {
+          "path": "source/game/client/channel-blit.mjs",
+          "line": 105
+        },
+        "test": "test/client-channel-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "A/G/R scaled by +62/+60/+61, B high"
+    },
+    {
+      "id": 2130,
+      "name": "channelBlit2130",
+      "originalSymbol": "function_2130",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 556610
+        },
+        "source": {
+          "path": "source/game/client/channel-blit.mjs",
+          "line": 106
+        },
+        "test": "test/client-channel-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "G/B/R scaled by +61/+60/+62, A high"
+    },
+    {
+      "id": 2147,
+      "name": "channelBlit2147",
+      "originalSymbol": "function_2147",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 561420
+        },
+        "source": {
+          "path": "source/game/client/channel-blit.mjs",
+          "line": 107
+        },
+        "test": "test/client-channel-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "G/A/R scaled by +62/+60/+61, B high"
+    },
+    {
+      "id": 2168,
+      "name": "channelBlit2168",
+      "originalSymbol": "function_2168",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 566941
+        },
+        "source": {
+          "path": "source/game/client/channel-blit.mjs",
+          "line": 108
+        },
+        "test": "test/client-channel-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "B/G/R scaled by +62/+61/+60, A high"
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-channel-blit.test.mjs",
+    "report": "reports/client-channel-blit-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 256,
+    "trappingComparisons": 8,
+    "completeLinearMemoryChecks": 256,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 256,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 4,
+      "boundary": 4,
+      "edges": 0
+    },
+    "argumentRows": [
+      "two rows of three four-channel pixels with both flag bits",
+      "the same descriptor shifted by four bytes with scaling only",
+      "four zeroed descriptors",
+      "four addresses at 0x3ffffff",
+      "240 combinations of flags 0-4, rows 0-3 and width 0/1/3"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. Bit 0 scales three channels; bit 1 scales or copies the fourth channel into bits 24-31.",
+    "limitations": [
+      "Flags above 4 only exercise the low two bits.",
+      "Multipliers 32/64/96/128 cover the divide-by-255 path.",
+      "Width zero reuses the previous counter.",
+      "These four functions are part of the 4,245 client functions; the ledger has 315 client bodies recovered and 3,930 remain machine code."
+    ]
+  }
+}

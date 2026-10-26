@@ -1,0 +1,76 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-member-assign.mjs",
+  "implementationSha256": "d234fb458b0cc7a4953e5288d5c263a143c00f6dd58f0cee238c688039542ea9",
+  "factory": "createStringMemberAssignHooks",
+  "functionIds": [
+    492,
+    498
+  ],
+  "functions": [
+    {
+      "id": 492,
+      "name": "assignMember12",
+      "originalSymbol": "function_492",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-member-assign.mjs",
+          "line": 9
+        },
+        "test": "test/server-string-member-assign.test.mjs"
+      },
+      "originalDirectDependencies": [
+        228
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Assigns the string at source+12 into destination via 228."
+    },
+    {
+      "id": 498,
+      "name": "assignMember16",
+      "originalSymbol": "function_498",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-member-assign.mjs",
+          "line": 12
+        },
+        "test": "test/server-string-member-assign.test.mjs"
+      },
+      "originalDirectDependencies": [
+        228
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Assigns the string at source+16 into destination via 228."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-member-assign.test.mjs",
+    "report": "reports/server-string-member-assign-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 6,
+    "completeLinearMemoryChecks": 6,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 6,
+    "trappingComparisons": 0,
+    "comparison": "2 members x 3 short lengths compare complete memory and stack pointer.",
+    "limitations": [
+      "Long-string assignment through 269 is not exercised.",
+      "Ledger: 405 server bodies recovered and 329 remain machine code."
+    ]
+  }
+}

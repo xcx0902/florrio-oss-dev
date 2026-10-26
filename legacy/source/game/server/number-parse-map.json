@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/number-parse.mjs",
+  "implementationSha256": "bcfc24d49ac91f3d604a6711a7cf78ad84250c8dba109586e3a979ddbc36944d",
+  "factory": "createNumberParseHook",
+  "functionIds": [
+    90
+  ],
+  "functions": [
+    {
+      "id": 90,
+      "name": "selectBase",
+      "originalSymbol": "function_90",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 18831
+        },
+        "source": {
+          "path": "source/game/server/number-parse.mjs",
+          "line": 28
+        },
+        "test": "test/server-number-parse.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Selects radix 0/8/16/10 from stream flags & 74; conflicting combinations fall back to decimal."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-number-parse.test.mjs",
+    "report": "reports/server-number-parse-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 768,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 768,
+    "trappingComparisons": 0,
+    "comparison": "Every 8-bit flag value crossed with three high-bit patterns compares the selected radix and stack pointer.",
+    "limitations": [
+      "Only the flags word is read; malformed stream pointers are not exercised.",
+      "Ledger: 217 server bodies recovered and 517 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/spatial-ai.mjs",
+  "factory": "createSpatialAiHooks",
+  "functionIds": [
+    196,
+    197,
+    198
+  ],
+  "functions": [
+    {
+      "id": 196,
+      "name": "alertNearby",
+      "originalSymbol": "function_196",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 43686
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 4625
+        },
+        "test": "test/server-spatial-ai.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_168",
+        "function_196"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 197,
+      "name": "findTarget",
+      "originalSymbol": "function_197",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 43967
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 4702
+        },
+        "test": "test/server-spatial-ai.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_17",
+        "readClock",
+        "function_168",
+        "function_197"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 198,
+      "name": "findPickupRecipient",
+      "originalSymbol": "function_198",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 44378
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 4795
+        },
+        "test": "test/server-spatial-ai.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "memcmp",
+        "function_17",
+        "function_198"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 5,
+    "oracleComparisons": 338,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true
+  },
+  "limitations": [
+    "Original clock, transform, target eligibility and memcmp services remain explicit calls; several now independently migrated.",
+    "Valid quadtree/entity fixtures and selected memory faults are tested; corrupt cyclic trees are not exhaustively proven."
+  ]
+}

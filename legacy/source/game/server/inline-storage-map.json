@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/inline-storage.mjs",
+  "implementationSha256": "a05832eb61f9678ad3c21af36bfb011fe54b9cc31f5eff5738624be7ad321728",
+  "factory": "createInlineStorageHook",
+  "functionIds": [
+    304
+  ],
+  "functions": [
+    {
+      "id": 304,
+      "name": "selectInlineStorage",
+      "originalSymbol": "function_304",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/inline-storage.mjs",
+          "line": 11
+        },
+        "test": "test/server-inline-storage.test.mjs"
+      },
+      "originalDirectDependencies": [
+        121
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Inline record when flag +128 is clear and count <=30; sets the flag; otherwise allocates count slots through 121."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-inline-storage.test.mjs",
+    "report": "reports/server-inline-storage-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 12,
+    "completeLinearMemoryChecks": 12,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 12,
+    "trappingComparisons": 0,
+    "comparison": "2 flag states x 6 slot counts cross the inline/allocation threshold, comparing result, complete memory and stack pointer.",
+    "limitations": [
+      "Ledger: 370 server bodies recovered and 364 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-read-word-record.mjs",
+  "implementationSha256": "257943224b9f8a4b9df5ed56ad8890d00b12e8c766514425365e4c970861c2c2",
+  "factory": "createStreamReadWordRecordHook",
+  "functionIds": [
+    315
+  ],
+  "functions": [
+    {
+      "id": 315,
+      "name": "readWordIntoRecord",
+      "originalSymbol": "function_315",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-read-word-record.mjs",
+          "line": 10
+        },
+        "test": "test/server-stream-read-word-record.test.mjs"
+      },
+      "originalDirectDependencies": [
+        361
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Reads a word through the stream pointer at handle, then stores the value at result+0 and the stream pointer at result+4."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-read-word-record.test.mjs",
+    "report": "reports/server-stream-read-word-record-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 9,
+    "completeLinearMemoryChecks": 9,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 9,
+    "trappingComparisons": 0,
+    "comparison": "3 positions x 3 values compare complete memory and stack pointer.",
+    "limitations": [
+      "Empty-buffer virtual underflow is not exercised.",
+      "Ledger: 373 server bodies recovered and 361 remain machine code."
+    ]
+  }
+}

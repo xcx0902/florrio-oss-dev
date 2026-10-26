@@ -1,0 +1,705 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/global-destructors.mjs",
+  "implementationSha256": "acae985239766d21a470a7bf2c9e644ecaa4dc01b0ca21b87218a8d4b0326e84",
+  "factory": "createGlobalDestructorHooks",
+  "functionIds": [
+    374,
+    381,
+    413,
+    439,
+    499,
+    833,
+    845,
+    895,
+    1269,
+    1280,
+    1291,
+    1302,
+    1313,
+    1335,
+    1379,
+    1390,
+    1401,
+    1412,
+    2285,
+    2398,
+    2574,
+    2604,
+    2608,
+    2635,
+    2661,
+    3841
+  ],
+  "functions": [
+    {
+      "id": 374,
+      "name": "destroyStructure374",
+      "originalSymbol": "function_374",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 5335
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "free(p)."
+    },
+    {
+      "id": 381,
+      "name": "destroyStructure381",
+      "originalSymbol": "function_381",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 7494
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "if ((*(u8*)(p+11)>>7)) free(*(p)); return p."
+    },
+    {
+      "id": 413,
+      "name": "destroyStructure413",
+      "originalSymbol": "function_413",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 14480
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "if (*(u8*)(p+11)>>7) free(*(p)); return p."
+    },
+    {
+      "id": 439,
+      "name": "destroyStructure439",
+      "originalSymbol": "function_439",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 16700
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy destination storage when flagged, copy +8 and +0..7 from source, clear source byte 11 and byte 0."
+    },
+    {
+      "id": 499,
+      "name": "destroyStructure499",
+      "originalSymbol": "function_499",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 31143
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy destination storage when flagged, copy +8 and +0..7 from source, clear source byte 11 and source word 0."
+    },
+    {
+      "id": 833,
+      "name": "destroyStructure833",
+      "originalSymbol": "function_833",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 177173
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "store vtable 126108; if (*(p+8) && *(u8*)(p+12)) free(*(p+8)); return p."
+    },
+    {
+      "id": 845,
+      "name": "destroyStructure845",
+      "originalSymbol": "function_845",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 177399
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "if (a==b) *(u8*)(a+128)=0; else free(b)."
+    },
+    {
+      "id": 895,
+      "name": "destroyStructure895",
+      "originalSymbol": "function_895",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 185579
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "if (p && p!=131484 && p!=131508) free(p)."
+    },
+    {
+      "id": 1269,
+      "name": "destroyStructure1269",
+      "originalSymbol": "function_1269",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 444487
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "free linked list at 7910236, then clear/free scalar at 7910228."
+    },
+    {
+      "id": 1280,
+      "name": "destroyStructure1280",
+      "originalSymbol": "function_1280",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 444840
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Free four global pointers and zero their 12-byte header blocks."
+    },
+    {
+      "id": 1291,
+      "name": "destroyStructure1291",
+      "originalSymbol": "function_1291",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 445216
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "guarded frees of globals 441384/441372."
+    },
+    {
+      "id": 1302,
+      "name": "destroyStructure1302",
+      "originalSymbol": "function_1302",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 445602
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "guarded frees of globals 439192/439180."
+    },
+    {
+      "id": 1313,
+      "name": "destroyStructure1313",
+      "originalSymbol": "function_1313",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 445942
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "free linked list at 441352, then clear/free scalar at 441344."
+    },
+    {
+      "id": 1335,
+      "name": "destroyStructure1335",
+      "originalSymbol": "function_1335",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 446762
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Free eight global pointers at 441260..441148 (stride 16) and zero their 12-byte header blocks."
+    },
+    {
+      "id": 1379,
+      "name": "destroyStructure1379",
+      "originalSymbol": "function_1379",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 448422
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walk/free nodes at 395156, conditionally free node strings at +20 and +8, then clear/free scalar at 395148."
+    },
+    {
+      "id": 1390,
+      "name": "destroyStructure1390",
+      "originalSymbol": "function_1390",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 448821
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "free(*391048); zero 391040..391051."
+    },
+    {
+      "id": 1401,
+      "name": "destroyStructure1401",
+      "originalSymbol": "function_1401",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 449184
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "free(*386936); zero 386928..386939."
+    },
+    {
+      "id": 1412,
+      "name": "destroyVector1412",
+      "originalSymbol": "function_1412",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 449603
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Free a pointer vector at 386780 (count 386772) using the original head-remainder plus eight-at-a-time loop, then free/clear 386792 and the vector storage."
+    },
+    {
+      "id": 2285,
+      "name": "destroyStructure2285",
+      "originalSymbol": "function_2285",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 641254
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "if *7922303 <= -1 free(*7922292)."
+    },
+    {
+      "id": 2398,
+      "name": "destroyStructure2398",
+      "originalSymbol": "function_2398",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 650223
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "free(*441276); zero 441268..441279."
+    },
+    {
+      "id": 2574,
+      "name": "destroyStructure2574",
+      "originalSymbol": "function_2574",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 675649
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "if *167971 <= -1 free(*167960)."
+    },
+    {
+      "id": 2604,
+      "name": "destroyStructure2604",
+      "originalSymbol": "function_2604",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 677695
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "free(*7922264); zero 7922256..7922267."
+    },
+    {
+      "id": 2608,
+      "name": "destroyStructure2608",
+      "originalSymbol": "function_2608",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 677948
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "p=*7948276; if p { *7948280=p; free(p) }."
+    },
+    {
+      "id": 2635,
+      "name": "destroyStructure2635",
+      "originalSymbol": "function_2635",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 679639
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "child=*(p+12); if child { free(*(child+12)); free(child) }."
+    },
+    {
+      "id": 2661,
+      "name": "destroyStructure2661",
+      "originalSymbol": "function_2661",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 681983
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "free(*437396); zero 437388..437399."
+    },
+    {
+      "id": 3841,
+      "name": "destroyStructure3841",
+      "originalSymbol": "function_3841",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 736324
+        },
+        "source": {
+          "path": "source/game/client/global-destructors.mjs",
+          "line": 50
+        },
+        "test": "test/client-global-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "store vtable 33508; first=*(p+28); second=*(p+32); *(first+8)=second; *(second+4)=first; free(p)."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-global-destructors.test.mjs",
+    "report": "reports/client-global-destructors-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 38,
+    "completeLinearMemoryChecks": 38,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 38,
+    "trappingComparisons": 0,
+    "comparison": "Each destructor runs from freshly allocated structures. Return value, all 67,108,864 memory bytes and the stack pointer are compared. Variants cover flagged/unflagged destinations, equal/different pointers, null/sentinel guards, both signed guards, nested string flags and zero/nonzero scalar cases.",
+    "limitations": [
+      "free (362) and allocate (371) remain native.",
+      "Invalid/double frees and cyclic lists are not exercised.",
+      "Ledger: 421 client bodies recovered and 3,824 remain machine code."
+    ]
+  }
+}

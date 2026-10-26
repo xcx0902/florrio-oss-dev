@@ -1,0 +1,77 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/locale-object-lifetime.mjs",
+  "implementationSha256": "e2621145c231be38f655860f5533fe8c16431476cdf252b38343e07c3a3cf36d",
+  "factory": "createLocaleObjectLifetimeHooks",
+  "functionIds": [
+    239,
+    640
+  ],
+  "functions": [
+    {
+      "id": 239,
+      "name": "resetLocaleObject",
+      "originalSymbol": "function_239",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/locale-object-lifetime.mjs",
+          "line": 19
+        },
+        "test": "test/server-locale-object-lifetime.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19,
+        201
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Installs vtable 7988, destroys +32 and releases +4, returning the object."
+    },
+    {
+      "id": 640,
+      "name": "deleteLocaleObject",
+      "originalSymbol": "function_640",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/locale-object-lifetime.mjs",
+          "line": 27
+        },
+        "test": "test/server-locale-object-lifetime.test.mjs"
+      },
+      "originalDirectDependencies": [
+        201,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Releases the control block and frees the object."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-locale-object-lifetime.test.mjs",
+    "report": "reports/server-locale-object-lifetime-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Both routines run on a real 64-byte object with a retained control block, comparing complete allocator memory and stack.",
+    "limitations": [
+      "Virtual release path is not exercised. Ledger: 450 server bodies recovered and 284 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/ownership.mjs",
+  "factory": "createOwnershipHooks",
+  "functionIds": [
+    73,
+    105,
+    170,
+    428
+  ],
+  "functions": [
+    {
+      "id": 73,
+      "name": "setEntityOwner",
+      "originalSymbol": "function_73",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 17080
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 4913
+        },
+        "test": "test/server-ownership.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_170",
+        "function_428"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 105,
+      "name": "serializeEntityReference",
+      "originalSymbol": "function_105",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 23506
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 1702
+        },
+        "test": "test/server-ownership.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "memcpy",
+        "free"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 170,
+      "name": "setOwnerReference",
+      "originalSymbol": "function_170",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 36644
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 2354
+        },
+        "test": "test/server-ownership.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "function_105"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 428,
+      "name": "attachOwnershipComponent",
+      "originalSymbol": "function_428",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 111192
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 4117
+        },
+        "test": "test/server-ownership.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "malloc",
+        "memcpy"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 5,
+    "oracleComparisons": 101,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackAndTraps": true
+  },
+  "limitations": [
+    "Shared free/malloc/memcpy remain explicit dependencies.",
+    "Valid object graphs and selected memory traps are tested; arbitrary corrupt or overlapping records are not exhaustively proven."
+  ]
+}

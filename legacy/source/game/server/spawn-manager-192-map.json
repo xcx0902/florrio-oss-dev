@@ -1,0 +1,85 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/spawn-manager-192.mjs",
+  "implementationSha256": "1d2ec841a14c99c9a00eb34ac3618c4d3bc32ab69d28a7ec9a256d47b9ffd68f",
+  "factory": "createSpawnManager192Hook",
+  "functionIds": [
+    420,
+    419
+  ],
+  "functions": [
+    {
+      "id": 420,
+      "name": "acquireRecord",
+      "originalSymbol": "function_420",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 109539
+        },
+        "source": {
+          "path": "source/game/server/spawn-manager-192.mjs",
+          "line": 120
+        },
+        "test": "test/server-spawn-manager-192.test.mjs"
+      },
+      "originalDirectDependencies": [
+        16,
+        15,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "56-byte record allocator: max-heap free addresses first, otherwise bump within 128-record blocks, allocating 7168-byte blocks and geometrically growing the block-pointer array."
+    },
+    {
+      "id": 419,
+      "name": "publishRecord",
+      "originalSymbol": "function_419",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 109278
+        },
+        "source": {
+          "path": "source/game/server/spawn-manager-192.mjs",
+          "line": 176
+        },
+        "test": "test/server-spawn-manager-192.test.mjs"
+      },
+      "originalDirectDependencies": [
+        16,
+        15,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Publishes a record: sets world flag, clears two id caches, stamps three id tables, appends to the active vector (geometric growth), writes world+472/+476, clears caches again."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-spawn-manager-192.test.mjs",
+    "report": "reports/server-spawn-manager-192-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 161,
+    "completeLinearMemoryChecks": 161,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 161,
+    "trappingComparisons": 0,
+    "comparison": "Heap pops for counts 1-100, nine block-allocation paths, repeated 127->128 transitions, two instances and 42 publisher cases with cache/vector variants compare return, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds pointers and malformed manager states are not exercised.",
+      "The role of free-heap capacity +20 is not touched by these functions and is not claimed.",
+      "Ledger: 248 server bodies recovered and 487 remain machine code."
+    ]
+  }
+}

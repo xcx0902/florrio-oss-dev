@@ -1,0 +1,117 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-buffer-primitives.mjs",
+  "implementationSha256": "8e2b8d9385e625514027f1de706ad9268751e11bae79322200764e09c386e3bd",
+  "factory": "createStreamBufferPrimitiveHooks",
+  "functionIds": [
+    41,
+    361,
+    365,
+    366
+  ],
+  "functions": [
+    {
+      "id": 41,
+      "name": "peekSignedByte",
+      "originalSymbol": "function_41",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 7762
+        },
+        "source": {
+          "path": "source/game/server/stream-buffer-primitives.mjs",
+          "line": 29
+        },
+        "test": "test/server-stream-buffer-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Takes a stream handle, peeks the signed byte at +12 without advancing, and calls virtual underflow (vtable+36) when empty."
+    },
+    {
+      "id": 361,
+      "name": "readStreamWord",
+      "originalSymbol": "function_361",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-buffer-primitives.mjs",
+          "line": 22
+        },
+        "test": "test/server-stream-buffer-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Reads a 32-bit word from +12, advances four; virtual underflow slot vtable+40 on an empty area."
+    },
+    {
+      "id": 365,
+      "name": "writeStreamUnit",
+      "originalSymbol": "function_365",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-buffer-primitives.mjs",
+          "line": 32
+        },
+        "test": "test/server-stream-buffer-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Writes the low byte at +24, advances; virtual overflow slot vtable+52 when full."
+    },
+    {
+      "id": 366,
+      "name": "readStreamByte",
+      "originalSymbol": "function_366",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-buffer-primitives.mjs",
+          "line": 45
+        },
+        "test": "test/server-stream-buffer-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Reads one byte from +12, advances one; virtual underflow slot vtable+40 on an empty area."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-buffer-primitives.test.mjs",
+    "report": "reports/server-stream-buffer-primitives-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 21,
+    "completeLinearMemoryChecks": 21,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 21,
+    "trappingComparisons": 0,
+    "comparison": "3 read positions x peek-signed/read-word/read-byte and 3 put positions x 4 values compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Virtual underflow/overflow slots are reached through the original indirect table but the empty-area cases are not exercised.",
+      "Ledger: 377 server bodies recovered and 357 remain machine code."
+    ]
+  }
+}

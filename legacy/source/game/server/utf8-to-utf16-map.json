@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/utf8-to-utf16.mjs",
+  "implementationSha256": "6c39d3198157628fb63da7f8509ed2cb1300746d186b87d8e74917ef02e568f1",
+  "factory": "createUtf8ToUtf16Hook",
+  "functionIds": [
+    484
+  ],
+  "functions": [
+    {
+      "id": 484,
+      "name": "decodeUtf8ToUtf16",
+      "originalSymbol": "function_484",
+      "signature": " (type $t14) (param i32 i32 i32 i32 i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 117179
+        },
+        "source": {
+          "path": "source/game/server/utf8-to-utf16.mjs",
+          "line": 13
+        },
+        "test": "test/server-utf8-to-utf16.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "UTF-8 to UTF-16 decoder: ASCII, 2/3/4-byte sequences, overlong/surrogate guards via 0xE0/0xED, surrogate pair output, status 0 complete / 1 truncated-or-full / 2 invalid, writes input and output cursors."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-utf8-to-utf16.test.mjs",
+    "report": "reports/server-utf8-to-utf16-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 110,
+    "completeLinearMemoryChecks": 110,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 110,
+    "trappingComparisons": 0,
+    "comparison": "22 byte sequences x 5 output capacities compare result, cursors, complete memory and stack pointer.",
+    "limitations": [
+      "Native 484's dead 16-byte stack frame is excluded from byte comparison.",
+      "Ledger: 352 server bodies recovered and 382 remain machine code."
+    ]
+  }
+}

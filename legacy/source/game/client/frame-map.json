@@ -1,0 +1,50 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/frame.mjs",
+  "factory": "createClientFrameHooks",
+  "functionIds": [
+    762
+  ],
+  "functions": [
+    {
+      "id": 762,
+      "name": "serializeReliableInput",
+      "originalSymbol": "function_762",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 132142
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0384-0447.dcmp",
+          "line": 3544
+        },
+        "test": "test/client-frame.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "function_363",
+        "free",
+        "function_671",
+        "allocateOrAbort",
+        "function_436"
+      ],
+      "originalIndirectCallSites": 1
+    }
+  ],
+  "validation": {
+    "testGroups": 1,
+    "oracleComparisons": 46,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true
+  },
+  "limitations": [
+    "This module registers complete762. The enclosing complete763 is registered in render-frame.mjs; its independent services remain unrecovered."
+  ],
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false.",
+  "implementationSha256": "c57f4c2d4122a10cd1e3b351553375efd3809c5c24de2a8c152468aa8214b8d4"
+}

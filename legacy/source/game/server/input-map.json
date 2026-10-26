@@ -1,0 +1,236 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "evidenceId": "ev_438a6ba007bd81cd8cd53601c7b9bd0293c17a4ea3c261bf7b63b3c36f2122b9",
+  "scope": "Complete original server input entry point655 and shared unsigned-varint reader388. No call to either own original body, bytecode interpreter or substitute input protocol.",
+  "coverage": {
+    "hooks": 2,
+    "factory": "createInputHooks",
+    "main655Complete": true,
+    "differentialValidation": {
+      "command": "node --test test/server-input.test.mjs",
+      "testCases": 13,
+      "directOracleComparisons": 295,
+      "worldReplaySnapshots": 41,
+      "worldReplayTicks": 40,
+      "comparedMemoryBytesPerOracle": 67108864,
+      "comparesReturn": true,
+      "comparesStack": true,
+      "comparesHostCalls": true,
+      "comparesOutgoingPackets": true,
+      "comparesEntropyConsumption": true
+    }
+  },
+  "functions": [
+    {
+      "id": 388,
+      "name": "readVarUint",
+      "complete": true,
+      "source": "source/game/server/input.mjs",
+      "signature": "(type $t1) (param $p0 i32) (result i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 88019,
+          "endLine": 88390
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0320-0383.dcmp",
+          "line": 3828,
+          "endLine": 3940
+        }
+      },
+      "originalDirectCalls": [],
+      "phases": [
+        {
+          "name": "readVarUint",
+          "description": "Complete original388 unsigned LEB128 body, with pending-byte alignment and truncated encodings.",
+          "sourceLine": 104
+        }
+      ]
+    },
+    {
+      "id": 655,
+      "name": "sendInput",
+      "complete": true,
+      "source": "source/game/server/input.mjs",
+      "signature": "(type $t2) (param $p0 i32) (param $p1 i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 181370,
+          "endLine": 189141
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 10814,
+          "endLine": 13098
+        }
+      },
+      "originalDirectCalls": [
+        "operatorNewOrAbort",
+        "free",
+        "function_388",
+        "function_43",
+        "function_269",
+        "memcmp",
+        "function_261",
+        "function_387",
+        "function_160",
+        "function_74",
+        "function_105",
+        "memcpy",
+        "malloc",
+        "memset",
+        "function_68",
+        "function_67",
+        "function_65",
+        "function_64",
+        "function_97",
+        "function_96",
+        "function_140",
+        "readClock",
+        "function_148",
+        "function_147",
+        "function_106",
+        "function_420",
+        "function_419",
+        "function_128",
+        "function_266",
+        "function_265",
+        "function_18",
+        "function_25",
+        "function_26",
+        "function_34",
+        "function_44",
+        "function_47",
+        "function_73",
+        "function_262",
+        "function_215",
+        "function_427",
+        "function_125",
+        "createEquippedPetal",
+        "function_421",
+        "function_425",
+        "function_145",
+        "emscriptenAsmConstDouble",
+        "function_213",
+        "function_58",
+        "workerRespondIntermediate",
+        "workerRespondFinal"
+      ],
+      "phases": [
+        {
+          "name": "sendInput",
+          "description": "16-byte reader frame, rolling XOR, sequence validation, command dispatch, 160-byte command frames and response flushing.",
+          "sourceLine": 767
+        },
+        {
+          "name": "readVarUint",
+          "description": "Complete original388 unsigned LEB128 body, with pending-byte alignment and truncated encodings.",
+          "sourceLine": 104
+        },
+        {
+          "name": "readString",
+          "description": "Original inline/heap libc++ string construction with exact cursor and stack writes.",
+          "sourceLine": 136
+        },
+        {
+          "name": "sanitizeName",
+          "description": "Blocked byte-sequence removal, whitespace trimming and UTF-8 DFA truncation.",
+          "sourceLine": 393
+        },
+        {
+          "name": "spawnPlayer",
+          "description": "Spawn bands, collision retries, component construction, parent ownership, prior levels/equipment and rare starter selection.",
+          "sourceLine": 467
+        },
+        {
+          "name": "inputButtons",
+          "description": "Sanitized float inputs, exact angle normalization, byte orientation, button flags and local spawn action.",
+          "sourceLine": 698
+        },
+        {
+          "name": "cycleInventory",
+          "description": "Level-dependent bench cycling.",
+          "sourceLine": 641
+        },
+        {
+          "name": "swapInventory",
+          "description": "Validated two-slot swaps.",
+          "sourceLine": 657
+        },
+        {
+          "name": "discardInventory",
+          "description": "Validated discard, rarity reward and bounded remembered inventory queue.",
+          "sourceLine": 667
+        }
+      ]
+    }
+  ],
+  "dependencyIds": [
+    14,
+    15,
+    16,
+    18,
+    20,
+    21,
+    25,
+    26,
+    29,
+    34,
+    43,
+    44,
+    47,
+    57,
+    58,
+    64,
+    65,
+    67,
+    68,
+    73,
+    74,
+    96,
+    97,
+    105,
+    106,
+    125,
+    128,
+    140,
+    145,
+    147,
+    148,
+    160,
+    213,
+    215,
+    261,
+    262,
+    265,
+    266,
+    269,
+    387,
+    397,
+    419,
+    420,
+    421,
+    425,
+    427
+  ],
+  "commandOpcodes": {
+    "0": "discard three prefixed handshake strings",
+    "2": "discard two prefixed handshake strings",
+    "3": "request suicide with zero argument",
+    "4": "request arena restart",
+    "5": "discard one string",
+    "6": "normalize player name and spawn/rejoin",
+    "7": "disconnect with zero argument",
+    "8": "discard equipped/bench item",
+    "10": "swap two validated inventory slots",
+    "12": "buttons, aim angle and movement strength",
+    "13": "cycle bench inventory"
+  },
+  "limitations": [
+    "Shared-ABI component allocators, tracked setters, spatial collision checks, petal helpers and string utilities remain explicit dependencies and are not counted as newly recovered here.",
+    "Differential validation is bounded to the documented states. Arbitrary corrupted memory, every reentrant host mutation and allocator exhaustion are not exhaustively tested."
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/utf8-decode.mjs",
+  "implementationSha256": "4c32a76cbc7d4da916d5604a5f428c058d194add86206c070034860dc1331098",
+  "factory": "createUtf8DecodeHooks",
+  "functionIds": [
+    531
+  ],
+  "functions": [
+    {
+      "id": 531,
+      "name": "decodeUtf8",
+      "originalSymbol": "function_531",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 42211
+        },
+        "source": {
+          "path": "source/game/client/utf8-decode.mjs",
+          "line": 36
+        },
+        "test": "test/client-utf8-decode.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Writes a -1 sentinel to the state word, then either a decoded code point or the original truncation/error result."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-utf8-decode.test.mjs",
+    "report": "reports/client-utf8-decode-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 10219,
+    "completeLinearMemoryChecks": 33,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 33,
+    "trappingComparisons": 1,
+    "comparison": "Every case asserts the i32 result and the state word. 33 cases additionally assert all 67,108,864 memory bytes and the stack pointer. All 256 one-byte inputs and all 7,680 two-byte lead/continuation pairs are exhaustive; 3/4-byte boundaries, truncation and random words are sampled.",
+    "limitations": [
+      "Callers own input/output pointer validity; boundary pointers trap identically.",
+      "The decoder does not enforce the Unicode 0x10FFFF ceiling, matching the original.",
+      "Ledger: 337 client bodies recovered and 3,908 remain machine code."
+    ]
+  }
+}

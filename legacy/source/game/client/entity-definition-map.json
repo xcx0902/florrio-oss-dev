@@ -1,0 +1,130 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/entity-definition.mjs",
+  "implementationSha256": "2852aae22e241a20305cdc647ecb6e70e26171dfd5db2df0f11ab21928818e0a",
+  "factory": "createEntityDefinitionHooks",
+  "functionIds": [
+    391,
+    441
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after client memory fill after parent review and passing differential tests.",
+  "functions": [
+    {
+      "id": 391,
+      "name": "getEntityDefinition",
+      "originalSymbol": "getEntityDefinition",
+      "signature": " (type $t3) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 8634,
+          "endLine": 9827
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 2494
+        },
+        "source": {
+          "path": "source/game/client/entity-definition.mjs",
+          "line": 287
+        },
+        "test": "test/client-entity-definition.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "acquireStaticInitializationGuard",
+        "initializeEntityDefinition",
+        "function_618",
+        "releaseStaticInitializationGuard"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 441,
+      "name": "initializeEntityDefinition",
+      "originalSymbol": "initializeEntityDefinition",
+      "signature": " (type $t66) (param i32 i32 i64 i32 f32 i32 i32 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 16778,
+          "endLine": 17026
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 406
+        },
+        "source": {
+          "path": "source/game/client/entity-definition.mjs",
+          "line": 195
+        },
+        "test": "test/client-entity-definition.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "catalog": {
+    "base": 384096,
+    "stride": 116,
+    "records": 23,
+    "end": 386764,
+    "guardAddress": 386764,
+    "frameBytes": 2192,
+    "copyPathTypes": [
+      5,
+      14,
+      16,
+      18,
+      21
+    ]
+  },
+  "abi": "391 takes one i32 type and returns an i32 record pointer. It allocates a 2192-byte frame, performs one-time initialization guarded by the two bytes at 386764/386765, restores the stack pointer on normal return, and leaves 2224 bytes allocated when the guard traps. The recovered body recreates the otherwise-dead 2192-byte argument frame (64 written byte runs plus 36 base-relative pointers) and the nested 16-byte guard/helper frames byte-for-byte. The catalog holds 23 records from 384096 through 386763. Lookup index arithmetic is ((type - 1) & 255) > 21 ? 0 : 384096 + type * 116. 441(destination, name, descriptions, shape, scale, entries, callback1, callback2) writes one 116-byte record in native order; descriptions is a pointer to a qword whose high dword is the count and whose low dword is the pointer-array base, while entries points to a byte count followed by 8-byte entries. Bad addresses trap with WebAssembly.RuntimeError and retain earlier stores. 369 and 370 are independently recovered in game/client/clock.mjs; 391 keeps an inline equivalent of the same guard state machine and frame scratch because it also has to preserve its own 2192-byte frame on the trap path. 618 is independently recovered in game/client/entity-record.mjs and registered after this module. Native 391 builds five source records in its argument frame and moves them with 618; the recovered 391 reproduces those five 116-byte results inline rather than dispatching the hook, because doing so would also have to materialize the same source frames and their destructive count clearing. Its complete-memory test confirms those five records and the surrounding frame are byte-identical.",
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-entity-definition.test.mjs",
+    "report": "reports/client-entity-definition-tests.tap",
+    "reportSha256": "c76d4e54da55ca7ddc9990ed256c1dce0f2eb3b3dbf870d8f93bdae20d6c15f7",
+    "testSourceSha256": "c022bbab547a449c682dd90fccc3874701a8ebb7d0e13eb00c17791f0cac0429",
+    "testGroups": 8,
+    "pass": 8,
+    "fail": 0,
+    "oracleComparisons": 351,
+    "trappingComparisons": 17,
+    "completeLinearMemoryChecks": 286,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 351,
+    "catalogRecordsChecked": 23,
+    "guardStatesChecked": [
+      "flag 1/0 skip",
+      "flag 2/0 skip",
+      "flag 3/0 skip",
+      "flag 0x80/0 skip",
+      "flag 0xff/0 skip",
+      "flag 0/state 1 wait",
+      "flag 0/state 4 initialize",
+      "flag 0/state 0x80 initialize",
+      "flag 0/state 2 trap",
+      "flag 0/state 3 trap",
+      "flag 0/state 6 trap",
+      "flag 0/state 0xff trap"
+    ],
+    "comparison": "Each comparison checks the return value or trap type/message, the stack pointer, the catalog window from 384000 through 386999 and both guard bytes. The 441 checks additionally compare the complete 64 MiB linear memory. One 391 initialization compares the complete 64 MiB linear memory, including the 2,192-byte dead argument frame (64 written byte runs and 36 rebased pointers) and the nested 369/370 guard frames, all of which the recovered body recreates exactly.",
+    "limitations": [
+      "The 23 catalog records are static and fully checked, but lookup types are deterministic samples rather than an exhaustive enumeration of all 2^32 i32 values.",
+      "Most 391 checks compare the catalog and guard window; one call compares the complete linear memory.",
+      "Functions 369 and 370 are recovered separately in clock.mjs; 618 is recovered separately in entity-record.mjs. The latest browser smoke dispatched 391 1,338 times and initialized the catalog, but did not call 441 or 618 directly.",
+      "The browser scenario does not necessarily dispatch 391 or 441, so this is a function-level equivalence claim.",
+      "The recovered functions are equivalents of the shipped WASM, not the original C++ source or its original identifiers."
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/rem-pio2f.mjs",
+  "implementationSha256": "02d9f9ddae66a0181acec689f93bce7a5de56c5dcffb8f7cfd1b26fd1aa6a4c7",
+  "factory": "createRemPio2fHook",
+  "functionIds": [
+    284
+  ],
+  "functions": [
+    {
+      "id": 284,
+      "name": "remPio2f",
+      "originalSymbol": "function_284",
+      "signature": " (type $t55) (param f32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 68060
+        },
+        "source": {
+          "path": "source/game/server/rem-pio2f.mjs",
+          "line": 31
+        },
+        "test": "test/server-rem-pio2f.test.mjs"
+      },
+      "originalDirectDependencies": [
+        285
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Single-precision argument reduction rem_pio2f. Fast path uses two-term f64 reduction; Inf/NaN stores x-x and returns 0; large path scales into [2^23,2^24) and delegates to unrecovered Payne-Hanek 285 with (scaled, out, exponent, 1, 0). Mirrors the 16-byte frame and restores the stack pointer."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-rem-pio2f.test.mjs",
+    "report": "reports/server-rem-pio2f-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 590,
+    "completeLinearMemoryChecks": 590,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 590,
+    "trappingComparisons": 0,
+    "comparison": "590 float bit patterns span zero, subnormals, exponent boundaries, the 1305022426 threshold, Inf/NaN and the Payne-Hanek range. Each compares result, output f64, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-range p1 pointers are not enumerated.",
+      "Ledger: 257 server bodies recovered and 477 remain machine code."
+    ]
+  }
+}

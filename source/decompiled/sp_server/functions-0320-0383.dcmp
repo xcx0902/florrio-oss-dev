@@ -1,0 +1,6195 @@
+// Reading view only. Rebuild the corresponding .wat, not this pseudocode.
+function function_334(a:int_ptr, b:int_ptr, c:int, d:int, e:int, f:int) { // func334
+  a = 
+    function_182(c, d, a = call_indirect(a + 8, (a[2])[0]:int), a + 168, f, e, 0) -
+    a;
+  if (a <= 167) { b[0] = a / 12 % 7 }
+}
+
+function function_335(a:int):int { // func335
+  return 2
+}
+
+function function_336(a:int, b:int, c:int, d:int, e:int_ptr, f:int_ptr, g:int) { // func336
+  var n:int_ptr;
+  var h:int;
+  var i:int;
+  var l:int_ptr;
+  var m:int_ptr;
+  var q:int_ptr;
+  var j:int = stack_pointer - 16;
+  stack_pointer = j;
+  var k:int_ptr = function_61(g);
+  call_indirect(j, g = n = function_134(g), (g[0]:int)[5]:int);
+  f[0] = d;
+  h = a;
+  g = h[0]:ubyte;
+  br_table[B_b, B_a, B_b, ..B_a](g - 43);
+  label B_b:
+  g = call_indirect(k, (g << 24) >> 24, (k[0])[11]:int);
+  f[0] = (h = f[0]) + 4;
+  h[0]:int = g;
+  h = a + 1;
+  label B_a:
+  if (c - (g = h) < 2) goto B_d;
+  if (h[0]:ubyte != 48) goto B_d;
+  if ((h[1]:ubyte | 32) != 120) goto B_d;
+  g = call_indirect(k, 48, (k[0])[11]:int);
+  f[0] = (i = f[0]) + 4;
+  i[0]:int = g;
+  g = call_indirect(k, h[1]:byte, (k[0])[11]:int);
+  f[0] = (i = f[0]) + 4;
+  i[0]:int = g;
+  h = h + 2;
+  g = h;
+  loop L_e {
+    if (c <= g) goto B_c;
+    i = g[0]:byte;
+    function_33();
+    if (eqz(i - 48 < 10 | (i | 32) - 97 < 6)) goto B_c;
+    g = g + 1;
+    continue L_e;
+  }
+  unreachable;
+  label B_d:
+  loop L_f {
+    if (c <= g) goto B_c;
+    i = g[0]:byte;
+    function_33();
+    if (i - 48 >= 10) goto B_c;
+    g = g + 1;
+    continue L_f;
+  }
+  unreachable;
+  label B_c:
+  if (eqz({
+            if (j[11]:ubyte >> 7) {
+              j[1]:int;
+              goto B_h;
+            }
+            j[11]:ubyte;
+            label B_h:
+          })) {
+    call_indirect(k, h, g, f[0], (k[0])[12]:int);
+    f[0] = f[0] + (g - h << 2);
+    goto B_g;
+  }
+  reverseByteRange(h, g);
+  var o:int = call_indirect(n, (n[0])[4]:int);
+  i = h;
+  loop L_k {
+    if (g <= i) {
+      function_181(d + (h - a << 2), f[0])
+    } else {
+      if (({
+             if (j[11]:ubyte >> 7) {
+               j[0]:int;
+               goto B_n;
+             }
+             j;
+             label B_n:
+           } +
+           l)[0]:byte <
+          1) goto B_m;
+      if (m !=
+          ({
+             if (j[11]:ubyte >> 7) {
+               j[0]:int;
+               goto B_p;
+             }
+             j;
+             label B_p:
+           } +
+           l)[0]:byte) goto B_m;
+      f[0] = (m = f[0]) + 4;
+      m[0] = o;
+      l = l +
+          (l <
+           {
+             if (j[11]:ubyte >> 7) {
+               j[1]:int;
+               goto B_r;
+             }
+             j[11]:ubyte;
+             label B_r:
+           } -
+           1);
+      m = 0;
+      label B_m:
+      var p:int = call_indirect(k, i[0]:byte, (k[0])[11]:int);
+      f[0] = (q = f[0]) + 4;
+      q[0] = p;
+      i = i + 1;
+      m = m + 1;
+      continue L_k;
+    }
+  }
+  label B_g:
+  loop L_v {
+    if (c <= g) goto B_u;
+    h = g[0]:ubyte;
+    if (h != 46) {
+      h = call_indirect(k, (h << 24) >> 24, (k[0])[11]:int);
+      f[0] = (l = f[0]) + 4;
+      l[0] = h;
+      g = g + 1;
+      continue L_v;
+    }
+  }
+  h = call_indirect(n, (n[0])[3]:int);
+  f[0] = (i = (l = f[0]) + 4);
+  l[0] = h;
+  g = g + 1;
+  goto B_t;
+  label B_u:
+  i = f[0];
+  label B_t:
+  call_indirect(k, g, c, i, (k[0])[12]:int);
+  f[0] = (f = f[0] + (c - g << 2));
+  e[0] = select_if(f, d + (b - a << 2), b == c);
+  destroyLibcppString(j);
+  stack_pointer = j + 16;
+}
+
+function function_337(a:int, b:int, c:int):int { // func337
+  var d:int;
+  var e:int_ptr;
+  var f:int_ptr = stack_pointer - 16;
+  stack_pointer = f;
+  if (b < 1073741808) {
+    if (b <= 1) {
+      a[11]:byte = 1;
+      d = a;
+      goto B_c;
+    }
+    a[0]:int =
+      (d = 
+         function_121(
+           e = 
+             if (b >= 2) { select_if(d = b + 4 & -4, d = d - 1, d == 2) } else { 1 } +
+             1));
+    a[2]:int = e | -2147483648;
+    a[1]:int = b;
+    label B_c:
+    var g:int = b;
+    e = d;
+    loop L_f {
+      e[0] = c;
+      e = e + 4;
+      g = g - 1;
+      if (g) continue L_f;
+    }
+    f[3] = 0;
+    d[b]:int = f[3];
+    stack_pointer = f + 16;
+    goto B_a;
+  }
+  function_58();
+  unreachable;
+  label B_a:
+  return a;
+}
+
+function function_338(a:int, b:int, c:int, d:int, e:int_ptr, f:int_ptr, g:int) { // func338
+  var n:int_ptr;
+  var h:int;
+  var k:byte_ptr;
+  var l:byte_ptr;
+  var m:byte_ptr;
+  var q:byte_ptr;
+  var i:int = stack_pointer - 16;
+  stack_pointer = i;
+  var j:int_ptr = function_62(g);
+  call_indirect(i, g = n = function_136(g), (g[0]:int)[5]:int);
+  f[0] = d;
+  h = a;
+  g = h[0]:ubyte;
+  br_table[B_b, B_a, B_b, ..B_a](g - 43);
+  label B_b:
+  g = call_indirect(j, (g << 24) >> 24, (j[0])[7]:int);
+  f[0] = (h = f[0]) + 1;
+  h[0]:byte = g;
+  h = a + 1;
+  label B_a:
+  if (c - (g = h) < 2) goto B_d;
+  if (h[0]:ubyte != 48) goto B_d;
+  if ((h[1]:ubyte | 32) != 120) goto B_d;
+  g = call_indirect(j, 48, (j[0])[7]:int);
+  f[0] = (k = f[0]) + 1;
+  k[0] = g;
+  g = call_indirect(j, h[1]:byte, (j[0])[7]:int);
+  f[0] = (k = f[0]) + 1;
+  k[0] = g;
+  h = h + 2;
+  g = h;
+  loop L_e {
+    if (c <= g) goto B_c;
+    k = g[0]:byte;
+    function_33();
+    if (eqz(k - 48 < 10 | (k | 32) - 97 < 6)) goto B_c;
+    g = g + 1;
+    continue L_e;
+  }
+  unreachable;
+  label B_d:
+  loop L_f {
+    if (c <= g) goto B_c;
+    k = g[0]:byte;
+    function_33();
+    if (k - 48 >= 10) goto B_c;
+    g = g + 1;
+    continue L_f;
+  }
+  unreachable;
+  label B_c:
+  if (eqz({
+            if (i[11]:ubyte >> 7) {
+              i[1]:int;
+              goto B_h;
+            }
+            i[11]:ubyte;
+            label B_h:
+          })) {
+    call_indirect(j, h, g, f[0], (j[0])[8]:int);
+    f[0] = f[0] + g - h;
+    goto B_g;
+  }
+  reverseByteRange(h, g);
+  var o:int = call_indirect(n, (n[0])[4]:int);
+  k = h;
+  loop L_k {
+    if (g <= k) {
+      reverseByteRange(d + h - a, f[0])
+    } else {
+      if (({
+             if (i[11]:ubyte >> 7) {
+               i[0]:int;
+               goto B_n;
+             }
+             i;
+             label B_n:
+           } +
+           l)[0]:byte <
+          1) goto B_m;
+      if (m !=
+          ({
+             if (i[11]:ubyte >> 7) {
+               i[0]:int;
+               goto B_p;
+             }
+             i;
+             label B_p:
+           } +
+           l)[0]:byte) goto B_m;
+      f[0] = (m = f[0]) + 1;
+      m[0] = o;
+      l = l +
+          (l <
+           {
+             if (i[11]:ubyte >> 7) {
+               i[1]:int;
+               goto B_r;
+             }
+             i[11]:ubyte;
+             label B_r:
+           } -
+           1);
+      m = 0;
+      label B_m:
+      var p:int = call_indirect(j, k[0], (j[0])[7]:int);
+      f[0] = (q = f[0]) + 1;
+      q[0] = p;
+      k = k + 1;
+      m = m + 1;
+      continue L_k;
+    }
+  }
+  label B_g:
+  loop L_t {
+    call_indirect(j,
+                  {
+                    if (c > g) {
+                      if ((h = g[0]:ubyte) != 46) goto B_u;
+                      h = call_indirect(n, (n[0])[3]:int);
+                      f[0] = (l = f[0]) + 1;
+                      l[0] = h;
+                      g = g + 1;
+                    }
+                    g;
+                    label B_v:
+                  },
+                  c,
+                  f[0],
+                  (j[0])[8]:int);
+    f[0] = (f = f[0] + c - g);
+    e[0] = select_if(f, d + b - a, b == c);
+    destroyLibcppString(i);
+    stack_pointer = i + 16;
+    return ;
+    label B_u:
+    h = call_indirect(j, (h << 24) >> 24, (j[0])[7]:int);
+    f[0] = (l = f[0]) + 1;
+    l[0] = h;
+    g = g + 1;
+    continue L_t;
+  }
+  unreachable;
+}
+
+function function_339(a:int, b:int, c:int_ptr, d:int, e:int_ptr, f:int_ptr):int { // func339
+  a = stack_pointer - 352;
+  stack_pointer = a;
+  a[84]:int = c;
+  a[86]:int = b;
+  var g:int = function_90(d);
+  var h:int = function_157(d, a + 224);
+  function_156(a + 208, d, a + 332);
+  b = clearThreeWords(a + 192);
+  function_23(
+    b,
+    if (b[11]:ubyte >> 7) { (b[2]:int & 2147483647) - 1 } else { 10 });
+  a[47]:int =
+    (d = {
+           if (b[11]:ubyte >> 7) {
+             b[0]:int;
+             goto B_b;
+           }
+           b;
+           label B_b:
+         });
+  a[3]:int = a + 16;
+  a[2]:int = 0;
+  var i:int = a[83]:int;
+  loop L_d {
+    if (eqz(function_59(a + 344, a + 336))) goto B_e;
+    if (a[47]:int ==
+        d +
+        (c = {
+               if (b[11]:ubyte >> 7) {
+                 b[1]:int;
+                 goto B_f;
+               }
+               b[11]:ubyte;
+               label B_f:
+             })) {
+      function_23(b, c << 1);
+      function_23(
+        b,
+        if (b[11]:ubyte >> 7) { (b[2]:int & 2147483647) - 1 } else { 10 });
+      a[47]:int =
+        (d = {
+               if (b[11]:ubyte >> 7) {
+                 b[0]:int;
+                 goto B_j;
+               }
+               b;
+               label B_j:
+             }) +
+        c;
+    }
+    if (function_133({
+                       c = a[86]:int;
+                       var j:int_ptr = c[3];
+                       if (j == c[4]) {
+                         call_indirect(c, (c[0])[9]:int);
+                         goto B_l;
+                       }
+                       j[0];
+                       label B_l:
+                     },
+                     g,
+                     d,
+                     a + 188,
+                     a + 8,
+                     i,
+                     a + 208,
+                     a + 16,
+                     a + 12,
+                     h)) goto B_e;
+    function_45(a + 344);
+    continue L_d;
+    label B_e:
+  }
+  c = a[3]:int;
+  if (eqz({
+            if (a[219]:ubyte >> 7) {
+              a[53]:int;
+              goto B_o;
+            }
+            a[219]:ubyte;
+            label B_o:
+          })) goto B_n;
+  if (c - a + 16 > 159) goto B_n;
+  c[0] = a[2]:int;
+  c = c + 4;
+  label B_n:
+  f[0] = function_345(d, a[47]:int, e, g);
+  function_53(a + 208, a + 16, c, e);
+  if (function_48(a + 344, a + 336)) { e[0] = e[0] | 2 }
+  c = a[86]:int;
+  destroyLibcppString(b);
+  destroyLibcppString(a + 208);
+  stack_pointer = a + 352;
+  return c;
+}
+
+function function_340(a:int, b:int_ptr, c:int):int { // func340
+  var d:int_ptr = stack_pointer - 16;
+  stack_pointer = d;
+  d[3] = b;
+  d[2] = c;
+  b = function_82(d, d + 12);
+  c = function_357(a, 2568, d[2]);
+  a = b[0];
+  if (a) {
+    d93[0]:int;
+    if (a) { d93[0]:int = select_if(8570492, a, a == -1) }
+  }
+  stack_pointer = d + 16;
+  return c;
+}
+
+function function_341(a:{ a:long, b:long }, b:int, c:int, d:int_ptr) { // func341
+  var i:int;
+  var l:long;
+  var m:long;
+  var k:long;
+  var j:long;
+  var e:int = stack_pointer - 32;
+  stack_pointer = e;
+  if (b != c) {
+    i = 8569384[0]:int;
+    8569384[0]:int = 0;
+    var f:{ a:long, b:long } = stack_pointer - 16;
+    stack_pointer = f;
+    function_33();
+    var g:{ a:long, b:long } = stack_pointer - 16;
+    stack_pointer = g;
+    var h:{ a:long, b:long } = stack_pointer - 16;
+    stack_pointer = h;
+    function_245(h, b, e + 28, 2);
+    g.a = h.a;
+    g.b = h.b;
+    stack_pointer = h + 16;
+    f.a = g.a;
+    f.b = g.b;
+    stack_pointer = g + 16;
+    e[0]:long = f.a;
+    e[1]:long = f.b;
+    stack_pointer = f + 16;
+    j = e[1]:long;
+    k = e[0]:long;
+    b = 8569384[0]:int;
+    if (eqz(b)) goto B_c;
+    if (e[7]:int != c) goto B_b;
+    l = k;
+    m = j;
+    if (b != 68) goto B_a;
+    goto B_b;
+  }
+  d[0] = 4;
+  goto B_a;
+  label B_c:
+  8569384[0]:int = i;
+  if (e[7]:int == c) goto B_a;
+  label B_b:
+  d[0] = 4;
+  k = l;
+  j = m;
+  label B_a:
+  a.a = k;
+  a.b = j;
+  stack_pointer = e + 32;
+}
+
+function function_342(a:int, b:int, c:int_ptr):double { // func342
+  var h:int;
+  var e:double;
+  var d:double;
+  var f:int_ptr = stack_pointer - 16;
+  stack_pointer = f;
+  if (a != b) {
+    h = 8569384[0]:int;
+    8569384[0]:int = 0;
+    function_33();
+    var g:{ a:long, b:long } = stack_pointer - 16;
+    stack_pointer = g;
+    function_245(g, a, f + 12, 1);
+    d = function_260(g.a, g.b);
+    stack_pointer = g + 16;
+    a = 8569384[0]:int;
+    if (eqz(a)) goto B_c;
+    if (f[3] != b) goto B_b;
+    e = d;
+    if (a != 68) goto B_a;
+    goto B_b;
+  }
+  c[0] = 4;
+  goto B_a;
+  label B_c:
+  8569384[0]:int = h;
+  if (f[3] == b) goto B_a;
+  label B_b:
+  c[0] = 4;
+  d = e;
+  label B_a:
+  stack_pointer = f + 16;
+  return d;
+}
+
+function function_343(a:int, b:int, c:int_ptr):float { // func343
+  var h:int;
+  var e:float;
+  var d:float;
+  var f:int_ptr = stack_pointer - 16;
+  stack_pointer = f;
+  if (a != b) {
+    h = 8569384[0]:int;
+    8569384[0]:int = 0;
+    function_33();
+    var g:{ a:long, b:long } = stack_pointer - 16;
+    stack_pointer = g;
+    function_245(g, a, f + 12, 0);
+    d = function_405(g.a, g.b);
+    stack_pointer = g + 16;
+    a = 8569384[0]:int;
+    if (eqz(a)) goto B_c;
+    if (f[3] != b) goto B_b;
+    e = d;
+    if (a != 68) goto B_a;
+    goto B_b;
+  }
+  c[0] = 4;
+  goto B_a;
+  label B_c:
+  8569384[0]:int = h;
+  if (f[3] == b) goto B_a;
+  label B_b:
+  c[0] = 4;
+  d = e;
+  label B_a:
+  stack_pointer = f + 16;
+  return d;
+}
+
+function function_344(a:ubyte_ptr, b:int, c:int_ptr, d:int):long { // func344
+  var f:int;
+  var h:long;
+  var e:int_ptr = stack_pointer - 16;
+  stack_pointer = e;
+  h = {
+        if (a != b) {
+          f = a[0];
+          if (f != 45) goto B_d;
+          a = a + 1;
+          if (a != b) goto B_d;
+          goto B_c;
+          label B_d:
+          var g:int = 8569384[0]:int;
+          8569384[0]:int = 0;
+          h = function_236(a, e + 12, d, function_33());
+          a = 8569384[0]:int;
+          if (a) {
+            if (e[3] != b) goto B_c;
+            if (a != 68) goto B_e;
+            c[0] = 4;
+            -1L;
+            goto B_a;
+          }
+          8569384[0]:int = g;
+          if (e[3] == b) goto B_e;
+          goto B_c;
+          label B_e:
+          select_if(0L - h, h, f == 45);
+          goto B_a;
+          label B_c:
+        }
+        c[0] = 4;
+        0L;
+        label B_a:
+      }
+  stack_pointer = e + 16;
+  return h;
+}
+
+function function_345(a:ubyte_ptr, b:int, c:int_ptr, d:int):int { // func345
+  var h:long;
+  var f:int;
+  var e:int_ptr = stack_pointer - 16;
+  stack_pointer = e;
+  a = {
+        if (a != b) {
+          f = a[0];
+          if (f != 45) goto B_e;
+          a = a + 1;
+          if (a != b) goto B_e;
+          goto B_d;
+          label B_e:
+          var g:int = 8569384[0]:int;
+          8569384[0]:int = 0;
+          h = function_236(a, e + 12, d, function_33());
+          a = 8569384[0]:int;
+          if (a) {
+            if (e[3] != b) goto B_d;
+            if (a == 68) goto B_f;
+            if (h > 4294967295L) goto B_f;
+            goto B_b;
+          }
+          8569384[0]:int = g;
+          if (e[3] == b) goto B_h;
+          goto B_d;
+          label B_h:
+          if (h < 4294967296L) goto B_b;
+          label B_f:
+          c[0] = 4;
+          -1;
+          goto B_a;
+          label B_d:
+        }
+        c[0] = 4;
+        0;
+        goto B_a;
+        label B_b:
+        select_if(0 - (a = i32_wrap_i64(h)), a, f == 45);
+        label B_a:
+      }
+  stack_pointer = e + 16;
+  return a;
+}
+
+function function_346(a:int, b:int, c:int_ptr, d:int, e:int_ptr, f:int_ptr):int { // func346
+  a = stack_pointer - 240;
+  stack_pointer = a;
+  a[56]:int = c;
+  a[58]:int = b;
+  var g:int = function_90(d);
+  function_158(a + 208, d, a + 223);
+  b = clearThreeWords(a + 192);
+  function_23(
+    b,
+    if (b[11]:ubyte >> 7) { (b[2]:int & 2147483647) - 1 } else { 10 });
+  a[47]:int =
+    (d = {
+           if (b[11]:ubyte >> 7) {
+             b[0]:int;
+             goto B_b;
+           }
+           b;
+           label B_b:
+         });
+  a[3]:int = a + 16;
+  a[2]:int = 0;
+  var h:int = a[223]:byte;
+  loop L_d {
+    if (eqz(function_60(a + 232, a + 224))) goto B_e;
+    if (a[47]:int ==
+        d +
+        (c = {
+               if (b[11]:ubyte >> 7) {
+                 b[1]:int;
+                 goto B_f;
+               }
+               b[11]:ubyte;
+               label B_f:
+             })) {
+      function_23(b, c << 1);
+      function_23(
+        b,
+        if (b[11]:ubyte >> 7) { (b[2]:int & 2147483647) - 1 } else { 10 });
+      a[47]:int =
+        (d = {
+               if (b[11]:ubyte >> 7) {
+                 b[0]:int;
+                 goto B_j;
+               }
+               b;
+               label B_j:
+             }) +
+        c;
+    }
+    if (function_135(function_41(a + 232),
+                     g,
+                     d,
+                     a + 188,
+                     a + 8,
+                     h,
+                     a + 208,
+                     a + 16,
+                     a + 12,
+                     13120)) goto B_e;
+    function_46(a + 232);
+    continue L_d;
+    label B_e:
+  }
+  c = a[3]:int;
+  if (eqz({
+            if (a[219]:ubyte >> 7) {
+              a[53]:int;
+              goto B_m;
+            }
+            a[219]:ubyte;
+            label B_m:
+          })) goto B_l;
+  if (c - a + 16 > 159) goto B_l;
+  c[0] = a[2]:int;
+  c = c + 4;
+  label B_l:
+  f[0] = function_345(d, a[47]:int, e, g);
+  function_53(a + 208, a + 16, c, e);
+  if (function_49(a + 232, a + 224)) { e[0] = e[0] | 2 }
+  c = a[58]:int;
+  destroyLibcppString(b);
+  destroyLibcppString(a + 208);
+  stack_pointer = a + 240;
+  return c;
+}
+
+function function_347(a:ubyte_ptr, b:int, c:int_ptr, d:int):int { // func347
+  var h:long;
+  var f:int;
+  var e:int_ptr = stack_pointer - 16;
+  stack_pointer = e;
+  a = {
+        if (a != b) {
+          f = a[0];
+          if (f != 45) goto B_e;
+          a = a + 1;
+          if (a != b) goto B_e;
+          goto B_d;
+          label B_e:
+          var g:int = 8569384[0]:int;
+          8569384[0]:int = 0;
+          h = function_236(a, e + 12, d, function_33());
+          a = 8569384[0]:int;
+          if (a) {
+            if (e[3] != b) goto B_d;
+            if (a == 68) goto B_f;
+            if (h > 65535L) goto B_f;
+            goto B_b;
+          }
+          8569384[0]:int = g;
+          if (e[3] == b) goto B_h;
+          goto B_d;
+          label B_h:
+          if (h < 65536L) goto B_b;
+          label B_f:
+          c[0] = 4;
+          65535;
+          goto B_a;
+          label B_d:
+        }
+        c[0] = 4;
+        0;
+        goto B_a;
+        label B_b:
+        select_if(0 - (a = i32_wrap_i64(h)), a, f == 45);
+        label B_a:
+      }
+  stack_pointer = e + 16;
+  return a & 65535;
+}
+
+function function_348(a:int, b:int, c:int_ptr, d:int):long { // func348
+  var g:long;
+  var e:int_ptr = stack_pointer - 16;
+  stack_pointer = e;
+  if (a != b) {
+    var f:int = 8569384[0]:int;
+    8569384[0]:int = 0;
+    g = function_352(a, e + 12, d, function_33());
+    a = 8569384[0]:int;
+    if (a) {
+      if (e[3] != b) goto B_c;
+      if (a != 68) goto B_a;
+      c[0] = 4;
+      g = select_if(9223372036854775807L, -9223372036854775808L, g > 0L);
+      goto B_a;
+    }
+    8569384[0]:int = f;
+    if (e[3] == b) goto B_a;
+    label B_c:
+  }
+  c[0] = 4;
+  g = 0L;
+  label B_a:
+  stack_pointer = e + 16;
+  return g;
+}
+
+function function_349(a:int, b:int, c:int_ptr, d:int):int { // func349
+  var e:int_ptr = stack_pointer - 16;
+  stack_pointer = e;
+  a = {
+        if (a != b) {
+          var f:int = 8569384[0]:int;
+          8569384[0]:int = 0;
+          var g:long = function_352(a, e + 12, d, function_33());
+          a = 8569384[0]:int;
+          if (a) {
+            if (e[3] != b) goto B_d;
+            if (a != 68) goto B_e;
+            c[0] = 4;
+            2147483647;
+            if (g > 0L) goto B_a;
+            goto B_b;
+          }
+          8569384[0]:int = f;
+          if (e[3] == b) goto B_e;
+          goto B_d;
+          label B_e:
+          if (g <= -2147483649L) {
+            c[0] = 4;
+            goto B_b;
+          }
+          if (g >= 2147483648L) {
+            c[0] = 4;
+            2147483647;
+            goto B_a;
+          }
+          i32_wrap_i64(g);
+          goto B_a;
+          label B_d:
+        }
+        c[0] = 4;
+        0;
+        goto B_a;
+        label B_b:
+        -2147483648;
+        label B_a:
+      }
+  stack_pointer = e + 16;
+  return a;
+}
+
+function function_350(a:{ a:int, b:int }, b:int_ptr):int { // func350
+  var c:int_ptr = stack_pointer - 16;
+  stack_pointer = c;
+  c[3] = 0;
+  a.a = c[3];
+  a.b = b[0];
+  stack_pointer = c + 16;
+  return a;
+}
+
+function function_351(a:int, b:int_ptr, c:int):int { // func351
+  var d:int_ptr;
+  var g:int;
+  var f:int_ptr = stack_pointer - 16;
+  stack_pointer = f;
+  var e:int = c - b >> 2;
+  if (e < 1073741808) {
+    if (e <= 1) {
+      a[11]:byte = e;
+      d = a;
+      goto B_c;
+    }
+    a[0]:int =
+      (d = 
+         function_121(
+           g = 
+             if (e >= 2) { select_if(d = e + 4 & -4, d = d - 1, d == 2) } else { 1 } +
+             1));
+    a[2]:int = g | -2147483648;
+    a[1]:int = e;
+    label B_c:
+    loop L_f {
+      if (b != c) {
+        d[0] = b[0];
+        d = d + 4;
+        b = b + 4;
+        continue L_f;
+      }
+    }
+    f[3] = 0;
+    d[0] = f[3];
+    stack_pointer = f + 16;
+    goto B_a;
+  }
+  function_58();
+  unreachable;
+  label B_a:
+  return a;
+}
+
+function function_352(a:int, b:int, c:int, d:int):long { // func352
+  return function_373(a, b, c, -9223372036854775808L)
+}
+
+function function_353(a:{ a:int, b:int, c:int, d:int }, b:int_ptr, c:int, d:int):int { // func353
+  var g:int;
+  var h:int;
+  var f:ubyte_ptr;
+  var e:int = b[0];
+  d = {
+        if (eqz(d)) goto B_k;
+        h = d[0]:int;
+        if (eqz(h)) goto B_k;
+        if (eqz(a)) {
+          g = c;
+          goto B_j;
+        }
+        d[0]:int = 0;
+        g = c;
+        goto B_i;
+        label B_k:
+        if (eqz((d93[0]:int)[0]:int)) {
+          if (eqz(a)) goto B_m;
+          if (eqz(c)) goto B_a;
+          d = c;
+          loop L_o {
+            g = e[0]:byte;
+            if (g) {
+              a.a = g & 57343;
+              a = a + 4;
+              e = e + 1;
+              d = d - 1;
+              if (d) continue L_o;
+              goto B_a;
+            }
+          }
+          a.a = 0;
+          b[0] = 0;
+          return c - d;
+        }
+        if (eqz(a)) {
+          g = c;
+          d = 0;
+          goto B_g;
+        }
+        g = c;
+        0;
+        goto B_h;
+        label B_m:
+        return strlen(e);
+        label B_j:
+        d = 1;
+        goto B_g;
+        label B_i:
+        1;
+        label B_h:
+      }
+  loop L_r {
+    if (eqz(d)) {
+      if (eqz(g)) goto B_a;
+      loop L_t {
+        f = e[0]:ubyte;
+        h = f - 1;
+        if (h > 126) {
+          d = f;
+          goto B_w;
+        }
+        if (e & 3) goto B_v;
+        if (g < 5) goto B_v;
+        loop L_z {
+          d = e[0]:int;
+          if ((d - 16843009 | d) & -2139062144) goto B_y;
+          a.a = d & 255;
+          a.b = e[1]:ubyte;
+          a.c = e[2]:ubyte;
+          a.d = e[3]:ubyte;
+          a = a + 16;
+          e = e + 4;
+          g = g - 4;
+          if (g > 4) continue L_z;
+        }
+        d = e[0]:ubyte;
+        label B_y:
+        f = d & 255;
+        h = f - 1;
+        label B_w:
+        if (h > 126) goto B_u;
+        label B_v:
+        a.a = f;
+        a = a + 4;
+        e = e + 1;
+        g = g - 1;
+        if (g) continue L_t;
+        goto B_a;
+        label B_u:
+      }
+      f = f - 194;
+      if (f > 50) goto B_e;
+      e = e + 1;
+      h = ((f << 2) + 12912)[0]:int;
+      d = 1;
+      continue L_r;
+    }
+    d = e[0]:ubyte;
+    f = d >> 3;
+    if ((f - 16 | f + (h >> 26)) > 7) goto B_f;
+    f = e + 1;
+    e = {
+          f;
+          if ((d = d - 128 | h << 6) > -1) goto B_ca;
+          var i:int = f[0] - 128;
+          if (i > 63) goto B_ba;
+          f = e + 2;
+          f;
+          if ((d = i | d << 6) > -1) goto B_ca;
+          f = f[0] - 128;
+          if (f > 63) goto B_ba;
+          d = f | d << 6;
+          e + 3;
+          label B_ca:
+        }
+    a.a = d;
+    g = g - 1;
+    a = a + 4;
+    goto B_aa;
+    label B_ba:
+    8569384[0]:int = 25;
+    e = e - 1;
+    goto B_c;
+    label B_aa:
+    d = 0;
+    continue L_r;
+  }
+  unreachable;
+  label B_g:
+  loop L_da {
+    g = {
+          if (eqz(d)) {
+            d = e[0]:ubyte;
+            if (d - 1 > 126) goto B_ia;
+            if (e & 3) goto B_ia;
+            d = e[0]:int;
+            if (eqz((d - 16843009 | d) & -2139062144)) goto B_ha;
+            label B_ia:
+            f = e;
+            goto B_ga;
+            label B_ha:
+            loop L_ja {
+              g = g - 4;
+              d = e[1]:int;
+              f = e + 4;
+              e = f;
+              if (eqz((d | d - 16843009) & -2139062144)) continue L_ja;
+            }
+            label B_ga:
+            e = d & 255;
+            if (e - 1 <= 126) {
+              e = f + 1;
+              g - 1;
+              goto B_ea;
+            }
+            h = e - 194;
+            if (h > 50) {
+              e = f;
+              goto B_e;
+            }
+            e = f + 1;
+            h = ((h << 2) + 12912)[0]:int;
+            d = 1;
+            continue L_da;
+          }
+          d = e[0]:ubyte >> 3;
+          if ((d - 16 | (h >> 26) + d) > 7) goto B_f;
+          d = e + 1;
+          e = {
+                d;
+                if (eqz(h & 33554432)) goto B_ma;
+                if ((d[0]:ubyte & 192) != 128) {
+                  e = e - 1;
+                  goto B_d;
+                }
+                d = e + 2;
+                d;
+                if (eqz(h & 524288)) goto B_ma;
+                if ((d[0]:ubyte & 192) != 128) {
+                  e = e - 1;
+                  goto B_d;
+                }
+                e + 3;
+                label B_ma:
+              }
+          g - 1;
+          label B_ea:
+        }
+    d = 0;
+    continue L_da;
+  }
+  unreachable;
+  label B_f:
+  e = e - 1;
+  if (h) goto B_d;
+  d = e[0]:ubyte;
+  label B_e:
+  if (d & 255) goto B_d;
+  if (a) {
+    a.a = 0;
+    b[0] = 0;
+  }
+  return c - g;
+  label B_d:
+  8569384[0]:int = 25;
+  if (eqz(a)) goto B_b;
+  label B_c:
+  b[0] = e;
+  label B_b:
+  return -1;
+  label B_a:
+  b[0] = e;
+  return c;
+}
+
+function function_354(a:int):int { // func354
+  var c:int_ptr;
+  var b:int = a;
+  loop L_a {
+    c = b;
+    b = c + 4;
+    if (c[0]) continue L_a;
+  }
+  return c - a >> 2;
+}
+
+function function_355(a:int) { // func355
+  if ((a != 0 & a != 18764) & a != 18788) { free(a) }
+}
+
+function function_356(a:int, b:int):int { // func356
+  var c:int_ptr = stack_pointer - 16;
+  stack_pointer = c;
+  c[3] = b;
+  a = function_357(a, 3166, b);
+  stack_pointer = c + 16;
+  return a;
+}
+
+function function_357(a:int, b:{ a:ubyte, b:ubyte, c:ubyte }, c:ubyte_ptr):int { // func357
+  var u:long;
+  var p:int;
+  var i:int;
+  var s:long;
+  var l:int;
+  var t:long;
+  var v:long;
+  var w:long;
+  var q:int;
+  var k:ubyte_ptr;
+  var m:int;
+  var j:int;
+  var f:int = stack_pointer - 144;
+  stack_pointer = f;
+  var d:int = memset(f, 0, 144);
+  d[19]:int = -1;
+  d[11]:int = a;
+  d[8]:int = 76;
+  d[21]:int = a;
+  var o:int_ptr = c;
+  c = 0;
+  var g:int = stack_pointer - 304;
+  stack_pointer = g;
+  d[19]:int;
+  f = b.a;
+  if (eqz(f)) goto B_a;
+  loop L_f {
+    f = f & 255;
+    a = f;
+    if (a == 32 | a - 9 < 5) {
+      loop L_j {
+        f = b;
+        b = f + 1;
+        a = f[1]:ubyte;
+        if (a == 32 | a - 9 < 5) continue L_j;
+      }
+      function_83(d, 0L);
+      loop L_k {
+        a = {
+              a = d[1]:int;
+              if (a < d[26]:int) {
+                d[1]:int = a + 1;
+                a[0]:ubyte;
+                goto B_l;
+              }
+              function_30(d);
+              label B_l:
+            }
+        if (a == 32 | a - 9 < 5) continue L_k;
+      }
+      b = d[1]:int;
+      if (d[26]:int) { d[1]:int = (b = b - 1) }
+      u = i64_extend_i32_s(b - d[2]:int) + d[15]:long + u;
+      goto B_h;
+    }
+    f = 
+      {
+        if (f == 37) {
+          a = b.b;
+          if (a == 42) goto B_q;
+          if (a != 37) goto B_p;
+        }
+        function_83(d, 0L);
+        f = b + (f == 37);
+        a = {
+              a = d[1]:int;
+              if (a < d[26]:int) {
+                d[1]:int = a + 1;
+                a[0]:ubyte;
+                goto B_s;
+              }
+              function_30(d);
+              label B_s:
+            }
+        if (a != f[0]:ubyte) {
+          if (d[26]:int) { d[1]:int = d[1]:int - 1 }
+          if (a > -1) goto B_a;
+          m = 0;
+          if (eqz(p)) goto B_c;
+          goto B_a;
+        }
+        u = u + 1L;
+        goto B_h;
+        label B_q:
+        i = 0;
+        b + 2;
+        goto B_o;
+        label B_p:
+        if (a - 48 >= 10) goto B_w;
+        if (b.c != 36) goto B_w;
+        f = stack_pointer - 16;
+        f[3]:int = o;
+        f[2]:int = (a = select_if(((a = a - 48) << 2) + o - 4, o, a > 1)) + 4;
+        i = a[0]:int;
+        b + 3;
+        goto B_o;
+        label B_w:
+        i = o[0];
+        o = o + 4;
+        b + 1;
+        label B_o:
+      }
+    var h:int = 0;
+    loop L_x {
+      b = f[0]:ubyte;
+      if (b - 48 < 10) {
+        f = f + 1;
+        h = h * 10 + b - 48;
+        continue L_x;
+      }
+    }
+    m = 0;
+    a = if (b != 109) {
+          f
+        } else {
+          j = 0;
+          m = i != 0;
+          b = f[1]:ubyte;
+          c = 0;
+          f + 1;
+        }
+    f = a + 1;
+    var e:ubyte_ptr = 3;
+    br_table[B_ba, B_d, B_ba, B_d, B_ba, B_ba, B_ba, B_d, B_d, B_d, B_d, B_ca, B_d, B_d, B_d, B_d, B_d, B_d, B_ba, B_d, B_d, B_d, B_d, B_ba, B_d, B_d, B_ba, B_d, B_d, B_d, B_d, B_d, B_ba, B_d, B_ba, B_ba, B_ba, B_ba, B_ba, B_fa, B_ba, B_aa, B_d, B_ea, B_d, B_ba, B_ba, B_ba, B_d, B_d, B_ba, B_da, B_ba, B_d, B_d, B_ba, B_d, B_da, ..B_d](
+      (b & 255) - 65)
+    label B_fa:
+    f = select_if(a + 2, f, a = a[1]:ubyte == 104);
+    e = select_if(-2, -1, a);
+    goto B_aa;
+    label B_ea:
+    f = select_if(a + 2, f, a = a[1]:ubyte == 108);
+    e = select_if(3, 1, a);
+    goto B_aa;
+    label B_da:
+    e = 1;
+    goto B_aa;
+    label B_ca:
+    e = 2;
+    goto B_aa;
+    label B_ba:
+    e = 0;
+    f = a;
+    label B_aa:
+    var n:int = select_if(1, e, b = ((a = f[0]:ubyte) & 47) == 3);
+    l = select_if(a | 32, a, b);
+    if (l == 91) goto B_ga;
+    if (l != 110) {
+      if (l != 99) goto B_ha;
+      h = select_if(h, 1, h > 1);
+      goto B_ga;
+    }
+    function_358(i, n, u);
+    goto B_h;
+    label B_ha:
+    function_83(d, 0L);
+    loop L_ja {
+      a = {
+            a = d[1]:int;
+            if (a < d[26]:int) {
+              d[1]:int = a + 1;
+              a[0]:ubyte;
+              goto B_ka;
+            }
+            function_30(d);
+            label B_ka:
+          }
+      if (a == 32 | a - 9 < 5) continue L_ja;
+    }
+    b = d[1]:int;
+    if (d[26]:int) { d[1]:int = (b = b - 1) }
+    u = i64_extend_i32_s(b - d[2]:int) + d[15]:long + u;
+    label B_ga:
+    function_83(d, s = i64_extend_i32_s(h));
+    a = d[1]:int;
+    if (a < (b = d[26]:int)) {
+      d[1]:int = a + 1;
+      goto B_na;
+    }
+    if (function_30(d) < 0) goto B_d;
+    b = d[26]:int;
+    label B_na:
+    if (b) { d[1]:int = d[1]:int - 1 }
+    b = 16;
+    br_table[B_va, B_qa, B_qa, B_za, B_qa, B_qa, B_qa, B_qa, B_qa, B_ab, B_qa, B_za, B_xa, B_ab, B_ab, B_ab, B_qa, B_wa, B_qa, B_qa, B_qa, B_qa, B_qa, B_ya, B_va, B_qa, B_qa, B_za, B_qa, B_xa, B_qa, B_qa, B_va, ..B_bb](
+      l - 88)
+    label B_bb:
+    a = l - 65;
+    if (a > 6) goto B_qa;
+    if (eqz(1 << a & 113)) goto B_qa;
+    label B_ab:
+    function_375(g, d, n, 0);
+    if (
+      d[15]:long == 0L - i64_extend_i32_s(d[1]:int - d[2]:int)) goto B_b;
+    if (eqz(i)) goto B_qa;
+    s = g[1]:long;
+    t = g[0]:long;
+    br_table[B_ua, B_ta, B_sa, ..B_qa](n);
+    label B_za:
+    if ((l & 239) == 99) {
+      memset(g + 32, -1, 257);
+      g[32]:byte = 0;
+      if (l != 115) goto B_ra;
+      g[65]:byte = 0;
+      g[46]:byte = 0;
+      g[21]:int@2 = 0;
+      goto B_ra;
+    }
+    memset(g + 32, b = (a = f[1]:ubyte) == 94, 257);
+    g[32]:byte = 0;
+    k = select_if(f + 2, f + 1, b);
+    f = {
+          b = (f + select_if(2, 1, b))[0]:ubyte;
+          if (b != 45) {
+            if (b == 93) goto B_fb;
+            e = a != 94;
+            k;
+            goto B_db;
+          }
+          g[78]:byte = (e = a != 94);
+          goto B_eb;
+          label B_fb:
+          g[126]:byte = (e = a != 94);
+          label B_eb:
+          k + 1;
+          label B_db:
+        }
+    loop L_hb {
+      b = f[0]:ubyte;
+      if (b != 45) {
+        if (eqz(b)) goto B_d;
+        if (b != 93) goto B_ib;
+        goto B_ra;
+      }
+      b = 45;
+      a = f[1]:ubyte;
+      if (eqz(a)) goto B_ib;
+      if (a == 93) goto B_ib;
+      k = f + 1;
+      if (a <= (f = (f - 1)[0]:ubyte)) {
+        b = a;
+        goto B_kb;
+      }
+      loop L_mb {
+        f = f + 1;
+        (f + g + 32)[0]:byte = e;
+        if (f < (b = k[0])) continue L_mb;
+      }
+      label B_kb:
+      f = k;
+      label B_ib:
+      (b + g)[33]:byte = e;
+      f = f + 1;
+      continue L_hb;
+    }
+    unreachable;
+    label B_ya:
+    b = 8;
+    goto B_va;
+    label B_xa:
+    b = 10;
+    goto B_va;
+    label B_wa:
+    b = 0;
+    label B_va:
+    s = 0L;
+    a = 0;
+    h = 0;
+    k = 0;
+    var r:long_ptr = stack_pointer - 16;
+    stack_pointer = r;
+    loop L_nb {
+      e = {
+            e = d[1]:int;
+            if (e < d[26]:int) {
+              d[1]:int = e + 1;
+              e[0];
+              goto B_ob;
+            }
+            function_30(d);
+            label B_ob:
+          }
+      q = e;
+      if (q == 32 | q - 9 < 5) continue L_nb;
+    }
+    br_table[B_rb, B_qb, B_rb, ..B_qb](e - 43)
+    label B_rb:
+    k = select_if(-1, 0, e == 45);
+    e = d[1]:int;
+    if (e < d[26]:int) {
+      d[1]:int = e + 1;
+      e = e[0];
+      goto B_qb;
+    }
+    e = function_30(d);
+    label B_qb:
+    s = 
+      {
+        if (b & -17) goto B_yb;
+        if (e != 48) goto B_yb;
+        e = {
+              e = d[1]:int;
+              if (e < d[26]:int) {
+                d[1]:int = e + 1;
+                e[0];
+                goto B_zb;
+              }
+              function_30(d);
+              label B_zb:
+            }
+        if ((e & -33) == 88) {
+          b = 16;
+          e = {
+                e = d[1]:int;
+                if (e < d[26]:int) {
+                  d[1]:int = e + 1;
+                  e[0];
+                  goto B_cc;
+                }
+                function_30(d);
+                label B_cc:
+              }
+          if ((e + 8657)[0]:ubyte < 16) goto B_wb;
+          if (d[26]:int) { d[1]:int = d[1]:int - 1 }
+          function_83(d, 0L);
+          0L;
+          goto B_tb;
+        }
+        if (b) goto B_xb;
+        b = 8;
+        goto B_wb;
+        label B_yb:
+        b = select_if(b, 10, b);
+        if (b > (e + 8657)[0]:ubyte) goto B_xb;
+        if (d[26]:int) { d[1]:int = d[1]:int - 1 }
+        function_83(d, 0L);
+        8569384[0]:int = 28;
+        0L;
+        goto B_tb;
+        label B_xb:
+        if (b != 10) goto B_wb;
+        a = e - 48;
+        if (a <= 9) {
+          b = 0;
+          loop L_hc {
+            b = b * 10 + a;
+            e = {
+                  a = d[1]:int;
+                  if (a < d[26]:int) {
+                    d[1]:int = a + 1;
+                    a[0]:ubyte;
+                    goto B_ic;
+                  }
+                  function_30(d);
+                  label B_ic:
+                }
+            a = e - 48;
+            if (select_if(a <= 9, 0, b < 429496729)) continue L_hc;
+          }
+          s = i64_extend_i32_u(b);
+        }
+        if (a > 9) goto B_kc;
+        t = s * 10L;
+        v = i64_extend_i32_u(a);
+        loop L_lc {
+          s = t + v;
+          e = {
+                a = d[1]:int;
+                if (a < d[26]:int) {
+                  d[1]:int = a + 1;
+                  a[0]:ubyte;
+                  goto B_mc;
+                }
+                function_30(d);
+                label B_mc:
+              }
+          a = e - 48;
+          if (a > 9) goto B_kc;
+          if (s >= 1844674407370955162L) goto B_kc;
+          t = s * 10L;
+          if (t <= ((v = i64_extend_i32_u(a)) ^ -1L)) continue L_lc;
+        }
+        b = 10;
+        goto B_vb;
+        label B_kc:
+        b = 10;
+        if (a <= 9) goto B_vb;
+        goto B_ub;
+        label B_wb:
+        if (b & b - 1) {
+          h = (e + 8657)[0]:ubyte;
+          if (h < b) {
+            loop L_qc {
+              a = a * b + h;
+              e = {
+                    e = d[1]:int;
+                    if (e < d[26]:int) {
+                      d[1]:int = e + 1;
+                      e[0];
+                      goto B_rc;
+                    }
+                    function_30(d);
+                    label B_rc:
+                  }
+              h = (e + 8657)[0]:ubyte;
+              if (select_if(h < b, 0, a < 119304647)) continue L_qc;
+            }
+            s = i64_extend_i32_u(a);
+          }
+          if (b <= h) goto B_vb;
+          t = i64_extend_i32_u(b);
+          loop L_tc {
+            v = s * t;
+            if (v > ((w = i64_extend_i32_u(h) & 255L) ^ -1L)) goto B_vb;
+            s = v + w;
+            if (b <=
+                (h = ((e = {
+                             if ((a = d[1]:int) < d[26]:int) {
+                               d[1]:int = a + 1;
+                               a[0]:ubyte;
+                               goto B_uc;
+                             }
+                             function_30(d);
+                             label B_uc:
+                           }) +
+                      8657)[0]:ubyte)) goto B_vb;
+            function_50(r, t, 0L, s, 0L);
+            if (eqz(r[1])) continue L_tc;
+          }
+          goto B_vb;
+        }
+        q = ((b * 23 >> 5 & 7) + 8913)[0]:byte;
+        a = (e + 8657)[0]:ubyte;
+        if (a < b) {
+          loop L_xc {
+            h = h << q | a;
+            e = {
+                  a = d[1]:int;
+                  if (a < d[26]:int) {
+                    d[1]:int = a + 1;
+                    a[0]:ubyte;
+                    goto B_yc;
+                  }
+                  function_30(d);
+                  label B_yc:
+                }
+            a = (e + 8657)[0]:ubyte;
+            if (select_if(a < b, 0, h < 134217728)) continue L_xc;
+          }
+          s = i64_extend_i32_u(h);
+        }
+        if (a >= b) goto B_vb;
+        v = -1L >> (t = i64_extend_i32_u(q));
+        if (v < s) goto B_vb;
+        loop L_ad {
+          s = (i64_extend_i32_u(a) & 255L) | s << t;
+          if (b <=
+              (a = ((e = {
+                           if ((a = d[1]:int) < d[26]:int) {
+                             d[1]:int = a + 1;
+                             a[0]:ubyte;
+                             goto B_bd;
+                           }
+                           function_30(d);
+                           label B_bd:
+                         }) +
+                    8657)[0]:ubyte)) goto B_vb;
+          if (s <= v) continue L_ad;
+        }
+        label B_vb:
+        if (b <= (e + 8657)[0]:ubyte) goto B_ub;
+        loop L_dd {
+          if (b >
+              ({
+                 if ((a = d[1]:int) < d[26]:int) {
+                   d[1]:int = a + 1;
+                   a[0]:ubyte;
+                   goto B_ed;
+                 }
+                 function_30(d);
+                 label B_ed:
+               } +
+               8657)[0]:ubyte) continue L_dd
+        }
+        k = 0;
+        8569384[0]:int = 68;
+        s = -1L;
+        label B_ub:
+        if (d[26]:int) { d[1]:int = d[1]:int - 1 }
+        (s ^ (t = i64_extend_i32_s(k))) - t;
+        label B_tb:
+      }
+    stack_pointer = r + 16;
+    if (
+      d[15]:long == 0L - i64_extend_i32_s(d[1]:int - d[2]:int)) goto B_b;
+    if (l != 112) goto B_hd;
+    if (eqz(i)) goto B_hd;
+    i[0]:int = s;
+    goto B_qa;
+    label B_hd:
+    function_358(i, n, s);
+    goto B_qa;
+    label B_ua:
+    i[0]:float = function_405(t, s);
+    goto B_qa;
+    label B_ta:
+    i[0]:double = function_260(t, s);
+    goto B_qa;
+    label B_sa:
+    i[0]:long = t;
+    i[1]:long = s;
+    goto B_qa;
+    label B_ra:
+    e = select_if(h + 1, 31, k = l == 99);
+    n = n != 1;
+    if (eqz(n)) {
+      a = i;
+      if (m) {
+        a = malloc(e << 2);
+        if (eqz(a)) goto B_e;
+      }
+      g[37]:long = 0L;
+      b = 0;
+      loop L_md {
+        c = {
+              c = d[1]:int;
+              if (c < d[26]:int) {
+                d[1]:int = c + 1;
+                c[0];
+                goto B_nd;
+              }
+              function_30(d);
+              label B_nd:
+            }
+        if (eqz((c + g)[33]:ubyte)) goto B_jd;
+        g[27]:byte = c;
+        c = function_184(g + 28, g + 27, 1, g + 296);
+        if (c == -2) continue L_md;
+        j = 0;
+        if (c == -1) {
+          c = a;
+          goto B_d;
+        }
+        if (a) {
+          a[b]:int = g[7]:int;
+          b = b + 1;
+        }
+        if (eqz(m & b == e)) continue L_md;
+        b = e;
+        h = b << 1 | 1;
+        e = h;
+        c = a;
+        a = function_183(c, h << 2);
+        if (a) continue L_md;
+      }
+      goto B_d;
+    }
+    if (m) {
+      b = 0;
+      h = malloc(e);
+      if (eqz(h)) goto B_e;
+      loop L_sd {
+        j = h;
+        loop L_td {
+          a = {
+                a = d[1]:int;
+                if (a < d[26]:int) {
+                  d[1]:int = a + 1;
+                  a[0]:ubyte;
+                  goto B_ud;
+                }
+                function_30(d);
+                label B_ud:
+              }
+          if (eqz((a + g)[33]:ubyte)) {
+            a = 0;
+            goto B_id;
+          }
+          (b + j)[0]:byte = a;
+          b = b + 1;
+          if (b != e) continue L_td;
+        }
+        c = 0;
+        b = e;
+        a = b << 1 | 1;
+        e = a;
+        h = function_183(j, a);
+        if (h) continue L_sd;
+      }
+      goto B_d;
+    }
+    b = 0;
+    if (i) {
+      loop L_yd {
+        a = {
+              a = d[1]:int;
+              if (a < d[26]:int) {
+                d[1]:int = a + 1;
+                a[0]:ubyte;
+                goto B_zd;
+              }
+              function_30(d);
+              label B_zd:
+            }
+        if ((a + g)[33]:ubyte) {
+          (b + i)[0]:byte = a;
+          b = b + 1;
+          continue L_yd;
+        } else {
+          a = 0;
+          j = i;
+          goto B_id;
+        }
+        unreachable;
+      }
+      unreachable;
+    }
+    loop L_ce {
+      if (({
+             a = d[1]:int;
+             if (a < d[26]:int) {
+               d[1]:int = a + 1;
+               a[0]:ubyte;
+               goto B_de;
+             }
+             function_30(d);
+             label B_de:
+           } +
+           g)[33]:ubyte) continue L_ce
+    }
+    j = 0;
+    a = 0;
+    goto B_id;
+    label B_jd:
+    j = 0;
+    c = a;
+    if (if (g + 296) { g[74]:int } else { 0 }) goto B_d;
+    label B_id:
+    h = d[1]:int;
+    if (d[26]:int) { d[1]:int = (h = h - 1) }
+    t = d[15]:long + i64_extend_i32_s(h - d[2]:int);
+    if (eqz(t)) goto B_g;
+    if (select_if(l == 99, 0, s != t)) goto B_g;
+    if (eqz(m)) goto B_he;
+    if (eqz(n)) {
+      i[0]:int = a;
+      goto B_he;
+    }
+    i[0]:int = j;
+    label B_he:
+    if (k) goto B_je;
+    if (a) { a[b]:int = 0 }
+    if (eqz(j)) {
+      j = 0;
+      goto B_je;
+    }
+    (b + j)[0]:byte = 0;
+    label B_je:
+    c = a;
+    label B_qa:
+    u = i64_extend_i32_s(d[1]:int - d[2]:int) + d[15]:long + u;
+    p = p + (i != 0);
+    label B_h:
+    b = f + 1;
+    f = f[1]:ubyte;
+    if (f) continue L_f;
+    goto B_a;
+    label B_g:
+  }
+  c = a;
+  goto B_b;
+  label B_e:
+  j = 0;
+  c = 0;
+  label B_d:
+  if (p) goto B_b;
+  label B_c:
+  p = -1;
+  label B_b:
+  if (eqz(m)) goto B_a;
+  free(j);
+  free(c);
+  label B_a:
+  stack_pointer = g + 304;
+  a = p;
+  stack_pointer = d + 144;
+  return a;
+}
+
+function function_358(a:int, b:int, c:long) { // func358
+  if (eqz(a)) goto B_a;
+  br_table[B_e, B_d, B_c, B_c, B_a, B_b, ..B_a](b + 2)
+  label B_e:
+  a[0]:byte = c;
+  return ;
+  label B_d:
+  a[0]:short = c;
+  return ;
+  label B_c:
+  a[0]:int = c;
+  return ;
+  label B_b:
+  a[0]:long = c;
+  label B_a:
+}
+
+function function_359(a:int_ptr, b:int) { // func359
+  var c:int_ptr = a[0];
+  if (eqz(c)) goto B_a;
+  if ({
+        var d:int_ptr = c[6];
+        if (d == c[7]) {
+          call_indirect(c, b, (c[0])[13]:int);
+          goto B_b;
+        }
+        c[6] = d + 4;
+        d[0] = b;
+        b;
+        label B_b:
+      } !=
+      -1) goto B_a;
+  a[0] = 0;
+  label B_a:
+}
+
+function function_360(a:int_ptr, b:int) { // func360
+  var c:int = a[0];
+  if (eqz(c)) goto B_a;
+  if (function_365(c, b) != -1) goto B_a;
+  a[0] = 0;
+  label B_a:
+}
+
+function function_361(a:int_ptr):int { // func361
+  var b:int_ptr = a[3];
+  if (b == a[4]) { return call_indirect(a, (a[0])[10]:int) }
+  a[3] = b + 4;
+  return b[0];
+}
+
+function function_362(a:int_ptr):int { // func362
+  var b:int_ptr = a[0];
+  if (b) {
+    if ({
+          var c:int_ptr = b[3];
+          if (c == b[4]) {
+            call_indirect(b, (b[0])[9]:int);
+            goto B_b;
+          }
+          c[0];
+          label B_b:
+        } !=
+        -1) {
+      return eqz(a[0])
+    }
+    a[0] = 0;
+  }
+  return 1;
+}
+
+function function_363(a:int, b:int):int { // func363
+  return (function_362(a) ^ function_362(b)) ^ 1
+}
+
+function createStingerR1PetalBehavior():int { // func364
+  var a:int_ptr = operatorNewOrAbort(4);
+  a[0] = 5476;
+  return a;
+}
+
+function function_365(a:int_ptr, b:int):int { // func365
+  var c:byte_ptr = a[6];
+  if (c == a[7]) { return call_indirect(a, b & 255, (a[0])[13]:int) }
+  a[6] = c + 1;
+  c[0] = b;
+  return b & 255;
+}
+
+function function_366(a:int_ptr):int { // func366
+  var b:ubyte_ptr = a[3];
+  if (b == a[4]) { return call_indirect(a, (a[0])[10]:int) }
+  a[3] = b + 1;
+  return b[0];
+}
+
+function function_367(a:int_ptr):int { // func367
+  var b:int_ptr = a[0];
+  if (b) {
+    if ({
+          var c:ubyte_ptr = b[3];
+          if (c == b[4]) {
+            call_indirect(b, (b[0])[9]:int);
+            goto B_b;
+          }
+          c[0];
+          label B_b:
+        } !=
+        -1) {
+      return eqz(a[0])
+    }
+    a[0] = 0;
+  }
+  return 1;
+}
+
+function function_368(a:int, b:int):int { // func368
+  return (function_367(a) ^ function_367(b)) ^ 1
+}
+
+function function_369(a:int) { // func369
+  free(function_241(a))
+}
+
+function function_370(a:int, b:int):int { // func370
+  return -1
+}
+
+function function_371(a:{ a:int, b:int }) { // func371
+  a.a =
+    {
+      if (8570708[0]:ubyte & 1) goto B_b;
+      if (eqz(cxaGuardAcquire(8570708))) goto B_b;
+      if (8570696[0]:ubyte & 1) goto B_c;
+      if (eqz(cxaGuardAcquire(8570696))) goto B_c;
+      8572308[0]:int = 0;
+      8572304[0]:int = 18828;
+      8572304[0]:int = 13816;
+      8572304[0]:int = 13368;
+      8572320[0]:long = 0L;
+      8572336[0]:int = 0;
+      8572480[0]:byte = 0;
+      if (function_305() <= 29) {
+        function_58();
+        unreachable;
+      }
+      8572320[0]:int = (a = function_304(8572352, 30));
+      8572324[0]:int = a;
+      8572336[0]:int = a + 120;
+      function_306(30);
+      function_123(8572496, 3608);
+      8572324[0]:int = 8572320[0]:int;
+      8571988[0]:int = 0;
+      8571984[0]:int = 18828;
+      8571984[0]:int = 13816;
+      8571984[0]:int = 14692;
+      function_39(8571984, function_38(8570520));
+      8571996[0]:int = 0;
+      8571992[0]:int = 18828;
+      8571992[0]:int = 13816;
+      8571992[0]:int = 14724;
+      function_39(8571992, function_38(8570528));
+      8572004[0]:int = 0;
+      8572000[0]:int = 18828;
+      8572000[0]:int = 13816;
+      8572000[0]:int = 13388;
+      8572008[0]:int = 9328;
+      8572012[0]:byte = 0;
+      function_39(8572000, function_38(8570724));
+      8572020[0]:int = 0;
+      8572016[0]:int = 18828;
+      8572016[0]:int = 13816;
+      8572016[0]:int = 13872;
+      function_39(8572016, function_38(8570716));
+      8572028[0]:int = 0;
+      8572024[0]:int = 18828;
+      8572024[0]:int = 13816;
+      8572024[0]:int = 14020;
+      function_39(8572024, function_38(8570732));
+      8572036[0]:int = 0;
+      8572032[0]:int = 18828;
+      8572032[0]:int = 13816;
+      8572032[0]:int = 13440;
+      8572040[0]:int = function_33();
+      function_39(8572032, function_38(8570740));
+      8572052[0]:int = 0;
+      8572048[0]:int = 18828;
+      8572048[0]:int = 13816;
+      8572048[0]:int = 14168;
+      function_39(8572048, function_38(8570748));
+      8572060[0]:int = 0;
+      8572056[0]:int = 18828;
+      8572056[0]:int = 13816;
+      8572056[0]:int = 14284;
+      function_39(8572056, function_38(8570756));
+      8572068[0]:int = 0;
+      8572064[0]:int = 18828;
+      8572064[0]:int = 13816;
+      8572072[0]:short = 11310;
+      8572064[0]:int = 13488;
+      clearThreeWords(8572076);
+      function_39(8572064, function_38(8570764));
+      8572100[0]:int = 0;
+      8572096[0]:int = 18828;
+      8572096[0]:int = 13816;
+      8572104[0]:long = 188978561070L;
+      8572096[0]:int = 13528;
+      clearThreeWords(8572112);
+      function_39(8572096, function_38(8570772));
+      8572132[0]:int = 0;
+      8572128[0]:int = 18828;
+      8572128[0]:int = 13816;
+      8572128[0]:int = 14756;
+      function_39(8572128, function_38(8570536));
+      8572140[0]:int = 0;
+      8572136[0]:int = 18828;
+      8572136[0]:int = 13816;
+      8572136[0]:int = 15000;
+      function_39(8572136, function_38(8570544));
+      8572148[0]:int = 0;
+      8572144[0]:int = 18828;
+      8572144[0]:int = 13816;
+      8572144[0]:int = 15212;
+      function_39(8572144, function_38(8570552));
+      8572156[0]:int = 0;
+      8572152[0]:int = 18828;
+      8572152[0]:int = 13816;
+      8572152[0]:int = 15444;
+      function_39(8572152, function_38(8570560));
+      8572164[0]:int = 0;
+      8572160[0]:int = 18828;
+      8572160[0]:int = 13816;
+      8572160[0]:int = 16428;
+      function_39(8572160, function_38(8570600));
+      8572172[0]:int = 0;
+      8572168[0]:int = 18828;
+      8572168[0]:int = 13816;
+      8572168[0]:int = 16576;
+      function_39(8572168, function_38(8570608));
+      8572180[0]:int = 0;
+      8572176[0]:int = 18828;
+      8572176[0]:int = 13816;
+      8572176[0]:int = 16692;
+      function_39(8572176, function_38(8570616));
+      8572188[0]:int = 0;
+      8572184[0]:int = 18828;
+      8572184[0]:int = 13816;
+      8572184[0]:int = 16808;
+      function_39(8572184, function_38(8570624));
+      8572196[0]:int = 0;
+      8572192[0]:int = 18828;
+      8572192[0]:int = 13816;
+      8572192[0]:int = 16924;
+      function_39(8572192, function_38(8570632));
+      8572204[0]:int = 0;
+      8572200[0]:int = 18828;
+      8572200[0]:int = 13816;
+      8572200[0]:int = 17088;
+      function_39(8572200, function_38(8570640));
+      8572212[0]:int = 0;
+      8572208[0]:int = 18828;
+      8572208[0]:int = 13816;
+      8572208[0]:int = 17252;
+      function_39(8572208, function_38(8570648));
+      8572220[0]:int = 0;
+      8572216[0]:int = 18828;
+      8572216[0]:int = 13816;
+      8572216[0]:int = 17416;
+      function_39(8572216, function_38(8570656));
+      8572228[0]:int = 0;
+      8572224[0]:int = 18828;
+      8572224[0]:int = 13816;
+      8572232[0]:int = 18672;
+      8572232[0]:int = 15692;
+      8572224[0]:int = 15644;
+      function_39(8572224, function_38(8570568));
+      8572244[0]:int = 0;
+      8572240[0]:int = 18828;
+      8572240[0]:int = 13816;
+      8572248[0]:int = 18708;
+      8572248[0]:int = 15956;
+      8572240[0]:int = 15908;
+      function_39(8572240, function_38(8570576));
+      8572260[0]:int = 0;
+      8572256[0]:int = 18828;
+      8572256[0]:int = 13816;
+      function_302(8572264);
+      8572256[0]:int = 16144;
+      function_39(8572256, function_38(8570584));
+      8572276[0]:int = 0;
+      8572272[0]:int = 18828;
+      8572272[0]:int = 13816;
+      function_302(8572280);
+      8572272[0]:int = 16300;
+      function_39(8572272, function_38(8570592));
+      8572292[0]:int = 0;
+      8572288[0]:int = 18828;
+      8572288[0]:int = 13816;
+      8572288[0]:int = 17580;
+      function_39(8572288, function_38(8570664));
+      8572300[0]:int = 0;
+      8572296[0]:int = 18828;
+      8572296[0]:int = 13816;
+      8572296[0]:int = 17700;
+      function_39(8572296, function_38(8570672));
+      8570688[0]:int = 8572304;
+      8570692[0]:int = 8570688;
+      cxaGuardRelease(8570696);
+      label B_c:
+      8570700[0]:int = (a = (8570692[0]:int)[0]:int);
+      a.b = a.b + 1;
+      8570704[0]:int = 8570700;
+      cxaGuardRelease(8570708);
+      label B_b:
+      a = (8570704[0]:int)[0]:int;
+      label B_a:
+    }
+  a.b = a.b + 1;
+}
+
+function function_372(a:int_ptr, b:int):int { // func372
+  var f:int_ptr;
+  var c:int_ptr;
+  var i:int;
+  var e:int_ptr = stack_pointer - 16;
+  stack_pointer = e;
+  var g:int = 1;
+  br_table[B_a, B_a, B_f, B_e, B_d, B_c, ..B_b](b - a >> 2)
+  label B_f:
+  c = b - 4;
+  if (c[0] >= a[0]) goto B_a;
+  b = a[0];
+  a[0] = c[0];
+  c[0] = b;
+  goto B_a;
+  label B_e:
+  function_137(a, a + 4, b - 4);
+  goto B_a;
+  label B_d:
+  function_244(a, a + 4, a + 8, b - 4);
+  goto B_a;
+  label B_c:
+  function_243(a, a + 4, a + 8, a + 12, b - 4);
+  goto B_a;
+  label B_b:
+  function_137(a, a + 4, f = a + 8);
+  var d:int_ptr = a + 12;
+  loop L_g {
+    if (b == d) goto B_a;
+    if (d[0] < f[0]) {
+      e[3] = d[0];
+      var h:int_ptr = d;
+      loop L_j {
+        h[0] = (c = f)[0];
+        if (a == c) {
+          c = a;
+          goto B_k;
+        }
+        h = c;
+        if (e[3] < (f = c - 4)[0]) continue L_j;
+        label B_k:
+      }
+      c[0] = e[3];
+      i = i + 1;
+      if (i == 8) goto B_h;
+    }
+    f = d;
+    d = f + 4;
+    continue L_g;
+    label B_h:
+  }
+  g = d + 4 == b;
+  label B_a:
+  stack_pointer = e + 16;
+  return g;
+}
+
+function function_373(a:ubyte_ptr, b:int_ptr, c:int, d:long):long { // func373
+  var f:int;
+  var e:int;
+  var g:int;
+  var l:long;
+  var o:long;
+  var j:int;
+  var h:int;
+  var i:long_ptr = stack_pointer - 16;
+  stack_pointer = i;
+  if (c <= 36) {
+    f = a[0];
+    if (f) goto B_c;
+    e = a;
+    goto B_b;
+  }
+  8569384[0]:int = 28;
+  d = 0L;
+  goto B_a;
+  label B_c:
+  e = a;
+  loop L_f {
+    g = (f << 24) >> 24;
+    if (eqz(g == 32 | g - 9 < 5)) goto B_e;
+    f = e[1]:ubyte;
+    g = e + 1;
+    e = g;
+    if (f) continue L_f;
+  }
+  e = g;
+  goto B_b;
+  label B_e:
+  f = f & 255;
+  br_table[B_g, B_b, B_g, ..B_b](f - 43);
+  label B_g:
+  h = select_if(-1, 0, f == 45);
+  e = e + 1;
+  label B_b:
+  var k:int = {
+                if (c & -17) goto B_i;
+                if (e[0]:ubyte != 48) goto B_i;
+                j = 1;
+                if ((e[1]:ubyte & 223) == 88) {
+                  e = e + 2;
+                  16;
+                  goto B_h;
+                }
+                e = e + 1;
+                select_if(c, 8, c);
+                goto B_h;
+                label B_i:
+                select_if(c, 10, c);
+                label B_h:
+              }
+  var m:long = i64_extend_i32_s(k);
+  c = 0;
+  loop L_k {
+    f = -48;
+    g = e[0]:byte;
+    if ((g - 48 & 255) < 10) goto B_m;
+    f = -87;
+    if ((g - 97 & 255) < 26) goto B_m;
+    f = -55;
+    if ((g - 65 & 255) > 25) goto B_l;
+    label B_m:
+    g = f + g;
+    if (g >= k) goto B_l;
+    function_50(i, m, 0L, l, 0L);
+    f = 1;
+    if (i[1] != 0L) goto B_n;
+    var n:long = l * m;
+    if (n > ((o = i64_extend_i32_s(g)) ^ -1L)) goto B_n;
+    l = n + o;
+    j = 1;
+    f = c;
+    label B_n:
+    e = e + 1;
+    c = f;
+    continue L_k;
+    label B_l:
+  }
+  if (b) { b[0] = select_if(e, a, j) }
+  if (c) {
+    8569384[0]:int = 68;
+    h = select_if(h, 0, eqz(m = d & 1L));
+    l = d;
+    goto B_q;
+  }
+  if (d > l) goto B_p;
+  m = d & 1L;
+  label B_q:
+  if (i32_wrap_i64(m)) goto B_s;
+  if (h) goto B_s;
+  8569384[0]:int = 68;
+  d = d - 1L;
+  goto B_a;
+  label B_s:
+  if (d >= l) goto B_p;
+  8569384[0]:int = 68;
+  goto B_a;
+  label B_p:
+  d = (l ^ (d = i64_extend_i32_s(h))) - d;
+  label B_a:
+  stack_pointer = i + 16;
+  return d;
+}
+
+function function_374(a:int_ptr, b:ubyte_ptr):long { // func374
+  var d:int;
+  var c:ubyte_ptr;
+  var e:int;
+  var f:int;
+  var g:long;
+  d = {
+        c = a[1];
+        if (c < a[26]) {
+          a[1] = c + 1;
+          c[0];
+          goto B_d;
+        }
+        function_30(a);
+        label B_d:
+      }
+  br_table[B_b, B_c, B_b, ..B_c](d - 43);
+  label B_c:
+  e = d - 48;
+  goto B_a;
+  label B_b:
+  f = d == 45;
+  c = {
+        c = a[1];
+        if (c < a[26]) {
+          a[1] = c + 1;
+          c[0];
+          goto B_g;
+        }
+        function_30(a);
+        label B_g:
+      }
+  e = c - 48;
+  if (e < 10) goto B_f;
+  if (eqz(b)) goto B_f;
+  if (eqz(a[26])) goto B_f;
+  a[1] = a[1] - 1;
+  label B_f:
+  d = c;
+  label B_a:
+  if (e < 10) {
+    c = 0;
+    loop L_k {
+      b = d + c * 10;
+      d = {
+            c = a[1];
+            if (c < a[26]) {
+              a[1] = c + 1;
+              c[0];
+              goto B_l;
+            }
+            function_30(a);
+            label B_l:
+          }
+      e = d - 48;
+      if (select_if(e <= 9, 0, (c = b - 48) < 214748364)) continue L_k;
+    }
+    g = i64_extend_i32_s(c);
+    if (e >= 10) goto B_n;
+    loop L_o {
+      g = i64_extend_i32_u(d) + g * 10L - 48L;
+      d = {
+            b = a[1];
+            if (b < a[26]) {
+              a[1] = b + 1;
+              b[0];
+              goto B_p;
+            }
+            function_30(a);
+            label B_p:
+          }
+      e = d - 48;
+      if (e > 9) goto B_n;
+      if (g < 92233720368547758L) continue L_o;
+    }
+    label B_n:
+    if (e < 10) {
+      loop L_s {
+        if ({
+              b = a[1];
+              if (b < a[26]) {
+                a[1] = b + 1;
+                b[0];
+                goto B_t;
+              }
+              function_30(a);
+              label B_t:
+            } -
+            48 <
+            10) continue L_s
+      }
+    }
+    if (a[26]) { a[1] = a[1] - 1 }
+    g = select_if(0L - g, g, f);
+    goto B_i;
+  }
+  g = -9223372036854775808L;
+  if (eqz(a[26])) goto B_i;
+  a[1] = a[1] - 1;
+  return -9223372036854775808L;
+  label B_i:
+  return g;
+}
+
+function function_375(a:{ a:long, b:long }, b:int, c:int, d:int_ptr) { // func375
+  var g:int;
+  var h:int;
+  var u:long;
+  var e:int;
+  var v:long;
+  var l:int;
+  var k:int;
+  var x:long;
+  var y:long;
+  var z:long;
+  var w:long;
+  var m:int_ptr;
+  var j:int_ptr;
+  var aa:long;
+  var s:int;
+  var f:int;
+  var i:int;
+  var q:int;
+  var n:{ a:long, b:long, c:long, d:long, e:long, f:long } = 
+    stack_pointer - 48;
+  stack_pointer = n;
+  if (c <= 2) {
+    c = c << 2;
+    var p:int = (c + 7868)[0]:int;
+    var o:int = (c + 7856)[0]:int;
+    loop L_c {
+      c = {
+            c = b[1]:int;
+            if (c < b[26]:int) {
+              b[1]:int = c + 1;
+              c[0]:ubyte;
+              goto B_d;
+            }
+            function_30(b);
+            label B_d:
+          }
+      h = c;
+      if (h == 32 | h - 9 < 5) continue L_c;
+    }
+    h = 1;
+    br_table[B_g, B_f, B_g, ..B_f](c - 43)
+    label B_g:
+    h = select_if(-1, 1, c == 45);
+    c = b[1]:int;
+    if (c < b[26]:int) {
+      b[1]:int = c + 1;
+      c = c[0]:ubyte;
+      goto B_f;
+    }
+    c = function_30(b);
+    label B_f:
+    loop L_k {
+      if ((g + 1472)[0]:byte == (c | 32)) {
+        if (g > 6) goto B_m;
+        c = b[1]:int;
+        if (c < b[26]:int) {
+          b[1]:int = c + 1;
+          c = c[0]:ubyte;
+          goto B_m;
+        }
+        c = function_30(b);
+        label B_m:
+        g = g + 1;
+        if (g != 8) continue L_k;
+        goto B_j;
+      }
+    }
+    if (g != 3) {
+      if (g == 8) goto B_j;
+      if (g < 4) goto B_i;
+      if (eqz(d)) goto B_i;
+      if (g == 8) goto B_j;
+    }
+    c = b[26]:int;
+    if (c) { b[1]:int = b[1]:int - 1 }
+    if (eqz(d)) goto B_j;
+    if (g < 4) goto B_j;
+    loop L_q {
+      if (c) { b[1]:int = b[1]:int - 1 }
+      g = g - 1;
+      if (g > 3) continue L_q;
+    }
+    label B_j:
+    c = stack_pointer - 16;
+    stack_pointer = c;
+    v = 
+      {
+        d = i32_reinterpret_f32(f32_convert_i32_s(h) * inff);
+        b = d & 2147483647;
+        if (b - 8388608 <= 2130706431) {
+          (i64_extend_i32_u(b) << 25L) + 4575657221408423936L;
+          goto B_s;
+        }
+        i64_extend_i32_u(d) << 25L | 9223090561878065152L;
+        if (b >= 2139095040) goto B_s;
+        0L;
+        if (eqz(b)) goto B_s;
+        function_55(c, i64_extend_i32_u(b), 0L, (b = clz(b)) + 81);
+        u = c[0]:long;
+        (c[1]:long ^ 281474976710656L) | i64_extend_i32_u(16265 - b) << 48L;
+        label B_s:
+      }
+    n.a = u;
+    n.b = v | i64_extend_i32_u(d & -2147483648) << 32L;
+    stack_pointer = c + 16;
+    u = n.b;
+    v = n.a;
+    goto B_a;
+    label B_i:
+    if (g) goto B_w;
+    g = 0;
+    loop L_x {
+      if ((g + 2660)[0]:byte != (c | 32)) goto B_w;
+      if (g > 1) goto B_y;
+      c = b[1]:int;
+      if (c < b[26]:int) {
+        b[1]:int = c + 1;
+        c = c[0]:ubyte;
+        goto B_y;
+      }
+      c = function_30(b);
+      label B_y:
+      g = g + 1;
+      if (g != 3) continue L_x;
+    }
+    goto B_v;
+    label B_w:
+    br_table[B_ba, B_aa, B_aa, B_v, ..B_aa](g)
+    label B_ba:
+    if (c != 48) goto B_ca;
+    if (({
+           g = b[1]:int;
+           if (g < b[26]:int) {
+             b[1]:int = g + 1;
+             g[0]:ubyte;
+             goto B_da;
+           }
+           function_30(b);
+           label B_da:
+         } &
+         -33) ==
+        88) {
+      c = 0;
+      f = stack_pointer - 432;
+      stack_pointer = f;
+      b = {
+            g = b;
+            b = g[1]:int;
+            if (b < g[26]:int) {
+              g[1]:int = b + 1;
+              c = b[0]:ubyte;
+              goto B_ha;
+            }
+            0;
+            goto B_ga;
+            label B_ha:
+            1;
+            label B_ga:
+          }
+      loop L_ja {
+        w = {
+              c = {
+                    if (eqz(b)) {
+                      function_30(g);
+                      goto B_ra;
+                    }
+                    if (c != 48) {
+                      y = 4611404543450677248L;
+                      if (c == 46) goto B_pa;
+                      0L;
+                      goto B_oa;
+                    }
+                    b = g[1]:int;
+                    if (b >= g[26]:int) goto B_qa;
+                    j = 1;
+                    g[1]:int = b + 1;
+                    b[0]:ubyte;
+                    label B_ra:
+                  }
+              b = 1;
+              continue L_ja;
+              label B_qa:
+              j = 1;
+              goto B_la;
+              label B_pa:
+              c = {
+                    b = g[1]:int;
+                    if (b < g[26]:int) {
+                      g[1]:int = b + 1;
+                      b[0]:ubyte;
+                      goto B_ua;
+                    }
+                    function_30(g);
+                    label B_ua:
+                  }
+              if (c == 48) goto B_na;
+              e = 1;
+              0L;
+              label B_oa:
+            }
+        goto B_ma;
+        label B_na:
+        loop L_wa {
+          u = u - 1L;
+          e = 1;
+          c = {
+                b = g[1]:int;
+                if (b < g[26]:int) {
+                  g[1]:int = b + 1;
+                  b[0]:ubyte;
+                  goto B_xa;
+                }
+                function_30(g);
+                label B_xa:
+              }
+          if (c == 48) continue L_wa;
+        }
+        j = 1;
+        label B_ma:
+        loop L_za {
+          i = c | 32;
+          l = c - 48;
+          if (l < 10) goto B_bb;
+          if (i - 97 < 6) goto B_cb;
+          if (c == 46) goto B_cb;
+          b = c;
+          goto B_ka;
+          label B_cb:
+          b = 46;
+          if (c != 46) goto B_bb;
+          if (e) goto B_ka;
+          e = 1;
+          u = v;
+          goto B_ab;
+          label B_bb:
+          b = select_if(i - 87, l, c > 57);
+          if (v <= 7L) {
+            k = b + (k << 4);
+            goto B_db;
+          }
+          if (v <= 28L) {
+            function_72(f + 48, b);
+            function_36(f + 32, x, y, 0L, 4610278643543834624L);
+            function_36(f + 16, x = f[4]:long, y = f[5]:long, f[6]:long, f[7]:long);
+            function_66(f, z, w, f[2]:long, f[3]:long);
+            w = f[1]:long;
+            z = f[0]:long;
+            goto B_db;
+          }
+          if (eqz(b)) goto B_db;
+          if (m) goto B_db;
+          function_36(f + 80, x, y, 0L, 4611123068473966592L);
+          function_66(f - -64, z, w, f[10]:long, f[11]:long);
+          w = f[9]:long;
+          m = 1;
+          z = f[8]:long;
+          label B_db:
+          v = v + 1L;
+          j = 1;
+          label B_ab:
+          b = g[1]:int;
+          c = if (b < g[26]:int) {
+                g[1]:int = b + 1;
+                b[0]:ubyte;
+              } else {
+                function_30(g)
+              }
+          continue L_za;
+        }
+        unreachable;
+        label B_la:
+        b = 0;
+        continue L_ja;
+        label B_ka:
+      }
+      v = 
+        {
+          if (eqz(j)) {
+            if (eqz(g[26]:int)) {
+              if (d) goto B_ib;
+              goto B_jb;
+            }
+            g[1]:int = (b = g[1]:int) - 1;
+            if (eqz(d)) goto B_jb;
+            g[1]:int = b - 2;
+            if (eqz(e)) goto B_ib;
+            g[1]:int = b - 3;
+            goto B_ib;
+          }
+          if (v <= 7L) {
+            y = v;
+            loop L_nb {
+              k = k << 4;
+              y = y + 1L;
+              if (y != 8L) continue L_nb;
+            }
+          }
+          if ((b & -33) == 80) {
+            y = function_374(g, d);
+            if (y != -9223372036854775808L) goto B_ob;
+            if (d) {
+              if (g[26]:int) goto B_qb;
+              goto B_pb;
+            }
+            z = 0L;
+            function_83(g, 0L);
+            0L;
+            goto B_hb;
+          }
+          if (eqz(g[26]:int)) goto B_pb;
+          label B_qb:
+          g[1]:int = g[1]:int - 1;
+          label B_pb:
+          y = 0L;
+          label B_ob:
+          if (eqz(k)) {
+            function_93(f + 112, f64_convert_i32_s(h) * 0.0);
+            z = f[14]:long;
+            f[15]:long;
+            goto B_hb;
+          }
+          v = (select_if(u, v, e) << 2L) + y - 32L;
+          if (v > i64_extend_i32_u(0 - p)) {
+            8569384[0]:int = 68;
+            function_72(f + 160, h);
+            function_36(f + 144, f[20]:long, f[21]:long, -1L, 9223090561878065151L);
+            function_36(f + 128, f[18]:long, f[19]:long, -1L, 9223090561878065151L);
+            z = f[16]:long;
+            f[17]:long;
+            goto B_hb;
+          }
+          if (i64_extend_i32_s(p - 226) <= v) {
+            if (k > -1) {
+              loop L_xb {
+                function_66(f + 416, z, w, 0L, -4611967493404098560L);
+                b = function_263(z, w, 4611123068473966592L);
+                function_66(f + 400,
+                            z,
+                            w,
+                            select_if(z, f[52]:long, c = b < 0),
+                            select_if(w, f[53]:long, c));
+                v = v - 1L;
+                w = f[51]:long;
+                z = f[50]:long;
+                k = k << 1 | b > -1;
+                if (k > -1) continue L_xb;
+              }
+            }
+            y = 
+              {
+                u = v - i64_extend_i32_s(p) + 32L;
+                b = i32_wrap_i64(u);
+                b = select_if(select_if(b, 0, b > 0), o, u < i64_extend_i32_u(o));
+                if (b >= 113) {
+                  function_72(f + 384, h);
+                  u = f[49]:long;
+                  x = f[48]:long;
+                  0L;
+                  goto B_yb;
+                }
+                function_93(f + 352, function_107(1.0, 144 - b));
+                function_72(f + 336, h);
+                function_377(f + 368, f[44]:long, f[45]:long, x = f[42]:long, u = f[43]:long);
+                aa = f[47]:long;
+                f[46]:long;
+                label B_yb:
+              }
+            function_142(
+              f + 320,
+              k + (b = eqz(k & 1) & (function_129(z, w, 0L, 0L) != 0 & b < 32)));
+            function_36(f + 304, x, u, f[40]:long, f[41]:long);
+            function_66(f + 272, f[38]:long, f[39]:long, y, aa);
+            function_36(f + 288, select_if(0L, z, b), select_if(0L, w, b), x, u);
+            function_66(f + 256, f[36]:long, f[37]:long, f[34]:long, f[35]:long);
+            function_258(f + 240, f[32]:long, f[33]:long, y, aa);
+            u = f[30]:long;
+            if (eqz(function_129(u, y = f[31]:long, 0L, 0L))) { 8569384[0]:int = 68 }
+            function_376(f + 224, u, y, i32_wrap_i64(v));
+            z = f[28]:long;
+            f[29]:long;
+            goto B_hb;
+          }
+          8569384[0]:int = 68;
+          function_72(f + 208, h);
+          function_36(f + 192, f[26]:long, f[27]:long, 0L, 281474976710656L);
+          function_36(f + 176, f[24]:long, f[25]:long, 0L, 281474976710656L);
+          z = f[22]:long;
+          f[23]:long;
+          goto B_hb;
+          label B_jb:
+          function_83(g, 0L);
+          label B_ib:
+          function_93(f + 96, f64_convert_i32_s(h) * 0.0);
+          z = f[12]:long;
+          f[13]:long;
+          label B_hb:
+        }
+      n.c = z;
+      n.d = v;
+      stack_pointer = f + 432;
+      u = n.d;
+      v = n.c;
+      goto B_a;
+    }
+    if (eqz(b[26]:int)) goto B_ca;
+    b[1]:int = b[1]:int - 1;
+    label B_ca:
+    f = b;
+    k = h;
+    h = 0;
+    g = 0;
+    e = stack_pointer - 8976;
+    stack_pointer = e;
+    var t:int = 0 - (s = o + p);
+    c = {
+          loop L_dc {
+            if (c != 48) {
+              if (c != 46) goto B_bc;
+              b = f[1]:int;
+              if (b >= f[26]:int) goto B_fc;
+              f[1]:int = b + 1;
+              b[0]:ubyte;
+              goto B_cc;
+              label B_fc:
+            } else {
+              b = f[1]:int;
+              c = if (b < f[26]:int) {
+                    h = 1;
+                    f[1]:int = b + 1;
+                    b[0]:ubyte;
+                  } else {
+                    h = 1;
+                    function_30(f);
+                  }
+              continue L_dc;
+            }
+          }
+          function_30(f);
+          label B_cc:
+        }
+    i = 1;
+    if (c != 48) goto B_bc;
+    loop L_hc {
+      u = u - 1L;
+      c = {
+            b = f[1]:int;
+            if (b < f[26]:int) {
+              f[1]:int = b + 1;
+              b[0]:ubyte;
+              goto B_ic;
+            }
+            function_30(f);
+            label B_ic:
+          }
+      if (c == 48) continue L_hc;
+    }
+    h = 1;
+    label B_bc:
+    e[196]:int = 0;
+    b = c == 46;
+    if (select_if(b, 1, (j = c - 48) > 9)) {
+      loop L_rc {
+        if (b & 1) {
+          if (eqz(i)) {
+            u = v;
+            i = 1;
+            goto B_sc;
+          }
+          b = eqz(h);
+          goto B_pc;
+        }
+        v = v + 1L;
+        if (g <= 2044) {
+          m = select_if(m, i32_wrap_i64(v), c == 48);
+          b = e + 784 + (g << 2);
+          b[0]:int = if (l) { c + b[0]:int * 10 - 48 } else { j }
+          h = 1;
+          l = select_if(0, b = l + 1, b = b == 9);
+          g = b + g;
+          goto B_sc;
+        }
+        if (c == 48) goto B_sc;
+        e[2240]:int = e[2240]:int | 1;
+        m = 18396;
+        label B_sc:
+        c = {
+              b = f[1]:int;
+              if (b < f[26]:int) {
+                f[1]:int = b + 1;
+                b[0]:ubyte;
+                goto B_xc;
+              }
+              function_30(f);
+              label B_xc:
+            }
+        j = c - 48;
+        b = c == 46;
+        if (b) continue L_rc;
+        if (j < 10) continue L_rc;
+      }
+    }
+    u = select_if(u, v, i);
+    if (eqz(h)) goto B_zc;
+    if ((c & -33) != 69) goto B_zc;
+    x = function_374(f, d);
+    if (x != -9223372036854775808L) goto B_ad;
+    if (eqz(d)) goto B_mc;
+    x = 0L;
+    if (eqz(f[26]:int)) goto B_ad;
+    f[1]:int = f[1]:int - 1;
+    label B_ad:
+    if (eqz(h)) goto B_nc;
+    u = u + x;
+    goto B_lc;
+    label B_zc:
+    b = eqz(h);
+    if (c < 0) goto B_oc;
+    label B_pc:
+    if (eqz(f[26]:int)) goto B_oc;
+    f[1]:int = f[1]:int - 1;
+    label B_oc:
+    if (eqz(b)) goto B_lc;
+    label B_nc:
+    8569384[0]:int = 28;
+    label B_mc:
+    v = 0L;
+    function_83(f, 0L);
+    u = 0L;
+    goto B_kc;
+    label B_lc:
+    b = e[196]:int;
+    if (eqz(b)) {
+      function_93(e, f64_convert_i32_s(k) * 0.0);
+      u = e[1]:long;
+      v = e[0]:long;
+      goto B_kc;
+    }
+    if (v > 9L) goto B_cd;
+    if (u != v) goto B_cd;
+    if (select_if(o <= 30, 0, b >> o)) goto B_cd;
+    function_72(e + 48, k);
+    function_142(e + 32, b);
+    function_36(e + 16, e[6]:long, e[7]:long, e[4]:long, e[5]:long);
+    u = e[3]:long;
+    v = e[2]:long;
+    goto B_kc;
+    label B_cd:
+    if (i64_extend_i32_u(p / -2) < u) {
+      8569384[0]:int = 68;
+      function_72(e + 96, k);
+      function_36(e + 80, e[12]:long, e[13]:long, -1L, 9223090561878065151L);
+      function_36(e - -64, e[10]:long, e[11]:long, -1L, 9223090561878065151L);
+      u = e[9]:long;
+      v = e[8]:long;
+      goto B_kc;
+    }
+    if (i64_extend_i32_s(p - 226) > u) {
+      8569384[0]:int = 68;
+      function_72(e + 144, k);
+      function_36(e + 128, e[18]:long, e[19]:long, 0L, 281474976710656L);
+      function_36(e + 112, e[16]:long, e[17]:long, 0L, 281474976710656L);
+      u = e[15]:long;
+      v = e[14]:long;
+      goto B_kc;
+    }
+    if (l) {
+      if (l <= 8) {
+        b = e + 784 + (g << 2);
+        f = b[0]:int;
+        loop L_hd {
+          f = f * 10;
+          l = l + 1;
+          if (l != 9) continue L_hd;
+        }
+        b[0]:int = f;
+      }
+      g = g + 1;
+    }
+    i = i32_wrap_i64(u);
+    if (m > 8) goto B_id;
+    if (i < m) goto B_id;
+    if (i > 17) goto B_id;
+    if (i == 9) {
+      function_72(e + 192, k);
+      function_142(e + 176, e[196]:int);
+      function_36(e + 160, e[24]:long, e[25]:long, e[22]:long, e[23]:long);
+      u = e[21]:long;
+      v = e[20]:long;
+      goto B_kc;
+    }
+    if (i <= 8) {
+      function_72(e + 272, k);
+      function_142(e + 256, e[196]:int);
+      function_36(e + 240, e[34]:long, e[35]:long, e[32]:long, e[33]:long);
+      function_72(e + 224, ((0 - i << 2) + 7856)[0]:int);
+      function_291(e + 208, e[30]:long, e[31]:long, e[28]:long, e[29]:long);
+      u = e[27]:long;
+      v = e[26]:long;
+      goto B_kc;
+    }
+    b = o + i * -3 + 27;
+    if (select_if(b <= 30, 0, (c = e[196]:int) >> b)) goto B_id;
+    function_72(e + 352, k);
+    function_142(e + 336, c);
+    function_36(e + 320, e[44]:long, e[45]:long, e[42]:long, e[43]:long);
+    function_72(e + 304, ((i << 2) + 7784)[0]:int);
+    function_36(e + 288, e[40]:long, e[41]:long, e[38]:long, e[39]:long);
+    u = e[37]:long;
+    v = e[36]:long;
+    goto B_kc;
+    label B_id:
+    loop L_ld {
+      if (eqz((e + 784)[g = (c = g) - 1]:int)) continue L_ld
+    }
+    b = i % 9;
+    if (eqz(b)) {
+      l = 0;
+      b = 0;
+      goto B_md;
+    }
+    d = select_if(b, b + 9, i > -1);
+    l = 0;
+    if (eqz(c)) {
+      b = 0;
+      c = 0;
+      goto B_od;
+    }
+    g = 1000000000 / (h = ((0 - d << 2) + 7856)[0]:int);
+    j = 0;
+    f = 0;
+    b = 0;
+    loop L_qd {
+      m = e + 784 + (f << 2);
+      m[0] = (j = j + (q = (m = m[0]) / h));
+      b = select_if(b + 1 & 2047, b, j = eqz(j) & b == f);
+      i = select_if(i - 9, i, j);
+      j = g * (m - h * q);
+      f = f + 1;
+      if (f != c) continue L_qd;
+    }
+    if (eqz(j)) goto B_od;
+    (e + 784)[c]:int = j;
+    c = c + 1;
+    label B_od:
+    i = i - d + 9;
+    label B_md:
+    loop L_rd {
+      g = e + 784 + (b << 2);
+      f = i < 36;
+      loop L_sd {
+        if (f) goto B_td;
+        if (i == 36) {
+          if (g[0]:int <= 10384592) goto B_td;
+          i = 36;
+        }
+        loop L_wd {
+          d = c + 1 & 2047;
+          j = e + 784 + ((c - 1 & 2047) << 2);
+          loop L_xd {
+            g = select_if(9, 1, i > 45);
+            loop L_zd {
+              h = b;
+              f = 0;
+              loop L_be {
+                b = f + h & 2047;
+                if (b == c) goto B_ce;
+                b = (e + 784)[b]:int;
+                if (b < (m = ((f << 2) + 7808)[0]:int)) goto B_ce;
+                if (b > m) goto B_ae;
+                f = f + 1;
+                if (f != 4) continue L_be;
+                label B_ce:
+              }
+              if (i != 36) goto B_ae;
+              u = 0L;
+              f = 0;
+              v = 0L;
+              loop L_de {
+                if (c == (b = f + h & 2047)) {
+                  c = c + 1 & 2047;
+                  ((c << 2) + e)[195]:int = 0;
+                }
+                function_36(e + 768, u, v, 0L, 4619810130798575616L);
+                function_142(e + 752, (e + 784)[b]:int);
+                function_66(e + 736, e[96]:long, e[97]:long, e[94]:long, e[95]:long);
+                v = e[93]:long;
+                u = e[92]:long;
+                f = f + 1;
+                if (f != 4) continue L_de;
+              }
+              function_72(e + 720, k);
+              function_36(e + 704, u, v, e[90]:long, e[91]:long);
+              v = e[89]:long;
+              u = 0L;
+              x = e[88]:long;
+              i = l + 113;
+              d = i - p;
+              b = select_if(select_if(d, 0, d > 0), o, g = d < o);
+              if (b <= 112) goto B_yd;
+              goto B_vd;
+              label B_ae:
+              l = g + l;
+              if (h == (b = c)) continue L_zd;
+            }
+            m = 1000000000 >> g;
+            q = -1 << g ^ -1;
+            f = 0;
+            b = h;
+            loop L_fe {
+              var r:int_ptr = e + 784 + (h << 2);
+              r[0] = (f = f + ((r = r[0]) >> g));
+              b = select_if(b + 1 & 2047, b, f = eqz(f) & b == h);
+              i = select_if(i - 9, i, f);
+              f = (q & r) * m;
+              h = h + 1 & 2047;
+              if (h != c) continue L_fe;
+            }
+            if (eqz(f)) continue L_xd;
+            if (b != d) {
+              (e + 784)[c]:int = f;
+              c = d;
+              continue L_wd;
+            }
+            j[0] = j[0] | 1;
+            b = d;
+            continue L_xd;
+            label B_yd:
+          }
+        }
+        function_93(e + 656, function_107(1.0, 225 - b));
+        function_377(e + 688, e[82]:long, e[83]:long, x, v);
+        y = e[87]:long;
+        aa = e[86]:long;
+        function_93(e + 640, function_107(1.0, 113 - b));
+        function_282(e + 672, x, v, e[80]:long, e[81]:long);
+        function_258(e + 624, x, v, u = e[84]:long, w = e[85]:long);
+        function_66(e + 608, aa, y, e[78]:long, e[79]:long);
+        v = e[77]:long;
+        x = e[76]:long;
+        label B_vd:
+        f = h + 4 & 2047;
+        if (f == c) goto B_he;
+        f = (e + 784)[f]:int;
+        if (f <= 499999999) {
+          if (eqz(select_if(f, 1, (h + 5 & 2047) == c))) goto B_ie;
+          function_93(e + 496, f64_convert_i32_s(k) * 0.25);
+          function_66(e + 480, u, w, e[62]:long, e[63]:long);
+          w = e[61]:long;
+          u = e[60]:long;
+          goto B_ie;
+        }
+        if (f != 500000000) {
+          function_93(e + 592, f64_convert_i32_s(k) * 0.75);
+          function_66(e + 576, u, w, e[74]:long, e[75]:long);
+          w = e[73]:long;
+          u = e[72]:long;
+          goto B_ie;
+        }
+        var ba:double = f64_convert_i32_s(k);
+        if (c == (h + 5 & 2047)) {
+          function_93(e + 528, ba * 0.5);
+          function_66(e + 512, u, w, e[66]:long, e[67]:long);
+          w = e[65]:long;
+          u = e[64]:long;
+          goto B_ie;
+        }
+        function_93(e + 560, ba * 0.75);
+        function_66(e + 544, u, w, e[70]:long, e[71]:long);
+        w = e[69]:long;
+        u = e[68]:long;
+        label B_ie:
+        if (b > 111) goto B_he;
+        function_282(e + 464, u, w, 0L, 4611404543450677248L);
+        if (function_129(e[58]:long, e[59]:long, 0L, 0L)) goto B_he;
+        function_66(e + 448, u, w, 0L, 4611404543450677248L);
+        w = e[57]:long;
+        u = e[56]:long;
+        label B_he:
+        function_66(e + 432, x, v, u, w);
+        function_258(e + 416, e[54]:long, e[55]:long, aa, y);
+        v = e[53]:long;
+        x = e[52]:long;
+        if (-2 - s >= (i & 2147483647)) goto B_me;
+        e[51]:long = v & 9223372036854775807L;
+        e[50]:long = x;
+        function_36(e + 384, x, v, 0L, 4611123068473966592L);
+        y = e[50]:long;
+        c = function_263(y, z = e[51]:long, 4643211215818981376L);
+        v = select_if(v, e[49]:long, h = c < 0);
+        x = select_if(x, e[48]:long, h);
+        if (t >= (l = l + (c > -1)) + 110) {
+          if (
+            select_if(g, g & b != d, function_263(y, z, 4643211215818981376L) < 0) !=
+            1) goto B_me;
+          if (eqz(function_129(u, w, 0L, 0L))) goto B_me;
+        }
+        8569384[0]:int = 68;
+        label B_me:
+        function_376(e + 368, x, v, l);
+        u = e[47]:long;
+        v = e[46]:long;
+        goto B_kc;
+        label B_td:
+        h = c + 2047;
+        j = 0;
+        loop L_oe {
+          u = i64_extend_i32_u(j) +
+              ((h = e + 784 + ((d = h & 2047) << 2))[0]:uint << 29L);
+          j = if (u < 1000000001L) {
+                0
+              } else {
+                v = u / 1000000000L;
+                u = v * -1000000000L + u;
+                i32_wrap_i64(v);
+              }
+          h[0]:int = (h = i32_wrap_i64(u));
+          c = select_if(c,
+                        select_if(c, select_if(c, d, h), b == d),
+                        d != (c - 1 & 2047));
+          h = d - 1;
+          if (b != d) continue L_oe;
+        }
+        l = l - 29;
+        if (eqz(j)) continue L_sd;
+      }
+      if (c == (b = b - 1 & 2047)) {
+        d = e + 784 + ((c + 2046 & 2047) << 2);
+        d[0] = d[0] | (e + 784)[c = c - 1 & 2047]:int;
+      }
+      i = i + 9;
+      (e + 784)[b]:int = j;
+      continue L_rd;
+    }
+    unreachable;
+    label B_kc:
+    n.e = v;
+    n.f = u;
+    stack_pointer = e + 8976;
+    u = n.f;
+    v = n.e;
+    goto B_a;
+    label B_aa:
+    if (b[26]:int) { b[1]:int = b[1]:int - 1 }
+    goto B_u;
+    label B_v:
+    if ({
+          c = b[1]:int;
+          if (c < b[26]:int) {
+            b[1]:int = c + 1;
+            c[0]:ubyte;
+            goto B_te;
+          }
+          function_30(b);
+          label B_te:
+        } ==
+        40) {
+      g = 1;
+      goto B_se;
+    }
+    u = 9223231299366420480L;
+    if (eqz(b[26]:int)) goto B_a;
+    b[1]:int = b[1]:int - 1;
+    goto B_a;
+    label B_se:
+    loop L_we {
+      c = {
+            c = b[1]:int;
+            if (c < b[26]:int) {
+              b[1]:int = c + 1;
+              c[0]:ubyte;
+              goto B_xe;
+            }
+            function_30(b);
+            label B_xe:
+          }
+      h = c - 65;
+      if (c - 48 < 10) goto B_af;
+      if (h < 26) goto B_af;
+      if (c == 95) goto B_af;
+      if (c - 97 >= 26) goto B_ze;
+      label B_af:
+      g = g + 1;
+      continue L_we;
+      label B_ze:
+    }
+    u = 9223231299366420480L;
+    if (c == 41) goto B_a;
+    c = b[26]:int;
+    if (c) { b[1]:int = b[1]:int - 1 }
+    if (d) {
+      if (eqz(g)) goto B_a;
+      loop L_df {
+        g = g - 1;
+        if (c) { b[1]:int = b[1]:int - 1 }
+        if (g) continue L_df;
+      }
+      goto B_a;
+    }
+    label B_u:
+    8569384[0]:int = 28;
+    function_83(b, 0L);
+  }
+  u = 0L;
+  label B_a:
+  a.a = v;
+  a.b = u;
+  stack_pointer = n + 48;
+}
+
+function function_376(a:{ a:long, b:long }, b:long, c:long, d:int) { // func376
+  var e:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long, i:long, j:long } = 
+    stack_pointer - 80;
+  stack_pointer = e;
+  if (d >= 16384) {
+    function_36(e + 32, b, c, 0L, 9222809086901354496L);
+    c = e.f;
+    b = e.e;
+    if (d < 32767) {
+      d = d - 16383;
+      goto B_a;
+    }
+    function_36(e + 16, b, c, 0L, 9222809086901354496L);
+    d = select_if(d, 49149, d < 49149) - 32766;
+    c = e.d;
+    b = e.c;
+    goto B_a;
+  }
+  if (d > -16383) goto B_a;
+  function_36(e - -64, b, c, 0L, 281474976710656L);
+  c = e.j;
+  b = e.i;
+  if (d > -32765) {
+    d = d + 16382;
+    goto B_a;
+  }
+  function_36(e + 48, b, c, 0L, 281474976710656L);
+  d = select_if(d, -49146, d > -49146) + 32764;
+  c = e.h;
+  b = e.g;
+  label B_a:
+  function_36(e, b, c, 0L, i64_extend_i32_u(d + 16383) << 48L);
+  a.b = e.b;
+  a.a = e.a;
+  stack_pointer = e + 80;
+}
+
+function function_377(a:{ a:long, b:long }, b:long, c:long, d:long, e:long) { // func377
+  a.a = b;
+  a.b =
+    (c & 281474976710655L) |
+    i64_extend_i32_u(
+      (i32_wrap_i64(e >> 48L) & 32768) | (i32_wrap_i64(c >> 48L) & 32767)) <<
+    48L;
+}
+
+function function_378(a:int, b:int):int { // func378
+  var c:int = b != 0;
+  if (eqz(a & 3)) goto B_c;
+  if (eqz(b)) goto B_c;
+  loop L_d {
+    if (eqz(a[0]:ubyte)) goto B_b;
+    b = b - 1;
+    c = b != 0;
+    a = a + 1;
+    if (eqz(a & 3)) goto B_c;
+    if (b) continue L_d;
+  }
+  label B_c:
+  if (eqz(c)) goto B_a;
+  if (eqz(a[0]:ubyte)) goto B_b;
+  if (b < 4) goto B_b;
+  loop L_e {
+    c = a[0]:int;
+    if (((c ^ -1) & c - 16843009) & -2139062144) goto B_b;
+    a = a + 4;
+    b = b - 4;
+    if (b > 3) continue L_e;
+  }
+  label B_b:
+  if (eqz(b)) goto B_a;
+  loop L_f {
+    if (eqz(a[0]:ubyte)) { return a }
+    a = a + 1;
+    b = b - 1;
+    if (b) continue L_f;
+  }
+  label B_a:
+  return 0;
+}
+
+function function_379(a:int, b:int, c:int_ptr) { // func379
+  if (b > 20) goto B_a;
+  br_table[B_k, B_j, B_i, B_h, B_g, B_f, B_e, B_d, B_c, B_b, ..B_a](
+    b - 9)
+  label B_k:
+  c[0] = (b = c[0]) + 4;
+  a[0]:int = b[0]:int;
+  return ;
+  label B_j:
+  c[0] = (b = c[0]) + 4;
+  a[0]:long = b[0]:int;
+  return ;
+  label B_i:
+  c[0] = (b = c[0]) + 4;
+  a[0]:long = b[0]:uint;
+  return ;
+  label B_h:
+  c[0] = (b = c[0] + 7 & -8) + 8;
+  a[0]:long = b[0]:long;
+  return ;
+  label B_g:
+  c[0] = (b = c[0]) + 4;
+  a[0]:long = b[0]:short;
+  return ;
+  label B_f:
+  c[0] = (b = c[0]) + 4;
+  a[0]:long = b[0]:ushort;
+  return ;
+  label B_e:
+  c[0] = (b = c[0]) + 4;
+  a[0]:long = b[0]:byte;
+  return ;
+  label B_d:
+  c[0] = (b = c[0]) + 4;
+  a[0]:long = b[0]:ubyte;
+  return ;
+  label B_c:
+  c[0] = (b = c[0] + 7 & -8) + 8;
+  a[0]:double = b[0]:double;
+  return ;
+  label B_b:
+  c[0] = (b = c[0] + 15 & -16) + 16;
+  a[0]:double = function_260(b[0]:long, b[1]:long);
+  label B_a:
+}
+
+function function_380(a:int_ptr):int { // func380
+  var c:int;
+  var b:byte_ptr = a[0];
+  loop L_a {
+    var d:int = b[0];
+    if (d - 48 < 10) {
+      a[0] = (b = b + 1);
+      c = c * 10 + d - 48;
+      continue L_a;
+    }
+  }
+  return c;
+}
+
+function function_381(a:double, b:int_ptr):double { // func381
+  var d:long = i64_reinterpret_f64(a);
+  var c:int = i32_wrap_i64(d >> 52L) & 2047;
+  return if (c != 2047) {
+           if (eqz(c)) {
+             b[0] =
+               if (a == 0.0) {
+                 0
+               } else {
+                 a = function_381(a * 18446744073709551616.0, b);
+                 b[0] + -64;
+               }
+             return a;
+           }
+           b[0] = c - 1022;
+           f64_reinterpret_i64(
+             (d & -9218868437227405313L) | 4602678819172646912L);
+         } else {
+           a
+         }
+}
+
+function function_382(a:int, b:int):int { // func382
+  if (eqz(a)) { return 0 }
+  return function_124(a, b);
+}
+
+function function_383(a:double):double { // func383
+  var g:long = i64_reinterpret_f64(a);
+  var b:int = i32_wrap_i64(g >> 32L) & 2147483647;
+  if (b > 1141899263) {
+    return select_if(a,
+                     1.570796 copysign a,
+                     (i64_reinterpret_f64(a) & 9223372036854775807L) >
+                     9218868437227405312L)
+  }
+  var c:int = {
+                if (b <= 1071382527) {
+                  if (b < 1044381696) goto B_b;
+                  b = -1;
+                  1;
+                  goto B_c;
+                }
+                a = abs(a);
+                a = {
+                      if (b <= 1072889855) {
+                        if (b <= 1072037887) {
+                          a = (a + a + -1.0) / (a + 2.0);
+                          b = 0;
+                          0;
+                          goto B_c;
+                        }
+                        b = 1;
+                        (a + -1.0) / (a + 1.0);
+                        goto B_e;
+                      }
+                      if (b <= 1073971199) {
+                        b = 2;
+                        (a + -1.5) / (a * 1.5 + 1.0);
+                        goto B_e;
+                      }
+                      b = 3;
+                      -1.0 / a;
+                      label B_e:
+                    }
+                0;
+                label B_c:
+              }
+  var e:double = a * a;
+  var d:double = e * e;
+  var f:double = 
+    d *
+    (d * (d * (d * (d * -0.036532 + -0.058336) + -0.076919) + -0.111111) +
+     -0.2);
+  d = 
+    e *
+    (d *
+     (d * (d * (d * (d * 0.016286 + 0.049769) + 0.066611) + 0.090909) +
+      0.142857) +
+     0.333333);
+  if (c) { return a - a * (f + d) }
+  b = b << 3;
+  a = (b + 7040)[0]:double - a * (f + d) - (b + 7072)[0]:double - a;
+  a = select_if(a, -(a), g > -1L);
+  label B_b:
+  return a;
+}
+
+function createCactusR2PetalBehavior():int { // func384
+  var a:int_ptr = operatorNewOrAbort(4);
+  a[0] = 5852;
+  return a;
+}
+
+function function_385(a:int, b:int):int { // func385
+  var c:float;
+  var f:int;
+  var d:float;
+  var g:int;
+  var e:float;
+  var j:int;
+  var h:int;
+  var i:int = 1;
+  br_table[B_c, B_c, B_h, B_g, B_f, B_e, ..B_d](b - a >> 3)
+  label B_h:
+  f = b - 4;
+  d = f[0]:float;
+  if (eqz(d < (c = a[1]:float))) goto B_c;
+  g = a[0]:ubyte;
+  a[0]:byte = (b = b - 8)[0]:ubyte;
+  b[0]:byte = g;
+  a[1]:float = d;
+  f[0]:float = c;
+  goto B_a;
+  label B_g:
+  h = b - 8;
+  f = b - 4;
+  e = f[0]:float;
+  c = a[3]:float;
+  if (eqz(c < (d = a[1]:float))) {
+    if (eqz(c > e)) goto B_c;
+    b = a[8]:ubyte;
+    a[8]:byte = h[0]:ubyte;
+    h[0]:byte = b;
+    a[3]:float = e;
+    f[0]:float = c;
+    d = a[3]:float;
+    if (eqz(d < (c = a[1]:float))) goto B_c;
+    b = a[8]:ubyte;
+    goto B_b;
+  }
+  if (c > e) {
+    b = a[0]:ubyte;
+    a[0]:byte = h[0]:ubyte;
+    h[0]:byte = b;
+    a[1]:float = e;
+    f[0]:float = d;
+    goto B_a;
+  }
+  g = a[8]:ubyte;
+  a[8]:byte = (b = a[0]:ubyte);
+  a[0]:byte = g;
+  a[3]:float = d;
+  a[1]:float = c;
+  c = f[0]:float;
+  if (eqz(c < d)) goto B_c;
+  a[8]:byte = h[0]:ubyte;
+  h[0]:byte = b;
+  a[3]:float = c;
+  f[0]:float = d;
+  goto B_a;
+  label B_f:
+  function_159(a, a + 8, a + 16, b - 8);
+  goto B_a;
+  label B_e:
+  function_159(a, a + 8, a + 16, a + 24);
+  f = b - 4;
+  d = f[0]:float;
+  if (eqz(d < (c = a[7]:float))) goto B_c;
+  g = a[24]:ubyte;
+  a[24]:byte = (b = b - 8)[0]:ubyte;
+  b[0]:byte = g;
+  a[7]:float = d;
+  f[0]:float = c;
+  d = a[7]:float;
+  if (eqz(d < (c = a[5]:float))) goto B_c;
+  b = a[24]:ubyte;
+  a[24]:byte = a[16]:ubyte;
+  a[16]:byte = b;
+  a[7]:float = c;
+  a[5]:float = d;
+  if (eqz(d < (c = a[3]:float))) goto B_c;
+  a[16]:byte = a[8]:ubyte;
+  a[8]:byte = b;
+  a[5]:float = c;
+  a[3]:float = d;
+  if (eqz(d < (c = a[1]:float))) goto B_c;
+  goto B_b;
+  label B_d:
+  f = a + 20;
+  e = f[0]:float;
+  g = a + 12;
+  d = g[0]:float;
+  if (eqz(d < (c = (h = a + 4)[0]:float))) {
+    if (eqz(d > e)) goto B_k;
+    f = a[16]:ubyte;
+    a[16]:byte = a[8]:ubyte;
+    a[8]:byte = f;
+    a[5]:float = d;
+    a[3]:float = e;
+    if (eqz(c > e)) goto B_k;
+    a[8]:byte = a[0]:ubyte;
+    a[0]:byte = f;
+    goto B_l;
+  }
+  if (d > e) {
+    g = a[16]:ubyte;
+    a[16]:byte = a[0]:ubyte;
+    a[0]:byte = g;
+    goto B_n;
+  }
+  h = a[8]:ubyte;
+  a[8]:byte = (j = a[0]:ubyte);
+  a[0]:byte = h;
+  a[3]:float = c;
+  a[1]:float = d;
+  if (eqz(c > e)) goto B_k;
+  h = a[16]:ubyte;
+  a[16]:byte = j;
+  a[8]:byte = h;
+  h = g;
+  label B_n:
+  g = f;
+  label B_l:
+  h[0]:float = e;
+  g[0]:float = c;
+  label B_k:
+  g = a + 24;
+  if (g == b) goto B_c;
+  i = a + 16;
+  j = 0;
+  loop L_q {
+    f = g;
+    h = f;
+    d = (h + 4)[0]:float;
+    if (d < (c = i[1]:float)) {
+      g = i[0]:ubyte;
+      h[1]:float = c;
+      h = f[0]:int;
+      f[0]:byte = g;
+      g = {
+            a;
+            if (a == i) goto B_s;
+            loop L_t {
+              i;
+              if (eqz((c = (i - 4)[0]:float) > d)) goto B_s;
+              i[1]:float = c;
+              i[0]:byte = (i = i - 8)[0]:ubyte;
+              if (a != i) continue L_t;
+            }
+            a;
+            label B_s:
+          }
+      g[1]:float = d;
+      g[0]:byte = h;
+      j = j + 1;
+      if (j == 8) goto B_p;
+    }
+    i = f;
+    g = i + 8;
+    if (g != b) continue L_q;
+  }
+  goto B_a;
+  label B_p:
+  i = f + 8 == b;
+  label B_c:
+  return i;
+  label B_b:
+  a[8]:byte = a[0]:ubyte;
+  a[0]:byte = b;
+  a[3]:float = c;
+  a[1]:float = d;
+  label B_a:
+  return 1;
+}
+
+function function_386(a:int_ptr, b:int) { // func386
+  a[4] = (b = eqz(a[6]) | b);
+  if (a[5] & b) {
+    function_42();
+    unreachable;
+  }
+}
+
+function function_387(a:int, b:int) { // func387
+  var c:int;
+  var d:int;
+  if (b >
+      (c = {
+             if (a[11]:ubyte >> 7) {
+               a[1]:int;
+               goto B_a;
+             }
+             a[11]:ubyte;
+             label B_a:
+           })) {
+    d = stack_pointer - 16;
+    stack_pointer = d;
+    var f:int = b - c;
+    if (f) {
+      var e:int = 
+        if (a[11]:ubyte >> 7) { (a[2]:int & 2147483647) - 1 } else { 10 }
+      c = {
+            if (a[11]:ubyte >> 7) {
+              a[1]:int;
+              goto B_f;
+            }
+            a[11]:ubyte;
+            label B_f:
+          }
+      b = c + f;
+      if (f > e - c) { function_227(a, e, b - e, c, c) }
+      function_325(c +
+                   (e = {
+                          if (a[11]:ubyte >> 7) {
+                            a[0]:int;
+                            goto B_i;
+                          }
+                          a;
+                          label B_i:
+                        }),
+                   f,
+                   0);
+      if (a[11]:ubyte >> 7) {
+        a[1]:int = b;
+        goto B_k;
+      }
+      a[11]:byte = b;
+      label B_k:
+      d[15]:byte = 0;
+      (b + e)[0]:byte = d[15]:ubyte;
+    }
+    stack_pointer = d + 16;
+    return ;
+  }
+  c = stack_pointer - 16;
+  stack_pointer = c;
+  if (a[11]:ubyte >> 7) {
+    d = a[0]:int;
+    c[15]:byte = 0;
+    (b + d)[0]:byte = c[15]:ubyte;
+    a[1]:int = b;
+    goto B_m;
+  }
+  c[14]:byte = 0;
+  (a + b)[0]:byte = c[14]:ubyte;
+  a[11]:byte = b;
+  label B_m:
+  stack_pointer = c + 16;
+}
+
+function function_388(a:{ a:int, b:int, c:int, d:int }):int { // func388
+  var c:int;
+  var b:int;
+  var d:int;
+  var e:int;
+  var g:int = a.a;
+  var f:int = a.b;
+  if (a.d) {
+    a.d = 0;
+    a.c = (b = (c = a.c) + 1);
+    d = c + 2;
+    if (d > f) goto B_a;
+    a.c = d;
+    b = (b + g)[0]:ubyte;
+    e = b & 127;
+    if (eqz(b & 128)) goto B_a;
+    if (d == f) goto B_a;
+    b = 0;
+    c = c + 3;
+    if (c <= f) goto B_e;
+    c = d;
+    goto B_d;
+  }
+  d = a.c;
+  c = d + 1;
+  if (c > f) goto B_a;
+  a.c = c;
+  b = (d + g)[0]:ubyte;
+  e = b & 127;
+  if (eqz(b & 128)) goto B_a;
+  if (c == f) goto B_a;
+  b = 0;
+  d = d + 2;
+  if (d <= f) goto B_c;
+  d = c;
+  goto B_b;
+  label B_e:
+  a.c = c;
+  b = (d + g)[0]:ubyte;
+  label B_d:
+  e = (b << 7 & 16256) | e;
+  if (eqz(b & 128)) goto B_a;
+  if (c == f) goto B_a;
+  b = 0;
+  if (f < (d = c + 1)) {
+    d = c;
+    goto B_g;
+  }
+  a.c = d;
+  b = (c + g)[0]:ubyte;
+  label B_g:
+  e = (b << 14 & 2080768) | e;
+  if (eqz(b & 128)) goto B_a;
+  if (d == f) goto B_a;
+  c = 0;
+  if (f < (b = d + 1)) {
+    b = d;
+    goto B_i;
+  }
+  a.c = b;
+  c = (d + g)[0]:ubyte;
+  label B_i:
+  e = (c << 21 & 266338304) | e;
+  if (eqz(c & 128)) goto B_a;
+  if (b == f) goto B_a;
+  c = 0;
+  return if (f >= (d = b + 1)) {
+           a.c = d;
+           (b + g)[0]:ubyte << 28;
+         } else {
+           0
+         } |
+         e;
+  label B_c:
+  a.c = d;
+  b = (c + g)[0]:ubyte;
+  label B_b:
+  e = (b << 7 & 16256) | e;
+  if (eqz(b & 128)) goto B_a;
+  if (d == f) goto B_a;
+  b = 0;
+  if (f < (c = d + 1)) {
+    c = d;
+    goto B_l;
+  }
+  a.c = c;
+  b = (d + g)[0]:ubyte;
+  label B_l:
+  e = (b << 14 & 2080768) | e;
+  if (eqz(b & 128)) goto B_a;
+  if (c == f) goto B_a;
+  d = 0;
+  if (f < (b = c + 1)) {
+    b = c;
+    goto B_n;
+  }
+  a.c = b;
+  d = (c + g)[0]:ubyte;
+  label B_n:
+  e = (d << 21 & 266338304) | e;
+  if (eqz(d & 128)) goto B_a;
+  if (b == f) goto B_a;
+  c = 0;
+  e = if (f >= (d = b + 1)) {
+        a.c = d;
+        (b + g)[0]:ubyte << 28;
+      } else {
+        0
+      } |
+      e;
+  label B_a:
+  return e;
+}
+
+function function_389(a:int_ptr, b:int_ptr):int { // func389
+  var j:float;
+  var c:int_ptr;
+  var e:int_ptr;
+  var f:int_ptr;
+  var g:int;
+  var d:int_ptr = 1;
+  br_table[B_a, B_a, B_f, B_e, B_d, B_c, ..B_b](b - a >> 2)
+  label B_f:
+  b = b - 4;
+  c = b[0];
+  e = c[25];
+  if (e) { j = (e[50])[4]:float }
+  e = a[0];
+  f = e[25];
+  if (eqz(if (f) { (f[50])[4]:float } else { 0.0f } < j)) goto B_a;
+  a[0] = c;
+  b[0] = e;
+  return 1;
+  label B_e:
+  function_139(a, a + 4, b - 4);
+  return 1;
+  label B_d:
+  function_251(a, a + 4, a + 8, b - 4);
+  return 1;
+  label B_c:
+  function_250(a, a + 4, a + 8, a + 12, b - 4);
+  return 1;
+  label B_b:
+  function_139(a, a + 4, f = a + 8);
+  c = a + 12;
+  if (c == b) goto B_a;
+  loop L_j {
+    var k:float = 0.0f;
+    j = 0.0f;
+    e = c;
+    var h:int = e[0];
+    var i:int_ptr = h;
+    c = (i + 100)[0]:int;
+    if (c) { j = (c[50])[4]:float }
+    d = e;
+    c = (f[0])[25]:int;
+    if (if (c) { (c[50])[4]:float } else { 0.0f } < j) {
+      loop L_n {
+        d[0] = (c = f)[0];
+        if (a == c) {
+          c = a;
+          goto B_o;
+        }
+        f = c - 4;
+        k = 0.0f;
+        j = 0.0f;
+        d = i[25];
+        if (d) { j = (d[50])[4]:float }
+        d = (f[0])[25]:int;
+        if (d) { k = (d[50])[4]:float }
+        d = c;
+        if (j > k) continue L_n;
+        label B_o:
+      }
+      c[0] = h;
+      g = g + 1;
+      if (g == 8) goto B_i;
+    }
+    f = e;
+    c = f + 4;
+    if (c != b) continue L_j;
+  }
+  return 1;
+  label B_i:
+  d = e + 4 == b;
+  label B_a:
+  return d;
+}
+
+function function_390(a:int_ptr, b:int, c:int, d:double, e:double, f:double, g:double) { // func390
+  var q:double;
+  var s:float;
+  var j:int = stack_pointer - 16;
+  stack_pointer = j;
+  var m:int = c[47]:int;
+  var k:int = m[48]:ubyte;
+  var i:int = c[42]:int;
+  var h:int = b[42]:int;
+  var l:int = b[47]:int;
+  var n:int = l[48]:ubyte;
+  k = {
+        if (eqz((a[0])[0]:ubyte)) goto B_c;
+        var o:int = b[95]:ubyte & 32;
+        if (o >> 5 == (c[95]:ubyte & 32) >> 5) goto B_c;
+        if (o) goto B_a;
+        if (eqz(n)) goto B_a;
+        o != 0 & k != 0;
+        goto B_b;
+        label B_c:
+        if (eqz(n)) goto B_a;
+        k != 0;
+        label B_b:
+      }
+  var p:double = 
+    f64_promote_f32(h[5]:float) - f64_promote_f32(i[5]:float);
+  var r:double = 
+    p * p +
+    (q = f64_promote_f32(h[4]:float) - f64_promote_f32(i[4]:float)) * q;
+  if (k) {
+    if (eqz(r > 0.0)) goto B_d;
+    h[5]:double =
+      h[5]:double +
+      p *
+      (d = 
+         ((d - f) * p + (e - g) * q) *
+         (d = 
+            (d = f64_promote_f32(m[2]:float)) * d * f64_promote_f32(m[10]:float)) *
+         -2.0 /
+         r *
+         (d +
+          (d = f64_promote_f32(l[2]:float)) * d * f64_promote_f32(l[10]:float)));
+    h[6]:double = h[6]:double + q * d;
+    goto B_d;
+  }
+  if (r > 0.0) {
+    h[5]:double =
+      p * (d = ((d - f) * p + (e - g) * q) * -2.0 / r) + h[5]:double;
+    h[6]:double = q * d + h[6]:double;
+  }
+  if (eqz(h[80]:ubyte)) { function_17(h) }
+  d = h[12]:double;
+  e = h[11]:double;
+  if (eqz(i[80]:ubyte)) { function_17(i) }
+  e = e - i[11]:double;
+  d = e * e + (d = d - i[12]:double) * d;
+  if (
+    eqz(
+      d <
+      (e = 
+         (e = f64_promote_f32(l[2]:float) + f64_promote_f32(m[2]:float)) * e))) goto B_d;
+  if (eqz(h[80]:ubyte)) { function_17(h) }
+  f = h[12]:double;
+  g = h[11]:double;
+  if (eqz(i[80]:ubyte)) { function_17(i) }
+  d = sqrt(e) - sqrt(d);
+  e = {
+        e = g - i[11]:double;
+        g = sqrt(e * e + (f = f - i[12]:double) * f);
+        if (g < 0.0) {
+          f = 0.0;
+          1.0;
+          goto B_k;
+        }
+        f = f / g;
+        e / g;
+        label B_k:
+      }
+  s = h[5]:float;
+  j[0]:double = (f = d * f + f64_promote_f32(h[4]:float));
+  j[1]:double = (d = d * e + f64_promote_f32(s));
+  if ((i64_reinterpret_f64(d) & 9218868437227405312L) ==
+      9218868437227405312L) goto B_d;
+  if ((i64_reinterpret_f64(f) & 9218868437227405312L) ==
+      9218868437227405312L) goto B_d;
+  k = h + 16;
+  n = h + 20;
+  if (eqz(h[80]:ubyte)) goto B_m;
+  h[80]:byte = 0;
+  i = (h[0]:int)[21]:int;
+  if (eqz(i)) goto B_m;
+  loop L_n {
+    l = i[2]:int;
+    function_34(i);
+    i = l;
+    if (i) continue L_n;
+  }
+  label B_m:
+  function_44(n, j + 8);
+  function_47(k, j);
+  label B_d:
+  if (eqz(b[95]:ubyte & 32)) goto B_a;
+  h[5]:double =
+    {
+      if ((d = sqrt(r)) < 0.0) {
+        e = 0.0;
+        0.2;
+        goto B_o;
+      }
+      e = q * 0.2 / d;
+      p * 0.2 / d;
+      label B_o:
+    } +
+    h[5]:double;
+  h[6]:double = e + h[6]:double;
+  label B_a:
+  if ((a[0])[0]:ubyte) goto B_q;
+  a = b[41]:int;
+  if (eqz(a)) goto B_q;
+  s = 1.0f;
+  b = b[50]:int;
+  if (eqz(b)) goto B_r;
+  i = c[50]:int;
+  if (eqz(i)) goto B_r;
+  s = 
+    select_if(
+      0.0f,
+      (s = f32_demote_f64(
+             f64_convert_i32_s(
+               select_if(i = i[148]:ubyte, b = b[148]:ubyte, b > i) - 5) *
+             0.2)) min
+      1.0f,
+      s < 0.0f);
+  label B_r:
+  var t:float = m[11]:float;
+  j[4]:short = 0;
+  function_43(a, c, s * t, j + 8);
+  label B_q:
+  stack_pointer = j + 16;
+}
+
+function function_391(a:int, b:int, c:int):int { // func391
+  var d:int;
+  var f:{ a:int, b:int }
+  var i:int;
+  var g:int;
+  var h:int;
+  var e:int = b;
+  loop L_a {
+    d = a[0]:int;
+    a[0]:int = e[0]:int;
+    e[0]:int = d;
+    f = (a + 8)[0]:int;
+    g = a[1]:int;
+    a[1]:long@4 = 0L;
+    i = a[12]:ubyte;
+    h = (e + 8)[0]:int;
+    e[2]:int = 0;
+    d = e[1]:int;
+    e[1]:int = 0;
+    a[1]:int = d;
+    d = a[2]:int;
+    a[2]:int = h;
+    if (eqz(d)) goto B_b;
+    d[1]:int = (h = d[1]:int) - 1;
+    if (h) goto B_b;
+    call_indirect(d, (d[0]:int)[2]:int);
+    function_35(d);
+    label B_b:
+    a[12]:byte = e[12]:ubyte;
+    e[1]:int = g;
+    d = e[2]:int;
+    e[2]:int = f;
+    if (eqz(d)) goto B_c;
+    d[1]:int = (f = d[1]:int) - 1;
+    if (f) goto B_c;
+    call_indirect(d, (d[0]:int)[2]:int);
+    function_35(d);
+    label B_c:
+    e[12]:byte = i;
+    a = a + 16;
+    if (c != (e = e + 16)) {
+      b = select_if(e, b, a == b);
+      continue L_a;
+    }
+  }
+  if (a != b) {
+    e = b;
+    d = a;
+    loop L_f {
+      f = d[0]:int;
+      d[0]:int = e[0]:int;
+      e[0]:int = f;
+      g = (d + 8)[0]:int;
+      i = d[1]:int;
+      d[1]:long@4 = 0L;
+      h = d[12]:ubyte;
+      var j:int = (e + 8)[0]:int;
+      e[2]:int = 0;
+      f = e[1]:int;
+      e[1]:int = 0;
+      d[1]:int = f;
+      f = d[2]:int;
+      d[2]:int = j;
+      if (eqz(f)) goto B_g;
+      f.b = (j = f.b) - 1;
+      if (j) goto B_g;
+      call_indirect(f, f.a[2]:int);
+      function_35(f);
+      label B_g:
+      d[12]:byte = e[12]:ubyte;
+      e[1]:int = i;
+      f = e[2]:int;
+      e[2]:int = g;
+      if (eqz(f)) goto B_h;
+      f.b = (g = f.b) - 1;
+      if (g) goto B_h;
+      call_indirect(f, f.a[2]:int);
+      function_35(f);
+      label B_h:
+      e[12]:byte = h;
+      d = d + 16;
+      if (c == (e = e + 16)) {
+        if (d != (e = b)) continue L_f
+      } else {
+        b = select_if(e, b, b == d);
+        continue L_f;
+      }
+    }
+  }
+  return a;
+}
+
+function function_392(a:{ a:int, b:int, c:int }, b:int_ptr):int { // func392
+  var c:int_ptr;
+  var d:int;
+  var f:int_ptr;
+  var e:int_ptr;
+  var i:int;
+  var g:int_ptr;
+  var j:int;
+  var n:int;
+  var h:int;
+  var k:int = 1;
+  br_table[B_b, B_b, B_g, B_f, B_e, B_d, ..B_c](b - a >> 2)
+  label B_g:
+  e = b - 4;
+  b = e[0];
+  if (select_if(b >> 14 < (c = a.a) >> 14,
+                (d = b & 16383) < (f = c & 16383),
+                d == f) !=
+      1) goto B_b;
+  a.a = b;
+  e[0] = c;
+  goto B_a;
+  label B_f:
+  e = a.b;
+  g = e >> 14;
+  h = select_if(g > (d = (b = b - 4)[0]) >> 14,
+                (c = d & 16383) < (f = e & 16383),
+                c == f);
+  if (eqz(select_if(g < (i = (c = a.a) >> 14), f < (g = c & 16383), f == g))) {
+    if (eqz(h)) goto B_b;
+    a.b = d;
+    b[0] = e;
+    b = a.b;
+    if (select_if(b >> 14 < (c = a.a) >> 14,
+                  (e = b & 16383) < (d = c & 16383),
+                  d == e) !=
+        1) goto B_b;
+    a.b = c;
+    a.a = b;
+    goto B_a;
+  }
+  if (h) {
+    a.a = d;
+    b[0] = c;
+    goto B_a;
+  }
+  a.b = c;
+  a.a = e;
+  e = b[0];
+  if (
+    select_if(e >> 14 < i, (d = e & 16383) < g, d == g) != 1) goto B_b;
+  a.b = e;
+  b[0] = c;
+  goto B_a;
+  label B_e:
+  function_252(a, a + 4, a + 8, b - 4);
+  goto B_a;
+  label B_d:
+  function_253(a, a + 4, a + 8, a + 12, b - 4);
+  goto B_a;
+  label B_c:
+  g = a.c;
+  var l:int = g >> 14;
+  var m:int = select_if(l < (j = (d = a.b) >> 14),
+                        (i = g & 16383) < (c = d & 16383),
+                        c == i);
+  f = a + 4;
+  e = a + 8;
+  if (eqz(select_if(j < (n = (h = a.a) >> 14), c < (j = h & 16383), c == j))) {
+    if (m) goto B_l;
+    d = g;
+    goto B_j;
+  }
+  if (m) {
+    c = a;
+    f = e;
+    d = h;
+    goto B_k;
+  }
+  a.b = h;
+  a.a = d;
+  c = f;
+  f = e;
+  d = h;
+  if (select_if(l < n, i < j, i == j) == 1) goto B_k;
+  d = g;
+  goto B_j;
+  label B_l:
+  a.c = d;
+  a.b = g;
+  c = a;
+  if (eqz(select_if(l < n, i < j, i == j))) goto B_j;
+  label B_k:
+  c[0] = g;
+  f[0] = h;
+  label B_j:
+  c = a + 12;
+  if (c == b) goto B_b;
+  k = 0;
+  loop L_o {
+    f = c;
+    g = f;
+    i = c[0];
+    j = i >> 14;
+    if (select_if(j < d >> 14, (h = i & 16383) < (c = d & 16383), c == h) ==
+        1) {
+      loop L_r {
+        g[0] = d;
+        if (a == (c = e)) {
+          c = a;
+          goto B_s;
+        }
+        g = c;
+        if (
+          select_if(j < (d = (e = c - 4)[0]) >> 14, h < (l = d & 16383), h == l)) continue L_r;
+        label B_s:
+      }
+      c[0] = i;
+      k = k + 1;
+      if (k == 8) goto B_p;
+    }
+    if (b == (c = f + 4)) goto B_a;
+    d = f[0];
+    e = f;
+    continue L_o;
+    label B_p:
+  }
+  k = f + 4 == b;
+  label B_b:
+  return k;
+  label B_a:
+  return 1;
+}
+
+function function_393(a:int, b:int, c:int, d:{ a:int, b:int, c:int, d:int }, e:int) { // func393
+  var h:ubyte_ptr;
+  var j:int;
+  var k:int;
+  var l:int;
+  var n:int;
+  var o:int;
+  var m:int = stack_pointer - 16;
+  stack_pointer = m;
+  var f:int = a[92]:ubyte;
+  var i:int = f & 1;
+  var g:int = (f << 24) >> 24;
+  if (e & 1) {
+    if (eqz(i)) goto B_k;
+    if (eqz(c)) {
+      if ((a[25]:int)[1]:int <= b) goto B_k;
+      if ((a + (e >> 4 & 4))[64]:int > b) goto B_k;
+    }
+    h = 1;
+    label B_k:
+    if (eqz(g & 2)) goto B_m;
+    if (eqz(c)) {
+      if ((a[26]:int)[1]:int <= b) goto B_m;
+      if ((a + (e >> 4 & 4))[66]:int > b) goto B_m;
+    }
+    h = h | 2;
+    label B_m:
+    if (g & 4) {
+      if (eqz(c)) { if ((a[27]:int)[1]:int <= b) goto B_i }
+      h = h | 4;
+    }
+    if (eqz(g & 8)) goto B_b;
+    if (c) goto B_c;
+    goto B_d;
+  }
+  f = 0;
+  if (eqz(i)) goto B_q;
+  if (eqz(c)) {
+    if ((a[25]:int)[1]:int <= b) goto B_q;
+    if ((a + (e >> 4 & 4))[64]:int > b) goto B_q;
+  }
+  if (d.a) { d.a = 0 }
+  f = 1;
+  g = select_if(d.c, 4096, h = d.d);
+  if (g < (k = (j = d.b) + 1)) {
+    loop L_u {
+      g = g << 1;
+      if (g < k) continue L_u;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(g);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = g;
+  }
+  (select_if(h, d + 16, h) + j)[0]:byte = 0;
+  d.b = k;
+  g = a[92]:ubyte;
+  label B_q:
+  if (eqz(g & 2)) goto B_w;
+  if (eqz(c)) {
+    if ((a[26]:int)[1]:int <= b) goto B_w;
+    if ((a + (e >> 4 & 4))[66]:int > b) goto B_w;
+  }
+  if (d.a) { d.a = 0 }
+  k = 2 - f;
+  f = select_if(d.c, 4096, j = d.d);
+  if (f < (i = (h = d.b) + 1)) {
+    loop L_aa {
+      f = f << 1;
+      if (f < i) continue L_aa;
+    }
+    g = select_if(j, l = d + 16, j);
+    j = malloc(f);
+    n = memcpy(j, g, h);
+    if (g != l) { free(g) }
+    d.d = n;
+    d.c = f;
+  }
+  (select_if(j, d + 16, j) + h)[0]:byte = k ^ 1;
+  d.b = i;
+  g = a[92]:ubyte;
+  f = 2;
+  label B_w:
+  if (g & 4) {
+    if (eqz(c)) { if ((a[27]:int)[1]:int <= b) goto B_h }
+    f = 3 - f ^ 1;
+    g = 0;
+    loop L_ea {
+      (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+      g = g + 1;
+      f = f >> 7;
+      if (h) continue L_ea;
+    }
+    if (d.a) { d.a = 0 }
+    f = select_if(d.c, 4096, h = d.d);
+    if (f < (k = (j = d.b) + g)) {
+      loop L_ha {
+        f = f << 1;
+        if (f < k) continue L_ha;
+      }
+      i = select_if(h, l = d + 16, h);
+      h = malloc(f);
+      n = memcpy(h, i, j);
+      if (i != l) { free(i) }
+      d.d = n;
+      d.c = f;
+    }
+    memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+    d.b = k;
+    g = a[92]:ubyte;
+    f = 3;
+  }
+  if (eqz(g & 8)) goto B_e;
+  if (c) goto B_f;
+  goto B_g;
+  label B_i:
+  if (g & 8) goto B_d;
+  goto B_b;
+  label B_h:
+  if (eqz(g & 8)) goto B_e;
+  label B_g:
+  if ((a[28]:int)[1]:int <= b) goto B_e;
+  label B_f:
+  f = 4 - f ^ 1;
+  g = 0;
+  loop L_ja {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_ja;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_ma {
+      f = f << 1;
+      if (f < k) continue L_ma;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[92]:ubyte;
+  f = 4;
+  label B_e:
+  if (eqz(g & 16)) goto B_oa;
+  if (eqz(c)) {
+    if ((a[29]:int)[1]:int <= b) goto B_oa;
+    if ((a + (e >> 4 & 4))[72]:int > b) goto B_oa;
+  }
+  f = 5 - f ^ 1;
+  g = 0;
+  loop L_qa {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_qa;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_ta {
+      f = f << 1;
+      if (f < k) continue L_ta;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[92]:ubyte;
+  f = 5;
+  label B_oa:
+  if (eqz(g & 32)) goto B_va;
+  if (eqz(c)) {
+    if ((a[30]:int)[1]:int <= b) goto B_va;
+    if ((a + (e >> 4 & 4))[74]:int > b) goto B_va;
+  }
+  f = 6 - f ^ 1;
+  g = 0;
+  loop L_xa {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_xa;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_ab {
+      f = f << 1;
+      if (f < k) continue L_ab;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[92]:ubyte;
+  f = 6;
+  label B_va:
+  if (eqz(g & 64)) goto B_cb;
+  if (eqz(c)) {
+    if ((a[31]:int)[1]:int <= b) goto B_cb;
+    if ((a + (e >> 4 & 4))[76]:int > b) goto B_cb;
+  }
+  f = 7 - f ^ 1;
+  g = 0;
+  loop L_eb {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_eb;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_hb {
+      f = f << 1;
+      if (f < k) continue L_hb;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[92]:ubyte;
+  f = 7;
+  label B_cb:
+  if ((g << 24) >> 24 > -1) goto B_jb;
+  if (eqz(c)) {
+    if ((a[0]:int)[79]:int <= b) goto B_jb;
+    if ((a + (e >> 4 & 4))[78]:int > b) goto B_jb;
+  }
+  f = 8 - f ^ 1;
+  g = 0;
+  loop L_lb {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_lb;
+  }
+  if (d.a) { d.a = 0 }
+  f = 8;
+  j = select_if(d.c, 4096, i = d.d);
+  if (j < (l = (k = d.b) + g)) {
+    loop L_ob {
+      j = j << 1;
+      if (j < l) continue L_ob;
+    }
+    h = select_if(i, n = d + 16, i);
+    i = malloc(j);
+    o = memcpy(i, h, k);
+    if (h != n) { free(h) }
+    d.d = o;
+    d.c = j;
+  }
+  memcpy(select_if(i, d + 16, i) + k, m + 8, g);
+  d.b = l;
+  label B_jb:
+  g = a[93]:ubyte;
+  if (g & 1) {
+    if (eqz(c)) { if ((a[32]:int)[1]:int <= b) goto B_tb }
+    f = 9 - f ^ 1;
+    g = 0;
+    loop L_wb {
+      (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+      g = g + 1;
+      f = f >> 7;
+      if (h) continue L_wb;
+    }
+    if (d.a) { d.a = 0 }
+    f = select_if(d.c, 4096, h = d.d);
+    if (f < (k = (j = d.b) + g)) {
+      loop L_zb {
+        f = f << 1;
+        if (f < k) continue L_zb;
+      }
+      i = select_if(h, l = d + 16, h);
+      h = malloc(f);
+      n = memcpy(h, i, j);
+      if (i != l) { free(i) }
+      d.d = n;
+      d.c = f;
+    }
+    memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+    d.b = k;
+    g = a[93]:ubyte;
+    f = 9;
+  }
+  if (eqz(g & 2)) goto B_qb;
+  if (c) goto B_rb;
+  goto B_sb;
+  label B_tb:
+  if (eqz(g & 2)) goto B_qb;
+  label B_sb:
+  if ((a[33]:int)[1]:int <= b) goto B_qb;
+  if ((a + (e >> 4 & 4))[82]:int > b) goto B_qb;
+  label B_rb:
+  f = 10 - f ^ 1;
+  g = 0;
+  loop L_bc {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_bc;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_ec {
+      f = f << 1;
+      if (f < k) continue L_ec;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[93]:ubyte;
+  f = 10;
+  label B_qb:
+  if (g & 4) {
+    if (eqz(c)) { if ((a[34]:int)[1]:int <= b) goto B_jc }
+    f = 11 - f ^ 1;
+    g = 0;
+    loop L_mc {
+      (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+      g = g + 1;
+      f = f >> 7;
+      if (h) continue L_mc;
+    }
+    if (d.a) { d.a = 0 }
+    f = select_if(d.c, 4096, h = d.d);
+    if (f < (k = (j = d.b) + g)) {
+      loop L_pc {
+        f = f << 1;
+        if (f < k) continue L_pc;
+      }
+      i = select_if(h, l = d + 16, h);
+      h = malloc(f);
+      n = memcpy(h, i, j);
+      if (i != l) { free(i) }
+      d.d = n;
+      d.c = f;
+    }
+    memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+    d.b = k;
+    g = a[93]:ubyte;
+    f = 11;
+  }
+  if (eqz(g & 8)) goto B_gc;
+  if (c) goto B_hc;
+  goto B_ic;
+  label B_jc:
+  if (eqz(g & 8)) goto B_gc;
+  label B_ic:
+  if ((a[35]:int)[1]:int <= b) goto B_gc;
+  label B_hc:
+  f = 12 - f ^ 1;
+  g = 0;
+  loop L_rc {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_rc;
+  }
+  if (d.a) { d.a = 0 }
+  f = 12;
+  j = select_if(d.c, 4096, i = d.d);
+  if (j < (l = (k = d.b) + g)) {
+    loop L_uc {
+      j = j << 1;
+      if (j < l) continue L_uc;
+    }
+    h = select_if(i, n = d + 16, i);
+    i = malloc(j);
+    o = memcpy(i, h, k);
+    if (h != n) { free(h) }
+    d.d = o;
+    d.c = j;
+  }
+  memcpy(select_if(i, d + 16, i) + k, m + 8, g);
+  d.b = l;
+  g = a[93]:ubyte;
+  label B_gc:
+  if (g & 16) {
+    if (eqz(c)) { if ((a[36]:int)[1]:int <= b) goto B_zc }
+    f = 13 - f ^ 1;
+    g = 0;
+    loop L_cd {
+      (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+      g = g + 1;
+      f = f >> 7;
+      if (h) continue L_cd;
+    }
+    if (d.a) { d.a = 0 }
+    f = select_if(d.c, 4096, h = d.d);
+    if (f < (k = (j = d.b) + g)) {
+      loop L_fd {
+        f = f << 1;
+        if (f < k) continue L_fd;
+      }
+      i = select_if(h, l = d + 16, h);
+      h = malloc(f);
+      n = memcpy(h, i, j);
+      if (i != l) { free(i) }
+      d.d = n;
+      d.c = f;
+    }
+    memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+    d.b = k;
+    g = a[93]:ubyte;
+    f = 13;
+  }
+  if (eqz(g & 32)) goto B_wc;
+  if (c) goto B_xc;
+  goto B_yc;
+  label B_zc:
+  if (eqz(g & 32)) goto B_wc;
+  label B_yc:
+  if ((a[37]:int)[1]:int <= b) goto B_wc;
+  if ((a + (e >> 4 & 4))[90]:int > b) goto B_wc;
+  label B_xc:
+  f = 14 - f ^ 1;
+  g = 0;
+  loop L_hd {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_hd;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_kd {
+      f = f << 1;
+      if (f < k) continue L_kd;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[93]:ubyte;
+  f = 14;
+  label B_wc:
+  if (eqz(g & 64)) goto B_md;
+  if (eqz(c)) {
+    if (a[55]:int <= b) goto B_md;
+    if ((a + (e >> 4 & 4))[92]:int > b) goto B_md;
+  }
+  f = 15 - f ^ 1;
+  g = 0;
+  loop L_od {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_od;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_rd {
+      f = f << 1;
+      if (f < k) continue L_rd;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[93]:ubyte;
+  f = 15;
+  label B_md:
+  if ((g << 24) >> 24 > -1) goto B_td;
+  if (eqz(c)) {
+    if ((a[0]:int)[157]:int <= b) goto B_td;
+    if ((a + (e >> 4 & 4))[94]:int > b) goto B_td;
+  }
+  f = 16 - f ^ 1;
+  g = 0;
+  loop L_vd {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_vd;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_yd {
+      f = f << 1;
+      if (f < k) continue L_yd;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  f = 16;
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  label B_td:
+  g = a[94]:ubyte;
+  if (g & 1) {
+    if (eqz(c)) { if ((a[38]:int)[1]:int <= b) goto B_de }
+    f = 17 - f ^ 1;
+    g = 0;
+    loop L_ge {
+      (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+      g = g + 1;
+      f = f >> 7;
+      if (h) continue L_ge;
+    }
+    if (d.a) { d.a = 0 }
+    f = select_if(d.c, 4096, h = d.d);
+    if (f < (k = (j = d.b) + g)) {
+      loop L_je {
+        f = f << 1;
+        if (f < k) continue L_je;
+      }
+      i = select_if(h, l = d + 16, h);
+      h = malloc(f);
+      n = memcpy(h, i, j);
+      if (i != l) { free(i) }
+      d.d = n;
+      d.c = f;
+    }
+    memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+    d.b = k;
+    g = a[94]:ubyte;
+    f = 17;
+  }
+  if (eqz(g & 2)) goto B_ae;
+  if (c) goto B_be;
+  goto B_ce;
+  label B_de:
+  if (eqz(g & 2)) goto B_ae;
+  label B_ce:
+  if ((a[39]:int)[1]:int <= b) goto B_ae;
+  label B_be:
+  f = 18 - f ^ 1;
+  g = 0;
+  loop L_le {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_le;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_oe {
+      f = f << 1;
+      if (f < k) continue L_oe;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[94]:ubyte;
+  f = 18;
+  label B_ae:
+  if (eqz(g & 4)) goto B_qe;
+  if (eqz(c)) {
+    if ((a[40]:int)[1]:int <= b) goto B_qe;
+    if ((a + (e >> 4 & 4))[100]:int > b) goto B_qe;
+  }
+  f = 19 - f ^ 1;
+  g = 0;
+  loop L_se {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_se;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_ve {
+      f = f << 1;
+      if (f < k) continue L_ve;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[94]:ubyte;
+  f = 19;
+  label B_qe:
+  if (eqz(g & 8)) goto B_xe;
+  if (eqz(c)) {
+    if ((a[41]:int)[1]:int <= b) goto B_xe;
+    if ((a + (e >> 4 & 4))[102]:int > b) goto B_xe;
+  }
+  f = 20 - f ^ 1;
+  g = 0;
+  loop L_ze {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_ze;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_cf {
+      f = f << 1;
+      if (f < k) continue L_cf;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[94]:ubyte;
+  f = 20;
+  label B_xe:
+  if (eqz(g & 16)) goto B_ef;
+  if (eqz(c)) {
+    if ((a[42]:int)[1]:int <= b) goto B_ef;
+    if ((a + (e >> 4 & 4))[104]:int > b) goto B_ef;
+  }
+  f = 21 - f ^ 1;
+  g = 0;
+  loop L_gf {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_gf;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_jf {
+      f = f << 1;
+      if (f < k) continue L_jf;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[94]:ubyte;
+  f = 21;
+  label B_ef:
+  if (eqz(g & 32)) goto B_lf;
+  if (eqz(c)) {
+    if ((a[43]:int)[1]:int <= b) goto B_lf;
+    if ((a + (e >> 4 & 4))[106]:int > b) goto B_lf;
+  }
+  f = 22 - f ^ 1;
+  g = 0;
+  loop L_nf {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_nf;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_qf {
+      f = f << 1;
+      if (f < k) continue L_qf;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  g = a[94]:ubyte;
+  f = 22;
+  label B_lf:
+  if (g & 64) {
+    if (eqz(c)) { if ((a[44]:int)[1]:int <= b) goto B_ag }
+    f = 23 - f ^ 1;
+    g = 0;
+    loop L_dg {
+      (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+      g = g + 1;
+      f = f >> 7;
+      if (h) continue L_dg;
+    }
+    if (d.a) { d.a = 0 }
+    f = select_if(d.c, 4096, h = d.d);
+    if (f < (k = (j = d.b) + g)) {
+      loop L_gg {
+        f = f << 1;
+        if (f < k) continue L_gg;
+      }
+      i = select_if(h, l = d + 16, h);
+      h = malloc(f);
+      n = memcpy(h, i, j);
+      if (i != l) { free(i) }
+      d.d = n;
+      d.c = f;
+    }
+    memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+    d.b = k;
+    g = a[94]:ubyte;
+    f = 23;
+  }
+  if ((g << 24) >> 24 >= 0) goto B_xf;
+  if (eqz(c)) goto B_zf;
+  goto B_yf;
+  label B_ag:
+  if ((g << 24) >> 24 >= 0) goto B_wf;
+  label B_zf:
+  if ((a[45]:int)[1]:int <= b) goto B_vf;
+  label B_yf:
+  f = 24 - f ^ 1;
+  g = 0;
+  loop L_ig {
+    (m + 8 + g)[0]:byte = (f & 127) | (h = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (h) continue L_ig;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, h = d.d);
+  if (f < (k = (j = d.b) + g)) {
+    loop L_lg {
+      f = f << 1;
+      if (f < k) continue L_lg;
+    }
+    i = select_if(h, l = d + 16, h);
+    h = malloc(f);
+    n = memcpy(h, i, j);
+    if (i != l) { free(i) }
+    d.d = n;
+    d.c = f;
+  }
+  memcpy(select_if(h, d + 16, h) + j, m + 8, g);
+  d.b = k;
+  f = 24;
+  label B_xf:
+  h = a + 95;
+  g = h[0];
+  if (eqz(g & 1)) goto B_sf;
+  if (eqz(c)) goto B_uf;
+  goto B_tf;
+  label B_wf:
+  h = a + 95;
+  g = h[0];
+  if (g & 1) goto B_uf;
+  goto B_sf;
+  label B_vf:
+  h = a + 95;
+  g = h[0];
+  if (eqz(g & 1)) goto B_sf;
+  label B_uf:
+  if ((a[46]:int)[1]:int <= b) goto B_sf;
+  if ((a + (e >> 4 & 4))[112]:int > b) goto B_sf;
+  label B_tf:
+  f = 25 - f ^ 1;
+  g = 0;
+  loop L_ng {
+    (m + 8 + g)[0]:byte = (f & 127) | (i = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (i) continue L_ng;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, i = d.d);
+  if (f < (l = (k = d.b) + g)) {
+    loop L_qg {
+      f = f << 1;
+      if (f < l) continue L_qg;
+    }
+    j = select_if(i, n = d + 16, i);
+    i = malloc(f);
+    o = memcpy(i, j, k);
+    if (j != n) { free(j) }
+    d.d = o;
+    d.c = f;
+  }
+  memcpy(select_if(i, d + 16, i) + k, m + 8, g);
+  d.b = l;
+  g = h[0];
+  f = 25;
+  label B_sf:
+  if (eqz(g & 2)) goto B_sg;
+  if (eqz(c)) {
+    if ((a[47]:int)[1]:int <= b) goto B_sg;
+    if ((a + (e >> 4 & 4))[114]:int > b) goto B_sg;
+  }
+  f = 26 - f ^ 1;
+  g = 0;
+  loop L_ug {
+    (m + 8 + g)[0]:byte = (f & 127) | (i = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (i) continue L_ug;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, i = d.d);
+  if (f < (l = (k = d.b) + g)) {
+    loop L_xg {
+      f = f << 1;
+      if (f < l) continue L_xg;
+    }
+    j = select_if(i, n = d + 16, i);
+    i = malloc(f);
+    o = memcpy(i, j, k);
+    if (j != n) { free(j) }
+    d.d = o;
+    d.c = f;
+  }
+  memcpy(select_if(i, d + 16, i) + k, m + 8, g);
+  d.b = l;
+  g = h[0];
+  f = 26;
+  label B_sg:
+  if (eqz(g & 4)) goto B_zg;
+  if (eqz(c)) {
+    if ((a[0]:int + 1492)[0]:int <= b) goto B_zg;
+    if ((a + (e >> 4 & 4))[116]:int > b) goto B_zg;
+  }
+  f = 27 - f ^ 1;
+  g = 0;
+  loop L_bh {
+    (m + 8 + g)[0]:byte = (f & 127) | (i = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (i) continue L_bh;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, i = d.d);
+  if (f < (l = (k = d.b) + g)) {
+    loop L_eh {
+      f = f << 1;
+      if (f < l) continue L_eh;
+    }
+    j = select_if(i, n = d + 16, i);
+    i = malloc(f);
+    o = memcpy(i, j, k);
+    if (j != n) { free(j) }
+    d.d = o;
+    d.c = f;
+  }
+  memcpy(select_if(i, d + 16, i) + k, m + 8, g);
+  d.b = l;
+  g = h[0];
+  f = 27;
+  label B_zg:
+  if (eqz(g & 8)) goto B_gh;
+  if (eqz(c)) {
+    if ((a[48]:int)[1]:int <= b) goto B_gh;
+    if ((a + (e >> 4 & 4))[118]:int > b) goto B_gh;
+  }
+  f = 28 - f ^ 1;
+  g = 0;
+  loop L_ih {
+    (m + 8 + g)[0]:byte = (f & 127) | (i = f > 127) << 7;
+    g = g + 1;
+    f = f >> 7;
+    if (i) continue L_ih;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, i = d.d);
+  if (f < (l = (k = d.b) + g)) {
+    loop L_lh {
+      f = f << 1;
+      if (f < l) continue L_lh;
+    }
+    j = select_if(i, n = d + 16, i);
+    i = malloc(f);
+    o = memcpy(i, j, k);
+    if (j != n) { free(j) }
+    d.d = o;
+    d.c = f;
+  }
+  memcpy(select_if(i, d + 16, i) + k, m + 8, g);
+  d.b = l;
+  g = h[0];
+  f = 28;
+  label B_gh:
+  if (g & 16) {
+    if (eqz(c)) { if ((a[49]:int)[1]:int <= b) goto B_qh }
+    f = 29 - f ^ 1;
+    g = 0;
+    loop L_th {
+      (m + 8 + g)[0]:byte = (f & 127) | (i = f > 127) << 7;
+      g = g + 1;
+      f = f >> 7;
+      if (i) continue L_th;
+    }
+    if (d.a) { d.a = 0 }
+    f = select_if(d.c, 4096, i = d.d);
+    if (f < (l = (k = d.b) + g)) {
+      loop L_wh {
+        f = f << 1;
+        if (f < l) continue L_wh;
+      }
+      j = select_if(i, n = d + 16, i);
+      i = malloc(f);
+      o = memcpy(i, j, k);
+      if (j != n) { free(j) }
+      d.d = o;
+      d.c = f;
+    }
+    memcpy(select_if(i, d + 16, i) + k, m + 8, g);
+    d.b = l;
+    g = h[0];
+    f = 29;
+  }
+  if (eqz(g & 32)) goto B_nh;
+  if (c) goto B_oh;
+  goto B_ph;
+  label B_qh:
+  if (eqz(g & 32)) goto B_nh;
+  label B_ph:
+  if ((a[50]:int)[1]:int <= b) goto B_nh;
+  if ((a + (e >> 4 & 4))[122]:int > b) goto B_nh;
+  label B_oh:
+  f = 30 - f ^ 1;
+  a = 0;
+  loop L_yh {
+    (m + 8 + a)[0]:byte = (f & 127) | (b = f > 127) << 7;
+    a = a + 1;
+    f = f >> 7;
+    if (b) continue L_yh;
+  }
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, c = d.d);
+  if (f < (g = (e = d.b) + a)) {
+    loop L_bi {
+      f = f << 1;
+      if (f < g) continue L_bi;
+    }
+    b = select_if(c, h = d + 16, c);
+    c = malloc(f);
+    i = memcpy(c, b, e);
+    if (b != h) { free(b) }
+    d.d = i;
+    d.c = f;
+  }
+  memcpy(select_if(c, d + 16, c) + e, m + 8, a);
+  d.b = g;
+  label B_nh:
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, g = d.d);
+  if (f < (c = (b = d.b) + 1)) {
+    loop L_fi {
+      f = f << 1;
+      if (f < c) continue L_fi;
+    }
+    a = select_if(g, e = d + 16, g);
+    g = malloc(f);
+    h = memcpy(g, a, b);
+    if (a != e) { free(a) }
+    d.d = h;
+    d.c = f;
+  }
+  (select_if(g, d + 16, g) + b)[0]:byte = 1;
+  d.b = c;
+  goto B_a;
+  label B_d:
+  if ((a[28]:int)[1]:int <= b) goto B_b;
+  label B_c:
+  h = h | 8;
+  label B_b:
+  if (eqz(g & 16)) goto B_hi;
+  if (eqz(c)) {
+    if ((a[29]:int)[1]:int <= b) goto B_hi;
+    if ((a + (e >> 4 & 4))[72]:int > b) goto B_hi;
+  }
+  h = h | 16;
+  label B_hi:
+  if (eqz(g & 32)) goto B_ji;
+  if (eqz(c)) {
+    if ((a[30]:int)[1]:int <= b) goto B_ji;
+    if ((a + (e >> 4 & 4))[74]:int > b) goto B_ji;
+  }
+  h = h | 32;
+  label B_ji:
+  if (eqz(g & 64)) goto B_li;
+  if (eqz(c)) {
+    if ((a[31]:int)[1]:int <= b) goto B_li;
+    if ((a + (e >> 4 & 4))[76]:int > b) goto B_li;
+  }
+  h = h | 64;
+  label B_li:
+  if (g > -1) goto B_ni;
+  if (eqz(c)) {
+    if ((a[0]:int)[79]:int <= b) goto B_ni;
+    if ((a + (e >> 4 & 4))[78]:int > b) goto B_ni;
+  }
+  h = h | -128;
+  label B_ni:
+  g = a[93]:ubyte;
+  f = (g << 24) >> 24;
+  if (g & 1) {
+    if (c) goto B_ik;
+    g = (a[32]:int)[1]:int > b;
+    if (f & 2) goto B_jk;
+    goto B_gk;
+  }
+  g = 0;
+  if (eqz(f & 2)) goto B_gk;
+  if (c) goto B_hk;
+  label B_jk:
+  if ((a[33]:int)[1]:int <= b) goto B_gk;
+  if ((a + (e >> 4 & 4))[82]:int > b) goto B_gk;
+  goto B_hk;
+  label B_ik:
+  g = 1;
+  if (f & 2) goto B_hk;
+  if (f & 4) goto B_fk;
+  if (f & 8) goto B_ck;
+  if (f & 16) goto B_ak;
+  if (f & 32) goto B_xj;
+  if (f & 64) goto B_vj;
+  if (f < 0) { goto B_tj }
+  i = a[94]:ubyte;
+  j = i & 1;
+  f = (i << 24) >> 24;
+  if (i & 2) goto B_rj;
+  if (f & 4) goto B_pj;
+  if (f & 8) goto B_nj;
+  if (f & 16) goto B_lj;
+  if (f & 32) goto B_jj;
+  if (f & 64) goto B_hj;
+  if (f < 0) { goto B_ej }
+  f = a[95]:ubyte;
+  if (f & 1) goto B_bj;
+  if (f & 2) {
+    i = 0;
+    goto B_zi;
+  }
+  if (f & 4) {
+    i = 0;
+    goto B_xi;
+  }
+  if (f & 8) {
+    i = 0;
+    goto B_vi;
+  }
+  if (f & 16) {
+    i = 0;
+    goto B_ti;
+  }
+  i = 0;
+  if (eqz(f & 32)) goto B_pi;
+  goto B_qi;
+  label B_hk:
+  g = g | 2;
+  label B_gk:
+  if (eqz(f & 4)) goto B_ek;
+  if (c) goto B_fk;
+  if ((a[34]:int)[1]:int > b) goto B_fk;
+  if (f & 8) goto B_dk;
+  goto B_bk;
+  label B_fk:
+  g = g | 4;
+  label B_ek:
+  if (eqz(f & 8)) goto B_bk;
+  if (c) goto B_ck;
+  label B_dk:
+  if ((a[35]:int)[1]:int <= b) goto B_bk;
+  label B_ck:
+  g = g | 8;
+  label B_bk:
+  if (eqz(f & 16)) goto B_zj;
+  if (c) goto B_ak;
+  if ((a[36]:int)[1]:int > b) goto B_ak;
+  if (f & 32) goto B_yj;
+  goto B_wj;
+  label B_ak:
+  g = g | 16;
+  label B_zj:
+  if (eqz(f & 32)) goto B_wj;
+  if (c) goto B_xj;
+  label B_yj:
+  if ((a[37]:int)[1]:int <= b) goto B_wj;
+  if ((a + (e >> 4 & 4))[90]:int > b) goto B_wj;
+  label B_xj:
+  g = g | 32;
+  label B_wj:
+  if (eqz(f & 64)) goto B_uj;
+  if (c) goto B_vj;
+  if (a[55]:int <= b) goto B_uj;
+  if ((a + (e >> 4 & 4))[92]:int > b) goto B_uj;
+  label B_vj:
+  g = g | 64;
+  label B_uj:
+  if (f >= 0) goto B_sj;
+  if (c) goto B_tj;
+  if ((a[0]:int)[157]:int <= b) goto B_sj;
+  if ((a + (e >> 4 & 4))[94]:int > b) goto B_sj;
+  label B_tj:
+  g = g | -128;
+  label B_sj:
+  f = a[94]:ubyte;
+  j = f & 1;
+  if (eqz(j)) goto B_sk;
+  if (c) goto B_sk;
+  j = (a[38]:int)[1]:int > b;
+  if (eqz(f & 2)) goto B_qj;
+  goto B_rk;
+  label B_sk:
+  if (eqz(f & 2)) goto B_qj;
+  if (c) goto B_rj;
+  label B_rk:
+  if ((a[39]:int)[1]:int <= b) goto B_qj;
+  label B_rj:
+  j = j | 2;
+  label B_qj:
+  if (eqz(f & 4)) goto B_oj;
+  if (c) goto B_pj;
+  if ((a[40]:int)[1]:int <= b) goto B_oj;
+  if ((a + (e >> 4 & 4))[100]:int > b) goto B_oj;
+  label B_pj:
+  j = j | 4;
+  label B_oj:
+  if (eqz(f & 8)) goto B_mj;
+  if (c) goto B_nj;
+  if ((a[41]:int)[1]:int <= b) goto B_mj;
+  if ((a + (e >> 4 & 4))[102]:int > b) goto B_mj;
+  label B_nj:
+  j = j | 8;
+  label B_mj:
+  if (eqz(f & 16)) goto B_kj;
+  if (c) goto B_lj;
+  if ((a[42]:int)[1]:int <= b) goto B_kj;
+  if ((a + (e >> 4 & 4))[104]:int > b) goto B_kj;
+  label B_lj:
+  j = j | 16;
+  label B_kj:
+  if (eqz(f & 32)) goto B_ij;
+  if (c) goto B_jj;
+  if ((a[43]:int)[1]:int <= b) goto B_ij;
+  if ((a + (e >> 4 & 4))[106]:int > b) goto B_ij;
+  label B_jj:
+  j = j | 32;
+  label B_ij:
+  if (eqz(f & 64)) goto B_gj;
+  if (c) goto B_hj;
+  if ((a[44]:int)[1]:int > b) goto B_hj;
+  i = 0;
+  if ((f << 24) >> 24 < 0) goto B_fj;
+  f = a[95]:ubyte;
+  if (eqz(f & 1)) goto B_aj;
+  goto B_cj;
+  label B_hj:
+  j = j | 64;
+  label B_gj:
+  if ((f << 24) >> 24 >= 0) goto B_dj;
+  if (c) goto B_ej;
+  label B_fj:
+  if ((a[45]:int)[1]:int > b) goto B_ej;
+  i = 0;
+  f = a[95]:ubyte;
+  if (f & 1) goto B_cj;
+  goto B_aj;
+  label B_ej:
+  j = j | -128;
+  label B_dj:
+  i = 0;
+  f = a[95]:ubyte;
+  if (eqz(f & 1)) goto B_aj;
+  if (c) goto B_bj;
+  label B_cj:
+  if ((a[46]:int)[1]:int <= b) goto B_aj;
+  if ((a + (e >> 4 & 4))[112]:int > b) goto B_aj;
+  label B_bj:
+  i = 1;
+  label B_aj:
+  if (eqz(f & 2)) goto B_yi;
+  if (c) goto B_zi;
+  if ((a[47]:int)[1]:int <= b) goto B_yi;
+  if ((a + (e >> 4 & 4))[114]:int > b) goto B_yi;
+  label B_zi:
+  i = i | 2;
+  label B_yi:
+  if (eqz(f & 4)) goto B_wi;
+  if (c) goto B_xi;
+  if ((a[0]:int + 1492)[0]:int <= b) goto B_wi;
+  if ((a + (e >> 4 & 4))[116]:int > b) goto B_wi;
+  label B_xi:
+  i = i | 4;
+  label B_wi:
+  if (eqz(f & 8)) goto B_ui;
+  if (c) goto B_vi;
+  if ((a[48]:int)[1]:int <= b) goto B_ui;
+  if ((a + (e >> 4 & 4))[118]:int > b) goto B_ui;
+  label B_vi:
+  i = i | 8;
+  label B_ui:
+  if (eqz(f & 16)) goto B_si;
+  if (c) goto B_ti;
+  if ((a[49]:int)[1]:int > b) goto B_ti;
+  if (eqz(f & 32)) goto B_pi;
+  goto B_ri;
+  label B_ti:
+  i = i | 16;
+  label B_si:
+  if (eqz(f & 32)) goto B_pi;
+  if (c) goto B_qi;
+  label B_ri:
+  if ((a[50]:int)[1]:int <= b) goto B_pi;
+  if ((a + (e >> 4 & 4))[122]:int > b) goto B_pi;
+  label B_qi:
+  i = i | 32;
+  label B_pi:
+  if (d.a) { d.a = 0 }
+  f = select_if(d.c, 4096, c = d.d);
+  if (f < (e = (b = d.b) + 4)) {
+    loop L_vk {
+      f = f << 1;
+      if (f < e) continue L_vk;
+    }
+    a = select_if(c, k = d + 16, c);
+    c = malloc(f);
+    l = memcpy(c, a, b);
+    if (a != k) { free(a) }
+    d.d = l;
+    d.c = f;
+  }
+  (select_if(c, d + 16, c) + b)[0]:int@1 =
+    (h & 255) | ((i << 24 | (j & 255) << 16) | (g & 255) << 8);
+  d.b = e;
+  label B_a:
+  stack_pointer = m + 16;
+}
+
+function function_394(a:int, b:int, c:int, d:int):int { // func394
+  var e:int;
+  var g:int = a[92]:ubyte;
+  var f:int = (g << 24) >> 24;
+  if (eqz(g & 1)) goto B_a;
+  if (eqz(c)) {
+    if ((a[25]:int)[1]:int <= b) goto B_a;
+    if ((a + (d >> 4 & 4))[64]:int > b) goto B_a;
+  }
+  e = 1;
+  label B_a:
+  if (eqz(f & 2)) goto B_c;
+  if (eqz(c)) {
+    if ((a[26]:int)[1]:int <= b) goto B_c;
+    if ((a + (d >> 4 & 4))[66]:int > b) goto B_c;
+  }
+  e = e + 1;
+  label B_c:
+  if (f & 4) {
+    if (eqz(c)) { if ((a[27]:int)[1]:int <= b) goto B_h }
+    e = e + 1;
+  }
+  if (eqz(f & 8)) goto B_e;
+  if (c) goto B_f;
+  goto B_g;
+  label B_h:
+  if (eqz(f & 8)) goto B_e;
+  label B_g:
+  if ((a[28]:int)[1]:int <= b) goto B_e;
+  label B_f:
+  e = e + 1;
+  label B_e:
+  if (eqz(f & 16)) goto B_k;
+  if (eqz(c)) {
+    if ((a[29]:int)[1]:int <= b) goto B_k;
+    if ((a + (d >> 4 & 4))[72]:int > b) goto B_k;
+  }
+  e = e + 1;
+  label B_k:
+  if (eqz(f & 32)) goto B_m;
+  if (eqz(c)) {
+    if ((a[30]:int)[1]:int <= b) goto B_m;
+    if ((a + (d >> 4 & 4))[74]:int > b) goto B_m;
+  }
+  e = e + 1;
+  label B_m:
+  if (eqz(f & 64)) goto B_o;
+  if (eqz(c)) {
+    if ((a[31]:int)[1]:int <= b) goto B_o;
+    if ((a + (d >> 4 & 4))[76]:int > b) goto B_o;
+  }
+  e = e + 1;
+  label B_o:
+  if (f > -1) goto B_q;
+  if (eqz(c)) {
+    if ((a[0]:int)[79]:int <= b) goto B_q;
+    if ((a + (d >> 4 & 4))[78]:int > b) goto B_q;
+  }
+  e = e + 1;
+  label B_q:
+  g = a[93]:ubyte;
+  f = (g << 24) >> 24;
+  if (g & 1) {
+    if (eqz(c)) { if ((a[32]:int)[1]:int <= b) goto B_v }
+    e = e + 1;
+  }
+  if (eqz(f & 2)) goto B_s;
+  if (c) goto B_t;
+  goto B_u;
+  label B_v:
+  if (eqz(f & 2)) goto B_s;
+  label B_u:
+  if ((a[33]:int)[1]:int <= b) goto B_s;
+  if ((a + (d >> 4 & 4))[82]:int > b) goto B_s;
+  label B_t:
+  e = e + 1;
+  label B_s:
+  if (f & 4) {
+    if (eqz(c)) { if ((a[34]:int)[1]:int <= b) goto B_ba }
+    e = e + 1;
+  }
+  if (eqz(f & 8)) goto B_y;
+  if (c) goto B_z;
+  goto B_aa;
+  label B_ba:
+  if (eqz(f & 8)) goto B_y;
+  label B_aa:
+  if ((a[35]:int)[1]:int <= b) goto B_y;
+  label B_z:
+  e = e + 1;
+  label B_y:
+  if (f & 16) {
+    if (eqz(c)) { if ((a[36]:int)[1]:int <= b) goto B_ha }
+    e = e + 1;
+  }
+  if (eqz(f & 32)) goto B_ea;
+  if (c) goto B_fa;
+  goto B_ga;
+  label B_ha:
+  if (eqz(f & 32)) goto B_ea;
+  label B_ga:
+  if ((a[37]:int)[1]:int <= b) goto B_ea;
+  if ((a + (d >> 4 & 4))[90]:int > b) goto B_ea;
+  label B_fa:
+  e = e + 1;
+  label B_ea:
+  if (eqz(f & 64)) goto B_ka;
+  if (eqz(c)) {
+    if (a[55]:int <= b) goto B_ka;
+    if ((a + (d >> 4 & 4))[92]:int > b) goto B_ka;
+  }
+  e = e + 1;
+  label B_ka:
+  if (f > -1) goto B_ma;
+  if (eqz(c)) {
+    if ((a[0]:int)[157]:int <= b) goto B_ma;
+    if ((a + (d >> 4 & 4))[94]:int > b) goto B_ma;
+  }
+  e = e + 1;
+  label B_ma:
+  g = a[94]:ubyte;
+  f = (g << 24) >> 24;
+  if (g & 1) {
+    if (eqz(c)) { if ((a[38]:int)[1]:int <= b) goto B_ra }
+    e = e + 1;
+  }
+  if (eqz(f & 2)) goto B_oa;
+  if (c) goto B_pa;
+  goto B_qa;
+  label B_ra:
+  if (eqz(f & 2)) goto B_oa;
+  label B_qa:
+  if ((a[39]:int)[1]:int <= b) goto B_oa;
+  label B_pa:
+  e = e + 1;
+  label B_oa:
+  if (eqz(f & 4)) goto B_ua;
+  if (eqz(c)) {
+    if ((a[40]:int)[1]:int <= b) goto B_ua;
+    if ((a + (d >> 4 & 4))[100]:int > b) goto B_ua;
+  }
+  e = e + 1;
+  label B_ua:
+  if (eqz(f & 8)) goto B_wa;
+  if (eqz(c)) {
+    if ((a[41]:int)[1]:int <= b) goto B_wa;
+    if ((a + (d >> 4 & 4))[102]:int > b) goto B_wa;
+  }
+  e = e + 1;
+  label B_wa:
+  if (eqz(f & 16)) goto B_ya;
+  if (eqz(c)) {
+    if ((a[42]:int)[1]:int <= b) goto B_ya;
+    if ((a + (d >> 4 & 4))[104]:int > b) goto B_ya;
+  }
+  e = e + 1;
+  label B_ya:
+  if (eqz(f & 32)) goto B_ab;
+  if (eqz(c)) {
+    if ((a[43]:int)[1]:int <= b) goto B_ab;
+    if ((a + (d >> 4 & 4))[106]:int > b) goto B_ab;
+  }
+  e = e + 1;
+  label B_ab:
+  e = {
+        if (f & 64) {
+          if (eqz(c)) { if ((a[44]:int)[1]:int <= b) goto B_kb }
+          e = e + 1;
+        }
+        e;
+        if (f >= 0) goto B_hb;
+        if (eqz(c)) goto B_jb;
+        goto B_ib;
+        label B_kb:
+        if (f >= 0) goto B_gb;
+        label B_jb:
+        if ((a[45]:int)[1]:int <= b) goto B_fb;
+        label B_ib:
+        e + 1;
+        label B_hb:
+      }
+  f = a[95]:ubyte;
+  if (eqz(f & 1)) goto B_cb;
+  if (eqz(c)) goto B_eb;
+  goto B_db;
+  label B_gb:
+  f = a[95]:ubyte;
+  if (f & 1) goto B_eb;
+  goto B_cb;
+  label B_fb:
+  f = a[95]:ubyte;
+  if (eqz(f & 1)) goto B_cb;
+  label B_eb:
+  if ((a[46]:int)[1]:int <= b) goto B_cb;
+  if ((a + (d >> 4 & 4))[112]:int > b) goto B_cb;
+  label B_db:
+  e = e + 1;
+  label B_cb:
+  if (eqz(f & 2)) goto B_nb;
+  if (eqz(c)) {
+    if ((a[47]:int)[1]:int <= b) goto B_nb;
+    if ((a + (d >> 4 & 4))[114]:int > b) goto B_nb;
+  }
+  e = e + 1;
+  label B_nb:
+  if (eqz(f & 4)) goto B_pb;
+  if (eqz(c)) {
+    if ((a[0]:int + 1492)[0]:int <= b) goto B_pb;
+    if ((a + (d >> 4 & 4))[116]:int > b) goto B_pb;
+  }
+  e = e + 1;
+  label B_pb:
+  if (eqz(f & 8)) goto B_rb;
+  if (eqz(c)) {
+    if ((a[48]:int)[1]:int <= b) goto B_rb;
+    if ((a + (d >> 4 & 4))[118]:int > b) goto B_rb;
+  }
+  e = e + 1;
+  label B_rb:
+  if (f & 16) {
+    if (eqz(c)) { if ((a[49]:int)[1]:int <= b) goto B_wb }
+    e = e + 1;
+  }
+  if (eqz(f & 32)) goto B_tb;
+  if (c) goto B_ub;
+  goto B_vb;
+  label B_wb:
+  if (eqz(f & 32)) goto B_tb;
+  label B_vb:
+  if ((a[50]:int)[1]:int <= b) goto B_tb;
+  if ((a + (d >> 4 & 4))[122]:int > b) goto B_tb;
+  label B_ub:
+  e = e + 1;
+  label B_tb:
+  return e;
+}
+
+function function_395(a:int, b:int) { // func395
+  var c:int_ptr;
+  var f:ubyte_ptr;
+  var g:int;
+  var e:ubyte_ptr;
+  if (a[0]:float == b[0]:float) goto B_a;
+  free(8551052[0]:int);
+  8551048[0]:long@4 = 0L;
+  8551040[0]:long@4 = 0L;
+  free(8555164[0]:int);
+  8555160[0]:long@4 = 0L;
+  8555152[0]:long@4 = 0L;
+  var i:float = a[0]:float;
+  if (8551040[0]:int) { 8551040[0]:int = 0 }
+  var d:int_ptr = select_if(8551048[0]:int, 4096, c = 8551052[0]:int);
+  if (d < (g = (f = 8551044[0]:int) + 4)) {
+    loop L_d {
+      d = d << 1;
+      if (d < g) continue L_d;
+    }
+    e = select_if(c, 8551056, c);
+    c = malloc(d);
+    var h:int = memcpy(c, e, f);
+    if (e != 8551056) { free(e) }
+    8551052[0]:int = h;
+    8551048[0]:int = d;
+  }
+  (select_if(c, 8551056, c) + f)[0]:float@1 = i;
+  8551044[0]:int = g;
+  a[0]:float = (i = b[0]:float);
+  if (8555152[0]:int) { 8555152[0]:int = 0 }
+  d = select_if(8555160[0]:int, 4096, b = 8555164[0]:int);
+  if (d < (c = (f = 8555156[0]:int) + 4)) {
+    loop L_h {
+      d = d << 1;
+      if (d < c) continue L_h;
+    }
+    e = select_if(b, 8555168, b);
+    b = malloc(d);
+    g = memcpy(b, e, f);
+    if (e != 8555168) { free(e) }
+    8555164[0]:int = g;
+    8555160[0]:int = d;
+  }
+  (select_if(b, 8555168, b) + f)[0]:float@1 = i;
+  8555156[0]:int = c;
+  if (8551044[0]:int != c) goto B_j;
+  if (eqz(c)) goto B_a;
+  b = 8551052[0]:int;
+  e = select_if(b, 8551056, b);
+  if (
+    e[0] != (f = select_if(b = 8555164[0]:int, 8555168, b))[0]) goto B_j;
+  b = 1;
+  loop L_k {
+    d = b;
+    if (d == c) goto B_a;
+    b = d + 1;
+    if ((d + e)[0]:ubyte == (d + f)[0]:ubyte) continue L_k;
+  }
+  if (c <= d) goto B_a;
+  label B_j:
+  d = a - 88;
+  a = d[0];
+  if (eqz(a)) goto B_a;
+  a[74]:int = (b = a[0]:int)[535]:int;
+  a[75]:int = b[535]:int;
+  c = b + ((a[4]:int & 16383) << 3) + 264876;
+  b = c[0];
+  c[0] = 0;
+  if (b) {
+    free(b[3]:int);
+    free(b);
+  }
+  c = a[0]:int + ((a[4]:int & 16383) << 3) + 264880;
+  b = c[0];
+  c[0] = 0;
+  if (b) {
+    free(b[3]:int);
+    free(b);
+  }
+  b = a[0]:int;
+  (b + ((a[4]:int & 16383) << 2) + 68268)[0]:int = (c = b[535]:int);
+  (b + ((a[4]:int & 16383) << 2) + 133804)[0]:int = c;
+  d[34] = ((d[0])[0]:int)[535]:int;
+  label B_a:
+}
+
+function function_396(a:int, b:int) { // func396
+  var c:int_ptr;
+  var f:ubyte_ptr;
+  var g:int;
+  var e:ubyte_ptr;
+  if (a[0]:float == b[0]:float) goto B_a;
+  free(8551052[0]:int);
+  8551048[0]:long@4 = 0L;
+  8551040[0]:long@4 = 0L;
+  free(8555164[0]:int);
+  8555160[0]:long@4 = 0L;
+  8555152[0]:long@4 = 0L;
+  var i:float = a[0]:float;
+  if (8551040[0]:int) { 8551040[0]:int = 0 }
+  var d:int_ptr = select_if(8551048[0]:int, 4096, c = 8551052[0]:int);
+  if (d < (g = (f = 8551044[0]:int) + 4)) {
+    loop L_d {
+      d = d << 1;
+      if (d < g) continue L_d;
+    }
+    e = select_if(c, 8551056, c);
+    c = malloc(d);
+    var h:int = memcpy(c, e, f);
+    if (e != 8551056) { free(e) }
+    8551052[0]:int = h;
+    8551048[0]:int = d;
+  }
+  (select_if(c, 8551056, c) + f)[0]:float@1 = i;
+  8551044[0]:int = g;
+  a[0]:float = (i = b[0]:float);
+  if (8555152[0]:int) { 8555152[0]:int = 0 }
+  d = select_if(8555160[0]:int, 4096, b = 8555164[0]:int);
+  if (d < (c = (f = 8555156[0]:int) + 4)) {
+    loop L_h {
+      d = d << 1;
+      if (d < c) continue L_h;
+    }
+    e = select_if(b, 8555168, b);
+    b = malloc(d);
+    g = memcpy(b, e, f);
+    if (e != 8555168) { free(e) }
+    8555164[0]:int = g;
+    8555160[0]:int = d;
+  }
+  (select_if(b, 8555168, b) + f)[0]:float@1 = i;
+  8555156[0]:int = c;
+  if (8551044[0]:int != c) goto B_j;
+  if (eqz(c)) goto B_a;
+  b = 8551052[0]:int;
+  e = select_if(b, 8551056, b);
+  if (
+    e[0] != (f = select_if(b = 8555164[0]:int, 8555168, b))[0]) goto B_j;
+  b = 1;
+  loop L_k {
+    d = b;
+    if (d == c) goto B_a;
+    b = d + 1;
+    if ((d + e)[0]:ubyte == (d + f)[0]:ubyte) continue L_k;
+  }
+  if (c <= d) goto B_a;
+  label B_j:
+  d = a - 12;
+  a = d[0];
+  if (eqz(a)) goto B_a;
+  a[74]:int = (b = a[0]:int)[535]:int;
+  a[75]:int = b[535]:int;
+  c = b + ((a[4]:int & 16383) << 3) + 264876;
+  b = c[0];
+  c[0] = 0;
+  if (b) {
+    free(b[3]:int);
+    free(b);
+  }
+  c = a[0]:int + ((a[4]:int & 16383) << 3) + 264880;
+  b = c[0];
+  c[0] = 0;
+  if (b) {
+    free(b[3]:int);
+    free(b);
+  }
+  b = a[0]:int;
+  (b + ((a[4]:int & 16383) << 2) + 68268)[0]:int = (c = b[535]:int);
+  (b + ((a[4]:int & 16383) << 2) + 133804)[0]:int = c;
+  d[29] = ((d[0])[0]:int)[535]:int;
+  label B_a:
+}
+
+function createEquippedPetal(a:int, b:int, c:int) { // func397
+  var f:int;
+  var e:int;
+  if (b > 7) goto B_a;
+  if (c > 2) goto B_a;
+  var g:{ a:int, b:int, c:int } = a + b * 36 + c * 12 + 296;
+  if (g.a) goto B_a;
+  var k:ubyte_ptr = a + b;
+  var d:int_ptr = k[20];
+  if (eqz(d)) goto B_a;
+  if ({
+        5;
+        if ((f = a[148]:ubyte) < 15) goto B_b;
+        6;
+        if (f < 30) goto B_b;
+        select_if(7, 8, f < 45);
+        label B_b:
+      } <=
+      b) goto B_a;
+  f = (d - 1 & 255) > 37;
+  if (f) goto B_a;
+  f = select_if(0, d * 52 + 8545792, f);
+  if (f[40]:ubyte) goto B_a;
+  if (f[8]:int <= c) goto B_a;
+  d = function_74((a[0]:int)[0]:int);
+  if (eqz(d)) goto B_a;
+  function_73(d, a[0]:int);
+  var h:int = d[31];
+  if (eqz(h)) {
+    d[31] = (h = function_128(d[0] + 268));
+    h[0]:int = d;
+    f = (d[0])[535]:int;
+    h[5]:int = 0;
+    h[8]:byte = 0;
+    h[1]:int = f;
+    h[3]:int = 0;
+    h[15]:int@1 = 0;
+    function_218(d, d[31]);
+    h = d[31];
+  }
+  f = d[42];
+  if (eqz(f)) {
+    d[42] = (e = function_97(d[0] + 1220));
+    e[0]:int = d;
+    f = (d[0])[535]:int;
+    e[1]:long = 0L;
+    e[1]:int = f;
+    e[2]:long = 0L;
+    e[3]:long = 0L;
+    e[8]:int = 0;
+    e[28]:int = 0;
+    e[36]:byte = 1;
+    e[5]:long = 0L;
+    e[6]:long = 0L;
+    e[7]:long = 0L;
+    (e - -64)[0]:long = 0L;
+    e[9]:long = 0L;
+    e[80]:byte = 0;
+    function_96(d, d[42]);
+    f = d[42];
+  }
+  e = (a[0]:int)[42]:int;
+  if (eqz(e[80]:ubyte)) { function_17(e) }
+  var i:int = f;
+  var l:double = e[11]:double;
+  var m:double = e[12]:double;
+  var j:{ a:double, b:double } = stack_pointer - 16;
+  stack_pointer = j;
+  j.a = m;
+  j.b = l;
+  if ((i64_reinterpret_f64(l) & 9218868437227405312L) ==
+      9218868437227405312L) goto B_f;
+  if ((i64_reinterpret_f64(m) & 9218868437227405312L) ==
+      9218868437227405312L) goto B_f;
+  if (eqz(i[80]:ubyte)) goto B_g;
+  i[80]:byte = 0;
+  e = (i[0]:int)[21]:int;
+  if (eqz(e)) goto B_g;
+  loop L_h {
+    f = e[2]:int;
+    function_34(e);
+    e = f;
+    if (e) continue L_h;
+  }
+  label B_g:
+  function_44(i + 20, j + 8);
+  function_47(i + 16, j);
+  label B_f:
+  stack_pointer = j + 16;
+  setPetalTypeAndCreateBehavior(h, b, c, k[20]);
+  if (d != g.a) {
+    f = g.b;
+    f[2]:int = g.c;
+    g.c[1]:int = f;
+    g.a = 0;
+    g.c = g;
+    g.b =
+      {
+        if (eqz(d)) {
+          h = g + 8;
+          g.a = 0;
+          g;
+          goto B_j;
+        }
+        g.a = d[1];
+        g.c = (f = (h = d + 12)[0]:int);
+        f[1]:int = g;
+        d + 4;
+        label B_j:
+      }
+    h[0]:int = g;
+  }
+  (a + b * 12)[c + 152]:int = 0;
+  (a + b * 3 + c)[584]:byte = 0;
+  function_85(a);
+  label B_a:
+}
+

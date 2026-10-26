@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/random-state.mjs",
+  "implementationSha256": "5aa37f2dc03b06fd91955424df22de3ff6ddea9386670e521af435e94a0b0ca0",
+  "factory": "createRandomStateHook",
+  "functionIds": [
+    203
+  ],
+  "functions": [
+    {
+      "id": 203,
+      "name": "nextRandom",
+      "originalSymbol": "function_203",
+      "signature": " (type $t50) (param $p0 i32) (result i64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 45761
+        },
+        "source": {
+          "path": "source/game/server/random-state.mjs",
+          "line": 35
+        },
+        "test": "test/server-random-state.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "312-word circular generator gated by byte 8573032: combines idx+156, idx+1 and the previous high bits, stores at idx, advances, then applies four shift/xor temper steps."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-random-state.test.mjs",
+    "report": "reports/server-random-state-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 16,
+    "completeLinearMemoryChecks": 16,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 16,
+    "trappingComparisons": 0,
+    "comparison": "Disabled and enabled generator states across eight index positions including every wrap boundary compare the signed i64 draw, complete memory and stack pointer.",
+    "limitations": [
+      "Only one draw per seeded state is compared; long sequential runs are not enumerated.",
+      "Ledger: 239 server bodies recovered and 495 remain machine code."
+    ]
+  }
+}

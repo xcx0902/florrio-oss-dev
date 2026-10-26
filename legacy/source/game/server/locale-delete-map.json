@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/locale-delete.mjs",
+  "implementationSha256": "dac3597b68186051a02329609fd16238a2940bc83b0756e0ef0b3de258e56685",
+  "factory": "createLocaleDeleteHook",
+  "functionIds": [
+    620
+  ],
+  "functions": [
+    {
+      "id": 620,
+      "name": "deleteLocaleObject",
+      "originalSymbol": "function_620",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/locale-delete.mjs",
+          "line": 9
+        },
+        "test": "test/server-locale-delete.test.mjs"
+      },
+      "originalDirectDependencies": [
+        239,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Resets through 239 and frees the object."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-locale-delete.test.mjs",
+    "report": "reports/server-locale-delete-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 1,
+    "completeLinearMemoryChecks": 1,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 1,
+    "trappingComparisons": 0,
+    "comparison": "One real 64-byte object with a retained control block compares complete allocator memory and stack.",
+    "limitations": [
+      "Only the retained-control-block path is exercised. Ledger: 452 server bodies recovered and 282 remain machine code."
+    ]
+  }
+}

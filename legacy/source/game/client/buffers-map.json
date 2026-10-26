@@ -1,0 +1,251 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/buffers.mjs",
+  "implementationSha256": "2e62f975e31aedab07e1b52416e59dac0077ef1208885a151423bbf395783ab9",
+  "factory": "createBufferHooks",
+  "functionIds": [
+    365,
+    523,
+    525,
+    914,
+    1796,
+    1797,
+    1799,
+    1938,
+    1941
+  ],
+  "functions": [
+    {
+      "id": 365,
+      "name": "compareByteStrings",
+      "originalSymbol": "function_365",
+      "signature": " (type $t4) (param $p0 i32) (param $p1 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 1819
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 60
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 523,
+      "name": "stringEndDword",
+      "originalSymbol": "function_523",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 37062
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 72
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 525,
+      "name": "stringEndByte",
+      "originalSymbol": "function_525",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 37182
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 73
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 914,
+      "name": "storeByWidthSelector",
+      "originalSymbol": "function_914",
+      "signature": " (type $t92) (param $p0 i32) (param $p1 i32) (param $p2 i64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 186620
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 78
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1796,
+      "name": "scanClassRun",
+      "originalSymbol": "function_1796",
+      "signature": " (type $t8) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 465749
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 92
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1797,
+      "name": "findClassWord",
+      "originalSymbol": "function_1797",
+      "signature": " (type $t8) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 465785
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 103
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1799,
+      "name": "widenClassMasks",
+      "originalSymbol": "function_1799",
+      "signature": " (type $t8) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 465846
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 115
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1938,
+      "name": "hashDwords",
+      "originalSymbol": "function_1938",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 484177
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 128
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1941,
+      "name": "hashSignedBytes",
+      "originalSymbol": "function_1941",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 484269
+        },
+        "source": {
+          "path": "source/game/client/buffers.mjs",
+          "line": 141
+        },
+        "test": "test/client-buffers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-buffers.test.mjs",
+    "report": "reports/client-buffers-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 43,
+    "trappingComparisons": 9,
+    "completeLinearMemoryChecks": 43,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 43,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 0,
+      "boundary": 9,
+      "widths": 0
+    },
+    "argumentRows": [
+      "seeded strings, string records, class words and hash inputs at 0x100000 + 0x100*index",
+      "the same records shifted by four bytes",
+      "all-zero arguments",
+      "addresses at 0x3ffffff minus index",
+      "seven width selectors for 914"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. All nine boundary rows trap. 523/525 select inline and heap string layouts in different rows; the width rows cover 8/16/32/64-bit stores and the non-storing selectors.",
+    "limitations": [
+      "The rows sample string sizes, class masks, hash inputs and overlapping ranges rather than every possible value.",
+      "1938/1941 exercise one non-trivial input pair; the rotate-xor recurrence is exact but not exhaustively enumerated.",
+      "1796/1797 return an address inside the scanned range or the supplied end pointer; only prepared hits/class breaks are covered.",
+      "These nine functions are part of the 4,245 client functions; the current ledger has 236 client bodies recovered and 4,009 remain machine code."
+    ]
+  }
+}

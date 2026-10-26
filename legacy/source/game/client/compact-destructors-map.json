@@ -1,0 +1,105 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/compact-destructors.mjs",
+  "implementationSha256": "5d37fe8604b037192a0d57f54292429c8702f32c6e662fdab2b5cc32f9706f96",
+  "factory": "createCompactDestructorHooks",
+  "functionIds": [
+    2494,
+    2662,
+    2683
+  ],
+  "functions": [
+    {
+      "id": 2494,
+      "name": "compactDestructor2494",
+      "originalSymbol": "function_2494",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/compact-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-compact-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        416,
+        377,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Two enable-gated reports, a global pointer-vector release, or a vtable plus subobject release."
+    },
+    {
+      "id": 2662,
+      "name": "compactDestructor2662",
+      "originalSymbol": "function_2662",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/compact-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-compact-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        416,
+        377,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Two enable-gated reports, a global pointer-vector release, or a vtable plus subobject release."
+    },
+    {
+      "id": 2683,
+      "name": "compactDestructor2683",
+      "originalSymbol": "function_2683",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/compact-destructors.mjs",
+          "line": 10
+        },
+        "test": "test/client-compact-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        416,
+        377,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Two enable-gated reports, a global pointer-vector release, or a vtable plus subobject release."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-compact-destructors.test.mjs",
+    "report": "reports/client-compact-destructors-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Both enable states for 2494 plus zero fixtures for 2662 and 2683 compare stack pointer and complete memory.",
+    "limitations": [
+      "Vector and vtable fixtures use empty records, so non-null releases are not exercised. Ledger: 659 client and 507 server bodies recovered."
+    ]
+  }
+}

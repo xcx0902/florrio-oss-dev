@@ -1,0 +1,411 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/small-accessors.mjs",
+  "implementationSha256": "6eb300d8805cbea3e0b47c4b71481c38cd666bcc7b68ac308ded4a4dc755af79",
+  "factory": "createSmallAccessorHooks",
+  "functionIds": [
+    424,
+    425,
+    445,
+    446,
+    567,
+    569,
+    854,
+    855,
+    859,
+    860,
+    910,
+    984,
+    1947,
+    1948,
+    2051,
+    2068
+  ],
+  "functions": [
+    {
+      "id": 424,
+      "name": "accessor424",
+      "originalSymbol": "function_424",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        899
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 425,
+      "name": "accessor425",
+      "originalSymbol": "function_425",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        903
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 445,
+      "name": "accessor445",
+      "originalSymbol": "function_445",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        901
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 446,
+      "name": "accessor446",
+      "originalSymbol": "function_446",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        905
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 567,
+      "name": "accessor567",
+      "originalSymbol": "function_567",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        518
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 569,
+      "name": "accessor569",
+      "originalSymbol": "function_569",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        518
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 854,
+      "name": "accessor854",
+      "originalSymbol": "function_854",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        518
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 855,
+      "name": "accessor855",
+      "originalSymbol": "function_855",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        518
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 859,
+      "name": "accessor859",
+      "originalSymbol": "function_859",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        518
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 860,
+      "name": "accessor860",
+      "originalSymbol": "function_860",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        518
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 910,
+      "name": "accessor910",
+      "originalSymbol": "function_910",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1019
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 984,
+      "name": "accessor984",
+      "originalSymbol": "function_984",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        772
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 1947,
+      "name": "accessor1947",
+      "originalSymbol": "function_1947",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        726
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 1948,
+      "name": "accessor1948",
+      "originalSymbol": "function_1948",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        646
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 2051,
+      "name": "accessor2051",
+      "originalSymbol": "function_2051",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1091
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    },
+    {
+      "id": 2068,
+      "name": "accessor2068",
+      "originalSymbol": "function_2068",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/small-accessors.mjs",
+          "line": 16
+        },
+        "test": "test/client-small-accessors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        383
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Loads one field, combines a flag or forwards a pointer/fixed address to a helper."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-small-accessors.test.mjs",
+    "report": "reports/client-small-accessors-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 16,
+    "completeLinearMemoryChecks": 16,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 16,
+    "trappingComparisons": 10,
+    "comparison": "Zero-record fixture compares result or trap, stack pointer and complete memory.",
+    "limitations": [
+      "Ten slots trap on the zero-record fixture, so their success paths are unexercised. Ledger: 506 client and 507 server bodies recovered."
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-get-char.mjs",
+  "implementationSha256": "ea85d0e4f80f314d80af683f6e89c170cf929c42ca23133dafe65877fb65e98c",
+  "factory": "createStreamGetCharHook",
+  "functionIds": [
+    633
+  ],
+  "functions": [
+    {
+      "id": 633,
+      "name": "getStreamChar",
+      "originalSymbol": "function_633",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-get-char.mjs",
+          "line": 14
+        },
+        "test": "test/server-stream-get-char.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Virtual peek at vtable+36; advances +12 and returns the previously addressed byte, or -1."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-get-char.test.mjs",
+    "report": "reports/server-stream-get-char-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 3,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 3,
+    "trappingComparisons": 0,
+    "comparison": "Three cursor bytes compare result, complete memory and stack through a real table slot.",
+    "limitations": [
+      "The -1 peek path is not exercised. Ledger: 433 server bodies recovered and 301 remain machine code."
+    ]
+  }
+}

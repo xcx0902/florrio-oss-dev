@@ -1,0 +1,106 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-object-wrappers.mjs",
+  "implementationSha256": "118d8386ae23a38e3faebba061734f173d396469a021ea6ca9e0ace575a8f6e0",
+  "factory": "createStringObjectWrapperHooks",
+  "functionIds": [
+    238,
+    617,
+    618
+  ],
+  "functions": [
+    {
+      "id": 238,
+      "name": "deleteStringObject",
+      "originalSymbol": "function_238",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        185
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-object-wrappers.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-object-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        185,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Initializes through 185 and frees the object."
+    },
+    {
+      "id": 617,
+      "name": "deleteStringObjectHeader",
+      "originalSymbol": "function_617",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        185
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-object-wrappers.mjs",
+          "line": 16
+        },
+        "test": "test/server-string-object-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        238
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Applies 238 to the header at -8."
+    },
+    {
+      "id": 618,
+      "name": "initStringObjectHeader",
+      "originalSymbol": "function_618",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        185
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-object-wrappers.mjs",
+          "line": 19
+        },
+        "test": "test/server-string-object-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        185
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Applies 185 to the header at -8 and returns it."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-object-wrappers.test.mjs",
+    "report": "reports/server-string-object-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 3,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 3,
+    "trappingComparisons": 0,
+    "comparison": "Three wrappers on zeroed objects compare result, complete memory and stack.",
+    "limitations": [
+      "Initializer 185 remains machine code. Ledger: 480 server bodies recovered and 254 remain machine code."
+    ]
+  }
+}

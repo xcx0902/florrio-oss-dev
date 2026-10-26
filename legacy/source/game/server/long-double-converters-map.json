@@ -1,0 +1,105 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/long-double-converters.mjs",
+  "implementationSha256": "4991bbf27f1b68f64f844fecf76ab1054df3c90d2be9fb5bf1f7231d5f14fb50",
+  "factory": "createLongDoubleConverterHooks",
+  "functionIds": [
+    140,
+    258,
+    356
+  ],
+  "functions": [
+    {
+      "id": 140,
+      "name": "forwardFourTo188",
+      "originalSymbol": "function_140",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        188
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/long-double-converters.mjs",
+          "line": 19
+        },
+        "test": "test/server-long-double-converters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        188
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards four arguments to 188."
+    },
+    {
+      "id": 258,
+      "name": "convertToLongDouble",
+      "originalSymbol": "function_258",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        66
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/long-double-converters.mjs",
+          "line": 22
+        },
+        "test": "test/server-long-double-converters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        66
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Flips the fourth operand sign, converts through 66 and copies 16 bytes."
+    },
+    {
+      "id": 356,
+      "name": "forwardFormatTo357",
+      "originalSymbol": "function_356",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        357
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/long-double-converters.mjs",
+          "line": 28
+        },
+        "test": "test/server-long-double-converters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        357
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards format id 3166 and the argument to 357."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-long-double-converters.test.mjs",
+    "report": "reports/server-long-double-converters-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 6,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 6,
+    "trappingComparisons": 0,
+    "comparison": "Three conversion inputs and three forwarding calls compare results and memory outside the dead stack window.",
+    "limitations": [
+      "Callees 66/188/357 remain machine code. Native dead stack is masked. Ledger: 487 server bodies recovered and 247 remain machine code."
+    ]
+  }
+}

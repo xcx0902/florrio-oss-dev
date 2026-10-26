@@ -1,0 +1,4158 @@
+// Reading view only. Rebuild the corresponding .wat, not this pseudocode.
+function function_2537(a:int) { // func2537
+  var d:{ a:int, b:int }
+  var c:int_ptr;
+  var f:int;
+  var g:int;
+  var e:int;
+  var b:int = a[24]:int;
+  function_681(if (b) {
+                 b
+               } else {
+                 a[24]:int = (d = function_449(a[0]:int + 548));
+                 d.a = a;
+                 d.b = (c = a[0]:int)[569];
+                 a[46]:byte = a[46]:ubyte | 16;
+                 b = c[146];
+                 if (b >= (g = (f = c[145]) + 1)) {
+                   b = c[147];
+                   goto B_b;
+                 }
+                 b = select_if(b << 1, 1024, b);
+                 loop L_d {
+                   e = b;
+                   b = e << 1;
+                   if (e < g) continue L_d;
+                 }
+                 var h:int = c[147];
+                 b = malloc(e << 2);
+                 var i:int = function_363(b, h, f << 2);
+                 free(h);
+                 c[147] = i;
+                 c[146] = e;
+                 label B_b:
+                 b[f]:int = d;
+                 c[145] = g;
+                 a[24]:int;
+               },
+               0);
+}
+
+function function_2538(a:int) { // func2538
+  var b:float;
+  var c:float;
+  var d:float;
+  var e:float;
+  var f:float;
+  if (7932380[0]:ubyte & 1) goto B_a;
+  if (eqz(acquireStaticInitializationGuard(7932380))) goto B_a;
+  7932356[0]:long@4 = 0L;
+  7932376[0]:byte = 0;
+  7932372[0]:byte = 0;
+  7932368[0]:byte = 0;
+  7932364[0]:byte = 0;
+  releaseStaticInitializationGuard(7932380);
+  label B_a:
+  a[48]:byte = 1;
+  a[4]:float =
+    (b = a[4]:float) +
+    (d = (c = a[0]:float) * 0.0f) + (f = (e = a[2]:float) * 0.0f);
+  a[2]:float = d + e * 0.4f + (b = b * 0.0f);
+  a[0]:float = c * 0.4f + f + b;
+  a[5]:float =
+    (b = a[5]:float) +
+    (d = (c = a[1]:float) * 0.0f) + (f = (e = a[3]:float) * 0.0f);
+  a[3]:float = d + e * 0.4f + (b = b * 0.0f);
+  a[1]:float = c * 0.4f + f + b;
+  function_1045(7932356, a);
+}
+
+function function_2539(a:int_ptr, b:int_ptr) { // func2539
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 53420;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 53444;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_2540(a:int) { // func2540
+  var b:float_ptr;
+  var f:double;
+  var g:float;
+  var c:int = stack_pointer - 16;
+  stack_pointer = c;
+  var d:int_ptr = function_784(a);
+  7948176[0]:int =
+    (b = 
+       select_if(
+         2147483647,
+         0,
+         (a = ((b = (a = 7948176[0]:int) / 44488) * -44488 + a) * 48271) <
+         (b = b * 3399)) +
+       a - b);
+  a = function_458(d[0]);
+  c[2]:float =
+    (g = 
+       f32_demote_f64(
+         (f = f64_promote_f32(f32_convert_i32_u(b - 1) * 0.0f + 40.0f)) * 0.7));
+  b = a + 8;
+  var e:int = a + 12;
+  var h:float = a[3]:float;
+  if (h <= 0.0f) {
+    function_380(b, c + 8);
+    goto B_a;
+  }
+  c[1]:float = b[0] * g / h;
+  function_380(b, c + 4);
+  label B_a:
+  function_399(e, c + 8);
+  a = function_467(d[0]);
+  a[16]:int = 1106247680;
+  c[1]:double = f;
+  function_404(a + 8, c + 8);
+  a[68]:byte = 0;
+  stack_pointer = c + 16;
+}
+
+function function_2541(a:int) { // func2541
+  var b:float;
+  var c:float;
+  var d:float;
+  var e:float;
+  var f:float;
+  if (7932352[0]:ubyte & 1) goto B_a;
+  if (eqz(acquireStaticInitializationGuard(7932352))) goto B_a;
+  7932336[0]:long@4 = 0L;
+  7932348[0]:byte = 0;
+  7932344[0]:byte = 0;
+  releaseStaticInitializationGuard(7932352);
+  label B_a:
+  a[48]:byte = 1;
+  a[4]:float =
+    (b = a[4]:float) +
+    (d = (c = a[0]:float) * 0.0f) + (f = (e = a[2]:float) * 0.0f);
+  a[2]:float = d + e * 0.8f + (b = b * 0.0f);
+  a[0]:float = c * 0.8f + f + b;
+  a[5]:float =
+    (b = a[5]:float) +
+    (d = (c = a[1]:float) * 0.0f) + (f = (e = a[3]:float) * 0.0f);
+  a[3]:float = d + e * 0.8f + (b = b * 0.0f);
+  a[1]:float = c * 0.8f + f + b;
+  function_785(7932336, a);
+}
+
+function function_2542(a:int) { // func2542
+  function_1046(function_682(a), 1)
+}
+
+function function_2543(a:int) { // func2543
+  var b:float;
+  var c:float;
+  var d:float;
+  var e:float;
+  var f:float;
+  if (7932332[0]:ubyte & 1) goto B_a;
+  if (eqz(acquireStaticInitializationGuard(7932332))) goto B_a;
+  7932316[0]:long@4 = 0L;
+  7932328[0]:byte = 0;
+  7932324[0]:byte = 0;
+  releaseStaticInitializationGuard(7932332);
+  label B_a:
+  a[48]:byte = 1;
+  a[4]:float =
+    (b = a[4]:float) +
+    (d = (c = a[0]:float) * 0.0f) + (f = (e = a[2]:float) * 0.0f);
+  a[2]:float = d + e * 0.6f + (b = b * 0.0f);
+  a[0]:float = c * 0.6f + f + b;
+  a[5]:float =
+    (b = a[5]:float) +
+    (d = (c = a[1]:float) * 0.0f) + (f = (e = a[3]:float) * 0.0f);
+  a[3]:float = d + e * 0.6f + (b = b * 0.0f);
+  a[1]:float = c * 0.6f + f + b;
+  function_785(7932316, a);
+}
+
+function function_2544(a:int) { // func2544
+  function_1046(function_682(a), 0)
+}
+
+function function_2545(a:int_ptr) { // func2545
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7937871[0]:byte <= -1) { free(7937860[0]:int) }
+  var d:int = 7937840[0]:int;
+  if (d != -1) {
+    c = 7937820[0]:int;
+    if (c) {
+      c[18] = 7937816[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7937744) goto B_d;
+    441324[0]:int = (b = 7937816[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7937816[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7937816[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7937840[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7937816[0]:int) goto B_h;
+  if (7937820[0]:int) goto B_h;
+  if (441324[0]:int != 7937744) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2546(a:int_ptr, b:int) { // func2546
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 53384;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 53396;
+  c = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 53408;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_2547(a:int) { // func2547
+  function_377(7937512)
+}
+
+function function_2548(a:int) { // func2548
+  function_377(7937288)
+}
+
+function function_2549(a:int_ptr, b:int) { // func2549
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 53516;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_2550(a:int) { // func2550
+  var d:int_ptr;
+  var g:int_ptr;
+  var b:int_ptr = stack_pointer - 16;
+  stack_pointer = b;
+  a = 7791360;
+  loop L_b {
+    if ((a - 17)[0]:byte <= -1) { free((a - 28)[0]:int) }
+    var c:int = a - 144;
+    var e:int_ptr = a - 48;
+    var f:int = e[0];
+    if (f != -1) {
+      g = a - 68;
+      d = g[0];
+      if (d) {
+        d[18] = (a - 72)[0]:int;
+        goto B_e;
+      }
+      if (441324[0]:int != c) goto B_e;
+      441324[0]:int = (a - 72)[0]:int;
+      label B_e:
+      var h:int_ptr = a - 72;
+      var i:int_ptr = h[0];
+      if (i) { i[19] = d }
+      h[0] = 0;
+      g[0] = 0;
+      b[0] = f;
+      emscripten_asm(136033, 31967, b);
+      e[0] = -1;
+      441320[0]:int = 441320[0]:int - 1;
+    }
+    if ((a - 72)[0]:int) goto B_a;
+    if ((a - 68)[0]:int) goto B_a;
+    if (441324[0]:int == c) goto B_a;
+    a = a - 160;
+    if (a != 7785120) continue L_b;
+  }
+  stack_pointer = b + 16;
+  return ;
+  label B_a:
+  function_1();
+  unreachable;
+}
+
+function function_2551(a:int_ptr) { // func2551
+  a = 7785116;
+  loop L_a {
+    var c:int_ptr = a - 4;
+    var b:int_ptr = c[0];
+    c[0] = 0;
+    if (b) { call_indirect(b, (b[0])[1]:int) }
+    if (c != 7784960) {
+      a = a - 8;
+      b = a[0];
+      a[0] = 0;
+      if (eqz(b)) continue L_a;
+      call_indirect(b, (b[0])[1]:int);
+      continue L_a;
+    }
+  }
+}
+
+function function_2552(a:int_ptr, b:int_ptr) { // func2552
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 53504;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 53528;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_2553(a:int_ptr, b:int) { // func2553
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 53468;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 53480;
+  c = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 53492;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_2554(a:int) { // func2554
+  function_377(7936840)
+}
+
+function function_2555(a:int) { // func2555
+  function_377(7936616)
+}
+
+function function_2556(a:int) { // func2556
+  function_792(374968)
+}
+
+function function_2557(a:int_ptr, b:int) { // func2557
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 53588;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_2558(a:int) { // func2558
+  var d:int_ptr;
+  var c:int_ptr = stack_pointer - 16;
+  stack_pointer = c;
+  var b:int = 167984[0]:ubyte * 5872;
+  if (eqz(b)) goto B_a;
+  a = 167992;
+  var e:int = b + 167992;
+  loop L_b {
+    function_536(a + 160);
+    if (a[135]:byte <= -1) { free(a[31]:int) }
+    b = a + 8;
+    var f:int = a[26]:int;
+    if (f != -1) {
+      d = a[21]:int;
+      if (d) {
+        d[18] = a[20]:int;
+        goto B_e;
+      }
+      if (441324[0]:int != b) goto B_e;
+      441324[0]:int = a[20]:int;
+      label B_e:
+      var g:int_ptr = a[20]:int;
+      if (g) { g[19] = d }
+      a[10]:long = 0L;
+      c[0] = f;
+      emscripten_asm(136033, 31967, c);
+      a[26]:int = -1;
+      441320[0]:int = 441320[0]:int - 1;
+    }
+    if (a[20]:int) goto B_h;
+    if (a[21]:int) goto B_h;
+    if (441324[0]:int == b) goto B_h;
+    a = a + 5872;
+    if (a == e) goto B_a;
+    continue L_b;
+    label B_h:
+  }
+  function_1();
+  unreachable;
+  label B_a:
+  167984[0]:byte = 0;
+  stack_pointer = c + 16;
+}
+
+function function_2559(a:int_ptr, b:int_ptr) { // func2559
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 53576;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 53600;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_2560(a:int) { // func2560
+  function_795(7890440)
+}
+
+function function_2561(a:int) { // func2561
+  var c:int;
+  var f:int;
+  var e:int;
+  var r:int_ptr;
+  var d:int;
+  var y:int;
+  var qe:int;
+  var re:int;
+  var ub:int;
+  var vb:int;
+  var b:int = stack_pointer - 38224;
+  stack_pointer = b;
+  a = 0;
+  b[4616]:byte = 0;
+  c = getEntityDefinition(1);
+  if (eqz(c)) goto B_a;
+  if (eqz(c[108]:ubyte)) goto B_a;
+  a = 1;
+  b[4617]:byte = 1;
+  label B_a:
+  c = getEntityDefinition(2);
+  if (eqz(c)) goto B_b;
+  if (eqz(c[108]:ubyte)) goto B_b;
+  (b + 4616 | a)[1]:byte = 2;
+  a = a + 1;
+  label B_b:
+  c = getEntityDefinition(3);
+  if (eqz(c)) goto B_c;
+  if (eqz(c[108]:ubyte)) goto B_c;
+  (b + 4616 | a)[1]:byte = 3;
+  a = a + 1;
+  label B_c:
+  c = getEntityDefinition(4);
+  if (eqz(c)) goto B_d;
+  if (eqz(c[108]:ubyte)) goto B_d;
+  (b + 4616 | a)[1]:byte = 4;
+  a = a + 1;
+  label B_d:
+  c = getEntityDefinition(5);
+  if (eqz(c)) goto B_e;
+  if (eqz(c[108]:ubyte)) goto B_e;
+  (a + b + 4617)[0]:byte = 5;
+  a = a + 1;
+  label B_e:
+  c = getEntityDefinition(6);
+  if (eqz(c)) goto B_f;
+  if (eqz(c[108]:ubyte)) goto B_f;
+  (a + b + 4617)[0]:byte = 6;
+  a = a + 1;
+  label B_f:
+  c = getEntityDefinition(7);
+  if (eqz(c)) goto B_g;
+  if (eqz(c[108]:ubyte)) goto B_g;
+  (a + b + 4617)[0]:byte = 7;
+  a = a + 1;
+  label B_g:
+  c = getEntityDefinition(8);
+  if (eqz(c)) goto B_h;
+  if (eqz(c[108]:ubyte)) goto B_h;
+  (a + b + 4617)[0]:byte = 8;
+  a = a + 1;
+  label B_h:
+  c = getEntityDefinition(9);
+  if (eqz(c)) goto B_i;
+  if (eqz(c[108]:ubyte)) goto B_i;
+  (a + b + 4617)[0]:byte = 9;
+  a = a + 1;
+  label B_i:
+  c = getEntityDefinition(10);
+  if (eqz(c)) goto B_j;
+  if (eqz(c[108]:ubyte)) goto B_j;
+  ((a & 255) + b + 4617)[0]:byte = 10;
+  a = a + 1;
+  label B_j:
+  c = getEntityDefinition(11);
+  if (eqz(c)) goto B_k;
+  if (eqz(c[108]:ubyte)) goto B_k;
+  ((a & 255) + b + 4617)[0]:byte = 11;
+  a = a + 1;
+  label B_k:
+  c = getEntityDefinition(12);
+  if (eqz(c)) goto B_l;
+  if (eqz(c[108]:ubyte)) goto B_l;
+  ((a & 255) + b + 4617)[0]:byte = 12;
+  a = a + 1;
+  label B_l:
+  c = getEntityDefinition(13);
+  if (eqz(c)) goto B_m;
+  if (eqz(c[108]:ubyte)) goto B_m;
+  ((a & 255) + b + 4617)[0]:byte = 13;
+  a = a + 1;
+  label B_m:
+  c = getEntityDefinition(14);
+  if (eqz(c)) goto B_n;
+  if (eqz(c[108]:ubyte)) goto B_n;
+  ((a & 255) + b + 4617)[0]:byte = 14;
+  a = a + 1;
+  label B_n:
+  c = getEntityDefinition(15);
+  if (eqz(c)) goto B_o;
+  if (eqz(c[108]:ubyte)) goto B_o;
+  ((a & 255) + b + 4617)[0]:byte = 15;
+  a = a + 1;
+  label B_o:
+  c = getEntityDefinition(16);
+  if (eqz(c)) goto B_p;
+  if (eqz(c[108]:ubyte)) goto B_p;
+  ((a & 255) + b + 4617)[0]:byte = 16;
+  a = a + 1;
+  label B_p:
+  c = getEntityDefinition(17);
+  if (eqz(c)) goto B_q;
+  if (eqz(c[108]:ubyte)) goto B_q;
+  ((a & 255) + b + 4617)[0]:byte = 17;
+  a = a + 1;
+  label B_q:
+  c = getEntityDefinition(18);
+  if (eqz(c)) goto B_r;
+  if (eqz(c[108]:ubyte)) goto B_r;
+  ((a & 255) + b + 4617)[0]:byte = 18;
+  a = a + 1;
+  label B_r:
+  c = getEntityDefinition(19);
+  if (eqz(c)) goto B_s;
+  if (eqz(c[108]:ubyte)) goto B_s;
+  ((a & 255) + b + 4617)[0]:byte = 19;
+  a = a + 1;
+  label B_s:
+  c = getEntityDefinition(20);
+  if (eqz(c)) goto B_t;
+  if (eqz(c[108]:ubyte)) goto B_t;
+  ((a & 255) + b + 4617)[0]:byte = 20;
+  a = a + 1;
+  label B_t:
+  c = getEntityDefinition(21);
+  if (eqz(c)) goto B_u;
+  if (eqz(c[108]:ubyte)) goto B_u;
+  ((a & 255) + b + 4617)[0]:byte = 21;
+  a = a + 1;
+  label B_u:
+  c = getEntityDefinition(22);
+  if (eqz(c)) goto B_v;
+  if (eqz(c[108]:ubyte)) goto B_v;
+  ((a & 255) + b + 4617)[0]:byte = 22;
+  a = a + 1;
+  label B_v:
+  b[4616]:byte = a;
+  var ja:ubyte_ptr = b + 4616 | 1;
+  function_791(ja, ja + (a = a & 255), a);
+  a = b[4616]:ubyte;
+  if (a) {
+    var dd:int = a + ja;
+    var ed:int = b + 200;
+    var fd:int = b + 4464;
+    var gd:int = b + 1240;
+    var hd:int = b + 1024;
+    var id:int = b + 384;
+    var k:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 232;
+    var jd:int = b + 21320;
+    var kd:int = b + 25752;
+    var ld:int = b + 30192;
+    var md:int = b + 34456;
+    var nd:int = b + 31232;
+    var od:int = b + 31016;
+    var pd:int = b + 30376;
+    var na:{ a:long, b:long } = b + 30352;
+    var z:int = b + 30340;
+    var oa:int = b + 30328;
+    var pa:{ a:long, b:long } = b + 30304;
+    var l:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 30224;
+    var qd:int = b + 30016;
+    var rd:int = b + 26792;
+    var sd:int = b + 26576;
+    var td:int = b + 25936;
+    var qa:{ a:long, b:long } = b + 25912;
+    var aa:int = b + 25900;
+    var ra:int = b + 25888;
+    var sa:{ a:long, b:long } = b + 25864;
+    var m:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 25784;
+    var ud:int = b + 25584;
+    var vd:int = b + 22360;
+    var wd:int = b + 22144;
+    var xd:int = b + 21504;
+    var ta:{ a:long, b:long } = b + 21480;
+    var ba:int = b + 21468;
+    var ua:int = b + 21456;
+    var va:{ a:long, b:long } = b + 21432;
+    var n:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 21352;
+    var yd:int = b + 21160;
+    var zd:int = b + 17936;
+    var ae:int = b + 17720;
+    var be:int = b + 17080;
+    var wa:{ a:long, b:long } = b + 17056;
+    var ca:int = b + 17044;
+    var xa:int = b + 17032;
+    var ya:{ a:long, b:long } = b + 17008;
+    var o:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 16928;
+    var ce:int = b + 16744;
+    var de:int = b + 13520;
+    var ee:int = b + 13304;
+    var fe:int = b + 12664;
+    var za:{ a:long, b:long } = b + 12640;
+    var da:int = b + 12628;
+    var ab:int = b + 12616;
+    var bb:{ a:long, b:long } = b + 12592;
+    var p:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 12512;
+    var ge:int = b + 11864;
+    var wb:int = b + 8640;
+    var he:int = b + 8424;
+    var xb:int = b + 7784;
+    var ie:int = b + 7568;
+    var yb:int = b + 6928;
+    var je:int = b + 6728;
+    var zb:int = b + 6088;
+    var ke:int = b + 5888;
+    var le:int = b + 5692;
+    var me:int = b + 5560;
+    var ac:{ a:long, b:long } = b + 5536;
+    var bc:int = b + 5524;
+    var cc:{ a:long, b:byte } = b + 5512;
+    var dc:{ a:long, b:long } = b + 5488;
+    var x:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 5408;
+    var ec:{ a:long, b:long } = b + 5384;
+    var fc:int = b + 5372;
+    var gc:{ a:long, b:byte } = b + 5360;
+    var hc:{ a:long, b:long } = b + 5336;
+    var t:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 5256;
+    var cb:{ a:long, b:long } = b + 4928;
+    var ea:int = b + 4916;
+    var db:int = b + 4904;
+    var ic:{ a:long, b:long } = b + 4728;
+    var eb:{ a:long, b:long } = b + 4880;
+    var h:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 4800;
+    var jc:{ a:long, b:long } = b + 4776;
+    var ne:int = b + 4764;
+    var kc:{ a:long, b:ubyte } = b + 4752;
+    var lc:{ a:long, b:byte } = b + 4720;
+    var u:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 4648;
+    var fb:{ a:long, b:long } = b + 5232;
+    var fa:int = b + 5220;
+    var gb:int = b + 5208;
+    var mc:{ a:long, b:long } = b + 5032;
+    var hb:{ a:long, b:long } = b + 5184;
+    var g:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 5104;
+    var nc:{ a:long, b:long } = b + 5080;
+    var ka:int = b + 5068;
+    var oc:{ a:long, b:ubyte } = b + 5056;
+    var pc:{ a:long, b:byte } = b + 5024;
+    var s:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 4952;
+    var ib:{ a:long, b:long } = b + 12464;
+    var ga:int = b + 12452;
+    var jb:int = b + 12440;
+    var kb:{ a:long, b:long } = b + 12416;
+    var i:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 12336;
+    var lb:{ a:long, b:long } = b + 12304;
+    var ha:int = b + 12292;
+    var mb:int = b + 12280;
+    var qc:{ a:long, b:long } = b + 12104;
+    var nb:{ a:long, b:long } = b + 12256;
+    var j:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 12176;
+    var rc:{ a:long, b:long } = b + 12152;
+    var ob:int = b + 12140;
+    var sc:{ a:long, b:ubyte } = b + 12128;
+    var tc:{ a:long, b:byte } = b + 12096;
+    var v:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 12024;
+    var uc:int = b + 25860;
+    var pb:{ a:long, b:byte } = b + 25816;
+    var rb:int = b + 25744;
+    var vc:int = b + 21312 | 1;
+    var wc:int = b + 30392;
+    var xc:{ a:int, b:short } = b + 30200;
+    var sb:{ a:long, b:long, c:long } = b + 30544;
+    var yc:{ a:long, b:long } = b + 30528;
+    var qb:int = b + 30516;
+    var zc:{ a:long, b:ubyte } = b + 30504;
+    var ad:{ a:long, b:long } = b + 30480;
+    var bd:{ a:long, b:byte } = b + 30472;
+    var w:{ a:long, b:long, c:long, d:long, e:long, f:long, g:long, h:long } = 
+      b + 30400;
+    var cd:int = b + 30176;
+    var oe:int = b + 34688;
+    var la:int = b + 34608 | 4;
+    var ia:int = b + 37896 | 4;
+    var ma:int = b + 30168 | 4;
+    var pe:int = b + 38032;
+    loop L_y {
+      var tb:int = ja[0];
+      var q:int = getEntityDefinition(tb);
+      b[38216]:byte = 0;
+      b[38032]:byte = 0;
+      b[9507]:int = 1;
+      b[37896]:byte = 0;
+      a = q[4]:ubyte << 2;
+      if (a) {
+        d = q + 8;
+        f = d + a;
+        loop L_aa {
+          a = d[0]:int;
+          b[7542]:int = 1096810496;
+          e = select_if(a, 125873, a);
+          a = stringLength(e);
+          if (a >= -16) goto B_w;
+          if (a >= 11) {
+            r = a + 16 & -16;
+            c = allocateOrAbort(r);
+            b[7545]:int = r | -2147483648;
+            b[7543]:int = c;
+            b[7544]:int = a;
+            goto B_ca;
+          }
+          b[30183]:byte = a;
+          c = ma;
+          if (eqz(a)) goto B_ba;
+          label B_ca:
+          function_363(c, e, a);
+          label B_ba:
+          (a + c)[0]:byte = 0;
+          b[7546]:int = -1082130432;
+          a = ia + ((c = b[37896]:ubyte) << 5);
+          a[0]:float = b[7542]:float;
+          a[3]:int = ma[2]:int;
+          a[1]:long@4 = ma[0]:long@4;
+          ma[0]:long@4 = 0L;
+          ma[2]:int = 0;
+          a[5]:long@4 = 0L;
+          a[4]:int = -1082130432;
+          a[7]:int = 0;
+          b[7549]:int = 0;
+          b[7547]:long@4 = 0L;
+          b[37896]:byte = c + 1;
+          function_519(b + 30168);
+          d = d + 4;
+          if (d != f) continue L_aa;
+        }
+      }
+      b[9472]:int = 1;
+      b[34680]:byte = 0;
+      b[34608]:byte = 0;
+      a = q[32]:ubyte;
+      f = a << 3;
+      if (f) {
+        a = la;
+        e = q + 36;
+        c = e;
+        r = f - 8;
+        d = (r >> 3) + 1 & 7;
+        if (d) {
+          loop L_ga {
+            a[0]:long@4 = c[0]:long@4;
+            c = c + 8;
+            a = a + 8;
+            d = d - 1;
+            if (d) continue L_ga;
+          }
+        }
+        if (r > 55) {
+          d = e + f;
+          loop L_ia {
+            a[0]:long@4 = c[0]:long@4;
+            a[2]:long@4 = c[2]:long@4;
+            a[4]:long@4 = c[4]:long@4;
+            a[6]:long@4 = c[6]:long@4;
+            a[8]:long@4 = c[8]:long@4;
+            a[10]:long@4 = c[10]:long@4;
+            a[12]:long@4 = c[12]:long@4;
+            a[14]:long@4 = c[14]:long@4;
+            a = a - -64;
+            c = c - -64;
+            if (c != d) continue L_ia;
+          }
+        }
+        a = q[32]:ubyte;
+      }
+      b[34608]:byte = a;
+      function_790(la, la + (a << 3));
+      a = b[34608]:ubyte << 3;
+      if (a) {
+        ub = a + la;
+        c = la;
+        loop L_oa {
+          var se:float = c[1]:float;
+          a = c[0]:ubyte;
+          if (7785116[0]:ubyte & 1) goto B_pa;
+          if (eqz(acquireStaticInitializationGuard(7785116))) goto B_pa;
+          releaseStaticInitializationGuard(7785116);
+          label B_pa:
+          if (7791360[0]:ubyte & 1) goto B_qa;
+          if (eqz(acquireStaticInitializationGuard(7791360))) goto B_qa;
+          7785224[0]:long = 0L;
+          7785204[0]:short = 1;
+          7785200[0]:int = 1167867904;
+          7785192[0]:long = 4607182418800017408L;
+          7785186[0]:byte = 2;
+          7785184[0]:short = 1;
+          7785176[0]:long = 0L;
+          7785168[0]:long = 4575657221408423936L;
+          7785160[0]:long = 1065353216L;
+          7785152[0]:long = 0L;
+          7785144[0]:long = 4575657221408423936L;
+          7785136[0]:long = 1065353216L;
+          7785128[0]:byte = 1;
+          7785208[0]:long = 0L;
+          7785232[0]:int = -1;
+          7785120[0]:byte = 0;
+          7785216[0]:byte = 0;
+          7785244[0]:byte = 0;
+          7785248[0]:byte = 0;
+          7785263[0]:byte = 0;
+          7785240[0]:int = 0;
+          7785384[0]:long = 0L;
+          7785364[0]:short = 1;
+          7785360[0]:int = 1167867904;
+          7785352[0]:long = 4607182418800017408L;
+          7785346[0]:byte = 2;
+          7785344[0]:short = 1;
+          7785336[0]:long = 0L;
+          7785328[0]:long = 4575657221408423936L;
+          7785320[0]:long = 1065353216L;
+          7785312[0]:long = 0L;
+          7785304[0]:long = 4575657221408423936L;
+          7785296[0]:long = 1065353216L;
+          7785288[0]:byte = 1;
+          7785272[0]:long = 4719772410523796111L;
+          7785264[0]:int = 16777215;
+          7785280[0]:byte = 0;
+          7785268[0]:short = 0;
+          7785252[0]:byte = 0;
+          7785368[0]:long = 0L;
+          7785392[0]:int = -1;
+          7785472[0]:long = 0L;
+          7785520[0]:int = 1167867904;
+          7785544[0]:long = 0L;
+          7785424[0]:int = 16777215;
+          7785504[0]:short = 1;
+          7785524[0]:short = 1;
+          7785432[0]:long = 4719772410523796111L;
+          7785456[0]:long = 1065353216L;
+          7785464[0]:long = 4575657221408423936L;
+          7785480[0]:long = 1065353216L;
+          7785488[0]:long = 4575657221408423936L;
+          7785496[0]:long = 0L;
+          7785512[0]:long = 4607182418800017408L;
+          7785506[0]:byte = 2;
+          7785448[0]:byte = 1;
+          7785376[0]:byte = 0;
+          7785423[0]:byte = 0;
+          7785408[0]:byte = 0;
+          7785404[0]:byte = 0;
+          7785400[0]:int = 0;
+          7785428[0]:short = 0;
+          7785440[0]:byte = 0;
+          7785412[0]:byte = 0;
+          7785528[0]:long = 0L;
+          7785552[0]:int = -1;
+          7785632[0]:long = 0L;
+          7785680[0]:int = 1167867904;
+          7785704[0]:long = 0L;
+          7785584[0]:int = 16777215;
+          7785664[0]:short = 1;
+          7785684[0]:short = 1;
+          7785592[0]:long = 4719772410523796111L;
+          7785616[0]:long = 1065353216L;
+          7785624[0]:long = 4575657221408423936L;
+          7785640[0]:long = 1065353216L;
+          7785648[0]:long = 4575657221408423936L;
+          7785656[0]:long = 0L;
+          7785672[0]:long = 4607182418800017408L;
+          7785666[0]:byte = 2;
+          7785608[0]:byte = 1;
+          7785536[0]:byte = 0;
+          7785583[0]:byte = 0;
+          7785568[0]:byte = 0;
+          7785564[0]:byte = 0;
+          7785560[0]:int = 0;
+          7785588[0]:short = 0;
+          7785600[0]:byte = 0;
+          7785572[0]:byte = 0;
+          7785688[0]:long = 0L;
+          7785712[0]:int = -1;
+          7785792[0]:long = 0L;
+          7785840[0]:int = 1167867904;
+          7785864[0]:long = 0L;
+          7785744[0]:int = 16777215;
+          7785824[0]:short = 1;
+          7785844[0]:short = 1;
+          7785752[0]:long = 4719772410523796111L;
+          7785776[0]:long = 1065353216L;
+          7785784[0]:long = 4575657221408423936L;
+          7785800[0]:long = 1065353216L;
+          7785808[0]:long = 4575657221408423936L;
+          7785816[0]:long = 0L;
+          7785832[0]:long = 4607182418800017408L;
+          7785826[0]:byte = 2;
+          7785768[0]:byte = 1;
+          7785696[0]:byte = 0;
+          7785743[0]:byte = 0;
+          7785728[0]:byte = 0;
+          7785724[0]:byte = 0;
+          7785720[0]:int = 0;
+          7785748[0]:short = 0;
+          7785760[0]:byte = 0;
+          7785732[0]:byte = 0;
+          7785848[0]:long = 0L;
+          7785872[0]:int = -1;
+          7785952[0]:long = 0L;
+          7786000[0]:int = 1167867904;
+          7786024[0]:long = 0L;
+          7785904[0]:int = 16777215;
+          7785984[0]:short = 1;
+          7786004[0]:short = 1;
+          7785912[0]:long = 4719772410523796111L;
+          7785936[0]:long = 1065353216L;
+          7785944[0]:long = 4575657221408423936L;
+          7785960[0]:long = 1065353216L;
+          7785968[0]:long = 4575657221408423936L;
+          7785976[0]:long = 0L;
+          7785992[0]:long = 4607182418800017408L;
+          7785986[0]:byte = 2;
+          7785928[0]:byte = 1;
+          7785856[0]:byte = 0;
+          7785903[0]:byte = 0;
+          7785888[0]:byte = 0;
+          7785884[0]:byte = 0;
+          7785880[0]:int = 0;
+          7785908[0]:short = 0;
+          7785920[0]:byte = 0;
+          7785892[0]:byte = 0;
+          7786008[0]:long = 0L;
+          7786032[0]:int = -1;
+          7786112[0]:long = 0L;
+          7786160[0]:int = 1167867904;
+          7786184[0]:long = 0L;
+          7786064[0]:int = 16777215;
+          7786144[0]:short = 1;
+          7786164[0]:short = 1;
+          7786072[0]:long = 4719772410523796111L;
+          7786096[0]:long = 1065353216L;
+          7786104[0]:long = 4575657221408423936L;
+          7786120[0]:long = 1065353216L;
+          7786128[0]:long = 4575657221408423936L;
+          7786136[0]:long = 0L;
+          7786152[0]:long = 4607182418800017408L;
+          7786146[0]:byte = 2;
+          7786088[0]:byte = 1;
+          7786016[0]:byte = 0;
+          7786063[0]:byte = 0;
+          7786048[0]:byte = 0;
+          7786044[0]:byte = 0;
+          7786040[0]:int = 0;
+          7786068[0]:short = 0;
+          7786080[0]:byte = 0;
+          7786052[0]:byte = 0;
+          7786168[0]:long = 0L;
+          7786192[0]:int = -1;
+          7786272[0]:long = 0L;
+          7786320[0]:int = 1167867904;
+          7786344[0]:long = 0L;
+          7786224[0]:int = 16777215;
+          7786304[0]:short = 1;
+          7786324[0]:short = 1;
+          7786232[0]:long = 4719772410523796111L;
+          7786256[0]:long = 1065353216L;
+          7786264[0]:long = 4575657221408423936L;
+          7786280[0]:long = 1065353216L;
+          7786288[0]:long = 4575657221408423936L;
+          7786296[0]:long = 0L;
+          7786312[0]:long = 4607182418800017408L;
+          7786306[0]:byte = 2;
+          7786248[0]:byte = 1;
+          7786176[0]:byte = 0;
+          7786223[0]:byte = 0;
+          7786208[0]:byte = 0;
+          7786204[0]:byte = 0;
+          7786200[0]:int = 0;
+          7786228[0]:short = 0;
+          7786240[0]:byte = 0;
+          7786212[0]:byte = 0;
+          7786328[0]:long = 0L;
+          7786352[0]:int = -1;
+          7786432[0]:long = 0L;
+          7786480[0]:int = 1167867904;
+          7786504[0]:long = 0L;
+          7786384[0]:int = 16777215;
+          7786464[0]:short = 1;
+          7786484[0]:short = 1;
+          7786392[0]:long = 4719772410523796111L;
+          7786416[0]:long = 1065353216L;
+          7786424[0]:long = 4575657221408423936L;
+          7786440[0]:long = 1065353216L;
+          7786448[0]:long = 4575657221408423936L;
+          7786456[0]:long = 0L;
+          7786472[0]:long = 4607182418800017408L;
+          7786466[0]:byte = 2;
+          7786408[0]:byte = 1;
+          7786336[0]:byte = 0;
+          7786383[0]:byte = 0;
+          7786368[0]:byte = 0;
+          7786364[0]:byte = 0;
+          7786360[0]:int = 0;
+          7786388[0]:short = 0;
+          7786400[0]:byte = 0;
+          7786372[0]:byte = 0;
+          7786488[0]:long = 0L;
+          7786512[0]:int = -1;
+          7786592[0]:long = 0L;
+          7786640[0]:int = 1167867904;
+          7786664[0]:long = 0L;
+          7786544[0]:int = 16777215;
+          7786624[0]:short = 1;
+          7786644[0]:short = 1;
+          7786552[0]:long = 4719772410523796111L;
+          7786576[0]:long = 1065353216L;
+          7786584[0]:long = 4575657221408423936L;
+          7786600[0]:long = 1065353216L;
+          7786608[0]:long = 4575657221408423936L;
+          7786616[0]:long = 0L;
+          7786632[0]:long = 4607182418800017408L;
+          7786626[0]:byte = 2;
+          7786568[0]:byte = 1;
+          7786496[0]:byte = 0;
+          7786543[0]:byte = 0;
+          7786528[0]:byte = 0;
+          7786524[0]:byte = 0;
+          7786520[0]:int = 0;
+          7786548[0]:short = 0;
+          7786560[0]:byte = 0;
+          7786532[0]:byte = 0;
+          7786648[0]:long = 0L;
+          7786672[0]:int = -1;
+          7786752[0]:long = 0L;
+          7786800[0]:int = 1167867904;
+          7786824[0]:long = 0L;
+          7786704[0]:int = 16777215;
+          7786784[0]:short = 1;
+          7786804[0]:short = 1;
+          7786712[0]:long = 4719772410523796111L;
+          7786736[0]:long = 1065353216L;
+          7786744[0]:long = 4575657221408423936L;
+          7786760[0]:long = 1065353216L;
+          7786768[0]:long = 4575657221408423936L;
+          7786776[0]:long = 0L;
+          7786792[0]:long = 4607182418800017408L;
+          7786786[0]:byte = 2;
+          7786728[0]:byte = 1;
+          7786656[0]:byte = 0;
+          7786703[0]:byte = 0;
+          7786688[0]:byte = 0;
+          7786684[0]:byte = 0;
+          7786680[0]:int = 0;
+          7786708[0]:short = 0;
+          7786720[0]:byte = 0;
+          7786692[0]:byte = 0;
+          7786808[0]:long = 0L;
+          7786832[0]:int = -1;
+          7786912[0]:long = 0L;
+          7786960[0]:int = 1167867904;
+          7786984[0]:long = 0L;
+          7786864[0]:int = 16777215;
+          7786944[0]:short = 1;
+          7786964[0]:short = 1;
+          7786872[0]:long = 4719772410523796111L;
+          7786896[0]:long = 1065353216L;
+          7786904[0]:long = 4575657221408423936L;
+          7786920[0]:long = 1065353216L;
+          7786928[0]:long = 4575657221408423936L;
+          7786936[0]:long = 0L;
+          7786952[0]:long = 4607182418800017408L;
+          7786946[0]:byte = 2;
+          7786888[0]:byte = 1;
+          7786816[0]:byte = 0;
+          7786863[0]:byte = 0;
+          7786848[0]:byte = 0;
+          7786844[0]:byte = 0;
+          7786840[0]:int = 0;
+          7786868[0]:short = 0;
+          7786880[0]:byte = 0;
+          7786852[0]:byte = 0;
+          7786968[0]:long = 0L;
+          7786992[0]:int = -1;
+          7787072[0]:long = 0L;
+          7787120[0]:int = 1167867904;
+          7787144[0]:long = 0L;
+          7787024[0]:int = 16777215;
+          7787104[0]:short = 1;
+          7787124[0]:short = 1;
+          7787032[0]:long = 4719772410523796111L;
+          7787056[0]:long = 1065353216L;
+          7787064[0]:long = 4575657221408423936L;
+          7787080[0]:long = 1065353216L;
+          7787088[0]:long = 4575657221408423936L;
+          7787096[0]:long = 0L;
+          7787112[0]:long = 4607182418800017408L;
+          7787106[0]:byte = 2;
+          7787048[0]:byte = 1;
+          7786976[0]:byte = 0;
+          7787023[0]:byte = 0;
+          7787008[0]:byte = 0;
+          7787004[0]:byte = 0;
+          7787000[0]:int = 0;
+          7787028[0]:short = 0;
+          7787040[0]:byte = 0;
+          7787012[0]:byte = 0;
+          7787128[0]:long = 0L;
+          7787152[0]:int = -1;
+          7787232[0]:long = 0L;
+          7787280[0]:int = 1167867904;
+          7787304[0]:long = 0L;
+          7787184[0]:int = 16777215;
+          7787264[0]:short = 1;
+          7787284[0]:short = 1;
+          7787192[0]:long = 4719772410523796111L;
+          7787216[0]:long = 1065353216L;
+          7787224[0]:long = 4575657221408423936L;
+          7787240[0]:long = 1065353216L;
+          7787248[0]:long = 4575657221408423936L;
+          7787256[0]:long = 0L;
+          7787272[0]:long = 4607182418800017408L;
+          7787266[0]:byte = 2;
+          7787208[0]:byte = 1;
+          7787136[0]:byte = 0;
+          7787183[0]:byte = 0;
+          7787168[0]:byte = 0;
+          7787164[0]:byte = 0;
+          7787160[0]:int = 0;
+          7787188[0]:short = 0;
+          7787200[0]:byte = 0;
+          7787172[0]:byte = 0;
+          7787288[0]:long = 0L;
+          7787312[0]:int = -1;
+          7787392[0]:long = 0L;
+          7787440[0]:int = 1167867904;
+          7787464[0]:long = 0L;
+          7787344[0]:int = 16777215;
+          7787424[0]:short = 1;
+          7787444[0]:short = 1;
+          7787352[0]:long = 4719772410523796111L;
+          7787376[0]:long = 1065353216L;
+          7787384[0]:long = 4575657221408423936L;
+          7787400[0]:long = 1065353216L;
+          7787408[0]:long = 4575657221408423936L;
+          7787416[0]:long = 0L;
+          7787432[0]:long = 4607182418800017408L;
+          7787426[0]:byte = 2;
+          7787368[0]:byte = 1;
+          7787296[0]:byte = 0;
+          7787343[0]:byte = 0;
+          7787328[0]:byte = 0;
+          7787324[0]:byte = 0;
+          7787320[0]:int = 0;
+          7787348[0]:short = 0;
+          7787360[0]:byte = 0;
+          7787332[0]:byte = 0;
+          7787448[0]:long = 0L;
+          7787472[0]:int = -1;
+          7787552[0]:long = 0L;
+          7787600[0]:int = 1167867904;
+          7787624[0]:long = 0L;
+          7787504[0]:int = 16777215;
+          7787584[0]:short = 1;
+          7787604[0]:short = 1;
+          7787512[0]:long = 4719772410523796111L;
+          7787536[0]:long = 1065353216L;
+          7787544[0]:long = 4575657221408423936L;
+          7787560[0]:long = 1065353216L;
+          7787568[0]:long = 4575657221408423936L;
+          7787576[0]:long = 0L;
+          7787592[0]:long = 4607182418800017408L;
+          7787586[0]:byte = 2;
+          7787528[0]:byte = 1;
+          7787456[0]:byte = 0;
+          7787503[0]:byte = 0;
+          7787488[0]:byte = 0;
+          7787484[0]:byte = 0;
+          7787480[0]:int = 0;
+          7787508[0]:short = 0;
+          7787520[0]:byte = 0;
+          7787492[0]:byte = 0;
+          7787608[0]:long = 0L;
+          7787632[0]:int = -1;
+          7787712[0]:long = 0L;
+          7787760[0]:int = 1167867904;
+          7787784[0]:long = 0L;
+          7787664[0]:int = 16777215;
+          7787744[0]:short = 1;
+          7787764[0]:short = 1;
+          7787672[0]:long = 4719772410523796111L;
+          7787696[0]:long = 1065353216L;
+          7787704[0]:long = 4575657221408423936L;
+          7787720[0]:long = 1065353216L;
+          7787728[0]:long = 4575657221408423936L;
+          7787736[0]:long = 0L;
+          7787752[0]:long = 4607182418800017408L;
+          7787746[0]:byte = 2;
+          7787688[0]:byte = 1;
+          7787616[0]:byte = 0;
+          7787663[0]:byte = 0;
+          7787648[0]:byte = 0;
+          7787644[0]:byte = 0;
+          7787640[0]:int = 0;
+          7787668[0]:short = 0;
+          7787680[0]:byte = 0;
+          7787652[0]:byte = 0;
+          7787768[0]:long = 0L;
+          7787792[0]:int = -1;
+          7787872[0]:long = 0L;
+          7787920[0]:int = 1167867904;
+          7787944[0]:long = 0L;
+          7787824[0]:int = 16777215;
+          7787904[0]:short = 1;
+          7787924[0]:short = 1;
+          7787832[0]:long = 4719772410523796111L;
+          7787856[0]:long = 1065353216L;
+          7787864[0]:long = 4575657221408423936L;
+          7787880[0]:long = 1065353216L;
+          7787888[0]:long = 4575657221408423936L;
+          7787896[0]:long = 0L;
+          7787912[0]:long = 4607182418800017408L;
+          7787906[0]:byte = 2;
+          7787848[0]:byte = 1;
+          7787776[0]:byte = 0;
+          7787823[0]:byte = 0;
+          7787808[0]:byte = 0;
+          7787804[0]:byte = 0;
+          7787800[0]:int = 0;
+          7787828[0]:short = 0;
+          7787840[0]:byte = 0;
+          7787812[0]:byte = 0;
+          7787928[0]:long = 0L;
+          7787952[0]:int = -1;
+          7788032[0]:long = 0L;
+          7788080[0]:int = 1167867904;
+          7788104[0]:long = 0L;
+          7787984[0]:int = 16777215;
+          7788064[0]:short = 1;
+          7788084[0]:short = 1;
+          7787992[0]:long = 4719772410523796111L;
+          7788016[0]:long = 1065353216L;
+          7788024[0]:long = 4575657221408423936L;
+          7788040[0]:long = 1065353216L;
+          7788048[0]:long = 4575657221408423936L;
+          7788056[0]:long = 0L;
+          7788072[0]:long = 4607182418800017408L;
+          7788066[0]:byte = 2;
+          7788008[0]:byte = 1;
+          7787936[0]:byte = 0;
+          7787983[0]:byte = 0;
+          7787968[0]:byte = 0;
+          7787964[0]:byte = 0;
+          7787960[0]:int = 0;
+          7787988[0]:short = 0;
+          7788000[0]:byte = 0;
+          7787972[0]:byte = 0;
+          7788088[0]:long = 0L;
+          7788112[0]:int = -1;
+          7788192[0]:long = 0L;
+          7788240[0]:int = 1167867904;
+          7788264[0]:long = 0L;
+          7788144[0]:int = 16777215;
+          7788224[0]:short = 1;
+          7788244[0]:short = 1;
+          7788152[0]:long = 4719772410523796111L;
+          7788176[0]:long = 1065353216L;
+          7788184[0]:long = 4575657221408423936L;
+          7788200[0]:long = 1065353216L;
+          7788208[0]:long = 4575657221408423936L;
+          7788216[0]:long = 0L;
+          7788232[0]:long = 4607182418800017408L;
+          7788226[0]:byte = 2;
+          7788168[0]:byte = 1;
+          7788096[0]:byte = 0;
+          7788143[0]:byte = 0;
+          7788128[0]:byte = 0;
+          7788124[0]:byte = 0;
+          7788120[0]:int = 0;
+          7788148[0]:short = 0;
+          7788160[0]:byte = 0;
+          7788132[0]:byte = 0;
+          7788248[0]:long = 0L;
+          7788272[0]:int = -1;
+          7788352[0]:long = 0L;
+          7788400[0]:int = 1167867904;
+          7788424[0]:long = 0L;
+          7788304[0]:int = 16777215;
+          7788384[0]:short = 1;
+          7788404[0]:short = 1;
+          7788312[0]:long = 4719772410523796111L;
+          7788336[0]:long = 1065353216L;
+          7788344[0]:long = 4575657221408423936L;
+          7788360[0]:long = 1065353216L;
+          7788368[0]:long = 4575657221408423936L;
+          7788376[0]:long = 0L;
+          7788392[0]:long = 4607182418800017408L;
+          7788386[0]:byte = 2;
+          7788328[0]:byte = 1;
+          7788256[0]:byte = 0;
+          7788303[0]:byte = 0;
+          7788288[0]:byte = 0;
+          7788284[0]:byte = 0;
+          7788280[0]:int = 0;
+          7788308[0]:short = 0;
+          7788320[0]:byte = 0;
+          7788292[0]:byte = 0;
+          7788408[0]:long = 0L;
+          7788432[0]:int = -1;
+          7788512[0]:long = 0L;
+          7788560[0]:int = 1167867904;
+          7788584[0]:long = 0L;
+          7788464[0]:int = 16777215;
+          7788544[0]:short = 1;
+          7788564[0]:short = 1;
+          7788472[0]:long = 4719772410523796111L;
+          7788496[0]:long = 1065353216L;
+          7788504[0]:long = 4575657221408423936L;
+          7788520[0]:long = 1065353216L;
+          7788528[0]:long = 4575657221408423936L;
+          7788536[0]:long = 0L;
+          7788552[0]:long = 4607182418800017408L;
+          7788546[0]:byte = 2;
+          7788488[0]:byte = 1;
+          7788416[0]:byte = 0;
+          7788463[0]:byte = 0;
+          7788448[0]:byte = 0;
+          7788444[0]:byte = 0;
+          7788440[0]:int = 0;
+          7788468[0]:short = 0;
+          7788480[0]:byte = 0;
+          7788452[0]:byte = 0;
+          7788568[0]:long = 0L;
+          7788592[0]:int = -1;
+          7788672[0]:long = 0L;
+          7788720[0]:int = 1167867904;
+          7788744[0]:long = 0L;
+          7788624[0]:int = 16777215;
+          7788704[0]:short = 1;
+          7788724[0]:short = 1;
+          7788632[0]:long = 4719772410523796111L;
+          7788656[0]:long = 1065353216L;
+          7788664[0]:long = 4575657221408423936L;
+          7788680[0]:long = 1065353216L;
+          7788688[0]:long = 4575657221408423936L;
+          7788696[0]:long = 0L;
+          7788712[0]:long = 4607182418800017408L;
+          7788706[0]:byte = 2;
+          7788648[0]:byte = 1;
+          7788576[0]:byte = 0;
+          7788623[0]:byte = 0;
+          7788608[0]:byte = 0;
+          7788604[0]:byte = 0;
+          7788600[0]:int = 0;
+          7788628[0]:short = 0;
+          7788640[0]:byte = 0;
+          7788612[0]:byte = 0;
+          7788728[0]:long = 0L;
+          7788752[0]:int = -1;
+          7788832[0]:long = 0L;
+          7788880[0]:int = 1167867904;
+          7788904[0]:long = 0L;
+          7788784[0]:int = 16777215;
+          7788864[0]:short = 1;
+          7788884[0]:short = 1;
+          7788792[0]:long = 4719772410523796111L;
+          7788816[0]:long = 1065353216L;
+          7788824[0]:long = 4575657221408423936L;
+          7788840[0]:long = 1065353216L;
+          7788848[0]:long = 4575657221408423936L;
+          7788856[0]:long = 0L;
+          7788872[0]:long = 4607182418800017408L;
+          7788866[0]:byte = 2;
+          7788808[0]:byte = 1;
+          7788736[0]:byte = 0;
+          7788783[0]:byte = 0;
+          7788768[0]:byte = 0;
+          7788764[0]:byte = 0;
+          7788760[0]:int = 0;
+          7788788[0]:short = 0;
+          7788800[0]:byte = 0;
+          7788772[0]:byte = 0;
+          7788888[0]:long = 0L;
+          7788912[0]:int = -1;
+          7788992[0]:long = 0L;
+          7789040[0]:int = 1167867904;
+          7789064[0]:long = 0L;
+          7788944[0]:int = 16777215;
+          7789024[0]:short = 1;
+          7789044[0]:short = 1;
+          7788952[0]:long = 4719772410523796111L;
+          7788976[0]:long = 1065353216L;
+          7788984[0]:long = 4575657221408423936L;
+          7789000[0]:long = 1065353216L;
+          7789008[0]:long = 4575657221408423936L;
+          7789016[0]:long = 0L;
+          7789032[0]:long = 4607182418800017408L;
+          7789026[0]:byte = 2;
+          7788968[0]:byte = 1;
+          7788896[0]:byte = 0;
+          7788943[0]:byte = 0;
+          7788928[0]:byte = 0;
+          7788924[0]:byte = 0;
+          7788920[0]:int = 0;
+          7788948[0]:short = 0;
+          7788960[0]:byte = 0;
+          7788932[0]:byte = 0;
+          7789048[0]:long = 0L;
+          7789072[0]:int = -1;
+          7789152[0]:long = 0L;
+          7789200[0]:int = 1167867904;
+          7789224[0]:long = 0L;
+          7789104[0]:int = 16777215;
+          7789184[0]:short = 1;
+          7789204[0]:short = 1;
+          7789112[0]:long = 4719772410523796111L;
+          7789136[0]:long = 1065353216L;
+          7789144[0]:long = 4575657221408423936L;
+          7789160[0]:long = 1065353216L;
+          7789168[0]:long = 4575657221408423936L;
+          7789176[0]:long = 0L;
+          7789192[0]:long = 4607182418800017408L;
+          7789186[0]:byte = 2;
+          7789128[0]:byte = 1;
+          7789056[0]:byte = 0;
+          7789103[0]:byte = 0;
+          7789088[0]:byte = 0;
+          7789084[0]:byte = 0;
+          7789080[0]:int = 0;
+          7789108[0]:short = 0;
+          7789120[0]:byte = 0;
+          7789092[0]:byte = 0;
+          7789208[0]:long = 0L;
+          7789232[0]:int = -1;
+          7789312[0]:long = 0L;
+          7789360[0]:int = 1167867904;
+          7789384[0]:long = 0L;
+          7789264[0]:int = 16777215;
+          7789344[0]:short = 1;
+          7789364[0]:short = 1;
+          7789272[0]:long = 4719772410523796111L;
+          7789296[0]:long = 1065353216L;
+          7789304[0]:long = 4575657221408423936L;
+          7789320[0]:long = 1065353216L;
+          7789328[0]:long = 4575657221408423936L;
+          7789336[0]:long = 0L;
+          7789352[0]:long = 4607182418800017408L;
+          7789346[0]:byte = 2;
+          7789288[0]:byte = 1;
+          7789216[0]:byte = 0;
+          7789263[0]:byte = 0;
+          7789248[0]:byte = 0;
+          7789244[0]:byte = 0;
+          7789240[0]:int = 0;
+          7789268[0]:short = 0;
+          7789280[0]:byte = 0;
+          7789252[0]:byte = 0;
+          7789368[0]:long = 0L;
+          7789392[0]:int = -1;
+          7789472[0]:long = 0L;
+          7789520[0]:int = 1167867904;
+          7789544[0]:long = 0L;
+          7789424[0]:int = 16777215;
+          7789504[0]:short = 1;
+          7789524[0]:short = 1;
+          7789432[0]:long = 4719772410523796111L;
+          7789456[0]:long = 1065353216L;
+          7789464[0]:long = 4575657221408423936L;
+          7789480[0]:long = 1065353216L;
+          7789488[0]:long = 4575657221408423936L;
+          7789496[0]:long = 0L;
+          7789512[0]:long = 4607182418800017408L;
+          7789506[0]:byte = 2;
+          7789448[0]:byte = 1;
+          7789376[0]:byte = 0;
+          7789423[0]:byte = 0;
+          7789408[0]:byte = 0;
+          7789404[0]:byte = 0;
+          7789400[0]:int = 0;
+          7789428[0]:short = 0;
+          7789440[0]:byte = 0;
+          7789412[0]:byte = 0;
+          7789528[0]:long = 0L;
+          7789552[0]:int = -1;
+          7789632[0]:long = 0L;
+          7789680[0]:int = 1167867904;
+          7789704[0]:long = 0L;
+          7789584[0]:int = 16777215;
+          7789664[0]:short = 1;
+          7789684[0]:short = 1;
+          7789592[0]:long = 4719772410523796111L;
+          7789616[0]:long = 1065353216L;
+          7789624[0]:long = 4575657221408423936L;
+          7789640[0]:long = 1065353216L;
+          7789648[0]:long = 4575657221408423936L;
+          7789656[0]:long = 0L;
+          7789672[0]:long = 4607182418800017408L;
+          7789666[0]:byte = 2;
+          7789608[0]:byte = 1;
+          7789536[0]:byte = 0;
+          7789583[0]:byte = 0;
+          7789568[0]:byte = 0;
+          7789564[0]:byte = 0;
+          7789560[0]:int = 0;
+          7789588[0]:short = 0;
+          7789600[0]:byte = 0;
+          7789572[0]:byte = 0;
+          7789688[0]:long = 0L;
+          7789712[0]:int = -1;
+          7789792[0]:long = 0L;
+          7789840[0]:int = 1167867904;
+          7789864[0]:long = 0L;
+          7789744[0]:int = 16777215;
+          7789824[0]:short = 1;
+          7789844[0]:short = 1;
+          7789752[0]:long = 4719772410523796111L;
+          7789776[0]:long = 1065353216L;
+          7789784[0]:long = 4575657221408423936L;
+          7789800[0]:long = 1065353216L;
+          7789808[0]:long = 4575657221408423936L;
+          7789816[0]:long = 0L;
+          7789832[0]:long = 4607182418800017408L;
+          7789826[0]:byte = 2;
+          7789768[0]:byte = 1;
+          7789696[0]:byte = 0;
+          7789743[0]:byte = 0;
+          7789728[0]:byte = 0;
+          7789724[0]:byte = 0;
+          7789720[0]:int = 0;
+          7789748[0]:short = 0;
+          7789760[0]:byte = 0;
+          7789732[0]:byte = 0;
+          7789848[0]:long = 0L;
+          7789872[0]:int = -1;
+          7789952[0]:long = 0L;
+          7790000[0]:int = 1167867904;
+          7790024[0]:long = 0L;
+          7789904[0]:int = 16777215;
+          7789984[0]:short = 1;
+          7790004[0]:short = 1;
+          7789912[0]:long = 4719772410523796111L;
+          7789936[0]:long = 1065353216L;
+          7789944[0]:long = 4575657221408423936L;
+          7789960[0]:long = 1065353216L;
+          7789968[0]:long = 4575657221408423936L;
+          7789976[0]:long = 0L;
+          7789992[0]:long = 4607182418800017408L;
+          7789986[0]:byte = 2;
+          7789928[0]:byte = 1;
+          7789856[0]:byte = 0;
+          7789903[0]:byte = 0;
+          7789888[0]:byte = 0;
+          7789884[0]:byte = 0;
+          7789880[0]:int = 0;
+          7789908[0]:short = 0;
+          7789920[0]:byte = 0;
+          7789892[0]:byte = 0;
+          7790008[0]:long = 0L;
+          7790032[0]:int = -1;
+          7790112[0]:long = 0L;
+          7790160[0]:int = 1167867904;
+          7790184[0]:long = 0L;
+          7790064[0]:int = 16777215;
+          7790144[0]:short = 1;
+          7790164[0]:short = 1;
+          7790072[0]:long = 4719772410523796111L;
+          7790096[0]:long = 1065353216L;
+          7790104[0]:long = 4575657221408423936L;
+          7790120[0]:long = 1065353216L;
+          7790128[0]:long = 4575657221408423936L;
+          7790136[0]:long = 0L;
+          7790152[0]:long = 4607182418800017408L;
+          7790146[0]:byte = 2;
+          7790088[0]:byte = 1;
+          7790016[0]:byte = 0;
+          7790063[0]:byte = 0;
+          7790048[0]:byte = 0;
+          7790044[0]:byte = 0;
+          7790040[0]:int = 0;
+          7790068[0]:short = 0;
+          7790080[0]:byte = 0;
+          7790052[0]:byte = 0;
+          7790168[0]:long = 0L;
+          7790192[0]:int = -1;
+          7790272[0]:long = 0L;
+          7790320[0]:int = 1167867904;
+          7790344[0]:long = 0L;
+          7790224[0]:int = 16777215;
+          7790304[0]:short = 1;
+          7790324[0]:short = 1;
+          7790232[0]:long = 4719772410523796111L;
+          7790256[0]:long = 1065353216L;
+          7790264[0]:long = 4575657221408423936L;
+          7790280[0]:long = 1065353216L;
+          7790288[0]:long = 4575657221408423936L;
+          7790296[0]:long = 0L;
+          7790312[0]:long = 4607182418800017408L;
+          7790306[0]:byte = 2;
+          7790248[0]:byte = 1;
+          7790176[0]:byte = 0;
+          7790223[0]:byte = 0;
+          7790208[0]:byte = 0;
+          7790204[0]:byte = 0;
+          7790200[0]:int = 0;
+          7790228[0]:short = 0;
+          7790240[0]:byte = 0;
+          7790212[0]:byte = 0;
+          7790328[0]:long = 0L;
+          7790352[0]:int = -1;
+          7790432[0]:long = 0L;
+          7790480[0]:int = 1167867904;
+          7790504[0]:long = 0L;
+          7790384[0]:int = 16777215;
+          7790464[0]:short = 1;
+          7790484[0]:short = 1;
+          7790392[0]:long = 4719772410523796111L;
+          7790416[0]:long = 1065353216L;
+          7790424[0]:long = 4575657221408423936L;
+          7790440[0]:long = 1065353216L;
+          7790448[0]:long = 4575657221408423936L;
+          7790456[0]:long = 0L;
+          7790472[0]:long = 4607182418800017408L;
+          7790466[0]:byte = 2;
+          7790408[0]:byte = 1;
+          7790336[0]:byte = 0;
+          7790383[0]:byte = 0;
+          7790368[0]:byte = 0;
+          7790364[0]:byte = 0;
+          7790360[0]:int = 0;
+          7790388[0]:short = 0;
+          7790400[0]:byte = 0;
+          7790372[0]:byte = 0;
+          7790488[0]:long = 0L;
+          7790512[0]:int = -1;
+          7790592[0]:long = 0L;
+          7790640[0]:int = 1167867904;
+          7790664[0]:long = 0L;
+          7790544[0]:int = 16777215;
+          7790624[0]:short = 1;
+          7790644[0]:short = 1;
+          7790552[0]:long = 4719772410523796111L;
+          7790576[0]:long = 1065353216L;
+          7790584[0]:long = 4575657221408423936L;
+          7790600[0]:long = 1065353216L;
+          7790608[0]:long = 4575657221408423936L;
+          7790616[0]:long = 0L;
+          7790632[0]:long = 4607182418800017408L;
+          7790626[0]:byte = 2;
+          7790568[0]:byte = 1;
+          7790496[0]:byte = 0;
+          7790543[0]:byte = 0;
+          7790528[0]:byte = 0;
+          7790524[0]:byte = 0;
+          7790520[0]:int = 0;
+          7790548[0]:short = 0;
+          7790560[0]:byte = 0;
+          7790532[0]:byte = 0;
+          7790648[0]:long = 0L;
+          7790672[0]:int = -1;
+          7790752[0]:long = 0L;
+          7790800[0]:int = 1167867904;
+          7790824[0]:long = 0L;
+          7790704[0]:int = 16777215;
+          7790784[0]:short = 1;
+          7790804[0]:short = 1;
+          7790712[0]:long = 4719772410523796111L;
+          7790736[0]:long = 1065353216L;
+          7790744[0]:long = 4575657221408423936L;
+          7790760[0]:long = 1065353216L;
+          7790768[0]:long = 4575657221408423936L;
+          7790776[0]:long = 0L;
+          7790792[0]:long = 4607182418800017408L;
+          7790786[0]:byte = 2;
+          7790728[0]:byte = 1;
+          7790656[0]:byte = 0;
+          7790703[0]:byte = 0;
+          7790688[0]:byte = 0;
+          7790684[0]:byte = 0;
+          7790680[0]:int = 0;
+          7790708[0]:short = 0;
+          7790720[0]:byte = 0;
+          7790692[0]:byte = 0;
+          7790808[0]:long = 0L;
+          7790832[0]:int = -1;
+          7790912[0]:long = 0L;
+          7790960[0]:int = 1167867904;
+          7790984[0]:long = 0L;
+          7790864[0]:int = 16777215;
+          7790944[0]:short = 1;
+          7790964[0]:short = 1;
+          7790872[0]:long = 4719772410523796111L;
+          7790896[0]:long = 1065353216L;
+          7790904[0]:long = 4575657221408423936L;
+          7790920[0]:long = 1065353216L;
+          7790928[0]:long = 4575657221408423936L;
+          7790936[0]:long = 0L;
+          7790952[0]:long = 4607182418800017408L;
+          7790946[0]:byte = 2;
+          7790888[0]:byte = 1;
+          7790816[0]:byte = 0;
+          7790863[0]:byte = 0;
+          7790848[0]:byte = 0;
+          7790844[0]:byte = 0;
+          7790840[0]:int = 0;
+          7790868[0]:short = 0;
+          7790880[0]:byte = 0;
+          7790852[0]:byte = 0;
+          7790968[0]:long = 0L;
+          7790992[0]:int = -1;
+          7791072[0]:long = 0L;
+          7791120[0]:int = 1167867904;
+          7791144[0]:long = 0L;
+          7791024[0]:int = 16777215;
+          7791104[0]:short = 1;
+          7791124[0]:short = 1;
+          7791032[0]:long = 4719772410523796111L;
+          7791056[0]:long = 1065353216L;
+          7791064[0]:long = 4575657221408423936L;
+          7791080[0]:long = 1065353216L;
+          7791088[0]:long = 4575657221408423936L;
+          7791096[0]:long = 0L;
+          7791112[0]:long = 4607182418800017408L;
+          7791106[0]:byte = 2;
+          7791048[0]:byte = 1;
+          7790976[0]:byte = 0;
+          7791023[0]:byte = 0;
+          7791008[0]:byte = 0;
+          7791004[0]:byte = 0;
+          7791000[0]:int = 0;
+          7791028[0]:short = 0;
+          7791040[0]:byte = 0;
+          7791012[0]:byte = 0;
+          7791128[0]:long = 0L;
+          7791152[0]:int = -1;
+          7791232[0]:long = 0L;
+          7791280[0]:int = 1167867904;
+          7791304[0]:long = 0L;
+          7791184[0]:int = 16777215;
+          7791264[0]:short = 1;
+          7791284[0]:short = 1;
+          7791192[0]:long = 4719772410523796111L;
+          7791216[0]:long = 1065353216L;
+          7791224[0]:long = 4575657221408423936L;
+          7791240[0]:long = 1065353216L;
+          7791248[0]:long = 4575657221408423936L;
+          7791256[0]:long = 0L;
+          7791272[0]:long = 4607182418800017408L;
+          7791266[0]:byte = 2;
+          7791208[0]:byte = 1;
+          7791136[0]:byte = 0;
+          7791183[0]:byte = 0;
+          7791168[0]:byte = 0;
+          7791164[0]:byte = 0;
+          7791160[0]:int = 0;
+          7791188[0]:short = 0;
+          7791200[0]:byte = 0;
+          7791172[0]:byte = 0;
+          7791288[0]:long = 0L;
+          7791312[0]:int = -1;
+          7791352[0]:long = 4719772410523796111L;
+          7791344[0]:int = 16777215;
+          7791296[0]:byte = 0;
+          7791343[0]:byte = 0;
+          7791328[0]:byte = 0;
+          7791324[0]:byte = 0;
+          7791320[0]:int = 0;
+          7791348[0]:short = 0;
+          7791332[0]:byte = 0;
+          releaseStaticInitializationGuard(7791360);
+          label B_qa:
+          b[7545]:int = 0;
+          b[30168]:byte = a;
+          xc.b = 0;
+          xc.a = 0;
+          b[7596]:int = 0;
+          b[7584]:int = 0;
+          b[3791]:long = 0L;
+          b[7570]:int = 0;
+          b[3784]:long = 0L;
+          b[7555]:long@4 = 0L;
+          b[7553]:long@4 = 4294967295L;
+          b[30208]:byte = 0;
+          b[15103]:short = 257;
+          b[15224]:short = 1;
+          b[3811]:long = 0L;
+          b[15234]:short = 1;
+          b[7616]:int = 1167867904;
+          b[3807]:long = 4607182418800017408L;
+          b[3805]:long = 0L;
+          b[3804]:long = 4575657221408423936L;
+          b[3803]:long = 1065353216L;
+          b[3802]:long = 0L;
+          b[3801]:long = 4575657221408423936L;
+          b[3800]:long = 1065353216L;
+          b[30392]:byte = 1;
+          b[15194]:short = 256;
+          b[7544]:int = 33016;
+          b[30450]:byte = 2;
+          bd.b = 0;
+          bd.a = 0L;
+          b[30527]:byte = 0;
+          b[30512]:byte = 0;
+          b[30508]:byte = 0;
+          b[7626]:int = 0;
+          b[7624]:int = -1;
+          b[3820]:long = 0L;
+          b[30552]:byte = 0;
+          b[7636]:int = 0;
+          b[3817]:long = 4719772410523796111L;
+          b[15266]:short = 0;
+          b[7632]:int = 16777215;
+          b[30516]:byte = 0;
+          d = (a << 2) + 7784960;
+          if (eqz(d[0]:int)) {
+            a = call_indirect(
+                  select_if(0, a * 52 + 382064, (a - 1 & 255) > 37)[12]:int);
+            f = d[0]:int;
+            d[0]:int = a;
+            call_indirect({
+                            if (f) {
+                              call_indirect(f, (f[0]:int)[1]:int);
+                              a = d[0]:int;
+                            }
+                            a;
+                            label B_sa:
+                          },
+                          0,
+                          (a[0]:int)[7]:int);
+          }
+          se = se * 100.0f;
+          var te:double = f64_promote_f32(se);
+          if (te < 0.9) {
+            b[16]:double = te;
+            function_412(b + 21312,
+                         64,
+                         {
+                           31253;
+                           if (se < 0.00009f) goto B_ya;
+                           31260;
+                           if (se < 0.0009f) goto B_ya;
+                           31267;
+                           if (se < 0.009f) goto B_ya;
+                           select_if(31274, 31281, se < 0.09f);
+                           label B_ya:
+                         },
+                         b + 128);
+            a = stringLength(vc);
+            b[3229]:long = 0L;
+            b[12906]:short = 1;
+            b[6452]:int = 1167867904;
+            b[3225]:long = 4607182418800017408L;
+            b[25794]:byte = 2;
+            b[12896]:short = 1;
+            b[3223]:long = 0L;
+            b[3222]:long = 4575657221408423936L;
+            b[3221]:long = 1065353216L;
+            b[3220]:long = 0L;
+            b[3219]:long = 4575657221408423936L;
+            b[3218]:long = 1065353216L;
+            b[25736]:byte = 1;
+            pb.b = 0;
+            pb.a = 0L;
+            b[25856]:byte = 0;
+            b[25852]:byte = 0;
+            b[6462]:int = 0;
+            b[6460]:int = -1;
+            if (a >= -16) goto B_w;
+            if (a >= 11) {
+              f = a + 16 & -16;
+              d = allocateOrAbort(f);
+              b[6467]:int = f | -2147483648;
+              b[6465]:int = d;
+              b[6466]:int = a;
+              goto B_ab;
+            }
+            b[25871]:byte = a;
+            d = uc;
+            if (eqz(a)) goto B_za;
+            label B_ab:
+            function_363(d, vc, a);
+            label B_za:
+            (a + d)[0]:byte = 0;
+            b[3235]:long = 4710765211269055119L;
+            b[12938]:short = 0;
+            b[6468]:int = 16777215;
+            function_800(wc, b + 25736);
+            if (b[25871]:byte <= -1) { free(b[6465]:int) }
+            f = b[6460]:int;
+            if (f == -1) goto B_ua;
+            d = b[6455]:int;
+            if (d) {
+              d[18]:int = b[6454]:int;
+              goto B_wa;
+            }
+            if (441324[0]:int != rb) goto B_wa;
+            441324[0]:int = (a = b[6454]:int);
+            goto B_va;
+          }
+          b[20]:double = f64_promote_f32(function_631(se));
+          function_412(b + 21312, 64, 31288, b + 160);
+          a = stringLength(b + 21312);
+          b[3229]:long = 0L;
+          b[12906]:short = 1;
+          b[6452]:int = 1167867904;
+          b[3225]:long = 4607182418800017408L;
+          b[25794]:byte = 2;
+          b[12896]:short = 1;
+          b[3223]:long = 0L;
+          b[3222]:long = 4575657221408423936L;
+          b[3221]:long = 1065353216L;
+          b[3220]:long = 0L;
+          b[3219]:long = 4575657221408423936L;
+          b[3218]:long = 1065353216L;
+          b[25736]:byte = 1;
+          pb.b = 0;
+          pb.a = 0L;
+          b[25856]:byte = 0;
+          b[25852]:byte = 0;
+          b[6462]:int = 0;
+          b[6460]:int = -1;
+          if (a >= -16) goto B_w;
+          if (a >= 11) {
+            f = a + 16 & -16;
+            d = allocateOrAbort(f);
+            b[6467]:int = f | -2147483648;
+            b[6465]:int = d;
+            b[6466]:int = a;
+            goto B_fb;
+          }
+          b[25871]:byte = a;
+          d = uc;
+          if (eqz(a)) goto B_eb;
+          label B_fb:
+          function_363(d, b + 21312, a);
+          label B_eb:
+          (a + d)[0]:byte = 0;
+          b[3235]:long = 4710765211269055119L;
+          b[12938]:short = 0;
+          b[6468]:int = 16777215;
+          function_800(wc, b + 25736);
+          if (b[25871]:byte <= -1) { free(b[6465]:int) }
+          f = b[6460]:int;
+          if (f != -1) {
+            d = b[6455]:int;
+            if (d) {
+              d[18]:int = b[6454]:int;
+              goto B_kb;
+            }
+            if (441324[0]:int != rb) goto B_kb;
+            441324[0]:int = (a = b[6454]:int);
+            goto B_jb;
+            label B_kb:
+            a = b[6454]:int;
+            label B_jb:
+            if (a) { a[19]:int = d }
+            b[3227]:long = 0L;
+            b[36]:int = f;
+            emscripten_asm(136033, 31967, b + 144);
+            b[6460]:int = -1;
+            441320[0]:int = 441320[0]:int - 1;
+          }
+          goto B_ua;
+          label B_wa:
+          a = b[6454]:int;
+          label B_va:
+          if (a) { a[19]:int = d }
+          b[3227]:long = 0L;
+          b[28]:int = f;
+          emscripten_asm(136033, 31967, b + 112);
+          b[6460]:int = -1;
+          441320[0]:int = 441320[0]:int - 1;
+          label B_ua:
+          if (b[6454]:int) goto B_ma;
+          if (b[6455]:int) goto B_ma;
+          if (441324[0]:int == rb) goto B_ma;
+          e = oe + (a = b[34680]:ubyte) * 400;
+          e[0]:byte = b[30168]:ubyte;
+          function_376(e + 8, cd);
+          e[2]:int = 33016;
+          e[110]:short = b[15194]:ushort;
+          d = b[30392]:ubyte;
+          e[312]:byte = 0;
+          e[38]:long = 0L;
+          e[224]:byte = d;
+          f = e + 232;
+          f[0]:long = w.a;
+          e[30]:long = w.b;
+          e[31]:long = w.c;
+          e[32]:long = w.d;
+          e[33]:long = w.e;
+          e[34]:long = w.f;
+          e[35]:long = w.g;
+          e[36]:long = w.h;
+          e[300]:byte = b[30468]:ubyte;
+          e[74]:int = b[7616]:int;
+          e[301]:byte = b[30469]:ubyte;
+          vb = a + 1;
+          r = b[7619]:int;
+          d = b[7618]:int;
+          if (d) goto B_pb;
+          if (r) goto B_pb;
+          y = 0;
+          a = 441324[0]:int;
+          if (a != w) goto B_ob;
+          label B_pb:
+          if (r) {
+            r[18] = d;
+            d = b[7618]:int;
+            goto B_qb;
+          }
+          if (441324[0]:int != w) goto B_qb;
+          441324[0]:int = d;
+          label B_qb:
+          if (d) { d[19]:int = r }
+          b[3809]:long = 0L;
+          y = 0;
+          a = 441324[0]:int;
+          if (a) {
+            e[76]:int = a;
+            a[19]:int = f;
+            y = b[7619]:int;
+          }
+          441324[0]:int = f;
+          a = f;
+          label B_ob:
+          e[40]:long = ad.b;
+          e[39]:long = ad.a;
+          e[82]:int = b[7624]:int;
+          b[7624]:int = -1;
+          e[344]:byte = zc.b;
+          e[42]:long = zc.a;
+          e[89]:int = qb[2]:int;
+          e[87]:long@4 = qb[0]:long@4;
+          qb[0]:long@4 = 0L;
+          qb[2]:int = 0;
+          e[46]:long = yc.b;
+          e[45]:long = yc.a;
+          e[47]:long = sb.a;
+          e[48]:long = sb.b;
+          e[49]:long = sb.c;
+          b[34680]:byte = vb;
+          if (y) goto B_ma;
+          if (a == w) goto B_ma;
+          function_377(cd);
+          c = c + 8;
+          if (c != ub) continue L_oa;
+        }
+      }
+      b[1514]:long = 0L;
+      b[6046]:short = 1;
+      b[3022]:int = 1167867904;
+      b[1510]:long = 4607182418800017408L;
+      b[12074]:byte = 2;
+      b[6036]:short = 1;
+      b[1508]:long = 0L;
+      b[1507]:long = 4575657221408423936L;
+      b[1506]:long = 1065353216L;
+      b[1505]:long = 0L;
+      b[1504]:long = 4575657221408423936L;
+      b[1503]:long = 1065353216L;
+      b[12016]:byte = 1;
+      tc.b = 0;
+      tc.a = 0L;
+      b[12151]:byte = 1;
+      b[12136]:byte = 0;
+      b[12132]:byte = 0;
+      b[3032]:int = 0;
+      b[3030]:int = -1;
+      b[1520]:long = 4724276010151166607L;
+      b[6078]:short = 0;
+      b[3038]:int = 16777215;
+      b[6070]:short = 63;
+      b[1531]:long = 0L;
+      b[12168]:byte = 1;
+      j.h = v.h;
+      j.g = v.g;
+      j.f = v.f;
+      j.e = v.e;
+      j.d = v.d;
+      j.c = v.c;
+      j.b = v.b;
+      j.a = v.a;
+      b[3060]:int = 1167867904;
+      b[6122]:short = 1;
+      if (v == (c = 441324[0]:int)) {
+        441324[0]:int = j;
+        b[1512]:long = 0L;
+        c = j;
+      }
+      nb.a = qc.a;
+      nb.b = qc.b;
+      b[3030]:int = -1;
+      mb[8]:byte = sc.b;
+      mb[0]:long = sc.a;
+      ha[2]:int = ob[2]:int;
+      ha[0]:long@4 = ob[0]:long@4;
+      ob[0]:long@4 = 0L;
+      ob[2]:int = 0;
+      lb.b = rc.b;
+      lb.a = rc.a;
+      b[1551]:long = 0L;
+      b[12328]:byte = 1;
+      i.h = j.h;
+      i.g = j.g;
+      i.f = j.f;
+      i.e = j.e;
+      i.d = j.d;
+      i.c = j.c;
+      i.b = j.b;
+      i.a = j.a;
+      b[3100]:int = 1167867904;
+      b[6202]:short = 1;
+      if (c == j) {
+        441324[0]:int = i;
+        b[1531]:long = 0L;
+      }
+      kb.a = nb.a;
+      kb.b = nb.b;
+      b[3068]:int = -1;
+      b[3108]:int = -1;
+      jb[8]:byte = mb[8]:ubyte;
+      jb[0]:long = mb[0]:long;
+      ga[2]:int = ha[2]:int;
+      ga[0]:long@4 = ha[0]:long@4;
+      ha[0]:long@4 = 0L;
+      ha[2]:int = 0;
+      ib.b = lb.b;
+      ib.a = lb.a;
+      d = q[0]:int;
+      a = stringLength(d);
+      b[630]:long = 0L;
+      b[2510]:short = 1;
+      b[1254]:int = 1167867904;
+      b[626]:long = 4607182418800017408L;
+      b[5002]:byte = 2;
+      b[2500]:short = 1;
+      b[624]:long = 0L;
+      b[623]:long = 4575657221408423936L;
+      b[622]:long = 1065353216L;
+      b[621]:long = 0L;
+      b[620]:long = 4575657221408423936L;
+      b[619]:long = 1065353216L;
+      b[4944]:byte = 1;
+      pc.b = 0;
+      pc.a = 0L;
+      b[5064]:byte = 0;
+      b[5060]:byte = 0;
+      b[1264]:int = 0;
+      b[1262]:int = -1;
+      if (a >= -16) goto B_w;
+      if (a >= 11) {
+        f = a + 16 & -16;
+        c = allocateOrAbort(f);
+        b[1269]:int = f | -2147483648;
+        b[1267]:int = c;
+        b[1268]:int = a;
+        goto B_xb;
+      }
+      b[5079]:byte = a;
+      c = ka;
+      if (eqz(a)) goto B_wb;
+      label B_xb:
+      function_363(c, d, a);
+      label B_wb:
+      (a + c)[0]:byte = 0;
+      b[647]:long = 0L;
+      b[636]:long = 4724276010151166607L;
+      b[2542]:short = 0;
+      b[1270]:int = 16777215;
+      b[5096]:byte = (ub = b[4944]:ubyte);
+      g.h = s.h;
+      g.g = s.g;
+      g.f = s.f;
+      g.e = s.e;
+      g.d = s.d;
+      g.c = s.c;
+      g.b = s.b;
+      g.a = s.a;
+      b[5172]:byte = (vb = b[5020]:ubyte);
+      b[1292]:int = (qe = b[1254]:int);
+      b[5173]:byte = (re = b[5021]:ubyte);
+      d = b[1257]:int;
+      c = b[1256]:int;
+      if (c) goto B_ac;
+      if (d) goto B_ac;
+      a = 441324[0]:int;
+      if (a != s) goto B_zb;
+      label B_ac:
+      if (d) {
+        d[18]:int = c;
+        c = b[1256]:int;
+        goto B_bc;
+      }
+      if (441324[0]:int != s) goto B_bc;
+      441324[0]:int = c;
+      label B_bc:
+      if (c) { c[19]:int = d }
+      b[628]:long = 0L;
+      a = 441324[0]:int;
+      if (a) {
+        b[1294]:int = a;
+        a[19]:int = g;
+      }
+      441324[0]:int = g;
+      a = g;
+      label B_zb:
+      hb.a = mc.a;
+      hb.b = mc.b;
+      y = b[1262]:int;
+      b[1262]:int = -1;
+      b[1300]:int = y;
+      gb[8]:byte = oc.b;
+      gb[0]:long = oc.a;
+      fa[2]:int = ka[2]:int;
+      fa[0]:long@4 = ka[0]:long@4;
+      ka[0]:long@4 = 0L;
+      ka[2]:int = 0;
+      fb.b = nc.b;
+      fb.a = nc.a;
+      f = 109;
+      e = 239;
+      r = 126;
+      d = 13126;
+      c = 6;
+      br_table[B_fc, B_lc, B_kc, B_jc, B_ic, B_hc, ..B_gc](q[6]:int)
+      label B_lc:
+      f = 93;
+      e = 230;
+      r = 255;
+      d = 13973;
+      c = 7;
+      goto B_fc;
+      label B_kc:
+      f = 227;
+      e = 77;
+      r = 94;
+      d = 16248;
+      c = 4;
+      goto B_fc;
+      label B_jc:
+      f = 222;
+      e = 31;
+      r = 134;
+      d = 19249;
+      c = 4;
+      goto B_fc;
+      label B_ic:
+      e = 31;
+      r = 222;
+      d = 5496;
+      c = 9;
+      f = 31;
+      goto B_fc;
+      label B_hc:
+      f = 101;
+      e = 31;
+      r = 222;
+      d = 15898;
+      goto B_fc;
+      label B_gc:
+      r = 255;
+      d = 23393;
+      c = 3;
+      e = 255;
+      f = 255;
+      label B_fc:
+      b[592]:long = 0L;
+      b[2358]:short = 1;
+      b[1178]:int = 1167867904;
+      b[588]:long = 4607182418800017408L;
+      b[4698]:byte = 2;
+      b[2348]:short = 1;
+      b[586]:long = 0L;
+      b[585]:long = 4575657221408423936L;
+      b[584]:long = 1065353216L;
+      b[583]:long = 0L;
+      b[582]:long = 4575657221408423936L;
+      b[581]:long = 1065353216L;
+      b[4640]:byte = 1;
+      lc.b = 0;
+      lc.a = 0L;
+      b[4775]:byte = c;
+      b[4760]:byte = 0;
+      b[4756]:byte = 0;
+      b[1188]:int = 0;
+      b[1186]:int = -1;
+      (c + (d = function_363(ne, d, c)))[0]:byte = 0;
+      b[598]:long = 4710765211269055119L;
+      b[4781]:byte = 0;
+      b[4779]:short@1 = 0;
+      b[4778]:byte = f;
+      b[4777]:byte = e;
+      b[4776]:byte = r;
+      b[609]:long = 0L;
+      b[4792]:byte = 1;
+      h.h = u.h;
+      h.g = u.g;
+      h.f = u.f;
+      h.e = u.e;
+      h.d = u.d;
+      h.c = u.c;
+      h.b = u.b;
+      h.a = u.a;
+      b[1216]:int = 1167867904;
+      b[2434]:short = 1;
+      if (a == u) {
+        441324[0]:int = h;
+        b[590]:long = 0L;
+        a = h;
+      }
+      eb.a = ic.a;
+      eb.b = ic.b;
+      b[1186]:int = -1;
+      b[1224]:int = -1;
+      db[8]:byte = kc.b;
+      db[0]:long = kc.a;
+      ea[2]:int = d[2]:int;
+      ea[0]:long@4 = d[0]:long@4;
+      d[0]:long@4 = 0L;
+      d[2]:int = 0;
+      cb.b = jc.b;
+      cb.a = jc.a;
+      b[666]:long = 0L;
+      b[5248]:byte = ub;
+      t.h = g.h;
+      t.g = g.g;
+      t.f = g.f;
+      t.e = g.e;
+      t.d = g.d;
+      t.c = g.c;
+      t.b = g.b;
+      t.a = g.a;
+      b[5325]:byte = re;
+      b[1330]:int = qe;
+      b[5324]:byte = vb;
+      c = b[1295]:int;
+      c = {
+            d = b[1294]:int;
+            if (d) goto B_oc;
+            if (c) goto B_oc;
+            0;
+            if (a != g) goto B_nc;
+            label B_oc:
+            if (c) {
+              c[18]:int = d;
+              d = b[1294]:int;
+              goto B_pc;
+            }
+            if (a != g) goto B_pc;
+            441324[0]:int = d;
+            a = d;
+            label B_pc:
+            if (d) { d[19]:int = c }
+            b[647]:long = 0L;
+            if (a) {
+              b[1332]:int = a;
+              a[19]:int = t;
+            }
+            441324[0]:int = t;
+            a = t;
+            b[1218]:int;
+            label B_nc:
+          }
+      hc.a = hb.a;
+      hc.b = hb.b;
+      b[1300]:int = -1;
+      b[1338]:int = y;
+      gc.b = gb[8]:ubyte;
+      gc.a = gb[0]:long;
+      fc[2]:int = fa[2]:int;
+      fc[0]:long@4 = fa[0]:long@4;
+      fa[0]:long@4 = 0L;
+      fa[2]:int = 0;
+      ec.b = fb.b;
+      ec.a = fb.a;
+      b[685]:long = 0L;
+      b[5400]:byte = 1;
+      x.h = h.h;
+      x.g = h.g;
+      x.f = h.f;
+      x.e = h.e;
+      x.d = h.d;
+      x.c = h.c;
+      x.b = h.b;
+      x.a = h.a;
+      b[1368]:int = 1167867904;
+      b[2738]:short = 1;
+      d = b[1219]:int;
+      if (c) goto B_uc;
+      if (d) goto B_uc;
+      if (a != h) goto B_tc;
+      label B_uc:
+      if (d) {
+        d[18]:int = c;
+        c = b[1218]:int;
+        goto B_vc;
+      }
+      if (a != h) goto B_vc;
+      441324[0]:int = c;
+      a = c;
+      label B_vc:
+      if (c) { c[19]:int = d }
+      b[609]:long = 0L;
+      if (a) {
+        b[1370]:int = a;
+        a[19]:int = x;
+      }
+      441324[0]:int = x;
+      label B_tc:
+      dc.a = eb.a;
+      dc.b = eb.b;
+      b[1224]:int = -1;
+      b[1376]:int = -1;
+      cc.b = db[8]:ubyte;
+      cc.a = db[0]:long;
+      bc[2]:int = ea[2]:int;
+      bc[0]:long@4 = ea[0]:long@4;
+      ea[0]:long@4 = 0L;
+      ea[2]:int = 0;
+      ac.b = cb.b;
+      ac.a = cb.a;
+      f = b[37896]:ubyte;
+      a = f << 5;
+      if (a) {
+        d = a + ia;
+        c = me;
+        a = ia;
+        loop L_bd {
+          c[0]:float = a[0]:float;
+          c[3]:int = a[3]:int;
+          c[1]:long@4 = a[1]:long@4;
+          a[1]:long@4 = 0L;
+          a[3]:int = 0;
+          c[4]:float = a[4]:float;
+          c[5]:int = a[5]:int;
+          c[6]:int = a[6]:int;
+          c[7]:int = a[7]:int;
+          a[7]:int = 0;
+          a[5]:long@4 = 0L;
+          c = c + 32;
+          a = a + 32;
+          if (a != d) continue L_bd;
+        }
+        b[5556]:byte = f;
+        if (d == (a = ia)) goto B_zc;
+        loop L_cd {
+          a = function_519(a) + 32;
+          if (a != d) continue L_cd;
+        }
+        goto B_zc;
+      }
+      b[5556]:byte = f;
+      label B_zc:
+      b[37896]:byte = 0;
+      b[1422]:int = b[9507]:int;
+      function_363(le, pe, 188);
+      b[6072]:byte = 0;
+      b[5888]:byte = 0;
+      b[1471]:int = 0;
+      a = function_508(zb, b + 5248);
+      b[1681]:int = b[1471]:int;
+      c = function_363(je, ke, 188);
+      var ue:long = q[26]:uint;
+      a = function_508(yb, a);
+      b[1891]:int = b[1681]:int;
+      c = function_363(ie, c, 188);
+      b[970]:long = ue << 32L;
+      d = function_508(xb, a);
+      b[2105]:int = b[1891]:int;
+      f = function_363(he, c, 188);
+      b[1077]:long = b[970]:long;
+      e = function_535(wb, b + 34680);
+      b[1573]:long = 0L;
+      b[12008]:byte = 0;
+      b[11864]:byte = 0;
+      b[2965]:int = 0;
+      b[12480]:byte = tb;
+      b[12504]:byte = b[12328]:ubyte;
+      p.h = i.h;
+      p.g = i.g;
+      p.f = i.f;
+      p.e = i.e;
+      p.d = i.d;
+      p.c = i.c;
+      p.b = i.b;
+      p.a = i.a;
+      b[12580]:byte = b[12404]:ubyte;
+      b[3144]:int = b[3100]:int;
+      b[12581]:byte = b[12405]:ubyte;
+      c = b[3103]:int;
+      a = b[3102]:int;
+      if (a) goto B_ed;
+      if (c) goto B_ed;
+      if (441324[0]:int != i) goto B_dd;
+      label B_ed:
+      if (c) {
+        c[18]:int = a;
+        a = b[3102]:int;
+        goto B_fd;
+      }
+      if (441324[0]:int != i) goto B_fd;
+      441324[0]:int = a;
+      label B_fd:
+      if (a) { a[19]:int = c }
+      b[1551]:long = 0L;
+      a = 441324[0]:int;
+      if (a) {
+        b[3146]:int = a;
+        a[19]:int = p;
+      }
+      441324[0]:int = p;
+      label B_dd:
+      bb.a = kb.a;
+      bb.b = kb.b;
+      a = b[3108]:int;
+      b[3108]:int = -1;
+      b[3152]:int = a;
+      ab[8]:byte = jb[8]:ubyte;
+      ab[0]:long = jb[0]:long;
+      da[2]:int = ga[2]:int;
+      da[0]:long@4 = ga[0]:long@4;
+      ga[0]:long@4 = 0L;
+      ga[2]:int = 0;
+      za.b = ib.b;
+      za.a = ib.a;
+      d = function_508(fe, d);
+      b[3325]:int = b[2105]:int;
+      f = function_363(ee, f, 188);
+      b[1687]:long = b[1077]:long;
+      b[13512]:byte = b[8632]:ubyte;
+      e = function_535(de, e);
+      b[4185]:int = b[2965]:int;
+      q = function_363(ce, ge, 148);
+      b[2125]:long = 0L;
+      b[16920]:byte = b[12504]:ubyte;
+      b[16896]:byte = b[12480]:ubyte;
+      o.h = p.h;
+      o.g = p.g;
+      o.f = p.f;
+      o.e = p.e;
+      o.d = p.d;
+      o.c = p.c;
+      o.b = p.b;
+      o.a = p.a;
+      b[4248]:int = b[3144]:int;
+      b[8498]:short = b[6290]:ushort;
+      c = b[3147]:int;
+      a = b[3146]:int;
+      if (a) goto B_kd;
+      if (c) goto B_kd;
+      if (441324[0]:int != p) goto B_jd;
+      label B_kd:
+      if (c) {
+        c[18]:int = a;
+        a = b[3146]:int;
+        goto B_ld;
+      }
+      if (441324[0]:int != p) goto B_ld;
+      441324[0]:int = a;
+      label B_ld:
+      if (a) { a[19]:int = c }
+      b[1573]:long = 0L;
+      a = 441324[0]:int;
+      if (a) {
+        b[4250]:int = a;
+        a[19]:int = o;
+      }
+      441324[0]:int = o;
+      label B_jd:
+      ya.a = bb.a;
+      ya.b = bb.b;
+      a = b[3152]:int;
+      b[3152]:int = -1;
+      b[4256]:int = a;
+      xa[8]:byte = ab[8]:ubyte;
+      xa[0]:long = ab[0]:long;
+      ca[2]:int = da[2]:int;
+      ca[0]:long@4 = da[0]:long@4;
+      da[0]:long@4 = 0L;
+      da[2]:int = 0;
+      wa.b = za.b;
+      wa.a = za.a;
+      d = function_508(be, d);
+      b[4429]:int = b[3325]:int;
+      f = function_363(ae, f, 188);
+      b[2239]:long = b[1687]:long;
+      b[17928]:byte = b[13512]:ubyte;
+      e = function_535(zd, e);
+      b[5289]:int = b[4185]:int;
+      q = function_363(yd, q, 148);
+      b[2678]:long = 0L;
+      b[21344]:byte = b[16920]:ubyte;
+      b[21320]:byte = b[16896]:ubyte;
+      n.h = o.h;
+      n.g = o.g;
+      n.f = o.f;
+      n.e = o.e;
+      n.d = o.d;
+      n.c = o.c;
+      n.b = o.b;
+      n.a = o.a;
+      b[5354]:int = b[4248]:int;
+      b[10710]:short = b[8498]:ushort;
+      c = b[4251]:int;
+      a = b[4250]:int;
+      if (a) goto B_qd;
+      if (c) goto B_qd;
+      if (441324[0]:int != o) goto B_pd;
+      label B_qd:
+      if (c) {
+        c[18]:int = a;
+        a = b[4250]:int;
+        goto B_rd;
+      }
+      if (441324[0]:int != o) goto B_rd;
+      441324[0]:int = a;
+      label B_rd:
+      if (a) { a[19]:int = c }
+      b[2125]:long = 0L;
+      a = 441324[0]:int;
+      if (a) {
+        b[5356]:int = a;
+        a[19]:int = n;
+      }
+      441324[0]:int = n;
+      label B_pd:
+      va.a = ya.a;
+      va.b = ya.b;
+      a = b[4256]:int;
+      b[4256]:int = -1;
+      b[5362]:int = a;
+      ua[8]:byte = xa[8]:ubyte;
+      ua[0]:long = xa[0]:long;
+      ba[2]:int = ca[2]:int;
+      ba[0]:long@4 = ca[0]:long@4;
+      ca[0]:long@4 = 0L;
+      ca[2]:int = 0;
+      ta.b = wa.b;
+      ta.a = wa.a;
+      d = function_508(xd, d);
+      b[5535]:int = b[4429]:int;
+      f = function_363(wd, f, 188);
+      b[2792]:long = b[2239]:long;
+      b[22352]:byte = b[17928]:ubyte;
+      e = function_535(vd, e);
+      b[6395]:int = b[5289]:int;
+      q = function_363(ud, q, 148);
+      b[3232]:long = 0L;
+      b[25776]:byte = b[21344]:ubyte;
+      b[25752]:byte = b[21320]:ubyte;
+      m.h = n.h;
+      m.g = n.g;
+      m.f = n.f;
+      m.e = n.e;
+      m.d = n.d;
+      m.c = n.c;
+      m.b = n.b;
+      m.a = n.a;
+      b[6462]:int = b[5354]:int;
+      b[12926]:short = b[10710]:ushort;
+      c = b[5357]:int;
+      a = b[5356]:int;
+      if (a) goto B_wd;
+      if (c) goto B_wd;
+      if (441324[0]:int != n) goto B_vd;
+      label B_wd:
+      if (c) {
+        c[18]:int = a;
+        a = b[5356]:int;
+        goto B_xd;
+      }
+      if (441324[0]:int != n) goto B_xd;
+      441324[0]:int = a;
+      label B_xd:
+      if (a) { a[19]:int = c }
+      b[2678]:long = 0L;
+      a = 441324[0]:int;
+      if (a) {
+        b[6464]:int = a;
+        a[19]:int = m;
+      }
+      441324[0]:int = m;
+      label B_vd:
+      sa.a = va.a;
+      sa.b = va.b;
+      a = b[5362]:int;
+      b[5362]:int = -1;
+      b[6470]:int = a;
+      ra[8]:byte = ua[8]:ubyte;
+      ra[0]:long = ua[0]:long;
+      aa[2]:int = ba[2]:int;
+      aa[0]:long@4 = ba[0]:long@4;
+      ba[0]:long@4 = 0L;
+      ba[2]:int = 0;
+      qa.b = ta.b;
+      qa.a = ta.a;
+      d = function_508(td, d);
+      b[6643]:int = b[5535]:int;
+      f = function_363(sd, f, 188);
+      b[3346]:long = b[2792]:long;
+      b[26784]:byte = b[22352]:ubyte;
+      e = function_535(rd, e);
+      b[7503]:int = b[6395]:int;
+      q = function_363(qd, q, 148);
+      b[3787]:long = 0L;
+      b[30216]:byte = b[25776]:ubyte;
+      b[30192]:byte = b[25752]:ubyte;
+      l.h = m.h;
+      l.g = m.g;
+      l.f = m.f;
+      l.e = m.e;
+      l.d = m.d;
+      l.c = m.c;
+      l.b = m.b;
+      l.a = m.a;
+      b[7572]:int = b[6462]:int;
+      b[15146]:short = b[12926]:ushort;
+      c = b[6465]:int;
+      a = b[6464]:int;
+      if (a) goto B_ce;
+      if (c) goto B_ce;
+      if (441324[0]:int != m) goto B_be;
+      label B_ce:
+      if (c) {
+        c[18]:int = a;
+        a = b[6464]:int;
+        goto B_de;
+      }
+      if (441324[0]:int != m) goto B_de;
+      441324[0]:int = a;
+      label B_de:
+      if (a) { a[19]:int = c }
+      b[3232]:long = 0L;
+      a = 441324[0]:int;
+      if (a) {
+        b[7574]:int = a;
+        a[19]:int = l;
+      }
+      441324[0]:int = l;
+      label B_be:
+      pa.a = sa.a;
+      pa.b = sa.b;
+      a = b[6470]:int;
+      b[6470]:int = -1;
+      b[7580]:int = a;
+      oa[8]:byte = ra[8]:ubyte;
+      oa[0]:long = ra[0]:long;
+      z[2]:int = aa[2]:int;
+      z[0]:long@4 = aa[0]:long@4;
+      aa[0]:long@4 = 0L;
+      aa[2]:int = 0;
+      na.b = qa.b;
+      na.a = qa.a;
+      d = function_508(pd, d);
+      b[7753]:int = b[6643]:int;
+      f = function_363(od, f, 188);
+      b[3901]:long = b[3346]:long;
+      b[31224]:byte = b[26784]:ubyte;
+      e = function_535(nd, e);
+      b[8613]:int = b[7503]:int;
+      q = function_363(md, q, 148);
+      b[38]:long = 0L;
+      b[224]:byte = b[30216]:ubyte;
+      b[200]:byte = b[30192]:ubyte;
+      k.h = l.h;
+      k.g = l.g;
+      k.f = l.f;
+      k.e = l.e;
+      k.d = l.d;
+      k.c = l.c;
+      k.b = l.b;
+      k.a = l.a;
+      b[74]:int = b[7572]:int;
+      b[150]:short = b[15146]:ushort;
+      c = b[7575]:int;
+      a = b[7574]:int;
+      if (a) goto B_ie;
+      if (c) goto B_ie;
+      if (441324[0]:int != l) goto B_he;
+      label B_ie:
+      if (c) {
+        c[18]:int = a;
+        a = b[7574]:int;
+        goto B_je;
+      }
+      if (441324[0]:int != l) goto B_je;
+      441324[0]:int = a;
+      label B_je:
+      if (a) { a[19]:int = c }
+      b[3787]:long = 0L;
+      a = 441324[0]:int;
+      if (a) {
+        b[76]:int = a;
+        a[19]:int = k;
+      }
+      441324[0]:int = k;
+      label B_he:
+      b[39]:long = pa.a;
+      b[40]:long = pa.b;
+      b[82]:int = b[7580]:int;
+      b[7580]:int = -1;
+      b[344]:byte = oa[8]:ubyte;
+      b[42]:long = oa[0]:long;
+      b[89]:int = z[2]:int;
+      b[87]:long@4 = z[0]:long@4;
+      z[0]:long@4 = 0L;
+      z[2]:int = 0;
+      b[46]:long = na.b;
+      b[45]:long = na.a;
+      r = function_508(id, d);
+      b[255]:int = b[7753]:int;
+      y = function_363(hd, f, 188);
+      b[152]:long = b[3901]:long;
+      b[1232]:byte = b[31224]:ubyte;
+      e = function_535(gd, e);
+      b[1115]:int = b[8613]:int;
+      q = function_363(fd, q, 148);
+      function_550(ld);
+      function_550(kd);
+      function_550(jd);
+      function_550(b + 16896);
+      function_550(b + 12480);
+      function_789(wb);
+      function_619(xb);
+      function_619(yb);
+      function_619(zb);
+      function_619(b + 5248);
+      if (b[4927]:byte <= -1) { free(b[1229]:int) }
+      d = b[1224]:int;
+      if (d != -1) {
+        c = b[1219]:int;
+        if (c) {
+          c[18]:int = b[1218]:int;
+          goto B_qe;
+        }
+        if (441324[0]:int != h) goto B_qe;
+        441324[0]:int = (a = b[1218]:int);
+        goto B_pe;
+        label B_qe:
+        a = b[1218]:int;
+        label B_pe:
+        if (a) { a[19]:int = c }
+        b[609]:long = 0L;
+        b[24]:int = d;
+        emscripten_asm(136033, 31967, b + 96);
+        b[1224]:int = -1;
+        441320[0]:int = 441320[0]:int - 1;
+      }
+      if (b[1218]:int) goto B_ma;
+      if (b[1219]:int) goto B_ma;
+      if (441324[0]:int == h) goto B_ma;
+      if (b[4775]:byte <= -1) { free(b[1191]:int) }
+      d = b[1186]:int;
+      if (d != -1) {
+        c = b[1181]:int;
+        if (c) {
+          c[18]:int = b[1180]:int;
+          goto B_we;
+        }
+        if (441324[0]:int != u) goto B_we;
+        441324[0]:int = (a = b[1180]:int);
+        goto B_ve;
+        label B_we:
+        a = b[1180]:int;
+        label B_ve:
+        if (a) { a[19]:int = c }
+        b[590]:long = 0L;
+        b[20]:int = d;
+        emscripten_asm(136033, 31967, b + 80);
+        b[1186]:int = -1;
+        441320[0]:int = 441320[0]:int - 1;
+      }
+      if (b[1180]:int) goto B_ma;
+      if (b[1181]:int) goto B_ma;
+      if (441324[0]:int == u) goto B_ma;
+      if (b[5231]:byte <= -1) { free(b[1305]:int) }
+      d = b[1300]:int;
+      if (d != -1) {
+        c = b[1295]:int;
+        if (c) {
+          c[18]:int = b[1294]:int;
+          goto B_cf;
+        }
+        if (441324[0]:int != g) goto B_cf;
+        441324[0]:int = (a = b[1294]:int);
+        goto B_bf;
+        label B_cf:
+        a = b[1294]:int;
+        label B_bf:
+        if (a) { a[19]:int = c }
+        b[647]:long = 0L;
+        b[16]:int = d;
+        emscripten_asm(136033, 31967, b - -64);
+        b[1300]:int = -1;
+        441320[0]:int = 441320[0]:int - 1;
+      }
+      if (b[1294]:int) goto B_ma;
+      if (b[1295]:int) goto B_ma;
+      if (441324[0]:int == g) goto B_ma;
+      if (b[5079]:byte <= -1) { free(b[1267]:int) }
+      d = b[1262]:int;
+      if (d != -1) {
+        c = b[1257]:int;
+        if (c) {
+          c[18]:int = b[1256]:int;
+          goto B_if;
+        }
+        if (441324[0]:int != s) goto B_if;
+        441324[0]:int = (a = b[1256]:int);
+        goto B_hf;
+        label B_if:
+        a = b[1256]:int;
+        label B_hf:
+        if (a) { a[19]:int = c }
+        b[628]:long = 0L;
+        b[12]:int = d;
+        emscripten_asm(136033, 31967, b + 48);
+        b[1262]:int = -1;
+        441320[0]:int = 441320[0]:int - 1;
+      }
+      if (b[1256]:int) goto B_ma;
+      if (b[1257]:int) goto B_ma;
+      if (441324[0]:int == s) goto B_ma;
+      if (b[12463]:byte <= -1) { free(b[3113]:int) }
+      d = b[3108]:int;
+      if (d != -1) {
+        c = b[3103]:int;
+        if (c) {
+          c[18]:int = b[3102]:int;
+          goto B_of;
+        }
+        if (441324[0]:int != i) goto B_of;
+        441324[0]:int = (a = b[3102]:int);
+        goto B_nf;
+        label B_of:
+        a = b[3102]:int;
+        label B_nf:
+        if (a) { a[19]:int = c }
+        b[1551]:long = 0L;
+        b[8]:int = d;
+        emscripten_asm(136033, 31967, b + 32);
+        b[3108]:int = -1;
+        441320[0]:int = 441320[0]:int - 1;
+      }
+      if (b[3102]:int) goto B_ma;
+      if (b[3103]:int) goto B_ma;
+      if (441324[0]:int == i) goto B_ma;
+      if (b[12303]:byte <= -1) { free(b[3073]:int) }
+      d = b[3068]:int;
+      if (d != -1) {
+        c = b[3063]:int;
+        if (c) {
+          c[18]:int = b[3062]:int;
+          goto B_uf;
+        }
+        if (441324[0]:int != j) goto B_uf;
+        441324[0]:int = (a = b[3062]:int);
+        goto B_tf;
+        label B_uf:
+        a = b[3062]:int;
+        label B_tf:
+        if (a) { a[19]:int = c }
+        b[1531]:long = 0L;
+        b[4]:int = d;
+        emscripten_asm(136033, 31967, b + 16);
+        b[3068]:int = -1;
+        441320[0]:int = 441320[0]:int - 1;
+      }
+      if (b[3062]:int) goto B_ma;
+      if (b[3063]:int) goto B_ma;
+      if (441324[0]:int == j) goto B_ma;
+      if (b[12151]:byte <= -1) { free(b[3035]:int) }
+      d = b[3030]:int;
+      if (d != -1) {
+        c = b[3025]:int;
+        if (c) {
+          c[18]:int = b[3024]:int;
+          goto B_ag;
+        }
+        if (441324[0]:int != v) goto B_ag;
+        441324[0]:int = (a = b[3024]:int);
+        goto B_zf;
+        label B_ag:
+        a = b[3024]:int;
+        label B_zf:
+        if (a) { a[19]:int = c }
+        b[1512]:long = 0L;
+        b[0]:int = d;
+        emscripten_asm(136033, 31967, b);
+        b[3030]:int = -1;
+        441320[0]:int = 441320[0]:int - 1;
+      }
+      if (b[3024]:int) goto B_ma;
+      if (b[3025]:int) goto B_ma;
+      if (441324[0]:int == v) goto B_ma;
+      function_789(b + 34680);
+      a = b[37896]:ubyte << 5;
+      if (a) {
+        c = a + ia;
+        a = ia;
+        loop L_eg {
+          a = function_519(a) + 32;
+          if (a != c) continue L_eg;
+        }
+      }
+      d = 7791368[0]:ubyte;
+      c = d * 4448;
+      a = c + 7791408;
+      a[0]:byte = b[200]:ubyte;
+      f = b[224]:ubyte;
+      (c + 7791512)[0]:long = 0L;
+      (c + 7791432)[0]:byte = f;
+      f = c + 7791440;
+      f[0]:long = k.a;
+      (c + 7791448)[0]:long = k.b;
+      (c + 7791456)[0]:long = k.c;
+      (c + 7791464)[0]:long = k.d;
+      (c + 7791472)[0]:long = k.e;
+      (c + 7791480)[0]:long = k.f;
+      (c + 7791488)[0]:long = k.g;
+      (c + 7791496)[0]:long = k.h;
+      (c + 7791508)[0]:byte = b[300]:ubyte;
+      (c + 7791504)[0]:int = b[74]:int;
+      (c + 7791509)[0]:byte = b[301]:ubyte;
+      tb = d + 1;
+      d = b[77]:int;
+      c = b[76]:int;
+      if (c) goto B_fg;
+      if (d) goto B_fg;
+      if (441324[0]:int != k) goto B_ja;
+      label B_fg:
+      if (eqz(d)) goto B_la;
+      d[18]:int = c;
+      c = b[76]:int;
+      goto B_ka;
+      label B_ma:
+      function_1();
+      unreachable;
+      label B_la:
+      if (441324[0]:int != k) goto B_ka;
+      441324[0]:int = c;
+      label B_ka:
+      if (c) { c[19]:int = d }
+      b[38]:long = 0L;
+      c = 441324[0]:int;
+      if (c) {
+        a[26]:int = c;
+        c[19]:int = f;
+      }
+      441324[0]:int = f;
+      label B_ja:
+      a[14]:long = b[39]:long;
+      a[15]:long = b[40]:long;
+      a[32]:int = b[82]:int;
+      b[82]:int = -1;
+      a[144]:byte = b[344]:ubyte;
+      a[17]:long = b[42]:long;
+      a[39]:int = b[89]:int;
+      a[37]:long@4 = b[87]:long@4;
+      b[87]:long@4 = 0L;
+      b[89]:int = 0;
+      a[21]:long = b[46]:long;
+      a[20]:long = b[45]:long;
+      function_508(a + 184, r);
+      a[205]:int = b[255]:int;
+      function_363(a + 824, y, 188);
+      a[127]:long = b[152]:long;
+      a[1032]:byte = b[1232]:ubyte;
+      function_535(a + 1040, e);
+      a[1065]:int = b[1115]:int;
+      function_363(a + 4264, q, 148);
+      7791368[0]:byte = tb;
+      function_550(ed);
+      ja = ja + 1;
+      if (ja != dd) continue L_y;
+    }
+  }
+  stack_pointer = b + 38224;
+  return ;
+  label B_w:
+  function_398();
+  unreachable;
+}
+
+function function_2562(a:int) { // func2562
+  7890148[0]:byte = 0;
+  var b:int = 7791368[0]:ubyte * 4448;
+  if (b) {
+    a = 7791376;
+    b = b + 7791376;
+    loop L_b {
+      function_550(a + 32);
+      a = a + 4448;
+      if (a != b) continue L_b;
+    }
+  }
+  7791368[0]:byte = 0;
+}
+
+function function_2563(a:int_ptr, b:int) { // func2563
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 53648;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_2564(a:int_ptr) { // func2564
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7938479[0]:byte <= -1) { free(7938468[0]:int) }
+  var d:int = 7938448[0]:int;
+  if (d != -1) {
+    c = 7938428[0]:int;
+    if (c) {
+      c[18] = 7938424[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7938352) goto B_d;
+    441324[0]:int = (b = 7938424[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7938424[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7938424[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7938448[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7938424[0]:int) goto B_h;
+  if (7938428[0]:int) goto B_h;
+  if (441324[0]:int != 7938352) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2565(a:int) { // func2565
+  function_377(7938120)
+}
+
+function function_2566(a:int) { // func2566
+  function_377(7937896)
+}
+
+function function_2567(a:int) { // func2567
+  function_797(7907352)
+}
+
+function function_2568(a:int) { // func2568
+  var c:int_ptr;
+  a = stack_pointer - 448;
+  stack_pointer = a;
+  var b:int_ptr = 1;
+  loop L_a {
+    if ((b - 1 & 255) <= 37) {
+      ((c & 255) + a)[409]:byte = b;
+      c = c + 1;
+    }
+    if ((b & 255) <= 37) {
+      ((c & 255) + a)[409]:byte = b + 1;
+      c = c + 1;
+    }
+    b = b + 2;
+    if (b != 39) continue L_a;
+  }
+  a[408]:byte = c;
+  var f:ubyte_ptr = a + 408 | 1;
+  c = f + (b = c & 255);
+  if (b <= 128) {
+    function_581(f, c, b, 0, 0);
+    goto B_d;
+  }
+  function_581(f, c, b, c = allocateOrAbort(b), b);
+  free(c);
+  label B_d:
+  b = a[408]:ubyte;
+  if (b) {
+    var h:int = a + b + 409;
+    var i:int = a + 8;
+    var d:long_ptr = a + 240;
+    var j:long_ptr = d;
+    loop L_g {
+      b = f[0];
+      a[3]:int = 0;
+      a[4]:byte = b;
+      a[0]:int = 0;
+      a[18]:short = 0;
+      a[8]:int = 0;
+      a[54]:int = 0;
+      a[42]:int = 0;
+      a[20]:long = 0L;
+      a[28]:int = 0;
+      a[13]:long = 0L;
+      a[13]:long@4 = 0L;
+      a[11]:long@4 = 4294967295L;
+      a[40]:byte = 0;
+      a[19]:short = 257;
+      a[144]:short = 1;
+      a[41]:long = 0L;
+      a[154]:short = 1;
+      a[76]:int = 1167867904;
+      a[37]:long = 4607182418800017408L;
+      a[290]:byte = 2;
+      a[35]:long = 0L;
+      a[34]:long = 4575657221408423936L;
+      a[33]:long = 1065353216L;
+      a[32]:long = 0L;
+      a[31]:long = 4575657221408423936L;
+      a[30]:long = 1065353216L;
+      a[232]:byte = 1;
+      a[224]:byte = 0;
+      a[110]:short = 256;
+      a[2]:int = 33016;
+      a[320]:byte = 0;
+      a[39]:long = 0L;
+      a[367]:byte = 0;
+      a[352]:byte = 0;
+      a[348]:byte = 0;
+      a[86]:int = 0;
+      a[50]:long = 0L;
+      a[392]:byte = 0;
+      a[96]:int = 0;
+      a[47]:long = 4719772410523796111L;
+      a[186]:short = 0;
+      a[92]:int = 16777215;
+      a[356]:byte = 0;
+      a[84]:int = -1;
+      b = call_indirect(
+            select_if(0, b * 52 + 382064, (b - 1 & 255) > 37)[12]:int);
+      c = a[0]:int;
+      a[0]:int = b;
+      call_indirect({
+                      if (c) {
+                        call_indirect(c, (c[0])[1]:int);
+                        b = a[0]:int;
+                      }
+                      b;
+                      label B_h:
+                    },
+                    0,
+                    (b[0])[7]:int);
+      c = a[0]:int;
+      a[0]:int = 0;
+      var e:int_ptr = 7891808[0]:ubyte;
+      b = e * 408;
+      (b + 7891816)[0]:int = c;
+      (b + 7891820)[0]:byte = a[4]:ubyte;
+      c = b + 7891824;
+      function_376(c, i);
+      c[0] = 33016;
+      (b + 7892036)[0]:short = a[110]:ushort;
+      (b + 7892040)[0]:byte = a[224]:ubyte;
+      c = a[232]:ubyte;
+      var k:int = b + 7892136;
+      k[0]:byte = 0;
+      var l:int = b + 7892128;
+      l[0]:long = 0L;
+      (b + 7892048)[0]:byte = c;
+      var g:long_ptr = b + 7892056;
+      g[0] = d[0];
+      (b + 7892064)[0]:long = d[1];
+      (b + 7892072)[0]:long = j[2];
+      (b + 7892080)[0]:long = d[3];
+      (b + 7892088)[0]:long = d[4];
+      (b + 7892096)[0]:long = d[5];
+      (b + 7892104)[0]:long = d[6];
+      (b + 7892112)[0]:long = d[7];
+      (b + 7892124)[0]:byte = a[308]:ubyte;
+      (b + 7892120)[0]:int = a[76]:int;
+      (b + 7892125)[0]:byte = a[309]:ubyte;
+      var m:int = e + 1;
+      var n:int_ptr = b + 7892152;
+      e = a[79]:int;
+      c = a[78]:int;
+      if (c) goto B_k;
+      if (e) goto B_k;
+      if (441324[0]:int != d) goto B_j;
+      label B_k:
+      if (e) {
+        e[18] = c;
+        c = a[78]:int;
+        goto B_l;
+      }
+      if (441324[0]:int != d) goto B_l;
+      441324[0]:int = c;
+      label B_l:
+      if (c) { c[19] = e }
+      a[39]:long = 0L;
+      c = 441324[0]:int;
+      if (c) {
+        l[0]:int = c;
+        c[19] = g;
+      }
+      441324[0]:int = g;
+      label B_j:
+      (b + 7892144)[0]:long = a[41]:long;
+      k[0]:long = a[40]:long;
+      n[0] = a[84]:int;
+      a[84]:int = -1;
+      (b + 7892168)[0]:byte = a[352]:ubyte;
+      (b + 7892160)[0]:long = a[43]:long;
+      (b + 7892180)[0]:int = a[91]:int;
+      (b + 7892172)[0]:long@4 = a[89]:long@4;
+      a[89]:long@4 = 0L;
+      a[91]:int = 0;
+      (b + 7892192)[0]:long = a[47]:long;
+      (b + 7892184)[0]:long = a[46]:long;
+      (b + 7892200)[0]:long = a[48]:long;
+      (b + 7892208)[0]:long = a[49]:long;
+      (b + 7892216)[0]:long = a[50]:long;
+      7891808[0]:byte = m;
+      function_620(a);
+      f = f + 1;
+      if (f != h) continue L_g;
+    }
+  }
+  stack_pointer = a + 448;
+}
+
+function function_2569(a:int_ptr, b:int_ptr) { // func2569
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 53636;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 53660;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_2570(a:int) { // func2570
+  var b:int = 7891808[0]:ubyte * 408;
+  if (b) {
+    a = 7891816;
+    b = b + 7891816;
+    loop L_b {
+      a = function_620(a) + 408;
+      if (a != b) continue L_b;
+    }
+  }
+  7891808[0]:byte = 0;
+}
+
+function function_2571(a:int_ptr) { // func2571
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7918751[0]:byte <= -1) { free(7918740[0]:int) }
+  var d:int = 7918720[0]:int;
+  if (d != -1) {
+    c = 7918700[0]:int;
+    if (c) {
+      c[18] = 7918696[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7918624) goto B_d;
+    441324[0]:int = (b = 7918696[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7918696[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7918696[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7918720[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7918696[0]:int) goto B_h;
+  if (7918700[0]:int) goto B_h;
+  if (441324[0]:int != 7918624) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2572(a:int_ptr) { // func2572
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7918591[0]:byte <= -1) { free(7918580[0]:int) }
+  var d:int = 7918560[0]:int;
+  if (d != -1) {
+    c = 7918540[0]:int;
+    if (c) {
+      c[18] = 7918536[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7918464) goto B_d;
+    441324[0]:int = (b = 7918536[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7918536[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7918536[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7918560[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7918536[0]:int) goto B_h;
+  if (7918540[0]:int) goto B_h;
+  if (441324[0]:int != 7918464) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2573(a:int_ptr) { // func2573
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7918431[0]:byte <= -1) { free(7918420[0]:int) }
+  var d:int = 7918400[0]:int;
+  if (d != -1) {
+    c = 7918380[0]:int;
+    if (c) {
+      c[18] = 7918376[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7918304) goto B_d;
+    441324[0]:int = (b = 7918376[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7918376[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7918376[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7918400[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7918376[0]:int) goto B_h;
+  if (7918380[0]:int) goto B_h;
+  if (441324[0]:int != 7918304) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2574(a:int) { // func2574
+  if (167971[0]:byte <= -1) { free(167960[0]:int) }
+}
+
+function function_2575(a:int) { // func2575
+  function_377(7918072)
+}
+
+function function_2576(a:int_ptr) { // func2576
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7918047[0]:byte <= -1) { free(7918036[0]:int) }
+  var d:int = 7918016[0]:int;
+  if (d != -1) {
+    c = 7917996[0]:int;
+    if (c) {
+      c[18] = 7917992[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7917920) goto B_d;
+    441324[0]:int = (b = 7917992[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7917992[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7917992[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7918016[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7917992[0]:int) goto B_h;
+  if (7917996[0]:int) goto B_h;
+  if (441324[0]:int != 7917920) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2577(a:int) { // func2577
+  function_377(7917688)
+}
+
+function function_2578(a:int_ptr) { // func2578
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7917663[0]:byte <= -1) { free(7917652[0]:int) }
+  var d:int = 7917632[0]:int;
+  if (d != -1) {
+    c = 7917612[0]:int;
+    if (c) {
+      c[18] = 7917608[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7917536) goto B_d;
+    441324[0]:int = (b = 7917608[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7917608[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7917608[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7917632[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7917608[0]:int) goto B_h;
+  if (7917612[0]:int) goto B_h;
+  if (441324[0]:int != 7917536) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2579(a:int_ptr, b:int) { // func2579
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 53696;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_2580(a:int) { // func2580
+  function_377(7917304)
+}
+
+function function_2581(a:int_ptr) { // func2581
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7917279[0]:byte <= -1) { free(7917268[0]:int) }
+  var d:int = 7917248[0]:int;
+  if (d != -1) {
+    c = 7917228[0]:int;
+    if (c) {
+      c[18] = 7917224[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7917152) goto B_d;
+    441324[0]:int = (b = 7917224[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7917224[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7917224[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7917248[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7917224[0]:int) goto B_h;
+  if (7917228[0]:int) goto B_h;
+  if (441324[0]:int != 7917152) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2582(a:int) { // func2582
+  function_377(7916920)
+}
+
+function function_2583(a:int) { // func2583
+  var b:int;
+  var c:int;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  function_495(a, 16329);
+  if (eqz(a[12]:ubyte)) goto B_a;
+  var d:int = 
+    select_if(a[0]:int, a, c = ((b = a[11]:ubyte) << 24) >> 24 < 0);
+  b = select_if(a[1]:int, b, c);
+  if (b ==
+      select_if(7919744[0]:int, c = 7919751[0]:ubyte, c = (c << 24) >> 24 < 0)) {
+    if (eqz(b)) goto B_b;
+    if (
+      eqz(function_366(select_if(7919740[0]:int, 7919740, c), d, b))) goto B_b;
+  }
+  function_459(7919740, d, b);
+  label B_b:
+  7919736[0]:int =
+    (b = 
+       select_if(7919744[0]:int, b = 7919751[0]:ubyte, (b << 24) >> 24 < 0));
+  7919732[0]:int = b;
+  if (eqz(a[12]:ubyte)) goto B_a;
+  if (a[11]:byte > -1) goto B_a;
+  free(a[0]:int);
+  label B_a:
+  stack_pointer = a + 16;
+}
+
+function function_2584(a:int) { // func2584
+  function_675(7919512)
+}
+
+function function_2585(a:int_ptr) { // func2585
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7919487[0]:byte <= -1) { free(7919476[0]:int) }
+  var d:int = 7919456[0]:int;
+  if (d != -1) {
+    c = 7919436[0]:int;
+    if (c) {
+      c[18] = 7919432[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7919360) goto B_d;
+    441324[0]:int = (b = 7919432[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7919432[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7919432[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7919456[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7919432[0]:int) goto B_h;
+  if (7919436[0]:int) goto B_h;
+  if (441324[0]:int != 7919360) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2586(a:int_ptr) { // func2586
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  var b:int = 7919340[0]:int;
+  if (b != -1) {
+    a[0] = b;
+    emscripten_asm(141569, 31967, a);
+  }
+  stack_pointer = a + 16;
+}
+
+function function_2587(a:int) { // func2587
+  function_377(7919104)
+}
+
+function function_2588(a:int_ptr, b:int) { // func2588
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 53780;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_2589(a:int_ptr) { // func2589
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7919079[0]:byte <= -1) { free(7919068[0]:int) }
+  var d:int = 7919048[0]:int;
+  if (d != -1) {
+    c = 7919028[0]:int;
+    if (c) {
+      c[18] = 7919024[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7918952) goto B_d;
+    441324[0]:int = (b = 7919024[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7919024[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7919024[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7919048[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7919024[0]:int) goto B_h;
+  if (7919028[0]:int) goto B_h;
+  if (441324[0]:int != 7918952) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2590(a:int_ptr) { // func2590
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7918911[0]:byte <= -1) { free(7918900[0]:int) }
+  var d:int = 7918880[0]:int;
+  if (d != -1) {
+    c = 7918860[0]:int;
+    if (c) {
+      c[18] = 7918856[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7918784) goto B_d;
+    441324[0]:int = (b = 7918856[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7918856[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7918856[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7918880[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7918856[0]:int) goto B_h;
+  if (7918860[0]:int) goto B_h;
+  if (441324[0]:int != 7918784) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2591(a:int_ptr) { // func2591
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7916895[0]:byte <= -1) { free(7916884[0]:int) }
+  var d:int = 7916864[0]:int;
+  if (d != -1) {
+    c = 7916844[0]:int;
+    if (c) {
+      c[18] = 7916840[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7916768) goto B_d;
+    441324[0]:int = (b = 7916840[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7916840[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7916840[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7916864[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7916840[0]:int) goto B_h;
+  if (7916844[0]:int) goto B_h;
+  if (441324[0]:int != 7916768) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2592(a:int) { // func2592
+  function_377(7916536)
+}
+
+function function_2593(a:int_ptr) { // func2593
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  var b:int = 7922284[0]:int;
+  if (b != -1) {
+    a[0] = b;
+    emscripten_asm(141569, 31967, a);
+  }
+  stack_pointer = a + 16;
+}
+
+function function_2594(a:int_ptr) { // func2594
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  var b:int = 7922276[0]:int;
+  if (b != -1) {
+    a[0] = b;
+    emscripten_asm(141569, 31967, a);
+  }
+  stack_pointer = a + 16;
+}
+
+function function_2595(a:int_ptr) { // func2595
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7916511[0]:byte <= -1) { free(7916500[0]:int) }
+  var d:int = 7916480[0]:int;
+  if (d != -1) {
+    c = 7916460[0]:int;
+    if (c) {
+      c[18] = 7916456[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7916384) goto B_d;
+    441324[0]:int = (b = 7916456[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7916456[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7916456[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7916480[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7916456[0]:int) goto B_h;
+  if (7916460[0]:int) goto B_h;
+  if (441324[0]:int != 7916384) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2596(a:int) { // func2596
+  function_377(7916152)
+}
+
+function function_2597(a:int_ptr) { // func2597
+  var b:int_ptr;
+  var c:int_ptr;
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  if (7916127[0]:byte <= -1) { free(7916116[0]:int) }
+  var d:int = 7916096[0]:int;
+  if (d != -1) {
+    c = 7916076[0]:int;
+    if (c) {
+      c[18] = 7916072[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7916000) goto B_d;
+    441324[0]:int = (b = 7916072[0]:int);
+    goto B_c;
+    label B_d:
+    b = 7916072[0]:int;
+    label B_c:
+    if (b) { b[19] = c }
+    7916072[0]:long = 0L;
+    a[0] = d;
+    emscripten_asm(136033, 31967, a);
+    7916096[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7916072[0]:int) goto B_h;
+  if (7916076[0]:int) goto B_h;
+  if (441324[0]:int != 7916000) goto B_g;
+  label B_h:
+  function_1();
+  unreachable;
+  label B_g:
+  stack_pointer = a + 16;
+}
+
+function function_2598(a:int_ptr, b:int_ptr) { // func2598
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 53768;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 53792;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_2599(a:int_ptr) { // func2599
+  var b:int_ptr;
+  var c:int_ptr = stack_pointer + -64;
+  stack_pointer = c;
+  if (7915967[0]:byte <= -1) { free(7915956[0]:int) }
+  var d:int = 7915936[0]:int;
+  if (d != -1) {
+    b = 7915916[0]:int;
+    if (b) {
+      b[18] = 7915912[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7915840) goto B_d;
+    441324[0]:int = (a = 7915912[0]:int);
+    goto B_c;
+    label B_d:
+    a = 7915912[0]:int;
+    label B_c:
+    if (a) { a[19] = b }
+    7915912[0]:long = 0L;
+    c[12] = d;
+    emscripten_asm(136033, 31967, c + 48);
+    7915936[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7915912[0]:int) goto B_g;
+  if (7915916[0]:int) goto B_g;
+  if (441324[0]:int == 7915840) goto B_g;
+  if (7915815[0]:byte <= -1) { free(7915804[0]:int) }
+  d = 7915784[0]:int;
+  if (d != -1) {
+    b = 7915764[0]:int;
+    if (b) {
+      b[18] = 7915760[0]:int;
+      goto B_k;
+    }
+    if (441324[0]:int != 7915688) goto B_k;
+    441324[0]:int = (a = 7915760[0]:int);
+    goto B_j;
+    label B_k:
+    a = 7915760[0]:int;
+    label B_j:
+    if (a) { a[19] = b }
+    7915760[0]:long = 0L;
+    c[8] = d;
+    emscripten_asm(136033, 31967, c + 32);
+    7915784[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7915760[0]:int) goto B_g;
+  if (7915764[0]:int) goto B_g;
+  if (441324[0]:int == 7915688) goto B_g;
+  if (7915663[0]:byte <= -1) { free(7915652[0]:int) }
+  d = 7915632[0]:int;
+  if (d != -1) {
+    b = 7915612[0]:int;
+    if (b) {
+      b[18] = 7915608[0]:int;
+      goto B_q;
+    }
+    if (441324[0]:int != 7915536) goto B_q;
+    441324[0]:int = (a = 7915608[0]:int);
+    goto B_p;
+    label B_q:
+    a = 7915608[0]:int;
+    label B_p:
+    if (a) { a[19] = b }
+    7915608[0]:long = 0L;
+    c[4] = d;
+    emscripten_asm(136033, 31967, c + 16);
+    7915632[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7915608[0]:int) goto B_g;
+  if (7915612[0]:int) goto B_g;
+  if (441324[0]:int == 7915536) goto B_g;
+  if (7915511[0]:byte <= -1) { free(7915500[0]:int) }
+  d = 7915480[0]:int;
+  if (d != -1) {
+    b = 7915460[0]:int;
+    if (b) {
+      b[18] = 7915456[0]:int;
+      goto B_w;
+    }
+    if (441324[0]:int != 7915384) goto B_w;
+    441324[0]:int = (a = 7915456[0]:int);
+    goto B_v;
+    label B_w:
+    a = 7915456[0]:int;
+    label B_v:
+    if (a) { a[19] = b }
+    7915456[0]:long = 0L;
+    c[0] = d;
+    emscripten_asm(136033, 31967, c);
+    7915480[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7915456[0]:int) goto B_g;
+  if (7915460[0]:int) goto B_g;
+  if (441324[0]:int == 7915384) goto B_g;
+  stack_pointer = c - -64;
+  return ;
+  label B_g:
+  function_1();
+  unreachable;
+}
+
+function function_2600(a:int_ptr) { // func2600
+  var b:int_ptr;
+  var c:int_ptr = stack_pointer + -64;
+  stack_pointer = c;
+  if (7915343[0]:byte <= -1) { free(7915332[0]:int) }
+  var d:int = 7915312[0]:int;
+  if (d != -1) {
+    b = 7915292[0]:int;
+    if (b) {
+      b[18] = 7915288[0]:int;
+      goto B_d;
+    }
+    if (441324[0]:int != 7915216) goto B_d;
+    441324[0]:int = (a = 7915288[0]:int);
+    goto B_c;
+    label B_d:
+    a = 7915288[0]:int;
+    label B_c:
+    if (a) { a[19] = b }
+    7915288[0]:long = 0L;
+    c[12] = d;
+    emscripten_asm(136033, 31967, c + 48);
+    7915312[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7915288[0]:int) goto B_g;
+  if (7915292[0]:int) goto B_g;
+  if (441324[0]:int == 7915216) goto B_g;
+  if (7915191[0]:byte <= -1) { free(7915180[0]:int) }
+  d = 7915160[0]:int;
+  if (d != -1) {
+    b = 7915140[0]:int;
+    if (b) {
+      b[18] = 7915136[0]:int;
+      goto B_k;
+    }
+    if (441324[0]:int != 7915064) goto B_k;
+    441324[0]:int = (a = 7915136[0]:int);
+    goto B_j;
+    label B_k:
+    a = 7915136[0]:int;
+    label B_j:
+    if (a) { a[19] = b }
+    7915136[0]:long = 0L;
+    c[8] = d;
+    emscripten_asm(136033, 31967, c + 32);
+    7915160[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7915136[0]:int) goto B_g;
+  if (7915140[0]:int) goto B_g;
+  if (441324[0]:int == 7915064) goto B_g;
+  if (7915039[0]:byte <= -1) { free(7915028[0]:int) }
+  d = 7915008[0]:int;
+  if (d != -1) {
+    b = 7914988[0]:int;
+    if (b) {
+      b[18] = 7914984[0]:int;
+      goto B_q;
+    }
+    if (441324[0]:int != 7914912) goto B_q;
+    441324[0]:int = (a = 7914984[0]:int);
+    goto B_p;
+    label B_q:
+    a = 7914984[0]:int;
+    label B_p:
+    if (a) { a[19] = b }
+    7914984[0]:long = 0L;
+    c[4] = d;
+    emscripten_asm(136033, 31967, c + 16);
+    7915008[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7914984[0]:int) goto B_g;
+  if (7914988[0]:int) goto B_g;
+  if (441324[0]:int == 7914912) goto B_g;
+  if (7914887[0]:byte <= -1) { free(7914876[0]:int) }
+  d = 7914856[0]:int;
+  if (d != -1) {
+    b = 7914836[0]:int;
+    if (b) {
+      b[18] = 7914832[0]:int;
+      goto B_w;
+    }
+    if (441324[0]:int != 7914760) goto B_w;
+    441324[0]:int = (a = 7914832[0]:int);
+    goto B_v;
+    label B_w:
+    a = 7914832[0]:int;
+    label B_v:
+    if (a) { a[19] = b }
+    7914832[0]:long = 0L;
+    c[0] = d;
+    emscripten_asm(136033, 31967, c);
+    7914856[0]:int = -1;
+    441320[0]:int = 441320[0]:int - 1;
+  }
+  if (7914832[0]:int) goto B_g;
+  if (7914836[0]:int) goto B_g;
+  if (441324[0]:int == 7914760) goto B_g;
+  stack_pointer = c - -64;
+  return ;
+  label B_g:
+  function_1();
+  unreachable;
+}
+

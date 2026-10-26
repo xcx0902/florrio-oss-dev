@@ -1,0 +1,93 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/asm-const-callbacks.mjs",
+  "implementationSha256": "3130103c3389c4cf5aa8126d01ce9185af241a4fc423c66dd496aff9e105a9e6",
+  "factory": "createAsmConstCallbackHooks",
+  "functionIds": [
+    2035,
+    2328,
+    2437
+  ],
+  "functions": [
+    {
+      "id": 2035,
+      "name": "asmConstCallback2035",
+      "originalSymbol": "function_2035",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-callbacks.mjs",
+          "line": 9
+        },
+        "test": "test/client-asm-const-callbacks.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Builds a signature frame and calls the host asm-const bridge."
+    },
+    {
+      "id": 2328,
+      "name": "asmConstCallback2328",
+      "originalSymbol": "function_2328",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-callbacks.mjs",
+          "line": 9
+        },
+        "test": "test/client-asm-const-callbacks.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Builds a signature frame and calls the host asm-const bridge."
+    },
+    {
+      "id": 2437,
+      "name": "asmConstCallback2437",
+      "originalSymbol": "function_2437",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/asm-const-callbacks.mjs",
+          "line": 9
+        },
+        "test": "test/client-asm-const-callbacks.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Builds a signature frame and calls the host asm-const bridge."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-asm-const-callbacks.test.mjs",
+    "report": "reports/client-asm-const-callbacks-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 3,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Zero-record fixtures compare trap parity and complete memory.",
+    "limitations": [
+      "Signature pointer variants are exercised through the zero record only. Ledger: 674 client and 512 server bodies recovered."
+    ]
+  }
+}

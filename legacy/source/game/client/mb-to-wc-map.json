@@ -1,0 +1,54 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/mb-to-wc.mjs",
+  "implementationSha256": "d5bc124f3a0769dc6a991df403be5da2d251e8e6ab1948370e15c854d8fc4be5",
+  "factory": "createMbToWcHooks",
+  "functionIds": [
+    651
+  ],
+  "functions": [
+    {
+      "id": 651,
+      "name": "multibyteToWideCharacter",
+      "originalSymbol": "function_651",
+      "signature": " (type $t8) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 84819
+        },
+        "source": {
+          "path": "source/game/client/mb-to-wc.mjs",
+          "line": 43
+        },
+        "test": "test/client-mb-to-wc.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "C-locale fast path stores signed bytes masked with 0xDFFF; locale table decodes 2-4 byte sequences, saves incomplete state at 7945608 or the caller pointer, and reports errno 25 for illegal input."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-mb-to-wc.test.mjs",
+    "report": "reports/client-mb-to-wc-tests.tap",
+    "testGroups": 5,
+    "pass": 5,
+    "fail": 0,
+    "oracleComparisons": 131,
+    "completeLinearMemoryChecks": 131,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 131,
+    "trappingComparisons": 0,
+    "comparison": "Every case compares the return value, all 67,108,864 memory bytes and the stack pointer. Coverage includes C-locale bytes, locale table decoding, illegal and truncated sequences, saved-state resume, null input/count, global versus explicit state pointers, stack output and 96 deterministic random spans.",
+    "limitations": [
+      "The locale flag, lead table and errno addresses are read from the original data segments.",
+      "Output pointer 0 writes to the original 16-byte stack scratch slot.",
+      "A 0x3ffffff descriptor is not exercised.",
+      "Ledger: 352 client bodies recovered and 3,893 remain machine code."
+    ]
+  }
+}

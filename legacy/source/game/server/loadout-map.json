@@ -1,0 +1,83 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/loadout.mjs",
+  "factory": "createLoadoutHooks",
+  "functionIds": [
+    125,
+    397
+  ],
+  "functions": [
+    {
+      "id": 125,
+      "name": "changeSlotType",
+      "originalSymbol": "function_125",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 26051
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 2527
+        },
+        "test": "test/server-loadout.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_43",
+        "free",
+        "function_85",
+        "function_145"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 397,
+      "name": "createEquippedPetal",
+      "originalSymbol": "createEquippedPetal",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 97020
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0320-0383.dcmp",
+          "line": 6078
+        },
+        "test": "test/server-loadout.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_74",
+        "function_73",
+        "function_128",
+        "function_218",
+        "function_97",
+        "function_96",
+        "function_17",
+        "function_34",
+        "function_44",
+        "function_47",
+        "setPetalTypeAndCreateBehavior",
+        "function_85"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 3,
+    "oracleComparisons": 363,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackOutputsAndTraps": true,
+    "asmHostSequenceDirectlyChecked": false
+  },
+  "limitations": [
+    "Shared component/allocator/replication calls remain explicit; several are independently migrated.",
+    "Ordinary object graphs and selected bounds/nonfinite paths are checked; arbitrary memory aliasing is not proven."
+  ]
+}

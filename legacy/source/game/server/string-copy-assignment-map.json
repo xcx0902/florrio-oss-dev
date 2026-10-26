@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-copy-assignment.mjs",
+  "implementationSha256": "633b96950fb329d19ffc95e76aba9d1d8f9158b733231422287e184cd92a102c",
+  "factory": "createStringCopyAssignmentHook",
+  "functionIds": [
+    228
+  ],
+  "functions": [
+    {
+      "id": 228,
+      "name": "assignStringCopy",
+      "originalSymbol": "function_228",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-copy-assignment.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-copy-assignment.test.mjs"
+      },
+      "originalDirectDependencies": [
+        269
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Short strings copy the 12-byte inline representation; long strings delegate to 269 with data pointer and size."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-copy-assignment.test.mjs",
+    "report": "reports/server-string-copy-assignment-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 9,
+    "completeLinearMemoryChecks": 9,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 9,
+    "trappingComparisons": 0,
+    "comparison": "9 lengths spanning short and long representations compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Long-copy reallocation behavior delegates to native 269.",
+      "Ledger: 357 server bodies recovered and 377 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/dynamic-call-thunks.mjs",
+  "implementationSha256": "3945cf1fb987e0b6c485d4d2af000b238dd1589108a964a8cf04356f47e2d60e",
+  "factory": "createDynamicCallThunkHooks",
+  "functionIds": [
+    1756,
+    1757,
+    1758,
+    1759,
+    1760,
+    1762,
+    4329
+  ],
+  "functions": [
+    {
+      "id": 1756,
+      "name": "dynamicCallThunk1756",
+      "originalSymbol": "function_1756",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/dynamic-call-thunks.mjs",
+          "line": 9
+        },
+        "test": "test/client-dynamic-call-thunks.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Repacks split 64-bit arguments and forwards through the indirect table."
+    },
+    {
+      "id": 1757,
+      "name": "dynamicCallThunk1757",
+      "originalSymbol": "function_1757",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/dynamic-call-thunks.mjs",
+          "line": 9
+        },
+        "test": "test/client-dynamic-call-thunks.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Repacks split 64-bit arguments and forwards through the indirect table."
+    },
+    {
+      "id": 1758,
+      "name": "dynamicCallThunk1758",
+      "originalSymbol": "function_1758",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/dynamic-call-thunks.mjs",
+          "line": 9
+        },
+        "test": "test/client-dynamic-call-thunks.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Repacks split 64-bit arguments and forwards through the indirect table."
+    },
+    {
+      "id": 1759,
+      "name": "dynamicCallThunk1759",
+      "originalSymbol": "function_1759",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/dynamic-call-thunks.mjs",
+          "line": 9
+        },
+        "test": "test/client-dynamic-call-thunks.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Repacks split 64-bit arguments and forwards through the indirect table."
+    },
+    {
+      "id": 1760,
+      "name": "dynamicCallThunk1760",
+      "originalSymbol": "function_1760",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/dynamic-call-thunks.mjs",
+          "line": 9
+        },
+        "test": "test/client-dynamic-call-thunks.test.mjs"
+      },
+      "originalDirectDependencies": [
+        37
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Repacks split 64-bit arguments and forwards through the indirect table."
+    },
+    {
+      "id": 1762,
+      "name": "dynamicCallThunk1762",
+      "originalSymbol": "function_1762",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/dynamic-call-thunks.mjs",
+          "line": 9
+        },
+        "test": "test/client-dynamic-call-thunks.test.mjs"
+      },
+      "originalDirectDependencies": [
+        37
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Repacks split 64-bit arguments and forwards through the indirect table."
+    },
+    {
+      "id": 4329,
+      "name": "dynamicCallThunk4329",
+      "originalSymbol": "function_4329",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/dynamic-call-thunks.mjs",
+          "line": 9
+        },
+        "test": "test/client-dynamic-call-thunks.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Repacks split 64-bit arguments and forwards through the indirect table."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-dynamic-call-thunks.test.mjs",
+    "report": "reports/client-dynamic-call-thunks-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 7,
+    "completeLinearMemoryChecks": 7,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Seven zero fixtures compare trap parity and complete memory.",
+    "limitations": [
+      "Only table index zero is covered. Ledger: 710 client and 512 server bodies recovered."
+    ]
+  }
+}

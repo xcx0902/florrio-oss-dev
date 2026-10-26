@@ -1,0 +1,53 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/record-sort.mjs",
+  "implementationSha256": "647dfbd063cf58c6bdb7afc59e8b05e1b7c08dafcf7fa45ce8f65f0a3316d508",
+  "factory": "createRecordSortHook",
+  "functionIds": [
+    385
+  ],
+  "functions": [
+    {
+      "id": 385,
+      "name": "sortRecords",
+      "originalSymbol": "function_385",
+      "signature": " (type $t3) (param i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 87306
+        },
+        "source": {
+          "path": "source/game/server/record-sort.mjs",
+          "line": 29
+        },
+        "test": "test/server-record-sort.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "libc++ insertion-sort-incomplete for contiguous 8-byte records with an 8-exchange cutoff; reuses the recovered 159 four-record network."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-record-sort.test.mjs",
+    "report": "reports/server-record-sort-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 1088,
+    "completeLinearMemoryChecks": 1088,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 1088,
+    "trappingComparisons": 0,
+    "comparison": "Zero/one-element ranges, every permutation of sizes 0-6, all 24 permutations of six key sets, targeted cutoff/NaN cases and 60 random 7-20 record ranges compare return, complete memory and stack pointer.",
+    "limitations": [
+      "Invalid reversed/out-of-bounds iterator ranges are not exercised.",
+      "Ledger: 240 server bodies recovered and 494 remain machine code.",
+      "Ledger: 238 server bodies recovered and 496 remain machine code."
+    ]
+  }
+}

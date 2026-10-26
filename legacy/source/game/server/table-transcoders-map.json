@@ -1,0 +1,292 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/table-transcoders.mjs",
+  "implementationSha256": "1e20775b277f323639065e72896fa7ac8b25677dbbaba682c55fcbb9a99a9141",
+  "factory": "createTableTranscoderHooks",
+  "functionIds": [
+    112,
+    452,
+    456,
+    458,
+    461,
+    465,
+    467,
+    469,
+    470,
+    471,
+    473,
+    482
+  ],
+  "functions": [
+    {
+      "id": 112,
+      "name": "copyWords",
+      "originalSymbol": "function_112",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 452,
+      "name": "copyBytesReplacingSigned",
+      "originalSymbol": "function_452",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 456,
+      "name": "decodeBytesInPlace10352",
+      "originalSymbol": "function_456",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 458,
+      "name": "decodeBytesInPlace11888",
+      "originalSymbol": "function_458",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 461,
+      "name": "clampWordsToBytes",
+      "originalSymbol": "function_461",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 465,
+      "name": "decodeWordsInPlace10352",
+      "originalSymbol": "function_465",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 467,
+      "name": "decodeWordsInPlace11888",
+      "originalSymbol": "function_467",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 469,
+      "name": "scanAllowedWords",
+      "originalSymbol": "function_469",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 470,
+      "name": "skipDisallowedWords",
+      "originalSymbol": "function_470",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 471,
+      "name": "widenWordsToBitset",
+      "originalSymbol": "function_471",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 473,
+      "name": "minimumSpan",
+      "originalSymbol": "function_473",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 482,
+      "name": "clearCatalogFlags",
+      "originalSymbol": "function_482",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/table-transcoders.mjs",
+          "line": 12
+        },
+        "test": "test/server-table-transcoders.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-table-transcoders.test.mjs",
+    "report": "reports/server-table-transcoders-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 24,
+    "completeLinearMemoryChecks": 24,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 24,
+    "trappingComparisons": 0,
+    "comparison": "2 trials per helper compare result, complete memory and stack pointer.",
+    "limitations": [
+      "473 uses 16 bytes of native dead stack scratch, excluded from byte comparison.",
+      "Ledger: 335 server bodies recovered and 399 remain machine code."
+    ]
+  }
+}

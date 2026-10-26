@@ -1,0 +1,360 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/components.mjs",
+  "factory": "createComponentHooks",
+  "functionIds": [
+    64,
+    65,
+    67,
+    68,
+    96,
+    97,
+    106,
+    113,
+    114,
+    115,
+    128,
+    147,
+    148
+  ],
+  "functions": [
+    {
+      "id": 64,
+      "name": "attachPhysics",
+      "originalSymbol": "function_64",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 15251
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 4393
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "malloc",
+        "memcpy"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 65,
+      "name": "allocatePhysicsRecord",
+      "originalSymbol": "function_65",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 15512
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 4457
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "memcpy",
+        "free"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 67,
+      "name": "attachHealth",
+      "originalSymbol": "function_67",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 16380
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 4703
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "malloc",
+        "memcpy"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 68,
+      "name": "allocateHealthRecord",
+      "originalSymbol": "function_68",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 16641
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 4767
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "memcpy",
+        "free"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 96,
+      "name": "attachTransform",
+      "originalSymbol": "function_96",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 20455
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 849
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "malloc",
+        "memcpy"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 97,
+      "name": "allocateTransformRecord",
+      "originalSymbol": "function_97",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 20716
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 913
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "memcpy",
+        "free"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 106,
+      "name": "allocatePooled16ByteRecord",
+      "originalSymbol": "function_106",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 23668
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 1748
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "memcpy",
+        "free"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 113,
+      "name": "spawnPopulationBand",
+      "originalSymbol": "function_113",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 24203
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 1953
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_161",
+        "spawnEntity"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 114,
+      "name": "configureBehavior",
+      "originalSymbol": "function_114",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 24510
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 2047
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "memcpy",
+        "readClock",
+        "function_102",
+        "function_34",
+        "emscriptenAsmConstDouble",
+        "function_94"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 115,
+      "name": "ensureBehavior",
+      "originalSymbol": "function_115",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 24747
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 2120
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "memcpy",
+        "free"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 128,
+      "name": "allocatePooled24ByteRecord",
+      "originalSymbol": "function_128",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 26991
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 2845
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "memcpy",
+        "free"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 147,
+      "name": "attachComponent184",
+      "originalSymbol": "function_147",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 31648
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 898
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "malloc",
+        "memcpy"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 148,
+      "name": "allocatePooled1024By16Record",
+      "originalSymbol": "function_148",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 31909
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 962
+        },
+        "test": "test/server-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "malloc",
+        "memcpy",
+        "free"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 7,
+    "oracleComparisons": null,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true
+  },
+  "limitations": [
+    "Independent shared dependencies remain explicit calls; several are separately migrated.",
+    "Bounded original-WASM comparisons do not prove every corrupt-memory state or long-term gameplay interleaving."
+  ]
+}

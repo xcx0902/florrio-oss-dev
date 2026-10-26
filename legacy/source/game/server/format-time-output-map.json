@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/format-time-output.mjs",
+  "implementationSha256": "b7d6bc40ea36f1b0be79c01c8dc3e21f2ba5ffec8863791d542ca7d475bfca61",
+  "factory": "createFormatTimeOutputHook",
+  "functionIds": [
+    548
+  ],
+  "functions": [
+    {
+      "id": 548,
+      "name": "writeLocaleTime",
+      "originalSymbol": "function_548",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/format-time-output.mjs",
+          "line": 15
+        },
+        "test": "test/server-format-time-output.test.mjs"
+      },
+      "originalDirectDependencies": [
+        328,
+        360
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Formats through 328 and appends every byte through 360; returns the iterator argument."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-format-time-output.test.mjs",
+    "report": "reports/server-format-time-output-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Two patterns compare result, stack and memory outside the dead stack window.",
+    "limitations": [
+      "Native stack scratch is excluded. Ledger: 462 server bodies recovered and 272 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/frexp.mjs",
+  "implementationSha256": "2d84d9d0736e728ca27e07e7f7fba96dd543c085e2e94a9cb9fbe35af52927fa",
+  "factory": "createFrexpHook",
+  "functionIds": [
+    922
+  ],
+  "functions": [
+    {
+      "id": 922,
+      "name": "frexp",
+      "originalSymbol": "function_922",
+      "signature": " (type $t52) (param $p0 f64) (param $p1 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 190593
+        },
+        "source": {
+          "path": "source/game/client/frexp.mjs",
+          "line": 23
+        },
+        "test": "test/client-frexp.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "IEEE-754 frexp: normalize the fraction into [0.5,1), scale subnormals by 2^64 recursively, write exponent-1022 (or the adjusted subnormal exponent) through the pointer, and pass infinities/NaNs through unchanged."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-frexp.test.mjs",
+    "report": "reports/client-frexp-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 16,
+    "completeLinearMemoryChecks": 16,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 16,
+    "trappingComparisons": 0,
+    "comparison": "16 inputs cover zero, signed zero, normals, powers of two, subnormals, infinities and NaN. Each compares the returned fraction (Object.is, NaN-aware), stored exponent, all 67,108,864 memory bytes and the stack pointer.",
+    "limitations": [
+      "Signaling-NaN payload preservation is compared bitwise by the returned value and memory.",
+      "Ledger: 429 client bodies recovered and 3,816 remain machine code."
+    ]
+  }
+}

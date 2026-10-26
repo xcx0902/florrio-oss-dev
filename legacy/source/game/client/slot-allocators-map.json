@@ -1,0 +1,76 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/slot-allocators.mjs",
+  "implementationSha256": "0656a4b5d8fc789d58a162e22039b646e6379f352196f71f8b5db501f991a14f",
+  "factory": "createSlotAllocatorHooks",
+  "functionIds": [
+    542,
+    846
+  ],
+  "functions": [
+    {
+      "id": 542,
+      "name": "allocateIndexArray",
+      "originalSymbol": "function_542",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/slot-allocators.mjs",
+          "line": 14
+        },
+        "test": "test/client-slot-allocators.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371,
+        406
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Rejects counts at or above 0x40000000 and allocates count*4 bytes through 371."
+    },
+    {
+      "id": 846,
+      "name": "allocateSlotOrIndexArray",
+      "originalSymbol": "function_846",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/slot-allocators.mjs",
+          "line": 8
+        },
+        "test": "test/client-slot-allocators.test.mjs"
+      },
+      "originalDirectDependencies": [
+        542
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Uses the inline slot below 31 live items and otherwise allocates through 542."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-slot-allocators.test.mjs",
+    "report": "reports/client-slot-allocators-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 8,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Slot counts 0/5/30/31, index counts 0/1/4 and the overflow trap compare result or trap plus complete memory.",
+    "limitations": [
+      "Ledger: 614 client and 507 server bodies recovered."
+    ]
+  }
+}

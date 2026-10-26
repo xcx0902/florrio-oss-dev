@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/format-time.mjs",
+  "implementationSha256": "b5121fe2ee4eb2b5edfa0a6c090cd8e51c8fa56294db5126c93b767d1ac6e7c9",
+  "factory": "createFormatTimeHook",
+  "functionIds": [
+    328
+  ],
+  "functions": [
+    {
+      "id": 328,
+      "name": "formatLocaleTime",
+      "originalSymbol": "function_328",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/format-time.mjs",
+          "line": 15
+        },
+        "test": "test/server-format-time.test.mjs"
+      },
+      "originalDirectDependencies": [
+        6
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Builds %XY with optional swap and formats through import 6."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-format-time.test.mjs",
+    "report": "reports/server-format-time-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 3,
+    "trappingComparisons": 0,
+    "comparison": "Three patterns compare stack, end cursor and memory outside the dead stack window.",
+    "limitations": [
+      "Native formatting scratch is excluded. Ledger: 461 server bodies recovered and 273 remain machine code."
+    ]
+  }
+}

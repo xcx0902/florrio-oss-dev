@@ -1,0 +1,94 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/sort3-and-state-helpers.mjs",
+  "implementationSha256": "0a506be0a8f9904ef1ec5e6f5d5579d6d378cdd3928b0169bff3e61d01798c6b",
+  "factory": "createSort3AndStateHooks",
+  "functionIds": [
+    137,
+    138,
+    222
+  ],
+  "functions": [
+    {
+      "id": 137,
+      "name": "sortThreeWords",
+      "originalSymbol": "function_137",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sort3-and-state-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-sort3-and-state.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 138,
+      "name": "writeUnsignedDecimal",
+      "originalSymbol": "function_138",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sort3-and-state-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-sort3-and-state.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 222,
+      "name": "advanceStreamState",
+      "originalSymbol": "function_222",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sort3-and-state-helpers.mjs",
+          "line": 11
+        },
+        "test": "test/server-sort3-and-state.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-sort3-and-state.test.mjs",
+    "report": "reports/server-sort3-and-state-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 40,
+    "completeLinearMemoryChecks": 40,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 40,
+    "trappingComparisons": 0,
+    "comparison": "6 permutations, 10 decimal values and 24 stream-state combinations compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Stream-state trials sample 24 field combinations rather than every reachable state.",
+      "Ledger: 349 server bodies recovered and 385 remain machine code."
+    ]
+  }
+}

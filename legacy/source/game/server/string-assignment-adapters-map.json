@@ -1,0 +1,76 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-assignment-adapters.mjs",
+  "implementationSha256": "858fae37537235c41e4c596650ccb18320a4f401153d7b68889e8df13cfa4d05",
+  "factory": "createStringAssignmentAdapterHooks",
+  "functionIds": [
+    27,
+    535
+  ],
+  "functions": [
+    {
+      "id": 27,
+      "name": "constructStringFromCString",
+      "originalSymbol": "function_27",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-assignment-adapters.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-assignment-adapters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        200
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Tail adapter for the libc++ string construction helper 200."
+    },
+    {
+      "id": 535,
+      "name": "assignStringObject",
+      "originalSymbol": "function_535",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-assignment-adapters.mjs",
+          "line": 14
+        },
+        "test": "test/server-string-assignment-adapters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        228
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Six-argument ABI forwards destination and source to libc++ string assignment 228; four middle arguments are unused by the original."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-assignment-adapters.test.mjs",
+    "report": "reports/server-string-assignment-adapters-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 24,
+    "completeLinearMemoryChecks": 24,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 24,
+    "trappingComparisons": 0,
+    "comparison": "8 lengths x construct/short-assign/long-assign compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Behavior delegates to native 200/228, which remain machine code.",
+      "Ledger: 354 server bodies recovered and 380 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/static-cleanup-loops.mjs",
+  "implementationSha256": "c7667c21f2b1cc045737132ec75898760e1a691d4de4b6b24a0580013dcb15ed",
+  "factory": "createStaticCleanupHooks",
+  "functionIds": [
+    1844,
+    1845,
+    1846
+  ],
+  "functions": [
+    {
+      "id": 1844,
+      "name": "cleanStaticRange",
+      "originalSymbol": "function_1844",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-cleanup-loops.mjs",
+          "line": 9
+        },
+        "test": "test/client-static-cleanup-loops.test.mjs"
+      },
+      "originalDirectDependencies": [
+        413
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walks a fixed static range backwards in 12-byte steps."
+    },
+    {
+      "id": 1845,
+      "name": "cleanStaticRange",
+      "originalSymbol": "function_1845",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-cleanup-loops.mjs",
+          "line": 9
+        },
+        "test": "test/client-static-cleanup-loops.test.mjs"
+      },
+      "originalDirectDependencies": [
+        413
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walks a fixed static range backwards in 12-byte steps."
+    },
+    {
+      "id": 1846,
+      "name": "cleanStaticRange",
+      "originalSymbol": "function_1846",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/static-cleanup-loops.mjs",
+          "line": 9
+        },
+        "test": "test/client-static-cleanup-loops.test.mjs"
+      },
+      "originalDirectDependencies": [
+        413
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walks a fixed static range backwards in 12-byte steps."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-static-cleanup-loops.test.mjs",
+    "report": "reports/client-static-cleanup-loops-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 3,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "One zero fixture per loop compares trap parity and complete memory.",
+    "limitations": [
+      "Only null argument fixtures are used. Ledger: 3104 client and 512 server bodies recovered."
+    ]
+  }
+}

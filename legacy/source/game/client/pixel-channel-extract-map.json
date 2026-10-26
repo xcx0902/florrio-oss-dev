@@ -1,0 +1,54 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/pixel-channel-extract.mjs",
+  "implementationSha256": "a990f46a5be67c5c18d063a817bc803fc2f2352dff4b36b5ea8a0ec99f4393ec",
+  "factory": "createPixelChannelExtractHooks",
+  "functionIds": [
+    530
+  ],
+  "functions": [
+    {
+      "id": 530,
+      "name": "extractPackedChannels",
+      "originalSymbol": "function_530",
+      "signature": " (type $t15) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32) (param $p4 i32) (param $p5 i32) (param $p6 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 42007
+        },
+        "source": {
+          "path": "source/game/client/pixel-channel-extract.mjs",
+          "line": 44
+        },
+        "test": "test/client-pixel-channel-extract.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Reads the global 4-byte plane-base table at 104976, composes a packed pixel, writes channel-minus-one values and an optional first-zero-channel index."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-pixel-channel-extract.test.mjs",
+    "report": "reports/client-pixel-channel-extract-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 178,
+    "completeLinearMemoryChecks": 24,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 24,
+    "trappingComparisons": 9,
+    "comparison": "Every case asserts the call outcome and all five output words. 24 cases additionally assert all 67,108,864 memory bytes and the stack pointer. Coverage includes all first-zero-channel paths, optional alpha, disabled alpha plane, shift variants, 120 random descriptors and boundary traps.",
+    "limitations": [
+      "Callers own descriptor, format and output pointer validity.",
+      "The global base table at 104976 must already be populated, as in the original.",
+      "Nine boundary/mode-pointer cases trap identically.",
+      "Ledger: 338 client bodies recovered and 3,907 remain machine code."
+    ]
+  }
+}

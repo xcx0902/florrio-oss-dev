@@ -1,0 +1,891 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/fixed-address-forwarders.mjs",
+  "implementationSha256": "eab3732bb61604deb23742b7001f4296b37197abfda2651ad2c2d69223b2586d",
+  "factory": "createFixedAddressForwarderHooks",
+  "functionIds": [
+    2547,
+    2548,
+    2554,
+    2555,
+    2565,
+    2566,
+    2575,
+    2577,
+    2580,
+    2582,
+    2587,
+    2592,
+    2596,
+    2603,
+    2610,
+    2629,
+    2651,
+    2653,
+    2680,
+    2681,
+    2687,
+    2688,
+    4068,
+    4071,
+    1831,
+    1834,
+    1836,
+    1838,
+    1847,
+    1849,
+    1851,
+    1854,
+    1817,
+    1818,
+    1824,
+    1825
+  ],
+  "functions": [
+    {
+      "id": 2547,
+      "name": "forward377At7937512",
+      "originalSymbol": "function_2547",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2548,
+      "name": "forward377At7937288",
+      "originalSymbol": "function_2548",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2554,
+      "name": "forward377At7936840",
+      "originalSymbol": "function_2554",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2555,
+      "name": "forward377At7936616",
+      "originalSymbol": "function_2555",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2565,
+      "name": "forward377At7938120",
+      "originalSymbol": "function_2565",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2566,
+      "name": "forward377At7937896",
+      "originalSymbol": "function_2566",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2575,
+      "name": "forward377At7918072",
+      "originalSymbol": "function_2575",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2577,
+      "name": "forward377At7917688",
+      "originalSymbol": "function_2577",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2580,
+      "name": "forward377At7917304",
+      "originalSymbol": "function_2580",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2582,
+      "name": "forward377At7916920",
+      "originalSymbol": "function_2582",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2587,
+      "name": "forward377At7919104",
+      "originalSymbol": "function_2587",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2592,
+      "name": "forward377At7916536",
+      "originalSymbol": "function_2592",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2596,
+      "name": "forward377At7916152",
+      "originalSymbol": "function_2596",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2603,
+      "name": "forward377At7910256",
+      "originalSymbol": "function_2603",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2610,
+      "name": "forward377At7937064",
+      "originalSymbol": "function_2610",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2629,
+      "name": "forward377At158616",
+      "originalSymbol": "function_2629",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2651,
+      "name": "forward377At157800",
+      "originalSymbol": "function_2651",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2653,
+      "name": "forward377At157416",
+      "originalSymbol": "function_2653",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2680,
+      "name": "forward377At7931592",
+      "originalSymbol": "function_2680",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2681,
+      "name": "forward377At7931368",
+      "originalSymbol": "function_2681",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2687,
+      "name": "forward377At7936392",
+      "originalSymbol": "function_2687",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 2688,
+      "name": "forward377At7936168",
+      "originalSymbol": "function_2688",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 4068,
+      "name": "forward377At151112",
+      "originalSymbol": "function_4068",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 4071,
+      "name": "forward377At150352",
+      "originalSymbol": "function_4071",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1831,
+      "name": "forward381At7946028",
+      "originalSymbol": "function_1831",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1834,
+      "name": "forward381At7945996",
+      "originalSymbol": "function_1834",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1836,
+      "name": "forward381At7946092",
+      "originalSymbol": "function_1836",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1838,
+      "name": "forward381At7946060",
+      "originalSymbol": "function_1838",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1847,
+      "name": "forward413At7946044",
+      "originalSymbol": "function_1847",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        413
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1849,
+      "name": "forward413At7946012",
+      "originalSymbol": "function_1849",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        413
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1851,
+      "name": "forward413At7946108",
+      "originalSymbol": "function_1851",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        413
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1854,
+      "name": "forward413At7946076",
+      "originalSymbol": "function_1854",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        413
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1817,
+      "name": "forward552At16083",
+      "originalSymbol": "function_1817",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1818,
+      "name": "forward552At15893",
+      "originalSymbol": "function_1818",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        552
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1824,
+      "name": "forward564At126300",
+      "originalSymbol": "function_1824",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        564
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    },
+    {
+      "id": 1825,
+      "name": "forward564At126280",
+      "originalSymbol": "function_1825",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/fixed-address-forwarders.mjs",
+          "line": 9
+        },
+        "test": "test/client-fixed-address-forwarders.test.mjs"
+      },
+      "originalDirectDependencies": [
+        564
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards the coerced record plus the fixed address."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-fixed-address-forwarders.test.mjs",
+    "report": "reports/client-fixed-address-forwarders-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 36,
+    "completeLinearMemoryChecks": 36,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 36,
+    "trappingComparisons": 0,
+    "comparison": "Every forwarder compares result, stack pointer and complete memory against the original for argument 0.",
+    "limitations": [
+      "Only argument 0 is exercised. Records are coerced with >>> 0 so JS callers without arguments match the WASM boundary. Ledger: 490 client and 507 server bodies recovered."
+    ]
+  }
+}

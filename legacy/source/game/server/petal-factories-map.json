@@ -1,0 +1,1951 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "scope": "Complete bodies of all 34 distinct petal catalog factories and func217 slot type setter; allocator and component-pool services remain separately identified dependencies.",
+  "coverage": {
+    "hooks": 35,
+    "distinctCatalogFactories": 34,
+    "catalogEntries": 39,
+    "typeSetter": 217,
+    "differentialValidation": {
+      "command": "node --test test/server-petal-factories.test.mjs",
+      "testCases": 1,
+      "oracleComparisons": 68,
+      "comparedMemoryBytesPerOracle": 67108864,
+      "comparesReturnValues": true,
+      "comparesTrapClasses": true,
+      "comparesStackPointer": true,
+      "comparesHostAndWrappedCallbackOrder": true
+    },
+    "limitations": [
+      "Original allocator operatorNewOrAbort (20), malloc/free/memcpy and component-pool services are runtime.call dependencies.",
+      "Factory, destructor and initializer calls retain typed table dispatch; their bodies are replaced independently by the registry.",
+      "Differential validation is bounded, not proof for every overlapping/corrupt-memory state.",
+      "The destructor-after-factory path and invalid signature/null result paths use declared test table callbacks; ordinary game factory bodies do not reenter.",
+      "Original behavior equivalence does not establish recovery of original C++ source names or class declarations."
+    ]
+  },
+  "sharedDependencies": [
+    {
+      "id": 14,
+      "role": "free"
+    },
+    {
+      "id": 15,
+      "role": "memcpy"
+    },
+    {
+      "id": 16,
+      "role": "malloc"
+    },
+    {
+      "id": 20,
+      "role": "operatorNewOrAbort"
+    },
+    {
+      "id": 64,
+      "role": "combat component attachment/replication"
+    },
+    {
+      "id": 65,
+      "role": "combat component pool allocation"
+    },
+    {
+      "id": 67,
+      "role": "health component attachment/replication"
+    },
+    {
+      "id": 68,
+      "role": "health component pool allocation"
+    },
+    {
+      "id": 147,
+      "role": "flag component attachment/replication"
+    },
+    {
+      "id": 148,
+      "role": "flag component pool allocation"
+    }
+  ],
+  "functions": [
+    {
+      "id": 217,
+      "name": "setPetalTypeAndCreateBehavior",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 51420,
+        "decompiled": "source/decompiled/sp_server/functions-0192-0255.dcmp",
+        "catalog": []
+      },
+      "directDependencies": [
+        14,
+        15,
+        16,
+        64,
+        65,
+        67,
+        68,
+        147,
+        148
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "indirectDependencies": [
+        {
+          "role": "catalog factory",
+          "signature": {
+            "parameters": [],
+            "results": [
+              "i32"
+            ]
+          },
+          "tableIndexSource": "u32((valid type 1..38 ? 8545792 + type*52 : 0) + 48)"
+        },
+        {
+          "role": "previous behavior destructor",
+          "signature": {
+            "parameters": [
+              "i32"
+            ],
+            "results": []
+          },
+          "tableIndexSource": "u32(u32(previousBehavior)+4)"
+        },
+        {
+          "role": "behavior initializer",
+          "signature": {
+            "parameters": [
+              "i32",
+              "i32"
+            ],
+            "results": []
+          },
+          "tableIndexSource": "u32(u32(activeBehavior)+8)"
+        }
+      ],
+      "retainedBehavior": [
+        "writes instance/loadout bytes at +17 then +16",
+        "serializes old and new type through original shared packet buffers",
+        "clears entity replication caches and updates revision stamps when bytes differ",
+        "retains an already nonzero behavior pointer",
+        "creates missing health, combat and flag components in original order",
+        "assigns factory result before destroying any behavior installed by the factory",
+        "rereads slot behavior after destructor before calling initializer",
+        "type zero or above38 selects address zero, preserving subsequent indirect-call behavior"
+      ]
+    },
+    {
+      "id": 235,
+      "name": "createFastR0PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 53625,
+        "decompiled": "source/decompiled/sp_server/functions-0192-0255.dcmp",
+        "catalog": [
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "factoryTableIndex": 16
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "factoryTableIndex": 19
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "factoryTableIndex": 20
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5256,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5256
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 327,
+      "name": "createWebR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 76402,
+        "decompiled": "source/decompiled/sp_server/functions-0256-0319.dcmp",
+        "catalog": [
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "factoryTableIndex": 31
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "factoryTableIndex": 35
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 6464,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6464
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 364,
+      "name": "createStingerR1PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 81969,
+        "decompiled": "source/decompiled/sp_server/functions-0320-0383.dcmp",
+        "catalog": [
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "factoryTableIndex": 11
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "factoryTableIndex": 30
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5476,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5476
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 384,
+      "name": "createCactusR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 87297,
+        "decompiled": "source/decompiled/sp_server/functions-0320-0383.dcmp",
+        "catalog": [
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "factoryTableIndex": 5
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "factoryTableIndex": 41
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5852,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5852
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 500,
+      "name": "createPeasR4PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 118818,
+        "decompiled": "source/decompiled/sp_server/functions-0448-0511.dcmp",
+        "catalog": [
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "factoryTableIndex": 40
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 6676,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6676
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 509,
+      "name": "createBasicR5PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 118938,
+        "decompiled": "source/decompiled/sp_server/functions-0448-0511.dcmp",
+        "catalog": [
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "factoryTableIndex": 39
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6756,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6756
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 519,
+      "name": "createSaltR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 119288,
+        "decompiled": "source/decompiled/sp_server/functions-0448-0511.dcmp",
+        "catalog": [
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "factoryTableIndex": 38
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6800,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6800
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 529,
+      "name": "createRiceR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 119445,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "factoryTableIndex": 37
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6844,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6844
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 533,
+      "name": "createCornR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 119666,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "factoryTableIndex": 36
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6888,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6888
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 539,
+      "name": "createHoneyR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 120888,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "factoryTableIndex": 34
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6548,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6548
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 542,
+      "name": "createLeafR1PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 121852,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "factoryTableIndex": 33
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6632,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6632
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 545,
+      "name": "createYinYangR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 122569,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "factoryTableIndex": 32
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6420,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6420
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 552,
+      "name": "createHeaviestR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 124182,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "factoryTableIndex": 29
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6376,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6376
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 558,
+      "name": "createAntennaeR4PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 125298,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "factoryTableIndex": 28
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6332,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6332
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 565,
+      "name": "createRoseR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 125955,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "factoryTableIndex": 27
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 6288,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 4,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6288
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 572,
+      "name": "createDandelionR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 126938,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "factoryTableIndex": 26
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 6072,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6072
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 579,
+      "name": "createCactusR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 128072,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "factoryTableIndex": 25
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 6156,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6156
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 583,
+      "name": "createEggR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 128640,
+        "decompiled": "source/decompiled/sp_server/functions-0512-0575.dcmp",
+        "catalog": [
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "factoryTableIndex": 24
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 32,
+        "virtualTableAddress": 6200,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 24,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6200
+          },
+          {
+            "offset": 24,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 590,
+      "name": "createEggR4PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 130406,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "factoryTableIndex": 23
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 32,
+        "virtualTableAddress": 6244,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 24,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6244
+          },
+          {
+            "offset": 24,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 593,
+      "name": "createPollenR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 130893,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "factoryTableIndex": 22
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 6028,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 6028
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 598,
+      "name": "createBubbleR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 132044,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "factoryTableIndex": 21
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 5984,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5984
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 602,
+      "name": "createBasicR0PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 132843,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "factoryTableIndex": 17
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5212,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5212
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 612,
+      "name": "createHeavyR0PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 133494,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "factoryTableIndex": 15
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5300,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5300
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 614,
+      "name": "createRockR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 133547,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "factoryTableIndex": 14
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5344,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5344
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 621,
+      "name": "createSquareR5PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 133606,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "factoryTableIndex": 13
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5388,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5388
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 626,
+      "name": "createRoseR1PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 134150,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "factoryTableIndex": 12
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 5432,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 4,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5432
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 629,
+      "name": "createIrisR1PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 134183,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "factoryTableIndex": 10
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5520,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5520
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 634,
+      "name": "createWingR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 134328,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "factoryTableIndex": 9
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 5604,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5604
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 642,
+      "name": "createMissileR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 134491,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "factoryTableIndex": 8
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 5648,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5648
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 643,
+      "name": "createPeasR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 134516,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "factoryTableIndex": 7
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 5692,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5692
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 648,
+      "name": "createPeasR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 134794,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "factoryTableIndex": 6
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 5772,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 1,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5772
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 650,
+      "name": "createFasterR2PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 134822,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "factoryTableIndex": 4
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 4,
+        "virtualTableAddress": 5896,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5896
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 651,
+      "name": "createRoseR3PetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 134832,
+        "decompiled": "source/decompiled/sp_server/functions-0576-0639.dcmp",
+        "catalog": [
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "factoryTableIndex": 3
+          }
+        ]
+      },
+      "directDependencies": [
+        20
+      ],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 24,
+        "virtualTableAddress": 5940,
+        "stores": [
+          {
+            "offset": 0,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 8,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 16,
+            "width": 8,
+            "value": "0"
+          },
+          {
+            "offset": 4,
+            "width": 4,
+            "value": 0
+          },
+          {
+            "offset": 0,
+            "width": 4,
+            "value": 5940
+          },
+          {
+            "offset": 8,
+            "width": 1,
+            "value": 0
+          }
+        ],
+        "returns": "allocated pointer as i32",
+        "allocationFailure": "runtime.call(20, size) retains actual malloc/abort behavior; no constructor store occurs until it returns"
+      }
+    },
+    {
+      "id": 683,
+      "name": "createNoPetalBehavior",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "sourceImplementation": "source/game/server/petal-factories.mjs",
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 204481,
+        "decompiled": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+        "catalog": [
+          {
+            "typeId": 0,
+            "name": "None",
+            "rarityIndex": 0,
+            "factoryTableIndex": 18
+          }
+        ]
+      },
+      "directDependencies": [],
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "constructor": {
+        "allocationBytes": 0,
+        "returns": 0,
+        "stores": []
+      }
+    }
+  ]
+}

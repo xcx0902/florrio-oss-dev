@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/vector-helpers.mjs",
+  "implementationSha256": "c7558c86cef038b4377dc72b810e7b5a750943bcde4b015b01c395da4651f16a",
+  "factory": "createVectorHelperHook",
+  "functionIds": [
+    306
+  ],
+  "functions": [
+    {
+      "id": 306,
+      "name": "appendZeroedSlots",
+      "originalSymbol": "function_306",
+      "signature": " (type $t0) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 71587
+        },
+        "source": {
+          "path": "source/game/server/vector-helpers.mjs",
+          "line": 24
+        },
+        "test": "test/server-vector-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Zeros count 32-bit slots at the global vector's current end and advances the end pointer; the 16-byte stack scratch matches the original frame."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-vector-helpers.test.mjs",
+    "report": "reports/server-vector-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 60,
+    "completeLinearMemoryChecks": 60,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 60,
+    "trappingComparisons": 0,
+    "comparison": "Three begin offsets, four end offsets and five counts compare complete memory and the stack pointer.",
+    "limitations": [
+      "The vector header address is fixed by the original binary.",
+      "Ledger: 229 server bodies recovered and 505 remain machine code."
+    ]
+  }
+}

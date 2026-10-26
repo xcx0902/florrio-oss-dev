@@ -1,0 +1,555 @@
+{
+  "schema": 1,
+  "source": {
+    "artifact": "web/client.wasm",
+    "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+    "evidence": "Fully initialized original client runtime catalogue, offline synthetic gallery fixture; includes probabilities and segment aliases populated after func391."
+  },
+  "entities": [
+    {
+      "typeId": 0,
+      "rarity": 0,
+      "drops": []
+    },
+    {
+      "typeId": 1,
+      "rarity": 0,
+      "drops": [
+        {
+          "petalTypeId": 4,
+          "chance": 0.00522140646353364
+        },
+        {
+          "petalTypeId": 2,
+          "chance": 0.034809377044439316
+        },
+        {
+          "petalTypeId": 3,
+          "chance": 0.10442813485860825
+        }
+      ]
+    },
+    {
+      "typeId": 2,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 26,
+          "chance": 0.0033121947199106216
+        },
+        {
+          "petalTypeId": 4,
+          "chance": 0.041402433067560196
+        },
+        {
+          "petalTypeId": 3,
+          "chance": 0.8280486464500427
+        }
+      ]
+    },
+    {
+      "typeId": 3,
+      "rarity": 0,
+      "drops": [
+        {
+          "petalTypeId": 33,
+          "chance": 0.00005275763396639377
+        },
+        {
+          "petalTypeId": 21,
+          "chance": 0.0010551526211202145
+        },
+        {
+          "petalTypeId": 10,
+          "chance": 0.00879293866455555
+        },
+        {
+          "petalTypeId": 13,
+          "chance": 0.02637881599366665
+        },
+        {
+          "petalTypeId": 7,
+          "chance": 0.0527576319873333
+        }
+      ]
+    },
+    {
+      "typeId": 4,
+      "rarity": 0,
+      "drops": [
+        {
+          "petalTypeId": 9,
+          "chance": 0.001985432580113411
+        },
+        {
+          "petalTypeId": 18,
+          "chance": 0.0037453279364854097
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 0.018574625253677368
+        },
+        {
+          "petalTypeId": 2,
+          "chance": 0.06750471144914627
+        },
+        {
+          "petalTypeId": 6,
+          "chance": 0.11113633215427399
+        }
+      ]
+    },
+    {
+      "typeId": 5,
+      "rarity": 3,
+      "drops": [
+        {
+          "petalTypeId": 6,
+          "chance": 1
+        },
+        {
+          "petalTypeId": 18,
+          "chance": 1
+        },
+        {
+          "petalTypeId": 24,
+          "chance": 1
+        },
+        {
+          "petalTypeId": 15,
+          "chance": 1
+        }
+      ]
+    },
+    {
+      "typeId": 6,
+      "rarity": 0,
+      "drops": [
+        {
+          "petalTypeId": 9,
+          "chance": 0.0034244447015225887
+        },
+        {
+          "petalTypeId": 18,
+          "chance": 0.006459886208176613
+        },
+        {
+          "petalTypeId": 31,
+          "chance": 0.01164311170578003
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 0.03203723952174187
+        },
+        {
+          "petalTypeId": 7,
+          "chance": 0.06985867023468018
+        },
+        {
+          "petalTypeId": 2,
+          "chance": 0.11643111705780029
+        }
+      ]
+    },
+    {
+      "typeId": 7,
+      "rarity": 0,
+      "drops": [
+        {
+          "petalTypeId": 17,
+          "chance": 0.0005683529889211059
+        },
+        {
+          "petalTypeId": 37,
+          "chance": 0.00522884726524353
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 0.11989766359329224
+        },
+        {
+          "petalTypeId": 32,
+          "chance": 0.2614423632621765
+        },
+        {
+          "petalTypeId": 2,
+          "chance": 0.435737282037735
+        }
+      ]
+    },
+    {
+      "typeId": 8,
+      "rarity": 0,
+      "drops": [
+        {
+          "petalTypeId": 17,
+          "chance": 0.0006008148775435984
+        },
+        {
+          "petalTypeId": 38,
+          "chance": 0.0055274972692132
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 0.12674571573734283
+        },
+        {
+          "petalTypeId": 32,
+          "chance": 0.27637484669685364
+        },
+        {
+          "petalTypeId": 2,
+          "chance": 0.4606247544288635
+        }
+      ]
+    },
+    {
+      "typeId": 9,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 17,
+          "chance": 0.00037516781594604254
+        },
+        {
+          "petalTypeId": 9,
+          "chance": 0.00845966674387455
+        },
+        {
+          "petalTypeId": 14,
+          "chance": 0.029625000432133675
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 0.07914403080940247
+        },
+        {
+          "petalTypeId": 8,
+          "chance": 0.11591359972953796
+        }
+      ]
+    },
+    {
+      "typeId": 10,
+      "rarity": 2,
+      "drops": [
+        {
+          "petalTypeId": 27,
+          "chance": 0.0063826232217252254
+        },
+        {
+          "petalTypeId": 17,
+          "chance": 0.013875268399715424
+        },
+        {
+          "petalTypeId": 22,
+          "chance": 0.06382623314857483
+        },
+        {
+          "petalTypeId": 9,
+          "chance": 0.3128736913204193
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 1
+        },
+        {
+          "petalTypeId": 14,
+          "chance": 1
+        }
+      ]
+    },
+    {
+      "typeId": 11,
+      "rarity": 2,
+      "drops": [
+        {
+          "petalTypeId": 22,
+          "chance": 0.06382623314857483
+        },
+        {
+          "petalTypeId": 9,
+          "chance": 0.3128736913204193
+        },
+        {
+          "petalTypeId": 8,
+          "chance": 1
+        }
+      ]
+    },
+    {
+      "typeId": 12,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 17,
+          "chance": 0.00027750537265092134
+        },
+        {
+          "petalTypeId": 9,
+          "chance": 0.006257473956793547
+        },
+        {
+          "petalTypeId": 36,
+          "chance": 0.06382623314857483
+        },
+        {
+          "petalTypeId": 8,
+          "chance": 0.08573935180902481
+        }
+      ]
+    },
+    {
+      "typeId": 13,
+      "rarity": 2,
+      "drops": [
+        {
+          "petalTypeId": 23,
+          "chance": 0.0063826232217252254
+        },
+        {
+          "petalTypeId": 17,
+          "chance": 0.013875268399715424
+        },
+        {
+          "petalTypeId": 9,
+          "chance": 0.3128736913204193
+        },
+        {
+          "petalTypeId": 8,
+          "chance": 1
+        }
+      ]
+    },
+    {
+      "typeId": 14,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 25,
+          "chance": 0.00028246641159057617
+        },
+        {
+          "petalTypeId": 9,
+          "chance": 0.02769278734922409
+        },
+        {
+          "petalTypeId": 18,
+          "chance": 0.052239783108234406
+        },
+        {
+          "petalTypeId": 10,
+          "chance": 0.09415547549724579
+        },
+        {
+          "petalTypeId": 31,
+          "chance": 0.09415547549724579
+        },
+        {
+          "petalTypeId": 20,
+          "chance": 0.14123320579528809
+        }
+      ]
+    },
+    {
+      "typeId": 15,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 17,
+          "chance": 0.00011612784146564081
+        },
+        {
+          "petalTypeId": 12,
+          "chance": 0.0005341880605556071
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 0.024497905746102333
+        },
+        {
+          "petalTypeId": 11,
+          "chance": 0.026709403842687607
+        },
+        {
+          "petalTypeId": 32,
+          "chance": 0.053418807685375214
+        },
+        {
+          "petalTypeId": 2,
+          "chance": 0.08903134614229202
+        }
+      ]
+    },
+    {
+      "typeId": 16,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 17,
+          "chance": 0.00011612784146564081
+        },
+        {
+          "petalTypeId": 12,
+          "chance": 0.0005341880605556071
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 0.024497905746102333
+        },
+        {
+          "petalTypeId": 11,
+          "chance": 0.026709403842687607
+        },
+        {
+          "petalTypeId": 32,
+          "chance": 0.053418807685375214
+        },
+        {
+          "petalTypeId": 2,
+          "chance": 0.08903134614229202
+        }
+      ]
+    },
+    {
+      "typeId": 17,
+      "rarity": 2,
+      "drops": [
+        {
+          "petalTypeId": 34,
+          "chance": 0.0012274276232346892
+        },
+        {
+          "petalTypeId": 17,
+          "chance": 0.0026683208998292685
+        },
+        {
+          "petalTypeId": 12,
+          "chance": 0.012274275533854961
+        },
+        {
+          "petalTypeId": 8,
+          "chance": 0.8244168162345886
+        }
+      ]
+    },
+    {
+      "typeId": 18,
+      "rarity": 2,
+      "drops": [
+        {
+          "petalTypeId": 34,
+          "chance": 0.0012274276232346892
+        },
+        {
+          "petalTypeId": 17,
+          "chance": 0.0026683208998292685
+        },
+        {
+          "petalTypeId": 12,
+          "chance": 0.012274275533854961
+        },
+        {
+          "petalTypeId": 8,
+          "chance": 0.8244168162345886
+        }
+      ]
+    },
+    {
+      "typeId": 19,
+      "rarity": 5,
+      "drops": [
+        {
+          "petalTypeId": 5,
+          "chance": 1
+        }
+      ]
+    },
+    {
+      "typeId": 20,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 15,
+          "chance": 0.0016212230548262596
+        },
+        {
+          "petalTypeId": 17,
+          "chance": 0.0019384188344702125
+        },
+        {
+          "petalTypeId": 28,
+          "chance": 0.01783345453441143
+        },
+        {
+          "petalTypeId": 9,
+          "chance": 0.043709445744752884
+        },
+        {
+          "petalTypeId": 18,
+          "chance": 0.0824536681175232
+        },
+        {
+          "petalTypeId": 24,
+          "chance": 0.35729923844337463
+        }
+      ]
+    },
+    {
+      "typeId": 21,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 17,
+          "chance": 0.0018350481986999512
+        },
+        {
+          "petalTypeId": 9,
+          "chance": 0.04137853905558586
+        },
+        {
+          "petalTypeId": 18,
+          "chance": 0.07805664092302322
+        },
+        {
+          "petalTypeId": 24,
+          "chance": 0.3382454216480255
+        },
+        {
+          "petalTypeId": 16,
+          "chance": 0.3871150612831116
+        },
+        {
+          "petalTypeId": 6,
+          "chance": 1
+        }
+      ]
+    },
+    {
+      "typeId": 22,
+      "rarity": 1,
+      "drops": [
+        {
+          "petalTypeId": 30,
+          "chance": 0.00017588958144187927
+        },
+        {
+          "petalTypeId": 14,
+          "chance": 0.03019361011683941
+        },
+        {
+          "petalTypeId": 29,
+          "chance": 0.08794479072093964
+        },
+        {
+          "petalTypeId": 8,
+          "chance": 0.1181383952498436
+        },
+        {
+          "petalTypeId": 7,
+          "chance": 0.17588958144187927
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-read-char.mjs",
+  "implementationSha256": "f0add6c132fc0a40f3599ec5da307eebd9a2dedacaa6a933f730a64b21551944",
+  "factory": "createStreamReadCharHook",
+  "functionIds": [
+    322
+  ],
+  "functions": [
+    {
+      "id": 322,
+      "name": "readStreamChar",
+      "originalSymbol": "function_322",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-read-char.mjs",
+          "line": 14
+        },
+        "test": "test/server-stream-read-char.test.mjs"
+      },
+      "originalDirectDependencies": [
+        366
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Advances a word, writes the stream pointer at result+4 and the sign-extended low byte at result+0."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-read-char.test.mjs",
+    "report": "reports/server-stream-read-char-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 6,
+    "completeLinearMemoryChecks": 6,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 6,
+    "trappingComparisons": 0,
+    "comparison": "Six word values including sign boundaries compare complete memory and stack.",
+    "limitations": [
+      "Ledger: 422 server bodies recovered and 312 remain machine code."
+    ]
+  }
+}

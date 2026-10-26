@@ -1,0 +1,86 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/spawn-components.mjs",
+  "implementationSha256": "c9bf8db5b00ab0cc59b263b23bb22bc735262527958eca5176af1af60dfd6e83",
+  "factory": "createSpawnComponentHooks",
+  "functionIds": [
+    265,
+    266
+  ],
+  "functions": [
+    {
+      "id": 265,
+      "name": "assignEntityString",
+      "originalSymbol": "function_265",
+      "signature": " (type $t4) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 62717
+        },
+        "source": {
+          "path": "source/game/server/spawn-components.mjs",
+          "line": 568
+        },
+        "test": "test/server-spawn-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        16,
+        15,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Assigns a libc++ string to an entity slot, invalidating two global name caches and the per-cell cache, and stamps two id tables when the caches still differ."
+    },
+    {
+      "id": 266,
+      "name": "publishSpawnedHandle",
+      "originalSymbol": "function_266",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 63206
+        },
+        "source": {
+          "path": "source/game/server/spawn-components.mjs",
+          "line": 691
+        },
+        "test": "test/server-spawn-components.test.mjs"
+      },
+      "originalDirectDependencies": [
+        16,
+        15,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Publishes a spawned handle: sets entity flag bit 2, clears per-cell caches, stamps three id tables, appends the handle to the world active-handle vector, writes entity+400/+404, then clears caches and rewrites two id tables."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-spawn-components.test.mjs",
+    "report": "reports/server-spawn-components-tests.tap",
+    "testGroups": 2,
+    "pass": 2,
+    "fail": 0,
+    "oracleComparisons": 57,
+    "completeLinearMemoryChecks": 94,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 94,
+    "trappingComparisons": 0,
+    "comparison": "33 string-assignment cases (SSO/heap/equal/different/empty/embedded NUL/primed caches) and 24 publish cases (capacity 0/exact/double/1024/4096, cache variants, repeats) compare void result, complete memory and stack pointer.",
+    "limitations": [
+      "265 global-cache initial contents were tested as zero or primed malloc buffers only.",
+      "266 illegal size>capacity states are not exercised.",
+      "Function 264 (spatial tree insertion) was attempted but its synthetic tests did not generalize to the real world; it is not registered.",
+      "Ledger: 250 server bodies recovered and 484 remain machine code."
+    ]
+  }
+}

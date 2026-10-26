@@ -1,0 +1,72 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-status.mjs",
+  "implementationSha256": "347dd7668247c3b199bf2ff564347fca26500580caf658ed2b24c7a9dd0f7407",
+  "factory": "createStreamStatusHooks",
+  "functionIds": [
+    362,
+    367
+  ],
+  "functions": [
+    {
+      "id": 362,
+      "name": "wordStatus",
+      "originalSymbol": "function_362",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-status.mjs",
+          "line": 38
+        },
+        "test": "test/server-stream-status.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Probes a word; non-EOF returns 1 only for a null handle, EOF clears the handle and returns 1."
+    },
+    {
+      "id": 367,
+      "name": "byteStatus",
+      "originalSymbol": "function_367",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-status.mjs",
+          "line": 41
+        },
+        "test": "test/server-stream-status.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Same status probe with an unsigned byte."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-status.test.mjs",
+    "report": "reports/server-stream-status-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 12,
+    "completeLinearMemoryChecks": 12,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 12,
+    "trappingComparisons": 0,
+    "comparison": "Both probes x null/present handles x 3 byte values compare result, complete memory and stack.",
+    "limitations": [
+      "The virtual peek path for an empty area is not exercised.",
+      "Ledger: 392 server bodies recovered and 342 remain machine code."
+    ]
+  }
+}

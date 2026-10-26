@@ -1,0 +1,4160 @@
+{
+  "schema": 1,
+  "generatedBy": "tools/gen-contracts.mjs",
+  "structs": {
+    "Vector": {
+      "size": 12,
+      "alignment": 4,
+      "confidence": "unknown",
+      "file": "common.yaml",
+      "fields": [
+        {
+          "name": "count",
+          "offset": 0,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "capacity",
+          "offset": 4,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "pointer",
+          "offset": 8,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "unknown",
+          "padding": false
+        }
+      ]
+    },
+    "CacheEntry": {
+      "size": 8,
+      "alignment": 4,
+      "confidence": "unknown",
+      "file": "common.yaml",
+      "fields": [
+        {
+          "name": "value",
+          "offset": 0,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "padding",
+          "offset": 4,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "unknown",
+          "padding": false
+        }
+      ]
+    },
+    "ComponentPair": {
+      "size": 8,
+      "alignment": 1,
+      "confidence": "unknown",
+      "file": "common.yaml",
+      "fields": [
+        {
+          "name": "slot",
+          "offset": 0,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "flags",
+          "offset": 1,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "padding",
+          "offset": 2,
+          "type": "u8",
+          "count": 6,
+          "size": 6,
+          "confidence": "unknown",
+          "padding": false
+        }
+      ]
+    },
+    "SpawnRule": {
+      "size": 16,
+      "alignment": 4,
+      "confidence": "unknown",
+      "file": "common.yaml",
+      "fields": [
+        {
+          "name": "weight",
+          "offset": 0,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "regionCount",
+          "offset": 4,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "regionIds",
+          "offset": 5,
+          "type": "u8",
+          "count": 8,
+          "size": 8,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "entityTypeId",
+          "offset": 13,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "unknown",
+          "padding": false
+        },
+        {
+          "name": "padding",
+          "offset": 14,
+          "type": "u8",
+          "count": 2,
+          "size": 2,
+          "confidence": "unknown",
+          "padding": false
+        }
+      ]
+    },
+    "ComponentPool": {
+      "size": 56,
+      "alignment": 8,
+      "confidence": "medium",
+      "file": "components.yaml",
+      "fields": [
+        {
+          "name": "nextIndex",
+          "offset": 0,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "blockCount",
+          "offset": 4,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "pointerCapacity",
+          "offset": 8,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "pointerArray",
+          "offset": 12,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "freeCount",
+          "offset": 16,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x14",
+          "offset": 20,
+          "type": "u8",
+          "count": 4,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "freeArray",
+          "offset": 24,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x1c",
+          "offset": 28,
+          "type": "u8",
+          "count": 28,
+          "confidence": "unknown",
+          "padding": true
+        }
+      ]
+    },
+    "EntityDefinition": {
+      "size": 116,
+      "alignment": 4,
+      "confidence": "high",
+      "file": "entity-definition.yaml",
+      "fields": [
+        {
+          "name": "namePointer",
+          "offset": 0,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "descriptionCount",
+          "offset": 4,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "descriptionPointers",
+          "offset": 8,
+          "type": "u32",
+          "count": 4,
+          "size": 16,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "rarity",
+          "offset": 24,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "scale",
+          "offset": 28,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "componentPairCount",
+          "offset": 32,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "componentPairs",
+          "offset": 36,
+          "type": "ComponentPair",
+          "count": 8,
+          "size": 64,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "typeId",
+          "offset": 100,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "zero104",
+          "offset": 104,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "field108",
+          "offset": 108,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "field109",
+          "offset": 109,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "field110",
+          "offset": 110,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x6f",
+          "offset": 111,
+          "type": "u8",
+          "count": 1,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "secondaryScale",
+          "offset": 112,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        }
+      ]
+    },
+    "EntitySlot": {
+      "size": 496,
+      "alignment": 4,
+      "confidence": "medium",
+      "file": "entity.yaml",
+      "fields": [
+        {
+          "name": "world",
+          "offset": 0,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x4",
+          "offset": 4,
+          "type": "u8",
+          "count": 12,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "handle",
+          "offset": 16,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "listOwner",
+          "offset": 20,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "listPrevious",
+          "offset": 24,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "listNext",
+          "offset": 28,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x20",
+          "offset": 32,
+          "type": "u8",
+          "count": 60,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "componentFlagsA",
+          "offset": 92,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "componentFlagsB",
+          "offset": 93,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x5e",
+          "offset": 94,
+          "type": "u8",
+          "count": 1,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "componentFlagsC",
+          "offset": 95,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x60",
+          "offset": 96,
+          "type": "u8",
+          "count": 216,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "trackedMarkA",
+          "offset": 312,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "trackedMarkARevision",
+          "offset": 316,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x140",
+          "offset": 320,
+          "type": "u8",
+          "count": 56,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "trackedMarkB",
+          "offset": 376,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "trackedMarkBRevision",
+          "offset": 380,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x180",
+          "offset": 384,
+          "type": "u8",
+          "count": 80,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "trackedMarkC",
+          "offset": 464,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "trackedMarkCRevision",
+          "offset": 468,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x1d8",
+          "offset": 472,
+          "type": "u8",
+          "count": 24,
+          "confidence": "unknown",
+          "padding": true
+        }
+      ]
+    },
+    "PetalDefinition": {
+      "size": 52,
+      "alignment": 4,
+      "confidence": "high",
+      "file": "petal.yaml",
+      "fields": [
+        {
+          "name": "namePointer",
+          "offset": 0,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "descriptionCount",
+          "offset": 4,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "descriptionPointers",
+          "offset": 8,
+          "type": "u32",
+          "count": 4,
+          "size": 16,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "rarityIndex",
+          "offset": 24,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "rechargeMilliseconds",
+          "offset": 28,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "instancesPerSlot",
+          "offset": 32,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "radius",
+          "offset": 36,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "flag40",
+          "offset": 40,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "medium",
+          "padding": false
+        },
+        {
+          "name": "flag41",
+          "offset": 41,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "medium",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x2a",
+          "offset": 42,
+          "type": "u8",
+          "count": 2,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "field44",
+          "offset": 44,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "medium",
+          "padding": false
+        },
+        {
+          "name": "factoryTableIndex",
+          "offset": 48,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        }
+      ]
+    },
+    "QuadTreeNode": {
+      "size": 48,
+      "alignment": 4,
+      "confidence": "low",
+      "file": "spatial.yaml",
+      "fields": [
+        {
+          "name": "minX",
+          "offset": 0,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "minY",
+          "offset": 4,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "maxX",
+          "offset": 8,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "maxY",
+          "offset": 12,
+          "type": "f32",
+          "count": 1,
+          "size": 4,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "child0",
+          "offset": 16,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "child1",
+          "offset": 20,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "child2",
+          "offset": 24,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "child3",
+          "offset": 28,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "entities",
+          "offset": 32,
+          "type": "Vector",
+          "count": 1,
+          "size": 12,
+          "confidence": "low",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x2c",
+          "offset": 44,
+          "type": "u8",
+          "count": 4,
+          "confidence": "unknown",
+          "padding": true
+        }
+      ]
+    },
+    "World": {
+      "size": 8522556,
+      "alignment": 4,
+      "confidence": "medium",
+      "file": "world.yaml",
+      "fields": [
+        {
+          "name": "arenaSettingsActive",
+          "offset": 0,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsEnabled",
+          "offset": 1,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountEnabled",
+          "offset": 2,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x3",
+          "offset": 3,
+          "type": "u8",
+          "count": 92,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "flags",
+          "offset": 95,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x60",
+          "offset": 96,
+          "type": "u8",
+          "count": 216,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "component8Owner",
+          "offset": 312,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "component8Revision",
+          "offset": 316,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "component8State0",
+          "offset": 320,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "component8State1",
+          "offset": 324,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x145",
+          "offset": 325,
+          "type": "u8",
+          "count": 3,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "component8Timestamp",
+          "offset": 328,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "component8Vector",
+          "offset": 336,
+          "type": "Vector",
+          "count": 1,
+          "size": 12,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x15c",
+          "offset": 348,
+          "type": "u8",
+          "count": 276,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaSettingsOwner",
+          "offset": 624,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsRevision",
+          "offset": 628,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsData",
+          "offset": 632,
+          "type": "u8",
+          "count": 240,
+          "size": 240,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsField872",
+          "offset": 872,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsField873",
+          "offset": 873,
+          "type": "u8",
+          "count": 1,
+          "size": 1,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x36a",
+          "offset": 874,
+          "type": "u8",
+          "count": 2,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaSettingsField876",
+          "offset": 876,
+          "type": "u8",
+          "count": 101,
+          "size": 101,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x3d1",
+          "offset": 977,
+          "type": "u8",
+          "count": 3,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaSettingsTimestamp980",
+          "offset": 980,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsTimestamp988",
+          "offset": 988,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsTimestamp996",
+          "offset": 996,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsTimestamp1004",
+          "offset": 1004,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsTimestamp1012",
+          "offset": 1012,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaSettingsTimestamp1020",
+          "offset": 1020,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x404",
+          "offset": 1028,
+          "type": "u8",
+          "count": 4,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaSettingsVector",
+          "offset": 1032,
+          "type": "Vector",
+          "count": 1,
+          "size": 12,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x414",
+          "offset": 1044,
+          "type": "u8",
+          "count": 444,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaCountOwner",
+          "offset": 1488,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountRevision",
+          "offset": 1492,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1496",
+          "offset": 1496,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1504",
+          "offset": 1504,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1512",
+          "offset": 1512,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x5ec",
+          "offset": 1516,
+          "type": "u8",
+          "count": 4,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaCountField1520",
+          "offset": 1520,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1528",
+          "offset": 1528,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1536",
+          "offset": 1536,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x608",
+          "offset": 1544,
+          "type": "u8",
+          "count": 8,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaCountField1552",
+          "offset": 1552,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x614",
+          "offset": 1556,
+          "type": "u8",
+          "count": 4,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaCountField1560",
+          "offset": 1560,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1568",
+          "offset": 1568,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x624",
+          "offset": 1572,
+          "type": "u8",
+          "count": 4,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaCountField1576",
+          "offset": 1576,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1584",
+          "offset": 1584,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1592",
+          "offset": 1592,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1600",
+          "offset": 1600,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1608",
+          "offset": 1608,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1616",
+          "offset": 1616,
+          "type": "u64",
+          "count": 1,
+          "size": 8,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "arenaCountField1624",
+          "offset": 1624,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x65c",
+          "offset": 1628,
+          "type": "u8",
+          "count": 4,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "arenaCountVector",
+          "offset": 1632,
+          "type": "Vector",
+          "count": 1,
+          "size": 12,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x66c",
+          "offset": 1644,
+          "type": "u8",
+          "count": 496,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "revision",
+          "offset": 2140,
+          "type": "u32",
+          "count": 1,
+          "size": 4,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x860",
+          "offset": 2144,
+          "type": "u8",
+          "count": 66124,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "entityRevisionTableA",
+          "offset": 68268,
+          "type": "u32",
+          "count": 16384,
+          "size": 65536,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "entityRevisionTableB",
+          "offset": 133804,
+          "type": "u32",
+          "count": 16384,
+          "size": 65536,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "entityRevisionTableC",
+          "offset": 199340,
+          "type": "u32",
+          "count": 16384,
+          "size": 65536,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "serializationCache",
+          "offset": 264876,
+          "type": "CacheEntry",
+          "count": 16384,
+          "size": 131072,
+          "confidence": "high",
+          "padding": false
+        },
+        {
+          "name": "_padding_0x60aac",
+          "offset": 395948,
+          "type": "u8",
+          "count": 144,
+          "confidence": "unknown",
+          "padding": true
+        },
+        {
+          "name": "entities",
+          "offset": 396092,
+          "type": "EntitySlot",
+          "count": 16384,
+          "size": 8126464,
+          "confidence": "high",
+          "padding": false
+        }
+      ]
+    }
+  },
+  "globals": {
+    "initialized": {
+      "address": 8545776,
+      "type": "u8",
+      "count": 1
+    },
+    "outputCount": {
+      "address": 8545512,
+      "type": "u8",
+      "count": 1
+    },
+    "outputPointers": {
+      "address": 8545516,
+      "type": "u32",
+      "count": 1
+    },
+    "packetXorKey": {
+      "address": 4576,
+      "type": "u8",
+      "count": 256
+    },
+    "petalTable": {
+      "address": 8545792,
+      "type": "PetalDefinition",
+      "count": 39
+    },
+    "spawnRuleTable": {
+      "address": 8547824,
+      "type": "SpawnRule",
+      "count": 20
+    },
+    "entityDefinitionTable": {
+      "address": 8548368,
+      "type": "EntityDefinition",
+      "count": 23
+    },
+    "entityDefinitionGuard": {
+      "address": 8551036,
+      "type": "u8",
+      "count": 1
+    },
+    "rngState": {
+      "address": 8569392,
+      "type": "u64",
+      "count": 1
+    }
+  },
+  "protocol": {
+    "schema": 1,
+    "name": "worker-protocol",
+    "confidence": "medium",
+    "source": {
+      "artifact": "web/sp_server.wasm",
+      "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+      "clientArtifact": "web/client.wasm",
+      "clientSha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+      "evidence": [
+        "source/javascript/sp_server.js",
+        "source/javascript/client.js",
+        "reports/server-behavior.md",
+        "reports/server-input.md",
+        "reports/client-snapshots.md",
+        "reports/client-entity-snapshot.md",
+        "reports/client-snapshot-decoder.md"
+      ]
+    },
+    "notes": [
+      "This is a byte-level contract assembled from the original worker glue, the recovered input entry point and the recovered snapshot decoder.",
+      "Fields whose exact wire type has not been proven are marked confidence medium and described by role, not invented names."
+    ],
+    "worker": {
+      "request": {
+        "fields": [
+          {
+            "name": "funcName",
+            "type": "string",
+            "confidence": "high"
+          },
+          {
+            "name": "callbackId",
+            "type": "i32",
+            "confidence": "high",
+            "note": "-1 for init; otherwise a monotonically increasing client callback slot"
+          },
+          {
+            "name": "data",
+            "type": "bytes",
+            "optional": true,
+            "confidence": "high",
+            "note": "transferred Uint8Array; absent or zero-length for init/think/flush"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "callbackId",
+            "type": "i32",
+            "confidence": "high"
+          },
+          {
+            "name": "finalResponse",
+            "type": "bool",
+            "confidence": "high",
+            "note": "true completes the callback; false is an intermediate packet"
+          },
+          {
+            "name": "data",
+            "type": "bytes",
+            "optional": true,
+            "confidence": "high"
+          }
+        ]
+      },
+      "functions": [
+        {
+          "name": "sp_server_init",
+          "wasmIndex": 656,
+          "args": [
+            0,
+            0
+          ],
+          "confidence": "high",
+          "behavior": "initialize world and catalogs, schedule the 50 ms tick, flush initial output"
+        },
+        {
+          "name": "sp_server_send",
+          "wasmIndex": 655,
+          "args": [
+            "pointer",
+            "length"
+          ],
+          "confidence": "high",
+          "behavior": "decode one client input packet and apply its commands"
+        },
+        {
+          "name": "sp_server_think",
+          "wasmIndex": 654,
+          "args": [],
+          "confidence": "high",
+          "behavior": "one 20 Hz simulation tick"
+        },
+        {
+          "name": "sp_server_flush",
+          "wasmIndex": 657,
+          "args": [
+            0,
+            0
+          ],
+          "confidence": "high",
+          "behavior": "drain the output queue, send one final empty response, free packets"
+        }
+      ]
+    },
+    "input": {
+      "maxPacketBytes": 65536,
+      "xor": {
+        "keyAddress": 4576,
+        "keyLength": 256,
+        "algorithm": "rolling-xor",
+        "confidence": "high"
+      },
+      "reader": {
+        "varint": "unsigned-leb128",
+        "maxVarintBytes": 5,
+        "endian": "little",
+        "confidence": "high"
+      },
+      "packet": {
+        "sequence": "varint",
+        "sequenceRole": "duplicate suppression",
+        "commands": "command-list"
+      },
+      "commands": [
+        {
+          "opcode": 0,
+          "name": "handshake-string",
+          "confidence": "high"
+        },
+        {
+          "opcode": 2,
+          "name": "handshake-string-alt",
+          "confidence": "high"
+        },
+        {
+          "opcode": 3,
+          "name": "suicide",
+          "confidence": "high"
+        },
+        {
+          "opcode": 4,
+          "name": "restart",
+          "confidence": "high"
+        },
+        {
+          "opcode": 5,
+          "name": "string",
+          "confidence": "high"
+        },
+        {
+          "opcode": 6,
+          "name": "player-spawn-and-name",
+          "confidence": "high",
+          "fields": [
+            "name-string",
+            "level"
+          ]
+        },
+        {
+          "opcode": 7,
+          "name": "disconnect",
+          "confidence": "high"
+        },
+        {
+          "opcode": 8,
+          "name": "discard-petal",
+          "confidence": "high",
+          "fields": [
+            "slot"
+          ]
+        },
+        {
+          "opcode": 10,
+          "name": "swap-petals",
+          "confidence": "high",
+          "fields": [
+            "slotA",
+            "slotB"
+          ]
+        },
+        {
+          "opcode": 12,
+          "name": "input-buttons-angle-strength",
+          "confidence": "high",
+          "fields": [
+            "buttons",
+            "angle",
+            "strength"
+          ]
+        },
+        {
+          "opcode": 13,
+          "name": "bench-cycle",
+          "confidence": "high"
+        },
+        {
+          "opcode": 1,
+          "name": "reserved-1",
+          "confidence": "medium"
+        },
+        {
+          "opcode": 9,
+          "name": "reserved-9",
+          "confidence": "medium"
+        },
+        {
+          "opcode": 11,
+          "name": "reserved-11",
+          "confidence": "medium"
+        }
+      ],
+      "fieldNotes": [
+        "Opcode 12 angle uses the original binary64 constants and is normalized as the original bit test does.",
+        "Name strings are trimmed and UTF-8 truncated on the original spawn path."
+      ]
+    },
+    "output": {
+      "queue": {
+        "countAddress": 8545512,
+        "pointersAddress": 8545516,
+        "capacity": 16,
+        "confidence": "high"
+      },
+      "packet": {
+        "headerBytes": 16,
+        "lengthOffset": 4,
+        "heapPayloadOffset": 12,
+        "inlinePayloadOffset": 16,
+        "inlinePayloadBytes": 4096,
+        "confidence": "high"
+      },
+      "payload": {
+        "typeByte": "first",
+        "types": [
+          {
+            "type": 0,
+            "name": "handshake",
+            "confidence": "medium"
+          },
+          {
+            "type": 1,
+            "name": "entity-snapshot",
+            "confidence": "high"
+          },
+          {
+            "type": 5,
+            "name": "events",
+            "confidence": "high"
+          },
+          {
+            "type": 2,
+            "name": "unknown-2",
+            "confidence": "low"
+          }
+        ]
+      },
+      "snapshot": {
+        "sequence": "varint",
+        "xorKeyAddress": 32272,
+        "xorKeyLength": 256,
+        "reliableAck": "varint",
+        "framing": {
+          "entityFlagsXor": 54,
+          "componentDeltaXor": 1
+        },
+        "sparseModes": {
+          "nativeSparse": {
+            "packetFormat": "archived-client",
+            "fieldDeltaXor": 1,
+            "indexDeltaXor": 1,
+            "indexedFields": [
+              3,
+              4,
+              10,
+              16,
+              25,
+              33,
+              35,
+              39,
+              60,
+              61
+            ],
+            "field26Role": "player-model"
+          },
+          "domainSparse": {
+            "packetFormat": "domain-counted",
+            "fieldDeltaXor": 0,
+            "indexDeltaXor": 0,
+            "indexedFields": [
+              3,
+              10,
+              16,
+              25,
+              39,
+              60,
+              61
+            ],
+            "field26Role": "entity-kind",
+            "note": "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md. Shared value widths do not assert native semantic equivalence."
+          }
+        },
+        "domainExtensions": [
+          {
+            "field": 26,
+            "name": "entity-kind",
+            "type": "byte",
+            "permanent": true,
+            "originalRole": "player-model",
+            "note": "Domain packets retain the permanent kind byte; the archived-client adapter writes the original model byte separately."
+          }
+        ],
+        "entityHandle": {
+          "bits": 32,
+          "indexMask": 16383,
+          "generationShift": 14,
+          "rotation": "rotl-14",
+          "confidence": "high"
+        },
+        "blocks": [
+          {
+            "name": "entity-deletes",
+            "count": "varint",
+            "entry": "handle"
+          },
+          {
+            "name": "entity-updates",
+            "count": "varint",
+            "entry": "handle + component-declarations + field-values"
+          },
+          {
+            "name": "events",
+            "count": "varint",
+            "entry": "opcode + fields"
+          },
+          {
+            "name": "trailing-framing",
+            "confidence": "medium"
+          }
+        ],
+        "componentModel": {
+          "componentCount": 30,
+          "sparseFieldCount": 63,
+          "denseGroupCount": 19,
+          "denseComponent30ExtraFields": 6,
+          "flags": {
+            "1": "component declarations use a 32-bit mask",
+            "2": "skip component declarations",
+            "8": "dense existing-component fields",
+            "64": "dense component 30 includes fields 58-63",
+            "128": "mark entity byte 44 bit 0"
+          },
+          "confidence": "high"
+        },
+        "fieldComponents": {
+          "1": {
+            "constructor": 478,
+            "offset": 8
+          },
+          "2": {
+            "constructor": 491,
+            "offset": 8
+          },
+          "3": {
+            "constructor": 477,
+            "offset": 8
+          },
+          "4": {
+            "constructor": 0,
+            "offset": 8
+          },
+          "5": {
+            "constructor": 478,
+            "offset": 16
+          },
+          "6": {
+            "constructor": 478,
+            "offset": 40
+          },
+          "7": {
+            "constructor": 467,
+            "offset": 8
+          },
+          "8": {
+            "constructor": 609,
+            "offset": 8
+          },
+          "9": {
+            "constructor": 755,
+            "offset": 8
+          },
+          "10": {
+            "constructor": 477,
+            "offset": 88
+          },
+          "11": {
+            "constructor": 477,
+            "offset": 248
+          },
+          "12": {
+            "constructor": 477,
+            "offset": 249
+          },
+          "13": {
+            "constructor": 0,
+            "offset": 8
+          },
+          "14": {
+            "constructor": 756,
+            "offset": 8
+          },
+          "15": {
+            "constructor": 0,
+            "offset": 24
+          },
+          "16": {
+            "constructor": 478,
+            "offset": 52
+          },
+          "17": {
+            "constructor": 549,
+            "offset": 8
+          },
+          "18": {
+            "constructor": 0,
+            "offset": 32
+          },
+          "19": {
+            "constructor": 477,
+            "offset": 252
+          },
+          "20": {
+            "constructor": 478,
+            "offset": 104
+          },
+          "21": {
+            "constructor": 478,
+            "offset": 108
+          },
+          "22": {
+            "constructor": 670,
+            "offset": 8
+          },
+          "23": {
+            "constructor": 0,
+            "offset": 8
+          },
+          "24": {
+            "constructor": 478,
+            "offset": 112
+          },
+          "25": {
+            "constructor": 0,
+            "offset": 40
+          },
+          "26": {
+            "constructor": 491,
+            "offset": 9
+          },
+          "27": {
+            "constructor": 0,
+            "offset": 56
+          },
+          "28": {
+            "constructor": 609,
+            "offset": 40
+          },
+          "29": {
+            "constructor": 533,
+            "offset": 8
+          },
+          "30": {
+            "constructor": 477,
+            "offset": 256
+          },
+          "31": {
+            "constructor": 491,
+            "offset": 10
+          },
+          "32": {
+            "constructor": 478,
+            "offset": 136
+          },
+          "33": {
+            "constructor": 0,
+            "offset": 60
+          },
+          "34": {
+            "constructor": 478,
+            "offset": 140
+          },
+          "35": {
+            "constructor": 0,
+            "offset": 72
+          },
+          "36": {
+            "constructor": 493,
+            "offset": 8
+          },
+          "37": {
+            "constructor": 0,
+            "offset": 32
+          },
+          "38": {
+            "constructor": 809,
+            "offset": 8
+          },
+          "39": {
+            "constructor": 477,
+            "offset": 260
+          },
+          "40": {
+            "constructor": 533,
+            "offset": 9
+          },
+          "41": {
+            "constructor": 0,
+            "offset": 88
+          },
+          "42": {
+            "constructor": 477,
+            "offset": 340
+          },
+          "43": {
+            "constructor": 757,
+            "offset": 8
+          },
+          "44": {
+            "constructor": 0,
+            "offset": 92
+          },
+          "45": {
+            "constructor": 477,
+            "offset": 344
+          },
+          "46": {
+            "constructor": 477,
+            "offset": 352
+          },
+          "47": {
+            "constructor": 478,
+            "offset": 141
+          },
+          "48": {
+            "constructor": 677,
+            "offset": 8
+          },
+          "49": {
+            "constructor": 609,
+            "offset": 64
+          },
+          "50": {
+            "constructor": 758,
+            "offset": 8
+          },
+          "51": {
+            "constructor": 0,
+            "offset": 96
+          },
+          "52": {
+            "constructor": 477,
+            "offset": 356
+          },
+          "53": {
+            "constructor": 458,
+            "offset": 8
+          },
+          "54": {
+            "constructor": 670,
+            "offset": 9
+          },
+          "55": {
+            "constructor": 458,
+            "offset": 12
+          },
+          "56": {
+            "constructor": 478,
+            "offset": 144
+          },
+          "57": {
+            "constructor": 0,
+            "offset": 20
+          },
+          "58": {
+            "constructor": 491,
+            "offset": 12
+          },
+          "59": {
+            "constructor": 491,
+            "offset": 16
+          },
+          "60": {
+            "constructor": 491,
+            "offset": 40
+          },
+          "61": {
+            "constructor": 491,
+            "offset": 120
+          },
+          "62": {
+            "constructor": 491,
+            "offset": 168
+          },
+          "63": {
+            "constructor": 491,
+            "offset": 169
+          }
+        },
+        "indexedFields": {
+          "3": {
+            "element": "reference",
+            "count": 10
+          },
+          "4": {
+            "element": "string",
+            "count": 1
+          },
+          "10": {
+            "element": "string",
+            "count": 10
+          },
+          "16": {
+            "element": "byte",
+            "count": 10
+          },
+          "25": {
+            "element": "string",
+            "count": 1
+          },
+          "33": {
+            "element": "bit",
+            "count": 1
+          },
+          "35": {
+            "element": "f64",
+            "count": 1
+          },
+          "39": {
+            "element": "varint",
+            "count": 10
+          },
+          "60": {
+            "element": "byte",
+            "count": 16
+          },
+          "61": {
+            "element": "short",
+            "count": 8
+          }
+        },
+        "fieldTypes": {
+          "byte": [
+            1,
+            2,
+            9,
+            11,
+            12,
+            14,
+            17,
+            20,
+            22,
+            26,
+            31,
+            34,
+            36,
+            38,
+            43,
+            46,
+            47,
+            50,
+            54,
+            62,
+            63
+          ],
+          "float": [
+            19,
+            21,
+            32,
+            42,
+            53,
+            55
+          ],
+          "interpolatedFloat": [
+            5,
+            7,
+            13,
+            24,
+            28,
+            49,
+            59
+          ],
+          "string": [
+            4,
+            6,
+            48
+          ],
+          "varint": [
+            15,
+            30,
+            41,
+            44,
+            51,
+            52,
+            58
+          ],
+          "reference": [
+            23,
+            56,
+            57
+          ],
+          "bit": [
+            29,
+            33,
+            37,
+            40
+          ],
+          "angleRaw16": [
+            8
+          ],
+          "double": [
+            18,
+            35
+          ],
+          "specialFloat": [
+            27,
+            45
+          ],
+          "stringArray": [
+            10,
+            25
+          ],
+          "byteArray": [
+            16,
+            60
+          ],
+          "handleArray": [
+            3
+          ],
+          "varintArray": [
+            39
+          ],
+          "shortArray": [
+            61
+          ],
+          "confidence": "high",
+          "note": "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing; domainSparse is not the native wire contract."
+        },
+        "denseGroups": [
+          {
+            "offset": 52,
+            "component": 1,
+            "fields": [
+              22,
+              54
+            ]
+          },
+          {
+            "offset": 56,
+            "component": 2,
+            "fields": [
+              36
+            ]
+          },
+          {
+            "offset": 68,
+            "component": 5,
+            "fields": [
+              9
+            ]
+          },
+          {
+            "offset": 72,
+            "component": 6,
+            "fields": [
+              1,
+              5,
+              6,
+              16,
+              20,
+              21,
+              24,
+              32,
+              34,
+              47,
+              56
+            ]
+          },
+          {
+            "offset": 76,
+            "component": 7,
+            "fields": [
+              50
+            ]
+          },
+          {
+            "offset": -8,
+            "component": 8,
+            "fields": [
+              13,
+              37
+            ]
+          },
+          {
+            "offset": 84,
+            "component": 10,
+            "fields": [
+              17
+            ]
+          },
+          {
+            "offset": 100,
+            "component": 14,
+            "fields": [
+              43
+            ]
+          },
+          {
+            "offset": -15,
+            "component": 15,
+            "fields": [
+              23,
+              57
+            ]
+          },
+          {
+            "offset": -16,
+            "component": 16,
+            "fields": [
+              3,
+              10,
+              11,
+              12,
+              19,
+              30,
+              39,
+              42,
+              45,
+              46,
+              52
+            ]
+          },
+          {
+            "offset": 112,
+            "component": 19,
+            "fields": [
+              48
+            ]
+          },
+          {
+            "offset": 116,
+            "component": 20,
+            "fields": [
+              53,
+              55
+            ]
+          },
+          {
+            "offset": 120,
+            "component": 21,
+            "fields": [
+              8,
+              28,
+              49
+            ]
+          },
+          {
+            "offset": 124,
+            "component": 22,
+            "fields": [
+              29,
+              40
+            ]
+          },
+          {
+            "offset": 136,
+            "component": 25,
+            "fields": [
+              38
+            ]
+          },
+          {
+            "offset": 140,
+            "component": 26,
+            "fields": [
+              7
+            ]
+          },
+          {
+            "offset": -27,
+            "component": 27,
+            "fields": [
+              4,
+              15,
+              18,
+              25,
+              27,
+              33,
+              35,
+              41,
+              44,
+              51
+            ]
+          },
+          {
+            "offset": 144,
+            "component": 28,
+            "fields": [
+              14
+            ]
+          },
+          {
+            "offset": 152,
+            "component": 30,
+            "fields": [
+              2,
+              26,
+              31
+            ],
+            "extendedFields": [
+              58,
+              59,
+              60,
+              61,
+              62,
+              63
+            ]
+          }
+        ],
+        "events": [
+          {
+            "opcode": 9,
+            "name": "chat-string",
+            "confidence": "high"
+          },
+          {
+            "opcode": 11,
+            "name": "entity-time",
+            "confidence": "high"
+          },
+          {
+            "opcode": 14,
+            "name": "visual",
+            "confidence": "high",
+            "fields": [
+              "entity-handle",
+              "visual-index"
+            ]
+          },
+          {
+            "opcode": 2,
+            "name": "unreachable-2",
+            "confidence": "high"
+          },
+          {
+            "opcode": 3,
+            "name": "unreachable-3",
+            "confidence": "high"
+          },
+          {
+            "opcode": 4,
+            "name": "unreachable-4",
+            "confidence": "high"
+          },
+          {
+            "opcode": 5,
+            "name": "unreachable-5",
+            "confidence": "high"
+          },
+          {
+            "opcode": 6,
+            "name": "unreachable-6",
+            "confidence": "high"
+          },
+          {
+            "opcode": 7,
+            "name": "unreachable-7",
+            "confidence": "high"
+          },
+          {
+            "opcode": 8,
+            "name": "unreachable-8",
+            "confidence": "high"
+          },
+          {
+            "opcode": 10,
+            "name": "unreachable-10",
+            "confidence": "high"
+          },
+          {
+            "opcode": 12,
+            "name": "unreachable-12",
+            "confidence": "high"
+          },
+          {
+            "opcode": 13,
+            "name": "unreachable-13",
+            "confidence": "high"
+          }
+        ]
+      }
+    },
+    "constants": {
+      "maxInputPacketBytes": 65536,
+      "outputQueueCapacity": 16,
+      "packetHeaderBytes": 16,
+      "inlinePayloadBytes": 4096,
+      "packetLengthOffset": 4,
+      "heapPayloadOffset": 12,
+      "inlinePayloadOffset": 16,
+      "inputXorKeyBytes": 256,
+      "snapshotXorKeyBytes": 256,
+      "maxVarintBytes": 5,
+      "snapshotType": 1,
+      "eventType": 5,
+      "componentCount": 30,
+      "sparseFieldCount": 63,
+      "denseGroupCount": 19,
+      "denseComponent30ExtraFields": 6,
+      "entityFlagsXor": 54,
+      "componentDeltaXor": 1,
+      "entityIndexMask": 16383,
+      "entityGenerationShift": 14,
+      "domainKindField": 26
+    },
+    "fields": [
+      {
+        "id": 1,
+        "type": "byte",
+        "component": {
+          "constructor": 478,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 2,
+        "type": "byte",
+        "component": {
+          "constructor": 491,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 3,
+        "type": "handleArray",
+        "component": {
+          "constructor": 477,
+          "offset": 8
+        },
+        "indexed": {
+          "element": "reference",
+          "count": 10
+        },
+        "denseType": "handleArray10"
+      },
+      {
+        "id": 4,
+        "type": "string",
+        "component": {
+          "constructor": 0,
+          "offset": 8
+        },
+        "indexed": {
+          "element": "string",
+          "count": 1
+        },
+        "denseType": "string"
+      },
+      {
+        "id": 5,
+        "type": "interpolatedFloat",
+        "component": {
+          "constructor": 478,
+          "offset": 16
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 6,
+        "type": "string",
+        "component": {
+          "constructor": 478,
+          "offset": 40
+        },
+        "denseType": "string"
+      },
+      {
+        "id": 7,
+        "type": "interpolatedFloat",
+        "component": {
+          "constructor": 467,
+          "offset": 8
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 8,
+        "type": "angleRaw16",
+        "component": {
+          "constructor": 609,
+          "offset": 8
+        },
+        "denseType": "angle"
+      },
+      {
+        "id": 9,
+        "type": "byte",
+        "component": {
+          "constructor": 755,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 10,
+        "type": "stringArray",
+        "component": {
+          "constructor": 477,
+          "offset": 88
+        },
+        "indexed": {
+          "element": "string",
+          "count": 10
+        },
+        "denseType": "stringArray10"
+      },
+      {
+        "id": 11,
+        "type": "byte",
+        "component": {
+          "constructor": 477,
+          "offset": 248
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 12,
+        "type": "byte",
+        "component": {
+          "constructor": 477,
+          "offset": 249
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 13,
+        "type": "interpolatedFloat",
+        "component": {
+          "constructor": 0,
+          "offset": 8
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 14,
+        "type": "byte",
+        "component": {
+          "constructor": 756,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 15,
+        "type": "varint",
+        "component": {
+          "constructor": 0,
+          "offset": 24
+        },
+        "denseType": "varint"
+      },
+      {
+        "id": 16,
+        "type": "byteArray",
+        "component": {
+          "constructor": 478,
+          "offset": 52
+        },
+        "indexed": {
+          "element": "byte",
+          "count": 10
+        },
+        "denseType": "byteArray10"
+      },
+      {
+        "id": 17,
+        "type": "byte",
+        "component": {
+          "constructor": 549,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 18,
+        "type": "double",
+        "component": {
+          "constructor": 0,
+          "offset": 32
+        },
+        "denseType": "f64"
+      },
+      {
+        "id": 19,
+        "type": "float",
+        "component": {
+          "constructor": 477,
+          "offset": 252
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 20,
+        "type": "byte",
+        "component": {
+          "constructor": 478,
+          "offset": 104
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 21,
+        "type": "float",
+        "component": {
+          "constructor": 478,
+          "offset": 108
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 22,
+        "type": "byte",
+        "component": {
+          "constructor": 670,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 23,
+        "type": "reference",
+        "component": {
+          "constructor": 0,
+          "offset": 8
+        },
+        "denseType": "reference"
+      },
+      {
+        "id": 24,
+        "type": "interpolatedFloat",
+        "component": {
+          "constructor": 478,
+          "offset": 112
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 25,
+        "type": "stringArray",
+        "component": {
+          "constructor": 0,
+          "offset": 40
+        },
+        "indexed": {
+          "element": "string",
+          "count": 1
+        },
+        "denseType": "string"
+      },
+      {
+        "id": 26,
+        "type": "byte",
+        "component": {
+          "constructor": 491,
+          "offset": 9
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 27,
+        "type": "specialFloat",
+        "component": {
+          "constructor": 0,
+          "offset": 56
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 28,
+        "type": "interpolatedFloat",
+        "component": {
+          "constructor": 609,
+          "offset": 40
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 29,
+        "type": "bit",
+        "component": {
+          "constructor": 533,
+          "offset": 8
+        },
+        "denseType": "bit"
+      },
+      {
+        "id": 30,
+        "type": "varint",
+        "component": {
+          "constructor": 477,
+          "offset": 256
+        },
+        "denseType": "varint"
+      },
+      {
+        "id": 31,
+        "type": "byte",
+        "component": {
+          "constructor": 491,
+          "offset": 10
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 32,
+        "type": "float",
+        "component": {
+          "constructor": 478,
+          "offset": 136
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 33,
+        "type": "bit",
+        "component": {
+          "constructor": 0,
+          "offset": 60
+        },
+        "indexed": {
+          "element": "bit",
+          "count": 1
+        },
+        "denseType": "bit"
+      },
+      {
+        "id": 34,
+        "type": "byte",
+        "component": {
+          "constructor": 478,
+          "offset": 140
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 35,
+        "type": "double",
+        "component": {
+          "constructor": 0,
+          "offset": 72
+        },
+        "indexed": {
+          "element": "f64",
+          "count": 1
+        },
+        "denseType": "f64"
+      },
+      {
+        "id": 36,
+        "type": "byte",
+        "component": {
+          "constructor": 493,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 37,
+        "type": "bit",
+        "component": {
+          "constructor": 0,
+          "offset": 32
+        },
+        "denseType": "bit"
+      },
+      {
+        "id": 38,
+        "type": "byte",
+        "component": {
+          "constructor": 809,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 39,
+        "type": "varintArray",
+        "component": {
+          "constructor": 477,
+          "offset": 260
+        },
+        "indexed": {
+          "element": "varint",
+          "count": 10
+        },
+        "denseType": "varintArray10"
+      },
+      {
+        "id": 40,
+        "type": "bit",
+        "component": {
+          "constructor": 533,
+          "offset": 9
+        },
+        "denseType": "bit"
+      },
+      {
+        "id": 41,
+        "type": "varint",
+        "component": {
+          "constructor": 0,
+          "offset": 88
+        },
+        "denseType": "varint"
+      },
+      {
+        "id": 42,
+        "type": "float",
+        "component": {
+          "constructor": 477,
+          "offset": 340
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 43,
+        "type": "byte",
+        "component": {
+          "constructor": 757,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 44,
+        "type": "varint",
+        "component": {
+          "constructor": 0,
+          "offset": 92
+        },
+        "denseType": "varint"
+      },
+      {
+        "id": 45,
+        "type": "specialFloat",
+        "component": {
+          "constructor": 477,
+          "offset": 344
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 46,
+        "type": "byte",
+        "component": {
+          "constructor": 477,
+          "offset": 352
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 47,
+        "type": "byte",
+        "component": {
+          "constructor": 478,
+          "offset": 141
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 48,
+        "type": "string",
+        "component": {
+          "constructor": 677,
+          "offset": 8
+        },
+        "denseType": "string"
+      },
+      {
+        "id": 49,
+        "type": "interpolatedFloat",
+        "component": {
+          "constructor": 609,
+          "offset": 64
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 50,
+        "type": "byte",
+        "component": {
+          "constructor": 758,
+          "offset": 8
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 51,
+        "type": "varint",
+        "component": {
+          "constructor": 0,
+          "offset": 96
+        },
+        "denseType": "varint"
+      },
+      {
+        "id": 52,
+        "type": "varint",
+        "component": {
+          "constructor": 477,
+          "offset": 356
+        },
+        "denseType": "varint"
+      },
+      {
+        "id": 53,
+        "type": "float",
+        "component": {
+          "constructor": 458,
+          "offset": 8
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 54,
+        "type": "byte",
+        "component": {
+          "constructor": 670,
+          "offset": 9
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 55,
+        "type": "float",
+        "component": {
+          "constructor": 458,
+          "offset": 12
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 56,
+        "type": "reference",
+        "component": {
+          "constructor": 478,
+          "offset": 144
+        },
+        "denseType": "reference"
+      },
+      {
+        "id": 57,
+        "type": "reference",
+        "component": {
+          "constructor": 0,
+          "offset": 20
+        },
+        "denseType": "reference"
+      },
+      {
+        "id": 58,
+        "type": "varint",
+        "component": {
+          "constructor": 491,
+          "offset": 12
+        },
+        "denseType": "varint"
+      },
+      {
+        "id": 59,
+        "type": "interpolatedFloat",
+        "component": {
+          "constructor": 491,
+          "offset": 16
+        },
+        "denseType": "f32"
+      },
+      {
+        "id": 60,
+        "type": "byteArray",
+        "component": {
+          "constructor": 491,
+          "offset": 40
+        },
+        "indexed": {
+          "element": "byte",
+          "count": 16
+        },
+        "denseType": "byteArray16"
+      },
+      {
+        "id": 61,
+        "type": "shortArray",
+        "component": {
+          "constructor": 491,
+          "offset": 120
+        },
+        "indexed": {
+          "element": "short",
+          "count": 8
+        },
+        "denseType": "shortArray8"
+      },
+      {
+        "id": 62,
+        "type": "byte",
+        "component": {
+          "constructor": 491,
+          "offset": 168
+        },
+        "denseType": "byte"
+      },
+      {
+        "id": 63,
+        "type": "byte",
+        "component": {
+          "constructor": 491,
+          "offset": 169
+        },
+        "denseType": "byte"
+      }
+    ],
+    "denseGroups": [
+      {
+        "offset": 52,
+        "component": 1,
+        "fields": [
+          22,
+          54
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 22,
+            "type": "byte"
+          },
+          {
+            "field": 54,
+            "type": "byte"
+          }
+        ]
+      },
+      {
+        "offset": 56,
+        "component": 2,
+        "fields": [
+          36
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 36,
+            "type": "byte"
+          }
+        ]
+      },
+      {
+        "offset": 68,
+        "component": 5,
+        "fields": [
+          9
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 9,
+            "type": "byte"
+          }
+        ]
+      },
+      {
+        "offset": 72,
+        "component": 6,
+        "fields": [
+          1,
+          5,
+          6,
+          16,
+          20,
+          21,
+          24,
+          32,
+          34,
+          47,
+          56
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 1,
+            "type": "byte"
+          },
+          {
+            "field": 5,
+            "type": "f32"
+          },
+          {
+            "field": 6,
+            "type": "string"
+          },
+          {
+            "field": 16,
+            "type": "byteArray10"
+          },
+          {
+            "field": 20,
+            "type": "byte"
+          },
+          {
+            "field": 21,
+            "type": "f32"
+          },
+          {
+            "field": 24,
+            "type": "f32"
+          },
+          {
+            "field": 32,
+            "type": "f32"
+          },
+          {
+            "field": 34,
+            "type": "byte"
+          },
+          {
+            "field": 47,
+            "type": "byte"
+          },
+          {
+            "field": 56,
+            "type": "reference"
+          }
+        ]
+      },
+      {
+        "offset": 76,
+        "component": 7,
+        "fields": [
+          50
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 50,
+            "type": "byte"
+          }
+        ]
+      },
+      {
+        "offset": -8,
+        "component": 8,
+        "fields": [
+          13,
+          37
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 13,
+            "type": "f32"
+          },
+          {
+            "field": 37,
+            "type": "bit"
+          }
+        ]
+      },
+      {
+        "offset": 84,
+        "component": 10,
+        "fields": [
+          17
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 17,
+            "type": "byte"
+          }
+        ]
+      },
+      {
+        "offset": 100,
+        "component": 14,
+        "fields": [
+          43
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 43,
+            "type": "byte"
+          }
+        ]
+      },
+      {
+        "offset": -15,
+        "component": 15,
+        "fields": [
+          23,
+          57
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 23,
+            "type": "reference"
+          },
+          {
+            "field": 57,
+            "type": "reference"
+          }
+        ]
+      },
+      {
+        "offset": -16,
+        "component": 16,
+        "fields": [
+          3,
+          10,
+          11,
+          12,
+          19,
+          30,
+          39,
+          42,
+          45,
+          46,
+          52
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 3,
+            "type": "handleArray10"
+          },
+          {
+            "field": 10,
+            "type": "stringArray10"
+          },
+          {
+            "field": 11,
+            "type": "byte"
+          },
+          {
+            "field": 12,
+            "type": "byte"
+          },
+          {
+            "field": 19,
+            "type": "f32"
+          },
+          {
+            "field": 30,
+            "type": "varint"
+          },
+          {
+            "field": 39,
+            "type": "varintArray10"
+          },
+          {
+            "field": 42,
+            "type": "f32"
+          },
+          {
+            "field": 45,
+            "type": "f32"
+          },
+          {
+            "field": 46,
+            "type": "byte"
+          },
+          {
+            "field": 52,
+            "type": "varint"
+          }
+        ]
+      },
+      {
+        "offset": 112,
+        "component": 19,
+        "fields": [
+          48
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 48,
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "offset": 116,
+        "component": 20,
+        "fields": [
+          53,
+          55
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 53,
+            "type": "f32"
+          },
+          {
+            "field": 55,
+            "type": "f32"
+          }
+        ]
+      },
+      {
+        "offset": 120,
+        "component": 21,
+        "fields": [
+          8,
+          28,
+          49
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 8,
+            "type": "angle"
+          },
+          {
+            "field": 28,
+            "type": "f32"
+          },
+          {
+            "field": 49,
+            "type": "f32"
+          }
+        ]
+      },
+      {
+        "offset": 124,
+        "component": 22,
+        "fields": [
+          29,
+          40
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 29,
+            "type": "bit"
+          },
+          {
+            "field": 40,
+            "type": "bit"
+          }
+        ]
+      },
+      {
+        "offset": 136,
+        "component": 25,
+        "fields": [
+          38
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 38,
+            "type": "byte"
+          }
+        ]
+      },
+      {
+        "offset": 140,
+        "component": 26,
+        "fields": [
+          7
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 7,
+            "type": "f32"
+          }
+        ]
+      },
+      {
+        "offset": -27,
+        "component": 27,
+        "fields": [
+          4,
+          15,
+          18,
+          25,
+          27,
+          33,
+          35,
+          41,
+          44,
+          51
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 4,
+            "type": "string"
+          },
+          {
+            "field": 15,
+            "type": "varint"
+          },
+          {
+            "field": 18,
+            "type": "f64"
+          },
+          {
+            "field": 25,
+            "type": "string"
+          },
+          {
+            "field": 27,
+            "type": "f32"
+          },
+          {
+            "field": 33,
+            "type": "bit"
+          },
+          {
+            "field": 35,
+            "type": "f64"
+          },
+          {
+            "field": 41,
+            "type": "varint"
+          },
+          {
+            "field": 44,
+            "type": "varint"
+          },
+          {
+            "field": 51,
+            "type": "varint"
+          }
+        ]
+      },
+      {
+        "offset": 144,
+        "component": 28,
+        "fields": [
+          14
+        ],
+        "extendedFields": [],
+        "specs": [
+          {
+            "field": 14,
+            "type": "byte"
+          }
+        ]
+      },
+      {
+        "offset": 152,
+        "component": 30,
+        "fields": [
+          2,
+          26,
+          31
+        ],
+        "extendedFields": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+        ],
+        "specs": [
+          {
+            "field": 2,
+            "type": "byte"
+          },
+          {
+            "field": 26,
+            "type": "byte"
+          },
+          {
+            "field": 31,
+            "type": "byte"
+          },
+          {
+            "field": 58,
+            "type": "varint"
+          },
+          {
+            "field": 59,
+            "type": "f32"
+          },
+          {
+            "field": 60,
+            "type": "byteArray16"
+          },
+          {
+            "field": 61,
+            "type": "shortArray8"
+          },
+          {
+            "field": 62,
+            "type": "byte"
+          },
+          {
+            "field": 63,
+            "type": "byte"
+          }
+        ]
+      }
+    ],
+    "sparseModes": {
+      "nativeSparse": {
+        "packetFormat": "archived-client",
+        "fieldDeltaXor": 1,
+        "indexDeltaXor": 1,
+        "fieldTerminator": 1,
+        "indexTerminator": 1,
+        "field26Role": "player-model",
+        "fields": [
+          {
+            "field": 1,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 2,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 3,
+            "encoding": "indexed-update",
+            "valueType": "reference"
+          },
+          {
+            "field": 4,
+            "encoding": "indexed-update",
+            "valueType": "string"
+          },
+          {
+            "field": 5,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 6,
+            "encoding": "scalar",
+            "valueType": "string"
+          },
+          {
+            "field": 7,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 8,
+            "encoding": "scalar",
+            "valueType": "angle"
+          },
+          {
+            "field": 9,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 10,
+            "encoding": "indexed-update",
+            "valueType": "string"
+          },
+          {
+            "field": 11,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 12,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 13,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 14,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 15,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 16,
+            "encoding": "indexed-update",
+            "valueType": "byte"
+          },
+          {
+            "field": 17,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 18,
+            "encoding": "scalar",
+            "valueType": "f64"
+          },
+          {
+            "field": 19,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 20,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 21,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 22,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 23,
+            "encoding": "scalar",
+            "valueType": "reference"
+          },
+          {
+            "field": 24,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 25,
+            "encoding": "indexed-update",
+            "valueType": "string"
+          },
+          {
+            "field": 26,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 27,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 28,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 29,
+            "encoding": "scalar",
+            "valueType": "bit"
+          },
+          {
+            "field": 30,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 31,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 32,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 33,
+            "encoding": "indexed-update",
+            "valueType": "bit"
+          },
+          {
+            "field": 34,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 35,
+            "encoding": "indexed-update",
+            "valueType": "f64"
+          },
+          {
+            "field": 36,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 37,
+            "encoding": "scalar",
+            "valueType": "bit"
+          },
+          {
+            "field": 38,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 39,
+            "encoding": "indexed-update",
+            "valueType": "varint"
+          },
+          {
+            "field": 40,
+            "encoding": "scalar",
+            "valueType": "bit"
+          },
+          {
+            "field": 41,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 42,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 43,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 44,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 45,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 46,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 47,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 48,
+            "encoding": "scalar",
+            "valueType": "string"
+          },
+          {
+            "field": 49,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 50,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 51,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 52,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 53,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 54,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 55,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 56,
+            "encoding": "scalar",
+            "valueType": "reference"
+          },
+          {
+            "field": 57,
+            "encoding": "scalar",
+            "valueType": "reference"
+          },
+          {
+            "field": 58,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 59,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 60,
+            "encoding": "indexed-update",
+            "valueType": "byte"
+          },
+          {
+            "field": 61,
+            "encoding": "indexed-update",
+            "valueType": "short"
+          },
+          {
+            "field": 62,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 63,
+            "encoding": "scalar",
+            "valueType": "byte"
+          }
+        ]
+      },
+      "domainSparse": {
+        "packetFormat": "domain-counted",
+        "fieldDeltaXor": 0,
+        "indexDeltaXor": 0,
+        "fieldTerminator": 0,
+        "indexTerminator": 0,
+        "field26Role": "entity-kind",
+        "fields": [
+          {
+            "field": 1,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 2,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 3,
+            "encoding": "indexed-update",
+            "valueType": "reference"
+          },
+          {
+            "field": 4,
+            "encoding": "scalar",
+            "valueType": "string"
+          },
+          {
+            "field": 5,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 6,
+            "encoding": "scalar",
+            "valueType": "string"
+          },
+          {
+            "field": 7,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 8,
+            "encoding": "scalar",
+            "valueType": "angle"
+          },
+          {
+            "field": 9,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 10,
+            "encoding": "indexed-update",
+            "valueType": "string"
+          },
+          {
+            "field": 11,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 12,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 13,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 14,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 15,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 16,
+            "encoding": "indexed-update",
+            "valueType": "byte"
+          },
+          {
+            "field": 17,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 18,
+            "encoding": "scalar",
+            "valueType": "f64"
+          },
+          {
+            "field": 19,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 20,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 21,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 22,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 23,
+            "encoding": "scalar",
+            "valueType": "reference"
+          },
+          {
+            "field": 24,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 25,
+            "encoding": "indexed-update",
+            "valueType": "string"
+          },
+          {
+            "field": 26,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 27,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 28,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 29,
+            "encoding": "scalar",
+            "valueType": "bit"
+          },
+          {
+            "field": 30,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 31,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 32,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 33,
+            "encoding": "scalar",
+            "valueType": "bit"
+          },
+          {
+            "field": 34,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 35,
+            "encoding": "scalar",
+            "valueType": "f64"
+          },
+          {
+            "field": 36,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 37,
+            "encoding": "scalar",
+            "valueType": "bit"
+          },
+          {
+            "field": 38,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 39,
+            "encoding": "indexed-update",
+            "valueType": "varint"
+          },
+          {
+            "field": 40,
+            "encoding": "scalar",
+            "valueType": "bit"
+          },
+          {
+            "field": 41,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 42,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 43,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 44,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 45,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 46,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 47,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 48,
+            "encoding": "scalar",
+            "valueType": "string"
+          },
+          {
+            "field": 49,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 50,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 51,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 52,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 53,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 54,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 55,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 56,
+            "encoding": "scalar",
+            "valueType": "reference"
+          },
+          {
+            "field": 57,
+            "encoding": "scalar",
+            "valueType": "reference"
+          },
+          {
+            "field": 58,
+            "encoding": "scalar",
+            "valueType": "varint"
+          },
+          {
+            "field": 59,
+            "encoding": "scalar",
+            "valueType": "f32"
+          },
+          {
+            "field": 60,
+            "encoding": "indexed-update",
+            "valueType": "byte"
+          },
+          {
+            "field": 61,
+            "encoding": "indexed-update",
+            "valueType": "short"
+          },
+          {
+            "field": 62,
+            "encoding": "scalar",
+            "valueType": "byte"
+          },
+          {
+            "field": 63,
+            "encoding": "scalar",
+            "valueType": "byte"
+          }
+        ]
+      }
+    }
+  }
+}

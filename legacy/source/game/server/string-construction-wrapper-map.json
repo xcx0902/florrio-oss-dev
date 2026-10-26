@@ -1,0 +1,76 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-construction-wrapper.mjs",
+  "implementationSha256": "54d26aced6565d71b8777f78aea2b9b8aba94aef4006509b55f486adf66e5d8b",
+  "factory": "createStringConstructionWrapperHooks",
+  "functionIds": [
+    200,
+    382
+  ],
+  "functions": [
+    {
+      "id": 200,
+      "name": "constructStringFromCString",
+      "originalSymbol": "function_200",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-construction-wrapper.mjs",
+          "line": 11
+        },
+        "test": "test/server-string-construction-wrapper.test.mjs"
+      },
+      "originalDirectDependencies": [
+        204
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Measures NUL-terminated text then calls the length-aware libc++ string constructor 204."
+    },
+    {
+      "id": 382,
+      "name": "encodeUtf8IfPresent",
+      "originalSymbol": "function_382",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/string-construction-wrapper.mjs",
+          "line": 19
+        },
+        "test": "test/server-string-construction-wrapper.test.mjs"
+      },
+      "originalDirectDependencies": [
+        124
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Returns 0 for a null destination, otherwise forwards to UTF-8 encoder 124."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-construction-wrapper.test.mjs",
+    "report": "reports/server-string-construction-wrapper-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 29,
+    "completeLinearMemoryChecks": 29,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 29,
+    "trappingComparisons": 0,
+    "comparison": "9 C-string lengths for 200 and 10 code points x null/present for 382 compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Behavior delegates to native 204 and 124; the latter also has a recovered hook.",
+      "Ledger: 356 server bodies recovered and 378 remain machine code."
+    ]
+  }
+}

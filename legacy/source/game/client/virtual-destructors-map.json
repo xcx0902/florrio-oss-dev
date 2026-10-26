@@ -1,0 +1,195 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/virtual-destructors.mjs",
+  "implementationSha256": "66973b6cf193401532da2a77ee9f1bb5b691caa97f301685b7fb3f868190082b",
+  "factory": "createVirtualDestructorHooks",
+  "functionIds": [
+    2413,
+    2419,
+    2435,
+    2459,
+    2466,
+    2472,
+    578
+  ],
+  "functions": [
+    {
+      "id": 2413,
+      "name": "virtualDestructor2413",
+      "originalSymbol": "function_2413",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/virtual-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-virtual-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Publishes the vtable, invokes cleanup slot 4 or 5 and frees the record."
+    },
+    {
+      "id": 2419,
+      "name": "virtualDestructor2419",
+      "originalSymbol": "function_2419",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/virtual-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-virtual-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Publishes the vtable, invokes cleanup slot 4 or 5 and frees the record."
+    },
+    {
+      "id": 2435,
+      "name": "virtualDestructor2435",
+      "originalSymbol": "function_2435",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/virtual-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-virtual-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Publishes the vtable, invokes cleanup slot 4 or 5 and frees the record."
+    },
+    {
+      "id": 2459,
+      "name": "virtualDestructor2459",
+      "originalSymbol": "function_2459",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/virtual-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-virtual-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Publishes the vtable, invokes cleanup slot 4 or 5 and frees the record."
+    },
+    {
+      "id": 2466,
+      "name": "virtualDestructor2466",
+      "originalSymbol": "function_2466",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/virtual-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-virtual-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Publishes the vtable, invokes cleanup slot 4 or 5 and frees the record."
+    },
+    {
+      "id": 2472,
+      "name": "virtualDestructor2472",
+      "originalSymbol": "function_2472",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/virtual-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-virtual-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Publishes the vtable, invokes cleanup slot 4 or 5 and frees the record."
+    },
+    {
+      "id": 578,
+      "name": "virtualDestructor578",
+      "originalSymbol": "function_578",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/virtual-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-virtual-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Invokes cleanup slot 4 or 5 without publishing a vtable, then frees."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-virtual-destructors.test.mjs",
+    "report": "reports/client-virtual-destructors-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 7,
+    "completeLinearMemoryChecks": 6,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "Null-buffer fixtures for seven destructors compare trap parity and complete memory.",
+    "limitations": [
+      "The virtual cleanup slot is not exercised by the null fixture. Ledger: 670 client and 512 server bodies recovered."
+    ]
+  }
+}

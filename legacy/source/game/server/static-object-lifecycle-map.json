@@ -1,0 +1,402 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/static-object-lifecycle.mjs",
+  "implementationSha256": "782a59c433d2f11089ef5a72302faf5d7c286b8175fd2dfb96c5e3ec190af14d",
+  "factory": "createStaticObjectLifecycleHooks",
+  "functionIds": [
+    516,
+    517,
+    518,
+    520,
+    521,
+    522,
+    523,
+    524,
+    525,
+    526,
+    527
+  ],
+  "functions": [
+    {
+      "id": 516,
+      "name": "staticObjectHelper516",
+      "originalSymbol": "function_516",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119246
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy 12-byte array 8571304\u21928571136 with original 37."
+    },
+    {
+      "id": 517,
+      "name": "staticObjectHelper517",
+      "originalSymbol": "function_517",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119258
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy 12-byte array 8571904\u21928571616."
+    },
+    {
+      "id": 518,
+      "name": "staticObjectHelper518",
+      "originalSymbol": "function_518",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119270
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy 12-byte array 8571976\u21928571952."
+    },
+    {
+      "id": 520,
+      "name": "staticObjectHelper520",
+      "originalSymbol": "function_520",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119282
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy single object 8570876."
+    },
+    {
+      "id": 521,
+      "name": "staticObjectHelper521",
+      "originalSymbol": "function_521",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119287
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded lazy init of 8570876 from literal 13640."
+    },
+    {
+      "id": 522,
+      "name": "staticObjectHelper522",
+      "originalSymbol": "function_522",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119300
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy single object 8570844."
+    },
+    {
+      "id": 523,
+      "name": "staticObjectHelper523",
+      "originalSymbol": "function_523",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119305
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded lazy init of 8570844 from literal 13604."
+    },
+    {
+      "id": 524,
+      "name": "staticObjectHelper524",
+      "originalSymbol": "function_524",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119318
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy single object 8570940."
+    },
+    {
+      "id": 525,
+      "name": "staticObjectHelper525",
+      "originalSymbol": "function_525",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119323
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded lazy init of 8570940 from literal 13760."
+    },
+    {
+      "id": 526,
+      "name": "staticObjectHelper526",
+      "originalSymbol": "function_526",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119336
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroy single object 8570908."
+    },
+    {
+      "id": 527,
+      "name": "staticObjectHelper527",
+      "originalSymbol": "function_527",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119341
+        },
+        "source": {
+          "path": "source/game/server/static-object-lifecycle.mjs",
+          "line": 13
+        },
+        "test": "test/server-static-object-lifecycle.test.mjs"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        37,
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Guarded lazy init of 8570908 from literal 13676."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap reports/server-static-object-lifecycle.test.mjs",
+    "report": "reports/server-static-object-lifecycle-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 180,
+    "completeLinearMemoryChecks": 180,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 180,
+    "trappingComparisons": 0,
+    "comparison": "Each case compares result, complete memory and stack pointer.",
+    "limitations": [
+      "Destructors and lazy initialization are delegated to native 31/32/37/131.",
+      "Ledger: 284 server bodies recovered and 450 remain machine code."
+    ]
+  }
+}

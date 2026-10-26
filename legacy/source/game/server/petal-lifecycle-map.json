@@ -1,0 +1,2054 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "scope": "All five remaining shared petal catalog virtual bodies plus complete orbit-index assignment (85) and petal component attachment (218).",
+  "coverage": {
+    "hooks": 7,
+    "distinctCatalogVirtualBodiesInThisModule": 5,
+    "distinctCatalogVirtualBodiesAcrossThreePetalModules": 57,
+    "relatedModules": [
+      "source/game/server/petals.mjs",
+      "source/game/server/petals-special.mjs",
+      "source/game/server/petal-lifecycle.mjs"
+    ],
+    "differentialValidation": {
+      "command": "node --test test/server-petal-lifecycle.test.mjs",
+      "testCases": 6,
+      "oracleComparisons": 1168,
+      "comparedMemoryBytesPerOracle": 67108864,
+      "comparesReturnValues": true,
+      "comparesTrapClasses": true,
+      "comparesStackPointer": true,
+      "comparesHostOrder": true,
+      "validatesTypedTableCalls": true,
+      "distinctSharedCatalogTableEntries": 42,
+      "orbitCatalogAndEntityStateComparisons": 1053
+    },
+    "limitations": [
+      "Free/malloc/memcpy remain original shared dependencies through runtime.call(14/16/15).",
+      "All57 catalog virtual bodies being covered is a bounded petal-method result, not complete server/game recovery.",
+      "Tests cover complete catalog types and all three-instance missing/entity/component state combinations, but do not prove all arbitrary corrupt or overlapping-memory states.",
+      "The original C++ class layout names are inferred from catalog and dataflow roles; this is equivalent source, not a claim to recover original identifiers."
+    ]
+  },
+  "sharedDependencies": [
+    {
+      "id": 14,
+      "name": "free",
+      "usedBy": [
+        22,
+        218
+      ]
+    },
+    {
+      "id": 15,
+      "name": "memcpy",
+      "usedBy": [
+        218
+      ]
+    },
+    {
+      "id": 16,
+      "name": "malloc",
+      "usedBy": [
+        218
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "id": 22,
+      "name": "deleteBehaviorObject",
+      "originalName": "deleteObject",
+      "signature": {
+        "parameters": [
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [
+        14
+      ],
+      "indirectDependencies": [],
+      "behavior": [
+        "Call free(14) with the object pointer; return void."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 4724,
+        "decompiled": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+        "catalogVirtualSlots": [
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 1,
+            "tableIndex": 100
+          },
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 1,
+            "tableIndex": 108
+          },
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 1,
+            "tableIndex": 111
+          },
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 114
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 1,
+            "tableIndex": 117
+          },
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 1,
+            "tableIndex": 118
+          },
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 1,
+            "tableIndex": 121
+          },
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 1,
+            "tableIndex": 124
+          },
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 136
+          },
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 139
+          },
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 142
+          },
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 153
+          },
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 164
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 169
+          },
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 172
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 1,
+            "tableIndex": 108
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 108
+          },
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 175
+          },
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 178
+          },
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 181
+          },
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 190
+          },
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 193
+          },
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 1,
+            "tableIndex": 196
+          },
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 199
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 1,
+            "tableIndex": 202
+          },
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 203
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 1,
+            "tableIndex": 121
+          },
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 206
+          },
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 209
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 1,
+            "tableIndex": 209
+          },
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 217
+          },
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 1,
+            "tableIndex": 223
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 1,
+            "tableIndex": 164
+          },
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 1,
+            "tableIndex": 226
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 1,
+            "tableIndex": 237
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 1,
+            "tableIndex": 238
+          },
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 239
+          },
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 1,
+            "tableIndex": 242
+          }
+        ]
+      }
+    },
+    {
+      "id": 85,
+      "name": "assignPetalOrbitIndices",
+      "originalName": "function_85",
+      "signature": {
+        "parameters": [
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [],
+      "indirectDependencies": [],
+      "behavior": [
+        "Visit all eight loadout slots, skipping type0/out-of-range and flag40 definitions.",
+        "Ungrouped instances receive consecutive indices; absent handles reserve configured positions, while entities without petal components do not.",
+        "Flag41 groups share a single index across up to three instances and advance once when any configured or present instance uses the position.",
+        "Write +292 when reaching the unlocked slot boundary selected by level byte +148 (5 below15,6 below30,7 below45,8 otherwise).",
+        "Preserve u8 truncation for index stores and all artifact load/store order within valid layouts."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 18157,
+        "decompiled": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+        "catalogVirtualSlots": []
+      }
+    },
+    {
+      "id": 98,
+      "name": "behaviorIdentity",
+      "originalName": "BasicR0PetalVirtualSlot0",
+      "signature": {
+        "parameters": [
+          "i32"
+        ],
+        "results": [
+          "i32"
+        ]
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [],
+      "indirectDependencies": [],
+      "behavior": [
+        "Return the original i32 argument unchanged."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 20982,
+        "decompiled": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+        "catalogVirtualSlots": [
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          },
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 0,
+            "tableIndex": 99
+          }
+        ]
+      }
+    },
+    {
+      "id": 152,
+      "name": "ignoreThreeArguments",
+      "originalName": "noopThreeArgs",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [],
+      "indirectDependencies": [],
+      "behavior": [
+        "Empty body; retain the three-i32 void signature."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 32773,
+        "decompiled": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+        "catalogVirtualSlots": [
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 145
+          },
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 167
+          },
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 4,
+            "tableIndex": 167
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          },
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 4,
+            "tableIndex": 103
+          },
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 6,
+            "tableIndex": 105
+          },
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 8,
+            "tableIndex": 107
+          }
+        ]
+      }
+    },
+    {
+      "id": 171,
+      "name": "ignoreTwoArguments",
+      "originalName": "noopTwoArgs",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [],
+      "indirectDependencies": [],
+      "behavior": [
+        "Empty body; retain the two-i32 void signature."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 36900,
+        "decompiled": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+        "catalogVirtualSlots": [
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          },
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 7,
+            "tableIndex": 106
+          }
+        ]
+      }
+    },
+    {
+      "id": 218,
+      "name": "attachPetalSlot",
+      "originalName": "function_218",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [
+        14,
+        15,
+        16
+      ],
+      "indirectDependencies": [],
+      "behavior": [
+        "Set entity flag92 bit64 and clear both cached replicated packets.",
+        "Set normal/alternate/initial replication epochs from world+2140.",
+        "Append the petal component to world vector at +300/+304/+308, retaining allocator and memcpy/free order when capacity grows.",
+        "Update entity+304/+308 revision stamps, clear both packet caches again, then update normal/alternate epochs."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 51948,
+        "decompiled": "source/decompiled/sp_server/functions-0192-0255.dcmp",
+        "catalogVirtualSlots": []
+      }
+    },
+    {
+      "id": 281,
+      "name": "ignoreFourArguments",
+      "originalName": "noopFourArgs",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32",
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [],
+      "indirectDependencies": [],
+      "behavior": [
+        "Empty body; retain the four-i32 void signature."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 67143,
+        "decompiled": "source/decompiled/sp_server/functions-0256-0319.dcmp",
+        "catalogVirtualSlots": [
+          {
+            "typeId": 1,
+            "name": "Basic",
+            "rarityIndex": 0,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 2,
+            "name": "Fast",
+            "rarityIndex": 0,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 3,
+            "name": "Heavy",
+            "rarityIndex": 0,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 4,
+            "name": "Rock",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 5,
+            "name": "Square",
+            "rarityIndex": 5,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 6,
+            "name": "Rose",
+            "rarityIndex": 1,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 7,
+            "name": "Stinger",
+            "rarityIndex": 1,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 8,
+            "name": "Iris",
+            "rarityIndex": 1,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 9,
+            "name": "Wing",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 10,
+            "name": "Missile",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 13,
+            "name": "Cactus",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 168
+          },
+          {
+            "typeId": 14,
+            "name": "Faster",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 15,
+            "name": "Rose",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 16,
+            "name": "Twin",
+            "rarityIndex": 1,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 17,
+            "name": "Triplet",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 18,
+            "name": "Bubble",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 19,
+            "name": "Pollen",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 20,
+            "name": "Dandelion",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 24,
+            "name": "Rose",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 25,
+            "name": "Antennae",
+            "rarityIndex": 4,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 26,
+            "name": "Heaviest",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 27,
+            "name": "Stinger",
+            "rarityIndex": 4,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 28,
+            "name": "Yin Yang",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 31,
+            "name": "Honey",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 32,
+            "name": "Leaf",
+            "rarityIndex": 1,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 33,
+            "name": "Cactus",
+            "rarityIndex": 4,
+            "virtualSlot": 5,
+            "tableIndex": 168
+          },
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 35,
+            "name": "Basic",
+            "rarityIndex": 5,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 36,
+            "name": "Salt",
+            "rarityIndex": 2,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 37,
+            "name": "Rice",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          },
+          {
+            "typeId": 38,
+            "name": "Corn",
+            "rarityIndex": 3,
+            "virtualSlot": 5,
+            "tableIndex": 104
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/clock.mjs",
+  "factory": "createClockHooks",
+  "functionIds": [
+    21,
+    31,
+    32
+  ],
+  "functions": [
+    {
+      "id": 21,
+      "name": "readClock",
+      "originalSymbol": "readClock",
+      "signature": " (type $t0) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 4565
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 1322
+        },
+        "test": "test/server-clock.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "cxaGuardAcquire",
+        "emscriptenAsmConstInt",
+        "cxaGuardRelease",
+        "emscriptenAsmConstDouble"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 31,
+      "name": "releaseGuard",
+      "originalSymbol": "cxaGuardRelease",
+      "signature": " (type $t0) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 5953
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 1736
+        },
+        "test": "test/server-clock.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 32,
+      "name": "acquireGuard",
+      "originalSymbol": "cxaGuardAcquire",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 6006
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 1754
+        },
+        "test": "test/server-clock.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 3,
+    "oracleComparisons": 1250,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true
+  },
+  "limitations": [
+    "The clock-kind and timestamp host bridge remain explicit environment dependencies.",
+    "All second guard bytes and four representative first bytes are compared; arbitrary overlapping guard/stack locations are not proven."
+  ]
+}

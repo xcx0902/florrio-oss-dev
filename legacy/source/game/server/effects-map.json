@@ -1,0 +1,298 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "scope": "Complete remaining-lifetime, area effect payload ownership, deferred callback storage/pool/vector/swap service bodies; main world tick expiry and scheduler execution are outside this module.",
+  "coverage": {
+    "hooks": 6,
+    "differentialValidation": {
+      "command": "node --test test/server-effects.test.mjs",
+      "testCases": 9,
+      "oracleComparisons": 284,
+      "comparedMemoryBytesPerOracle": 67108864,
+      "comparesReturnValues": true,
+      "comparesTrapClasses": true,
+      "comparesStackPointer": true,
+      "comparesHostAndDeclaredCallbackOrder": true,
+      "actualPeasCallbacks": true,
+      "actualAllocatorExhaustion": true
+    },
+    "limitations": [
+      "The full main spServerThink body, including when callbacks execute and effects are removed on expiry, remains outside this module.",
+      "Clock read21, free14, memcpy15, malloc16, operatorNewOrAbort20 and native length-error58 remain explicit shared dependencies.",
+      "Typed callback targets are retained table dispatch, allowing separately recovered virtual bodies to be used by the registry.",
+      "Synthetic inline callbacks and a destructor-induced replacement fixture are declared test substitutions; the actual Peas fixture uses the shipped factory/launch callbacks.",
+      "Tests are bounded evidence, not a proof for every arbitrary overlapping or corrupt memory arrangement.",
+      "The invalid-clock lifetime branch is statically recovered; ordinary retained readClock returns a valid clock, so that branch is not separately forced in the differential tests."
+    ]
+  },
+  "poolLayout": {
+    "used": 8548308,
+    "blockCount": 8548312,
+    "blockCapacity": 8548316,
+    "blockItems": 8548320,
+    "freeCount": 8548324,
+    "freeCapacity": 8548328,
+    "freeItems": 8548332,
+    "slotBytes": 40,
+    "slotsPerBlock": 4096,
+    "blockBytes": 163840,
+    "freeOrder": "maximum unsigned address first"
+  },
+  "functions": [
+    {
+      "id": 118,
+      "name": "remainingEffectLifetime",
+      "originalName": "function_118",
+      "signature": {
+        "parameters": [
+          "i32"
+        ],
+        "results": [
+          "f32"
+        ]
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [
+        21
+      ],
+      "intraModuleDependencies": [],
+      "hostDependencies": [],
+      "indirectDependencies": [],
+      "behavior": [
+        "Allocate a16-byte original stack frame and invoke the original readClock service.",
+        "Return +Infinity for an untimed effect, -Infinity when a timed effect has no valid clock, otherwise f32(expiryF64-nowF64).",
+        "Restore stack only on normal return; a trap retains its active frame."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 25659,
+        "decompiled": "source/decompiled/sp_server/functions-0064-0127.dcmp"
+      }
+    },
+    {
+      "id": 150,
+      "name": "releaseDeferredSlot",
+      "originalName": "function_150",
+      "signature": {
+        "parameters": [
+          "i32"
+        ],
+        "results": [
+          "i32"
+        ]
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [
+        14,
+        15,
+        16
+      ],
+      "intraModuleDependencies": [],
+      "hostDependencies": [],
+      "indirectDependencies": [
+        {
+          "slot": 4,
+          "role": "destroy inline callback",
+          "signature": {
+            "parameters": [
+              "i32"
+            ],
+            "results": []
+          }
+        },
+        {
+          "slot": 5,
+          "role": "destroy external callback",
+          "signature": {
+            "parameters": [
+              "i32"
+            ],
+            "results": []
+          }
+        }
+      ],
+      "behavior": [
+        "Move the slot pointer from its unique holder, zeroing the holder before callback destruction.",
+        "Destroy inline callbacks through vtable slot4 and external callbacks through slot5.",
+        "Append the40-byte slot address to the global free max-heap and sift upward with unsigned address comparisons.",
+        "Retain slot bytes after callback destruction; return the holder address."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 32266,
+        "decompiled": "source/decompiled/sp_server/functions-0128-0191.dcmp"
+      }
+    },
+    {
+      "id": 271,
+      "name": "replaceAreaEffect",
+      "originalName": "function_271",
+      "signature": {
+        "parameters": [
+          "i32",
+          "f32",
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [
+        14,
+        15,
+        16
+      ],
+      "intraModuleDependencies": [],
+      "hostDependencies": [],
+      "indirectDependencies": [
+        {
+          "slot": 1,
+          "role": "destroy previous area payload",
+          "signature": {
+            "parameters": [
+              "i32"
+            ],
+            "results": []
+          }
+        }
+      ],
+      "behavior": [
+        "Store intensity as f32 and visit the intrusive tracked-target handle vector.",
+        "Replace an existing shared area payload in each target effect pointer vector; append when there was no previous payload; remove by replacing with last when clearing.",
+        "Preserve the original end write/length decrement if a malformed target vector lacks the previous payload.",
+        "Move incoming ownership into the area, destroy the previous payload through vtable slot1, then reread the installed payload after that callback.",
+        "When no payload remains, unlink every tracked handle, free the handle vector, and zero its count/capacity/items fields."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 64107,
+        "decompiled": "source/decompiled/sp_server/functions-0256-0319.dcmp"
+      }
+    },
+    {
+      "id": 275,
+      "name": "growDeferredVector",
+      "originalName": "function_275",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [
+        14,
+        20,
+        58
+      ],
+      "intraModuleDependencies": [
+        150
+      ],
+      "hostDependencies": [
+        {
+          "module": "a",
+          "field": "f",
+          "role": "abort followed by unreachable for capacity overflow"
+        }
+      ],
+      "indirectDependencies": [],
+      "behavior": [
+        "Apply the original owned-vector capacity and overflow policy.",
+        "Allocate through operatorNewOrAbort; transfer the incoming unique slot pointer and zero its source.",
+        "Move old vector entries backward in original order; replace vector pointers; destroy moved-from entries through recovered func150; free the old allocation."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 64789,
+        "decompiled": "source/decompiled/sp_server/functions-0256-0319.dcmp"
+      }
+    },
+    {
+      "id": 276,
+      "name": "swapDeferredCallbacks",
+      "originalName": "function_276",
+      "signature": {
+        "parameters": [
+          "i32",
+          "i32"
+        ],
+        "results": []
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [],
+      "intraModuleDependencies": [],
+      "hostDependencies": [],
+      "indirectDependencies": [
+        {
+          "slot": 3,
+          "role": "copy inline callback",
+          "signature": {
+            "parameters": [
+              "i32",
+              "i32"
+            ],
+            "results": []
+          }
+        },
+        {
+          "slot": 4,
+          "role": "destroy inline callback",
+          "signature": {
+            "parameters": [
+              "i32"
+            ],
+            "results": []
+          }
+        }
+      ],
+      "behavior": [
+        "Always allocate the original16-byte stack scratch frame, including self swaps.",
+        "Swap external/empty callbacks through pointer exchange.",
+        "Use exact typed vtable slot3 copy and slot4 inline destruction for inline/inline and inline/external swaps.",
+        "Reload callback pointers after callbacks before subsequent operations, preserving reentrant state and trap ordering."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 64947,
+        "decompiled": "source/decompiled/sp_server/functions-0256-0319.dcmp"
+      }
+    },
+    {
+      "id": 277,
+      "name": "acquireDeferredSlot",
+      "originalName": "function_277",
+      "signature": {
+        "parameters": [],
+        "results": [
+          "i32"
+        ]
+      },
+      "recoveredBody": true,
+      "forwardsOwnOriginalBody": false,
+      "directDependencies": [
+        14,
+        15,
+        16
+      ],
+      "intraModuleDependencies": [],
+      "hostDependencies": [],
+      "indirectDependencies": [],
+      "behavior": [
+        "Prefer the highest-address released40-byte slot from the global max-heap; preserve pop swaps, tie selection and sift writes.",
+        "Otherwise allocate sequentially from a4096-slot block using40-byte stride.",
+        "When full, allocate163840 bytes, grow the block pointer vector through malloc/memcpy/free, append the block, set used1 and then publish the new block count.",
+        "Return an existing/new slot without initializing its bytes."
+      ],
+      "evidence": {
+        "wat": "source/wasm/sp_server.wat",
+        "watLine": 65085,
+        "decompiled": "source/decompiled/sp_server/functions-0256-0319.dcmp"
+      }
+    }
+  ]
+}

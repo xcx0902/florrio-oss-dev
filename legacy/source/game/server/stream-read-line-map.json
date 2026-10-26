@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-read-line.mjs",
+  "implementationSha256": "6e2c668c6c2aab3f3404d4cd39133c3ff75e979bd6f3d0b03dd8e8f94356841c",
+  "factory": "createStreamReadLineHook",
+  "functionIds": [
+    613
+  ],
+  "functions": [
+    {
+      "id": 613,
+      "name": "readBufferedLine",
+      "originalSymbol": "function_613",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-read-line.mjs",
+          "line": 15
+        },
+        "test": "test/server-stream-read-line.test.mjs"
+      },
+      "originalDirectDependencies": [
+        378
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Copies min(count, scanned length) bytes from +84, advances +84/+8, records cursor+count at +4."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-read-line.test.mjs",
+    "report": "reports/server-stream-read-line-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Four buffered texts and counts compare result, complete memory and stack.",
+    "limitations": [
+      "Ledger: 456 server bodies recovered and 278 remain machine code."
+    ]
+  }
+}

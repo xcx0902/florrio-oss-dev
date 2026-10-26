@@ -1,0 +1,117 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/transforms.mjs",
+  "implementationSha256": "4b0e42912091c6979e188f1ec63e07d032b02533a0782d917e7cae256e920194",
+  "factory": "createClientTransformHooks",
+  "functionIds": [
+    409,
+    672,
+    705
+  ],
+  "functions": [
+    {
+      "id": 409,
+      "name": "updateWorldTransform",
+      "originalSymbol": "function_409",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 13146
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 3826
+        },
+        "test": "test/client-transforms.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_409",
+        "function_372",
+        "function_403",
+        "function_407",
+        "function_705"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 672,
+      "name": "updateVisualBounds",
+      "originalSymbol": "function_672",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 93646
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0256-0319.dcmp",
+          "line": 5540
+        },
+        "test": "test/client-transforms.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_372",
+        "function_409",
+        "function_672"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 705,
+      "name": "interpolateAngle",
+      "originalSymbol": "function_705",
+      "signature": " (type $t42) (param $p0 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 110549
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0320-0383.dcmp",
+          "line": 3571
+        },
+        "test": "test/client-transforms.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_372",
+        "function_2"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 6,
+    "oracleComparisons": 830,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true,
+    "combinedClientRenderTest": "test/client-render-frame.test.mjs"
+  },
+  "limitations": [
+    "Shared linear-memory ABI fields without an established name retain original offsets.",
+    "Original libm, memory comparison, browser clock and Canvas services remain explicit dependencies as listed.",
+    "Finite direct cases and captured scenes do not prove arbitrary malformed pointer graphs or every future input.",
+    "Browser validation is bound to recorded source/artifact hashes; see reports/current-verification.json and reports/runtime/readable.json."
+  ],
+  "semanticNotes": {
+    "interpolationWindowMilliseconds": 120,
+    "rotationEpsilon": 2.220446049250313e-16,
+    "ownerIndex": {
+      "stateBuckets": 2220,
+      "stateBucketCount": 2224,
+      "nodeNext": 0,
+      "nodeHash": 4,
+      "nodeOwner": 8,
+      "nodeChild": 12
+    },
+    "angles": "nearest winding; remainder host retains exact call order"
+  },
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

@@ -1,0 +1,49 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/type-check.mjs",
+  "implementationSha256": "42bda9e211afed20cdce86ec0a6c8526e376ddc6e4b0d65f18df700190e8d663",
+  "factory": "createTypeCheckHook",
+  "functionIds": [
+    731
+  ],
+  "functions": [
+    {
+      "id": 731,
+      "name": "notNestedType22",
+      "originalSymbol": "function_731",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/type-check.mjs",
+          "line": 10
+        },
+        "test": "test/server-type-check.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Returns 0 only when +148 points at an object whose byte +8 is 22; otherwise 1."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-type-check.test.mjs",
+    "report": "reports/server-type-check-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Absent, type 0, type 22 and type 255 nested objects compare result and stack pointer.",
+    "limitations": [
+      "Ledger: 388 server bodies recovered and 346 remain machine code."
+    ]
+  }
+}

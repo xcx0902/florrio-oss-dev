@@ -1,0 +1,462 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/object-lifecycle-slots.mjs",
+  "implementationSha256": "dc22c8b015393c3616a6cc28133bf381449b50f0afadeee3b5f630bb447636b3",
+  "factory": "createObjectLifecycleSlotHooks",
+  "functionIds": [
+    715,
+    727,
+    839,
+    841,
+    842,
+    901,
+    905,
+    923,
+    1828,
+    1829,
+    1830,
+    1944,
+    1946,
+    1960,
+    1961,
+    2427,
+    2451,
+    2694
+  ],
+  "functions": [
+    {
+      "id": 715,
+      "name": "lifecycle715",
+      "originalSymbol": "function_715",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        405,
+        895
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 727,
+      "name": "lifecycle727",
+      "originalSymbol": "function_727",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381,
+        611
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 839,
+      "name": "lifecycle839",
+      "originalSymbol": "function_839",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        405,
+        895
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 841,
+      "name": "lifecycle841",
+      "originalSymbol": "function_841",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 842,
+      "name": "lifecycle842",
+      "originalSymbol": "function_842",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 901,
+      "name": "lifecycle901",
+      "originalSymbol": "function_901",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        900
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 905,
+      "name": "lifecycle905",
+      "originalSymbol": "function_905",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        904
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 923,
+      "name": "lifecycle923",
+      "originalSymbol": "function_923",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        543
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 1828,
+      "name": "lifecycle1828",
+      "originalSymbol": "function_1828",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 1829,
+      "name": "lifecycle1829",
+      "originalSymbol": "function_1829",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 1830,
+      "name": "lifecycle1830",
+      "originalSymbol": "function_1830",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        381
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 1944,
+      "name": "lifecycle1944",
+      "originalSymbol": "function_1944",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        726
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 1946,
+      "name": "lifecycle1946",
+      "originalSymbol": "function_1946",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        646
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 1960,
+      "name": "lifecycle1960",
+      "originalSymbol": "function_1960",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        906
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 1961,
+      "name": "lifecycle1961",
+      "originalSymbol": "function_1961",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        728
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 2427,
+      "name": "lifecycle2427",
+      "originalSymbol": "function_2427",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1024
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 2451,
+      "name": "lifecycle2451",
+      "originalSymbol": "function_2451",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1026
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    },
+    {
+      "id": 2694,
+      "name": "lifecycle2694",
+      "originalSymbol": "function_2694",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/object-lifecycle-slots.mjs",
+          "line": 10
+        },
+        "test": "test/client-object-lifecycle-slots.test.mjs"
+      },
+      "originalDirectDependencies": [
+        460
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Virtual-base destructor, static sweep, equality helper or guarded destructor."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-object-lifecycle-slots.test.mjs",
+    "report": "reports/client-object-lifecycle-slots-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 18,
+    "completeLinearMemoryChecks": 18,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 18,
+    "trappingComparisons": 5,
+    "comparison": "Null-record fixture compares result or trap, stack pointer and complete memory.",
+    "limitations": [
+      "Four slots (1844-1846, 2337) were excluded because the null fixture hangs or the recovered sweep is not safe. Ledger: 583 client and 507 server bodies recovered."
+    ]
+  }
+}

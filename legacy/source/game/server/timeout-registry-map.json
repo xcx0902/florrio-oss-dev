@@ -1,0 +1,60 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/timeout-registry.mjs",
+  "implementationSha256": "65668048e0c6db043526022ee004a3ace5d385a24767998fd1cf0d2c3c7495d0",
+  "factory": "createTimeoutRegistryHook",
+  "functionIds": [
+    658
+  ],
+  "dependencies": [
+    14
+  ],
+  "functions": [
+    {
+      "id": 658,
+      "name": "destroyTimeoutRegistry",
+      "originalSymbol": "destroyTimeoutRegistry",
+      "signature": " (type $t0) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        14
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 196864
+        },
+        "source": {
+          "path": "source/game/server/timeout-registry.mjs",
+          "line": 30
+        },
+        "test": "test/server-timeout-registry.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 2,
+      "notes": "Walks the list at 8569340; clears each node callback, dispatches vtable slot 4 when the callback is its own base object and slot 5 otherwise, frees callback and node, then frees and clears the auxiliary block at 8569332."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-timeout-registry.test.mjs",
+    "report": "reports/server-timeout-registry-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Four registry shapes: empty list, one callback-free node, two nodes with one vtable-slot-5 callback, and three nodes with a second callback plus an auxiliary block. Each compares complete 67,108,864-byte memory and the stack pointer.",
+    "limitations": [
+      "The self-based vtable slot 4 branch is implemented but not exercised because a node cannot simultaneously act as its own vtable without corrupting the successor chain.",
+      "free 14 remains native.",
+      "Ledger: 205 server bodies recovered and 529 remain machine code."
+    ]
+  }
+}

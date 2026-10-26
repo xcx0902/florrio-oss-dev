@@ -1,0 +1,147 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/flag-and-field-helpers.mjs",
+  "implementationSha256": "3b8c1f2d7c1ada21ab94c77a6943c7607768f9115a355360ce40a6f171d13fad",
+  "factory": "createFlagAndFieldHelperHooks",
+  "functionIds": [
+    435,
+    856,
+    1992,
+    2023,
+    2031
+  ],
+  "functions": [
+    {
+      "id": 435,
+      "name": "flagField435",
+      "originalSymbol": "function_435",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/flag-and-field-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/client-flag-and-field-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        820
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Flag gate, field copy, descriptor select, cache clear or missing-definition report."
+    },
+    {
+      "id": 856,
+      "name": "flagField856",
+      "originalSymbol": "function_856",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/flag-and-field-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/client-flag-and-field-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        899
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Flag gate, field copy, descriptor select, cache clear or missing-definition report."
+    },
+    {
+      "id": 1992,
+      "name": "flagField1992",
+      "originalSymbol": "function_1992",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/flag-and-field-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/client-flag-and-field-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        517
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Flag gate, field copy, descriptor select, cache clear or missing-definition report."
+    },
+    {
+      "id": 2023,
+      "name": "flagField2023",
+      "originalSymbol": "function_2023",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/flag-and-field-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/client-flag-and-field-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        383
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Flag gate, field copy, descriptor select, cache clear or missing-definition report."
+    },
+    {
+      "id": 2031,
+      "name": "flagField2031",
+      "originalSymbol": "function_2031",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/flag-and-field-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/client-flag-and-field-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        364
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Flag gate, field copy, descriptor select, cache clear or missing-definition report."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-flag-and-field-helpers.test.mjs",
+    "report": "reports/client-flag-and-field-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 5,
+    "completeLinearMemoryChecks": 5,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 5,
+    "trappingComparisons": 1,
+    "comparison": "Zero fixtures compare result or trap, stack pointer and complete memory; four slots succeed.",
+    "limitations": [
+      "Ledger: 588 client and 507 server bodies recovered."
+    ]
+  }
+}

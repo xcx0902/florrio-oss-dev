@@ -1,0 +1,49 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/vtable-invokers.mjs",
+  "implementationSha256": "656db3a58dab95ccb708ad2c9566afbda792039411f8781f6638a36c24f15468",
+  "factory": "createVtableInvokerHooks",
+  "functionIds": [
+    2044
+  ],
+  "functions": [
+    {
+      "id": 2044,
+      "name": "invokeStaticVtableFirstSlot",
+      "originalSymbol": "function_2044",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/vtable-invokers.mjs",
+          "line": 9
+        },
+        "test": "test/client-vtable-invokers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Builds a frame around the static vtable at 52088 and invokes its first slot."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-vtable-invokers.test.mjs",
+    "report": "reports/client-vtable-invokers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 1,
+    "completeLinearMemoryChecks": 1,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "A null-object fixture compares trap parity and complete memory.",
+    "limitations": [
+      "Only the null-object path is covered. Ledger: 680 client and 512 server bodies recovered."
+    ]
+  }
+}

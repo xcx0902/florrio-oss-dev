@@ -1,0 +1,5050 @@
+// Reading view only. Rebuild the corresponding .wat, not this pseudocode.
+function function_2153(a:int) { // func2153
+  var d:int_ptr;
+  var b:int;
+  var f:int;
+  var e:int;
+  var c:int;
+  var h:int;
+  a[7]:int = (b = (d = a[7]:int) - 1);
+  var m:int = (a[1]:int << 16) / (f = a[6]:int);
+  var n:int = (a[2]:int << 16) / d;
+  if (d) {
+    var o:int = a[13]:int & 1;
+    var p:int = a[62]:ubyte;
+    var q:int = a[61]:ubyte;
+    var r:int = a[60]:ubyte;
+    var g:int = a[5]:int;
+    d = g;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((c = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        h = h + (c >> 16) + 1;
+      }
+      if (f) {
+        var k:int = -1;
+        b = 65536;
+        var l:int_ptr = 0;
+        loop L_e {
+          if (b >= 65536) {
+            l = 
+              a[0]:int + a[3]:int * h +
+              ((k = 
+                  k + ((c = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (c & -65536) - 65536;
+          }
+          f = f - 1;
+          c = l[0];
+          var i:int = c >> 24;
+          var j:int = c >> 8 & 255;
+          c = c >> 16 & 255;
+          if (o) {
+            j = j * p / 255;
+            i = i * r / 255;
+            c = c * q / 255;
+          }
+          d[0] = (j << 16 | c << 8) | i;
+          d = d + 4;
+          b = b + m;
+          if (f) continue L_e;
+        }
+        b = a[7]:int;
+      }
+      a[7]:int = (d = b - 1);
+      g = g + a[8]:int;
+      if (b) {
+        e = e + n;
+        f = a[6]:int;
+        b = d;
+        d = g;
+        continue L_b;
+      }
+    }
+    a[5]:int = g;
+  }
+}
+
+function function_2154(a:int) { // func2154
+  var c:int;
+  var b:int;
+  var h:int;
+  var i:int;
+  var j:int;
+  a[7]:int = (b = (c = a[7]:int) - 1);
+  if (c) {
+    var k:int = a[13]:int & 1;
+    var l:int = a[62]:ubyte;
+    var m:int = a[61]:ubyte;
+    var n:int = a[60]:ubyte;
+    var f:int = a[5]:int;
+    var d:int_ptr = f;
+    var g:int = a[0]:int;
+    var e:int_ptr = g;
+    loop L_b {
+      a[7]:int =
+        (b = (c = if (h = a[6]:int) {
+                    loop L_d {
+                      h = h - 1;
+                      i = (c = e[0]) >> 24;
+                      j = c >> 8 & 255;
+                      b = c >> 16 & 255;
+                      if (k) {
+                        j = j * l / 255;
+                        i = i * n / 255;
+                        b = b * m / 255;
+                      }
+                      d[0] = (b << 8 | i) | j << 16;
+                      d = d + 4;
+                      e = e + 4;
+                      if (h) continue L_d;
+                    }
+                    a[7]:int;
+                  } else {
+                    b
+                  }) -
+             1);
+      f = f + a[8]:int;
+      d = f;
+      g = g + a[3]:int;
+      e = g;
+      if (c) continue L_b;
+    }
+    a[5]:int = f;
+    a[0]:int = g;
+  }
+}
+
+function function_2155(a:int_ptr) { // func2155
+  var b:int_ptr;
+  var c:int;
+  var j:int;
+  var h:int;
+  var d:int;
+  var o:int;
+  a[7] = (c = (b = a[7]) - 1);
+  var r:int = (a[1] << 16) / (j = a[6]);
+  var s:int = (a[2] << 16) / b;
+  if (b) {
+    b = a[13];
+    var t:int = b & 48;
+    b = b & 112;
+    var u:int = b - 16;
+    var v:int = b == 64;
+    var n:int = a[5];
+    b = n;
+    loop L_b {
+      if (h >= 65536) {
+        h = 
+          h - ((d = h - select_if(h, 131071, h < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (d >> 16) + 1;
+      }
+      if (j) {
+        var p:int = -1;
+        c = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            q = 
+              a[0] + a[3] * o +
+              ((p = 
+                  p + ((d = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (d & -65536) - 65536;
+          }
+          var f:int = q[0];
+          var k:int = f & 255;
+          var l:int = f >> 24;
+          var e:int = b[0];
+          var g:int = e >> 8;
+          d = e >> 16;
+          var m:int = f >> 8 & 255;
+          f = f >> 16 & 255;
+          if (eqz(t)) goto B_g;
+          if (k == 255) goto B_g;
+          m = k * m / 255;
+          f = f * k / 255;
+          l = k * l / 255;
+          label B_g:
+          j = j - 1;
+          var i:int = e & 255;
+          e = g & 255;
+          g = d & 255;
+          br_table[B_j, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_i, ..B_k](
+            u)
+          label B_k:
+          if (eqz(v)) goto B_h;
+          g = (g * m & 65535) / 255;
+          e = (e * f & 65535) / 255;
+          i = (i * l & 65535) / 255;
+          goto B_h;
+          label B_j:
+          g = m + g * (d = k ^ 255) / 255;
+          e = f + d * e / 255;
+          i = l + d * i / 255;
+          goto B_h;
+          label B_i:
+          d = g + m;
+          g = select_if(d, 255, d < 255);
+          d = e + f;
+          e = select_if(d, 255, d < 255);
+          d = i + l;
+          i = select_if(d, 255, d < 255);
+          label B_h:
+          b[0] = (e << 8 | i) | g << 16;
+          b = b + 4;
+          c = c + r;
+          if (j) continue L_e;
+        }
+        c = a[7];
+      }
+      a[7] = (b = c - 1);
+      n = n + a[8];
+      if (c) {
+        h = h + s;
+        j = a[6];
+        c = b;
+        b = n;
+        continue L_b;
+      }
+    }
+    a[5] = n;
+  }
+}
+
+function function_2156(a:int_ptr, b:int) { // func2156
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 52340;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_2157(a:int_ptr) { // func2157
+  var b:int;
+  var c:int;
+  var n:int;
+  var d:int;
+  var h:int;
+  var i:int;
+  var e:int;
+  var j:int;
+  var f:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13];
+    var o:int = b & 48;
+    b = b & 112;
+    var p:int = b - 16;
+    var q:int = b == 64;
+    var l:int = a[5];
+    var g:int_ptr = l;
+    var m:int = a[0];
+    var k:int_ptr = m;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (n = a[6]) {
+                loop L_d {
+                  h = (d = k[0]) & 255;
+                  i = d >> 24;
+                  e = (c = g[0]) >> 8;
+                  b = c >> 16;
+                  j = d >> 8 & 255;
+                  d = d >> 16 & 255;
+                  if (eqz(o)) goto B_e;
+                  if (h == 255) goto B_e;
+                  j = h * j / 255;
+                  d = d * h / 255;
+                  i = h * i / 255;
+                  label B_e:
+                  n = n - 1;
+                  c = c & 255;
+                  f = e & 255;
+                  e = b & 255;
+                  br_table[B_h, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_g, ..B_i](
+                    p)
+                  label B_i:
+                  if (eqz(q)) goto B_f;
+                  e = (e * j & 65535) / 255;
+                  f = (d * f & 65535) / 255;
+                  c = (c * i & 65535) / 255;
+                  goto B_f;
+                  label B_h:
+                  e = j + e * (b = h ^ 255) / 255;
+                  f = d + b * f / 255;
+                  c = i + b * c / 255;
+                  goto B_f;
+                  label B_g:
+                  e = select_if(b = e + j, 255, b < 255);
+                  f = select_if(b = d + f, 255, b < 255);
+                  c = select_if(b = c + i, 255, b < 255);
+                  label B_f:
+                  g[0] = (f << 8 | c) | e << 16;
+                  g = g + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      l = l + a[8];
+      g = l;
+      m = m + a[3];
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5] = l;
+    a[0] = m;
+  }
+}
+
+function function_2158(a:int) { // func2158
+  var c:int_ptr;
+  var d:int;
+  var m:int;
+  var g:int;
+  var b:int;
+  var o:int;
+  a[7]:int = (d = (c = a[7]:int) - 1);
+  var r:int = (a[1]:int << 16) / (m = a[6]:int);
+  var s:int = (a[2]:int << 16) / c;
+  if (c) {
+    c = a[13]:int;
+    var t:int = c & 48;
+    var u:int = c & 2;
+    var v:int = c & 1;
+    var w:int = a[63]:ubyte;
+    var x:int = a[62]:ubyte;
+    var y:int = a[61]:ubyte;
+    var z:int = a[60]:ubyte;
+    c = c & 112;
+    var aa:int = c - 16;
+    var ba:int = c == 64;
+    var n:int = a[5]:int;
+    c = n;
+    loop L_b {
+      if (g >= 65536) {
+        g = 
+          g - ((b = g - select_if(g, 131071, g < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (b >> 16) + 1;
+      }
+      if (m) {
+        var p:int = -1;
+        d = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (d >= 65536) {
+            q = 
+              a[0]:int + a[3]:int * o +
+              ((p = 
+                  p + ((b = d - select_if(d, 131071, d < 131071) + 65535) >> 16) + 1) <<
+               2);
+            d = d - (b & -65536) - 65536;
+          }
+          var e:int = c[0];
+          b = q[0];
+          var j:int = b >> 24;
+          var k:int = b >> 8 & 255;
+          var h:int = b >> 16 & 255;
+          if (v) {
+            k = k * x / 255;
+            j = j * z / 255;
+            h = h * y / 255;
+          }
+          var i:int = b & 255;
+          i = select_if(i * w / 255, i, u);
+          var f:int = e >> 8;
+          b = e >> 16;
+          if (eqz(t)) goto B_h;
+          if (i > 254) goto B_h;
+          k = i * k / 255;
+          h = h * i / 255;
+          j = i * j / 255;
+          label B_h:
+          m = m - 1;
+          var l:int = e & 255;
+          e = f & 255;
+          f = b & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            aa)
+          label B_l:
+          if (eqz(ba)) goto B_i;
+          l = k * l / 255;
+          e = e * h / 255;
+          f = f * j / 255;
+          goto B_i;
+          label B_k:
+          l = k + (b = 255 - i) * l / 255;
+          e = h + b * e / 255;
+          f = j + b * f / 255;
+          goto B_i;
+          label B_j:
+          b = k + l;
+          l = select_if(b, 255, b < 255);
+          b = e + h;
+          e = select_if(b, 255, b < 255);
+          b = f + j;
+          f = select_if(b, 255, b < 255);
+          label B_i:
+          c[0] = (e << 8 | f << 16) | l;
+          c = c + 4;
+          d = d + r;
+          if (m) continue L_e;
+        }
+        d = a[7]:int;
+      }
+      a[7]:int = (c = d - 1);
+      n = n + a[8]:int;
+      if (d) {
+        g = g + s;
+        m = a[6]:int;
+        d = c;
+        c = n;
+        continue L_b;
+      }
+    }
+    a[5]:int = n;
+  }
+}
+
+function function_2159(a:int) { // func2159
+  var b:int;
+  var c:int;
+  var n:int;
+  var d:int;
+  var g:int;
+  var h:int;
+  var f:int;
+  var e:int;
+  var i:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var o:int = b & 48;
+    var p:int = b & 2;
+    var q:int = b & 1;
+    var r:int = a[63]:ubyte;
+    var s:int = a[62]:ubyte;
+    var t:int = a[61]:ubyte;
+    var u:int = a[60]:ubyte;
+    b = b & 112;
+    var v:int = b - 16;
+    var w:int = b == 64;
+    var l:int = a[5]:int;
+    var j:int_ptr = l;
+    var m:int = a[0]:int;
+    var k:int_ptr = m;
+    loop L_b {
+      a[7]:int =
+        (c = 
+           (b = 
+              if (n = a[6]:int) {
+                loop L_d {
+                  d = j[0];
+                  g = (b = k[0]) >> 24;
+                  h = b >> 8 & 255;
+                  f = b >> 16 & 255;
+                  if (q) {
+                    h = h * s / 255;
+                    g = g * u / 255;
+                    f = f * t / 255;
+                  }
+                  c = b & 255;
+                  c = select_if(c * r / 255, c, p);
+                  e = d >> 8;
+                  b = d >> 16;
+                  if (eqz(o)) goto B_f;
+                  if (c > 254) goto B_f;
+                  h = c * h / 255;
+                  f = c * f / 255;
+                  g = c * g / 255;
+                  label B_f:
+                  n = n - 1;
+                  i = d & 255;
+                  d = e & 255;
+                  e = b & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    v)
+                  label B_j:
+                  if (eqz(w)) goto B_g;
+                  i = h * i / 255;
+                  d = d * f / 255;
+                  e = e * g / 255;
+                  goto B_g;
+                  label B_i:
+                  i = h + (b = 255 - c) * i / 255;
+                  d = f + b * d / 255;
+                  e = g + b * e / 255;
+                  goto B_g;
+                  label B_h:
+                  i = select_if(b = h + i, 255, b < 255);
+                  d = select_if(b = d + f, 255, b < 255);
+                  e = select_if(b = e + g, 255, b < 255);
+                  label B_g:
+                  j[0] = (d << 8 | e << 16) | i;
+                  j = j + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                c
+              }) -
+           1);
+      l = l + a[8]:int;
+      j = l;
+      m = m + a[3]:int;
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5]:int = l;
+    a[0]:int = m;
+  }
+}
+
+function function_2160(a:int) { // func2160
+  var c:int_ptr;
+  var b:int;
+  var f:int;
+  var e:int;
+  var d:int;
+  var h:int;
+  a[7]:int = (b = (c = a[7]:int) - 1);
+  var m:int = (a[1]:int << 16) / (f = a[6]:int);
+  var n:int = (a[2]:int << 16) / c;
+  if (c) {
+    var o:int = a[13]:int & 1;
+    var p:int = a[62]:ubyte;
+    var q:int = a[61]:ubyte;
+    var r:int = a[60]:ubyte;
+    var g:int = a[5]:int;
+    c = g;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((d = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        h = h + (d >> 16) + 1;
+      }
+      if (f) {
+        var k:int = -1;
+        b = 65536;
+        var l:int_ptr = 0;
+        loop L_e {
+          if (b >= 65536) {
+            l = 
+              a[0]:int + a[3]:int * h +
+              ((k = 
+                  k + ((d = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (d & -65536) - 65536;
+          }
+          f = f - 1;
+          d = l[0];
+          var i:int = d >> 24;
+          var j:int = d >> 8 & 255;
+          d = d >> 16 & 255;
+          c[0] =
+            (if (o) {
+               j = j * p / 255;
+               i = i * r / 255;
+               d * q / 255;
+             } else {
+               d
+             } <<
+             8 |
+             j) |
+            i << 16;
+          c = c + 4;
+          b = b + m;
+          if (f) continue L_e;
+        }
+        b = a[7]:int;
+      }
+      a[7]:int = (c = b - 1);
+      g = g + a[8]:int;
+      if (b) {
+        e = e + n;
+        f = a[6]:int;
+        b = c;
+        c = g;
+        continue L_b;
+      }
+    }
+    a[5]:int = g;
+  }
+}
+
+function function_2161(a:int) { // func2161
+  var c:int;
+  var b:int;
+  var h:int;
+  var i:int;
+  var j:int;
+  a[7]:int = (b = (c = a[7]:int) - 1);
+  if (c) {
+    var k:int = a[13]:int & 1;
+    var l:int = a[62]:ubyte;
+    var m:int = a[61]:ubyte;
+    var n:int = a[60]:ubyte;
+    var f:int = a[5]:int;
+    var d:int_ptr = f;
+    var g:int = a[0]:int;
+    var e:int_ptr = g;
+    loop L_b {
+      a[7]:int =
+        (b = (c = if (h = a[6]:int) {
+                    loop L_d {
+                      h = h - 1;
+                      i = (c = e[0]) >> 24;
+                      j = c >> 8 & 255;
+                      b = c >> 16 & 255;
+                      if (k) {
+                        j = j * l / 255;
+                        i = i * n / 255;
+                        b = b * m / 255;
+                      }
+                      d[0] = (b << 8 | i << 16) | j;
+                      d = d + 4;
+                      e = e + 4;
+                      if (h) continue L_d;
+                    }
+                    a[7]:int;
+                  } else {
+                    b
+                  }) -
+             1);
+      f = f + a[8]:int;
+      d = f;
+      g = g + a[3]:int;
+      e = g;
+      if (c) continue L_b;
+    }
+    a[5]:int = f;
+    a[0]:int = g;
+  }
+}
+
+function function_2162(a:int_ptr) { // func2162
+  var b:int_ptr;
+  var c:int;
+  var j:int;
+  var h:int;
+  var d:int;
+  var o:int;
+  a[7] = (c = (b = a[7]) - 1);
+  var r:int = (a[1] << 16) / (j = a[6]);
+  var s:int = (a[2] << 16) / b;
+  if (b) {
+    b = a[13];
+    var t:int = b & 48;
+    b = b & 112;
+    var u:int = b - 16;
+    var v:int = b == 64;
+    var n:int = a[5];
+    b = n;
+    loop L_b {
+      if (h >= 65536) {
+        h = 
+          h - ((d = h - select_if(h, 131071, h < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (d >> 16) + 1;
+      }
+      if (j) {
+        var p:int = -1;
+        c = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            q = 
+              a[0] + a[3] * o +
+              ((p = 
+                  p + ((d = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (d & -65536) - 65536;
+          }
+          var f:int = q[0];
+          var k:int = f & 255;
+          var l:int = f >> 24;
+          var e:int = b[0];
+          var g:int = e >> 8;
+          d = e >> 16;
+          var m:int = f >> 8 & 255;
+          f = f >> 16 & 255;
+          if (eqz(t)) goto B_g;
+          if (k == 255) goto B_g;
+          m = k * m / 255;
+          f = f * k / 255;
+          l = k * l / 255;
+          label B_g:
+          j = j - 1;
+          var i:int = e & 255;
+          e = g & 255;
+          g = d & 255;
+          br_table[B_j, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_i, ..B_k](
+            u)
+          label B_k:
+          if (eqz(v)) goto B_h;
+          i = (i * m & 65535) / 255;
+          e = (e * f & 65535) / 255;
+          g = (g * l & 65535) / 255;
+          goto B_h;
+          label B_j:
+          i = m + (d = k ^ 255) * i / 255;
+          e = f + d * e / 255;
+          g = l + d * g / 255;
+          goto B_h;
+          label B_i:
+          d = i + m;
+          i = select_if(d, 255, d < 255);
+          d = e + f;
+          e = select_if(d, 255, d < 255);
+          d = g + l;
+          g = select_if(d, 255, d < 255);
+          label B_h:
+          b[0] = (e << 8 | g << 16) | i;
+          b = b + 4;
+          c = c + r;
+          if (j) continue L_e;
+        }
+        c = a[7];
+      }
+      a[7] = (b = c - 1);
+      n = n + a[8];
+      if (c) {
+        h = h + s;
+        j = a[6];
+        c = b;
+        b = n;
+        continue L_b;
+      }
+    }
+    a[5] = n;
+  }
+}
+
+function function_2163(a:int_ptr) { // func2163
+  var b:int;
+  var c:int;
+  var n:int;
+  var d:int;
+  var h:int;
+  var i:int;
+  var e:int;
+  var j:int;
+  var f:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13];
+    var o:int = b & 48;
+    b = b & 112;
+    var p:int = b - 16;
+    var q:int = b == 64;
+    var l:int = a[5];
+    var g:int_ptr = l;
+    var m:int = a[0];
+    var k:int_ptr = m;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (n = a[6]) {
+                loop L_d {
+                  h = (d = k[0]) & 255;
+                  i = d >> 24;
+                  e = (c = g[0]) >> 8;
+                  b = c >> 16;
+                  j = d >> 8 & 255;
+                  d = d >> 16 & 255;
+                  if (eqz(o)) goto B_e;
+                  if (h == 255) goto B_e;
+                  j = h * j / 255;
+                  d = d * h / 255;
+                  i = h * i / 255;
+                  label B_e:
+                  n = n - 1;
+                  c = c & 255;
+                  f = e & 255;
+                  e = b & 255;
+                  br_table[B_h, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_g, ..B_i](
+                    p)
+                  label B_i:
+                  if (eqz(q)) goto B_f;
+                  c = (c * j & 65535) / 255;
+                  f = (d * f & 65535) / 255;
+                  e = (e * i & 65535) / 255;
+                  goto B_f;
+                  label B_h:
+                  c = j + (b = h ^ 255) * c / 255;
+                  f = d + b * f / 255;
+                  e = i + b * e / 255;
+                  goto B_f;
+                  label B_g:
+                  c = select_if(b = c + j, 255, b < 255);
+                  f = select_if(b = d + f, 255, b < 255);
+                  e = select_if(b = e + i, 255, b < 255);
+                  label B_f:
+                  g[0] = (f << 8 | e << 16) | c;
+                  g = g + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      l = l + a[8];
+      g = l;
+      m = m + a[3];
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5] = l;
+    a[0] = m;
+  }
+}
+
+function function_2164(a:int) { // func2164
+  var c:int_ptr;
+  var d:int;
+  var m:int;
+  var h:int;
+  var b:int;
+  var o:int;
+  a[7]:int = (d = (c = a[7]:int) - 1);
+  var s:int = (a[1]:int << 16) / (m = a[6]:int);
+  var t:int = (a[2]:int << 16) / c;
+  if (c) {
+    c = a[13]:int;
+    var u:int = c & 48;
+    var v:int = c & 2;
+    var w:int = c & 1;
+    var x:int = a[63]:ubyte;
+    var y:int = a[62]:ubyte;
+    var z:int = a[61]:ubyte;
+    var aa:int = a[60]:ubyte;
+    c = c & 112;
+    var ba:int = c - 16;
+    var ca:int = c == 64;
+    var n:int = a[5]:int;
+    c = n;
+    loop L_b {
+      if (h >= 65536) {
+        h = 
+          h - ((b = h - select_if(h, 131071, h < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (b >> 16) + 1;
+      }
+      if (m) {
+        var q:int = -1;
+        d = 65536;
+        var r:int_ptr = 0;
+        loop L_e {
+          if (d >= 65536) {
+            r = 
+              a[0]:int + a[3]:int * o +
+              ((q = 
+                  q + ((b = d - select_if(d, 131071, d < 131071) + 65535) >> 16) + 1) <<
+               2);
+            d = d - (b & -65536) - 65536;
+          }
+          var e:int = c[0];
+          b = r[0];
+          var j:int = b & 255;
+          var k:int = b >> 8 & 255;
+          var i:int = b >> 16 & 255;
+          if (w) {
+            j = j * y / 255;
+            k = k * z / 255;
+            i = i * aa / 255;
+          }
+          var f:int = b >> 24;
+          f = select_if(f * x / 255, f, v);
+          var g:int = e >> 8;
+          b = e >> 16;
+          if (eqz(u)) goto B_h;
+          if (f > 254) goto B_h;
+          j = f * j / 255;
+          k = f * k / 255;
+          i = f * i / 255;
+          label B_h:
+          m = m - 1;
+          var p:int = e >> 24;
+          var l:int = e & 255;
+          e = g & 255;
+          g = b & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            ba)
+          label B_l:
+          if (eqz(ca)) goto B_i;
+          l = j * l / 255;
+          e = e * k / 255;
+          g = g * i / 255;
+          goto B_i;
+          label B_k:
+          b = 255 - f;
+          p = b * p / 255 + f;
+          l = j + b * l / 255;
+          e = k + b * e / 255;
+          g = i + b * g / 255;
+          goto B_i;
+          label B_j:
+          b = j + l;
+          l = select_if(b, 255, b < 255);
+          b = e + k;
+          e = select_if(b, 255, b < 255);
+          b = g + i;
+          g = select_if(b, 255, b < 255);
+          label B_i:
+          c[0] = ((e << 8 | g << 16) | l) | p << 24;
+          c = c + 4;
+          d = d + s;
+          if (m) continue L_e;
+        }
+        d = a[7]:int;
+      }
+      a[7]:int = (c = d - 1);
+      n = n + a[8]:int;
+      if (d) {
+        h = h + t;
+        m = a[6]:int;
+        d = c;
+        c = n;
+        continue L_b;
+      }
+    }
+    a[5]:int = n;
+  }
+}
+
+function function_2165(a:int_ptr, b:int) { // func2165
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 52304;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 52328;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_2166(a:int) { // func2166
+  var b:int;
+  var c:int;
+  var n:int;
+  var g:int;
+  var h:int;
+  var f:int;
+  var d:int;
+  var e:int;
+  var o:int;
+  var i:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var p:int = b & 48;
+    var q:int = b & 2;
+    var r:int = b & 1;
+    var s:int = a[63]:ubyte;
+    var t:int = a[62]:ubyte;
+    var u:int = a[61]:ubyte;
+    var v:int = a[60]:ubyte;
+    b = b & 112;
+    var w:int = b - 16;
+    var x:int = b == 64;
+    var l:int = a[5]:int;
+    var j:int_ptr = l;
+    var m:int = a[0]:int;
+    var k:int_ptr = m;
+    loop L_b {
+      a[7]:int =
+        (c = 
+           (b = 
+              if (n = a[6]:int) {
+                loop L_d {
+                  c = j[0];
+                  g = (b = k[0]) & 255;
+                  h = b >> 8 & 255;
+                  f = b >> 16 & 255;
+                  if (r) {
+                    g = g * t / 255;
+                    h = h * u / 255;
+                    f = f * v / 255;
+                  }
+                  d = b >> 24;
+                  d = select_if(d * s / 255, d, q);
+                  e = c >> 8;
+                  b = c >> 16;
+                  if (eqz(p)) goto B_f;
+                  if (d > 254) goto B_f;
+                  g = d * g / 255;
+                  h = d * h / 255;
+                  f = d * f / 255;
+                  label B_f:
+                  n = n - 1;
+                  o = c >> 24;
+                  c = c & 255;
+                  i = e & 255;
+                  e = b & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    w)
+                  label B_j:
+                  if (eqz(x)) goto B_g;
+                  c = c * g / 255;
+                  i = h * i / 255;
+                  e = e * f / 255;
+                  goto B_g;
+                  label B_i:
+                  o = (b = 255 - d) * o / 255 + d;
+                  c = g + b * c / 255;
+                  i = h + b * i / 255;
+                  e = f + b * e / 255;
+                  goto B_g;
+                  label B_h:
+                  c = select_if(b = c + g, 255, b < 255);
+                  i = select_if(b = h + i, 255, b < 255);
+                  e = select_if(b = e + f, 255, b < 255);
+                  label B_g:
+                  j[0] = ((i << 8 | e << 16) | c) | o << 24;
+                  j = j + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                c
+              }) -
+           1);
+      l = l + a[8]:int;
+      j = l;
+      m = m + a[3]:int;
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5]:int = l;
+    a[0]:int = m;
+  }
+}
+
+function function_2167(a:int) { // func2167
+  var c:int_ptr;
+  var b:int;
+  var f:int;
+  var e:int;
+  var d:int;
+  var h:int;
+  a[7]:int = (b = (c = a[7]:int) - 1);
+  var n:int = (a[1]:int << 16) / (f = a[6]:int);
+  var o:int = (a[2]:int << 16) / c;
+  if (c) {
+    c = a[13]:int;
+    var p:int = c & 2;
+    var q:int = c & 1;
+    var r:int = a[63]:ubyte;
+    var s:int = a[62]:ubyte;
+    var t:int = a[61]:ubyte;
+    var u:int = a[60]:ubyte;
+    var g:int = a[5]:int;
+    c = g;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((d = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        h = h + (d >> 16) + 1;
+      }
+      if (f) {
+        var l:int = -1;
+        b = 65536;
+        var m:int_ptr = 0;
+        loop L_e {
+          if (b >= 65536) {
+            m = 
+              a[0]:int + a[3]:int * h +
+              ((l = 
+                  l + ((d = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (d & -65536) - 65536;
+          }
+          d = m[0];
+          var j:int = d & 255;
+          var k:int = d >> 8 & 255;
+          var i:int = d >> 16 & 255;
+          if (q) {
+            j = j * s / 255;
+            k = k * t / 255;
+            i = i * u / 255;
+          }
+          f = f - 1;
+          d = d >> 24;
+          c[0] = ((j | k << 8) | i << 16) | select_if(d * r / 255, d, p) << 24;
+          c = c + 4;
+          b = b + n;
+          if (f) continue L_e;
+        }
+        b = a[7]:int;
+      }
+      a[7]:int = (c = b - 1);
+      g = g + a[8]:int;
+      if (b) {
+        e = e + o;
+        f = a[6]:int;
+        b = c;
+        c = g;
+        continue L_b;
+      }
+    }
+    a[5]:int = g;
+  }
+}
+
+function function_2168(a:int) { // func2168
+  var b:int;
+  var c:int;
+  var h:int;
+  var i:int;
+  var j:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var k:int = b & 2;
+    var l:int = b & 1;
+    var m:int = a[63]:ubyte;
+    var n:int = a[62]:ubyte;
+    var o:int = a[61]:ubyte;
+    var p:int = a[60]:ubyte;
+    var f:int = a[5]:int;
+    var d:int_ptr = f;
+    var g:int = a[0]:int;
+    var e:int_ptr = g;
+    loop L_b {
+      a[7]:int =
+        (c = 
+           (b = 
+              if (h = a[6]:int) {
+                loop L_d {
+                  i = (c = e[0]) & 255;
+                  j = c >> 8 & 255;
+                  b = c >> 16 & 255;
+                  if (l) {
+                    i = i * n / 255;
+                    j = j * o / 255;
+                    b = b * p / 255;
+                  }
+                  h = h - 1;
+                  c = c >> 24;
+                  d[0] = ((j << 8 | b << 16) | i) | select_if(c * m / 255, c, k) << 24;
+                  d = d + 4;
+                  e = e + 4;
+                  if (h) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                c
+              }) -
+           1);
+      f = f + a[8]:int;
+      d = f;
+      g = g + a[3]:int;
+      e = g;
+      if (b) continue L_b;
+    }
+    a[5]:int = f;
+    a[0]:int = g;
+  }
+}
+
+function function_2169(a:int_ptr) { // func2169
+  var c:int_ptr;
+  var d:int;
+  var k:int;
+  var g:int;
+  var b:int;
+  var p:int;
+  a[7] = (d = (c = a[7]) - 1);
+  var s:int = (a[1] << 16) / (k = a[6]);
+  var t:int = (a[2] << 16) / c;
+  if (c) {
+    c = a[13];
+    var u:int = c & 48;
+    c = c & 112;
+    var v:int = c - 16;
+    var w:int = c == 64;
+    var o:int = a[5];
+    c = o;
+    loop L_b {
+      if (g >= 65536) {
+        g = 
+          g - ((b = g - select_if(g, 131071, g < 131071) + 65535) & -65536) -
+          65536;
+        p = p + (b >> 16) + 1;
+      }
+      if (k) {
+        var q:int = -1;
+        d = 65536;
+        var r:int_ptr = 0;
+        loop L_e {
+          if (d >= 65536) {
+            r = 
+              a[0] + a[3] * p +
+              ((q = 
+                  q + ((b = d - select_if(d, 131071, d < 131071) + 65535) >> 16) + 1) <<
+               2);
+            d = d - (b & -65536) - 65536;
+          }
+          var h:int = r[0];
+          var j:int = h >> 24;
+          var l:int = h & 255;
+          var e:int = c[0];
+          var f:int = e >> 8;
+          b = e >> 16;
+          var m:int = h >> 8 & 255;
+          var n:int = h >> 16 & 255;
+          if (eqz(u)) goto B_g;
+          if (j == 255) goto B_g;
+          l = j * l / 255;
+          m = j * m / 255;
+          n = j * n / 255;
+          label B_g:
+          k = k - 1;
+          h = e >> 24;
+          var i:int = e & 255;
+          e = f & 255;
+          f = b & 255;
+          br_table[B_j, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_i, ..B_k](
+            v)
+          label B_k:
+          if (eqz(w)) goto B_h;
+          i = (i * l & 65535) / 255;
+          e = (e * m & 65535) / 255;
+          f = (f * n & 65535) / 255;
+          goto B_h;
+          label B_j:
+          b = j ^ 255;
+          h = b * h / 255 + j;
+          i = l + b * i / 255;
+          e = m + b * e / 255;
+          f = n + b * f / 255;
+          goto B_h;
+          label B_i:
+          b = i + l;
+          i = select_if(b, 255, b < 255);
+          b = e + m;
+          e = select_if(b, 255, b < 255);
+          b = f + n;
+          f = select_if(b, 255, b < 255);
+          label B_h:
+          c[0] = ((e << 8 | f << 16) | i) | h << 24;
+          c = c + 4;
+          d = d + s;
+          if (k) continue L_e;
+        }
+        d = a[7];
+      }
+      a[7] = (c = d - 1);
+      o = o + a[8];
+      if (d) {
+        g = g + t;
+        k = a[6];
+        d = c;
+        c = o;
+        continue L_b;
+      }
+    }
+    a[5] = o;
+  }
+}
+
+function function_2170(a:int_ptr) { // func2170
+  var b:int;
+  var c:int;
+  var o:int;
+  var e:int;
+  var g:int;
+  var i:int;
+  var d:int;
+  var j:int;
+  var k:int;
+  var f:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13];
+    var p:int = b & 48;
+    b = b & 112;
+    var q:int = b - 16;
+    var r:int = b == 64;
+    var m:int = a[5];
+    var h:int_ptr = m;
+    var n:int = a[0];
+    var l:int_ptr = n;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (o = a[6]) {
+                loop L_d {
+                  g = (e = l[0]) >> 24;
+                  i = e & 255;
+                  d = (c = h[0]) >> 8;
+                  b = c >> 16;
+                  j = e >> 8 & 255;
+                  k = e >> 16 & 255;
+                  if (eqz(p)) goto B_e;
+                  if (g == 255) goto B_e;
+                  i = g * i / 255;
+                  j = g * j / 255;
+                  k = g * k / 255;
+                  label B_e:
+                  o = o - 1;
+                  e = c >> 24;
+                  c = c & 255;
+                  f = d & 255;
+                  d = b & 255;
+                  br_table[B_h, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_g, ..B_i](
+                    q)
+                  label B_i:
+                  if (eqz(r)) goto B_f;
+                  c = (c * i & 65535) / 255;
+                  f = (f * j & 65535) / 255;
+                  d = (d * k & 65535) / 255;
+                  goto B_f;
+                  label B_h:
+                  e = (b = g ^ 255) * e / 255 + g;
+                  c = i + b * c / 255;
+                  f = j + b * f / 255;
+                  d = k + b * d / 255;
+                  goto B_f;
+                  label B_g:
+                  c = select_if(b = c + i, 255, b < 255);
+                  f = select_if(b = f + j, 255, b < 255);
+                  d = select_if(b = d + k, 255, b < 255);
+                  label B_f:
+                  h[0] = ((f << 8 | d << 16) | c) | e << 24;
+                  h = h + 4;
+                  l = l + 4;
+                  if (o) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      m = m + a[8];
+      h = m;
+      n = n + a[3];
+      l = n;
+      if (b) continue L_b;
+    }
+    a[5] = m;
+    a[0] = n;
+  }
+}
+
+function function_2171(a:int) { // func2171
+  var c:int_ptr;
+  var d:int;
+  var m:int;
+  var g:int;
+  var b:int;
+  var o:int;
+  a[7]:int = (d = (c = a[7]:int) - 1);
+  var r:int = (a[1]:int << 16) / (m = a[6]:int);
+  var s:int = (a[2]:int << 16) / c;
+  if (c) {
+    c = a[13]:int;
+    var t:int = c & 48;
+    var u:int = c & 2;
+    var v:int = c & 1;
+    var w:int = a[63]:ubyte;
+    var x:int = a[62]:ubyte;
+    var y:int = a[61]:ubyte;
+    var z:int = a[60]:ubyte;
+    c = c & 112;
+    var aa:int = c - 16;
+    var ba:int = c == 64;
+    var n:int = a[5]:int;
+    c = n;
+    loop L_b {
+      if (g >= 65536) {
+        g = 
+          g - ((b = g - select_if(g, 131071, g < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (b >> 16) + 1;
+      }
+      if (m) {
+        var p:int = -1;
+        d = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (d >= 65536) {
+            q = 
+              a[0]:int + a[3]:int * o +
+              ((p = 
+                  p + ((b = d - select_if(d, 131071, d < 131071) + 65535) >> 16) + 1) <<
+               2);
+            d = d - (b & -65536) - 65536;
+          }
+          var e:int = c[0];
+          b = q[0];
+          var j:int = b & 255;
+          var k:int = b >> 8 & 255;
+          var h:int = b >> 16 & 255;
+          if (v) {
+            j = j * x / 255;
+            k = k * y / 255;
+            h = h * z / 255;
+          }
+          var i:int = b >> 24;
+          i = select_if(i * w / 255, i, u);
+          var f:int = e >> 8;
+          b = e >> 16;
+          if (eqz(t)) goto B_h;
+          if (i > 254) goto B_h;
+          j = i * j / 255;
+          k = i * k / 255;
+          h = h * i / 255;
+          label B_h:
+          m = m - 1;
+          var l:int = e & 255;
+          e = f & 255;
+          f = b & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            aa)
+          label B_l:
+          if (eqz(ba)) goto B_i;
+          f = f * j / 255;
+          e = e * k / 255;
+          l = h * l / 255;
+          goto B_i;
+          label B_k:
+          f = j + (b = 255 - i) * f / 255;
+          e = k + b * e / 255;
+          l = h + b * l / 255;
+          goto B_i;
+          label B_j:
+          b = f + j;
+          f = select_if(b, 255, b < 255);
+          b = e + k;
+          e = select_if(b, 255, b < 255);
+          b = h + l;
+          l = select_if(b, 255, b < 255);
+          label B_i:
+          c[0] = (e << 8 | l) | f << 16;
+          c = c + 4;
+          d = d + r;
+          if (m) continue L_e;
+        }
+        d = a[7]:int;
+      }
+      a[7]:int = (c = d - 1);
+      n = n + a[8]:int;
+      if (d) {
+        g = g + s;
+        m = a[6]:int;
+        d = c;
+        c = n;
+        continue L_b;
+      }
+    }
+    a[5]:int = n;
+  }
+}
+
+function function_2172(a:int) { // func2172
+  var b:int;
+  var c:int;
+  var n:int;
+  var d:int;
+  var g:int;
+  var h:int;
+  var f:int;
+  var e:int;
+  var i:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var o:int = b & 48;
+    var p:int = b & 2;
+    var q:int = b & 1;
+    var r:int = a[63]:ubyte;
+    var s:int = a[62]:ubyte;
+    var t:int = a[61]:ubyte;
+    var u:int = a[60]:ubyte;
+    b = b & 112;
+    var v:int = b - 16;
+    var w:int = b == 64;
+    var l:int = a[5]:int;
+    var j:int_ptr = l;
+    var m:int = a[0]:int;
+    var k:int_ptr = m;
+    loop L_b {
+      a[7]:int =
+        (c = 
+           (b = 
+              if (n = a[6]:int) {
+                loop L_d {
+                  d = j[0];
+                  g = (b = k[0]) & 255;
+                  h = b >> 8 & 255;
+                  f = b >> 16 & 255;
+                  if (q) {
+                    g = g * s / 255;
+                    h = h * t / 255;
+                    f = f * u / 255;
+                  }
+                  c = b >> 24;
+                  c = select_if(c * r / 255, c, p);
+                  e = d >> 8;
+                  b = d >> 16;
+                  if (eqz(o)) goto B_f;
+                  if (c > 254) goto B_f;
+                  g = c * g / 255;
+                  h = c * h / 255;
+                  f = c * f / 255;
+                  label B_f:
+                  n = n - 1;
+                  i = d & 255;
+                  d = e & 255;
+                  e = b & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    v)
+                  label B_j:
+                  if (eqz(w)) goto B_g;
+                  e = e * g / 255;
+                  d = d * h / 255;
+                  i = f * i / 255;
+                  goto B_g;
+                  label B_i:
+                  e = g + (b = 255 - c) * e / 255;
+                  d = h + b * d / 255;
+                  i = f + b * i / 255;
+                  goto B_g;
+                  label B_h:
+                  e = select_if(b = e + g, 255, b < 255);
+                  d = select_if(b = d + h, 255, b < 255);
+                  i = select_if(b = f + i, 255, b < 255);
+                  label B_g:
+                  j[0] = (d << 8 | i) | e << 16;
+                  j = j + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                c
+              }) -
+           1);
+      l = l + a[8]:int;
+      j = l;
+      m = m + a[3]:int;
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5]:int = l;
+    a[0]:int = m;
+  }
+}
+
+function function_2173(a:int_ptr) { // func2173
+  var b:int_ptr;
+  var c:int;
+  var j:int;
+  var h:int;
+  var d:int;
+  var o:int;
+  a[7] = (c = (b = a[7]) - 1);
+  var r:int = (a[1] << 16) / (j = a[6]);
+  var s:int = (a[2] << 16) / b;
+  if (b) {
+    b = a[13];
+    var t:int = b & 48;
+    b = b & 112;
+    var u:int = b - 16;
+    var v:int = b == 64;
+    var n:int = a[5];
+    b = n;
+    loop L_b {
+      if (h >= 65536) {
+        h = 
+          h - ((d = h - select_if(h, 131071, h < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (d >> 16) + 1;
+      }
+      if (j) {
+        var p:int = -1;
+        c = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            q = 
+              a[0] + a[3] * o +
+              ((p = 
+                  p + ((d = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (d & -65536) - 65536;
+          }
+          var f:int = q[0];
+          var k:int = f >> 24;
+          var l:int = f & 255;
+          var e:int = b[0];
+          var g:int = e >> 8;
+          d = e >> 16;
+          var m:int = f >> 8 & 255;
+          f = f >> 16 & 255;
+          if (eqz(t)) goto B_g;
+          if (k == 255) goto B_g;
+          l = k * l / 255;
+          m = k * m / 255;
+          f = f * k / 255;
+          label B_g:
+          j = j - 1;
+          var i:int = e & 255;
+          e = g & 255;
+          g = d & 255;
+          br_table[B_j, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_i, ..B_k](
+            u)
+          label B_k:
+          if (eqz(v)) goto B_h;
+          g = (g * l & 65535) / 255;
+          e = (e * m & 65535) / 255;
+          i = (f * i & 65535) / 255;
+          goto B_h;
+          label B_j:
+          g = l + g * (d = k ^ 255) / 255;
+          e = m + d * e / 255;
+          i = f + d * i / 255;
+          goto B_h;
+          label B_i:
+          d = g + l;
+          g = select_if(d, 255, d < 255);
+          d = e + m;
+          e = select_if(d, 255, d < 255);
+          d = f + i;
+          i = select_if(d, 255, d < 255);
+          label B_h:
+          b[0] = (e << 8 | i) | g << 16;
+          b = b + 4;
+          c = c + r;
+          if (j) continue L_e;
+        }
+        c = a[7];
+      }
+      a[7] = (b = c - 1);
+      n = n + a[8];
+      if (c) {
+        h = h + s;
+        j = a[6];
+        c = b;
+        b = n;
+        continue L_b;
+      }
+    }
+    a[5] = n;
+  }
+}
+
+function function_2174(a:int_ptr) { // func2174
+  var b:int;
+  var c:int;
+  var n:int;
+  var d:int;
+  var h:int;
+  var i:int;
+  var e:int;
+  var j:int;
+  var f:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13];
+    var o:int = b & 48;
+    b = b & 112;
+    var p:int = b - 16;
+    var q:int = b == 64;
+    var l:int = a[5];
+    var g:int_ptr = l;
+    var m:int = a[0];
+    var k:int_ptr = m;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (n = a[6]) {
+                loop L_d {
+                  h = (d = k[0]) >> 24;
+                  i = d & 255;
+                  e = (c = g[0]) >> 8;
+                  b = c >> 16;
+                  j = d >> 8 & 255;
+                  d = d >> 16 & 255;
+                  if (eqz(o)) goto B_e;
+                  if (h == 255) goto B_e;
+                  i = h * i / 255;
+                  j = h * j / 255;
+                  d = d * h / 255;
+                  label B_e:
+                  n = n - 1;
+                  c = c & 255;
+                  f = e & 255;
+                  e = b & 255;
+                  br_table[B_h, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_g, ..B_i](
+                    p)
+                  label B_i:
+                  if (eqz(q)) goto B_f;
+                  e = (e * i & 65535) / 255;
+                  f = (f * j & 65535) / 255;
+                  c = (c * d & 65535) / 255;
+                  goto B_f;
+                  label B_h:
+                  e = i + e * (b = h ^ 255) / 255;
+                  f = j + b * f / 255;
+                  c = d + b * c / 255;
+                  goto B_f;
+                  label B_g:
+                  e = select_if(b = e + i, 255, b < 255);
+                  f = select_if(b = f + j, 255, b < 255);
+                  c = select_if(b = c + d, 255, b < 255);
+                  label B_f:
+                  g[0] = (f << 8 | c) | e << 16;
+                  g = g + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      l = l + a[8];
+      g = l;
+      m = m + a[3];
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5] = l;
+    a[0] = m;
+  }
+}
+
+function function_2175(a:int) { // func2175
+  var c:int_ptr;
+  var d:int;
+  var m:int;
+  var g:int;
+  var b:int;
+  var o:int;
+  a[7]:int = (d = (c = a[7]:int) - 1);
+  var r:int = (a[1]:int << 16) / (m = a[6]:int);
+  var s:int = (a[2]:int << 16) / c;
+  if (c) {
+    c = a[13]:int;
+    var t:int = c & 48;
+    var u:int = c & 2;
+    var v:int = c & 1;
+    var w:int = a[63]:ubyte;
+    var x:int = a[62]:ubyte;
+    var y:int = a[61]:ubyte;
+    var z:int = a[60]:ubyte;
+    c = c & 112;
+    var aa:int = c - 16;
+    var ba:int = c == 64;
+    var n:int = a[5]:int;
+    c = n;
+    loop L_b {
+      if (g >= 65536) {
+        g = 
+          g - ((b = g - select_if(g, 131071, g < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (b >> 16) + 1;
+      }
+      if (m) {
+        var p:int = -1;
+        d = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (d >= 65536) {
+            q = 
+              a[0]:int + a[3]:int * o +
+              ((p = 
+                  p + ((b = d - select_if(d, 131071, d < 131071) + 65535) >> 16) + 1) <<
+               2);
+            d = d - (b & -65536) - 65536;
+          }
+          var e:int = c[0];
+          b = q[0];
+          var j:int = b & 255;
+          var k:int = b >> 8 & 255;
+          var h:int = b >> 16 & 255;
+          if (v) {
+            j = j * x / 255;
+            k = k * y / 255;
+            h = h * z / 255;
+          }
+          var i:int = b >> 24;
+          i = select_if(i * w / 255, i, u);
+          var f:int = e >> 8;
+          b = e >> 16;
+          if (eqz(t)) goto B_h;
+          if (i > 254) goto B_h;
+          j = i * j / 255;
+          k = i * k / 255;
+          h = h * i / 255;
+          label B_h:
+          m = m - 1;
+          var l:int = e & 255;
+          e = f & 255;
+          f = b & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            aa)
+          label B_l:
+          if (eqz(ba)) goto B_i;
+          l = j * l / 255;
+          e = e * k / 255;
+          f = f * h / 255;
+          goto B_i;
+          label B_k:
+          l = j + (b = 255 - i) * l / 255;
+          e = k + b * e / 255;
+          f = h + b * f / 255;
+          goto B_i;
+          label B_j:
+          b = j + l;
+          l = select_if(b, 255, b < 255);
+          b = e + k;
+          e = select_if(b, 255, b < 255);
+          b = f + h;
+          f = select_if(b, 255, b < 255);
+          label B_i:
+          c[0] = (e << 8 | f << 16) | l;
+          c = c + 4;
+          d = d + r;
+          if (m) continue L_e;
+        }
+        d = a[7]:int;
+      }
+      a[7]:int = (c = d - 1);
+      n = n + a[8]:int;
+      if (d) {
+        g = g + s;
+        m = a[6]:int;
+        d = c;
+        c = n;
+        continue L_b;
+      }
+    }
+    a[5]:int = n;
+  }
+}
+
+function function_2176(a:int_ptr, b:int) { // func2176
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 52448;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_2177(a:int) { // func2177
+  var b:int;
+  var c:int;
+  var n:int;
+  var d:int;
+  var g:int;
+  var h:int;
+  var f:int;
+  var e:int;
+  var i:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var o:int = b & 48;
+    var p:int = b & 2;
+    var q:int = b & 1;
+    var r:int = a[63]:ubyte;
+    var s:int = a[62]:ubyte;
+    var t:int = a[61]:ubyte;
+    var u:int = a[60]:ubyte;
+    b = b & 112;
+    var v:int = b - 16;
+    var w:int = b == 64;
+    var l:int = a[5]:int;
+    var j:int_ptr = l;
+    var m:int = a[0]:int;
+    var k:int_ptr = m;
+    loop L_b {
+      a[7]:int =
+        (c = 
+           (b = 
+              if (n = a[6]:int) {
+                loop L_d {
+                  d = j[0];
+                  g = (b = k[0]) & 255;
+                  h = b >> 8 & 255;
+                  f = b >> 16 & 255;
+                  if (q) {
+                    g = g * s / 255;
+                    h = h * t / 255;
+                    f = f * u / 255;
+                  }
+                  c = b >> 24;
+                  c = select_if(c * r / 255, c, p);
+                  e = d >> 8;
+                  b = d >> 16;
+                  if (eqz(o)) goto B_f;
+                  if (c > 254) goto B_f;
+                  g = c * g / 255;
+                  h = c * h / 255;
+                  f = c * f / 255;
+                  label B_f:
+                  n = n - 1;
+                  i = d & 255;
+                  d = e & 255;
+                  e = b & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    v)
+                  label B_j:
+                  if (eqz(w)) goto B_g;
+                  i = g * i / 255;
+                  d = d * h / 255;
+                  e = e * f / 255;
+                  goto B_g;
+                  label B_i:
+                  i = g + (b = 255 - c) * i / 255;
+                  d = h + b * d / 255;
+                  e = f + b * e / 255;
+                  goto B_g;
+                  label B_h:
+                  i = select_if(b = g + i, 255, b < 255);
+                  d = select_if(b = d + h, 255, b < 255);
+                  e = select_if(b = e + f, 255, b < 255);
+                  label B_g:
+                  j[0] = (d << 8 | e << 16) | i;
+                  j = j + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                c
+              }) -
+           1);
+      l = l + a[8]:int;
+      j = l;
+      m = m + a[3]:int;
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5]:int = l;
+    a[0]:int = m;
+  }
+}
+
+function function_2178(a:int_ptr) { // func2178
+  var b:int_ptr;
+  var c:int;
+  var j:int;
+  var h:int;
+  var d:int;
+  var o:int;
+  a[7] = (c = (b = a[7]) - 1);
+  var r:int = (a[1] << 16) / (j = a[6]);
+  var s:int = (a[2] << 16) / b;
+  if (b) {
+    b = a[13];
+    var t:int = b & 48;
+    b = b & 112;
+    var u:int = b - 16;
+    var v:int = b == 64;
+    var n:int = a[5];
+    b = n;
+    loop L_b {
+      if (h >= 65536) {
+        h = 
+          h - ((d = h - select_if(h, 131071, h < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (d >> 16) + 1;
+      }
+      if (j) {
+        var p:int = -1;
+        c = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            q = 
+              a[0] + a[3] * o +
+              ((p = 
+                  p + ((d = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (d & -65536) - 65536;
+          }
+          var f:int = q[0];
+          var k:int = f >> 24;
+          var l:int = f & 255;
+          var e:int = b[0];
+          var g:int = e >> 8;
+          d = e >> 16;
+          var m:int = f >> 8 & 255;
+          f = f >> 16 & 255;
+          if (eqz(t)) goto B_g;
+          if (k == 255) goto B_g;
+          l = k * l / 255;
+          m = k * m / 255;
+          f = f * k / 255;
+          label B_g:
+          j = j - 1;
+          var i:int = e & 255;
+          e = g & 255;
+          g = d & 255;
+          br_table[B_j, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_h, B_i, ..B_k](
+            u)
+          label B_k:
+          if (eqz(v)) goto B_h;
+          i = (i * l & 65535) / 255;
+          e = (e * m & 65535) / 255;
+          g = (f * g & 65535) / 255;
+          goto B_h;
+          label B_j:
+          i = l + (d = k ^ 255) * i / 255;
+          e = m + d * e / 255;
+          g = f + d * g / 255;
+          goto B_h;
+          label B_i:
+          d = i + l;
+          i = select_if(d, 255, d < 255);
+          d = e + m;
+          e = select_if(d, 255, d < 255);
+          d = f + g;
+          g = select_if(d, 255, d < 255);
+          label B_h:
+          b[0] = (e << 8 | g << 16) | i;
+          b = b + 4;
+          c = c + r;
+          if (j) continue L_e;
+        }
+        c = a[7];
+      }
+      a[7] = (b = c - 1);
+      n = n + a[8];
+      if (c) {
+        h = h + s;
+        j = a[6];
+        c = b;
+        b = n;
+        continue L_b;
+      }
+    }
+    a[5] = n;
+  }
+}
+
+function function_2179(a:int_ptr) { // func2179
+  var b:int;
+  var c:int;
+  var n:int;
+  var d:int;
+  var h:int;
+  var i:int;
+  var e:int;
+  var j:int;
+  var f:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13];
+    var o:int = b & 48;
+    b = b & 112;
+    var p:int = b - 16;
+    var q:int = b == 64;
+    var l:int = a[5];
+    var g:int_ptr = l;
+    var m:int = a[0];
+    var k:int_ptr = m;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (n = a[6]) {
+                loop L_d {
+                  h = (d = k[0]) >> 24;
+                  i = d & 255;
+                  e = (c = g[0]) >> 8;
+                  b = c >> 16;
+                  j = d >> 8 & 255;
+                  d = d >> 16 & 255;
+                  if (eqz(o)) goto B_e;
+                  if (h == 255) goto B_e;
+                  i = h * i / 255;
+                  j = h * j / 255;
+                  d = d * h / 255;
+                  label B_e:
+                  n = n - 1;
+                  c = c & 255;
+                  f = e & 255;
+                  e = b & 255;
+                  br_table[B_h, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_f, B_g, ..B_i](
+                    p)
+                  label B_i:
+                  if (eqz(q)) goto B_f;
+                  c = (c * i & 65535) / 255;
+                  f = (f * j & 65535) / 255;
+                  e = (d * e & 65535) / 255;
+                  goto B_f;
+                  label B_h:
+                  c = i + (b = h ^ 255) * c / 255;
+                  f = j + b * f / 255;
+                  e = d + b * e / 255;
+                  goto B_f;
+                  label B_g:
+                  c = select_if(b = c + i, 255, b < 255);
+                  f = select_if(b = f + j, 255, b < 255);
+                  e = select_if(b = d + e, 255, b < 255);
+                  label B_f:
+                  g[0] = (f << 8 | e << 16) | c;
+                  g = g + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      l = l + a[8];
+      g = l;
+      m = m + a[3];
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5] = l;
+    a[0] = m;
+  }
+}
+
+function function_2180(a:int) { // func2180
+  var c:int_ptr;
+  var d:int;
+  var k:int;
+  var l:int;
+  var f:int;
+  var b:int;
+  var o:int;
+  a[7]:int = (d = (c = a[7]:int) - 1);
+  var s:int = (a[1]:int << 16) / (k = a[6]:int);
+  var t:int = (a[2]:int << 16) / c;
+  if (c) {
+    c = a[13]:int;
+    var u:int = 
+      (c & 48) != 0 & (l = select_if(a[63]:ubyte, 255, c & 2)) != 255;
+    var v:int = c & 1;
+    var m:int = l ^ 255;
+    var w:int = a[62]:ubyte;
+    var x:int = a[61]:ubyte;
+    var y:int = a[60]:ubyte;
+    c = c & 112;
+    var z:int = c - 16;
+    var aa:int = c == 64;
+    var n:int = a[5]:int;
+    c = n;
+    loop L_b {
+      if (f >= 65536) {
+        f = 
+          f - ((b = f - select_if(f, 131071, f < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (b >> 16) + 1;
+      }
+      if (k) {
+        var q:int = -1;
+        d = 65536;
+        var r:int_ptr = 0;
+        loop L_e {
+          if (d >= 65536) {
+            r = 
+              a[0]:int + a[3]:int * o +
+              ((q = 
+                  q + ((b = d - select_if(d, 131071, d < 131071) + 65535) >> 16) + 1) <<
+               2);
+            d = d - (b & -65536) - 65536;
+          }
+          var e:int = c[0];
+          b = r[0];
+          var g:int = b & 255;
+          var h:int = b >> 8 & 255;
+          b = b >> 16 & 255;
+          if (v) {
+            h = h * x / 255;
+            g = g * y / 255;
+            b = b * w / 255;
+          }
+          if (u) {
+            h = h * l / 255;
+            g = g * l / 255;
+            b = b * l / 255;
+          }
+          k = k - 1;
+          var p:int = e >> 24;
+          var i:int = e & 255;
+          var j:int = e >> 8 & 255;
+          e = e >> 16 & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            z)
+          label B_l:
+          if (eqz(aa)) goto B_i;
+          i = b * i / 255;
+          j = h * j / 255;
+          e = e * g / 255;
+          goto B_i;
+          label B_k:
+          p = m * p / 255 + l;
+          i = b + i * m / 255;
+          j = h + j * m / 255;
+          e = g + e * m / 255;
+          goto B_i;
+          label B_j:
+          b = b + i;
+          i = select_if(b, 255, b < 255);
+          b = h + j;
+          j = select_if(b, 255, b < 255);
+          b = e + g;
+          e = select_if(b, 255, b < 255);
+          label B_i:
+          c[0] = ((j << 8 | e << 16) | i) | p << 24;
+          c = c + 4;
+          d = d + s;
+          if (k) continue L_e;
+        }
+        d = a[7]:int;
+      }
+      a[7]:int = (c = d - 1);
+      n = n + a[8]:int;
+      if (d) {
+        f = f + t;
+        k = a[6]:int;
+        d = c;
+        c = n;
+        continue L_b;
+      }
+    }
+    a[5]:int = n;
+  }
+}
+
+function function_2181(a:int) { // func2181
+  var b:int;
+  var d:int;
+  var h:int;
+  var n:int;
+  var c:int;
+  var e:int;
+  var f:int;
+  var o:int;
+  var g:int;
+  a[7]:int = (d = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var p:int = 
+      (b & 48) != 0 & (h = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var q:int = b & 1;
+    var j:int = h ^ 255;
+    var r:int = a[62]:ubyte;
+    var s:int = a[61]:ubyte;
+    var t:int = a[60]:ubyte;
+    b = b & 112;
+    var u:int = b - 16;
+    var v:int = b == 64;
+    var l:int = a[5]:int;
+    var i:int_ptr = l;
+    var m:int = a[0]:int;
+    var k:int_ptr = m;
+    loop L_b {
+      a[7]:int =
+        (d = 
+           (b = 
+              if (n = a[6]:int) {
+                loop L_d {
+                  c = i[0];
+                  e = (b = k[0]) & 255;
+                  f = b >> 8 & 255;
+                  b = b >> 16 & 255;
+                  if (q) {
+                    f = f * s / 255;
+                    e = e * t / 255;
+                    b = b * r / 255;
+                  }
+                  if (p) {
+                    f = f * h / 255;
+                    e = e * h / 255;
+                    b = b * h / 255;
+                  }
+                  n = n - 1;
+                  o = c >> 24;
+                  d = c & 255;
+                  g = c >> 8 & 255;
+                  c = c >> 16 & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    u)
+                  label B_j:
+                  if (eqz(v)) goto B_g;
+                  d = b * d / 255;
+                  g = f * g / 255;
+                  c = c * e / 255;
+                  goto B_g;
+                  label B_i:
+                  o = j * o / 255 + h;
+                  d = b + d * j / 255;
+                  g = f + g * j / 255;
+                  c = e + c * j / 255;
+                  goto B_g;
+                  label B_h:
+                  d = select_if(b = b + d, 255, b < 255);
+                  g = select_if(b = f + g, 255, b < 255);
+                  c = select_if(b = c + e, 255, b < 255);
+                  label B_g:
+                  i[0] = ((g << 8 | c << 16) | d) | o << 24;
+                  i = i + 4;
+                  k = k + 4;
+                  if (n) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                d
+              }) -
+           1);
+      l = l + a[8]:int;
+      i = l;
+      m = m + a[3]:int;
+      k = m;
+      if (b) continue L_b;
+    }
+    a[5]:int = l;
+    a[0]:int = m;
+  }
+}
+
+function function_2182(a:int) { // func2182
+  var c:int_ptr;
+  var b:int;
+  var f:int;
+  var e:int;
+  var d:int;
+  var h:int;
+  a[7]:int = (b = (c = a[7]:int) - 1);
+  var m:int = (a[1]:int << 16) / (f = a[6]:int);
+  var n:int = (a[2]:int << 16) / c;
+  if (c) {
+    var o:int = 
+      select_if(a[63]:ubyte << 24, -16777216, (c = a[13]:int) & 2);
+    var p:int = c & 1;
+    var q:int = a[62]:ubyte;
+    var r:int = a[61]:ubyte;
+    var s:int = a[60]:ubyte;
+    var g:int = a[5]:int;
+    c = g;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((d = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        h = h + (d >> 16) + 1;
+      }
+      if (f) {
+        var k:int = -1;
+        b = 65536;
+        var l:int_ptr = 0;
+        loop L_e {
+          if (b >= 65536) {
+            l = 
+              a[0]:int + a[3]:int * h +
+              ((k = 
+                  k + ((d = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (d & -65536) - 65536;
+          }
+          f = f - 1;
+          d = l[0];
+          var i:int = d & 255;
+          var j:int = d >> 8 & 255;
+          d = d >> 16 & 255;
+          c[0] =
+            (if (p) {
+               j = j * r / 255;
+               i = i * s / 255;
+               d * q / 255;
+             } else {
+               d
+             } |
+             (j << 8 | o)) |
+            i << 16;
+          c = c + 4;
+          b = b + m;
+          if (f) continue L_e;
+        }
+        b = a[7]:int;
+      }
+      a[7]:int = (c = b - 1);
+      g = g + a[8]:int;
+      if (b) {
+        e = e + n;
+        f = a[6]:int;
+        b = c;
+        c = g;
+        continue L_b;
+      }
+    }
+    a[5]:int = g;
+  }
+}
+
+function function_2183(a:int) { // func2183
+  var b:int;
+  var c:int;
+  var h:int;
+  var i:int;
+  var j:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  if (b) {
+    var k:int = 
+      select_if(a[63]:ubyte << 24, -16777216, (b = a[13]:int) & 2);
+    var l:int = b & 1;
+    var m:int = a[62]:ubyte;
+    var n:int = a[61]:ubyte;
+    var o:int = a[60]:ubyte;
+    var f:int = a[5]:int;
+    var d:int_ptr = f;
+    var g:int = a[0]:int;
+    var e:int_ptr = g;
+    loop L_b {
+      a[7]:int =
+        (c = (b = if (h = a[6]:int) {
+                    loop L_d {
+                      h = h - 1;
+                      i = (b = e[0]) & 255;
+                      j = b >> 8 & 255;
+                      c = b >> 16 & 255;
+                      d[0] =
+                        if (l) {
+                          j = j * n / 255;
+                          i = i * o / 255;
+                          c * m / 255;
+                        } else {
+                          c
+                        } |
+                        ((i << 16 | k) | j << 8);
+                      d = d + 4;
+                      e = e + 4;
+                      if (h) continue L_d;
+                    }
+                    a[7]:int;
+                  } else {
+                    c
+                  }) -
+             1);
+      f = f + a[8]:int;
+      d = f;
+      g = g + a[3]:int;
+      e = g;
+      if (b) continue L_b;
+    }
+    a[5]:int = f;
+    a[0]:int = g;
+  }
+}
+
+function function_2184(a:int_ptr) { // func2184
+  var d:int_ptr;
+  var c:int;
+  var j:int;
+  var e:int;
+  var b:int;
+  var l:int;
+  a[7] = (c = (d = a[7]) - 1);
+  var q:int = (a[1] << 16) / (j = a[6]);
+  var r:int = (a[2] << 16) / d;
+  if (d) {
+    d = a[13] & 112;
+    var s:int = d - 16;
+    var t:int = d == 64;
+    var k:int = a[5];
+    d = k;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((b = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        l = l + (b >> 16) + 1;
+      }
+      if (j) {
+        var n:int = -1;
+        c = 65536;
+        var o:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            o = 
+              a[0] + a[3] * l +
+              ((n = 
+                  n + ((b = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (b & -65536) - 65536;
+          }
+          j = j - 1;
+          var f:int = d[0];
+          var p:int = f >> 24;
+          var g:int = f & 255;
+          b = o[0];
+          var m:int = b & 255;
+          var h:int = f >> 8 & 255;
+          var i:int = f >> 16 & 255;
+          f = b >> 8 & 255;
+          b = b >> 16 & 255;
+          br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+            s)
+          label B_j:
+          if (eqz(t)) goto B_g;
+          g = b * g / 255;
+          h = f * h / 255;
+          i = i * m / 255;
+          goto B_g;
+          label B_i:
+          p = 255;
+          i = m;
+          h = f;
+          g = b;
+          goto B_g;
+          label B_h:
+          b = b + g;
+          g = select_if(b, 255, b < 255);
+          b = f + h;
+          h = select_if(b, 255, b < 255);
+          b = i + m;
+          i = select_if(b, 255, b < 255);
+          label B_g:
+          d[0] = ((h << 8 | i << 16) | g) | p << 24;
+          d = d + 4;
+          c = c + q;
+          if (j) continue L_e;
+        }
+        c = a[7];
+      }
+      a[7] = (d = c - 1);
+      k = k + a[8];
+      if (c) {
+        e = e + r;
+        j = a[6];
+        c = d;
+        d = k;
+        continue L_b;
+      }
+    }
+    a[5] = k;
+  }
+}
+
+function function_2185(a:int_ptr) { // func2185
+  var b:int;
+  var c:int;
+  var j:int;
+  var m:int;
+  var d:int;
+  var k:int;
+  var e:int;
+  var l:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13] & 112;
+    var n:int = b - 16;
+    var o:int = b == 64;
+    var h:int = a[5];
+    var f:int_ptr = h;
+    var i:int = a[0];
+    var g:int_ptr = i;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (j = a[6]) {
+                loop L_d {
+                  j = j - 1;
+                  m = (c = f[0]) >> 24;
+                  d = c & 255;
+                  k = (b = g[0]) & 255;
+                  e = c >> 8 & 255;
+                  c = c >> 16 & 255;
+                  l = b >> 8 & 255;
+                  b = b >> 16 & 255;
+                  br_table[B_g, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_f, ..B_h](
+                    n)
+                  label B_h:
+                  if (eqz(o)) goto B_e;
+                  d = b * d / 255;
+                  e = e * l / 255;
+                  c = c * k / 255;
+                  goto B_e;
+                  label B_g:
+                  m = 255;
+                  c = k;
+                  e = l;
+                  d = b;
+                  goto B_e;
+                  label B_f:
+                  d = select_if(b = b + d, 255, b < 255);
+                  e = select_if(b = e + l, 255, b < 255);
+                  c = select_if(c = c + k, 255, c < 255);
+                  label B_e:
+                  f[0] = ((e << 8 | c << 16) | d) | m << 24;
+                  f = f + 4;
+                  g = g + 4;
+                  if (j) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      h = h + a[8];
+      f = h;
+      i = i + a[3];
+      g = i;
+      if (b) continue L_b;
+    }
+    a[5] = h;
+    a[0] = i;
+  }
+}
+
+function function_2186(a:int_ptr, b:int_ptr) { // func2186
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 52436;
+  var c:int_ptr = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 52460;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_2187(a:int) { // func2187
+  167820[0]:byte = 0;
+  167892[0]:byte = 0;
+  167748[0]:byte = 0;
+  167676[0]:byte = 0;
+  167604[0]:byte = 0;
+  167532[0]:byte = 0;
+  167460[0]:byte = 0;
+  167388[0]:byte = 0;
+  167316[0]:byte = 0;
+  167244[0]:byte = 0;
+  167172[0]:byte = 0;
+  167100[0]:byte = 0;
+  167028[0]:byte = 0;
+  166956[0]:byte = 0;
+  166884[0]:byte = 0;
+  166812[0]:byte = 0;
+  166740[0]:byte = 0;
+  166668[0]:byte = 0;
+  166596[0]:byte = 0;
+  166452[0]:byte = 0;
+  166524[0]:byte = 0;
+  166380[0]:byte = 0;
+  166308[0]:byte = 0;
+  166236[0]:byte = 0;
+  166164[0]:byte = 0;
+  166092[0]:byte = 0;
+  166020[0]:byte = 0;
+  165948[0]:byte = 0;
+  165876[0]:byte = 0;
+  165804[0]:byte = 0;
+  165732[0]:byte = 0;
+  165660[0]:byte = 0;
+  165588[0]:byte = 0;
+  165516[0]:byte = 0;
+  165444[0]:byte = 0;
+}
+
+function function_2188(a:int_ptr) { // func2188
+  var c:int_ptr;
+  var b:int;
+  var f:int;
+  var d:int;
+  var e:int;
+  var g:int;
+  a[7] = (b = (c = a[7]) - 1);
+  var k:int = (a[1] << 16) / (f = a[6]);
+  var l:int = (a[2] << 16) / c;
+  if (c) {
+    var h:int = a[5];
+    c = h;
+    loop L_b {
+      if (d >= 65536) {
+        d = 
+          d - ((e = d - select_if(d, 131071, d < 131071) + 65535) & -65536) -
+          65536;
+        g = g + (e >> 16) + 1;
+      }
+      if (f) {
+        b = 65536;
+        var i:int = -1;
+        var j:int_ptr = 0;
+        loop L_e {
+          f = f - 1;
+          if (b >= 65536) {
+            j = 
+              a[0] + a[3] * g +
+              ((i = 
+                  i + ((e = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (e & -65536) - 65536;
+          }
+          c[0] =
+            (((e = j[0]) << 16 | (e & 65280)) | (e >> 16 & 255)) | -16777216;
+          c = c + 4;
+          b = b + k;
+          if (f) continue L_e;
+        }
+        b = a[7];
+      }
+      a[7] = (c = b - 1);
+      h = h + a[8];
+      if (b) {
+        d = d + l;
+        f = a[6];
+        b = c;
+        c = h;
+        continue L_b;
+      }
+    }
+    a[5] = h;
+  }
+}
+
+function function_2189(a:int) { // func2189
+  var c:int_ptr;
+  var d:int;
+  var k:int;
+  var l:int;
+  var f:int;
+  var b:int;
+  var n:int;
+  a[7]:int = (d = (c = a[7]:int) - 1);
+  var r:int = (a[1]:int << 16) / (k = a[6]:int);
+  var s:int = (a[2]:int << 16) / c;
+  if (c) {
+    c = a[13]:int;
+    var t:int = 
+      (c & 48) != 0 & (l = select_if(a[63]:ubyte, 255, c & 2)) != 255;
+    var u:int = c & 1;
+    var o:int = l ^ 255;
+    var v:int = a[62]:ubyte;
+    var w:int = a[61]:ubyte;
+    var x:int = a[60]:ubyte;
+    c = c & 112;
+    var y:int = c - 16;
+    var z:int = c == 64;
+    var m:int = a[5]:int;
+    c = m;
+    loop L_b {
+      if (f >= 65536) {
+        f = 
+          f - ((b = f - select_if(f, 131071, f < 131071) + 65535) & -65536) -
+          65536;
+        n = n + (b >> 16) + 1;
+      }
+      if (k) {
+        var p:int = -1;
+        d = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (d >= 65536) {
+            q = 
+              a[0]:int + a[3]:int * n +
+              ((p = 
+                  p + ((b = d - select_if(d, 131071, d < 131071) + 65535) >> 16) + 1) <<
+               2);
+            d = d - (b & -65536) - 65536;
+          }
+          var e:int = c[0];
+          b = q[0];
+          var g:int = b & 255;
+          var h:int = b >> 8 & 255;
+          b = b >> 16 & 255;
+          if (u) {
+            h = h * w / 255;
+            g = g * x / 255;
+            b = b * v / 255;
+          }
+          if (t) {
+            h = h * l / 255;
+            g = g * l / 255;
+            b = b * l / 255;
+          }
+          k = k - 1;
+          var i:int = e & 255;
+          var j:int = e >> 8 & 255;
+          e = e >> 16 & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            y)
+          label B_l:
+          if (eqz(z)) goto B_i;
+          e = b * e / 255;
+          j = h * j / 255;
+          i = g * i / 255;
+          goto B_i;
+          label B_k:
+          e = b + e * o / 255;
+          j = h + j * o / 255;
+          i = g + i * o / 255;
+          goto B_i;
+          label B_j:
+          b = b + e;
+          e = select_if(b, 255, b < 255);
+          b = h + j;
+          j = select_if(b, 255, b < 255);
+          b = g + i;
+          i = select_if(b, 255, b < 255);
+          label B_i:
+          c[0] = (j << 8 | i) | e << 16;
+          c = c + 4;
+          d = d + r;
+          if (k) continue L_e;
+        }
+        d = a[7]:int;
+      }
+      a[7]:int = (c = d - 1);
+      m = m + a[8]:int;
+      if (d) {
+        f = f + s;
+        k = a[6]:int;
+        d = c;
+        c = m;
+        continue L_b;
+      }
+    }
+    a[5]:int = m;
+  }
+}
+
+function function_2190(a:int) { // func2190
+  var b:int;
+  var d:int;
+  var i:int;
+  var n:int;
+  var c:int;
+  var e:int;
+  var f:int;
+  var g:int;
+  a[7]:int = (d = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var o:int = 
+      (b & 48) != 0 & (i = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var p:int = b & 1;
+    var k:int = i ^ 255;
+    var q:int = a[62]:ubyte;
+    var r:int = a[61]:ubyte;
+    var s:int = a[60]:ubyte;
+    b = b & 112;
+    var t:int = b - 16;
+    var u:int = b == 64;
+    var l:int = a[5]:int;
+    var h:int_ptr = l;
+    var m:int = a[0]:int;
+    var j:int_ptr = m;
+    loop L_b {
+      a[7]:int =
+        (d = 
+           (b = 
+              if (n = a[6]:int) {
+                loop L_d {
+                  c = h[0];
+                  e = (b = j[0]) & 255;
+                  f = b >> 8 & 255;
+                  b = b >> 16 & 255;
+                  if (p) {
+                    f = f * r / 255;
+                    e = e * s / 255;
+                    b = b * q / 255;
+                  }
+                  if (o) {
+                    f = f * i / 255;
+                    e = e * i / 255;
+                    b = b * i / 255;
+                  }
+                  n = n - 1;
+                  d = c & 255;
+                  g = c >> 8 & 255;
+                  c = c >> 16 & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    t)
+                  label B_j:
+                  if (eqz(u)) goto B_g;
+                  c = b * c / 255;
+                  g = f * g / 255;
+                  d = d * e / 255;
+                  goto B_g;
+                  label B_i:
+                  c = b + c * k / 255;
+                  g = f + g * k / 255;
+                  d = e + d * k / 255;
+                  goto B_g;
+                  label B_h:
+                  c = select_if(b = b + c, 255, b < 255);
+                  g = select_if(b = f + g, 255, b < 255);
+                  d = select_if(b = d + e, 255, b < 255);
+                  label B_g:
+                  h[0] = (g << 8 | d) | c << 16;
+                  h = h + 4;
+                  j = j + 4;
+                  if (n) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                d
+              }) -
+           1);
+      l = l + a[8]:int;
+      h = l;
+      m = m + a[3]:int;
+      j = m;
+      if (b) continue L_b;
+    }
+    a[5]:int = l;
+    a[0]:int = m;
+  }
+}
+
+function function_2191(a:int_ptr) { // func2191
+  var d:int_ptr;
+  var c:int;
+  var j:int;
+  var e:int;
+  var b:int;
+  var l:int;
+  a[7] = (c = (d = a[7]) - 1);
+  var p:int = (a[1] << 16) / (j = a[6]);
+  var q:int = (a[2] << 16) / d;
+  if (d) {
+    d = a[13] & 112;
+    var r:int = d - 16;
+    var s:int = d == 64;
+    var k:int = a[5];
+    d = k;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((b = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        l = l + (b >> 16) + 1;
+      }
+      if (j) {
+        var n:int = -1;
+        c = 65536;
+        var o:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            o = 
+              a[0] + a[3] * l +
+              ((n = 
+                  n + ((b = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (b & -65536) - 65536;
+          }
+          j = j - 1;
+          var f:int = d[0];
+          var g:int = f & 255;
+          b = o[0];
+          var m:int = b & 255;
+          var h:int = f >> 8 & 255;
+          var i:int = f >> 16 & 255;
+          f = b >> 8 & 255;
+          b = b >> 16 & 255;
+          br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+            r)
+          label B_j:
+          if (eqz(s)) goto B_g;
+          i = b * i / 255;
+          h = f * h / 255;
+          g = g * m / 255;
+          goto B_g;
+          label B_i:
+          g = m;
+          h = f;
+          i = b;
+          goto B_g;
+          label B_h:
+          b = b + i;
+          i = select_if(b, 255, b < 255);
+          b = f + h;
+          h = select_if(b, 255, b < 255);
+          b = g + m;
+          g = select_if(b, 255, b < 255);
+          label B_g:
+          d[0] = (h << 8 | g) | i << 16;
+          d = d + 4;
+          c = c + p;
+          if (j) continue L_e;
+        }
+        c = a[7];
+      }
+      a[7] = (d = c - 1);
+      k = k + a[8];
+      if (c) {
+        e = e + q;
+        j = a[6];
+        c = d;
+        d = k;
+        continue L_b;
+      }
+    }
+    a[5] = k;
+  }
+}
+
+function function_2192(a:int_ptr) { // func2192
+  var b:int;
+  var c:int;
+  var j:int;
+  var d:int;
+  var e:int;
+  var k:int;
+  var l:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13] & 112;
+    var m:int = b - 16;
+    var n:int = b == 64;
+    var h:int = a[5];
+    var f:int_ptr = h;
+    var i:int = a[0];
+    var g:int_ptr = i;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (j = a[6]) {
+                loop L_d {
+                  j = j - 1;
+                  c = (d = f[0]) & 255;
+                  k = (e = g[0]) & 255;
+                  b = d >> 8 & 255;
+                  d = d >> 16 & 255;
+                  l = e >> 8 & 255;
+                  e = e >> 16 & 255;
+                  br_table[B_g, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_f, ..B_h](
+                    m)
+                  label B_h:
+                  if (eqz(n)) goto B_e;
+                  d = d * e / 255;
+                  b = b * l / 255;
+                  c = c * k / 255;
+                  goto B_e;
+                  label B_g:
+                  c = k;
+                  b = l;
+                  d = e;
+                  goto B_e;
+                  label B_f:
+                  d = select_if(d = d + e, 255, d < 255);
+                  b = select_if(b = b + l, 255, b < 255);
+                  c = select_if(c = c + k, 255, c < 255);
+                  label B_e:
+                  f[0] = (b << 8 | c) | d << 16;
+                  f = f + 4;
+                  g = g + 4;
+                  if (j) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      h = h + a[8];
+      f = h;
+      i = i + a[3];
+      g = i;
+      if (b) continue L_b;
+    }
+    a[5] = h;
+    a[0] = i;
+  }
+}
+
+function function_2193(a:int) { // func2193
+  var c:int_ptr;
+  var d:int;
+  var k:int;
+  var l:int;
+  var f:int;
+  var b:int;
+  var n:int;
+  a[7]:int = (d = (c = a[7]:int) - 1);
+  var r:int = (a[1]:int << 16) / (k = a[6]:int);
+  var s:int = (a[2]:int << 16) / c;
+  if (c) {
+    c = a[13]:int;
+    var t:int = 
+      (c & 48) != 0 & (l = select_if(a[63]:ubyte, 255, c & 2)) != 255;
+    var u:int = c & 1;
+    var o:int = l ^ 255;
+    var v:int = a[62]:ubyte;
+    var w:int = a[61]:ubyte;
+    var x:int = a[60]:ubyte;
+    c = c & 112;
+    var y:int = c - 16;
+    var z:int = c == 64;
+    var m:int = a[5]:int;
+    c = m;
+    loop L_b {
+      if (f >= 65536) {
+        f = 
+          f - ((b = f - select_if(f, 131071, f < 131071) + 65535) & -65536) -
+          65536;
+        n = n + (b >> 16) + 1;
+      }
+      if (k) {
+        var p:int = -1;
+        d = 65536;
+        var q:int_ptr = 0;
+        loop L_e {
+          if (d >= 65536) {
+            q = 
+              a[0]:int + a[3]:int * n +
+              ((p = 
+                  p + ((b = d - select_if(d, 131071, d < 131071) + 65535) >> 16) + 1) <<
+               2);
+            d = d - (b & -65536) - 65536;
+          }
+          var e:int = c[0];
+          b = q[0];
+          var g:int = b & 255;
+          var h:int = b >> 8 & 255;
+          b = b >> 16 & 255;
+          if (u) {
+            h = h * w / 255;
+            g = g * x / 255;
+            b = b * v / 255;
+          }
+          if (t) {
+            h = h * l / 255;
+            g = g * l / 255;
+            b = b * l / 255;
+          }
+          k = k - 1;
+          var i:int = e & 255;
+          var j:int = e >> 8 & 255;
+          e = e >> 16 & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            y)
+          label B_l:
+          if (eqz(z)) goto B_i;
+          i = b * i / 255;
+          j = h * j / 255;
+          e = e * g / 255;
+          goto B_i;
+          label B_k:
+          i = b + i * o / 255;
+          j = h + j * o / 255;
+          e = g + e * o / 255;
+          goto B_i;
+          label B_j:
+          b = b + i;
+          i = select_if(b, 255, b < 255);
+          b = h + j;
+          j = select_if(b, 255, b < 255);
+          b = e + g;
+          e = select_if(b, 255, b < 255);
+          label B_i:
+          c[0] = (j << 8 | e << 16) | i;
+          c = c + 4;
+          d = d + r;
+          if (k) continue L_e;
+        }
+        d = a[7]:int;
+      }
+      a[7]:int = (c = d - 1);
+      m = m + a[8]:int;
+      if (d) {
+        f = f + s;
+        k = a[6]:int;
+        d = c;
+        c = m;
+        continue L_b;
+      }
+    }
+    a[5]:int = m;
+  }
+}
+
+function function_2194(a:int) { // func2194
+  var b:int;
+  var d:int;
+  var i:int;
+  var n:int;
+  var c:int;
+  var e:int;
+  var f:int;
+  var g:int;
+  a[7]:int = (d = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var o:int = 
+      (b & 48) != 0 & (i = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var p:int = b & 1;
+    var k:int = i ^ 255;
+    var q:int = a[62]:ubyte;
+    var r:int = a[61]:ubyte;
+    var s:int = a[60]:ubyte;
+    b = b & 112;
+    var t:int = b - 16;
+    var u:int = b == 64;
+    var l:int = a[5]:int;
+    var h:int_ptr = l;
+    var m:int = a[0]:int;
+    var j:int_ptr = m;
+    loop L_b {
+      a[7]:int =
+        (d = 
+           (b = 
+              if (n = a[6]:int) {
+                loop L_d {
+                  c = h[0];
+                  e = (b = j[0]) & 255;
+                  f = b >> 8 & 255;
+                  b = b >> 16 & 255;
+                  if (p) {
+                    f = f * r / 255;
+                    e = e * s / 255;
+                    b = b * q / 255;
+                  }
+                  if (o) {
+                    f = f * i / 255;
+                    e = e * i / 255;
+                    b = b * i / 255;
+                  }
+                  n = n - 1;
+                  d = c & 255;
+                  g = c >> 8 & 255;
+                  c = c >> 16 & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    t)
+                  label B_j:
+                  if (eqz(u)) goto B_g;
+                  d = b * d / 255;
+                  g = f * g / 255;
+                  c = c * e / 255;
+                  goto B_g;
+                  label B_i:
+                  d = b + d * k / 255;
+                  g = f + g * k / 255;
+                  c = e + c * k / 255;
+                  goto B_g;
+                  label B_h:
+                  d = select_if(b = b + d, 255, b < 255);
+                  g = select_if(b = f + g, 255, b < 255);
+                  c = select_if(b = c + e, 255, b < 255);
+                  label B_g:
+                  h[0] = (g << 8 | c << 16) | d;
+                  h = h + 4;
+                  j = j + 4;
+                  if (n) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                d
+              }) -
+           1);
+      l = l + a[8]:int;
+      h = l;
+      m = m + a[3]:int;
+      j = m;
+      if (b) continue L_b;
+    }
+    a[5]:int = l;
+    a[0]:int = m;
+  }
+}
+
+function function_2195(a:int_ptr, b:int_ptr) { // func2195
+  a = stack_pointer - 48;
+  stack_pointer = a;
+  a[10] = 52244;
+  var c:int_ptr = a + 40;
+  call_indirect(c, a + 32, (c[0])[0]:int);
+  a[6] = 52292;
+  c = a + 24;
+  call_indirect(c, b, (c[0])[0]:int);
+  a[4] = 52424;
+  b = a + 16;
+  call_indirect(b, a + 8, (b[0])[0]:int);
+  stack_pointer = a + 48;
+}
+
+function function_2196(a:int_ptr) { // func2196
+  var d:int_ptr;
+  var c:int;
+  var j:int;
+  var e:int;
+  var b:int;
+  var l:int;
+  a[7] = (c = (d = a[7]) - 1);
+  var p:int = (a[1] << 16) / (j = a[6]);
+  var q:int = (a[2] << 16) / d;
+  if (d) {
+    d = a[13] & 112;
+    var r:int = d - 16;
+    var s:int = d == 64;
+    var k:int = a[5];
+    d = k;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((b = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        l = l + (b >> 16) + 1;
+      }
+      if (j) {
+        var n:int = -1;
+        c = 65536;
+        var o:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            o = 
+              a[0] + a[3] * l +
+              ((n = 
+                  n + ((b = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (b & -65536) - 65536;
+          }
+          j = j - 1;
+          var f:int = d[0];
+          var g:int = f & 255;
+          b = o[0];
+          var m:int = b & 255;
+          var h:int = f >> 8 & 255;
+          var i:int = f >> 16 & 255;
+          f = b >> 8 & 255;
+          b = b >> 16 & 255;
+          br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+            r)
+          label B_j:
+          if (eqz(s)) goto B_g;
+          g = b * g / 255;
+          h = f * h / 255;
+          i = i * m / 255;
+          goto B_g;
+          label B_i:
+          i = m;
+          h = f;
+          g = b;
+          goto B_g;
+          label B_h:
+          b = b + g;
+          g = select_if(b, 255, b < 255);
+          b = f + h;
+          h = select_if(b, 255, b < 255);
+          b = i + m;
+          i = select_if(b, 255, b < 255);
+          label B_g:
+          d[0] = (h << 8 | i << 16) | g;
+          d = d + 4;
+          c = c + p;
+          if (j) continue L_e;
+        }
+        c = a[7];
+      }
+      a[7] = (d = c - 1);
+      k = k + a[8];
+      if (c) {
+        e = e + q;
+        j = a[6];
+        c = d;
+        d = k;
+        continue L_b;
+      }
+    }
+    a[5] = k;
+  }
+}
+
+function function_2197(a:int_ptr) { // func2197
+  var b:int;
+  var c:int;
+  var j:int;
+  var d:int;
+  var e:int;
+  var k:int;
+  var l:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13] & 112;
+    var m:int = b - 16;
+    var n:int = b == 64;
+    var h:int = a[5];
+    var f:int_ptr = h;
+    var i:int = a[0];
+    var g:int_ptr = i;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (j = a[6]) {
+                loop L_d {
+                  j = j - 1;
+                  c = (d = f[0]) & 255;
+                  k = (e = g[0]) & 255;
+                  b = d >> 8 & 255;
+                  d = d >> 16 & 255;
+                  l = e >> 8 & 255;
+                  e = e >> 16 & 255;
+                  br_table[B_g, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_f, ..B_h](
+                    m)
+                  label B_h:
+                  if (eqz(n)) goto B_e;
+                  c = c * e / 255;
+                  b = b * l / 255;
+                  d = d * k / 255;
+                  goto B_e;
+                  label B_g:
+                  d = k;
+                  b = l;
+                  c = e;
+                  goto B_e;
+                  label B_f:
+                  c = select_if(c = c + e, 255, c < 255);
+                  b = select_if(b = b + l, 255, b < 255);
+                  d = select_if(d = d + k, 255, d < 255);
+                  label B_e:
+                  f[0] = (b << 8 | d << 16) | c;
+                  f = f + 4;
+                  g = g + 4;
+                  if (j) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      h = h + a[8];
+      f = h;
+      i = i + a[3];
+      g = i;
+      if (b) continue L_b;
+    }
+    a[5] = h;
+    a[0] = i;
+  }
+}
+
+function function_2198(a:int) { // func2198
+  var b:int_ptr;
+  var c:int;
+  var l:int;
+  var m:int;
+  var g:int;
+  var d:int;
+  var p:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  var t:int = (a[1]:int << 16) / (l = a[6]:int);
+  var u:int = (a[2]:int << 16) / b;
+  if (b) {
+    b = a[13]:int;
+    var v:int = 
+      (b & 48) != 0 & (m = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var w:int = b & 1;
+    var n:int = m ^ 255;
+    var x:int = a[62]:ubyte;
+    var y:int = a[61]:ubyte;
+    var z:int = a[60]:ubyte;
+    b = b & 112;
+    var aa:int = b - 16;
+    var ba:int = b == 64;
+    var o:int = a[5]:int;
+    b = o;
+    loop L_b {
+      if (g >= 65536) {
+        g = 
+          g - ((d = g - select_if(g, 131071, g < 131071) + 65535) & -65536) -
+          65536;
+        p = p + (d >> 16) + 1;
+      }
+      if (l) {
+        var r:int = -1;
+        c = 65536;
+        var s:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            s = 
+              a[0]:int + a[3]:int * p +
+              ((r = 
+                  r + ((d = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (d & -65536) - 65536;
+          }
+          var e:int = b[0];
+          d = s[0];
+          var h:int = d & 255;
+          var i:int = d >> 8 & 255;
+          var f:int = d >> 16 & 255;
+          if (w) {
+            h = h * x / 255;
+            i = i * y / 255;
+            f = f * z / 255;
+          }
+          if (v) {
+            h = h * m / 255;
+            i = i * m / 255;
+            f = f * m / 255;
+          }
+          l = l - 1;
+          var q:int = e >> 24;
+          var j:int = e & 255;
+          var k:int = e >> 8 & 255;
+          e = e >> 16 & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            aa)
+          label B_l:
+          if (eqz(ba)) goto B_i;
+          j = h * j / 255;
+          k = i * k / 255;
+          e = e * f / 255;
+          goto B_i;
+          label B_k:
+          q = n * q / 255 + m;
+          j = h + j * n / 255;
+          k = i + k * n / 255;
+          e = f + e * n / 255;
+          goto B_i;
+          label B_j:
+          d = h + j;
+          j = select_if(d, 255, d < 255);
+          d = i + k;
+          k = select_if(d, 255, d < 255);
+          d = e + f;
+          e = select_if(d, 255, d < 255);
+          label B_i:
+          b[0] = ((k << 8 | e << 16) | j) | q << 24;
+          b = b + 4;
+          c = c + t;
+          if (l) continue L_e;
+        }
+        c = a[7]:int;
+      }
+      a[7]:int = (b = c - 1);
+      o = o + a[8]:int;
+      if (c) {
+        g = g + u;
+        l = a[6]:int;
+        c = b;
+        b = o;
+        continue L_b;
+      }
+    }
+    a[5]:int = o;
+  }
+}
+
+function function_2199(a:int) { // func2199
+  var b:int;
+  var d:int;
+  var i:int;
+  var o:int;
+  var c:int;
+  var f:int;
+  var g:int;
+  var e:int;
+  var p:int;
+  var h:int;
+  a[7]:int = (d = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var q:int = 
+      (b & 48) != 0 & (i = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var r:int = b & 1;
+    var k:int = i ^ 255;
+    var s:int = a[62]:ubyte;
+    var t:int = a[61]:ubyte;
+    var u:int = a[60]:ubyte;
+    b = b & 112;
+    var v:int = b - 16;
+    var w:int = b == 64;
+    var m:int = a[5]:int;
+    var j:int_ptr = m;
+    var n:int = a[0]:int;
+    var l:int_ptr = n;
+    loop L_b {
+      a[7]:int =
+        (d = 
+           (b = 
+              if (o = a[6]:int) {
+                loop L_d {
+                  c = j[0];
+                  f = (b = l[0]) & 255;
+                  g = b >> 8 & 255;
+                  e = b >> 16 & 255;
+                  if (r) {
+                    f = f * s / 255;
+                    g = g * t / 255;
+                    e = e * u / 255;
+                  }
+                  if (q) {
+                    f = f * i / 255;
+                    g = g * i / 255;
+                    e = e * i / 255;
+                  }
+                  o = o - 1;
+                  p = c >> 24;
+                  d = c & 255;
+                  h = c >> 8 & 255;
+                  c = c >> 16 & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    v)
+                  label B_j:
+                  if (eqz(w)) goto B_g;
+                  d = d * f / 255;
+                  h = g * h / 255;
+                  c = c * e / 255;
+                  goto B_g;
+                  label B_i:
+                  p = k * p / 255 + i;
+                  d = f + d * k / 255;
+                  h = g + h * k / 255;
+                  c = e + c * k / 255;
+                  goto B_g;
+                  label B_h:
+                  d = select_if(b = d + f, 255, b < 255);
+                  h = select_if(b = g + h, 255, b < 255);
+                  c = select_if(b = c + e, 255, b < 255);
+                  label B_g:
+                  j[0] = ((h << 8 | c << 16) | d) | p << 24;
+                  j = j + 4;
+                  l = l + 4;
+                  if (o) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                d
+              }) -
+           1);
+      m = m + a[8]:int;
+      j = m;
+      n = n + a[3]:int;
+      l = n;
+      if (b) continue L_b;
+    }
+    a[5]:int = m;
+    a[0]:int = n;
+  }
+}
+
+function function_2200(a:int) { // func2200
+  var c:int_ptr;
+  var b:int;
+  var f:int;
+  var e:int;
+  var d:int;
+  var h:int;
+  a[7]:int = (b = (c = a[7]:int) - 1);
+  var m:int = (a[1]:int << 16) / (f = a[6]:int);
+  var n:int = (a[2]:int << 16) / c;
+  if (c) {
+    var o:int = 
+      select_if(a[63]:ubyte << 24, -16777216, (c = a[13]:int) & 2);
+    var p:int = c & 1;
+    var q:int = a[62]:ubyte;
+    var r:int = a[61]:ubyte;
+    var s:int = a[60]:ubyte;
+    var g:int = a[5]:int;
+    c = g;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((d = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        h = h + (d >> 16) + 1;
+      }
+      if (f) {
+        var k:int = -1;
+        b = 65536;
+        var l:int_ptr = 0;
+        loop L_e {
+          if (b >= 65536) {
+            l = 
+              a[0]:int + a[3]:int * h +
+              ((k = 
+                  k + ((d = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (d & -65536) - 65536;
+          }
+          f = f - 1;
+          d = l[0];
+          var i:int = d & 255;
+          var j:int = d >> 8 & 255;
+          d = d >> 16 & 255;
+          if (p) {
+            i = i * q / 255;
+            j = j * r / 255;
+            d = d * s / 255;
+          }
+          c[0] = ((j << 8 | o) | i) | d << 16;
+          c = c + 4;
+          b = b + m;
+          if (f) continue L_e;
+        }
+        b = a[7]:int;
+      }
+      a[7]:int = (c = b - 1);
+      g = g + a[8]:int;
+      if (b) {
+        e = e + n;
+        f = a[6]:int;
+        b = c;
+        c = g;
+        continue L_b;
+      }
+    }
+    a[5]:int = g;
+  }
+}
+
+function function_2201(a:int) { // func2201
+  var b:int;
+  var c:int;
+  var h:int;
+  var i:int;
+  var j:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  if (b) {
+    var k:int = 
+      select_if(a[63]:ubyte << 24, -16777216, (b = a[13]:int) & 2);
+    var l:int = b & 1;
+    var m:int = a[62]:ubyte;
+    var n:int = a[61]:ubyte;
+    var o:int = a[60]:ubyte;
+    var f:int = a[5]:int;
+    var d:int_ptr = f;
+    var g:int = a[0]:int;
+    var e:int_ptr = g;
+    loop L_b {
+      a[7]:int =
+        (c = (b = if (h = a[6]:int) {
+                    loop L_d {
+                      h = h - 1;
+                      i = (b = e[0]) & 255;
+                      j = b >> 8 & 255;
+                      c = b >> 16 & 255;
+                      if (l) {
+                        i = i * m / 255;
+                        j = j * n / 255;
+                        c = c * o / 255;
+                      }
+                      d[0] = ((c << 16 | k) | j << 8) | i;
+                      d = d + 4;
+                      e = e + 4;
+                      if (h) continue L_d;
+                    }
+                    a[7]:int;
+                  } else {
+                    c
+                  }) -
+             1);
+      f = f + a[8]:int;
+      d = f;
+      g = g + a[3]:int;
+      e = g;
+      if (b) continue L_b;
+    }
+    a[5]:int = f;
+    a[0]:int = g;
+  }
+}
+
+function function_2202(a:int_ptr) { // func2202
+  var c:int_ptr;
+  var b:int;
+  var j:int;
+  var f:int;
+  var d:int;
+  var m:int;
+  a[7] = (b = (c = a[7]) - 1);
+  var q:int = (a[1] << 16) / (j = a[6]);
+  var r:int = (a[2] << 16) / c;
+  if (c) {
+    c = a[13] & 112;
+    var s:int = c - 16;
+    var t:int = c == 64;
+    var l:int = a[5];
+    c = l;
+    loop L_b {
+      if (f >= 65536) {
+        f = 
+          f - ((d = f - select_if(f, 131071, f < 131071) + 65535) & -65536) -
+          65536;
+        m = m + (d >> 16) + 1;
+      }
+      if (j) {
+        var n:int = -1;
+        b = 65536;
+        var o:int_ptr = 0;
+        loop L_e {
+          if (b >= 65536) {
+            o = 
+              a[0] + a[3] * m +
+              ((n = 
+                  n + ((d = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (d & -65536) - 65536;
+          }
+          j = j - 1;
+          var e:int = c[0];
+          var p:int = e >> 24;
+          var g:int = e & 255;
+          d = o[0];
+          var k:int = d & 255;
+          var h:int = e >> 8 & 255;
+          var i:int = e >> 16 & 255;
+          e = d >> 8 & 255;
+          d = d >> 16 & 255;
+          br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+            s)
+          label B_j:
+          if (eqz(t)) goto B_g;
+          g = g * k / 255;
+          h = e * h / 255;
+          i = d * i / 255;
+          goto B_g;
+          label B_i:
+          p = 255;
+          i = d;
+          h = e;
+          g = k;
+          goto B_g;
+          label B_h:
+          k = g + k;
+          g = select_if(k, 255, k < 255);
+          e = e + h;
+          h = select_if(e, 255, e < 255);
+          d = d + i;
+          i = select_if(d, 255, d < 255);
+          label B_g:
+          c[0] = ((h << 8 | i << 16) | g) | p << 24;
+          c = c + 4;
+          b = b + q;
+          if (j) continue L_e;
+        }
+        b = a[7];
+      }
+      a[7] = (c = b - 1);
+      l = l + a[8];
+      if (b) {
+        f = f + r;
+        j = a[6];
+        b = c;
+        c = l;
+        continue L_b;
+      }
+    }
+    a[5] = l;
+  }
+}
+
+function function_2203(a:int_ptr) { // func2203
+  var c:int;
+  var b:int;
+  var l:int;
+  var m:int;
+  var d:int;
+  var g:int;
+  var e:int;
+  var h:int;
+  a[7] = (b = (c = a[7]) - 1);
+  if (c) {
+    c = a[13] & 112;
+    var n:int = c - 16;
+    var o:int = c == 64;
+    var j:int = a[5];
+    var f:int_ptr = j;
+    var k:int = a[0];
+    var i:int_ptr = k;
+    loop L_b {
+      a[7] =
+        (b = 
+           (c = 
+              if (l = a[6]) {
+                loop L_d {
+                  l = l - 1;
+                  m = (b = f[0]) >> 24;
+                  d = b & 255;
+                  g = (c = i[0]) & 255;
+                  e = b >> 8 & 255;
+                  b = b >> 16 & 255;
+                  h = c >> 8 & 255;
+                  c = c >> 16 & 255;
+                  br_table[B_g, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_f, ..B_h](
+                    n)
+                  label B_h:
+                  if (eqz(o)) goto B_e;
+                  d = d * g / 255;
+                  e = e * h / 255;
+                  b = b * c / 255;
+                  goto B_e;
+                  label B_g:
+                  m = 255;
+                  b = c;
+                  e = h;
+                  d = g;
+                  goto B_e;
+                  label B_f:
+                  d = select_if(g = d + g, 255, g < 255);
+                  e = select_if(h = e + h, 255, h < 255);
+                  b = select_if(b = b + c, 255, b < 255);
+                  label B_e:
+                  f[0] = ((e << 8 | b << 16) | d) | m << 24;
+                  f = f + 4;
+                  i = i + 4;
+                  if (l) continue L_d;
+                }
+                a[7];
+              } else {
+                b
+              }) -
+           1);
+      j = j + a[8];
+      f = j;
+      k = k + a[3];
+      i = k;
+      if (c) continue L_b;
+    }
+    a[5] = j;
+    a[0] = k;
+  }
+}
+
+function function_2204(a:int_ptr) { // func2204
+  var c:int_ptr;
+  var b:int;
+  var e:int;
+  var d:int;
+  var h:int;
+  var f:int;
+  a[7] = (b = (c = a[7]) - 1);
+  var k:int = (a[1] << 16) / (e = a[6]);
+  var l:int = (a[2] << 16) / c;
+  if (c) {
+    var g:int = a[5];
+    c = g;
+    loop L_b {
+      if (d >= 65536) {
+        d = 
+          d - ((h = d - select_if(d, 131071, d < 131071) + 65535) & -65536) -
+          65536;
+        f = f + (h >> 16) + 1;
+      }
+      if (e) {
+        b = 65536;
+        var i:int = -1;
+        var j:int_ptr = 0;
+        loop L_e {
+          e = e - 1;
+          if (b >= 65536) {
+            j = 
+              a[0] + a[3] * f +
+              ((i = 
+                  i + ((h = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (h & -65536) - 65536;
+          }
+          c[0] = j[0] | -16777216;
+          c = c + 4;
+          b = b + k;
+          if (e) continue L_e;
+        }
+        b = a[7];
+      }
+      a[7] = (c = b - 1);
+      g = g + a[8];
+      if (b) {
+        d = d + l;
+        e = a[6];
+        b = c;
+        c = g;
+        continue L_b;
+      }
+    }
+    a[5] = g;
+  }
+}
+
+function function_2205(a:int_ptr, b:int) { // func2205
+  a = stack_pointer - 32;
+  stack_pointer = a;
+  a[6] = 52184;
+  var c:int_ptr = a + 24;
+  call_indirect(c, a + 16, (c[0])[0]:int);
+  a[2] = 52232;
+  c = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 32;
+}
+
+function function_2206(a:int) { // func2206
+  var b:int_ptr;
+  var c:int;
+  var l:int;
+  var m:int;
+  var g:int;
+  var d:int;
+  var o:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  var s:int = (a[1]:int << 16) / (l = a[6]:int);
+  var t:int = (a[2]:int << 16) / b;
+  if (b) {
+    b = a[13]:int;
+    var u:int = 
+      (b & 48) != 0 & (m = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var v:int = b & 1;
+    var p:int = m ^ 255;
+    var w:int = a[62]:ubyte;
+    var x:int = a[61]:ubyte;
+    var y:int = a[60]:ubyte;
+    b = b & 112;
+    var z:int = b - 16;
+    var aa:int = b == 64;
+    var n:int = a[5]:int;
+    b = n;
+    loop L_b {
+      if (g >= 65536) {
+        g = 
+          g - ((d = g - select_if(g, 131071, g < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (d >> 16) + 1;
+      }
+      if (l) {
+        var q:int = -1;
+        c = 65536;
+        var r:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            r = 
+              a[0]:int + a[3]:int * o +
+              ((q = 
+                  q + ((d = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (d & -65536) - 65536;
+          }
+          var e:int = b[0];
+          d = r[0];
+          var h:int = d & 255;
+          var i:int = d >> 8 & 255;
+          var f:int = d >> 16 & 255;
+          if (v) {
+            h = h * w / 255;
+            i = i * x / 255;
+            f = f * y / 255;
+          }
+          if (u) {
+            h = h * m / 255;
+            i = i * m / 255;
+            f = f * m / 255;
+          }
+          l = l - 1;
+          var j:int = e & 255;
+          var k:int = e >> 8 & 255;
+          e = e >> 16 & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            z)
+          label B_l:
+          if (eqz(aa)) goto B_i;
+          e = e * h / 255;
+          k = i * k / 255;
+          j = f * j / 255;
+          goto B_i;
+          label B_k:
+          e = h + e * p / 255;
+          k = i + k * p / 255;
+          j = f + j * p / 255;
+          goto B_i;
+          label B_j:
+          d = e + h;
+          e = select_if(d, 255, d < 255);
+          d = i + k;
+          k = select_if(d, 255, d < 255);
+          d = f + j;
+          j = select_if(d, 255, d < 255);
+          label B_i:
+          b[0] = (k << 8 | j) | e << 16;
+          b = b + 4;
+          c = c + s;
+          if (l) continue L_e;
+        }
+        c = a[7]:int;
+      }
+      a[7]:int = (b = c - 1);
+      n = n + a[8]:int;
+      if (c) {
+        g = g + t;
+        l = a[6]:int;
+        c = b;
+        b = n;
+        continue L_b;
+      }
+    }
+    a[5]:int = n;
+  }
+}
+
+function function_2207(a:int) { // func2207
+  var b:int;
+  var d:int;
+  var j:int;
+  var o:int;
+  var c:int;
+  var f:int;
+  var g:int;
+  var e:int;
+  var h:int;
+  a[7]:int = (d = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var p:int = 
+      (b & 48) != 0 & (j = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var q:int = b & 1;
+    var l:int = j ^ 255;
+    var r:int = a[62]:ubyte;
+    var s:int = a[61]:ubyte;
+    var t:int = a[60]:ubyte;
+    b = b & 112;
+    var u:int = b - 16;
+    var v:int = b == 64;
+    var m:int = a[5]:int;
+    var i:int_ptr = m;
+    var n:int = a[0]:int;
+    var k:int_ptr = n;
+    loop L_b {
+      a[7]:int =
+        (d = 
+           (b = 
+              if (o = a[6]:int) {
+                loop L_d {
+                  c = i[0];
+                  f = (b = k[0]) & 255;
+                  g = b >> 8 & 255;
+                  e = b >> 16 & 255;
+                  if (q) {
+                    f = f * r / 255;
+                    g = g * s / 255;
+                    e = e * t / 255;
+                  }
+                  if (p) {
+                    f = f * j / 255;
+                    g = g * j / 255;
+                    e = e * j / 255;
+                  }
+                  o = o - 1;
+                  d = c & 255;
+                  h = c >> 8 & 255;
+                  c = c >> 16 & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    u)
+                  label B_j:
+                  if (eqz(v)) goto B_g;
+                  c = c * f / 255;
+                  h = g * h / 255;
+                  d = d * e / 255;
+                  goto B_g;
+                  label B_i:
+                  c = f + c * l / 255;
+                  h = g + h * l / 255;
+                  d = e + d * l / 255;
+                  goto B_g;
+                  label B_h:
+                  c = select_if(b = c + f, 255, b < 255);
+                  h = select_if(b = g + h, 255, b < 255);
+                  d = select_if(b = d + e, 255, b < 255);
+                  label B_g:
+                  i[0] = (h << 8 | d) | c << 16;
+                  i = i + 4;
+                  k = k + 4;
+                  if (o) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                d
+              }) -
+           1);
+      m = m + a[8]:int;
+      i = m;
+      n = n + a[3]:int;
+      k = n;
+      if (b) continue L_b;
+    }
+    a[5]:int = m;
+    a[0]:int = n;
+  }
+}
+
+function function_2208(a:int_ptr) { // func2208
+  var c:int_ptr;
+  var b:int;
+  var j:int;
+  var e:int;
+  var d:int;
+  var m:int;
+  a[7] = (b = (c = a[7]) - 1);
+  var p:int = (a[1] << 16) / (j = a[6]);
+  var q:int = (a[2] << 16) / c;
+  if (c) {
+    c = a[13] & 112;
+    var r:int = c - 16;
+    var s:int = c == 64;
+    var l:int = a[5];
+    c = l;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((d = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        m = m + (d >> 16) + 1;
+      }
+      if (j) {
+        var n:int = -1;
+        b = 65536;
+        var o:int_ptr = 0;
+        loop L_e {
+          if (b >= 65536) {
+            o = 
+              a[0] + a[3] * m +
+              ((n = 
+                  n + ((d = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (d & -65536) - 65536;
+          }
+          j = j - 1;
+          var f:int = c[0];
+          var g:int = f & 255;
+          d = o[0];
+          var k:int = d & 255;
+          var h:int = f >> 8 & 255;
+          var i:int = f >> 16 & 255;
+          f = d >> 8 & 255;
+          d = d >> 16 & 255;
+          br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+            r)
+          label B_j:
+          if (eqz(s)) goto B_g;
+          i = i * k / 255;
+          h = f * h / 255;
+          g = d * g / 255;
+          goto B_g;
+          label B_i:
+          g = d;
+          h = f;
+          i = k;
+          goto B_g;
+          label B_h:
+          k = i + k;
+          i = select_if(k, 255, k < 255);
+          f = f + h;
+          h = select_if(f, 255, f < 255);
+          d = d + g;
+          g = select_if(d, 255, d < 255);
+          label B_g:
+          c[0] = (h << 8 | g) | i << 16;
+          c = c + 4;
+          b = b + p;
+          if (j) continue L_e;
+        }
+        b = a[7];
+      }
+      a[7] = (c = b - 1);
+      l = l + a[8];
+      if (b) {
+        e = e + q;
+        j = a[6];
+        b = c;
+        c = l;
+        continue L_b;
+      }
+    }
+    a[5] = l;
+  }
+}
+
+function function_2209(a:int_ptr) { // func2209
+  var b:int;
+  var c:int;
+  var j:int;
+  var d:int;
+  var e:int;
+  var k:int;
+  var l:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13] & 112;
+    var m:int = b - 16;
+    var n:int = b == 64;
+    var h:int = a[5];
+    var f:int_ptr = h;
+    var i:int = a[0];
+    var g:int_ptr = i;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (j = a[6]) {
+                loop L_d {
+                  j = j - 1;
+                  c = (d = f[0]) & 255;
+                  k = (e = g[0]) & 255;
+                  b = d >> 8 & 255;
+                  d = d >> 16 & 255;
+                  l = e >> 8 & 255;
+                  e = e >> 16 & 255;
+                  br_table[B_g, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_f, ..B_h](
+                    m)
+                  label B_h:
+                  if (eqz(n)) goto B_e;
+                  d = d * k / 255;
+                  b = b * l / 255;
+                  c = c * e / 255;
+                  goto B_e;
+                  label B_g:
+                  c = e;
+                  b = l;
+                  d = k;
+                  goto B_e;
+                  label B_f:
+                  d = select_if(d = d + k, 255, d < 255);
+                  b = select_if(b = b + l, 255, b < 255);
+                  c = select_if(c = c + e, 255, c < 255);
+                  label B_e:
+                  f[0] = (b << 8 | c) | d << 16;
+                  f = f + 4;
+                  g = g + 4;
+                  if (j) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      h = h + a[8];
+      f = h;
+      i = i + a[3];
+      g = i;
+      if (b) continue L_b;
+    }
+    a[5] = h;
+    a[0] = i;
+  }
+}
+
+function function_2210(a:int) { // func2210
+  var b:int_ptr;
+  var c:int;
+  var l:int;
+  var m:int;
+  var g:int;
+  var d:int;
+  var o:int;
+  a[7]:int = (c = (b = a[7]:int) - 1);
+  var s:int = (a[1]:int << 16) / (l = a[6]:int);
+  var t:int = (a[2]:int << 16) / b;
+  if (b) {
+    b = a[13]:int;
+    var u:int = 
+      (b & 48) != 0 & (m = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var v:int = b & 1;
+    var p:int = m ^ 255;
+    var w:int = a[62]:ubyte;
+    var x:int = a[61]:ubyte;
+    var y:int = a[60]:ubyte;
+    b = b & 112;
+    var z:int = b - 16;
+    var aa:int = b == 64;
+    var n:int = a[5]:int;
+    b = n;
+    loop L_b {
+      if (g >= 65536) {
+        g = 
+          g - ((d = g - select_if(g, 131071, g < 131071) + 65535) & -65536) -
+          65536;
+        o = o + (d >> 16) + 1;
+      }
+      if (l) {
+        var q:int = -1;
+        c = 65536;
+        var r:int_ptr = 0;
+        loop L_e {
+          if (c >= 65536) {
+            r = 
+              a[0]:int + a[3]:int * o +
+              ((q = 
+                  q + ((d = c - select_if(c, 131071, c < 131071) + 65535) >> 16) + 1) <<
+               2);
+            c = c - (d & -65536) - 65536;
+          }
+          var e:int = b[0];
+          d = r[0];
+          var h:int = d & 255;
+          var i:int = d >> 8 & 255;
+          var f:int = d >> 16 & 255;
+          if (v) {
+            h = h * w / 255;
+            i = i * x / 255;
+            f = f * y / 255;
+          }
+          if (u) {
+            h = h * m / 255;
+            i = i * m / 255;
+            f = f * m / 255;
+          }
+          l = l - 1;
+          var j:int = e & 255;
+          var k:int = e >> 8 & 255;
+          e = e >> 16 & 255;
+          br_table[B_k, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_i, B_j, ..B_l](
+            z)
+          label B_l:
+          if (eqz(aa)) goto B_i;
+          j = h * j / 255;
+          k = i * k / 255;
+          e = e * f / 255;
+          goto B_i;
+          label B_k:
+          j = h + j * p / 255;
+          k = i + k * p / 255;
+          e = f + e * p / 255;
+          goto B_i;
+          label B_j:
+          d = h + j;
+          j = select_if(d, 255, d < 255);
+          d = i + k;
+          k = select_if(d, 255, d < 255);
+          d = e + f;
+          e = select_if(d, 255, d < 255);
+          label B_i:
+          b[0] = (k << 8 | e << 16) | j;
+          b = b + 4;
+          c = c + s;
+          if (l) continue L_e;
+        }
+        c = a[7]:int;
+      }
+      a[7]:int = (b = c - 1);
+      n = n + a[8]:int;
+      if (c) {
+        g = g + t;
+        l = a[6]:int;
+        c = b;
+        b = n;
+        continue L_b;
+      }
+    }
+    a[5]:int = n;
+  }
+}
+
+function function_2211(a:int) { // func2211
+  var b:int;
+  var d:int;
+  var j:int;
+  var o:int;
+  var c:int;
+  var f:int;
+  var g:int;
+  var e:int;
+  var h:int;
+  a[7]:int = (d = (b = a[7]:int) - 1);
+  if (b) {
+    b = a[13]:int;
+    var p:int = 
+      (b & 48) != 0 & (j = select_if(a[63]:ubyte, 255, b & 2)) != 255;
+    var q:int = b & 1;
+    var l:int = j ^ 255;
+    var r:int = a[62]:ubyte;
+    var s:int = a[61]:ubyte;
+    var t:int = a[60]:ubyte;
+    b = b & 112;
+    var u:int = b - 16;
+    var v:int = b == 64;
+    var m:int = a[5]:int;
+    var i:int_ptr = m;
+    var n:int = a[0]:int;
+    var k:int_ptr = n;
+    loop L_b {
+      a[7]:int =
+        (d = 
+           (b = 
+              if (o = a[6]:int) {
+                loop L_d {
+                  c = i[0];
+                  f = (b = k[0]) & 255;
+                  g = b >> 8 & 255;
+                  e = b >> 16 & 255;
+                  if (q) {
+                    f = f * r / 255;
+                    g = g * s / 255;
+                    e = e * t / 255;
+                  }
+                  if (p) {
+                    f = f * j / 255;
+                    g = g * j / 255;
+                    e = e * j / 255;
+                  }
+                  o = o - 1;
+                  d = c & 255;
+                  h = c >> 8 & 255;
+                  c = c >> 16 & 255;
+                  br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+                    u)
+                  label B_j:
+                  if (eqz(v)) goto B_g;
+                  d = d * f / 255;
+                  h = g * h / 255;
+                  c = c * e / 255;
+                  goto B_g;
+                  label B_i:
+                  d = f + d * l / 255;
+                  h = g + h * l / 255;
+                  c = e + c * l / 255;
+                  goto B_g;
+                  label B_h:
+                  d = select_if(b = d + f, 255, b < 255);
+                  h = select_if(b = g + h, 255, b < 255);
+                  c = select_if(b = c + e, 255, b < 255);
+                  label B_g:
+                  i[0] = (h << 8 | c << 16) | d;
+                  i = i + 4;
+                  k = k + 4;
+                  if (o) continue L_d;
+                }
+                a[7]:int;
+              } else {
+                d
+              }) -
+           1);
+      m = m + a[8]:int;
+      i = m;
+      n = n + a[3]:int;
+      k = n;
+      if (b) continue L_b;
+    }
+    a[5]:int = m;
+    a[0]:int = n;
+  }
+}
+
+function function_2212(a:int_ptr, b:int) { // func2212
+  a = stack_pointer - 16;
+  stack_pointer = a;
+  a[2] = 52508;
+  var c:int_ptr = a + 8;
+  call_indirect(c, b, (c[0])[0]:int);
+  stack_pointer = a + 16;
+}
+
+function function_2213(a:int_ptr) { // func2213
+  var c:int_ptr;
+  var b:int;
+  var j:int;
+  var e:int;
+  var d:int;
+  var m:int;
+  a[7] = (b = (c = a[7]) - 1);
+  var p:int = (a[1] << 16) / (j = a[6]);
+  var q:int = (a[2] << 16) / c;
+  if (c) {
+    c = a[13] & 112;
+    var r:int = c - 16;
+    var s:int = c == 64;
+    var l:int = a[5];
+    c = l;
+    loop L_b {
+      if (e >= 65536) {
+        e = 
+          e - ((d = e - select_if(e, 131071, e < 131071) + 65535) & -65536) -
+          65536;
+        m = m + (d >> 16) + 1;
+      }
+      if (j) {
+        var n:int = -1;
+        b = 65536;
+        var o:int_ptr = 0;
+        loop L_e {
+          if (b >= 65536) {
+            o = 
+              a[0] + a[3] * m +
+              ((n = 
+                  n + ((d = b - select_if(b, 131071, b < 131071) + 65535) >> 16) + 1) <<
+               2);
+            b = b - (d & -65536) - 65536;
+          }
+          j = j - 1;
+          var f:int = c[0];
+          var g:int = f & 255;
+          d = o[0];
+          var k:int = d & 255;
+          var h:int = f >> 8 & 255;
+          var i:int = f >> 16 & 255;
+          f = d >> 8 & 255;
+          d = d >> 16 & 255;
+          br_table[B_i, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_g, B_h, ..B_j](
+            r)
+          label B_j:
+          if (eqz(s)) goto B_g;
+          g = g * k / 255;
+          h = f * h / 255;
+          i = d * i / 255;
+          goto B_g;
+          label B_i:
+          i = d;
+          h = f;
+          g = k;
+          goto B_g;
+          label B_h:
+          k = g + k;
+          g = select_if(k, 255, k < 255);
+          f = f + h;
+          h = select_if(f, 255, f < 255);
+          d = d + i;
+          i = select_if(d, 255, d < 255);
+          label B_g:
+          c[0] = (h << 8 | i << 16) | g;
+          c = c + 4;
+          b = b + p;
+          if (j) continue L_e;
+        }
+        b = a[7];
+      }
+      a[7] = (c = b - 1);
+      l = l + a[8];
+      if (b) {
+        e = e + q;
+        j = a[6];
+        b = c;
+        c = l;
+        continue L_b;
+      }
+    }
+    a[5] = l;
+  }
+}
+
+function function_2214(a:int_ptr) { // func2214
+  var b:int;
+  var c:int;
+  var j:int;
+  var d:int;
+  var e:int;
+  var k:int;
+  var l:int;
+  a[7] = (c = (b = a[7]) - 1);
+  if (b) {
+    b = a[13] & 112;
+    var m:int = b - 16;
+    var n:int = b == 64;
+    var h:int = a[5];
+    var f:int_ptr = h;
+    var i:int = a[0];
+    var g:int_ptr = i;
+    loop L_b {
+      a[7] =
+        (c = 
+           (b = 
+              if (j = a[6]) {
+                loop L_d {
+                  j = j - 1;
+                  c = (d = f[0]) & 255;
+                  k = (e = g[0]) & 255;
+                  b = d >> 8 & 255;
+                  d = d >> 16 & 255;
+                  l = e >> 8 & 255;
+                  e = e >> 16 & 255;
+                  br_table[B_g, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_e, B_f, ..B_h](
+                    m)
+                  label B_h:
+                  if (eqz(n)) goto B_e;
+                  c = c * k / 255;
+                  b = b * l / 255;
+                  d = d * e / 255;
+                  goto B_e;
+                  label B_g:
+                  d = e;
+                  b = l;
+                  c = k;
+                  goto B_e;
+                  label B_f:
+                  c = select_if(c = c + k, 255, c < 255);
+                  b = select_if(b = b + l, 255, b < 255);
+                  d = select_if(d = d + e, 255, d < 255);
+                  label B_e:
+                  f[0] = (b << 8 | d << 16) | c;
+                  f = f + 4;
+                  g = g + 4;
+                  if (j) continue L_d;
+                }
+                a[7];
+              } else {
+                c
+              }) -
+           1);
+      h = h + a[8];
+      f = h;
+      i = i + a[3];
+      g = i;
+      if (b) continue L_b;
+    }
+    a[5] = h;
+    a[0] = i;
+  }
+}
+
+function function_2215(a:int) { // func2215
+  var l:int;
+  var d:int;
+  var q:int;
+  var p:int;
+  var r:int;
+  var o:int;
+  var x:int;
+  var m:int;
+  var h:int;
+  var j:int;
+  var k:int;
+  var i:int;
+  var t:int;
+  var n:int;
+  var g:int;
+  var b:int = a[11]:int;
+  var v:int = b[9]:ubyte;
+  var c:int = a[10]:int;
+  var u:int = c[9]:ubyte;
+  var e:int = c[6]:int;
+  a[7]:int = (d = (l = a[7]:int) - 1);
+  var y:int = (a[1]:int << 16) / (q = a[6]:int);
+  var z:int = (a[2]:int << 16) / l;
+  if (eqz(l)) goto B_a;
+  l = a[13]:int;
+  var aa:int = l & 48;
+  var ba:int = l & 2;
+  var ca:int = l & 1;
+  var da:int = l & 256;
+  var ea:int = l >> 4 & 7;
+  var fa:int = e ^ -1;
+  var ga:int = a[14]:int;
+  var ha:int = a[63]:ubyte;
+  var ia:int = a[62]:ubyte;
+  var ja:int = a[61]:ubyte;
+  var ka:int = a[60]:ubyte;
+  var f:int = a[5]:int;
+  var w:int = u - 1;
+  var s:int = v - 1;
+  loop L_b {
+    if (p >= 65536) {
+      p = 
+        p - ((e = p - select_if(p, 131071, p < 131071) + 65535) & -65536) -
+        65536;
+      r = r + (e >> 16) + 1;
+    }
+    a[7]:int =
+      (d = 
+         (o = 
+            if (q) {
+              o = 65536;
+              x = -1;
+              m = 0;
+              loop L_e {
+                if (o >= 65536) {
+                  m = 
+                    a[0]:int + a[3]:int * r +
+                    (x = 
+                       x + ((e = o - select_if(o, 131071, o < 131071) + 65535) >> 16) + 1) *
+                    u;
+                  o = o - (e & -65536) - 65536;
+                }
+                if (e = c[6]:int) {
+                  d = 0;
+                  h = 0;
+                  j = 0;
+                  k = 0;
+                  i = 0;
+                  br_table[B_l, B_k, B_j, B_i, ..B_g](w)
+                  label B_l:
+                  h = (((c[31]:ubyte << 2) + 104976)[0]:int +
+                       ((e & (d = m[0]:ubyte)) >> c[35]:ubyte))[0]:ubyte;
+                  j = (((c[30]:ubyte << 2) + 104976)[0]:int +
+                       ((c[5]:int & d) >> c[34]:ubyte))[0]:ubyte;
+                  k = (((c[29]:ubyte << 2) + 104976)[0]:int +
+                       ((c[4]:int & d) >> c[33]:ubyte))[0]:ubyte;
+                  i = (((c[28]:ubyte << 2) + 104976)[0]:int +
+                       ((c[3]:int & d) >> c[32]:ubyte))[0]:ubyte;
+                  goto B_g;
+                  label B_k:
+                  h = (((c[31]:ubyte << 2) + 104976)[0]:int +
+                       ((e & (d = m[0]:ushort)) >> c[35]:ubyte))[0]:ubyte;
+                  j = (((c[30]:ubyte << 2) + 104976)[0]:int +
+                       ((c[5]:int & d) >> c[34]:ubyte))[0]:ubyte;
+                  k = (((c[29]:ubyte << 2) + 104976)[0]:int +
+                       ((c[4]:int & d) >> c[33]:ubyte))[0]:ubyte;
+                  i = (((c[28]:ubyte << 2) + 104976)[0]:int +
+                       ((c[3]:int & d) >> c[32]:ubyte))[0]:ubyte;
+                  goto B_g;
+                  label B_j:
+                  j = (m + (c[34]:ubyte >> 3))[0]:ubyte;
+                  k = (m + (c[33]:ubyte >> 3))[0]:ubyte;
+                  i = (m + (c[32]:ubyte >> 3))[0]:ubyte;
+                  h = 255;
+                  goto B_g;
+                  label B_i:
+                  h = (((c[31]:ubyte << 2) + 104976)[0]:int +
+                       (((d = m[0]:int) & e) >> c[35]:ubyte))[0]:ubyte;
+                  j = (((c[30]:ubyte << 2) + 104976)[0]:int +
+                       ((c[5]:int & d) >> c[34]:ubyte))[0]:ubyte;
+                  k = (((c[29]:ubyte << 2) + 104976)[0]:int +
+                       ((c[4]:int & d) >> c[33]:ubyte))[0]:ubyte;
+                  i = (((c[28]:ubyte << 2) + 104976)[0]:int +
+                       ((c[3]:int & d) >> c[32]:ubyte))[0]:ubyte;
+                  goto B_g;
+                }
+                d = 0;
+                h = 255;
+                j = 0;
+                k = 0;
+                i = 0;
+                br_table[B_p, B_o, B_n, B_m, ..B_g](w)
+                label B_p:
+                j = (((c[30]:ubyte << 2) + 104976)[0]:int +
+                     (((d = m[0]:ubyte) & c[5]:int) >> c[34]:ubyte))[0]:ubyte;
+                k = (((c[29]:ubyte << 2) + 104976)[0]:int +
+                     ((c[4]:int & d) >> c[33]:ubyte))[0]:ubyte;
+                i = (((c[28]:ubyte << 2) + 104976)[0]:int +
+                     ((c[3]:int & d) >> c[32]:ubyte))[0]:ubyte;
+                goto B_g;
+                label B_o:
+                j = (((c[30]:ubyte << 2) + 104976)[0]:int +
+                     (((d = m[0]:ushort) & c[5]:int) >> c[34]:ubyte))[0]:ubyte;
+                k = (((c[29]:ubyte << 2) + 104976)[0]:int +
+                     ((c[4]:int & d) >> c[33]:ubyte))[0]:ubyte;
+                i = (((c[28]:ubyte << 2) + 104976)[0]:int +
+                     ((c[3]:int & d) >> c[32]:ubyte))[0]:ubyte;
+                goto B_g;
+                label B_n:
+                j = (m + (c[34]:ubyte >> 3))[0]:ubyte;
+                k = (m + (c[33]:ubyte >> 3))[0]:ubyte;
+                i = (m + (c[32]:ubyte >> 3))[0]:ubyte;
+                goto B_g;
+                label B_m:
+                j = (((c[30]:ubyte << 2) + 104976)[0]:int +
+                     (((d = m[0]:int) & c[5]:int) >> c[34]:ubyte))[0]:ubyte;
+                k = (((c[29]:ubyte << 2) + 104976)[0]:int +
+                     ((c[4]:int & d) >> c[33]:ubyte))[0]:ubyte;
+                i = (((c[28]:ubyte << 2) + 104976)[0]:int +
+                     ((c[3]:int & d) >> c[32]:ubyte))[0]:ubyte;
+                label B_g:
+                q = q - 1;
+                j = j & 255;
+                k = k & 255;
+                i = i & 255;
+                if (da) {
+                  if (
+                    eqz(
+                      (if (u == 3) { (k << c[33]:ubyte | i << c[32]:ubyte) | j << c[34]:ubyte } else { d } ^
+                       ga) &
+                      fa)) goto B_q
+                }
+                if (t = b[6]:int) {
+                  n = 0;
+                  g = 0;
+                  e = 0;
+                  l = 0;
+                  br_table[B_y, B_x, B_w, B_v, ..B_t](s)
+                  label B_y:
+                  n = (((b[31]:ubyte << 2) + 104976)[0]:int +
+                       ((t & (d = f[0]:ubyte)) >> b[35]:ubyte))[0]:ubyte;
+                  g = (((b[30]:ubyte << 2) + 104976)[0]:int +
+                       ((b[5]:int & d) >> b[34]:ubyte))[0]:ubyte;
+                  e = (((b[29]:ubyte << 2) + 104976)[0]:int +
+                       ((b[4]:int & d) >> b[33]:ubyte))[0]:ubyte;
+                  l = (((b[28]:ubyte << 2) + 104976)[0]:int +
+                       ((b[3]:int & d) >> b[32]:ubyte))[0]:ubyte;
+                  goto B_t;
+                  label B_x:
+                  n = (((b[31]:ubyte << 2) + 104976)[0]:int +
+                       ((t & (d = f[0]:ushort)) >> b[35]:ubyte))[0]:ubyte;
+                  g = (((b[30]:ubyte << 2) + 104976)[0]:int +
+                       ((b[5]:int & d) >> b[34]:ubyte))[0]:ubyte;
+                  e = (((b[29]:ubyte << 2) + 104976)[0]:int +
+                       ((b[4]:int & d) >> b[33]:ubyte))[0]:ubyte;
+                  l = (((b[28]:ubyte << 2) + 104976)[0]:int +
+                       ((b[3]:int & d) >> b[32]:ubyte))[0]:ubyte;
+                  goto B_t;
+                  label B_w:
+                  g = (f + (b[34]:ubyte >> 3))[0]:ubyte;
+                  e = (f + (b[33]:ubyte >> 3))[0]:ubyte;
+                  l = (f + (b[32]:ubyte >> 3))[0]:ubyte;
+                  n = 255;
+                  goto B_t;
+                  label B_v:
+                  n = (((b[31]:ubyte << 2) + 104976)[0]:int +
+                       (((d = f[0]:int) & t) >> b[35]:ubyte))[0]:ubyte;
+                  g = (((b[30]:ubyte << 2) + 104976)[0]:int +
+                       ((b[5]:int & d) >> b[34]:ubyte))[0]:ubyte;
+                  e = (((b[29]:ubyte << 2) + 104976)[0]:int +
+                       ((b[4]:int & d) >> b[33]:ubyte))[0]:ubyte;
+                  l = (((b[28]:ubyte << 2) + 104976)[0]:int +
+                       ((b[3]:int & d) >> b[32]:ubyte))[0]:ubyte;
+                  goto B_t;
+                }
+                g = 0;
+                n = 255;
+                e = 0;
+                l = 0;
+                br_table[B_ca, B_ba, B_aa, B_z, ..B_t](s)
+                label B_ca:
+                g = (((b[30]:ubyte << 2) + 104976)[0]:int +
+                     (((d = f[0]:ubyte) & b[5]:int) >> b[34]:ubyte))[0]:ubyte;
+                e = (((b[29]:ubyte << 2) + 104976)[0]:int +
+                     ((b[4]:int & d) >> b[33]:ubyte))[0]:ubyte;
+                l = (((b[28]:ubyte << 2) + 104976)[0]:int +
+                     ((b[3]:int & d) >> b[32]:ubyte))[0]:ubyte;
+                goto B_t;
+                label B_ba:
+                g = (((b[30]:ubyte << 2) + 104976)[0]:int +
+                     (((d = f[0]:ushort) & b[5]:int) >> b[34]:ubyte))[0]:ubyte;
+                e = (((b[29]:ubyte << 2) + 104976)[0]:int +
+                     ((b[4]:int & d) >> b[33]:ubyte))[0]:ubyte;
+                l = (((b[28]:ubyte << 2) + 104976)[0]:int +
+                     ((b[3]:int & d) >> b[32]:ubyte))[0]:ubyte;
+                goto B_t;
+                label B_aa:
+                g = (f + (b[34]:ubyte >> 3))[0]:ubyte;
+                e = (f + (b[33]:ubyte >> 3))[0]:ubyte;
+                l = (f + (b[32]:ubyte >> 3))[0]:ubyte;
+                goto B_t;
+                label B_z:
+                g = (((b[30]:ubyte << 2) + 104976)[0]:int +
+                     (((d = f[0]:int) & b[5]:int) >> b[34]:ubyte))[0]:ubyte;
+                e = (((b[29]:ubyte << 2) + 104976)[0]:int +
+                     ((b[4]:int & d) >> b[33]:ubyte))[0]:ubyte;
+                l = (((b[28]:ubyte << 2) + 104976)[0]:int +
+                     ((b[3]:int & d) >> b[32]:ubyte))[0]:ubyte;
+                label B_t:
+                if (ca) {
+                  j = j * ia / 255;
+                  k = k * ja / 255;
+                  i = i * ka / 255;
+                }
+                d = h & 255;
+                d = select_if(d * ha / 255, d, ba);
+                if (eqz(aa)) goto B_ea;
+                if (d > 254) goto B_ea;
+                j = d * j / 255;
+                k = d * k / 255;
+                i = d * i / 255;
+                label B_ea:
+                n = n & 255;
+                h = g & 255;
+                g = e & 255;
+                e = l;
+                br_table[B_ja, B_ia, B_ha, B_fa, B_ga, ..B_fa](ea)
+                label B_ja:
+                n = d;
+                h = j;
+                g = k;
+                e = i;
+                goto B_fa;
+                label B_ia:
+                n = d + (d = 255 - d) * n / 255;
+                h = j + d * h / 255;
+                g = k + d * g / 255;
+                e = i + d * e / 255;
+                goto B_fa;
+                label B_ha:
+                h = select_if(d = h + j, 255, d < 255);
+                g = select_if(d = g + k, 255, d < 255);
+                e = select_if(e = e + i, 255, e < 255);
+                goto B_fa;
+                label B_ga:
+                h = h * j / 255;
+                g = g * k / 255;
+                e = e * i / 255;
+                label B_fa:
+                if (t) {
+                  br_table[B_oa, B_na, B_ma, B_la, ..B_q](s)
+                  label B_oa:
+                  f[0]:byte =
+                    (((g >> b[29]:ubyte) << b[33]:ubyte | (e >> b[28]:ubyte) << b[32]:ubyte) |
+                     (h >> b[30]:ubyte) << b[34]:ubyte) |
+                    (n >> b[31]:ubyte) << b[35]:ubyte;
+                  goto B_q;
+                  label B_na:
+                  f[0]:short =
+                    (((g >> b[29]:ubyte) << b[33]:ubyte | (e >> b[28]:ubyte) << b[32]:ubyte) |
+                     (h >> b[30]:ubyte) << b[34]:ubyte) |
+                    (n >> b[31]:ubyte) << b[35]:ubyte;
+                  goto B_q;
+                  label B_ma:
+                  (f + (b[32]:ubyte >> 3))[0]:byte = e;
+                  (f + (b[33]:ubyte >> 3))[0]:byte = g;
+                  (f + (b[34]:ubyte >> 3))[0]:byte = h;
+                  goto B_q;
+                  label B_la:
+                  f[0]:int =
+                    (((g >> b[29]:ubyte) << b[33]:ubyte | (e >> b[28]:ubyte) << b[32]:ubyte) |
+                     (h >> b[30]:ubyte) << b[34]:ubyte) |
+                    (n >> b[31]:ubyte) << b[35]:ubyte;
+                  goto B_q;
+                }
+                br_table[B_sa, B_ra, B_qa, B_pa, ..B_q](s)
+                label B_sa:
+                f[0]:byte =
+                  ((g >> b[29]:ubyte) << b[33]:ubyte | (e >> b[28]:ubyte) << b[32]:ubyte) |
+                  (h >> b[30]:ubyte) << b[34]:ubyte;
+                goto B_q;
+                label B_ra:
+                f[0]:short =
+                  ((g >> b[29]:ubyte) << b[33]:ubyte | (e >> b[28]:ubyte) << b[32]:ubyte) |
+                  (h >> b[30]:ubyte) << b[34]:ubyte;
+                goto B_q;
+                label B_qa:
+                (f + (b[32]:ubyte >> 3))[0]:byte = e;
+                (f + (b[33]:ubyte >> 3))[0]:byte = g;
+                (f + (b[34]:ubyte >> 3))[0]:byte = h;
+                goto B_q;
+                label B_pa:
+                f[0]:int =
+                  ((g >> b[29]:ubyte) << b[33]:ubyte | (e >> b[28]:ubyte) << b[32]:ubyte) |
+                  (h >> b[30]:ubyte) << b[34]:ubyte;
+                label B_q:
+                o = o + y;
+                f = f + v;
+                if (q) continue L_e;
+              }
+              f = a[5]:int;
+              a[7]:int;
+            } else {
+              d
+            }) -
+         1);
+    a[5]:int = (f = f + a[8]:int);
+    if (eqz(o)) goto B_a;
+    p = p + z;
+    q = a[6]:int;
+    continue L_b;
+  }
+  unreachable;
+  label B_a:
+}
+
+function function_2216(a:int) { // func2216
+  function_664(a, 100256)
+}
+

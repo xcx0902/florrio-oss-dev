@@ -1,0 +1,771 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "factory": "createEntitySnapshotHooks",
+  "functions": [
+    {
+      "id": 1015,
+      "name": "decodeEntitySnapshot",
+      "source": "source/game/client/entity-snapshot.mjs",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "confidence": "high",
+      "coverage": "complete original1015 body: framing, acknowledgements, entity retirement/activation, all63 sparse fields and all dense groups, references, events and login reliable output",
+      "evidence": {
+        "originalFunctionIndex": 1015,
+        "wat": "source/wasm/client.wat",
+        "watStart": 247314,
+        "watEnd": 278280,
+        "decompiled": "source/decompiled/client/functions-0640-0703.dcmp",
+        "decompiledStart": 4601,
+        "decompiledEnd": 14346,
+        "test": "test/client-entity-snapshot.test.mjs",
+        "packetTrace": "reports/runtime/client-packet-traces.json"
+      }
+    }
+  ],
+  "directDependencies": [
+    {
+      "id": 436,
+      "name": "function_436",
+      "signature": " (type $t2) (param $p0 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 362,
+      "name": "free",
+      "signature": " (type $t2) (param $p0 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 1011,
+      "name": "function_1011",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 1010,
+      "name": "function_1010",
+      "signature": " (type $t2) (param $p0 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 382,
+      "name": "fillMemory",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 1008,
+      "name": "function_1008",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 372,
+      "name": "function_372",
+      "signature": " (type $t2) (param $p0 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 371,
+      "name": "allocateOrAbort",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 575,
+      "name": "function_575",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 705,
+      "name": "function_705",
+      "signature": " (type $t42) (param $p0 i32) (result f64)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 398,
+      "name": "function_398",
+      "signature": " (type $t12)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 478,
+      "name": "function_478",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 491,
+      "name": "function_491",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 477,
+      "name": "function_477",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 368,
+      "name": "malloc",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 363,
+      "name": "function_363",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 458,
+      "name": "function_458",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 670,
+      "name": "function_670",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 758,
+      "name": "function_758",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 609,
+      "name": "function_609",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 677,
+      "name": "function_677",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 757,
+      "name": "function_757",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 533,
+      "name": "function_533",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 809,
+      "name": "function_809",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 493,
+      "name": "function_493",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 549,
+      "name": "function_549",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 756,
+      "name": "function_756",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 755,
+      "name": "function_755",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 467,
+      "name": "function_467",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 1009,
+      "name": "function_1009",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    },
+    {
+      "id": 495,
+      "name": "function_495",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "scope": "explicit dependency through runtime.call; own1015 body is never invoked"
+    }
+  ],
+  "indirectDependencies": [
+    {
+      "signature": {
+        "parameters": [
+          "i32"
+        ],
+        "results": []
+      },
+      "selector": "owner.vtable[2]",
+      "purpose": "dispose reliable packet owner when biased strong count was0"
+    }
+  ],
+  "flags": {
+    "1": "component declarations use mask rather than ordinal deltas",
+    "2": "skip component declarations",
+    "8": "dense existing-component fields rather than sparse field deltas",
+    "64": "dense component30 includes fields58\u201363",
+    "128": "mark entity byte44 bit0"
+  },
+  "reader": {
+    "layout": {
+      "data": 0,
+      "length": 4,
+      "cursor": 8,
+      "pendingBits": 12
+    },
+    "handles": "u32 little endian, i32.rotl14",
+    "xorTable": 32272,
+    "xorPeriod": 256,
+    "varint": "at most5 bytes, unsigned32; sparse deltas XOR1"
+  },
+  "fields": [
+    {
+      "field": 1,
+      "component": 6,
+      "constructor": 478,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 2,
+      "component": 30,
+      "constructor": 491,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 3,
+      "component": 16,
+      "constructor": 477,
+      "offset": 8,
+      "wireType": "handle-array",
+      "denseElements": 10,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 4,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 8,
+      "wireType": "string-array",
+      "denseElements": 1,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 5,
+      "component": 6,
+      "constructor": 478,
+      "offset": 16,
+      "wireType": "filtered-f32",
+      "previousOffset": 20,
+      "timestampOffset": 24,
+      "interpolation": "clamp((now-previousTime)/120,0,1); f32 difference, f64 interpolation, f32 result"
+    },
+    {
+      "field": 6,
+      "component": 6,
+      "constructor": 478,
+      "offset": 40,
+      "wireType": "zero-terminated-string"
+    },
+    {
+      "field": 7,
+      "component": 26,
+      "constructor": 467,
+      "offset": 8,
+      "wireType": "filtered-f32",
+      "previousOffset": 12,
+      "timestampOffset": 16,
+      "interpolation": "clamp((now-previousTime)/120,0,1); f32 difference, f64 interpolation, f32 result"
+    },
+    {
+      "field": 8,
+      "component": 21,
+      "constructor": 609,
+      "offset": 8,
+      "wireType": "u16-angle",
+      "previousOffset": 16,
+      "timestampOffset": 24,
+      "scale": "2*Math.PI/65535",
+      "interpolationDependency": 705
+    },
+    {
+      "field": 9,
+      "component": 5,
+      "constructor": 755,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 10,
+      "component": 16,
+      "constructor": 477,
+      "offset": 88,
+      "wireType": "string-array",
+      "denseElements": 10,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 11,
+      "component": 16,
+      "constructor": 477,
+      "offset": 248,
+      "wireType": "u8"
+    },
+    {
+      "field": 12,
+      "component": 16,
+      "constructor": 477,
+      "offset": 249,
+      "wireType": "u8"
+    },
+    {
+      "field": 13,
+      "component": 8,
+      "constructor": "inline-state+312",
+      "offset": 8,
+      "wireType": "filtered-f32",
+      "previousOffset": 12,
+      "timestampOffset": 16,
+      "interpolation": "clamp((now-previousTime)/120,0,1); f32 difference, f64 interpolation, f32 result"
+    },
+    {
+      "field": 14,
+      "component": 28,
+      "constructor": 756,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 15,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 24,
+      "wireType": "varint"
+    },
+    {
+      "field": 16,
+      "component": 6,
+      "constructor": 478,
+      "offset": 52,
+      "wireType": "byte-array",
+      "denseElements": 10,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 17,
+      "component": 10,
+      "constructor": 549,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 18,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 32,
+      "wireType": "filtered-f64"
+    },
+    {
+      "field": 19,
+      "component": 16,
+      "constructor": 477,
+      "offset": 252,
+      "wireType": "filtered-f32"
+    },
+    {
+      "field": 20,
+      "component": 6,
+      "constructor": 478,
+      "offset": 104,
+      "wireType": "u8"
+    },
+    {
+      "field": 21,
+      "component": 6,
+      "constructor": 478,
+      "offset": 108,
+      "wireType": "filtered-f32"
+    },
+    {
+      "field": 22,
+      "component": 1,
+      "constructor": 670,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 23,
+      "component": 15,
+      "constructor": "inline-entity+168",
+      "offset": 8,
+      "wireType": "rotl14-u32-intrusive-reference",
+      "referenceDependency": 575
+    },
+    {
+      "field": 24,
+      "component": 6,
+      "constructor": 478,
+      "offset": 112,
+      "wireType": "filtered-f32",
+      "previousOffset": 116,
+      "timestampOffset": 120,
+      "interpolation": "clamp((now-previousTime)/120,0,1); f32 difference, f64 interpolation, f32 result"
+    },
+    {
+      "field": 25,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 40,
+      "wireType": "string-array",
+      "denseElements": 1,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 26,
+      "component": 30,
+      "constructor": 491,
+      "offset": 9,
+      "wireType": "u8"
+    },
+    {
+      "field": 27,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 56,
+      "wireType": "filtered-f32"
+    },
+    {
+      "field": 28,
+      "component": 21,
+      "constructor": 609,
+      "offset": 40,
+      "wireType": "filtered-f32",
+      "previousOffset": 44,
+      "timestampOffset": 48,
+      "interpolation": "clamp((now-previousTime)/120,0,1); f32 difference, f64 interpolation, f32 result"
+    },
+    {
+      "field": 29,
+      "component": 22,
+      "constructor": 533,
+      "offset": 8,
+      "wireType": "bit"
+    },
+    {
+      "field": 30,
+      "component": 16,
+      "constructor": 477,
+      "offset": 256,
+      "wireType": "varint",
+      "storedBytes": 4
+    },
+    {
+      "field": 31,
+      "component": 30,
+      "constructor": 491,
+      "offset": 10,
+      "wireType": "u8"
+    },
+    {
+      "field": 32,
+      "component": 6,
+      "constructor": 478,
+      "offset": 136,
+      "wireType": "filtered-f32"
+    },
+    {
+      "field": 33,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 60,
+      "wireType": "bit-array",
+      "denseElements": 1,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 34,
+      "component": 6,
+      "constructor": 478,
+      "offset": 140,
+      "wireType": "u8"
+    },
+    {
+      "field": 35,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 72,
+      "wireType": "double-array",
+      "denseElements": 1,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 36,
+      "component": 2,
+      "constructor": 493,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 37,
+      "component": 8,
+      "constructor": "inline-state+312",
+      "offset": 32,
+      "wireType": "bit"
+    },
+    {
+      "field": 38,
+      "component": 25,
+      "constructor": 809,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 39,
+      "component": 16,
+      "constructor": 477,
+      "offset": 260,
+      "wireType": "varint-array",
+      "denseElements": 10,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 40,
+      "component": 22,
+      "constructor": 533,
+      "offset": 9,
+      "wireType": "bit"
+    },
+    {
+      "field": 41,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 88,
+      "wireType": "varint"
+    },
+    {
+      "field": 42,
+      "component": 16,
+      "constructor": 477,
+      "offset": 340,
+      "wireType": "filtered-f32"
+    },
+    {
+      "field": 43,
+      "component": 14,
+      "constructor": 757,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 44,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 92,
+      "wireType": "varint"
+    },
+    {
+      "field": 45,
+      "component": 16,
+      "constructor": 477,
+      "offset": 344,
+      "wireType": "filtered-f32",
+      "storedType": "f64"
+    },
+    {
+      "field": 46,
+      "component": 16,
+      "constructor": 477,
+      "offset": 352,
+      "wireType": "u8"
+    },
+    {
+      "field": 47,
+      "component": 6,
+      "constructor": 478,
+      "offset": 141,
+      "wireType": "u8"
+    },
+    {
+      "field": 48,
+      "component": 19,
+      "constructor": 677,
+      "offset": 8,
+      "wireType": "zero-terminated-string"
+    },
+    {
+      "field": 49,
+      "component": 21,
+      "constructor": 609,
+      "offset": 64,
+      "wireType": "filtered-f32",
+      "previousOffset": 68,
+      "timestampOffset": 72,
+      "interpolation": "clamp((now-previousTime)/120,0,1); f32 difference, f64 interpolation, f32 result"
+    },
+    {
+      "field": 50,
+      "component": 7,
+      "constructor": 758,
+      "offset": 8,
+      "wireType": "u8"
+    },
+    {
+      "field": 51,
+      "component": 27,
+      "constructor": "inline-state+1512",
+      "offset": 96,
+      "wireType": "varint"
+    },
+    {
+      "field": 52,
+      "component": 16,
+      "constructor": 477,
+      "offset": 356,
+      "wireType": "varint",
+      "storedBytes": 4
+    },
+    {
+      "field": 53,
+      "component": 20,
+      "constructor": 458,
+      "offset": 8,
+      "wireType": "filtered-f32"
+    },
+    {
+      "field": 54,
+      "component": 1,
+      "constructor": 670,
+      "offset": 9,
+      "wireType": "u8"
+    },
+    {
+      "field": 55,
+      "component": 20,
+      "constructor": 458,
+      "offset": 12,
+      "wireType": "filtered-f32"
+    },
+    {
+      "field": 56,
+      "component": 6,
+      "constructor": 478,
+      "offset": 144,
+      "wireType": "rotl14-u32-intrusive-reference",
+      "referenceDependency": 575
+    },
+    {
+      "field": 57,
+      "component": 15,
+      "constructor": "inline-entity+168",
+      "offset": 20,
+      "wireType": "rotl14-u32-intrusive-reference",
+      "referenceDependency": 575
+    },
+    {
+      "field": 58,
+      "component": 30,
+      "constructor": 491,
+      "offset": 12,
+      "wireType": "varint",
+      "storedBytes": 2
+    },
+    {
+      "field": 59,
+      "component": 30,
+      "constructor": 491,
+      "offset": 16,
+      "wireType": "filtered-f32",
+      "previousOffset": 20,
+      "timestampOffset": 24,
+      "interpolation": "clamp((now-previousTime)/120,0,1); f32 difference, f64 interpolation, f32 result"
+    },
+    {
+      "field": 60,
+      "component": 30,
+      "constructor": 491,
+      "offset": 40,
+      "wireType": "byte-array",
+      "denseElements": 16,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 61,
+      "component": 30,
+      "constructor": 491,
+      "offset": 120,
+      "wireType": "short-array",
+      "denseElements": 8,
+      "sparseElements": "aligned varint XOR1 unsigned index delta; cumulative index minus1; zero delta terminates"
+    },
+    {
+      "field": 62,
+      "component": 30,
+      "constructor": 491,
+      "offset": 168,
+      "wireType": "u8"
+    },
+    {
+      "field": 63,
+      "component": 30,
+      "constructor": 491,
+      "offset": 169,
+      "wireType": "u8"
+    }
+  ],
+  "verification": {
+    "testGroups": 13,
+    "comparison": [
+      "complete64MiB memory SHA256",
+      "all15 captured snapshot intermediate memory digests",
+      "all host calls and argument order",
+      "stack pointer including trap paths",
+      "exception class/message",
+      "packet reader cursors and input bytes within complete memory"
+    ],
+    "integration": "original1015 definition replaced by JS hook in transformed WAT; all15 captured snapshots invoke the hook",
+    "scenarioFamilies": [
+      "all63 sparse fields and unknown default",
+      "19 dense groups, extended component30 and all-components combined",
+      "short/heap strings and replacement",
+      "sparse arrays, adjacent bits, float filtering and interpolation",
+      "activation, retirement, generations and spatial swaps",
+      "reference groups with2/3/33/40 records, relocation, rebinding and pruning",
+      "reliable acknowledgement binary search, biased owners and overlapping compaction",
+      "login reliable output with0\u20138193 byte strings and capacity growth",
+      "sequence/pending/stale/event framing boundaries",
+      "truncated framing including unsigned-length underflow and original traps"
+    ],
+    "traceProvenance": "retained rebuilt-runtime browser capture, not pristine original-release network capture"
+  },
+  "unknowns": [
+    "Numeric component/field offsets are preserved; product names for most fields remain unknown.",
+    "Independent dependencies retain their original bodies unless separately registered as recovered.",
+    "This reconstruction does not by itself establish full-game source recovery or browser visual identity."
+  ],
+  "reaEvidence": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80"
+}

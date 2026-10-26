@@ -1,0 +1,303 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/drawing-primitives.mjs",
+  "implementationSha256": "7664940b3da86902e46e338f5bc63d5ad64aeb2ccc553b3b085f94cb1ae07a07",
+  "factory": "createDrawingPrimitiveHooks",
+  "functionIds": [
+    395,
+    410,
+    455,
+    562,
+    588,
+    631,
+    1131
+  ],
+  "functions": [
+    {
+      "id": 395,
+      "name": "fillAndStrokeCurrentPath",
+      "originalSymbol": "function_395",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 10288
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 2920
+        },
+        "source": {
+          "path": "source/game/client/drawing-primitives.mjs",
+          "line": 34
+        },
+        "test": "test/client-drawing-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_366"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 410,
+      "name": "fillRectangle",
+      "originalSymbol": "function_410",
+      "signature": " (type $t50) (param $p0 i32) (param $p1 f64) (param $p2 f64) (param $p3 f64) (param $p4 f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 13482
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 3947
+        },
+        "source": {
+          "path": "source/game/client/drawing-primitives.mjs",
+          "line": 182
+        },
+        "test": "test/client-drawing-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_366",
+        "emscripten_asm_const_int"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 455,
+      "name": "strokeStoredPath",
+      "originalSymbol": "function_455",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 19205
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 1171
+        },
+        "source": {
+          "path": "source/game/client/drawing-primitives.mjs",
+          "line": 60
+        },
+        "test": "test/client-drawing-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_366",
+        "emscripten_asm_const_int"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 562,
+      "name": "appendPathLine",
+      "originalSymbol": "function_562",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 53382
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0192-0255.dcmp",
+          "line": 1902
+        },
+        "source": {
+          "path": "source/game/client/drawing-primitives.mjs",
+          "line": 155
+        },
+        "test": "test/client-drawing-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_366",
+        "emscripten_asm_const_int"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 588,
+      "name": "arenaBandBoundary",
+      "originalSymbol": "function_588",
+      "signature": " (type $t74) (param $p0 i32) (param $p1 i32) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 65742
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0192-0255.dcmp",
+          "line": 5961
+        },
+        "source": {
+          "path": "source/game/client/drawing-primitives.mjs",
+          "line": 242
+        },
+        "test": "test/client-drawing-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_631"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 631,
+      "name": "roundF32",
+      "originalSymbol": "function_631",
+      "signature": " (type $t25) (param $p0 f32) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 82085
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0256-0319.dcmp",
+          "line": 1875
+        },
+        "source": {
+          "path": "source/game/client/drawing-primitives.mjs",
+          "line": 233
+        },
+        "test": "test/client-drawing-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1131,
+      "name": "drawCachedImageRegion",
+      "originalSymbol": "function_1131",
+      "signature": " (type $t103) (param $p0 i32) (param $p1 i32) (param $p2 f64) (param $p3 f64) (param $p4 f64) (param $p5 f64) (param $p6 f64) (param $p7 f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 436618
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0768-0831.dcmp",
+          "line": 260
+        },
+        "source": {
+          "path": "source/game/client/drawing-primitives.mjs",
+          "line": 90
+        },
+        "test": "test/client-drawing-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_366",
+        "emscripten_asm_const_int",
+        "function_372"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 8,
+    "oracleComparisons": 487,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true,
+    "combinedClientRenderTest": "test/client-render-frame.test.mjs",
+    "perCallFullMemoryComparisons": 485,
+    "batchedFullMemoryComparisons": 2,
+    "additionalScalarComparisons": 8511,
+    "testLog": "reports/tests.tap"
+  },
+  "limitations": [
+    "Shared linear-memory ABI fields without an established name retain original offsets.",
+    "Memory comparison and Canvas remain explicit dependencies; f32 rounding and arena-band arithmetic use recovered source bodies.",
+    "Finite direct cases and captured scenes do not prove arbitrary malformed pointer graphs or every future input.",
+    "Current browser verification and artifact identity are recorded in reports/current-verification.json; retained earlier reports apply only to their recorded source hashes.",
+    "Current browser verification and artifact identity are recorded in reports/current-verification.json; retained earlier reports apply only to their recorded source hashes.",
+    "Current browser verification and artifact identity are recorded in reports/current-verification.json; retained earlier reports apply only to their recorded source hashes."
+  ],
+  "semanticNotes": {
+    "renderer": {
+      "matrix": 0,
+      "cachedMatrix": 24,
+      "dirtyFlag": 48,
+      "contextId": 96
+    },
+    "canvasCalls": [
+      {
+        "address": 136414,
+        "name": "setTransform"
+      },
+      {
+        "address": 137843,
+        "name": "lineTo"
+      },
+      {
+        "address": 137096,
+        "name": "fillRectUnit"
+      },
+      {
+        "address": 136661,
+        "name": "fill"
+      },
+      {
+        "address": 136732,
+        "name": "stroke"
+      },
+      {
+        "address": 136763,
+        "name": "stroke stored Path2D"
+      },
+      {
+        "address": 138280,
+        "name": "drawImage source crop to unit rectangle"
+      },
+      {
+        "address": 136661,
+        "name": "fill"
+      },
+      {
+        "address": 136732,
+        "name": "stroke"
+      },
+      {
+        "address": 136763,
+        "name": "stroke stored Path2D"
+      },
+      {
+        "address": 138280,
+        "name": "drawImage source crop to unit rectangle"
+      },
+      {
+        "address": 136661,
+        "name": "fill"
+      },
+      {
+        "address": 136732,
+        "name": "stroke"
+      },
+      {
+        "address": 136763,
+        "name": "stroke stored Path2D"
+      },
+      {
+        "address": 138280,
+        "name": "drawImage source crop to unit rectangle"
+      }
+    ],
+    "rounding": "nearest integer, halfway away from zero, signed zero retained",
+    "arenaBands": "50-unit grid with signed level boundaries 15/30/45 and timed mode at 900000 milliseconds"
+  },
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

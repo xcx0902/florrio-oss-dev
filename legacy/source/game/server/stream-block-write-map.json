@@ -1,0 +1,76 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-block-write.mjs",
+  "implementationSha256": "e7a5c0e4c3e5099c26921e9f68bb94e7d8b073f917bbb5974d6f469213c159e1",
+  "factory": "createStreamBlockWriteHooks",
+  "functionIds": [
+    274,
+    427
+  ],
+  "functions": [
+    {
+      "id": 274,
+      "name": "writeStreamBlock",
+      "originalSymbol": "function_274",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-block-write.mjs",
+          "line": 34
+        },
+        "test": "test/server-stream-block-write.test.mjs"
+      },
+      "originalDirectDependencies": [
+        430
+      ],
+      "originalIndirectCallSites": 1,
+      "notes": "Copies source bytes into the put area at +20 and advances it; insufficient space delegates to virtual vtable+36; byte +75 enables newline prefix handling."
+    },
+    {
+      "id": 427,
+      "name": "writeElements",
+      "originalSymbol": "function_427",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-block-write.mjs",
+          "line": 45
+        },
+        "test": "test/server-stream-block-write.test.mjs"
+      },
+      "originalDirectDependencies": [
+        274
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Writes size*count bytes; full write returns count (0 when size is zero), otherwise written/size."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-block-write.test.mjs",
+    "report": "reports/server-stream-block-write-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 15,
+    "completeLinearMemoryChecks": 15,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 15,
+    "trappingComparisons": 0,
+    "comparison": "427: 3 sizes x 4 counts; 274: 4 counts; each compares result, complete memory and stack.",
+    "limitations": [
+      "Insufficient-space virtual writes and newline prefix handling are not exercised.",
+      "Ledger: 398 server bodies recovered and 336 remain machine code."
+    ]
+  }
+}

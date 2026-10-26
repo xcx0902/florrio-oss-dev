@@ -1,0 +1,49 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-write-copy.mjs",
+  "implementationSha256": "06c837530f7e63f3b120174b1947380453cd9b969ac25a1147cab61d5de7b477",
+  "factory": "createStreamWriteCopyHook",
+  "functionIds": [
+    647
+  ],
+  "functions": [
+    {
+      "id": 647,
+      "name": "writeStreamCopy",
+      "originalSymbol": "function_647",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-write-copy.mjs",
+          "line": 14
+        },
+        "test": "test/server-stream-write-copy.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Copies into +20, clamping advance to +16 - +20, and returns count."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-write-copy.test.mjs",
+    "report": "reports/server-stream-write-copy-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Four counts including clamp overflow compare result, complete memory and stack.",
+    "limitations": [
+      "Ledger: 439 server bodies recovered and 295 remain machine code."
+    ]
+  }
+}

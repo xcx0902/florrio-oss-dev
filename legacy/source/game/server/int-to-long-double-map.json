@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/int-to-long-double.mjs",
+  "implementationSha256": "07c760b834fb36ae7d83448e9a8504d9c59b217575399c4246aa0d115a8d26f6",
+  "factory": "createIntToLongDoubleHook",
+  "functionIds": [
+    72
+  ],
+  "functions": [
+    {
+      "id": 72,
+      "name": "intToLongDouble",
+      "originalSymbol": "function_72",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/int-to-long-double.mjs",
+          "line": 14
+        },
+        "test": "test/server-int-to-long-double.test.mjs"
+      },
+      "originalDirectDependencies": [
+        55
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Normalizes the magnitude through 55 and restores the sign bit."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-int-to-long-double.test.mjs",
+    "report": "reports/server-int-to-long-double-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 8,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 8,
+    "trappingComparisons": 0,
+    "comparison": "Eight signed values compare output bytes, stack and memory outside the dead 32-byte stack window.",
+    "limitations": [
+      "Native normalization scratch is excluded. Ledger: 465 server bodies recovered and 269 remain machine code."
+    ]
+  }
+}

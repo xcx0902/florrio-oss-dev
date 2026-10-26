@@ -1,0 +1,174 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "factory": "createSnapshotDecoderHooks",
+  "functions": [
+    {
+      "id": 1007,
+      "name": "attachComponent12",
+      "source": "source/game/client/snapshot-decoder.mjs",
+      "signature": " (type $t2) (param $p0 i32)",
+      "confidence": "high",
+      "coverage": "complete 20-byte component pool allocation, free max-heap removal and active-vector registration",
+      "evidence": {
+        "originalFunctionIndex": 1007,
+        "wat": "source/wasm/client.wat",
+        "watStart": 233556,
+        "watEnd": 233928,
+        "test": "test/client-snapshot-decoder.test.mjs",
+        "packetTrace": "reports/runtime/client-packet-traces.json"
+      }
+    },
+    {
+      "id": 1008,
+      "name": "decodeEntityComponentDeclarations",
+      "source": "source/game/client/snapshot-decoder.mjs",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "confidence": "high",
+      "coverage": "complete 30-component mask/delta declaration parser and all inline allocation/list behavior",
+      "evidence": {
+        "originalFunctionIndex": 1008,
+        "wat": "source/wasm/client.wat",
+        "watStart": 233929,
+        "watEnd": 236807,
+        "test": "test/client-snapshot-decoder.test.mjs",
+        "packetTrace": "reports/runtime/client-packet-traces.json"
+      }
+    },
+    {
+      "id": 1009,
+      "name": "decodeSnapshotEvent",
+      "source": "source/game/client/snapshot-decoder.mjs",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "confidence": "high",
+      "coverage": "complete event opcode parser, string ownership, generation/timestamps, visual allocation and coordinate projection",
+      "evidence": {
+        "originalFunctionIndex": 1009,
+        "wat": "source/wasm/client.wat",
+        "watStart": 236808,
+        "watEnd": 238328,
+        "test": "test/client-snapshot-decoder.test.mjs",
+        "packetTrace": "reports/runtime/client-packet-traces.json"
+      }
+    }
+  ],
+  "originalDependencies": [
+    362,
+    363,
+    368,
+    369,
+    370,
+    371,
+    372,
+    382,
+    398,
+    409,
+    416,
+    426,
+    449,
+    458,
+    467,
+    477,
+    478,
+    491,
+    493,
+    533,
+    549,
+    557,
+    609,
+    670,
+    677,
+    679,
+    682,
+    755,
+    756,
+    757,
+    758,
+    781,
+    783,
+    784,
+    809
+  ],
+  "componentOrdinalConstructors": {
+    "1": 670,
+    "2": 493,
+    "3": 682,
+    "4": 781,
+    "5": 755,
+    "6": 478,
+    "7": 758,
+    "8": "inline: state+312",
+    "9": "pool449: entity+80, state+372",
+    "10": 549,
+    "11": "pool783: entity+88, state+460",
+    "12": 1007,
+    "13": "pool449: entity+96, state+548",
+    "14": 757,
+    "15": "inline: entity+168",
+    "16": 477,
+    "17": 679,
+    "18": "pool449: entity+108, state+1112",
+    "19": 677,
+    "20": 458,
+    "21": 609,
+    "22": 533,
+    "23": 784,
+    "24": "pool449: entity+132, state+1376",
+    "25": 809,
+    "26": 467,
+    "27": "inline: state+1512",
+    "28": 756,
+    "29": "pool449: entity+148, state+1712",
+    "30": 491
+  },
+  "wireModes": {
+    "mask": "flags&1: align pending byte then consume little-endian32-bit mask; bits0..29 map to ordinals1..30",
+    "delta": "otherwise: align before every varint; value XOR1 is an unsigned delta added to ordinal; zero terminates; unknown ordinal selects constructor670"
+  },
+  "eventOpcodes": {
+    "9": "zero-terminated string; format helper557 suppressed for duplicate sequences",
+    "11": "rotate-left14 entity handle, generation check, current time to state+2200 and/or component+56",
+    "14": "rotate-left14 entity handle plus byte index;496-byte visual in global slot395184+index*4",
+    "reservedTraps": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      12,
+      13
+    ],
+    "default": "read and destroy zero-terminated string"
+  },
+  "remainingNativeGameLogic": {
+    "409": "transform evaluation remains native",
+    "416": "visual ownership replacement remains native",
+    "426": "singleton initialization remains native",
+    "557": "formatted output remains native",
+    "1015": "full entity/component value parser, entity removal/update orchestration, caches and handle linking; remains native and is not counted as recovered",
+    "componentConstructors": "listed original dependency functions retain their own component defaults and resource pools"
+  },
+  "unknowns": [
+    "Component ordinals preserve numeric IDs: feature names have not been inferred from offsets alone.",
+    "Event14 object fields not explained by wire/control flow retain literal byte offsets and original integer/float constants.",
+    "This restores bounded complete functions1007/1008/1009, not the containing1015 body or all gameplay behavior."
+  ],
+  "verification": {
+    "testGroups": 14,
+    "comparison": [
+      "complete64MiB memory SHA256",
+      "stack delta including exception paths",
+      "exception class and message",
+      "every external host call and arguments"
+    ],
+    "integration": [
+      "all15 captured type1 packets run native1015 with1007/1008/1009 patched to these hooks; finalsequence89, all readers consumed",
+      "native1006 runs restored1009 for XOR-framed normal/duplicate events"
+    ],
+    "traceProvenance": "retained rebuilt-runtime browser capture; not misrepresented as a capture of the pristine original release"
+  },
+  "reaEvidence": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80"
+}

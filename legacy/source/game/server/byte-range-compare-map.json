@@ -1,0 +1,50 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/byte-range-compare.mjs",
+  "implementationSha256": "cdf4211d8334f4e29dc9dd896daf0f5b13c5edb1f9dd6d057cc627c4fe702952",
+  "factory": "createByteRangeCompareHook",
+  "functionIds": [
+    611
+  ],
+  "functions": [
+    {
+      "id": 611,
+      "name": "compareByteRanges",
+      "originalSymbol": "function_611",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 133438
+        },
+        "source": {
+          "path": "source/game/server/byte-range-compare.mjs",
+          "line": 11
+        },
+        "test": "test/server-byte-range-compare.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Five-argument ABI: the first argument is scratch; compares two signed byte ranges lexicographically, prefixes less and longer greater."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-byte-range-compare.test.mjs",
+    "report": "reports/server-byte-range-compare-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 13,
+    "completeLinearMemoryChecks": 13,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 13,
+    "trappingComparisons": 0,
+    "comparison": "13 range pairs cover empty, prefix, equality and signed-byte differences.",
+    "limitations": [
+      "Ledger: 364 server bodies recovered and 370 remain machine code."
+    ]
+  }
+}

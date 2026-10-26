@@ -1,0 +1,341 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/materials.mjs",
+  "implementationSha256": "3518b039e900743bf88d48e2bd4c3c8e0111b58e04b0e922b6a7e1f9c2cf3ca5",
+  "factory": "createMaterialHooks",
+  "functionIds": [
+    461,
+    1122,
+    3408,
+    3441,
+    3541,
+    4070,
+    1783,
+    1785,
+    1792,
+    1794,
+    1311,
+    3357,
+    2334
+  ],
+  "functions": [
+    {
+      "id": 461,
+      "name": "initializeMaterial130",
+      "originalSymbol": "function_461",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 20907
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 98
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1122,
+      "name": "initializeMaterial145",
+      "originalSymbol": "function_1122",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 432869
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 99
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 3408,
+      "name": "initializeMaterial120",
+      "originalSymbol": "function_3408",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 711072
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 100
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 3441,
+      "name": "initializeMaterial110",
+      "originalSymbol": "function_3441",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 713042
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 101
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 3541,
+      "name": "initializeMaterial140",
+      "originalSymbol": "function_3541",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 718697
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 102
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 4070,
+      "name": "initializeMaterial100",
+      "originalSymbol": "function_4070",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 750430
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 103
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1783,
+      "name": "mapSignedBytesLower",
+      "originalSymbol": "function_1783",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 465422
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 106
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1785,
+      "name": "mapSignedBytesUpper",
+      "originalSymbol": "function_1785",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 465476
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 107
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1792,
+      "name": "mapDwordsLower",
+      "originalSymbol": "function_1792",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 465653
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 110
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1794,
+      "name": "mapDwordsUpper",
+      "originalSymbol": "function_1794",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 465701
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 111
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 1311,
+      "name": "fillHash25OffsetFour",
+      "originalSymbol": "function_1311",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 445883
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 114
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 3357,
+      "name": "fillHash25OffsetZero",
+      "originalSymbol": "function_3357",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 708796
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 115
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2334,
+      "name": "testSingletonWord",
+      "originalSymbol": "function_2334",
+      "signature": " (type $t3) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 645682
+        },
+        "source": {
+          "path": "source/game/client/materials.mjs",
+          "line": 118
+        },
+        "test": "test/client-materials.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-materials.test.mjs",
+    "report": "reports/client-materials-tests.tap",
+    "testGroups": 2,
+    "pass": 2,
+    "fail": 0,
+    "oracleComparisons": 52,
+    "trappingComparisons": 16,
+    "completeLinearMemoryChecks": 52,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 52,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 3,
+      "boundary": 13
+    },
+    "argumentRows": [
+      "seeded records at 0x100000 + 0x100*index",
+      "the same records shifted by four bytes; material flags select the alternate constant",
+      "all-zero arguments",
+      "addresses at 0x3ffffff minus index"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. The safe row selects the initial material constant (flags 3) and the overlap row selects the alternate (flags 2). The zero row traps in the two hash fills and in 2334; all thirteen boundary rows trap.",
+    "limitations": [
+      "The generic rows cover flags 2 and 3; flags 0 and 1 take the same branch structure but are not separately enumerated.",
+      "The 25-byte hash fills use one seed value in the generic rows; the generator arithmetic is exact but not proven for every 32-bit seed here.",
+      "Map tables are shipped data; the mapping names describe the lookup shape rather than original character-set names.",
+      "These 13 functions are part of the 4,245 client functions; the current ledger has 227 client bodies recovered and 4,018 remain machine code."
+    ]
+  }
+}

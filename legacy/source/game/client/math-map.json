@@ -1,0 +1,95 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/math.mjs",
+  "implementationSha256": "158aa66a1ffc0e76be61f1c389889e95e283dd999aac561bf522358898209d69",
+  "factory": "createClientMathHooks",
+  "functionIds": [
+    375,
+    511
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after parent review and passing candidate tests.",
+  "functions": [
+    {
+      "id": 375,
+      "name": "powF64",
+      "originalSymbol": "function_375",
+      "signature": " (type $t38) (param $p0 f64) (param $p1 f64) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 5339,
+          "endLine": 6224
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 1483
+        },
+        "source": {
+          "path": "source/game/client/math.mjs",
+          "line": 133
+        },
+        "test": "test/client-math.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_511"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 511,
+      "name": "scaleBinaryExponent",
+      "originalSymbol": "function_511",
+      "signature": " (type $t52) (param $p0 f64) (param $p1 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 33740,
+          "endLine": 33815
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0128-0191.dcmp",
+          "line": 1989
+        },
+        "source": {
+          "path": "source/game/client/math.mjs",
+          "line": 193
+        },
+        "test": "test/client-math.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "abi": "WASM f64 parameters and results preserve payload bits; 511 receives its exponent as i32.",
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-math.test.mjs",
+    "report": "reports/client-math-tests.tap",
+    "reportSha256": "dd7969666835290b03e7f49d58d4f140a123d615b7c0a8c9d8ce6b1132bd6021",
+    "testSourceSha256": "d171053d4be420dc2c3ac8b584adcc7a4b48efaa51fddeff5430660d6969ecbc",
+    "testGroups": 5,
+    "pass": 5,
+    "fail": 0,
+    "oracleScalarComparisons": 108122,
+    "memoryBytesPerComparison": 67108864,
+    "completeMemoryAndStackUnchanged": true,
+    "coefficientTableReads": 3,
+    "parameterCoercionCases": 44,
+    "comparison": "Each oracle call compares raw IEEE-754 result bits against the archived WASM; the complete 64 MiB linear memory and stack pointer are compared after each group.",
+    "limitations": [
+      "Oracle inputs are deterministic samples, not an exhaustive enumeration of all f64 pairs.",
+      "Results are compared bit-for-bit; this does not prove equivalence of unrelated WASM state not touched by these functions.",
+      "The recovered body executes through the shared linear memory and C stack adapter; reflective properties such as function names differ."
+    ]
+  }
+}

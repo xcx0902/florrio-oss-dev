@@ -1,0 +1,204 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/sequence-and-table-helpers.mjs",
+  "implementationSha256": "75d59b7ba2f5701df675dc0b6ae31c3bfd59f38499af7b8d77f4edf4811c4162",
+  "factory": "createSequenceAndTableHelperHooks",
+  "functionIds": [
+    40,
+    350,
+    354,
+    454,
+    457,
+    459,
+    463,
+    472
+  ],
+  "functions": [
+    {
+      "id": 40,
+      "name": "buildPairFromPointer",
+      "originalSymbol": "function_40",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sequence-and-table-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-sequence-and-table-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 350,
+      "name": "buildZeroAndPointerPair",
+      "originalSymbol": "function_350",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sequence-and-table-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-sequence-and-table-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 354,
+      "name": "countWordsUntilZero",
+      "originalSymbol": "function_354",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sequence-and-table-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-sequence-and-table-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 454,
+      "name": "copyByteRange",
+      "originalSymbol": "function_454",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sequence-and-table-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-sequence-and-table-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 457,
+      "name": "decodeSignedByte10352",
+      "originalSymbol": "function_457",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sequence-and-table-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-sequence-and-table-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 459,
+      "name": "decodeSignedByte11888",
+      "originalSymbol": "function_459",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sequence-and-table-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-sequence-and-table-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 463,
+      "name": "widenSignedBytes",
+      "originalSymbol": "function_463",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sequence-and-table-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-sequence-and-table-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 472,
+      "name": "testBitSet9328",
+      "originalSymbol": "function_472",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/sequence-and-table-helpers.mjs",
+          "line": 10
+        },
+        "test": "test/server-sequence-and-table-helpers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-sequence-and-table-helpers.test.mjs",
+    "report": "reports/server-sequence-and-table-helpers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 24,
+    "completeLinearMemoryChecks": 24,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 24,
+    "trappingComparisons": 0,
+    "comparison": "3 trials per helper compare result, complete memory and stack pointer.",
+    "limitations": [
+      "40/350 use 16 bytes of native dead stack scratch, excluded from byte comparison.",
+      "Ledger: 323 server bodies recovered and 411 remain machine code."
+    ]
+  }
+}

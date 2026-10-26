@@ -1,0 +1,131 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/catalog-initializers.mjs",
+  "implementationSha256": "8006785d9460c2a002e2d58ef62ded633ddbe9f40c39f76e6aa9cea71e7963a1",
+  "factory": "createCatalogInitializerHook",
+  "functionIds": [
+    513,
+    514,
+    515
+  ],
+  "functions": [
+    {
+      "id": 513,
+      "name": "getCatalog513",
+      "originalSymbol": "function_513",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        24,
+        27,
+        31,
+        32
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118990
+        },
+        "source": {
+          "path": "source/game/server/catalog-initializers.mjs",
+          "line": 15
+        },
+        "test": "test/server-catalog-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        24,
+        27,
+        31,
+        32
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Lazy guarded catalog: outer guard 8570816, inner guard 8571944, clear 8571920..8571944, 2 string assignments, publish 8571920 at 8570812, return loaded pointer."
+    },
+    {
+      "id": 514,
+      "name": "getCatalog514",
+      "originalSymbol": "function_514",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        24,
+        27,
+        31,
+        32
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119041
+        },
+        "source": {
+          "path": "source/game/server/catalog-initializers.mjs",
+          "line": 15
+        },
+        "test": "test/server-catalog-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        24,
+        27,
+        31,
+        32
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Lazy guarded catalog: outer guard 8570800, inner guard 8571600, clear 8571312..8571600, 24 string assignments, publish 8571312 at 8570796, return loaded pointer."
+    },
+    {
+      "id": 515,
+      "name": "getCatalog515",
+      "originalSymbol": "function_515",
+      "signature": " (type $t1) (param i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        24,
+        27,
+        31,
+        32
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 119158
+        },
+        "source": {
+          "path": "source/game/server/catalog-initializers.mjs",
+          "line": 15
+        },
+        "test": "test/server-catalog-initializers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        24,
+        27,
+        31,
+        32
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Lazy guarded catalog: outer guard 8570784, inner guard 8571128, clear 8570960..8571128, 14 string assignments, publish 8570960 at 8570780, return loaded pointer."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-catalog-initializers.test.mjs",
+    "report": "reports/server-catalog-initializers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 72,
+    "completeLinearMemoryChecks": 72,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 72,
+    "trappingComparisons": 0,
+    "comparison": "12 trials per catalog exercise cold initialization and warm reuse, comparing result, complete memory and stack pointer.",
+    "limitations": [
+      "Guard, string-assignment and clear primitives 24/27/31/32 are native dependencies.",
+      "Guard contention paths cannot occur in single-threaded tests.",
+      "Ledger: 269 server bodies recovered and 465 remain machine code."
+    ]
+  }
+}

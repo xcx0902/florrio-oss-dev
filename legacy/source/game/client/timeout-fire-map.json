@@ -1,0 +1,69 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/timeout-fire.mjs",
+  "implementationSha256": "60446bf75dec7935ec7f6436373c5695d02c313a3ebdbd8aa5a07a03ab8bf180",
+  "factory": "createTimeoutFireHook",
+  "functionIds": [
+    3278
+  ],
+  "dependencies": [
+    362,
+    369,
+    370,
+    406
+  ],
+  "functions": [
+    {
+      "id": 3278,
+      "name": "fireTimeoutCallback",
+      "originalSymbol": "fireTimeoutCallback",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        362,
+        406
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 705528
+        },
+        "source": {
+          "path": "source/game/client/timeout-fire.mjs",
+          "line": 39
+        },
+        "test": "test/client-timeout-fire.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362,
+        369,
+        370,
+        406
+      ],
+      "originalIndirectCallSites": 4,
+      "notes": "Fires one client timer from the libc++-style unordered map at 7932796, invoking the callback through vtable byte offset 24, re-looking up after the callback, unlinking with predecessor bucket-clear/next rehash rules, decrementing the live count, destroying the callback through slot 4/5 and freeing entry+node. Null callback aborts through 406."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-timeout-fire.test.mjs",
+    "report": "reports/client-timeout-fire-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 11,
+    "completeLinearMemoryChecks": 11,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 11,
+    "trappingComparisons": 2,
+    "comparison": "Eleven map scenarios: empty, absent, power-of-two hit, collision first/second node, next-node rehash, duplicate id, self callback, normal callback, null-callback trap, lazy initialization and bucket-array OOB. Each compares outcome/error constructor+message, complete 67,108,864-byte memory and the stack pointer; callback cases assert four host invocations across native+hook runs.",
+    "limitations": [
+      "Guard acquire returning 0 is not exercised.",
+      "A callback that mutates/rehashes the map between invocation and the second lookup is implemented but only exercised on an unchanged map.",
+      "Chain node equal to the sentinel, node+12==0 and out-of-bounds chain nodes are not exercised.",
+      "free 362 and abort 406 remain native.",
+      "Ledger: 439 client bodies recovered and 3,806 remain machine code."
+    ]
+  }
+}

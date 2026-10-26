@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/depth-comparator.mjs",
+  "implementationSha256": "6075b8c80a4d02b8c0332659ee1e6dc6721ebbc543a54a8b7a055c22db37bdea",
+  "factory": "createDepthComparatorHook",
+  "functionIds": [
+    139
+  ],
+  "functions": [
+    {
+      "id": 139,
+      "name": "sortThreeByDepth",
+      "originalSymbol": "function_139",
+      "signature": " (type $t4) (param i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 28146
+        },
+        "source": {
+          "path": "source/game/server/depth-comparator.mjs",
+          "line": 38
+        },
+        "test": "test/server-depth-comparator.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Three-slot descending-depth exchange network over entities; depth is f32 at manager(entity+100)+200+16, zero when the manager is absent; returns exchange count."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-depth-comparator.test.mjs",
+    "report": "reports/server-depth-comparator-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 216,
+    "completeLinearMemoryChecks": 216,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 216,
+    "trappingComparisons": 0,
+    "comparison": "Depth pairs, all permutations, NaN signs/payloads, manager-absence masks, null slots, exchange counts and signed/zero/infinite branch permutations compare return, all slot pointers via full memory and stack pointer.",
+    "limitations": [
+      "manager+200 == 0 is dereferenced as the original does; out-of-bounds pointers are not exercised.",
+      "Ledger: 244 server bodies recovered and 490 remain machine code."
+    ]
+  }
+}

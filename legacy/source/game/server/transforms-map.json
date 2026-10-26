@@ -1,0 +1,149 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/transforms.mjs",
+  "factory": "createTransformHooks",
+  "functionIds": [
+    17,
+    34,
+    44,
+    47,
+    94
+  ],
+  "functions": [
+    {
+      "id": 17,
+      "name": "updateWorldTransform",
+      "originalSymbol": "function_17",
+      "signature": " (type $t0) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 4191
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 1202
+        },
+        "test": "test/server-transforms.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_17",
+        "function_169",
+        "function_149"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 34,
+      "name": "invalidateDescendant",
+      "originalSymbol": "function_34",
+      "signature": " (type $t0) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 6386
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 1894
+        },
+        "test": "test/server-transforms.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_34"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 44,
+      "name": "setLocalX",
+      "originalSymbol": "function_44",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 13854
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 3954
+        },
+        "test": "test/server-transforms.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "malloc",
+        "memcpy"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 47,
+      "name": "setLocalY",
+      "originalSymbol": "function_47",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 14201
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0000-0063.dcmp",
+          "line": 4051
+        },
+        "test": "test/server-transforms.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "malloc",
+        "memcpy"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 94,
+      "name": "setLocalAngle",
+      "originalSymbol": "function_94",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 19156
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0064-0127.dcmp",
+          "line": 474
+        },
+        "test": "test/server-transforms.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "free",
+        "emscriptenAsmConstDouble",
+        "malloc",
+        "memcpy"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 5,
+    "oracleComparisons": 415,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true
+  },
+  "limitations": [
+    "Shared malloc/free/memcpy, exact libm cosine/sine and host remainder remain explicit dependencies.",
+    "Known valid ABI states and selected bounds traps are verified; arbitrary aliasing and corrupt-memory equivalence is not proven."
+  ]
+}

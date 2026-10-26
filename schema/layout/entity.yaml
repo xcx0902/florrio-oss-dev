@@ -1,0 +1,32 @@
+schema: 1
+name: EntitySlot
+kind: struct
+confidence: medium
+size: 496
+alignment: 4
+source:
+  artifact: web/sp_server.wasm
+  sha256: 75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d
+  evidence:
+    - source/game/server/initialization.mjs
+    - reports/server-entity-definitions.md
+    - reports/client-entity-snapshot.md
+notes:
+  - 16,384 live entity slots of 496 bytes begin at absolute address 419020.
+  - Entity+0 points back to World; Entity+16 is the 32-bit generation handle.
+  - Most component payloads live outside this record and are reached through the world component tables.
+fields:
+  - { name: world, offset: 0, type: u32, confidence: high }
+  - { name: handle, offset: 16, type: u32, confidence: high }
+  - { name: listOwner, offset: 20, type: u32, confidence: high }
+  - { name: listPrevious, offset: 24, type: u32, confidence: high }
+  - { name: listNext, offset: 28, type: u32, confidence: high }
+  - { name: componentFlagsA, offset: 92, type: u8, confidence: high }
+  - { name: componentFlagsB, offset: 93, type: u8, confidence: high }
+  - { name: componentFlagsC, offset: 95, type: u8, confidence: high }
+  - { name: trackedMarkA, offset: 312, type: u32, confidence: high }
+  - { name: trackedMarkARevision, offset: 316, type: u32, confidence: high }
+  - { name: trackedMarkB, offset: 376, type: u32, confidence: high }
+  - { name: trackedMarkBRevision, offset: 380, type: u32, confidence: high }
+  - { name: trackedMarkC, offset: 464, type: u32, confidence: high }
+  - { name: trackedMarkCRevision, offset: 468, type: u32, confidence: high }

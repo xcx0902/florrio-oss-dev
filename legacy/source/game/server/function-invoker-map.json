@@ -1,0 +1,49 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/function-invoker.mjs",
+  "implementationSha256": "1222dde4d1ed96929a30f6f264e69614c6c8f3427b70a5fcd58bf5df2236bb5d",
+  "factory": "createFunctionInvokerHook",
+  "functionIds": [
+    287
+  ],
+  "functions": [
+    {
+      "id": 287,
+      "name": "invokeFourArgumentFunction",
+      "originalSymbol": "function_287",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/function-invoker.mjs",
+          "line": 14
+        },
+        "test": "test/server-function-invoker.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 1,
+      "notes": "Resolves the four-argument target through vtable[0]+28 and forwards four arguments."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-function-invoker.test.mjs",
+    "report": "reports/server-function-invoker-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 8,
+    "completeLinearMemoryChecks": 8,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 8,
+    "trappingComparisons": 0,
+    "comparison": "Four flag/adjustment states with and without an offset record compare complete memory and stack using a typed no-op table target.",
+    "limitations": [
+      "Table target is a test adapter; the original slot is restored after the test. Ledger: 504 server bodies recovered and 230 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,355 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/refcounted-string-destructors.mjs",
+  "implementationSha256": "ef7ae5b62515a26dd96b839a1f4e8dab313c33aab2d179ed4c484a2923817021",
+  "factory": "createRefcountedStringDestructorHooks",
+  "functionIds": [
+    433,
+    466,
+    550,
+    539,
+    585,
+    620,
+    621,
+    795,
+    797,
+    1070,
+    1111,
+    1114,
+    536
+  ],
+  "functions": [
+    {
+      "id": 433,
+      "name": "destroyRefcountedString433",
+      "originalSymbol": "function_433",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Unlinks the string, reports the released block and asserts the link state."
+    },
+    {
+      "id": 466,
+      "name": "destroyRefcountedString466",
+      "originalSymbol": "function_466",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 15
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        362,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Unlinks the string, reports the released block and asserts the link state."
+    },
+    {
+      "id": 550,
+      "name": "destroyRefcountedString550",
+      "originalSymbol": "function_550",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 19
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        789,
+        619,
+        362,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Releases two owned subobjects before the shared string unlink."
+    },
+    {
+      "id": 539,
+      "name": "destroyRefcountedString539",
+      "originalSymbol": "function_539",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 585,
+      "name": "destroyRefcountedString585",
+      "originalSymbol": "function_585",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 620,
+      "name": "destroyRefcountedString620",
+      "originalSymbol": "function_620",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 621,
+      "name": "destroyRefcountedString621",
+      "originalSymbol": "function_621",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 795,
+      "name": "destroyRefcountedString795",
+      "originalSymbol": "function_795",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 797,
+      "name": "destroyRefcountedString797",
+      "originalSymbol": "function_797",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 1070,
+      "name": "destroyRefcountedString1070",
+      "originalSymbol": "function_1070",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 1111,
+      "name": "destroyRefcountedString1111",
+      "originalSymbol": "function_1111",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 1114,
+      "name": "destroyRefcountedString1114",
+      "originalSymbol": "function_1114",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 17
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        377,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same string unlink with owned subobject cleanup before or after."
+    },
+    {
+      "id": 536,
+      "name": "destroyStringArray",
+      "originalSymbol": "function_536",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/refcounted-string-destructors.mjs",
+          "line": 32
+        },
+        "test": "test/client-refcounted-string-destructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        519,
+        362,
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Repeats subobject release and string destruction over a 304-byte element array."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-refcounted-string-destructors.test.mjs",
+    "report": "reports/client-refcounted-string-destructors-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 38,
+    "completeLinearMemoryChecks": 6,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 2,
+    "comparison": "Twelve layouts use linked, unlinked and inline-free fixtures; the array layout uses counts 0 and 1. All compare trap parity and complete memory.",
+    "limitations": [
+      "Ledger: 643 client and 507 server bodies recovered."
+    ]
+  }
+}

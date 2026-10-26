@@ -1,0 +1,102 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/object-deleters.mjs",
+  "implementationSha256": "55a8174c08eb2b7538fc458a06b9b28395b7496f17d238513aa8c77dcf8212c9",
+  "factory": "createObjectDeleterHooks",
+  "functionIds": [
+    460,
+    495,
+    499
+  ],
+  "functions": [
+    {
+      "id": 460,
+      "name": "deleteGuardedBuffer",
+      "originalSymbol": "function_460",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-deleters.mjs",
+          "line": 11
+        },
+        "test": "test/server-object-deleters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        292,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 292 then frees the object."
+    },
+    {
+      "id": 495,
+      "name": "deleteStringMember12",
+      "originalSymbol": "function_495",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-deleters.mjs",
+          "line": 15
+        },
+        "test": "test/server-object-deleters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        299,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 299 then frees the object."
+    },
+    {
+      "id": 499,
+      "name": "deleteStringMember16",
+      "originalSymbol": "function_499",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/object-deleters.mjs",
+          "line": 19
+        },
+        "test": "test/server-object-deleters.test.mjs"
+      },
+      "originalDirectDependencies": [
+        300,
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Runs 300 then frees the object."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-object-deleters.test.mjs",
+    "report": "reports/server-object-deleters-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 3,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 3,
+    "trappingComparisons": 0,
+    "comparison": "Each deleter runs on a real 64-byte allocation, comparing complete allocator memory and stack.",
+    "limitations": [
+      "Ledger: 436 server bodies recovered and 298 remain machine code."
+    ]
+  }
+}

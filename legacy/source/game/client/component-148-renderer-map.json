@@ -1,0 +1,303 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/component-148-renderer.mjs",
+  "implementationSha256": "45d1ed398d993ec10aa71d1cf4656516968dce4e56b6508df8f95185984b3acd",
+  "factory": "createComponent148RendererHooks",
+  "functionIds": [
+    1044
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after parent review and original-WASM differential tests.",
+  "functions": [
+    {
+      "id": 1044,
+      "name": "drawComponent148",
+      "originalSymbol": "function_1044",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "transitiveCoverageBasis": "Candidate1044 plus existing registered source bodies for the complete original static closure; browser host behavior remains external.",
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 288661,
+          "endLine": 291114
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0640-0703.dcmp",
+          "line": 17570
+        },
+        "source": {
+          "path": "source/game/client/component-148-renderer.mjs",
+          "line": 107
+        },
+        "test": "test/client-component-148-renderer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_372",
+        "function_373",
+        "function_366",
+        "function_395",
+        "function_410"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "phases": [
+    {
+      "name": "configureLineStyle",
+      "watLine": 288668,
+      "watEndLine": 288721,
+      "description": "Set line width, round joins and round caps.",
+      "sourceLine": 130
+    },
+    {
+      "name": "resolveComponentColors",
+      "watLine": 288722,
+      "watEndLine": 289259,
+      "description": "Resolve the three palettes and their independently sampled hit flashes.",
+      "sourceLine": 154
+    },
+    {
+      "name": "applyDarkFillAndOutline",
+      "watLine": 289260,
+      "watEndLine": 289475,
+      "description": "Set the dark fill and its shaded stroke, preserving optional grayscale conversion.",
+      "sourceLine": 343
+    },
+    {
+      "name": "drawTriangle",
+      "watLine": 289476,
+      "watEndLine": 289838,
+      "description": "Build and fill/stroke the triangular path.",
+      "sourceLine": 441
+    },
+    {
+      "name": "drawFilledEllipse",
+      "watLine": 289839,
+      "watEndLine": 290036,
+      "description": "Build the ellipse and apply its light fill.",
+      "sourceLine": 543
+    },
+    {
+      "name": "drawClippedStripes",
+      "watLine": 290037,
+      "watEndLine": 290229,
+      "description": "Save the drawing state, clip the ellipse, draw three bars and restore state.",
+      "sourceLine": 615
+    },
+    {
+      "name": "strokeEllipse",
+      "watLine": 290230,
+      "watEndLine": 290510,
+      "description": "Rebuild and stroke the ellipse with its separate palette.",
+      "sourceLine": 674
+    },
+    {
+      "name": "applyCurveColors",
+      "watLine": 290511,
+      "watEndLine": 290642,
+      "description": "Set stroke/fill palettes and use the 3-unit curve stroke.",
+      "sourceLine": 766
+    },
+    {
+      "name": "drawSideCurvesAndEndpoints",
+      "watLine": 290643,
+      "watEndLine": 291110,
+      "description": "Draw the curve and filled endpoint at each of the two signs.",
+      "sourceLine": 821
+    }
+  ],
+  "staticDependencyClosure": [
+    {
+      "id": 366,
+      "implementation": "source/game/client/runtime-primitives.mjs"
+    },
+    {
+      "id": 369,
+      "implementation": "source/game/client/clock.mjs"
+    },
+    {
+      "id": 370,
+      "implementation": "source/game/client/clock.mjs"
+    },
+    {
+      "id": 372,
+      "implementation": "source/game/client/clock.mjs"
+    },
+    {
+      "id": 373,
+      "implementation": "source/game/client/runtime-primitives.mjs"
+    },
+    {
+      "id": 395,
+      "implementation": "source/game/client/drawing-primitives.mjs"
+    },
+    {
+      "id": 410,
+      "implementation": "source/game/client/drawing-primitives.mjs"
+    }
+  ],
+  "directRuntimeDependencies": [
+    366,
+    372,
+    373,
+    395,
+    410
+  ],
+  "hostBridges": {
+    "canvasSetLineWidthAbi": {
+      "field": "a",
+      "code": "138111",
+      "signature": "93028"
+    },
+    "canvasSetLineJoinRoundAbi": {
+      "field": "a",
+      "code": "138811",
+      "signature": "31967"
+    },
+    "canvasSetLineCapRoundAbi": {
+      "field": "a",
+      "code": "138730",
+      "signature": "31967"
+    },
+    "canvasSetFillRgbAbi": {
+      "field": "a",
+      "code": "137186",
+      "signature": "32170"
+    },
+    "canvasSetStrokeRgbAbi": {
+      "field": "a",
+      "code": "137456",
+      "signature": "32170"
+    },
+    "canvasBeginPathAbi": {
+      "field": "a",
+      "code": "136878",
+      "signature": "31967"
+    },
+    "canvasSetTransformAbi": {
+      "field": "a",
+      "code": "136414",
+      "signature": "32144"
+    },
+    "canvasMoveToAbi": {
+      "field": "a",
+      "code": "137806",
+      "signature": "32166"
+    },
+    "canvasLineToAbi": {
+      "field": "a",
+      "code": "137843",
+      "signature": "32166"
+    },
+    "canvasClosePathAbi": {
+      "field": "a",
+      "code": "136912",
+      "signature": "31967"
+    },
+    "canvasEllipseAbi": {
+      "field": "a",
+      "code": "138047",
+      "signature": "32191"
+    },
+    "canvasFillAbi": {
+      "field": "a",
+      "code": "136661",
+      "signature": "31967"
+    },
+    "canvasSaveAbi": {
+      "field": "a",
+      "code": "136300",
+      "signature": "31967"
+    },
+    "canvasClipAbi": {
+      "field": "a",
+      "code": "136807",
+      "signature": "31967"
+    },
+    "canvasRestoreAbi": {
+      "field": "a",
+      "code": "136329",
+      "signature": "31967"
+    },
+    "canvasStrokeAbi": {
+      "field": "a",
+      "code": "136732",
+      "signature": "31967"
+    },
+    "canvasQuadraticCurveToAbi": {
+      "field": "a",
+      "code": "137880",
+      "signature": "32160"
+    },
+    "canvasArcAbi": {
+      "field": "a",
+      "code": "137995",
+      "signature": "32183"
+    }
+  },
+  "abi": {
+    "scratchBytes": 1504,
+    "clockOutputOffset": 1432,
+    "rendererSavedStateOffset": 1436,
+    "rendererSavedStateBytes": 64,
+    "component": {
+      "entityPointer": 0
+    },
+    "entity": {
+      "visualComponent": 136,
+      "renderComponent": 148
+    },
+    "visual": {
+      "flashTimestampValid": 56,
+      "flashTimestamp": 64
+    },
+    "renderer": {
+      "affineMatrix": 0,
+      "cachedAffineMatrix": 24,
+      "transformDirty": 48,
+      "lineCap": 49,
+      "lineJoin": 50,
+      "grayscale": 69,
+      "canvasHandle": 96
+    }
+  },
+  "validation": {
+    "command": "node --test test/client-component-148-renderer.test.mjs",
+    "report": "reports/client-component-148-renderer.candidate.tap",
+    "testSourceSha256": "2dd00844f7f4d718a02fa10bd33002a7749672213794eef509a761eed28f9607",
+    "testGroups": 7,
+    "oraclePairs": 28,
+    "completeMemoryCheckpoints": 139,
+    "memoryBytesPerComparison": 67108864,
+    "comparison": [
+      "Complete linear memory at scenario end and each stated checkpoint",
+      "Ordered host bridge identity, signature, argument pointer, decoded values and live argument bytes",
+      "Exception class/message and partial stack state"
+    ],
+    "branches": [
+      "Real constructor/pool defaults and component148 dispatch through original760",
+      "Both attached and detached component entity pointers",
+      "Flash validity and sixteen finite/nonfinite timestamps, f32 flash-color threshold",
+      "Grayscale enabled/disabled, five affine matrices including signed zero, infinity and NaN",
+      "Line cap/join state, transform dirty/equal/different cache cases",
+      "Host-mutated timestamp validity, grayscale and transform flags",
+      "Nested renderer reentry from Canvas save",
+      "Ten Canvas failures, timestamp-host failure and four pointer traps",
+      "Renderer overlapping three regions of the component scratch frame"
+    ],
+    "limitations": [
+      "Finite differential corpus is not a proof for all possible memory aliases or hostile hosts.",
+      "Pixel rendering, font behavior and browser Canvas implementation are not compared by this local probe.",
+      "The component product identity remains unconfirmed; the name uses entity offset148."
+    ],
+    "combinedRegisteredClientBodyCount": 67,
+    "candidateBodyCount": 1,
+    "testLog": "reports/tests.tap"
+  },
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

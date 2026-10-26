@@ -1,0 +1,75 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/wide-bool-string.mjs",
+  "implementationSha256": "cb1e9b44e8524fe4534cdfc22497e3b34fef27f6abb3b597dd0808ddf28eff43",
+  "factory": "createWideBoolStringHooks",
+  "functionIds": [
+    496,
+    497
+  ],
+  "functions": [
+    {
+      "id": 496,
+      "name": "writeWideFalse",
+      "originalSymbol": "function_496",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/wide-bool-string.mjs",
+          "line": 9
+        },
+        "test": "test/server-wide-bool-string.test.mjs"
+      },
+      "originalDirectDependencies": [
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Constructs wide \"false\" at destination."
+    },
+    {
+      "id": 497,
+      "name": "writeWideTrue",
+      "originalSymbol": "function_497",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/wide-bool-string.mjs",
+          "line": 12
+        },
+        "test": "test/server-wide-bool-string.test.mjs"
+      },
+      "originalDirectDependencies": [
+        131
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Constructs wide \"true\" at destination."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-wide-bool-string.test.mjs",
+    "report": "reports/server-wide-bool-string-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Both literals x two unused-argument values compare complete memory and stack.",
+    "limitations": [
+      "131 remains native; ledger: 418 server bodies recovered and 316 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/mbrtowc.mjs",
+  "implementationSha256": "8b4f9592e4408eb58a9234c49250cb45b5c217ec031bc006e138bf22a68625a7",
+  "factory": "createMbrtowcHook",
+  "functionIds": [
+    184
+  ],
+  "functions": [
+    {
+      "id": 184,
+      "name": "mbrtowc",
+      "originalSymbol": "function_184",
+      "signature": " (type $t4) (param i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 39223
+        },
+        "source": {
+          "path": "source/game/server/mbrtowc.mjs",
+          "line": 67
+        },
+        "test": "test/server-mbrtowc.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "C mbrtowc with a static state: C-locale byte path by default, strict UTF-8 path when the locale gate is enabled, persisting the exact continuation-range accumulator."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-mbrtowc.test.mjs",
+    "report": "reports/server-mbrtowc-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 682,
+    "completeLinearMemoryChecks": 682,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 682,
+    "trappingComparisons": 0,
+    "comparison": "All 256 one-byte inputs in both locale modes, 110 two-byte boundary combinations, accepted/rejected three- and four-byte forms and every prefix, null/zero cases and split resumes compare return, state word, output word, stack pointer and a SHA-1 digest of complete memory.",
+    "limitations": [
+      "Out-of-bounds s/pwc/ps pointers and oversized counts are not exercised.",
+      "The shipped locale gate defaults to the C branch; UTF-8 is dormant unless enabled.",
+      "Ledger: 242 server bodies recovered and 492 remain machine code."
+    ]
+  }
+}

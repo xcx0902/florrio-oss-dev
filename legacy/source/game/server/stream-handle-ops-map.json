@@ -1,0 +1,124 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-handle-ops.mjs",
+  "implementationSha256": "623483571ed25fe53fd9d03bc1cb63d498583c0b5422c2f575d389c2a25c9a3b",
+  "factory": "createStreamHandleOpHooks",
+  "functionIds": [
+    45,
+    46,
+    59,
+    60
+  ],
+  "functions": [
+    {
+      "id": 45,
+      "name": "advanceByteHandle",
+      "originalSymbol": "function_45",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-handle-ops.mjs",
+          "line": 18
+        },
+        "test": "test/server-stream-handle-ops.test.mjs"
+      },
+      "originalDirectDependencies": [
+        361
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Advances the referenced byte stream and returns the handle."
+    },
+    {
+      "id": 46,
+      "name": "advanceWordHandle",
+      "originalSymbol": "function_46",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-handle-ops.mjs",
+          "line": 22
+        },
+        "test": "test/server-stream-handle-ops.test.mjs"
+      },
+      "originalDirectDependencies": [
+        366
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Advances the referenced word stream and returns the handle."
+    },
+    {
+      "id": 59,
+      "name": "wordStatusDifferent",
+      "originalSymbol": "function_59",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-handle-ops.mjs",
+          "line": 26
+        },
+        "test": "test/server-stream-handle-ops.test.mjs"
+      },
+      "originalDirectDependencies": [
+        363
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Negates the 363 word-status equality."
+    },
+    {
+      "id": 60,
+      "name": "byteStatusDifferent",
+      "originalSymbol": "function_60",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-handle-ops.mjs",
+          "line": 29
+        },
+        "test": "test/server-stream-handle-ops.test.mjs"
+      },
+      "originalDirectDependencies": [
+        368
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Negates the 368 byte-status equality."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-handle-ops.test.mjs",
+    "report": "reports/server-stream-handle-ops-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 14,
+    "completeLinearMemoryChecks": 14,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 14,
+    "trappingComparisons": 0,
+    "comparison": "45/46 x 3 values; 59/60 x 2x2 handle presence, comparing result, complete memory and stack.",
+    "limitations": [
+      "Empty-area virtual peek paths are not exercised.",
+      "Ledger: 403 server bodies recovered and 331 remain machine code."
+    ]
+  }
+}

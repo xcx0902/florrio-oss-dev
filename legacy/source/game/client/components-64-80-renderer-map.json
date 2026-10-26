@@ -1,0 +1,256 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "retainedEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/components-64-80-renderer.mjs",
+  "implementationSha256": "cc1182ddf871d9fb52398f85d4947f45b608f8c4b62413b90f2d758548bd2902",
+  "factory": "createComponents6480RendererHooks",
+  "functionIds": [
+    1038,
+    1039
+  ],
+  "functions": [
+    {
+      "id": 1038,
+      "name": "drawComponent64",
+      "endLine": 284705,
+      "decompiledLine": 15966,
+      "decompiledEndLine": 16343,
+      "scratchBytes": 560,
+      "componentSlot": 64,
+      "originalSymbol": "function_1038",
+      "signature": " (type $t22) (param $p0 i32) (param $p1 i32) (param $p2 f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 283549,
+          "endLine": 284705
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0640-0703.dcmp",
+          "line": 15966,
+          "endLine": 16343
+        },
+        "source": {
+          "path": "source/game/client/components-64-80-renderer.mjs",
+          "line": 223
+        },
+        "test": "test/client-components-64-80-renderer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_409",
+        "function_375",
+        "function_427",
+        "function_431",
+        "function_366",
+        "function_372",
+        "function_373",
+        "function_395"
+      ],
+      "originalIndirectCallSites": 0,
+      "staticInternalCallClosure": [
+        366,
+        369,
+        370,
+        372,
+        373,
+        375,
+        395,
+        403,
+        407,
+        409,
+        427,
+        431,
+        486,
+        487,
+        511,
+        593,
+        594,
+        705,
+        929,
+        930,
+        931,
+        1038
+      ],
+      "remainingNativeInternalDependencies": [
+        403,
+        407,
+        593,
+        594,
+        930,
+        931
+      ],
+      "externalImports": [
+        0,
+        2
+      ],
+      "unrecoveredStaticDependencyIds": [
+        403,
+        407,
+        593,
+        594,
+        930,
+        931
+      ]
+    },
+    {
+      "id": 1039,
+      "name": "drawComponent80",
+      "endLine": 285219,
+      "decompiledLine": 16344,
+      "decompiledEndLine": 16532,
+      "scratchBytes": 208,
+      "componentSlot": 80,
+      "originalSymbol": "function_1039",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 284706,
+          "endLine": 285219
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0640-0703.dcmp",
+          "line": 16344,
+          "endLine": 16532
+        },
+        "source": {
+          "path": "source/game/client/components-64-80-renderer.mjs",
+          "line": 232
+        },
+        "test": "test/client-components-64-80-renderer.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_372",
+        "emscripten_asm_const_int",
+        "function_373",
+        "function_366",
+        "function_395"
+      ],
+      "originalIndirectCallSites": 0,
+      "staticInternalCallClosure": [
+        366,
+        369,
+        370,
+        372,
+        373,
+        395,
+        1039
+      ],
+      "remainingNativeInternalDependencies": [],
+      "externalImports": [
+        0,
+        2
+      ]
+    }
+  ],
+  "layout": {
+    "componentOwner": 0,
+    "component64Phase": 8,
+    "component64PreviousWorldPosition": [
+      16,
+      20
+    ],
+    "component64MotionInitialized": 24,
+    "component64SmoothedSpeed": 28,
+    "entityTransform": 120,
+    "entityVisual": 136,
+    "transformWorldPosition": [
+      152,
+      160
+    ],
+    "transformWorldValid": 144,
+    "visualHitValid": 56,
+    "visualHitTimestamp": 64,
+    "rendererTransform": 0,
+    "rendererCachedTransform": 24,
+    "rendererTransformDirty": 48,
+    "rendererLineCap": 49,
+    "rendererLineJoin": 50,
+    "rendererGrayscale": 69,
+    "rendererCanvas": 96
+  },
+  "exactConstants": {
+    "speedDifferenceTolerance": 1e-7,
+    "smoothingBase": 0.6,
+    "smoothingDeltaFactor": 0.06,
+    "phaseSpeedMultiplier": 4,
+    "phaseAngleMultiplier": 0.015,
+    "outlineShadeMultiplier": 0.8999999985098839,
+    "component80LineWidth": 5.249999910593033,
+    "component80RectanglePosition": -24.748737335205078,
+    "component80RectangleExtent": 49.497474670410156
+  },
+  "stages": [
+    {
+      "name": "lineStyle",
+      "sourceLine": 85
+    },
+    {
+      "name": "hitSample",
+      "sourceLine": 98
+    },
+    {
+      "name": "resolveHitColor",
+      "sourceLine": 108
+    },
+    {
+      "name": "shade",
+      "sourceLine": 123
+    },
+    {
+      "name": "synchronizeTransform",
+      "sourceLine": 130
+    },
+    {
+      "name": "updateComponent64Motion",
+      "sourceLine": 153
+    },
+    {
+      "name": "drawComponent64Strokes",
+      "sourceLine": 178
+    },
+    {
+      "name": "drawComponent64Circle",
+      "sourceLine": 207
+    },
+    {
+      "name": "drawComponent64",
+      "sourceLine": 223
+    },
+    {
+      "name": "drawComponent80",
+      "sourceLine": 232
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-components-64-80-renderer.test.mjs",
+    "testGroups": 7,
+    "oracleComparisons": 43,
+    "behaviorCheckpoints": 262,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackExceptionsAndCompleteMemoryCompared": true,
+    "hostDecodedArgumentsCompared": true,
+    "hostArgumentByteWindow": 80,
+    "sourceOnlyIsolatedPatchedAndCombinedPatched": true,
+    "testSourceSha256": "2303291948705b78c25d9a14fe387e771e0dbfb471707e87e758d544aff12ad8",
+    "report": "reports/client-components-64-80-renderer-tests.tap",
+    "reportSha256": "90feacffff42119729947966adabbcd1fde2a16c8bf1a30aa1e2ea80bff00035",
+    "pass": 7,
+    "fail": 0,
+    "registration": "Registered in source/runtime/registry.mjs after parent review and passing candidate tests."
+  },
+  "limitations": [
+    "Component product names are unproven; names describe observed component slots, geometry and field behavior.",
+    "1038 direct math dependencies 375/427/431/409 are now recovered; its static closure still includes native 403, 407, 593, 594, 930 and 931. 1039 has a complete static internal source closure in the active registry.",
+    "The finite native oracle matrix covers representative malformed pointers, six scratch overlaps per component and synchronous host mutation; it does not prove every arbitrary alias layout.",
+    "This recovery task performed local Node oracle validation only and left both candidates unregistered; combined-build and browser attribution belong to parent integration."
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after parent review and passing candidate tests."
+}

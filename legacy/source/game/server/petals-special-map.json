@@ -1,0 +1,1154 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/petals-special.mjs",
+  "factory": "createSpecialPetalHooks",
+  "functionIds": [
+    146,
+    272,
+    273,
+    431,
+    673,
+    674,
+    675,
+    676,
+    677,
+    678,
+    679,
+    681,
+    691,
+    693,
+    719,
+    732,
+    741,
+    742,
+    743,
+    744,
+    745,
+    746,
+    747
+  ],
+  "scope": "Complete executable recovered bodies; shared services remain explicit dependencies until separately migrated.",
+  "differentialValidation": {
+    "command": "node --test test/server-petals-special.test.mjs",
+    "testCases": 8,
+    "comparedMemoryBytesPerOracle": 67108864,
+    "checksReturnStackAndHostCalls": true
+  },
+  "functions": [
+    {
+      "id": 146,
+      "name": "destroyAndFreePeasCallback",
+      "originalSymbol": "function_146",
+      "signature": " (type $t0) (param $p0 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 31531
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0128-0191.dcmp",
+          "line": 853
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 14,
+          "name": "free"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 272,
+      "name": "launchPeas",
+      "originalSymbol": "function_272",
+      "signature": " (type $t0) (param $p0 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 64467
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0256-0319.dcmp",
+          "line": 136
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 77,
+          "name": "function_77"
+        },
+        {
+          "id": 78,
+          "name": "function_78"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 273,
+      "name": "unlinkPeasCallbackHandles",
+      "originalSymbol": "function_273",
+      "signature": " (type $t0) (param $p0 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 64563
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0256-0319.dcmp",
+          "line": 167
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 431,
+      "name": "splitPoisonPeas",
+      "originalSymbol": "PeasR4PetalOrbit",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 111494
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0384-0447.dcmp",
+          "line": 4199
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": [
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 21,
+          "name": "readClock"
+        },
+        {
+          "id": 74,
+          "name": "function_74"
+        },
+        {
+          "id": 73,
+          "name": "function_73"
+        },
+        {
+          "id": 97,
+          "name": "function_97"
+        },
+        {
+          "id": 96,
+          "name": "function_96"
+        },
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 34,
+          "name": "function_34"
+        },
+        {
+          "id": 44,
+          "name": "function_44"
+        },
+        {
+          "id": 47,
+          "name": "function_47"
+        },
+        {
+          "id": 128,
+          "name": "function_128"
+        },
+        {
+          "id": 218,
+          "name": "function_218"
+        },
+        {
+          "id": 217,
+          "name": "setPetalTypeAndCreateBehavior"
+        },
+        {
+          "id": 106,
+          "name": "function_106"
+        },
+        {
+          "id": 278,
+          "name": "function_278"
+        },
+        {
+          "id": 151,
+          "name": "function_151"
+        },
+        {
+          "id": 18,
+          "name": "function_18"
+        },
+        {
+          "id": 25,
+          "name": "function_25"
+        },
+        {
+          "id": 78,
+          "name": "function_78"
+        },
+        {
+          "id": 77,
+          "name": "function_77"
+        },
+        {
+          "id": 277,
+          "name": "function_277"
+        },
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        },
+        {
+          "id": 276,
+          "name": "function_276"
+        },
+        {
+          "id": 275,
+          "name": "function_275"
+        },
+        {
+          "id": 150,
+          "name": "function_150"
+        },
+        {
+          "id": 85,
+          "name": "function_85"
+        }
+      ],
+      "originalIndirectCallSites": 1
+    },
+    {
+      "id": 673,
+      "name": "clonePeasCallback",
+      "originalSymbol": "function_673",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 199134
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 16021
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 674,
+      "name": "allocatePeasCallback",
+      "originalSymbol": "function_674",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 199294
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 16072
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 675,
+      "name": "destroyPeasCallback",
+      "originalSymbol": "function_675",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 199496
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 16136
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 676,
+      "name": "splitPeas",
+      "originalSymbol": "PeasR2PetalOrbit",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 199625
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 16183
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": [
+          {
+            "typeId": 11,
+            "name": "Peas",
+            "rarityIndex": 2,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 21,
+          "name": "readClock"
+        },
+        {
+          "id": 74,
+          "name": "function_74"
+        },
+        {
+          "id": 73,
+          "name": "function_73"
+        },
+        {
+          "id": 97,
+          "name": "function_97"
+        },
+        {
+          "id": 96,
+          "name": "function_96"
+        },
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 34,
+          "name": "function_34"
+        },
+        {
+          "id": 44,
+          "name": "function_44"
+        },
+        {
+          "id": 47,
+          "name": "function_47"
+        },
+        {
+          "id": 128,
+          "name": "function_128"
+        },
+        {
+          "id": 218,
+          "name": "function_218"
+        },
+        {
+          "id": 217,
+          "name": "setPetalTypeAndCreateBehavior"
+        },
+        {
+          "id": 106,
+          "name": "function_106"
+        },
+        {
+          "id": 278,
+          "name": "function_278"
+        },
+        {
+          "id": 151,
+          "name": "function_151"
+        },
+        {
+          "id": 18,
+          "name": "function_18"
+        },
+        {
+          "id": 25,
+          "name": "function_25"
+        },
+        {
+          "id": 78,
+          "name": "function_78"
+        },
+        {
+          "id": 77,
+          "name": "function_77"
+        },
+        {
+          "id": 277,
+          "name": "function_277"
+        },
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        },
+        {
+          "id": 276,
+          "name": "function_276"
+        },
+        {
+          "id": 275,
+          "name": "function_275"
+        },
+        {
+          "id": 150,
+          "name": "function_150"
+        },
+        {
+          "id": 85,
+          "name": "function_85"
+        }
+      ],
+      "originalIndirectCallSites": 1
+    },
+    {
+      "id": 677,
+      "name": "cloneVisiblePeasCallback",
+      "originalSymbol": "function_677",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 201471
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 16756
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 678,
+      "name": "allocateVisiblePeasCallback",
+      "originalSymbol": "function_678",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 201631
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 16807
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 679,
+      "name": "destroyVisiblePeasCallback",
+      "originalSymbol": "function_679",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 201833
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 16871
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 681,
+      "name": "splitVisiblePeas",
+      "originalSymbol": "PeasR3PetalOrbit",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 202237
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 17022
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": [
+          {
+            "typeId": 12,
+            "name": "Peas",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 21,
+          "name": "readClock"
+        },
+        {
+          "id": 74,
+          "name": "function_74"
+        },
+        {
+          "id": 73,
+          "name": "function_73"
+        },
+        {
+          "id": 97,
+          "name": "function_97"
+        },
+        {
+          "id": 96,
+          "name": "function_96"
+        },
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 34,
+          "name": "function_34"
+        },
+        {
+          "id": 44,
+          "name": "function_44"
+        },
+        {
+          "id": 47,
+          "name": "function_47"
+        },
+        {
+          "id": 128,
+          "name": "function_128"
+        },
+        {
+          "id": 218,
+          "name": "function_218"
+        },
+        {
+          "id": 217,
+          "name": "setPetalTypeAndCreateBehavior"
+        },
+        {
+          "id": 106,
+          "name": "function_106"
+        },
+        {
+          "id": 278,
+          "name": "function_278"
+        },
+        {
+          "id": 151,
+          "name": "function_151"
+        },
+        {
+          "id": 18,
+          "name": "function_18"
+        },
+        {
+          "id": 25,
+          "name": "function_25"
+        },
+        {
+          "id": 78,
+          "name": "function_78"
+        },
+        {
+          "id": 77,
+          "name": "function_77"
+        },
+        {
+          "id": 277,
+          "name": "function_277"
+        },
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        },
+        {
+          "id": 276,
+          "name": "function_276"
+        },
+        {
+          "id": 275,
+          "name": "function_275"
+        },
+        {
+          "id": 150,
+          "name": "function_150"
+        },
+        {
+          "id": 85,
+          "name": "function_85"
+        }
+      ],
+      "originalIndirectCallSites": 1
+    },
+    {
+      "id": 691,
+      "name": "cactusIncomingHitPoison",
+      "originalSymbol": "CactusR3PetalVirtualSlot5",
+      "signature": " (type $t11) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 205663
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 18073
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": [
+          {
+            "typeId": 21,
+            "name": "Cactus",
+            "rarityIndex": 3,
+            "virtualSlot": 5
+          }
+        ]
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        },
+        {
+          "id": 21,
+          "name": "readClock"
+        },
+        {
+          "id": 118,
+          "name": "function_118"
+        },
+        {
+          "id": 16,
+          "name": "malloc"
+        },
+        {
+          "id": 14,
+          "name": "free"
+        }
+      ],
+      "originalIndirectCallSites": 2
+    },
+    {
+      "id": 693,
+      "name": "hatchEggAfterOneSecond",
+      "originalSymbol": "EggR3PetalOrbit",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 206209
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 18279
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": [
+          {
+            "typeId": 22,
+            "name": "Egg",
+            "rarityIndex": 3,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 21,
+          "name": "readClock"
+        },
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 144,
+          "name": "spawnEntity"
+        },
+        {
+          "id": 85,
+          "name": "function_85"
+        },
+        {
+          "id": 73,
+          "name": "function_73"
+        },
+        {
+          "id": 43,
+          "name": "function_43"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 719,
+      "name": "hatchEggAfterTwoAndAHalfSeconds",
+      "originalSymbol": "EggR4PetalOrbit",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 213251
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 16
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": [
+          {
+            "typeId": 23,
+            "name": "Egg",
+            "rarityIndex": 4,
+            "virtualSlot": 3
+          }
+        ]
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 21,
+          "name": "readClock"
+        },
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 144,
+          "name": "spawnEntity"
+        },
+        {
+          "id": 85,
+          "name": "function_85"
+        },
+        {
+          "id": 73,
+          "name": "function_73"
+        },
+        {
+          "id": 43,
+          "name": "function_43"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 732,
+      "name": "spawnWebOnHit",
+      "originalSymbol": "WebR2PetalVirtualSlot6",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 214447
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 416
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": [
+          {
+            "typeId": 29,
+            "name": "Web",
+            "rarityIndex": 2,
+            "virtualSlot": 6
+          },
+          {
+            "typeId": 30,
+            "name": "Web",
+            "rarityIndex": 4,
+            "virtualSlot": 6
+          }
+        ]
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 74,
+          "name": "function_74"
+        },
+        {
+          "id": 65,
+          "name": "function_65"
+        },
+        {
+          "id": 64,
+          "name": "function_64"
+        },
+        {
+          "id": 26,
+          "name": "function_26"
+        },
+        {
+          "id": 68,
+          "name": "function_68"
+        },
+        {
+          "id": 67,
+          "name": "function_67"
+        },
+        {
+          "id": 18,
+          "name": "function_18"
+        },
+        {
+          "id": 25,
+          "name": "function_25"
+        },
+        {
+          "id": 97,
+          "name": "function_97"
+        },
+        {
+          "id": 96,
+          "name": "function_96"
+        },
+        {
+          "id": 17,
+          "name": "function_17"
+        },
+        {
+          "id": 34,
+          "name": "function_34"
+        },
+        {
+          "id": 44,
+          "name": "function_44"
+        },
+        {
+          "id": 47,
+          "name": "function_47"
+        },
+        {
+          "id": 148,
+          "name": "function_148"
+        },
+        {
+          "id": 147,
+          "name": "function_147"
+        },
+        {
+          "id": 16,
+          "name": "malloc"
+        },
+        {
+          "id": 15,
+          "name": "memcpy"
+        },
+        {
+          "id": 14,
+          "name": "free"
+        },
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        },
+        {
+          "id": 271,
+          "name": "function_271"
+        },
+        {
+          "id": 73,
+          "name": "function_73"
+        }
+      ],
+      "originalIndirectCallSites": 1
+    },
+    {
+      "id": 741,
+      "name": "clonePoisonPeasCallback",
+      "originalSymbol": "function_741",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216415
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 1002
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 742,
+      "name": "allocatePoisonPeasCallback",
+      "originalSymbol": "function_742",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216575
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 1053
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 743,
+      "name": "destroyPoisonPeasCallback",
+      "originalSymbol": "function_743",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216777
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 1117
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 744,
+      "name": "serializePoisonTick",
+      "originalSymbol": "function_744",
+      "signature": " (type $t2) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216905
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 1164
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 745,
+      "name": "destroyAndFreePoisonEffect",
+      "originalSymbol": "function_745",
+      "signature": " (type $t0) (param $p0 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216914
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 1169
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 14,
+          "name": "free"
+        }
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 746,
+      "name": "destroyPoisonEffect",
+      "originalSymbol": "function_746",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216932
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 1177
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": []
+      },
+      "originalDirectFunctionDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 747,
+      "name": "poisonPeasOnHit",
+      "originalSymbol": "PeasR4PetalVirtualSlot4",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/server/petals-special.mjs",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 216950
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0704-0733.dcmp",
+          "line": 1185
+        },
+        "test": "test/server-petals-special.test.mjs",
+        "catalogEntries": [
+          {
+            "typeId": 34,
+            "name": "Peas",
+            "rarityIndex": 4,
+            "virtualSlot": 4
+          }
+        ]
+      },
+      "originalDirectFunctionDependencies": [
+        {
+          "id": 20,
+          "name": "operatorNewOrAbort"
+        },
+        {
+          "id": 21,
+          "name": "readClock"
+        },
+        {
+          "id": 118,
+          "name": "function_118"
+        },
+        {
+          "id": 16,
+          "name": "malloc"
+        },
+        {
+          "id": 14,
+          "name": "free"
+        }
+      ],
+      "originalIndirectCallSites": 2
+    }
+  ],
+  "limitations": [
+    "This module is an increment of the full high-level reconstruction, not a complete standalone server.",
+    "Original direct dependencies describe instruction provenance. Several are inlined in the high-level body; remaining runtime.call and indirect services retain their original ABI.",
+    "Validation is bounded by the actual fixtures and deterministic replay; it is not a proof over every possible memory state."
+  ]
+}

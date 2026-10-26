@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/utf8-decode.mjs",
+  "implementationSha256": "98fe1a4a20804aa7959647d42818739ecc04c74d0ee405f41e2d415bdea887c4",
+  "factory": "createUtf8DecodeHook",
+  "functionIds": [
+    486
+  ],
+  "functions": [
+    {
+      "id": 486,
+      "name": "scanUtf8CodePoints",
+      "originalSymbol": "function_486",
+      "signature": " (type $t10) (param i32 i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 117878
+        },
+        "source": {
+          "path": "source/game/server/utf8-decode.mjs",
+          "line": 37
+        },
+        "test": "test/server-utf8-decode.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Counts bytes covered by up to budget complete UTF-8 code points from start to end; invalid/truncated sequences are not consumed. Code-point sibling of 483."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-utf8-decode.test.mjs",
+    "report": "reports/server-utf8-decode-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 1871,
+    "completeLinearMemoryChecks": 1871,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 1871,
+    "trappingComparisons": 0,
+    "comparison": "All 256 single bytes, lead/continuation class cross-products, every prefix, budgets and 200 random strings compare return, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds pointers and cursor beyond end are not enumerated.",
+      "Ledger: 253 server bodies recovered and 481 remain machine code."
+    ]
+  }
+}

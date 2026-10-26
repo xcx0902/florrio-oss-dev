@@ -1,0 +1,226 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "factory": "createClientTransportHooks",
+  "functions": [
+    {
+      "id": 702,
+      "name": "receiveTransportPacket",
+      "signature": " (type $t6) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 702,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 1096,
+      "name": "initializeGameTransportOnce",
+      "signature": " (type $t12)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 1096,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 1118,
+      "name": "acknowledgeAndDeliverTransportPacket",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 1118,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 1119,
+      "name": "decompressAndDeliverTransportPacket",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 1119,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3191,
+      "name": "handleWebRTCOpen",
+      "signature": " (type $t2) (param $p0 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3191,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3223,
+      "name": "handleWebRTCMessage",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3223,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3234,
+      "name": "handleWebRTCClosed",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3234,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3299,
+      "name": "acceptClipboardText",
+      "signature": " (type $t2) (param $p0 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3299,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3310,
+      "name": "accumulateMouseWheel",
+      "signature": " (type $t34) (param $p0 f64)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3310,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3331,
+      "name": "setForcedServerId",
+      "signature": " (type $t2) (param $p0 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3331,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3342,
+      "name": "requestDisconnect",
+      "signature": " (type $t12)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3342,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3353,
+      "name": "pollWebSocketEvents",
+      "signature": " (type $t12)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3353,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3375,
+      "name": "handleCanvasContextLost",
+      "signature": " (type $t2) (param $p0 i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3375,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    },
+    {
+      "id": 3386,
+      "name": "shouldConfirmBrowserQuit",
+      "signature": " (type $t7) (result i32)",
+      "source": "source/game/client/transport.mjs",
+      "evidence": {
+        "kind": "instruction-and-original-wasm-differential",
+        "functionIndex": 3386,
+        "readingView": "source/decompiled/client/",
+        "tests": "test/client-transport.test.mjs"
+      },
+      "confidence": "high",
+      "coverage": "entire function body; dependencies retain original allocator/string/logger/callback behavior"
+    }
+  ],
+  "originalDependencies": [
+    362,
+    363,
+    364,
+    368,
+    371,
+    378,
+    382,
+    459,
+    469,
+    589,
+    799,
+    3256,
+    3364,
+    3475
+  ],
+  "hostDependencies": {
+    "a.a": "ASM_CONST browser bridges",
+    "a.Me": "create worker from UTF8 path",
+    "a.o": "post worker request"
+  },
+  "stackModel": "original stackSave/stackAlloc/stackRestore; no restore after thrown trap",
+  "remaining": "clientFrame 1095, full drawing/UI/entity snapshot logic remain instruction-equivalent WASM"
+}

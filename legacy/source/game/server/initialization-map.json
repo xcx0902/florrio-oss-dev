@@ -1,0 +1,164 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "evidenceId": "ev_438a6ba007bd81cd8cd53601c7b9bd0293c17a4ea3c261bf7b63b3c36f2122b9",
+  "scope": "Complete original spServerInit function656, including its inlined world/pool/catalog/session/handshake work. No forwarding to its own original body and no interpreter.",
+  "coverage": {
+    "hooks": 1,
+    "factory": "createInitializationHooks",
+    "main656Complete": true,
+    "differentialValidation": {
+      "command": "node --test test/server-initialization.test.mjs",
+      "testCases": 11,
+      "directOracleComparisons": 40,
+      "worldReplaySnapshots": 41,
+      "worldReplayTicks": 40,
+      "comparedMemoryBytesPerOracle": 67108864,
+      "comparesStack": true,
+      "comparesHostCalls": true,
+      "comparesOutgoingPackets": true
+    }
+  },
+  "functions": [
+    {
+      "id": 656,
+      "name": "initializeServer",
+      "complete": true,
+      "source": "source/game/server/initialization.mjs",
+      "signature": "(type $t2) (param $p0 i32) (param $p1 i32)",
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 189144,
+          "endLine": 196776
+        },
+        "decompiled": {
+          "path": "source/decompiled/sp_server/functions-0640-0703.dcmp",
+          "line": 13100,
+          "endLine": 15199
+        }
+      },
+      "originalDirectCalls": [
+        "memset",
+        "function_74",
+        "function_214",
+        "function_268",
+        "free",
+        "malloc",
+        "memcpy",
+        "function_102",
+        "getEntityDefinition",
+        "function_247",
+        "function_400",
+        "memcmp",
+        "function_409",
+        "function_204",
+        "cxaGuardAcquire",
+        "cxaGuardRelease",
+        "operatorNewOrAbort",
+        "function_219",
+        "function_130",
+        "function_203",
+        "function_371",
+        "function_141",
+        "function_202",
+        "function_187",
+        "clearThreeWords",
+        "function_201",
+        "function_259",
+        "function_200",
+        "function_35",
+        "strlen",
+        "function_257",
+        "readClock",
+        "function_408",
+        "function_407",
+        "function_126",
+        "function_140",
+        "emscriptenAsmConstInt",
+        "workerRespondIntermediate",
+        "workerRespondFinal"
+      ],
+      "originalIndirectCallSites": 1,
+      "phases": [
+        {
+          "name": "resetWorldDefaults",
+          "description": "Ordered world component-pool headers, intrusive list sentinels, session storage and fixed arena state.",
+          "sourceLine": 155
+        },
+        {
+          "name": "initializeEntitySlots",
+          "description": "All 16,384 entity slots, exact four-record zeroing order, free-list linkage and nonzero LCG generation handles.",
+          "sourceLine": 366
+        },
+        {
+          "name": "initializeArenaComponents",
+          "description": "Replicated arena settings, player-directory and arena-count components with tracked field serialization and cache invalidation.",
+          "sourceLine": 420
+        },
+        {
+          "name": "initializeCatalog",
+          "description": "Eight spawn histograms, summoned species mass, rarity weighting, bounded drop-probability redistribution, inherited aliases, pruning and sorting.",
+          "sourceLine": 489
+        },
+        {
+          "name": "initializeLocalSession",
+          "description": "Literal UUID validation or four guarded MT19937-64 generators, stream formatting, handshake ownership, player directory and player-pool/reconnect attachment.",
+          "sourceLine": 964
+        },
+        {
+          "name": "flushInitializationOutput",
+          "description": "Intermediate and final host replies, callback-visible queue changes and buffer destruction.",
+          "sourceLine": 1032
+        },
+        {
+          "name": "initializeServer",
+          "description": "Original entry point ordering, 208-byte/3312-byte stack frames, ready flags and 50ms scheduling bridge.",
+          "sourceLine": 1050
+        }
+      ]
+    }
+  ],
+  "dependencyIds": [
+    14,
+    15,
+    16,
+    20,
+    21,
+    24,
+    29,
+    31,
+    32,
+    35,
+    57,
+    74,
+    102,
+    103,
+    104,
+    126,
+    130,
+    140,
+    141,
+    187,
+    200,
+    201,
+    202,
+    203,
+    204,
+    214,
+    219,
+    247,
+    257,
+    259,
+    268,
+    371,
+    400,
+    407,
+    408,
+    409
+  ],
+  "limitations": [
+    "Explicit shared-ABI dependency functions are retained and are not counted as recovered by this module.",
+    "Full-memory equivalence is bounded to the documented inputs, states, host callbacks and forty captured-input world ticks; arbitrary corrupted memory and allocator exhaustion are not exhaustively validated."
+  ]
+}

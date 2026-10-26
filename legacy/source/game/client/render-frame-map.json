@@ -1,0 +1,607 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/render-frame.mjs",
+  "implementationSha256": "3355ce6985bb240dd6bebc7edbe4979291e384a20891d10f3aa488984766ab10",
+  "factory": "createRenderFrameHooks",
+  "functionIds": [
+    763
+  ],
+  "functions": [
+    {
+      "id": 763,
+      "name": "updateAndRender",
+      "originalSymbol": "function_763",
+      "signature": " (type $t32) (param $p0 i32) (param $p1 i32) (param $p2 f64) (param $p3 i32) (param $p4 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 132681,
+          "endLine": 143515
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0384-0447.dcmp",
+          "line": 3692
+        },
+        "test": "test/client-render-frame.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_372",
+        "acquireStaticInitializationGuard",
+        "releaseStaticInitializationGuard",
+        "emscripten_asm_const_int",
+        "function_421",
+        "function_426",
+        "allocateOrAbort",
+        "malloc",
+        "free",
+        "function_409",
+        "function_521",
+        "function_802",
+        "function_427",
+        "function_431",
+        "function_375",
+        "function_363",
+        "function_591",
+        "function_672",
+        "function_547",
+        "function_1014",
+        "function_610",
+        "function_554",
+        "function_407",
+        "function_410",
+        "function_588",
+        "function_2",
+        "function_366",
+        "function_761",
+        "function_562",
+        "function_760",
+        "function_556",
+        "function_392",
+        "fillMemory",
+        "function_1013",
+        "function_403",
+        "function_587",
+        "function_576",
+        "function_1"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "phases": [
+    {
+      "name": "setSceneDrawTransform",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "camera",
+        "frame"
+      ],
+      "watLine": 138303,
+      "watEndLine": 138634,
+      "description": "Save the drawing state and map world coordinates through the camera."
+    },
+    {
+      "name": "updatePointerMarker",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "camera",
+        "state",
+        "amount"
+      ],
+      "watLine": 138635,
+      "watEndLine": 139552,
+      "description": "Animate and draw the pointer marker for the local player."
+    },
+    {
+      "name": "drawBackgroundEntities",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "camera",
+        "state",
+        "frame"
+      ],
+      "watLine": 139553,
+      "watEndLine": 139655,
+      "description": "Draw entities in the background component group."
+    },
+    {
+      "name": "drawHealthBars",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "state",
+        "frame",
+        "transformVector",
+        "transformCount"
+      ],
+      "watLine": 139656,
+      "watEndLine": 141386,
+      "description": "Interpolate current and trailing health values, then draw health bars."
+    },
+    {
+      "name": "drawEntityNames",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "healthVector",
+        "localHandle",
+        "state",
+        "savedDrawingState",
+        "frame",
+        "transformVector",
+        "nameVector",
+        "entityIndex"
+      ],
+      "watLine": 141387,
+      "watEndLine": 141803,
+      "description": "Draw interpolated entity-name labels, excluding the local player."
+    },
+    {
+      "name": "drawEvent14Effects",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "frame"
+      ],
+      "watLine": 141804,
+      "watEndLine": 143079,
+      "description": "Animate the visuals created by snapshot event14."
+    },
+    {
+      "name": "drawSortedEntities",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "camera",
+        "state",
+        "frame",
+        "transformVector"
+      ],
+      "watLine": 143080,
+      "watEndLine": 143343,
+      "description": "Collect visible drawable entities, sort their draw order, and render them."
+    },
+    {
+      "name": "drawSceneEntities",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "camera",
+        "state",
+        "frame"
+      ],
+      "watLine": 138288,
+      "watEndLine": 143390,
+      "description": "Run the world entity layers for an active local player."
+    },
+    {
+      "name": "captureFrameClock",
+      "parameters": [],
+      "watLine": 132683,
+      "watEndLine": 132747,
+      "description": "Temporarily publish this frame clock while preserving the previous clock."
+    },
+    {
+      "name": "saveOuterDrawingState",
+      "parameters": [
+        "frame",
+        "callerRenderer"
+      ],
+      "watLine": 132748,
+      "watEndLine": 132793,
+      "description": "Preserve the caller drawing state when a renderer is supplied."
+    },
+    {
+      "name": "queuePlayerInput",
+      "parameters": [
+        "frame",
+        "game",
+        "elapsedMilliseconds"
+      ],
+      "watLine": 132794,
+      "watEndLine": 133972,
+      "description": "Read keyboard or touch controls and queue reliable player-input records."
+    },
+    {
+      "name": "invalidateTransformCaches",
+      "parameters": [
+        "game"
+      ],
+      "watLine": 133973,
+      "watEndLine": 134069,
+      "description": "Invalidate cached world transforms before interpolation and drawing."
+    },
+    {
+      "name": "clearEntitySpatialHash",
+      "parameters": [
+        "camera"
+      ],
+      "watLine": 134159,
+      "watEndLine": 134273,
+      "description": "Release the previous entity hash nodes while retaining bucket storage."
+    },
+    {
+      "name": "populateEntitySpatialHash",
+      "parameters": [
+        "camera",
+        "state"
+      ],
+      "watLine": 134280,
+      "watEndLine": 135165,
+      "description": "Index eligible owned entities using the original integer hash and bucket policy."
+    },
+    {
+      "name": "refreshVisualBounds",
+      "parameters": [
+        "state"
+      ],
+      "watLine": 135166,
+      "watEndLine": 135287,
+      "description": "Invalidate and refresh cached visual bounds for spatial components."
+    },
+    {
+      "name": "rebuildVisualSpatialTree",
+      "parameters": [
+        "state"
+      ],
+      "watLine": 135288,
+      "watEndLine": 135586,
+      "description": "Create scene bounds, insert visual colliders, and update their spatial tree."
+    },
+    {
+      "name": "updateCamera",
+      "parameters": [
+        "scratch",
+        "camera",
+        "state",
+        "frame"
+      ],
+      "watLine": 135587,
+      "watEndLine": 136183,
+      "description": "Follow the local player and derive the viewport projection with original smoothing."
+    },
+    {
+      "name": "drawArenaBands",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "camera",
+        "state",
+        "frame",
+        "viewportWidthF32",
+        "heightScale",
+        "pixelsPerWorld",
+        "viewportWidthF64"
+      ],
+      "watLine": 136184,
+      "watEndLine": 137341,
+      "description": "Draw arena bands and the interpolated boundary overlay."
+    },
+    {
+      "name": "drawWorldGrid",
+      "parameters": [
+        "renderer",
+        "scratch",
+        "camera"
+      ],
+      "watLine": 137342,
+      "watEndLine": 138287,
+      "description": "Project and draw the half-pixel-aligned world grid."
+    },
+    {
+      "name": "restoreOuterDrawingState",
+      "parameters": [
+        "frame",
+        "callerRenderer"
+      ],
+      "watLine": 143441,
+      "watEndLine": 143484,
+      "description": "Restore the caller drawing state after the scene pass."
+    },
+    {
+      "name": "restoreFrameClock",
+      "parameters": [
+        "frame"
+      ],
+      "watLine": 143485,
+      "watEndLine": 143515,
+      "description": "Restore the preceding clock and release the outer frame scratch area."
+    }
+  ],
+  "dependencyAliases": [
+    {
+      "id": 362,
+      "name": "free",
+      "recoveredHere": false
+    },
+    {
+      "id": 363,
+      "name": "copyMemory",
+      "recoveredHere": false
+    },
+    {
+      "id": 366,
+      "name": "compareMemory",
+      "recoveredHere": false
+    },
+    {
+      "id": 368,
+      "name": "malloc",
+      "recoveredHere": false
+    },
+    {
+      "id": 369,
+      "name": "acquireGuard",
+      "recoveredHere": false
+    },
+    {
+      "id": 370,
+      "name": "releaseGuard",
+      "recoveredHere": false
+    },
+    {
+      "id": 371,
+      "name": "allocateOrAbort",
+      "recoveredHere": false
+    },
+    {
+      "id": 372,
+      "name": "readClock",
+      "recoveredHere": false
+    },
+    {
+      "id": 375,
+      "name": "powF64",
+      "recoveredHere": false
+    },
+    {
+      "id": 382,
+      "name": "fillMemory",
+      "recoveredHere": false
+    },
+    {
+      "id": 392,
+      "name": "drawTextLabel",
+      "recoveredHere": false
+    },
+    {
+      "id": 403,
+      "name": "cosF64",
+      "recoveredHere": false
+    },
+    {
+      "id": 407,
+      "name": "sinF64",
+      "recoveredHere": false
+    },
+    {
+      "id": 409,
+      "name": "updateWorldTransform",
+      "recoveredHere": false
+    },
+    {
+      "id": 410,
+      "name": "fillRectangle",
+      "recoveredHere": false
+    },
+    {
+      "id": 421,
+      "name": "useTouchControls",
+      "recoveredHere": false
+    },
+    {
+      "id": 426,
+      "name": "initializeSceneUi",
+      "recoveredHere": false
+    },
+    {
+      "id": 427,
+      "name": "cosF32",
+      "recoveredHere": false
+    },
+    {
+      "id": 431,
+      "name": "sinF32",
+      "recoveredHere": false
+    },
+    {
+      "id": 521,
+      "name": "initializeSettings",
+      "recoveredHere": false
+    },
+    {
+      "id": 547,
+      "name": "destroySpatialChildren",
+      "recoveredHere": false
+    },
+    {
+      "id": 554,
+      "name": "elapsedFromOrigin",
+      "recoveredHere": false
+    },
+    {
+      "id": 556,
+      "name": "prepareTextLabel",
+      "recoveredHere": false
+    },
+    {
+      "id": 562,
+      "name": "appendPathLine",
+      "recoveredHere": false
+    },
+    {
+      "id": 576,
+      "name": "sortDrawOrder",
+      "recoveredHere": false
+    },
+    {
+      "id": 587,
+      "name": "drawPetalIcon",
+      "recoveredHere": false
+    },
+    {
+      "id": 588,
+      "name": "arenaBandBoundary",
+      "recoveredHere": false
+    },
+    {
+      "id": 591,
+      "name": "nextPrime",
+      "recoveredHere": false
+    },
+    {
+      "id": 610,
+      "name": "compactSpatialTree",
+      "recoveredHere": false
+    },
+    {
+      "id": 672,
+      "name": "updateVisualBounds",
+      "recoveredHere": false
+    },
+    {
+      "id": 760,
+      "name": "drawEntity",
+      "recoveredHere": false
+    },
+    {
+      "id": 761,
+      "name": "atan2F64",
+      "recoveredHere": false
+    },
+    {
+      "id": 802,
+      "name": "atan2F32",
+      "recoveredHere": false
+    },
+    {
+      "id": 1013,
+      "name": "decodeSnapshotEvent",
+      "recoveredHere": false
+    },
+    {
+      "id": 1014,
+      "name": "insertSpatialCollider",
+      "recoveredHere": false
+    }
+  ],
+  "hostAbi": {
+    "canvasSaveAbi": {
+      "field": "a",
+      "code": "136300",
+      "signature": "31967"
+    },
+    "canvasRestoreAbi": {
+      "field": "a",
+      "code": "136329",
+      "signature": "31967"
+    },
+    "canvasSetGlobalAlphaAbi": {
+      "field": "a",
+      "code": "137728",
+      "signature": "93028"
+    },
+    "canvasSetLineCapRoundAbi": {
+      "field": "a",
+      "code": "138730",
+      "signature": "31967"
+    },
+    "canvasSetLineJoinRoundAbi": {
+      "field": "a",
+      "code": "138811",
+      "signature": "31967"
+    },
+    "canvasSetLineWidthAbi": {
+      "field": "a",
+      "code": "138111",
+      "signature": "93028"
+    },
+    "canvasBeginPathAbi": {
+      "field": "a",
+      "code": "136878",
+      "signature": "31967"
+    },
+    "canvasSetTransformAbi": {
+      "field": "a",
+      "code": "136414",
+      "signature": "32144"
+    },
+    "canvasMoveToAbi": {
+      "field": "a",
+      "code": "137806",
+      "signature": "32166"
+    },
+    "canvasSetStrokeRgbAbi": {
+      "field": "a",
+      "code": "137456",
+      "signature": "32170"
+    },
+    "canvasStrokeAbi": {
+      "field": "a",
+      "code": "136732",
+      "signature": "31967"
+    },
+    "canvasLineToAbi": {
+      "field": "a",
+      "code": "137843",
+      "signature": "32166"
+    },
+    "canvasSetGlobalAlphaDuplicateAbi": {
+      "field": "a",
+      "code": "137767",
+      "signature": "93028"
+    },
+    "canvasRectAbi": {
+      "field": "a",
+      "code": "136946",
+      "signature": "32160"
+    },
+    "isMobileUserAgentAbi": {
+      "field": "a",
+      "code": "133733",
+      "signature": "31967"
+    },
+    "canvasSetFillRgbAbi": {
+      "field": "a",
+      "code": "137186",
+      "signature": "32170"
+    },
+    "floatingPointRemainderAbi": {
+      "field": "c",
+      "code": "150328",
+      "signature": "33144"
+    }
+  },
+  "validation": {
+    "testGroups": 5,
+    "oracleComparisons": 12,
+    "additionalFrameCheckpoints": 96,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true,
+    "decodedCanvasArgumentsCompared": true,
+    "frameDeltaMilliseconds": [
+      1,
+      16,
+      16.6666666667,
+      40,
+      1000
+    ],
+    "capturePackets": 15,
+    "capturePath": "reports/runtime/client-packet-traces.json",
+    "captureSha256": "1c43e102a4df717699fc16b757ff4c88f50738d1f281611aaf97dd542cd61f89",
+    "combinedActiveRegistry": true
+  },
+  "limitations": [
+    "Independent entity drawing, allocation, text, settings, spatial and native Canvas/WAT services remain explicit dependencies.",
+    "The retained capture was made by an earlier recovered build, not the original release; each differential oracle executes the original archived WASM.",
+    "Canvas host calls and decoded arguments are compared in a deterministic host harness; browser raster output is not compared.",
+    "Shared ABI fields that lack established semantic names retain their exact offsets.",
+    "Browser validation is bound to recorded source/artifact hashes; see reports/current-verification.json and reports/runtime/readable.json."
+  ],
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

@@ -1,0 +1,410 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/misc-tiny-wrappers.mjs",
+  "implementationSha256": "d47377782de203403f9676ae11bd0e7507f57aff622284085f8757e2b0cca434",
+  "factory": "createMiscTinyWrapperHooks",
+  "functionIds": [
+    396,
+    725,
+    844,
+    892,
+    912,
+    1974,
+    2216,
+    2217,
+    2218,
+    2219,
+    2291,
+    2292,
+    2486,
+    2584,
+    2614,
+    3245
+  ],
+  "functions": [
+    {
+      "id": 396,
+      "name": "tiny396",
+      "originalSymbol": "function_396",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        423
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 725,
+      "name": "tiny725",
+      "originalSymbol": "function_725",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        730
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 844,
+      "name": "tiny844",
+      "originalSymbol": "function_844",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        405
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 892,
+      "name": "tiny892",
+      "originalSymbol": "function_892",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        912
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 912,
+      "name": "tiny912",
+      "originalSymbol": "function_912",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        730
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 1974,
+      "name": "tiny1974",
+      "originalSymbol": "function_1974",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Reads imported capability a.N."
+    },
+    {
+      "id": 2216,
+      "name": "tiny2216",
+      "originalSymbol": "function_2216",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        664
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 2217,
+      "name": "tiny2217",
+      "originalSymbol": "function_2217",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        664
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 2218,
+      "name": "tiny2218",
+      "originalSymbol": "function_2218",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        664
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 2219,
+      "name": "tiny2219",
+      "originalSymbol": "function_2219",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        664
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 2291,
+      "name": "tiny2291",
+      "originalSymbol": "function_2291",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        981
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 2292,
+      "name": "tiny2292",
+      "originalSymbol": "function_2292",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        981
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 2486,
+      "name": "tiny2486",
+      "originalSymbol": "function_2486",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        675,
+        362
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 2584,
+      "name": "tiny2584",
+      "originalSymbol": "function_2584",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        675
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 2614,
+      "name": "tiny2614",
+      "originalSymbol": "function_2614",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        585
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    },
+    {
+      "id": 3245,
+      "name": "tiny3245",
+      "originalSymbol": "function_3245",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/misc-tiny-wrappers.mjs",
+          "line": 10
+        },
+        "test": "test/client-misc-tiny-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Small forwarding, store, guard or abort slot."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-misc-tiny-wrappers.test.mjs",
+    "report": "reports/client-misc-tiny-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 17,
+    "completeLinearMemoryChecks": 17,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 17,
+    "trappingComparisons": 1,
+    "comparison": "Zero fixtures plus both guard states compare result or trap, stack pointer and complete memory; 15 slots succeed and 3245 traps.",
+    "limitations": [
+      "Ledger: 565 client and 507 server bodies recovered."
+    ]
+  }
+}

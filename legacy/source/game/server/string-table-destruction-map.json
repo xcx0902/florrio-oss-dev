@@ -1,0 +1,224 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/string-table-destruction.mjs",
+  "implementationSha256": "86333970aea8fd7b0f46d7dfd8077f634068676b2f7dcabce5114f8ede478c9f",
+  "factory": "createStringTableDestructionHook",
+  "functionIds": [
+    501,
+    502,
+    503,
+    504,
+    506,
+    508,
+    511
+  ],
+  "functions": [
+    {
+      "id": 501,
+      "name": "destroyStringTable501",
+      "originalSymbol": "function_501",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        19
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118842
+        },
+        "source": {
+          "path": "source/game/server/string-table-destruction.mjs",
+          "line": 15
+        },
+        "test": "test/server-string-table-destruction.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walks the 12-byte string array from 8571128 down to 8570960 (14 destructor calls)."
+    },
+    {
+      "id": 502,
+      "name": "destroyStringTable502",
+      "originalSymbol": "function_502",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        19
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118856
+        },
+        "source": {
+          "path": "source/game/server/string-table-destruction.mjs",
+          "line": 15
+        },
+        "test": "test/server-string-table-destruction.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walks the 12-byte string array from 8571600 down to 8571312 (24 destructor calls)."
+    },
+    {
+      "id": 503,
+      "name": "destroyStringTable503",
+      "originalSymbol": "function_503",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        19
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118870
+        },
+        "source": {
+          "path": "source/game/server/string-table-destruction.mjs",
+          "line": 15
+        },
+        "test": "test/server-string-table-destruction.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walks the 12-byte string array from 8571944 down to 8571920 (2 destructor calls)."
+    },
+    {
+      "id": 504,
+      "name": "destroyStringTable504",
+      "originalSymbol": "function_504",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        19
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118884
+        },
+        "source": {
+          "path": "source/game/server/string-table-destruction.mjs",
+          "line": 15
+        },
+        "test": "test/server-string-table-destruction.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroys the single static string at 8570860."
+    },
+    {
+      "id": 506,
+      "name": "destroyStringTable506",
+      "originalSymbol": "function_506",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        19
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118908
+        },
+        "source": {
+          "path": "source/game/server/string-table-destruction.mjs",
+          "line": 15
+        },
+        "test": "test/server-string-table-destruction.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroys the single static string at 8570828."
+    },
+    {
+      "id": 508,
+      "name": "destroyStringTable508",
+      "originalSymbol": "function_508",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        19
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118932
+        },
+        "source": {
+          "path": "source/game/server/string-table-destruction.mjs",
+          "line": 15
+        },
+        "test": "test/server-string-table-destruction.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroys the single static string at 8570924."
+    },
+    {
+      "id": 511,
+      "name": "destroyStringTable511",
+      "originalSymbol": "function_511",
+      "signature": " (type $t0) (param i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        19
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 118966
+        },
+        "source": {
+          "path": "source/game/server/string-table-destruction.mjs",
+          "line": 15
+        },
+        "test": "test/server-string-table-destruction.test.mjs"
+      },
+      "originalDirectDependencies": [
+        19
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Destroys the single static string at 8570892."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-string-table-destruction.test.mjs",
+    "report": "reports/server-string-table-destruction-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 168,
+    "completeLinearMemoryChecks": 168,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 168,
+    "trappingComparisons": 0,
+    "comparison": "24 randomized trials per function with initialized 12-byte string headers compare result, complete memory and stack pointer.",
+    "limitations": [
+      "All work is delegated to native 19 destroyLibcppString; 19 itself is not recovered.",
+      "Ledger: 265 server bodies recovered and 469 remain machine code."
+    ]
+  }
+}

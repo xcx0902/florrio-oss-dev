@@ -1,0 +1,2149 @@
+{
+  "source": "Frozen client.wasm; func391/1095, isolated synthetic discovery fixture",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "changelog": [
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "New petals."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "We're back to FFA."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        3,
+        1,
+        1,
+        2,
+        1
+      ],
+      "text": [
+        [
+          "Changed value from last change to 2.5 seconds."
+        ],
+        [
+          "Leaf, Cactus and Faster now only apply their effects once they",
+          "have spawned the first time.",
+          "Effect still applies if they're reloading after they get destroyed."
+        ],
+        [
+          "We'll be playing Battle Royale again for the next couple of days."
+        ],
+        [
+          "Battle Royale now has 3x exp and drop rate."
+        ],
+        [
+          "The game mode will be polished a bit better later, for now it's a",
+          "bit of a work in progress."
+        ],
+        [
+          "Buffed Epic Peas a little bit."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        2
+      ],
+      "text": [
+        [
+          "First petal spawn when changing a slot takes at least 5 seconds.",
+          "Which makes quickly swapping loadouts less effective."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "You can now press X to swap your loadout."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Nerfed Leaf damage by 20%."
+        ],
+        [
+          "Reduced Stinger health."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        2
+      ],
+      "text": [
+        [
+          "It seems there aren't enough players to support the game mode.",
+          "We've switched back to FFA now."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        4
+      ],
+      "text": [
+        [
+          "We'll be trying out a new game mode for a couple of days: Battle",
+          "Royale.",
+          "There aren't enough players to split among two game modes, so",
+          "this will be the only game mode available for a little bit."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "Added 1 new petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "Honey now also slows down movement speed a little bit."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "Added 1 new petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Flowers now only keep up to 10 items after their death."
+        ],
+        [
+          "Flowers now spawn at 3/4 their previous level, rather than half."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        2
+      ],
+      "text": [
+        [
+          "You now get to keep some of your items and half your level when",
+          "you die."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Changed flower health from 100-200 (lvl 1-45) to 100-150."
+        ],
+        [
+          "Rarer drops take a tiny bit longer to despawn."
+        ],
+        [
+          "Legendary Egg hatch time nerfed."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Added 1 new petal."
+        ],
+        [
+          "Web now affects mobs."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        2,
+        1
+      ],
+      "text": [
+        [
+          "Turns out Hornets got too smart. Now only a small percentage of",
+          "them will be einstein."
+        ],
+        [
+          "Web movement speed debuff increased."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Hornet AI is now a lot smarter. No more herding."
+        ],
+        [
+          "Nerfed Hornet missile damage."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "Added 1 new petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        3
+      ],
+      "text": [
+        [
+          "Unknown zone is now a lot smaller.",
+          "All other zones are the same size as before, which means the map",
+          "got smaller."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Added spiders."
+        ],
+        [
+          "Added 3 new petals."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        2,
+        1,
+        1,
+        2,
+        2
+      ],
+      "text": [
+        [
+          "Legendary petals are now easier to find.",
+          "Square has been moved to a separate category."
+        ],
+        [
+          "Rare Roses now stick together."
+        ],
+        [
+          "Added 1 new petal."
+        ],
+        [
+          "Changed map dimensions (total area still the same, just longer",
+          "sideways)."
+        ],
+        [
+          "All flowers are now the same speed, regardless of level.",
+          "Mob chase speed adjusted to compensate."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        2
+      ],
+      "text": [
+        [
+          "Rare Rose nerfed (-30% heal)."
+        ],
+        [
+          "Dandelion rarity changed to Rare (now drops a lot more",
+          "frequently)."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        2,
+        1
+      ],
+      "text": [
+        [
+          "Added Ladybug variant to ???."
+        ],
+        [
+          "Hornets were accidentally made a lot more common a couple of",
+          "days ago, that has been fixed."
+        ],
+        [
+          "Added 1 new petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        3,
+        1
+      ],
+      "text": [
+        [
+          "Petal drop rates are now generated automatically.",
+          "This will allow a more fair distribution of drops based on their",
+          "rarity (so for example, all epics are equally as rare)."
+        ],
+        [
+          "Mobs can now drop more than one petal at a time."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        2
+      ],
+      "text": [
+        [
+          "Added keyboard controls (disabled by default until we know",
+          "which players prefer)."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "Added Egg petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Improved changelog UI."
+        ],
+        [
+          "Added Discord button. Join our community!"
+        ],
+        [
+          "Reddit button soon, meanwhile, join us at reddit.com/r/florrio"
+        ],
+        [
+          "Mob gallery improvements."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        2,
+        1,
+        2
+      ],
+      "text": [
+        [
+          "Added mob gallery. No pictures at the moment, but maybe",
+          "eventually."
+        ],
+        [
+          "Added 2 new petals."
+        ],
+        [
+          "Decreased ram damage between two low leveled flowers (to curb",
+          "noobs chasing each other)."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "Added 1 new petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "Added 1 new petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1
+      ],
+      "text": [
+        [
+          "Added 3 new petals."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        2,
+        2,
+        1
+      ],
+      "text": [
+        [
+          "Petals you haven't unlocked will not appear in the title screen",
+          "anymore."
+        ],
+        [
+          "Added a little movement arrow to help find your mouse (disabled",
+          "by default)."
+        ],
+        [
+          "Added 1 new petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        2,
+        1
+      ],
+      "text": [
+        [
+          "Added Petal Gallery to keep track of which petals you've seen."
+        ],
+        [
+          "New petal announcements will no longer include their names, to",
+          "make it a bit more mysterious."
+        ],
+        [
+          "Added 1 new petal."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Added Ants."
+        ],
+        [
+          "A few balance tweaks."
+        ]
+      ]
+    },
+    {
+      "wrap": 433.239990234375,
+      "lines": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "text": [
+        [
+          "Changed map background."
+        ],
+        [
+          "Early levels are a bit slower."
+        ],
+        [
+          "Added Cacti to medium zone."
+        ],
+        [
+          "Added Massive Beetle."
+        ],
+        [
+          "Added Massive Centipede."
+        ],
+        [
+          "Buffed Iris."
+        ],
+        [
+          "Buffed Peas."
+        ],
+        [
+          "Nerfed Rose."
+        ]
+      ]
+    }
+  ],
+  "mobs": [
+    {
+      "type": 7,
+      "height": 181,
+      "drops": [
+        {
+          "type": 2,
+          "label": "44%"
+        },
+        {
+          "type": 32,
+          "label": "26%"
+        },
+        {
+          "type": 16,
+          "label": "12%"
+        },
+        {
+          "type": 37,
+          "label": ".5%"
+        },
+        {
+          "type": 17,
+          "label": ".06%"
+        }
+      ],
+      "description": [
+        "Weak and defenseless, but big",
+        "dreams."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 6,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 2,
+          "label": "12%"
+        },
+        {
+          "type": 7,
+          "label": "7%"
+        },
+        {
+          "type": 16,
+          "label": "3%"
+        },
+        {
+          "type": 31,
+          "label": "1%"
+        },
+        {
+          "type": 18,
+          "label": ".6%"
+        },
+        {
+          "type": 9,
+          "label": ".3%"
+        }
+      ],
+      "description": [
+        "It stings. Don't touch it."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 3,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 7,
+          "label": "5%"
+        },
+        {
+          "type": 13,
+          "label": "3%"
+        },
+        {
+          "type": 10,
+          "label": ".9%"
+        },
+        {
+          "type": 21,
+          "label": ".1%"
+        },
+        {
+          "type": 33,
+          "label": ".005%"
+        }
+      ],
+      "description": [
+        "Avoid touching it, it hurts."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 4,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 6,
+          "label": "11%"
+        },
+        {
+          "type": 2,
+          "label": "7%"
+        },
+        {
+          "type": 16,
+          "label": "2%"
+        },
+        {
+          "type": 18,
+          "label": ".4%"
+        },
+        {
+          "type": 9,
+          "label": ".2%"
+        }
+      ],
+      "description": [
+        "Cute and harmless."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 1,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 3,
+          "label": "10%"
+        },
+        {
+          "type": 2,
+          "label": "3%"
+        },
+        {
+          "type": 4,
+          "label": ".5%"
+        }
+      ],
+      "description": [
+        "A rock. It doesn't do much."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 8,
+      "height": 200.60000610351562,
+      "drops": [
+        {
+          "type": 2,
+          "label": "46%"
+        },
+        {
+          "type": 32,
+          "label": "28%"
+        },
+        {
+          "type": 16,
+          "label": "13%"
+        },
+        {
+          "type": 38,
+          "label": ".6%"
+        },
+        {
+          "type": 17,
+          "label": ".06%"
+        }
+      ],
+      "description": [
+        "It's a bit temperamental,",
+        "probably from working all the",
+        "time."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 12,
+      "height": 181,
+      "drops": [
+        {
+          "type": 8,
+          "label": "9%"
+        },
+        {
+          "type": 36,
+          "label": "6%"
+        },
+        {
+          "type": 9,
+          "label": ".6%"
+        },
+        {
+          "type": 17,
+          "label": ".03%"
+        }
+      ],
+      "description": [
+        "It's hungry and flowers are its",
+        "favorite meal."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 2,
+      "height": 181,
+      "drops": [
+        {
+          "type": 3,
+          "label": "83%"
+        },
+        {
+          "type": 4,
+          "label": "4%"
+        },
+        {
+          "type": 26,
+          "label": ".3%"
+        }
+      ],
+      "description": [
+        "A bigger rock. It doesn't do much",
+        "either."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 15,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 2,
+          "label": "9%"
+        },
+        {
+          "type": 32,
+          "label": "5%"
+        },
+        {
+          "type": 11,
+          "label": "3%"
+        },
+        {
+          "type": 16,
+          "label": "2%"
+        },
+        {
+          "type": 12,
+          "label": ".05%"
+        },
+        {
+          "type": 17,
+          "label": ".01%"
+        }
+      ],
+      "description": [
+        "It's just there doing its thing."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 14,
+      "height": 181,
+      "drops": [
+        {
+          "type": 20,
+          "label": "14%"
+        },
+        {
+          "type": 10,
+          "label": "9%"
+        },
+        {
+          "type": 31,
+          "label": "9%"
+        },
+        {
+          "type": 18,
+          "label": "5%"
+        },
+        {
+          "type": 9,
+          "label": "3%"
+        },
+        {
+          "type": 25,
+          "label": ".03%"
+        }
+      ],
+      "description": [
+        "These aren't quite as nice as the",
+        "little bees."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 20,
+      "height": 181,
+      "drops": [
+        {
+          "type": 24,
+          "label": "36%"
+        },
+        {
+          "type": 18,
+          "label": "8%"
+        },
+        {
+          "type": 9,
+          "label": "4%"
+        },
+        {
+          "type": 28,
+          "label": "2%"
+        },
+        {
+          "type": 17,
+          "label": ".2%"
+        },
+        {
+          "type": 15,
+          "label": ".2%"
+        }
+      ],
+      "description": [
+        "Cute and harmless... if left",
+        "unprovoked."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 21,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 6,
+          "label": "100%"
+        },
+        {
+          "type": 16,
+          "label": "39%"
+        },
+        {
+          "type": 24,
+          "label": "34%"
+        },
+        {
+          "type": 18,
+          "label": "8%"
+        },
+        {
+          "type": 9,
+          "label": "4%"
+        },
+        {
+          "type": 17,
+          "label": ".2%"
+        }
+      ],
+      "description": [
+        "Shiny, cute and mostly harmless."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 9,
+      "height": 181,
+      "drops": [
+        {
+          "type": 8,
+          "label": "12%"
+        },
+        {
+          "type": 16,
+          "label": "8%"
+        },
+        {
+          "type": 14,
+          "label": "3%"
+        },
+        {
+          "type": 9,
+          "label": ".8%"
+        },
+        {
+          "type": 17,
+          "label": ".04%"
+        }
+      ],
+      "description": [
+        "It's got wings and it's ready to",
+        "use them."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 22,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 7,
+          "label": "18%"
+        },
+        {
+          "type": 8,
+          "label": "12%"
+        },
+        {
+          "type": 29,
+          "label": "9%"
+        },
+        {
+          "type": 14,
+          "label": "3%"
+        },
+        {
+          "type": 30,
+          "label": ".02%"
+        }
+      ],
+      "description": [
+        "Spooky."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 11,
+      "height": 181,
+      "drops": [
+        {
+          "type": 8,
+          "label": "100%"
+        },
+        {
+          "type": 9,
+          "label": "31%"
+        },
+        {
+          "type": 22,
+          "label": "6%"
+        }
+      ],
+      "description": [
+        "Ants go in, and come out. Can't",
+        "explain that."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 17,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 8,
+          "label": "82%"
+        },
+        {
+          "type": 12,
+          "label": "1%"
+        },
+        {
+          "type": 17,
+          "label": ".3%"
+        },
+        {
+          "type": 34,
+          "label": ".1%"
+        }
+      ],
+      "description": [
+        "This one loves flowers."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 13,
+      "height": 181,
+      "drops": [
+        {
+          "type": 8,
+          "label": "100%"
+        },
+        {
+          "type": 9,
+          "label": "31%"
+        },
+        {
+          "type": 17,
+          "label": "1%"
+        },
+        {
+          "type": 23,
+          "label": ".6%"
+        }
+      ],
+      "description": [
+        "Someone overfed this one, you",
+        "might be next."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 10,
+      "height": 181,
+      "drops": [
+        {
+          "type": 16,
+          "label": "100%"
+        },
+        {
+          "type": 14,
+          "label": "100%"
+        },
+        {
+          "type": 9,
+          "label": "31%"
+        },
+        {
+          "type": 22,
+          "label": "6%"
+        },
+        {
+          "type": 17,
+          "label": "1%"
+        },
+        {
+          "type": 27,
+          "label": ".6%"
+        }
+      ],
+      "description": [
+        "You must have done something",
+        "really bad if she's chasing you."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 5,
+      "height": 181,
+      "drops": [
+        {
+          "type": 6,
+          "label": "100%"
+        },
+        {
+          "type": 18,
+          "label": "100%"
+        },
+        {
+          "type": 24,
+          "label": "100%"
+        },
+        {
+          "type": 15,
+          "label": "100%"
+        }
+      ],
+      "description": [
+        "This one is really big, but still",
+        "cute."
+      ],
+      "descriptionWrap": 220
+    },
+    {
+      "type": 19,
+      "height": 161.39999389648438,
+      "drops": [
+        {
+          "type": 5,
+          "label": "100%"
+        }
+      ],
+      "description": [
+        "This shape... it looks familiar..."
+      ],
+      "descriptionWrap": 220
+    }
+  ],
+  "scrollHeights": {
+    "Petals": 710,
+    "Mobs": 3663.19970703125,
+    "Changelog": 4330.39990234375
+  },
+  "panelAnimations": [
+    {
+      "panel": "Settings",
+      "initial": {
+        "panel": 0,
+        "alphas": {
+          "Settings": 0,
+          "Petals": 0,
+          "Mobs": 0,
+          "Changelog": 0
+        }
+      },
+      "samples": [
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.2899415194988251,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.4958169460296631,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.6420005559921265,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.7457994818687439,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.8195027709007263,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.8718364238739014,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9089963436126709,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.935382068157196,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.954117476940155,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9674206972122192,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9768667817115784,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9835740327835083,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9883366227149963,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9917182922363281,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9941195249557495,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9958245158195496,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9970351457595825,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9978947639465332,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.998505175113678,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9989385604858398,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9992462992668152,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9994648098945618,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9996199607849121,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9997301697731018,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9998084306716919,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 1,
+          "alphas": {
+            "Settings": 0.9998639822006226,
+            "Petals": 0,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        }
+      ]
+    },
+    {
+      "panel": "Petals",
+      "initial": {
+        "panel": 1,
+        "alphas": {
+          "Settings": 1,
+          "Petals": 0,
+          "Mobs": 0,
+          "Changelog": 0
+        }
+      },
+      "samples": [
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.7100584506988525,
+            "Petals": 0.2899415194988251,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.5041830539703369,
+            "Petals": 0.4958169460296631,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.35799944400787354,
+            "Petals": 0.6420005559921265,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.2542005479335785,
+            "Petals": 0.7457994818687439,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.18049725890159607,
+            "Petals": 0.8195027709007263,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.12816360592842102,
+            "Petals": 0.8718364238739014,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.0910036563873291,
+            "Petals": 0.9089963436126709,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.06461791694164276,
+            "Petals": 0.935382068157196,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.04588250070810318,
+            "Petals": 0.954117476940155,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.03257925808429718,
+            "Petals": 0.9674206972122192,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.023133179172873497,
+            "Petals": 0.9768667817115784,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.016425909474492073,
+            "Petals": 0.9835740327835083,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.011663355864584446,
+            "Petals": 0.9883366227149963,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.008281664922833443,
+            "Petals": 0.9917182922363281,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.0058804661966860294,
+            "Petals": 0.9941195249557495,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.004175474867224693,
+            "Petals": 0.9958245158195496,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.0029648314230144024,
+            "Petals": 0.9970351457595825,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.002105203690007329,
+            "Petals": 0.9978947639465332,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.00149481778498739,
+            "Petals": 0.998505175113678,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.001061408082023263,
+            "Petals": 0.9989385604858398,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.0007536617922596633,
+            "Petals": 0.9992462992668152,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.000535143946763128,
+            "Petals": 0.9994648098945618,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.00037998351035639644,
+            "Petals": 0.9996199607849121,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.00026981052360497415,
+            "Petals": 0.9997301697731018,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.0001915812463266775,
+            "Petals": 0.9998084306716919,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 2,
+          "alphas": {
+            "Settings": 0.00013603389379568398,
+            "Petals": 0.9998639822006226,
+            "Mobs": 0,
+            "Changelog": 0
+          }
+        }
+      ]
+    },
+    {
+      "panel": "Mobs",
+      "initial": {
+        "panel": 2,
+        "alphas": {
+          "Settings": 0,
+          "Petals": 1,
+          "Mobs": 0,
+          "Changelog": 0
+        }
+      },
+      "samples": [
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.7100584506988525,
+            "Mobs": 0.2899415194988251,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.5041830539703369,
+            "Mobs": 0.4958169460296631,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.35799944400787354,
+            "Mobs": 0.6420005559921265,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.2542005479335785,
+            "Mobs": 0.7457994818687439,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.18049725890159607,
+            "Mobs": 0.8195027709007263,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.12816360592842102,
+            "Mobs": 0.8718364238739014,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.0910036563873291,
+            "Mobs": 0.9089963436126709,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.06461791694164276,
+            "Mobs": 0.935382068157196,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.04588250070810318,
+            "Mobs": 0.954117476940155,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.03257925808429718,
+            "Mobs": 0.9674206972122192,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.023133179172873497,
+            "Mobs": 0.9768667817115784,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.016425909474492073,
+            "Mobs": 0.9835740327835083,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.011663355864584446,
+            "Mobs": 0.9883366227149963,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.008281664922833443,
+            "Mobs": 0.9917182922363281,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.0058804661966860294,
+            "Mobs": 0.9941195249557495,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.004175474867224693,
+            "Mobs": 0.9958245158195496,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.0029648314230144024,
+            "Mobs": 0.9970351457595825,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.002105203690007329,
+            "Mobs": 0.9978947639465332,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.00149481778498739,
+            "Mobs": 0.998505175113678,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.001061408082023263,
+            "Mobs": 0.9989385604858398,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.0007536617922596633,
+            "Mobs": 0.9992462992668152,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.000535143946763128,
+            "Mobs": 0.9994648098945618,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.00037998351035639644,
+            "Mobs": 0.9996199607849121,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.00026981052360497415,
+            "Mobs": 0.9997301697731018,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.0001915812463266775,
+            "Mobs": 0.9998084306716919,
+            "Changelog": 0
+          }
+        },
+        {
+          "panel": 3,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0.00013603389379568398,
+            "Mobs": 0.9998639822006226,
+            "Changelog": 0
+          }
+        }
+      ]
+    },
+    {
+      "panel": "Changelog",
+      "initial": {
+        "panel": 3,
+        "alphas": {
+          "Settings": 0,
+          "Petals": 0,
+          "Mobs": 1,
+          "Changelog": 0
+        }
+      },
+      "samples": [
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.7100584506988525,
+            "Changelog": 0.2899415194988251
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.5041830539703369,
+            "Changelog": 0.4958169460296631
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.35799944400787354,
+            "Changelog": 0.6420005559921265
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.2542005479335785,
+            "Changelog": 0.7457994818687439
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.18049725890159607,
+            "Changelog": 0.8195027709007263
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.12816360592842102,
+            "Changelog": 0.8718364238739014
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.0910036563873291,
+            "Changelog": 0.9089963436126709
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.06461791694164276,
+            "Changelog": 0.935382068157196
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.04588250070810318,
+            "Changelog": 0.954117476940155
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.03257925808429718,
+            "Changelog": 0.9674206972122192
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.023133179172873497,
+            "Changelog": 0.9768667817115784
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.016425909474492073,
+            "Changelog": 0.9835740327835083
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.011663355864584446,
+            "Changelog": 0.9883366227149963
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.008281664922833443,
+            "Changelog": 0.9917182922363281
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.0058804661966860294,
+            "Changelog": 0.9941195249557495
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.004175474867224693,
+            "Changelog": 0.9958245158195496
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.0029648314230144024,
+            "Changelog": 0.9970351457595825
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.002105203690007329,
+            "Changelog": 0.9978947639465332
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.00149481778498739,
+            "Changelog": 0.998505175113678
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.001061408082023263,
+            "Changelog": 0.9989385604858398
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.0007536617922596633,
+            "Changelog": 0.9992462992668152
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.000535143946763128,
+            "Changelog": 0.9994648098945618
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.00037998351035639644,
+            "Changelog": 0.9996199607849121
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.00026981052360497415,
+            "Changelog": 0.9997301697731018
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.0001915812463266775,
+            "Changelog": 0.9998084306716919
+          }
+        },
+        {
+          "panel": 4,
+          "alphas": {
+            "Settings": 0,
+            "Petals": 0,
+            "Mobs": 0.00013603389379568398,
+            "Changelog": 0.9998639822006226
+          }
+        }
+      ]
+    }
+  ]
+}

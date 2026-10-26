@@ -1,0 +1,363 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/lifecycle-wrappers.mjs",
+  "implementationSha256": "48af782ff948c420d076d484791e385e71cfa5d5500bcb0ea1daa596763aca27",
+  "factory": "createLifecycleWrapperHooks",
+  "functionIds": [
+    387,
+    398,
+    406,
+    428,
+    429,
+    451,
+    456,
+    2383,
+    2387,
+    2556,
+    2560,
+    2567,
+    2611,
+    2690
+  ],
+  "functions": [
+    {
+      "id": 387,
+      "name": "forward1090",
+      "originalSymbol": "function_387",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1090
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 398,
+      "name": "abortVia406",
+      "originalSymbol": "function_398",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        406
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 406,
+      "name": "abortVia1",
+      "originalSymbol": "function_406",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 428,
+      "name": "forward901",
+      "originalSymbol": "function_428",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        901
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 429,
+      "name": "forward905",
+      "originalSymbol": "function_429",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        905
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 451,
+      "name": "forward518At7945884",
+      "originalSymbol": "function_451",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        518
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 456,
+      "name": "forward518At7945892",
+      "originalSymbol": "function_456",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        518
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 2383,
+      "name": "report11821",
+      "originalSymbol": "function_2383",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        630
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 2387,
+      "name": "report31452",
+      "originalSymbol": "function_2387",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        630
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 2556,
+      "name": "report374968",
+      "originalSymbol": "function_2556",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        792
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 2560,
+      "name": "report7890440",
+      "originalSymbol": "function_2560",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        795
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 2567,
+      "name": "report7907352",
+      "originalSymbol": "function_2567",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        797
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 2611,
+      "name": "report379680",
+      "originalSymbol": "function_2611",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        687
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    },
+    {
+      "id": 2690,
+      "name": "report151576",
+      "originalSymbol": "function_2690",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/lifecycle-wrappers.mjs",
+          "line": 12
+        },
+        "test": "test/client-lifecycle-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        1114
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Forwards to one native dependency; abort pair reports through function 1 and traps."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-lifecycle-wrappers.test.mjs",
+    "report": "reports/client-lifecycle-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 14,
+    "completeLinearMemoryChecks": 14,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 14,
+    "trappingComparisons": 2,
+    "comparison": "Each wrapper compares result or trap, stack pointer and complete memory against the original; the abort pair must both trap.",
+    "limitations": [
+      "Trap messages are not compared, only trap occurrence. Dependencies remain native. Ledger: 454 client and 507 server bodies recovered."
+    ]
+  }
+}

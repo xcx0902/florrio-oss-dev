@@ -1,0 +1,54 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/packed-key-sort-five.mjs",
+  "implementationSha256": "197ae39a7270880d0fe12fbd6ad3fa2e515c489b5fe93240cc5219d41797b2ae",
+  "factory": "createFiveKeySortHook",
+  "functionIds": [
+    253
+  ],
+  "functions": [
+    {
+      "id": 253,
+      "name": "sortFivePackedKeys",
+      "originalSymbol": "function_253",
+      "signature": " (type $t10) (param i32 i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 58835
+        },
+        "source": {
+          "path": "source/game/server/packed-key-sort-five.mjs",
+          "line": 27
+        },
+        "test": "test/server-packed-key-sort-five.test.mjs"
+      },
+      "originalDirectDependencies": [
+        252
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Recovered four-key network then right-to-left insertion of the fifth key; low 14-bit field primary, high 18-bit tie-break; returns total exchanges."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-packed-key-sort-five.test.mjs",
+    "report": "reports/server-packed-key-sort-five-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 580,
+    "completeLinearMemoryChecks": 580,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 580,
+    "trappingComparisons": 0,
+    "comparison": "All 24 permutations of four key sets plus 100 deterministic random key quintuples compare return, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds key pointers are not exercised.",
+      "Ledger: 245 server bodies recovered and 489 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,789 @@
+{
+  "sp_server": {
+    "0": {
+      "name": "emscriptenAsmConstDouble",
+      "evidence": "web/sp_server.js Va.a = xa; Na[22855] clock and Na[22903] remainder",
+      "confidence": "high"
+    },
+    "1": {
+      "name": "emscriptenAsmConstInt",
+      "evidence": "web/sp_server.js Va.b = xa; Na host dispatch",
+      "confidence": "high"
+    },
+    "2": {
+      "name": "workerRespondFinal",
+      "evidence": "web/sp_server.js Va.c posts finalResponse:true",
+      "confidence": "high"
+    },
+    "3": {
+      "name": "workerRespondIntermediate",
+      "evidence": "web/sp_server.js Va.d posts finalResponse:false",
+      "confidence": "high"
+    },
+    "4": {
+      "name": "abortOutOfMemory",
+      "evidence": "web/sp_server.js Va.e calls D(\"OOM\")",
+      "confidence": "high"
+    },
+    "5": {
+      "name": "abort",
+      "evidence": "web/sp_server.js Va.f calls D()",
+      "confidence": "high"
+    },
+    "6": {
+      "name": "strftime",
+      "evidence": "web/sp_server.js Va.g delegates Qa, calendar formatting",
+      "confidence": "high"
+    },
+    "7": {
+      "name": "environGet",
+      "evidence": "web/sp_server.js Va.h enumerates J() environment strings",
+      "confidence": "high"
+    },
+    "8": {
+      "name": "environSizesGet",
+      "evidence": "web/sp_server.js Va.i writes environment count and length",
+      "confidence": "high"
+    },
+    "9": {
+      "name": "fdWrite",
+      "evidence": "web/sp_server.js Va.j writes each iovec to N.za",
+      "confidence": "high"
+    },
+    "10": {
+      "name": "fdCloseNoop",
+      "evidence": "web/sp_server.js Va.k returns zero",
+      "confidence": "high"
+    },
+    "11": {
+      "name": "fdSeekNoop",
+      "evidence": "web/sp_server.js Va.l empty",
+      "confidence": "high"
+    },
+    "12": {
+      "name": "emscriptenMemcpyBig",
+      "evidence": "web/sp_server.js Va.m = HEAPU8.copyWithin",
+      "confidence": "high"
+    },
+    "13": {
+      "name": "randomGet",
+      "evidence": "web/sp_server.js Va.n = R; R fills bytes from crypto.getRandomValues via Pa()",
+      "confidence": "high"
+    },
+    "14": {
+      "name": "free",
+      "evidence": "web/sp_server.js _free = asm.r",
+      "confidence": "high"
+    },
+    "15": {
+      "name": "memcpy",
+      "evidence": "func15 performs forward byte/word copy and returns destination",
+      "confidence": "high"
+    },
+    "16": {
+      "name": "malloc",
+      "evidence": "web/sp_server.js _malloc = asm.q",
+      "confidence": "high"
+    },
+    "19": {
+      "name": "destroyLibcppString",
+      "evidence": "func19 frees pointer iff libc++ short-string discriminator at +11 is negative",
+      "confidence": "high"
+    },
+    "20": {
+      "name": "operatorNewOrAbort",
+      "evidence": "func20 calls malloc with minimum size1 and aborts on null",
+      "confidence": "high"
+    },
+    "21": {
+      "name": "readClock",
+      "evidence": "func21 calls Na[22855] performance.now/Date.now unless override set",
+      "confidence": "high"
+    },
+    "22": {
+      "name": "deleteObject",
+      "evidence": "func22 delegates free",
+      "confidence": "high"
+    },
+    "24": {
+      "name": "clearThreeWords",
+      "evidence": "func24 stores zero in each of three i32 words",
+      "confidence": "high"
+    },
+    "29": {
+      "name": "memset",
+      "evidence": "func29 fills byte/word ranges and returns destination",
+      "confidence": "high"
+    },
+    "31": {
+      "name": "cxaGuardRelease",
+      "evidence": "func31 guard completion byte/lock release",
+      "confidence": "high"
+    },
+    "32": {
+      "name": "cxaGuardAcquire",
+      "evidence": "func32 function-static guard state logic",
+      "confidence": "high"
+    },
+    "56": {
+      "name": "initializeEntityDefinition",
+      "evidence": "func56 writes 116-byte name/description/parameters/drop-list/initializer record",
+      "confidence": "high"
+    },
+    "57": {
+      "name": "memcmp",
+      "evidence": "func57 compares unsigned bytes and returns first difference",
+      "confidence": "high"
+    },
+    "98": {
+      "name": "BasicR0PetalVirtualSlot0",
+      "evidence": "server-catalogs.json: petal type1, vtable5212, slot0; shared owner/slots BasicR0[0], FastR0[0], HeavyR0[0], RockR2[0], SquareR5[0], RoseR1[0], StingerR1[0], IrisR1[0], WingR2[0], MissileR2[0], PeasR2[0], PeasR3[0], CactusR2[0], FasterR2[0], RoseR3[0], TwinR1[0], TripletR3[0], BubbleR2[0], PollenR3[0], DandelionR2[0], CactusR3[0], EggR3[0], EggR4[0], RoseR2[0], AntennaeR4[0], HeaviestR3[0], StingerR4[0], YinYangR3[0], WebR2[0], WebR4[0], HoneyR2[0], LeafR1[0], CactusR4[0], PeasR4[0], BasicR5[0], SaltR2[0], RiceR3[0], CornR3[0]",
+      "confidence": "high"
+    },
+    "103": {
+      "name": "getEntityDefinition",
+      "evidence": "func103 lazily initializes 23 records at8548368 with stride116, returns id1..22 or null",
+      "confidence": "high"
+    },
+    "104": {
+      "name": "strlen",
+      "evidence": "func104 scans zero terminator with word acceleration",
+      "confidence": "high"
+    },
+    "117": {
+      "name": "returnTrue",
+      "evidence": "func117 returns1",
+      "confidence": "high"
+    },
+    "119": {
+      "name": "basicPetalOrbit",
+      "evidence": "func119; differential test of all256 input bytes and null owner",
+      "confidence": "high"
+    },
+    "120": {
+      "name": "reverseByteRange",
+      "evidence": "func120 swaps bytes from opposing ends",
+      "confidence": "high"
+    },
+    "144": {
+      "name": "spawnEntity",
+      "evidence": "func144 calls getEntityDefinition and its +100 initializer via indirect call",
+      "confidence": "high"
+    },
+    "152": {
+      "name": "noopThreeArgs",
+      "evidence": "func152 empty",
+      "confidence": "high"
+    },
+    "171": {
+      "name": "noopTwoArgs",
+      "evidence": "func171 empty",
+      "confidence": "high"
+    },
+    "217": {
+      "name": "setPetalTypeAndCreateBehavior",
+      "evidence": "func217 assigns type at+8, calls definition+48 factory then behavior vtable slot2",
+      "confidence": "high"
+    },
+    "235": {
+      "name": "createFastR0PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by FastR0, TwinR1, TripletR3",
+      "confidence": "high"
+    },
+    "279": {
+      "name": "initializeRuntimeAndGameCatalogs",
+      "evidence": "web/sp_server.js ___wasm_call_ctors = asm.p; func279 writes petal and weighted spawn registries",
+      "confidence": "high"
+    },
+    "281": {
+      "name": "noopFourArgs",
+      "evidence": "func281 empty",
+      "confidence": "high"
+    },
+    "289": {
+      "name": "main",
+      "evidence": "web/sp_server.js _main = asm.s; func289 returns0",
+      "confidence": "high"
+    },
+    "327": {
+      "name": "createWebR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by WebR2, WebR4",
+      "confidence": "high"
+    },
+    "364": {
+      "name": "createStingerR1PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by StingerR1, StingerR4",
+      "confidence": "high"
+    },
+    "384": {
+      "name": "createCactusR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by CactusR2, CactusR4",
+      "confidence": "high"
+    },
+    "397": {
+      "name": "createEquippedPetal",
+      "evidence": "func397 validates slot0..7/subslot0..2 and required level, allocates entity and calls func217",
+      "confidence": "high"
+    },
+    "411": {
+      "name": "PeasR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type11, vtable5692, slot2; shared owner/slots PeasR2[2], PeasR3[2]",
+      "confidence": "high"
+    },
+    "412": {
+      "name": "RoseR1PetalInitialize",
+      "evidence": "server-catalogs.json: petal type6, vtable5432, slot2; shared owner/slots RoseR1[2], RoseR3[2]",
+      "confidence": "high"
+    },
+    "413": {
+      "name": "fastFamilyPetalOrbit",
+      "evidence": "func413; differential test of all256 input bytes and null owner",
+      "confidence": "high"
+    },
+    "414": {
+      "name": "FastR0PetalInitialize",
+      "evidence": "server-catalogs.json: petal type2, vtable5256, slot2; shared owner/slots FastR0[2], FasterR2[2], TwinR1[2], TripletR3[2]",
+      "confidence": "high"
+    },
+    "431": {
+      "name": "PeasR4PetalOrbit",
+      "evidence": "server-catalogs.json: petal type34, vtable6676, slot3; shared owner/slots PeasR4[3]",
+      "confidence": "medium"
+    },
+    "432": {
+      "name": "PeasR4PetalInitialize",
+      "evidence": "server-catalogs.json: petal type34, vtable6676, slot2; shared owner/slots PeasR4[2]",
+      "confidence": "high"
+    },
+    "433": {
+      "name": "BasicR0PetalInitialize",
+      "evidence": "server-catalogs.json: petal type1, vtable5212, slot2; shared owner/slots BasicR0[2], SquareR5[2], AntennaeR4[2], HoneyR2[2], BasicR5[2], SaltR2[2]",
+      "confidence": "high"
+    },
+    "434": {
+      "name": "RiceR3PetalInitialize",
+      "evidence": "server-catalogs.json: petal type37, vtable6844, slot2; shared owner/slots RiceR3[2]",
+      "confidence": "high"
+    },
+    "435": {
+      "name": "CornR3PetalInitialize",
+      "evidence": "server-catalogs.json: petal type38, vtable6888, slot2; shared owner/slots CornR3[2]",
+      "confidence": "high"
+    },
+    "500": {
+      "name": "createPeasR4PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by PeasR4",
+      "confidence": "high"
+    },
+    "509": {
+      "name": "createBasicR5PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by BasicR5",
+      "confidence": "high"
+    },
+    "519": {
+      "name": "createSaltR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by SaltR2",
+      "confidence": "high"
+    },
+    "529": {
+      "name": "createRiceR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by RiceR3",
+      "confidence": "high"
+    },
+    "533": {
+      "name": "createCornR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by CornR3",
+      "confidence": "high"
+    },
+    "539": {
+      "name": "createHoneyR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by HoneyR2",
+      "confidence": "high"
+    },
+    "542": {
+      "name": "createLeafR1PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by LeafR1",
+      "confidence": "high"
+    },
+    "545": {
+      "name": "createYinYangR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by YinYangR3",
+      "confidence": "high"
+    },
+    "552": {
+      "name": "createHeaviestR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by HeaviestR3",
+      "confidence": "high"
+    },
+    "558": {
+      "name": "createAntennaeR4PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by AntennaeR4",
+      "confidence": "high"
+    },
+    "565": {
+      "name": "createRoseR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by RoseR2",
+      "confidence": "high"
+    },
+    "572": {
+      "name": "createDandelionR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by DandelionR2",
+      "confidence": "high"
+    },
+    "579": {
+      "name": "createCactusR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by CactusR3",
+      "confidence": "high"
+    },
+    "583": {
+      "name": "createEggR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by EggR3",
+      "confidence": "high"
+    },
+    "590": {
+      "name": "createEggR4PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by EggR4",
+      "confidence": "high"
+    },
+    "593": {
+      "name": "createPollenR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by PollenR3",
+      "confidence": "high"
+    },
+    "598": {
+      "name": "createBubbleR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by BubbleR2",
+      "confidence": "high"
+    },
+    "602": {
+      "name": "createBasicR0PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by BasicR0",
+      "confidence": "high"
+    },
+    "612": {
+      "name": "createHeavyR0PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by HeavyR0",
+      "confidence": "high"
+    },
+    "614": {
+      "name": "createRockR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by RockR2",
+      "confidence": "high"
+    },
+    "621": {
+      "name": "createSquareR5PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by SquareR5",
+      "confidence": "high"
+    },
+    "626": {
+      "name": "createRoseR1PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by RoseR1",
+      "confidence": "high"
+    },
+    "629": {
+      "name": "createIrisR1PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by IrisR1",
+      "confidence": "high"
+    },
+    "634": {
+      "name": "createWingR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by WingR2",
+      "confidence": "high"
+    },
+    "642": {
+      "name": "createMissileR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by MissileR2",
+      "confidence": "high"
+    },
+    "643": {
+      "name": "createPeasR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by PeasR2",
+      "confidence": "high"
+    },
+    "648": {
+      "name": "createPeasR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by PeasR3",
+      "confidence": "high"
+    },
+    "650": {
+      "name": "createFasterR2PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by FasterR2",
+      "confidence": "high"
+    },
+    "651": {
+      "name": "createRoseR3PetalBehavior",
+      "evidence": "server-catalogs.json: petal factory dispatch; shared by RoseR3",
+      "confidence": "high"
+    },
+    "652": {
+      "name": "destroyLocalServer",
+      "evidence": "func652 clears output packets and server/player lists when initialized",
+      "confidence": "high"
+    },
+    "653": {
+      "name": "destroyLocalServerString",
+      "evidence": "func653 frees static libc++ string iff heap-backed",
+      "confidence": "high"
+    },
+    "654": {
+      "name": "spServerThink",
+      "evidence": "web/sp_server.js _sp_server_think = asm.v; func654 simulation tick",
+      "confidence": "high"
+    },
+    "655": {
+      "name": "spServerSend",
+      "evidence": "web/sp_server.js _sp_server_send = asm.w; func655 XOR decode then input command dispatch",
+      "confidence": "high"
+    },
+    "656": {
+      "name": "spServerInit",
+      "evidence": "web/sp_server.js _sp_server_init = asm.u; func656 initializes server and schedules think every50ms",
+      "confidence": "high"
+    },
+    "657": {
+      "name": "spServerFlush",
+      "evidence": "web/sp_server.js _sp_server_flush = asm.t; func657 sends queued packets and final empty reply, frees queue",
+      "confidence": "high"
+    },
+    "658": {
+      "name": "destroyTimeoutRegistry",
+      "evidence": "func658 destroys linked timeout callback nodes and hash buckets",
+      "confidence": "high"
+    },
+    "659": {
+      "name": "cp6TimeoutFire",
+      "evidence": "web/sp_server.js _cp6_timeout_fire = asm.x; func659 removes matching timer callback id",
+      "confidence": "high"
+    },
+    "660": {
+      "name": "cp6CheckWebSockets",
+      "evidence": "web/sp_server.js _cp6_check_ws = asm.y; func660 drains Na[22639] event queues",
+      "confidence": "high"
+    },
+    "661": {
+      "name": "heavyPetalOrbit",
+      "evidence": "func661; differential test of all256 input bytes and null owner",
+      "confidence": "high"
+    },
+    "662": {
+      "name": "HeavyR0PetalInitialize",
+      "evidence": "server-catalogs.json: petal type3, vtable5300, slot2; shared owner/slots HeavyR0[2]",
+      "confidence": "high"
+    },
+    "663": {
+      "name": "rockPetalOrbit",
+      "evidence": "func663; differential test of all256 input bytes and null owner",
+      "confidence": "high"
+    },
+    "664": {
+      "name": "RockR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type4, vtable5344, slot2; shared owner/slots RockR2[2]",
+      "confidence": "high"
+    },
+    "665": {
+      "name": "RoseR1PetalOrbit",
+      "evidence": "server-catalogs.json: petal type6, vtable5432, slot3; shared owner/slots RoseR1[3]",
+      "confidence": "medium"
+    },
+    "666": {
+      "name": "IrisR1PetalVirtualSlot4",
+      "evidence": "server-catalogs.json: petal type8, vtable5520, slot4; shared owner/slots IrisR1[4]",
+      "confidence": "medium"
+    },
+    "667": {
+      "name": "IrisR1PetalOrbit",
+      "evidence": "server-catalogs.json: petal type8, vtable5520, slot3; shared owner/slots IrisR1[3]",
+      "confidence": "medium"
+    },
+    "668": {
+      "name": "IrisR1PetalInitialize",
+      "evidence": "server-catalogs.json: petal type8, vtable5520, slot2; shared owner/slots IrisR1[2]",
+      "confidence": "high"
+    },
+    "669": {
+      "name": "WingR2PetalOrbit",
+      "evidence": "server-catalogs.json: petal type9, vtable5604, slot3; shared owner/slots WingR2[3]",
+      "confidence": "medium"
+    },
+    "670": {
+      "name": "WingR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type9, vtable5604, slot2; shared owner/slots WingR2[2]",
+      "confidence": "high"
+    },
+    "671": {
+      "name": "MissileR2PetalOrbit",
+      "evidence": "server-catalogs.json: petal type10, vtable5648, slot3; shared owner/slots MissileR2[3]",
+      "confidence": "medium"
+    },
+    "672": {
+      "name": "MissileR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type10, vtable5648, slot2; shared owner/slots MissileR2[2]",
+      "confidence": "high"
+    },
+    "676": {
+      "name": "PeasR2PetalOrbit",
+      "evidence": "server-catalogs.json: petal type11, vtable5692, slot3; shared owner/slots PeasR2[3]",
+      "confidence": "medium"
+    },
+    "680": {
+      "name": "PeasR3PetalVirtualSlot4",
+      "evidence": "server-catalogs.json: petal type12, vtable5772, slot4; shared owner/slots PeasR3[4]",
+      "confidence": "medium"
+    },
+    "681": {
+      "name": "PeasR3PetalOrbit",
+      "evidence": "server-catalogs.json: petal type12, vtable5772, slot3; shared owner/slots PeasR3[3]",
+      "confidence": "medium"
+    },
+    "682": {
+      "name": "RoseR3PetalOrbit",
+      "evidence": "server-catalogs.json: petal type15, vtable5940, slot3; shared owner/slots RoseR3[3]",
+      "confidence": "medium"
+    },
+    "683": {
+      "name": "createNoPetalBehavior",
+      "evidence": "func683 returns0; petal registry index0 references it",
+      "confidence": "high"
+    },
+    "684": {
+      "name": "BubbleR2PetalOrbit",
+      "evidence": "server-catalogs.json: petal type18, vtable5984, slot3; shared owner/slots BubbleR2[3]",
+      "confidence": "medium"
+    },
+    "685": {
+      "name": "BubbleR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type18, vtable5984, slot2; shared owner/slots BubbleR2[2]",
+      "confidence": "high"
+    },
+    "686": {
+      "name": "PollenR3PetalOrbit",
+      "evidence": "server-catalogs.json: petal type19, vtable6028, slot3; shared owner/slots PollenR3[3]",
+      "confidence": "medium"
+    },
+    "687": {
+      "name": "PollenR3PetalInitialize",
+      "evidence": "server-catalogs.json: petal type19, vtable6028, slot2; shared owner/slots PollenR3[2]",
+      "confidence": "high"
+    },
+    "688": {
+      "name": "DandelionR2PetalVirtualSlot4",
+      "evidence": "server-catalogs.json: petal type20, vtable6072, slot4; shared owner/slots DandelionR2[4]",
+      "confidence": "medium"
+    },
+    "689": {
+      "name": "DandelionR2PetalOrbit",
+      "evidence": "server-catalogs.json: petal type20, vtable6072, slot3; shared owner/slots DandelionR2[3]",
+      "confidence": "medium"
+    },
+    "690": {
+      "name": "DandelionR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type20, vtable6072, slot2; shared owner/slots DandelionR2[2]",
+      "confidence": "high"
+    },
+    "691": {
+      "name": "CactusR3PetalVirtualSlot5",
+      "evidence": "server-catalogs.json: petal type21, vtable6156, slot5; shared owner/slots CactusR3[5]",
+      "confidence": "medium"
+    },
+    "692": {
+      "name": "CactusR3PetalVirtualSlot4",
+      "evidence": "server-catalogs.json: petal type21, vtable6156, slot4; shared owner/slots CactusR3[4]",
+      "confidence": "medium"
+    },
+    "693": {
+      "name": "EggR3PetalOrbit",
+      "evidence": "server-catalogs.json: petal type22, vtable6200, slot3; shared owner/slots EggR3[3]",
+      "confidence": "medium"
+    },
+    "694": {
+      "name": "EggR3PetalInitialize",
+      "evidence": "server-catalogs.json: petal type22, vtable6200, slot2; shared owner/slots EggR3[2]",
+      "confidence": "high"
+    },
+    "697": {
+      "name": "initializeSpiderEntity22",
+      "evidence": "server-catalogs.json: entity type22 record+100 table index72; called by func144",
+      "confidence": "high"
+    },
+    "698": {
+      "name": "initializeLadybugEntity21",
+      "evidence": "server-catalogs.json: entity type21 record+100 table index71; called by func144",
+      "confidence": "high"
+    },
+    "699": {
+      "name": "initializeLadybugEntity20",
+      "evidence": "server-catalogs.json: entity type20 record+100 table index70; called by func144",
+      "confidence": "high"
+    },
+    "700": {
+      "name": "initializeSquareEntity19",
+      "evidence": "server-catalogs.json: entity type19 record+100 table index69; called by func144",
+      "confidence": "high"
+    },
+    "701": {
+      "name": "initializeEvilCentipedeEntity18",
+      "evidence": "server-catalogs.json: entity type18 record+100 table index68; called by func144",
+      "confidence": "high"
+    },
+    "702": {
+      "name": "initializeEvilCentipedeEntity17",
+      "evidence": "server-catalogs.json: entity type17 record+100 table index67; called by func144",
+      "confidence": "high"
+    },
+    "703": {
+      "name": "initializeCentipedeEntity16",
+      "evidence": "server-catalogs.json: entity type16 record+100 table index66; called by func144",
+      "confidence": "high"
+    },
+    "704": {
+      "name": "initializeCentipedeEntity15",
+      "evidence": "server-catalogs.json: entity type15 record+100 table index65; called by func144",
+      "confidence": "high"
+    },
+    "705": {
+      "name": "initializeHornetEntity14",
+      "evidence": "server-catalogs.json: entity type14 record+100 table index64; called by func144",
+      "confidence": "high"
+    },
+    "706": {
+      "name": "initializeMassiveBeetleEntity13",
+      "evidence": "server-catalogs.json: entity type13 record+100 table index63; called by func144",
+      "confidence": "high"
+    },
+    "707": {
+      "name": "initializeBeetleEntity12",
+      "evidence": "server-catalogs.json: entity type12 record+100 table index62; called by func144",
+      "confidence": "high"
+    },
+    "708": {
+      "name": "initializeAntHoleEntity11",
+      "evidence": "server-catalogs.json: entity type11 record+100 table index61; called by func144",
+      "confidence": "high"
+    },
+    "709": {
+      "name": "initializeQueenAntEntity10",
+      "evidence": "server-catalogs.json: entity type10 record+100 table index60; called by func144",
+      "confidence": "high"
+    },
+    "710": {
+      "name": "initializeSoldierAntEntity9",
+      "evidence": "server-catalogs.json: entity type9 record+100 table index59; called by func144",
+      "confidence": "high"
+    },
+    "711": {
+      "name": "initializeWorkerAntEntity8",
+      "evidence": "server-catalogs.json: entity type8 record+100 table index58; called by func144",
+      "confidence": "high"
+    },
+    "712": {
+      "name": "initializeBabyAntEntity7",
+      "evidence": "server-catalogs.json: entity type7 record+100 table index57; called by func144",
+      "confidence": "high"
+    },
+    "713": {
+      "name": "initializeBeeEntity6",
+      "evidence": "server-catalogs.json: entity type6 record+100 table index56; called by func144",
+      "confidence": "high"
+    },
+    "714": {
+      "name": "initializeMassiveLadybugEntity5",
+      "evidence": "server-catalogs.json: entity type5 record+100 table index55; called by func144",
+      "confidence": "high"
+    },
+    "715": {
+      "name": "initializeLadybugEntity4",
+      "evidence": "server-catalogs.json: entity type4 record+100 table index54; called by func144",
+      "confidence": "high"
+    },
+    "716": {
+      "name": "initializeCactusEntity3",
+      "evidence": "server-catalogs.json: entity type3 record+100 table index53; called by func144",
+      "confidence": "high"
+    },
+    "717": {
+      "name": "initializeBoulderEntity2",
+      "evidence": "server-catalogs.json: entity type2 record+100 table index52; called by func144",
+      "confidence": "high"
+    },
+    "718": {
+      "name": "initializeRockEntity1",
+      "evidence": "server-catalogs.json: entity type1 record+100 table index51; called by func144",
+      "confidence": "high"
+    },
+    "719": {
+      "name": "EggR4PetalOrbit",
+      "evidence": "server-catalogs.json: petal type23, vtable6244, slot3; shared owner/slots EggR4[3]",
+      "confidence": "medium"
+    },
+    "720": {
+      "name": "EggR4PetalInitialize",
+      "evidence": "server-catalogs.json: petal type23, vtable6244, slot2; shared owner/slots EggR4[2]",
+      "confidence": "high"
+    },
+    "723": {
+      "name": "RoseR2PetalOrbit",
+      "evidence": "server-catalogs.json: petal type24, vtable6288, slot3; shared owner/slots RoseR2[3]",
+      "confidence": "medium"
+    },
+    "724": {
+      "name": "RoseR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type24, vtable6288, slot2; shared owner/slots RoseR2[2]",
+      "confidence": "high"
+    },
+    "725": {
+      "name": "HeaviestR3PetalOrbit",
+      "evidence": "server-catalogs.json: petal type26, vtable6376, slot3; shared owner/slots HeaviestR3[3]",
+      "confidence": "medium"
+    },
+    "726": {
+      "name": "HeaviestR3PetalInitialize",
+      "evidence": "server-catalogs.json: petal type26, vtable6376, slot2; shared owner/slots HeaviestR3[2]",
+      "confidence": "high"
+    },
+    "727": {
+      "name": "StingerR1PetalInitialize",
+      "evidence": "server-catalogs.json: petal type7, vtable5476, slot2; shared owner/slots StingerR1[2], StingerR4[2]",
+      "confidence": "high"
+    },
+    "728": {
+      "name": "YinYangR3PetalInitialize",
+      "evidence": "server-catalogs.json: petal type28, vtable6420, slot2; shared owner/slots YinYangR3[2]",
+      "confidence": "high"
+    },
+    "732": {
+      "name": "WebR2PetalVirtualSlot6",
+      "evidence": "server-catalogs.json: petal type29, vtable6464, slot6; shared owner/slots WebR2[6], WebR4[6]",
+      "confidence": "medium"
+    },
+    "733": {
+      "name": "WebR2PetalOrbit",
+      "evidence": "server-catalogs.json: petal type29, vtable6464, slot3; shared owner/slots WebR2[3], WebR4[3]",
+      "confidence": "medium"
+    },
+    "734": {
+      "name": "WebR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type29, vtable6464, slot2; shared owner/slots WebR2[2], WebR4[2]",
+      "confidence": "high"
+    },
+    "738": {
+      "name": "HoneyR2PetalVirtualSlot4",
+      "evidence": "server-catalogs.json: petal type31, vtable6548, slot4; shared owner/slots HoneyR2[4]",
+      "confidence": "medium"
+    },
+    "739": {
+      "name": "LeafR1PetalInitialize",
+      "evidence": "server-catalogs.json: petal type32, vtable6632, slot2; shared owner/slots LeafR1[2]",
+      "confidence": "high"
+    },
+    "740": {
+      "name": "CactusR2PetalInitialize",
+      "evidence": "server-catalogs.json: petal type13, vtable5852, slot2; shared owner/slots CactusR2[2], CactusR3[2], CactusR4[2]",
+      "confidence": "high"
+    },
+    "747": {
+      "name": "PeasR4PetalVirtualSlot4",
+      "evidence": "server-catalogs.json: petal type34, vtable6676, slot4; shared owner/slots PeasR4[4]",
+      "confidence": "medium"
+    }
+  }
+}

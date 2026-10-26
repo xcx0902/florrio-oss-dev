@@ -1,0 +1,551 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/text.mjs",
+  "implementationSha256": "97a2c802c212004303a089150cbf42f9a2a01a7d9f03615bcf8674e0c6e7eb4b",
+  "factory": "createTextHooks",
+  "functionIds": [
+    385,
+    392,
+    443,
+    444,
+    472,
+    496,
+    556,
+    561,
+    590,
+    632,
+    633,
+    634,
+    636,
+    817,
+    818,
+    819
+  ],
+  "functions": [
+    {
+      "id": 385,
+      "name": "measureLabel",
+      "originalSymbol": "function_385",
+      "signature": " (type $t39) (param $p0 i32) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 8241
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 2362
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 124
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "acquireStaticInitializationGuard",
+        "function_818",
+        "releaseStaticInitializationGuard",
+        "function_632",
+        "function_366",
+        "emscripten_asm_const_int",
+        "function_817"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 392,
+      "name": "drawTextLabel",
+      "originalSymbol": "function_392",
+      "signature": " (type $t65) (param $p0 i32) (param $p1 i32) (param $p2 f32) (param $p3 f32) (param $p4 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 9830
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 2778
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 440
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_385",
+        "function_444",
+        "function_443"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 443,
+      "name": "drawCachedCanvas",
+      "originalSymbol": "function_443",
+      "signature": " (type $t67) (param $p0 i32) (param $p1 i32) (param $p2 f64) (param $p3 f64) (param $p4 f64) (param $p5 f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 17076
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 509
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 279
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_366",
+        "emscripten_asm_const_int",
+        "function_372"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 444,
+      "name": "rasterizeLabel",
+      "originalSymbol": "function_444",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 17356
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 576
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 363
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_496",
+        "function_366",
+        "function_817",
+        "function_634"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 472,
+      "name": "copyBytesIfNonempty",
+      "originalSymbol": "function_472",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 21796
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 2025
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 166
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_363"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 496,
+      "name": "clearCanvas",
+      "originalSymbol": "function_496",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 29464
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0128-0191.dcmp",
+          "line": 626
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 56
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_632",
+        "function_366",
+        "emscripten_asm_const_int"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 556,
+      "name": "prepareTextLabel",
+      "originalSymbol": "function_556",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 47182
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0192-0255.dcmp",
+          "line": 134
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 244
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_366",
+        "function_561",
+        "function_590"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 561,
+      "name": "assignInlineString",
+      "originalSymbol": "function_561",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 53332
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0192-0255.dcmp",
+          "line": 1887
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 212
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_472",
+        "function_636"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 590,
+      "name": "assignHeapString",
+      "originalSymbol": "function_590",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 65895
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0192-0255.dcmp",
+          "line": 6014
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 227
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_472",
+        "function_636"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 632,
+      "name": "createCanvas",
+      "originalSymbol": "function_632",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 82158
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0256-0319.dcmp",
+          "line": 1899
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 466
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_372",
+        "acquireStaticInitializationGuard",
+        "releaseStaticInitializationGuard",
+        "function_633"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 633,
+      "name": "initializeCanvasState",
+      "originalSymbol": "function_633",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 82298
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0256-0319.dcmp",
+          "line": 1944
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 503
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_366"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 634,
+      "name": "resizeCanvas",
+      "originalSymbol": "function_634",
+      "signature": " (type $t1) (param $p0 i32) (param $p1 i32) (param $p2 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 82549
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0256-0319.dcmp",
+          "line": 2011
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 564
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "emscripten_asm_const_int",
+        "function_633",
+        "function_632",
+        "function_496"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 636,
+      "name": "growStringAndReplace",
+      "originalSymbol": "function_636",
+      "signature": " (type $t23) (param $p0 i32) (param $p1 i32) (param $p2 i32) (param $p3 i32) (param $p4 i32) (param $p5 i32) (param $p6 i32) (param $p7 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 82684
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0256-0319.dcmp",
+          "line": 2050
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 175
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "allocateOrAbort",
+        "function_472",
+        "free",
+        "function_398"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 817,
+      "name": "measureCanvasText",
+      "originalSymbol": "function_817",
+      "signature": " (type $t55) (param $p0 i32) (param $p1 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 172220
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0448-0511.dcmp",
+          "line": 404
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 95
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_372",
+        "function_366",
+        "emscripten_asm_const_int",
+        "function_2"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 818,
+      "name": "initializeRenderer",
+      "originalSymbol": "function_818",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 172344
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0448-0511.dcmp",
+          "line": 439
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 37
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 819,
+      "name": "drawLeftAlignedLabel",
+      "originalSymbol": "function_819",
+      "signature": " (type $t89) (param $p0 i32) (param $p1 i32) (param $p2 f32) (param $p3 f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 172394
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0448-0511.dcmp",
+          "line": 458
+        },
+        "source": {
+          "path": "source/game/client/text.mjs",
+          "line": 453
+        },
+        "test": "test/client-text.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_444",
+        "function_385",
+        "function_443"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "layout": {
+    "label": {
+      "dirty": 0,
+      "renderer": 8,
+      "rasterScale": 112,
+      "measuredWidth": 116,
+      "widthValid": 120,
+      "text": 124,
+      "fillRgb": 136,
+      "strokeRgb": 139,
+      "outlineRatio": 144,
+      "fontSize": 148
+    },
+    "renderer": {
+      "matrix": 0,
+      "cachedMatrix": 24,
+      "transformDirty": 48,
+      "alpha": 56,
+      "previous": 76,
+      "next": 72,
+      "clockValid": 80,
+      "timestamp": 88,
+      "contextId": 96
+    },
+    "globals": {
+      "canvasCount": 441320,
+      "canvasListHead": 441324,
+      "offscreenSupported": 441328,
+      "offscreenGuard": 441332,
+      "measurementRenderer": 7932984,
+      "measurementRendererGuard": 7933088
+    },
+    "string": {
+      "inlineCapacity": 10,
+      "storage": 0,
+      "heapLength": 4,
+      "heapCapacityWithFlag": 8,
+      "inlineLengthOrHeapTag": 11
+    }
+  },
+  "validation": {
+    "testGroups": 15,
+    "oracleComparisons": 738,
+    "memoryBytesPerComparison": 67108864,
+    "returnStackHostEventsAndTraps": true,
+    "decodedCanvasArgsAndBytes": true,
+    "canvasSizesAndAllocationOrder": true,
+    "combinedClientRenderTest": "test/client-render-frame.test.mjs",
+    "testLog": "reports/tests.tap"
+  },
+  "limitations": [
+    "Browser Canvas, font readiness and text measurement remain host dependencies. Host tests use deterministic responses and do not establish pixel equivalence.",
+    "Memory comparison/copy, conditional copy and string growth now execute recovered source; allocation/free and fatal length rejection retain explicit native/WAT dependencies.",
+    "Labels lacking established field names retain ABI offsets; finite tests do not prove every arbitrary pointer alias.",
+    "The retained capture has no guaranteed name component, so the combined scene test also renders a changing explicit label.",
+    "Browser validation is bound to recorded source/artifact hashes; see reports/current-verification.json and reports/runtime/readable.json."
+  ],
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

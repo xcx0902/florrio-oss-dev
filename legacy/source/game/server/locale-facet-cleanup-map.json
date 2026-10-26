@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/locale-facet-cleanup.mjs",
+  "implementationSha256": "88f3d56dcd5069fde97de12d6e50f3f5793f7342c6b9d9add79120d09f7d819d",
+  "factory": "createLocaleFacetCleanupHook",
+  "functionIds": [
+    242
+  ],
+  "functions": [
+    {
+      "id": 242,
+      "name": "destroyLocaleFacets",
+      "originalSymbol": "function_242",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/locale-facet-cleanup.mjs",
+          "line": 14
+        },
+        "test": "test/server-locale-facet-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 2,
+      "notes": "Destroys facet pairs, releases the shared locale object and frees four buffers."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-locale-facet-cleanup.test.mjs",
+    "report": "reports/server-locale-facet-cleanup-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Reference counts 2 and 1 compare complete memory and stack with empty facet arrays.",
+    "limitations": [
+      "Non-empty facet arrays are not exercised. A typed no-op table target stands in for the release slot. Ledger: 506 server bodies recovered and 228 remain machine code."
+    ]
+  }
+}

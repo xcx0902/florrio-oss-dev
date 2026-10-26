@@ -1,0 +1,51 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/global-buffer-cleanup.mjs",
+  "implementationSha256": "6a76cc639748f65499d7e97652f814aa373f17cc7d22fceddf0dba28c1e29069",
+  "factory": "createGlobalBufferCleanupHook",
+  "functionIds": [
+    474
+  ],
+  "functions": [
+    {
+      "id": 474,
+      "name": "cleanupGlobalBuffers",
+      "originalSymbol": "function_474",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/global-buffer-cleanup.mjs",
+          "line": 15
+        },
+        "test": "test/server-global-buffer-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Frees and clears eight 16-byte descriptors ending at 8548268."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-global-buffer-cleanup.test.mjs",
+    "report": "reports/server-global-buffer-cleanup-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Null and live pointer states compare complete allocator memory and stack.",
+    "limitations": [
+      "Ledger: 453 server bodies recovered and 281 remain machine code."
+    ]
+  }
+}

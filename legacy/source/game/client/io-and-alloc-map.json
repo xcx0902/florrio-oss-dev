@@ -1,0 +1,100 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/io-and-alloc.mjs",
+  "implementationSha256": "a0935c2d842adf4da0855c30143921c06baee43344f575df3e42a96f3e0468a4",
+  "factory": "createIoAndAllocHooks",
+  "functionIds": [
+    584,
+    928,
+    1021
+  ],
+  "functions": [
+    {
+      "id": 584,
+      "name": "bumpAllocate",
+      "originalSymbol": "function_584",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/io-and-alloc.mjs",
+          "line": 10
+        },
+        "test": "test/client-io-and-alloc.test.mjs"
+      },
+      "originalDirectDependencies": [
+        13
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Carves a 4-byte aligned block from the global bump pointer."
+    },
+    {
+      "id": 928,
+      "name": "flushStreams",
+      "originalSymbol": "function_928",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/io-and-alloc.mjs",
+          "line": 24
+        },
+        "test": "test/client-io-and-alloc.test.mjs"
+      },
+      "originalDirectDependencies": [
+        735
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Flushes one stream or every registered stream."
+    },
+    {
+      "id": 1021,
+      "name": "dispatchReadWrite",
+      "originalSymbol": "function_1021",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat"
+        },
+        "source": {
+          "path": "source/game/client/io-and-alloc.mjs",
+          "line": 37
+        },
+        "test": "test/client-io-and-alloc.test.mjs"
+      },
+      "originalDirectDependencies": [
+        647,
+        389
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Dispatches a read/write request by stream flags."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-io-and-alloc.test.mjs",
+    "report": "reports/client-io-and-alloc-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 3,
+    "completeLinearMemoryChecks": 3,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 0,
+    "trappingComparisons": 0,
+    "comparison": "One zero fixture per helper compares result and complete memory.",
+    "limitations": [
+      "The static initialiser 1084 was dropped because its host scratch differs from the oracle. Ledger: 696 client and 512 server bodies recovered."
+    ]
+  }
+}

@@ -1,0 +1,277 @@
+schema: 1
+name: worker-protocol
+confidence: medium
+source:
+  artifact: web/sp_server.wasm
+  sha256: 75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d
+  clientArtifact: web/client.wasm
+  clientSha256: c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1
+  evidence:
+    - source/javascript/sp_server.js
+    - source/javascript/client.js
+    - reports/server-behavior.md
+    - reports/server-input.md
+    - reports/client-snapshots.md
+    - reports/client-entity-snapshot.md
+    - reports/client-snapshot-decoder.md
+notes:
+  - This is a byte-level contract assembled from the original worker glue, the recovered input entry point and the recovered snapshot decoder.
+  - Fields whose exact wire type has not been proven are marked confidence medium and described by role, not invented names.
+
+worker:
+  request:
+    fields:
+      - { name: funcName, type: string, confidence: high }
+      - { name: callbackId, type: i32, confidence: high, note: "-1 for init; otherwise a monotonically increasing client callback slot" }
+      - { name: data, type: bytes, optional: true, confidence: high, note: "transferred Uint8Array; absent or zero-length for init/think/flush" }
+  response:
+    fields:
+      - { name: callbackId, type: i32, confidence: high }
+      - { name: finalResponse, type: bool, confidence: high, note: "true completes the callback; false is an intermediate packet" }
+      - { name: data, type: bytes, optional: true, confidence: high }
+  functions:
+    - { name: sp_server_init, wasmIndex: 656, args: [0, 0], confidence: high, behavior: "initialize world and catalogs, schedule the 50 ms tick, flush initial output" }
+    - { name: sp_server_send, wasmIndex: 655, args: [pointer, length], confidence: high, behavior: "decode one client input packet and apply its commands" }
+    - { name: sp_server_think, wasmIndex: 654, args: [], confidence: high, behavior: "one 20 Hz simulation tick" }
+    - { name: sp_server_flush, wasmIndex: 657, args: [0, 0], confidence: high, behavior: "drain the output queue, send one final empty response, free packets" }
+
+input:
+  maxPacketBytes: 65536
+  xor:
+    keyAddress: 4576
+    keyLength: 256
+    algorithm: rolling-xor
+    confidence: high
+  reader:
+    varint: unsigned-leb128
+    maxVarintBytes: 5
+    endian: little
+    confidence: high
+  packet:
+    sequence: varint
+    sequenceRole: duplicate suppression
+    commands: command-list
+  commands:
+    - { opcode: 0, name: handshake-string, confidence: high }
+    - { opcode: 2, name: handshake-string-alt, confidence: high }
+    - { opcode: 3, name: suicide, confidence: high }
+    - { opcode: 4, name: restart, confidence: high }
+    - { opcode: 5, name: string, confidence: high }
+    - { opcode: 6, name: player-spawn-and-name, confidence: high, fields: [name-string, level] }
+    - { opcode: 7, name: disconnect, confidence: high }
+    - { opcode: 8, name: discard-petal, confidence: high, fields: [slot] }
+    - { opcode: 10, name: swap-petals, confidence: high, fields: [slotA, slotB] }
+    - { opcode: 12, name: input-buttons-angle-strength, confidence: high, fields: [buttons, angle, strength] }
+    - { opcode: 13, name: bench-cycle, confidence: high }
+    - { opcode: 1, name: reserved-1, confidence: medium }
+    - { opcode: 9, name: reserved-9, confidence: medium }
+    - { opcode: 11, name: reserved-11, confidence: medium }
+  fieldNotes:
+    - "Opcode 12 angle uses the original binary64 constants and is normalized as the original bit test does."
+    - "Name strings are trimmed and UTF-8 truncated on the original spawn path."
+
+output:
+  queue:
+    countAddress: 8545512
+    pointersAddress: 8545516
+    capacity: 16
+    confidence: high
+  packet:
+    headerBytes: 16
+    lengthOffset: 4
+    heapPayloadOffset: 12
+    inlinePayloadOffset: 16
+    inlinePayloadBytes: 4096
+    confidence: high
+  payload:
+    typeByte: first
+    types:
+      - { type: 0, name: handshake, confidence: medium }
+      - { type: 1, name: entity-snapshot, confidence: high }
+      - { type: 5, name: events, confidence: high }
+      - { type: 2, name: unknown-2, confidence: low }
+  snapshot:
+    sequence: varint
+    xorKeyAddress: 32272
+    xorKeyLength: 256
+    reliableAck: varint
+    framing:
+      entityFlagsXor: 54
+      componentDeltaXor: 1
+    # Dense value widths/component mappings are shared. Sparse field framing
+    # is deliberately NOT wire-equivalent across these two packet formats.
+    sparseModes:
+      nativeSparse:
+        packetFormat: archived-client
+        fieldDeltaXor: 1
+        indexDeltaXor: 1
+        indexedFields: [3, 4, 10, 16, 25, 33, 35, 39, 60, 61]
+        field26Role: player-model
+      domainSparse:
+        packetFormat: domain-counted
+        fieldDeltaXor: 0
+        indexDeltaXor: 0
+        indexedFields: [3, 10, 16, 25, 39, 60, 61]
+        field26Role: entity-kind
+        note: "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md. Shared value widths do not assert native semantic equivalence."
+      # Decoded zero terminates both field and index lists; its encoded byte
+      # is the corresponding mode's XOR value. Fields4/33/35 are scalar only
+      # in domainSparse. Indexed counts below describe component storage,
+      # not an added validation bound on the existing domain stream.
+    domainExtensions:
+      - { field: 26, name: entity-kind, type: byte, permanent: true, originalRole: player-model, note: "Domain packets retain the permanent kind byte; the archived-client adapter writes the original model byte separately." }
+    entityHandle:
+      bits: 32
+      indexMask: 16383
+      generationShift: 14
+      rotation: rotl-14
+      confidence: high
+    blocks:
+      - { name: entity-deletes, count: varint, entry: handle }
+      - { name: entity-updates, count: varint, entry: handle + component-declarations + field-values }
+      - { name: events, count: varint, entry: opcode + fields }
+      - { name: trailing-framing, confidence: medium }
+    componentModel:
+      componentCount: 30
+      sparseFieldCount: 63
+      denseGroupCount: 19
+      denseComponent30ExtraFields: 6
+      flags:
+        1: component declarations use a 32-bit mask
+        2: skip component declarations
+        8: dense existing-component fields
+        64: dense component 30 includes fields 58-63
+        128: mark entity byte 44 bit 0
+      confidence: high
+    fieldComponents:
+      # Original1015: byteFields/floatFields/interpolatedFields/arrayFields and
+      # readField branches. Constructor 0 denotes an inline component, not an
+      # unverified/default mapping. Domain field26 remains a permanent kind byte.
+      1: { constructor: 478, offset: 8 }
+      2: { constructor: 491, offset: 8 }
+      3: { constructor: 477, offset: 8 }
+      4: { constructor: 0, offset: 8 }
+      5: { constructor: 478, offset: 16 }
+      6: { constructor: 478, offset: 40 }
+      7: { constructor: 467, offset: 8 }
+      8: { constructor: 609, offset: 8 }
+      9: { constructor: 755, offset: 8 }
+      10: { constructor: 477, offset: 88 }
+      11: { constructor: 477, offset: 248 }
+      12: { constructor: 477, offset: 249 }
+      13: { constructor: 0, offset: 8 }
+      14: { constructor: 756, offset: 8 }
+      15: { constructor: 0, offset: 24 }
+      16: { constructor: 478, offset: 52 }
+      17: { constructor: 549, offset: 8 }
+      18: { constructor: 0, offset: 32 }
+      19: { constructor: 477, offset: 252 }
+      20: { constructor: 478, offset: 104 }
+      21: { constructor: 478, offset: 108 }
+      22: { constructor: 670, offset: 8 }
+      23: { constructor: 0, offset: 8 }
+      24: { constructor: 478, offset: 112 }
+      25: { constructor: 0, offset: 40 }
+      26: { constructor: 491, offset: 9 }
+      27: { constructor: 0, offset: 56 }
+      28: { constructor: 609, offset: 40 }
+      29: { constructor: 533, offset: 8 }
+      30: { constructor: 477, offset: 256 }
+      31: { constructor: 491, offset: 10 }
+      32: { constructor: 478, offset: 136 }
+      33: { constructor: 0, offset: 60 }
+      34: { constructor: 478, offset: 140 }
+      35: { constructor: 0, offset: 72 }
+      36: { constructor: 493, offset: 8 }
+      37: { constructor: 0, offset: 32 }
+      38: { constructor: 809, offset: 8 }
+      39: { constructor: 477, offset: 260 }
+      40: { constructor: 533, offset: 9 }
+      41: { constructor: 0, offset: 88 }
+      42: { constructor: 477, offset: 340 }
+      43: { constructor: 757, offset: 8 }
+      44: { constructor: 0, offset: 92 }
+      45: { constructor: 477, offset: 344 }
+      46: { constructor: 477, offset: 352 }
+      47: { constructor: 478, offset: 141 }
+      48: { constructor: 677, offset: 8 }
+      49: { constructor: 609, offset: 64 }
+      50: { constructor: 758, offset: 8 }
+      51: { constructor: 0, offset: 96 }
+      52: { constructor: 477, offset: 356 }
+      53: { constructor: 458, offset: 8 }
+      54: { constructor: 670, offset: 9 }
+      55: { constructor: 458, offset: 12 }
+      56: { constructor: 478, offset: 144 }
+      57: { constructor: 0, offset: 20 }
+      58: { constructor: 491, offset: 12 }
+      59: { constructor: 491, offset: 16 }
+      60: { constructor: 491, offset: 40 }
+      61: { constructor: 491, offset: 120 }
+      62: { constructor: 491, offset: 168 }
+      63: { constructor: 491, offset: 169 }
+    indexedFields:
+      3: { element: reference, count: 10 }
+      4: { element: string, count: 1 }
+      10: { element: string, count: 10 }
+      16: { element: byte, count: 10 }
+      25: { element: string, count: 1 }
+      33: { element: bit, count: 1 }
+      35: { element: f64, count: 1 }
+      39: { element: varint, count: 10 }
+      60: { element: byte, count: 16 }
+      61: { element: short, count: 8 }
+    fieldTypes:
+      byte: [1, 2, 9, 11, 12, 14, 17, 20, 22, 26, 31, 34, 36, 38, 43, 46, 47, 50, 54, 62, 63]
+      float: [19, 21, 32, 42, 53, 55]
+      interpolatedFloat: [5, 7, 13, 24, 28, 49, 59]
+      string: [4, 6, 48]
+      varint: [15, 30, 41, 44, 51, 52, 58]
+      reference: [23, 56, 57]
+      bit: [29, 33, 37, 40]
+      angleRaw16: [8]
+      double: [18, 35]
+      specialFloat: [27, 45]
+      stringArray: [10, 25]
+      byteArray: [16, 60]
+      handleArray: [3]
+      varintArray: [39]
+      shortArray: [61]
+      confidence: high
+      note: "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing; domainSparse is not the native wire contract."
+    denseGroups:
+      - { offset: 52, component: 1, fields: [22, 54] }
+      - { offset: 56, component: 2, fields: [36] }
+      - { offset: 68, component: 5, fields: [9] }
+      - { offset: 72, component: 6, fields: [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56] }
+      - { offset: 76, component: 7, fields: [50] }
+      - { offset: -8, component: 8, fields: [13, 37] }
+      - { offset: 84, component: 10, fields: [17] }
+      - { offset: 100, component: 14, fields: [43] }
+      - { offset: -15, component: 15, fields: [23, 57] }
+      - { offset: -16, component: 16, fields: [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52] }
+      - { offset: 112, component: 19, fields: [48] }
+      - { offset: 116, component: 20, fields: [53, 55] }
+      - { offset: 120, component: 21, fields: [8, 28, 49] }
+      - { offset: 124, component: 22, fields: [29, 40] }
+      - { offset: 136, component: 25, fields: [38] }
+      - { offset: 140, component: 26, fields: [7] }
+      # Original1015 readDenseFields includes BOTH 44/51. WAT 258947,
+      # 259155, 259334 stores state+1600/1604/1608 = inline27+88/92/96.
+      - { offset: -27, component: 27, fields: [4, 15, 18, 25, 27, 33, 35, 41, 44, 51] }
+      - { offset: 144, component: 28, fields: [14] }
+      - { offset: 152, component: 30, fields: [2, 26, 31], extendedFields: [58, 59, 60, 61, 62, 63] }
+    events:
+      - { opcode: 9, name: chat-string, confidence: high }
+      - { opcode: 11, name: entity-time, confidence: high }
+      - { opcode: 14, name: visual, confidence: high, fields: [entity-handle, visual-index] }
+      - { opcode: 2, name: unreachable-2, confidence: high }
+      - { opcode: 3, name: unreachable-3, confidence: high }
+      - { opcode: 4, name: unreachable-4, confidence: high }
+      - { opcode: 5, name: unreachable-5, confidence: high }
+      - { opcode: 6, name: unreachable-6, confidence: high }
+      - { opcode: 7, name: unreachable-7, confidence: high }
+      - { opcode: 8, name: unreachable-8, confidence: high }
+      - { opcode: 10, name: unreachable-10, confidence: high }
+      - { opcode: 12, name: unreachable-12, confidence: high }
+      - { opcode: 13, name: unreachable-13, confidence: high }

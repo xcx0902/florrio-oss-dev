@@ -1,0 +1,55 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/rem-pio2-large.mjs",
+  "implementationSha256": "fe5c1242e76355e8abae6f7e64443ad96c4bfb79a0a2e3cc042d16b4d8b85e0e",
+  "factory": "createRemPio2LargeHook",
+  "functionIds": [
+    285
+  ],
+  "functions": [
+    {
+      "id": 285,
+      "name": "remPio2Large",
+      "originalSymbol": "function_285",
+      "signature": " (type $t10) (param i32 i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 68175
+        },
+        "source": {
+          "path": "source/game/server/rem-pio2-large.mjs",
+          "line": 16
+        },
+        "test": "test/server-rem-pio2-large.test.mjs"
+      },
+      "originalDirectDependencies": [
+        107
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Payne-Hanek __rem_pio2_large. 66-entry 2/pi table at linear 19200, init_jk {3,4,4,6}, 24-bit limb accumulation/distillation, ih complement/carry, cancellation recomputation, PIo2 convolution and prec 0..3 compression. scalbn is recovered 107."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-rem-pio2-large.test.mjs",
+    "report": "reports/server-rem-pio2-large-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 828,
+    "completeLinearMemoryChecks": 748,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 828,
+    "trappingComparisons": 0,
+    "comparison": "748 direct 285 cases compare result, y words, stack and full memory outside native 285's dead 560-byte scratch; 80 composition cases run recovered 283/284 with recovered 285 and compare results/words/stack.",
+    "limitations": [
+      "Native 285's dead 560-byte scratch frame is excluded from byte comparison.",
+      "All-zero limb arrays trap in native and are not enumerated; out-of-bounds pointers are not enumerated.",
+      "Ledger: 266 server bodies recovered and 468 remain machine code."
+    ]
+  }
+}

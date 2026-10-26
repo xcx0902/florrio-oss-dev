@@ -1,0 +1,1256 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/vtable-constructors.mjs",
+  "implementationSha256": "5fda27fa6676ec9c9696486b5961eb5838e950c1a91583e220b30ec9a7744eb7",
+  "factory": "createVtableConstructorHooks",
+  "functionIds": [
+    709,
+    1434,
+    1445,
+    1456,
+    1467,
+    1478,
+    1532,
+    1543,
+    1565,
+    1587,
+    1598,
+    1609,
+    1620,
+    1631,
+    1652,
+    1663,
+    1706,
+    1717,
+    1728,
+    1739,
+    1750,
+    1870,
+    2336,
+    2351,
+    2354,
+    2358,
+    2361,
+    2364,
+    2367,
+    2370,
+    2382,
+    2386,
+    2389,
+    2392,
+    2402,
+    2409,
+    2423,
+    2429,
+    2440,
+    2443,
+    2446,
+    2452,
+    2637,
+    4048,
+    4050,
+    4053,
+    4057
+  ],
+  "functions": [
+    {
+      "id": 709,
+      "name": "constructVtableObject709",
+      "originalSymbol": "function_709",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 111252
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33200 at offset 0 and returns the object."
+    },
+    {
+      "id": 1434,
+      "name": "constructVtableObject1434",
+      "originalSymbol": "function_1434",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 450559
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 34428 at offset 0, zeroes offset 4 and returns the object."
+    },
+    {
+      "id": 1445,
+      "name": "constructVtableObject1445",
+      "originalSymbol": "function_1445",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 450909
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371,
+        382
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate 652, fill zero via 382, store vtable 34472, clear fields +4/+8."
+    },
+    {
+      "id": 1456,
+      "name": "constructVtableObject1456",
+      "originalSymbol": "function_1456",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 451279
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate 16, zero two words, store vtable 34516, clear fields +4/+8/+12."
+    },
+    {
+      "id": 1467,
+      "name": "constructVtableObject1467",
+      "originalSymbol": "function_1467",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 451655
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 34560 at offset 0, zeroes offset 4 and returns the object."
+    },
+    {
+      "id": 1478,
+      "name": "constructVtableObject1478",
+      "originalSymbol": "function_1478",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 452033
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 34604 at offset 0, zeroes offset 4 and returns the object."
+    },
+    {
+      "id": 1532,
+      "name": "constructVtableObject1532",
+      "originalSymbol": "function_1532",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 453968
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 34208 at offset 0 and returns the object."
+    },
+    {
+      "id": 1543,
+      "name": "constructVtableObject1543",
+      "originalSymbol": "function_1543",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 454315
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 34164 at offset 0 and returns the object."
+    },
+    {
+      "id": 1565,
+      "name": "constructVtableObject1565",
+      "originalSymbol": "function_1565",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 455133
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33944 at offset 0 and returns the object."
+    },
+    {
+      "id": 1587,
+      "name": "constructVtableObject1587",
+      "originalSymbol": "function_1587",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 455877
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 34032 at offset 0 and returns the object."
+    },
+    {
+      "id": 1598,
+      "name": "constructVtableObject1598",
+      "originalSymbol": "function_1598",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 456266
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 34076 at offset 0 and returns the object."
+    },
+    {
+      "id": 1609,
+      "name": "constructVtableObject1609",
+      "originalSymbol": "function_1609",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 456669
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33900 at offset 0 and returns the object."
+    },
+    {
+      "id": 1620,
+      "name": "constructVtableObject1620",
+      "originalSymbol": "function_1620",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 457002
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33856 at offset 0 and returns the object."
+    },
+    {
+      "id": 1631,
+      "name": "constructVtableObject1631",
+      "originalSymbol": "function_1631",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 457391
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33156 at offset 0 and returns the object."
+    },
+    {
+      "id": 1652,
+      "name": "constructVtableObject1652",
+      "originalSymbol": "function_1652",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 458104
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33244 at offset 0 and returns the object."
+    },
+    {
+      "id": 1663,
+      "name": "constructVtableObject1663",
+      "originalSymbol": "function_1663",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 458493
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate 16, zero two words, store vtable 33288, clear fields +4/+8/+12."
+    },
+    {
+      "id": 1706,
+      "name": "constructVtableObject1706",
+      "originalSymbol": "function_1706",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 460005
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33464 at offset 0 and returns the object."
+    },
+    {
+      "id": 1717,
+      "name": "constructVtableObject1717",
+      "originalSymbol": "function_1717",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 460366
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate 24, zero three words, store vtable 33548, clear byte +8."
+    },
+    {
+      "id": 1728,
+      "name": "constructVtableObject1728",
+      "originalSymbol": "function_1728",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 460711
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33592 at offset 0 and returns the object."
+    },
+    {
+      "id": 1739,
+      "name": "constructVtableObject1739",
+      "originalSymbol": "function_1739",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 461072
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 33636 at offset 0, zeroes offset 4 and returns the object."
+    },
+    {
+      "id": 1750,
+      "name": "constructVtableObject1750",
+      "originalSymbol": "function_1750",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 461408
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 33680 at offset 0, zeroes offset 4 and returns the object."
+    },
+    {
+      "id": 1870,
+      "name": "constructVtableObject1870",
+      "originalSymbol": "function_1870",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 472385
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 4 bytes through 371, stores vtable 33768 at offset 0 and returns the object."
+    },
+    {
+      "id": 2336,
+      "name": "constructVtableObject2336",
+      "originalSymbol": "function_2336",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 645710
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90288 at offset 0 and returns the object."
+    },
+    {
+      "id": 2351,
+      "name": "constructVtableObject2351",
+      "originalSymbol": "function_2351",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 646682
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 34720 at offset 0 and returns the object."
+    },
+    {
+      "id": 2354,
+      "name": "constructVtableObject2354",
+      "originalSymbol": "function_2354",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 646867
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 34756 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2358,
+      "name": "constructVtableObject2358",
+      "originalSymbol": "function_2358",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 646919
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 34792 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2361,
+      "name": "constructVtableObject2361",
+      "originalSymbol": "function_2361",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 646947
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 34828 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2364,
+      "name": "constructVtableObject2364",
+      "originalSymbol": "function_2364",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 647005
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 12 bytes through 371, stores vtable 34864 at offset 0, copies input+4..+11 to object+4..+11 and returns the object."
+    },
+    {
+      "id": 2367,
+      "name": "constructVtableObject2367",
+      "originalSymbol": "function_2367",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 647061
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 34900 at offset 0 and returns the object."
+    },
+    {
+      "id": 2370,
+      "name": "constructVtableObject2370",
+      "originalSymbol": "function_2370",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 647305
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 12 bytes through 371, stores vtable 34936 at offset 0, copies input+4..+11 to object+4..+11 and returns the object."
+    },
+    {
+      "id": 2382,
+      "name": "constructVtableObject2382",
+      "originalSymbol": "function_2382",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 649013
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90144 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2386,
+      "name": "constructVtableObject2386",
+      "originalSymbol": "function_2386",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 649059
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90180 at offset 0 and returns the object."
+    },
+    {
+      "id": 2389,
+      "name": "constructVtableObject2389",
+      "originalSymbol": "function_2389",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 649076
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90216 at offset 0 and returns the object."
+    },
+    {
+      "id": 2392,
+      "name": "constructVtableObject2392",
+      "originalSymbol": "function_2392",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 649979
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90252 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2402,
+      "name": "constructVtableObject2402",
+      "originalSymbol": "function_2402",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 650290
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371,
+        382
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate 168, fill zero via 382, store vtable 34648."
+    },
+    {
+      "id": 2409,
+      "name": "constructVtableObject2409",
+      "originalSymbol": "function_2409",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 651455
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90360 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2423,
+      "name": "constructVtableObject2423",
+      "originalSymbol": "function_2423",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 652540
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90396 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2429,
+      "name": "constructVtableObject2429",
+      "originalSymbol": "function_2429",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 653207
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371,
+        1024
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate 48, store vtable 90720, copy-construct +8.. from input +8 via 1024."
+    },
+    {
+      "id": 2440,
+      "name": "constructVtableObject2440",
+      "originalSymbol": "function_2440",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 654045
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90576 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2443,
+      "name": "constructVtableObject2443",
+      "originalSymbol": "function_2443",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 654128
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90612 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2446,
+      "name": "constructVtableObject2446",
+      "originalSymbol": "function_2446",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 654409
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90648 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 2452,
+      "name": "constructVtableObject2452",
+      "originalSymbol": "function_2452",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 655850
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371,
+        1026
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocate 48, store vtable 90504, copy-construct +8.. from input +8 via 1026."
+    },
+    {
+      "id": 2637,
+      "name": "constructVtableObject2637",
+      "originalSymbol": "function_2637",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 680047
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90324 at offset 0 and returns the object."
+    },
+    {
+      "id": 4048,
+      "name": "constructVtableObject4048",
+      "originalSymbol": "function_4048",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 746916
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 89964 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 4050,
+      "name": "constructVtableObject4050",
+      "originalSymbol": "function_4050",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 746984
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90000 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 4053,
+      "name": "constructVtableObject4053",
+      "originalSymbol": "function_4053",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 747057
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90036 at offset 0, copies input+4 to object+4 and returns the object."
+    },
+    {
+      "id": 4057,
+      "name": "constructVtableObject4057",
+      "originalSymbol": "function_4057",
+      "signature": " (type $t7) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 747505
+        },
+        "source": {
+          "path": "source/game/client/vtable-constructors.mjs",
+          "line": 87
+        },
+        "test": "test/client-vtable-constructors.test.mjs"
+      },
+      "originalDirectDependencies": [
+        371
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Allocates 8 bytes through 371, stores vtable 90072 at offset 0, copies input+4 to object+4 and returns the object."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-vtable-constructors.test.mjs",
+    "report": "reports/client-vtable-constructors-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 47,
+    "completeLinearMemoryChecks": 47,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 47,
+    "trappingComparisons": 0,
+    "comparison": "Each constructor is compared once against the original: return value, all 67,108,864 memory bytes and the stack pointer, after restoring the pre-call heap so the allocator starts from the same state. Copy constructors receive the same source object.",
+    "limitations": [
+      "The allocator (371), fillMemory (382) and copy helpers 1024/1026 remain native at the oracle level.",
+      "Allocation failure is not exercised.",
+      "A 0x3ffffff object is not exercised.",
+      "Ledger: 428 client bodies recovered and 3,817 remain machine code."
+    ]
+  }
+}

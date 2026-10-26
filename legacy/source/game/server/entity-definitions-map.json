@@ -1,0 +1,73 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/entity-definitions.mjs",
+  "implementationSha256": "8a9b823b0ec9ec447bdd2c37b1b30d2d47626bdc5e846fc00ae2806322eb831c",
+  "factory": "createEntityDefinitionHook",
+  "functionIds": [
+    103
+  ],
+  "dependencies": [
+    31,
+    32,
+    56,
+    166
+  ],
+  "functions": [
+    {
+      "id": 103,
+      "name": "getEntityDefinition",
+      "originalSymbol": "$getEntityDefinition",
+      "signature": " (type $t1) (param $p0 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        31,
+        32,
+        56,
+        166
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 22257
+        },
+        "source": {
+          "path": "source/game/server/entity-definitions.mjs",
+          "line": 1071
+        },
+        "test": "test/server-entity-definitions.test.mjs",
+        "testReport": "reports/server-entity-definitions-tests.tap"
+      },
+      "originalDirectDependencies": [
+        31,
+        32,
+        56,
+        166
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Lazy catalog construction under the 8551036 C++ static guard, followed by `(id-1)&255 <= 21` lookup into 23 records of 116 bytes at 8548368. 18 records are built by initializeEntityDefinition 56, 5 variants are moved by 166."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-entity-definitions.test.mjs",
+    "report": "reports/server-entity-definitions-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 65,
+    "completeLinearMemoryChecks": 65,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 65,
+    "trappingComparisons": 0,
+    "coldInitializationComparisons": 4,
+    "coldInitializationByteIdentical": true,
+    "comparison": "Cold first lookups (ids 0, 1, 23, 257) and warm lookups for ids 1..23, 23 modulo-256 aliases and 15 invalid/extreme ids compare result, complete 67,108,864-byte memory and stack pointer. The cold path leaves the original 2192-byte descriptor frame byte-identical.",
+    "limitations": [
+      "initializeEntityDefinition 56 and record move 166 remain native dependencies; their record layout writes are not duplicated in JS.",
+      "Guard acquire 32 and release 31 remain native dependencies; the acquire-failure branch was not observed because a clear guard always acquires.",
+      "The catalog has 23 slots, not 22: lookup rejects slot 22, so the Spider record (id 23, entityType 72) is built but unreachable through this function.",
+      "Ledger: 215 server bodies recovered and 519 remain machine code."
+    ]
+  }
+}

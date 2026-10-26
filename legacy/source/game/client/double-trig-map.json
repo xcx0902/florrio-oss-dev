@@ -1,0 +1,198 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/double-trig.mjs",
+  "implementationSha256": "6a8c33ef3ff8d210b9e678c552ffc75796d67d7f62409757e5b6b1018a1566ff",
+  "factory": "createClientDoubleTrigHooks",
+  "functionIds": [
+    593,
+    594,
+    931,
+    403,
+    407
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after client trig after parent review and passing differential tests.",
+  "functions": [
+    {
+      "id": 593,
+      "name": "kernelCosDouble",
+      "originalSymbol": "function_593",
+      "signature": " (type $t38) (param $p0 f64) (param $p1 f64) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 66926,
+          "endLine": 66979
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0192-0255.dcmp",
+          "line": 6251
+        },
+        "source": {
+          "path": "source/game/client/double-trig.mjs",
+          "line": 88
+        },
+        "test": "test/client-double-trig.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 594,
+      "name": "kernelSinDouble",
+      "originalSymbol": "function_594",
+      "signature": " (type $t75) (param $p0 f64) (param $p1 f64) (param $p2 i32) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 66980,
+          "endLine": 67042
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0192-0255.dcmp",
+          "line": 6263
+        },
+        "source": {
+          "path": "source/game/client/double-trig.mjs",
+          "line": 99
+        },
+        "test": "test/client-double-trig.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 931,
+      "name": "remPio2",
+      "originalSymbol": "function_931",
+      "signature": " (type $t96) (param $p0 f64) (param $p1 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        930
+      ],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 192119,
+          "endLine": 192620
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0512-0575.dcmp",
+          "line": 3189
+        },
+        "source": {
+          "path": "source/game/client/double-trig.mjs",
+          "line": 112
+        },
+        "test": "test/client-double-trig.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_930"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 403,
+      "name": "cos",
+      "originalSymbol": "function_403",
+      "signature": " (type $t24) (param $p0 f64) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 12354,
+          "endLine": 12440
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 3565
+        },
+        "source": {
+          "path": "source/game/client/double-trig.mjs",
+          "line": 242
+        },
+        "test": "test/client-double-trig.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_593",
+        "function_594",
+        "function_931"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 407,
+      "name": "sin",
+      "originalSymbol": "function_407",
+      "signature": " (type $t24) (param $p0 f64) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 12991,
+          "endLine": 13082
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 3772
+        },
+        "source": {
+          "path": "source/game/client/double-trig.mjs",
+          "line": 266
+        },
+        "test": "test/client-double-trig.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_931",
+        "function_594",
+        "function_593"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "abi": "403/407 accept f64 and return f64 through 16-byte C stack frames. 593 receives (f64,f64), 594 (f64,f64,i32), 931 (f64,i32); all preserve WASM ToNumber/ToInt32 parameter coercion. 931 writes two f64 values to the i32-addressed output, allocates 48 bytes of native stack for the huge-argument path, and returns the i32 quadrant.",
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-double-trig.test.mjs",
+    "report": "reports/client-double-trig-tests.tap",
+    "reportSha256": "18c5afbd6fe6e87cb55e9e85c9d4816f07b1b3c60a45eb7e8e62e9a6379ae63a",
+    "testSourceSha256": "6e15431204af016dafe1adab7a1c654e6bf9fef2bf3aec08879a68a704ead9f6",
+    "testGroups": 4,
+    "pass": 4,
+    "fail": 0,
+    "oracleScalarComparisons": 9438,
+    "stackScratchCheckpoints": 9438,
+    "stackScratchBytesPerCheckpoint": 4096,
+    "groupMemoryChecks": 3,
+    "memoryBytesPerGroupCheck": 67108864,
+    "completeLinearMemoryOutsideStackCheckedAfterGroups": true,
+    "parameterCoercionAndTrapCases": 61,
+    "comparison": "Every oracle call compares raw f64 result bits, the stack pointer and a 4 KiB stack scratch window above the saved frame; 931 also compares its 16-byte two-double output. Three groups additionally compare complete 64 MiB linear memory outside the scratch window after restoring independently checked ephemeral state.",
+    "limitations": [
+      "Oracle inputs are deterministic samples, not exhaustive over all f64 values.",
+      "Group memory checks exclude the 4 KiB stack scratch window, which is compared per call.",
+      "The native 930 huge-argument reduction remains an explicit unrecovered dependency and is invoked with the original frame, argument pointers and count.",
+      "The finite browser scenario did not separately dispatch every double-precision entry point; numeric coverage is the original-WASM differential suite.",
+      "No pixel-identical rendering claim follows from these numeric comparisons."
+    ],
+    "specialLowWordSamples": 4,
+    "thirdStageSamples": 3
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/minus-string.mjs",
+  "implementationSha256": "f81551f31da8740fb3f96eee15a99381b13d0d607235c41704a6182366ee3aa0",
+  "factory": "createMinusStringHook",
+  "functionIds": [
+    326
+  ],
+  "functions": [
+    {
+      "id": 326,
+      "name": "assignMinusString",
+      "originalSymbol": "function_326",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/minus-string.mjs",
+          "line": 10
+        },
+        "test": "test/server-minus-string.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Writes size 1 at +11, '-' at +0 and a NUL at +1."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-minus-string.test.mjs",
+    "report": "reports/server-minus-string-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "4 initial lengths compare complete memory and stack pointer.",
+    "limitations": [
+      "Ledger: 375 server bodies recovered and 359 remain machine code."
+    ]
+  }
+}

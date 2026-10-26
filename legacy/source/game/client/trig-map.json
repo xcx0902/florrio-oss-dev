@@ -1,0 +1,202 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/trig.mjs",
+  "implementationSha256": "48bb82768d97823830fd030da67c6f18330f85aab39e9d4f005270e230f9de1a",
+  "factory": "createClientTrigHooks",
+  "functionIds": [
+    486,
+    487,
+    929,
+    427,
+    431
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after eye-renderer after parent review and passing differential tests.",
+  "functions": [
+    {
+      "id": 486,
+      "name": "cosKernel",
+      "originalSymbol": "function_486",
+      "signature": " (type $t51) (param $p0 f64) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 27370,
+          "endLine": 27396
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 3817
+        },
+        "source": {
+          "path": "source/game/client/trig.mjs",
+          "line": 59
+        },
+        "test": "test/client-trig.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 487,
+      "name": "sinKernel",
+      "originalSymbol": "function_487",
+      "signature": " (type $t51) (param $p0 f64) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 27399,
+          "endLine": 27427
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 3824
+        },
+        "source": {
+          "path": "source/game/client/trig.mjs",
+          "line": 72
+        },
+        "test": "test/client-trig.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 929,
+      "name": "remPio2f",
+      "originalSymbol": "function_929",
+      "signature": " (type $t95) (param $p0 f32) (param $p1 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        930
+      ],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 190895,
+          "endLine": 191007
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0512-0575.dcmp",
+          "line": 2804
+        },
+        "source": {
+          "path": "source/game/client/trig.mjs",
+          "line": 86
+        },
+        "test": "test/client-trig.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_930"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 427,
+      "name": "cosf",
+      "originalSymbol": "function_427",
+      "signature": " (type $t25) (param $p0 f32) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        930
+      ],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 15805,
+          "endLine": 15956
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 62
+        },
+        "source": {
+          "path": "source/game/client/trig.mjs",
+          "line": 120
+        },
+        "test": "test/client-trig.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_486",
+        "function_487",
+        "function_929"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 431,
+      "name": "sinf",
+      "originalSymbol": "function_431",
+      "signature": " (type $t25) (param $p0 f32) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        930
+      ],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 16157,
+          "endLine": 16320
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0064-0127.dcmp",
+          "line": 191
+        },
+        "source": {
+          "path": "source/game/client/trig.mjs",
+          "line": 165
+        },
+        "test": "test/client-trig.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_487",
+        "function_486",
+        "function_929"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "abi": "All entry points accept f32/f64 and preserve WASM ToNumber coercion. 486/487 receive an f64 reduced argument and return f32; 929 receives (f32,i32), writes an f64 to the i32-addressed output, and returns the i32 quadrant; 427/431 use 16-byte C stack frames and return raw f32 bits.",
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-trig.test.mjs",
+    "report": "reports/client-trig-tests.tap",
+    "reportSha256": "0adfc44ceb8d44e3ed8f8e05f7e952b366785586b3ea7ca49dea981f55ac6eec",
+    "testSourceSha256": "62a3be2b6ffbf55d2dd47cc387ddf9764d6a4747ce0d2a499e1bad16e437eedb",
+    "testGroups": 5,
+    "pass": 5,
+    "fail": 0,
+    "oracleScalarComparisons": 6924,
+    "stackScratchCheckpoints": 6924,
+    "stackScratchBytesPerCheckpoint": 4096,
+    "groupMemoryChecks": 4,
+    "memoryBytesPerGroupCheck": 67108864,
+    "completeLinearMemoryOutsideStackCheckedAfterGroups": true,
+    "parameterCoercionCases": 44,
+    "outOfBoundsTrapCases": 12,
+    "comparison": "Every oracle call compares raw result bits or the i32 quadrant, the stack pointer and a 4 KiB stack scratch window above the saved frame; 929 also compares its 8-byte output. Four groups additionally compare the complete 64 MiB linear memory outside that scratch window after restoring independently checked ephemeral state.",
+    "limitations": [
+      "Oracle inputs are deterministic samples, not an exhaustive enumeration of all 2^32 f32 bit patterns or f64 values.",
+      "Group memory checks exclude the 4 KiB stack scratch window, which is compared per call instead; they prove no non-scratch static memory changed in those groups.",
+      "The native 930 large range reduction remains an explicit unrecovered dependency and is invoked with the original 16-byte frame, argument pointers and return value.",
+      "The finite browser scenario dispatched 427 and 431 883 times each but did not separately dispatch 486/487/929, so their nested execution count is unknown; they have original-WASM differential coverage.",
+      "No pixel-identical rendering claim follows from these numeric comparisons."
+    ],
+    "largeRangeSamplePairs": 270
+  }
+}

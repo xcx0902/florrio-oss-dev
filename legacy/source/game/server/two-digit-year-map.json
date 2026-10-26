@@ -1,0 +1,79 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/two-digit-year.mjs",
+  "implementationSha256": "8fbcdc2c49483560475834aaaf14dcab7844f1ec890899af86c690ce6d582197",
+  "factory": "createTwoDigitYearHooks",
+  "functionIds": [
+    329,
+    332
+  ],
+  "functions": [
+    {
+      "id": 329,
+      "name": "writeYear329",
+      "originalSymbol": "function_329",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        87
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/two-digit-year.mjs",
+          "line": 24
+        },
+        "test": "test/server-two-digit-year.test.mjs"
+      },
+      "originalDirectDependencies": [
+        87
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Reads the year through 87 and stores year-1900 with two-digit expansion."
+    },
+    {
+      "id": 332,
+      "name": "writeYear332",
+      "originalSymbol": "function_332",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        88
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/two-digit-year.mjs",
+          "line": 28
+        },
+        "test": "test/server-two-digit-year.test.mjs"
+      },
+      "originalDirectDependencies": [
+        88
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Reads the year through 88 and stores year-1900 with two-digit expansion."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-two-digit-year.test.mjs",
+    "report": "reports/server-two-digit-year-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Two readers x flag bit clear/set compare stack and memory outside the dead stack window.",
+    "limitations": [
+      "Year readers 87/88 remain machine code. Ledger: 494 server bodies recovered and 240 remain machine code."
+    ]
+  }
+}

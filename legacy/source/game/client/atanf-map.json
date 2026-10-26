@@ -1,0 +1,53 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/atanf.mjs",
+  "implementationSha256": "9059355b4d5ed4a4daa7e686091a0e5f003f2b89666282b3004f993b050090d9",
+  "factory": "createAtanfHooks (arity-free; the hook uses no runtime state)",
+  "functionIds": [
+    932
+  ],
+  "functions": [
+    {
+      "id": 932,
+      "name": "atanf",
+      "originalSymbol": "function_932",
+      "signature": " (type $t25) (param $p0 f32) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 192620
+        },
+        "source": {
+          "path": "source/game/client/atanf.mjs",
+          "line": 39
+        },
+        "test": "test/client-atanf.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-atanf.test.mjs",
+    "report": "reports/client-atanf-tests.tap",
+    "testGroups": 2,
+    "pass": 2,
+    "fail": 0,
+    "oracleComparisons": 293,
+    "trappingComparisons": 0,
+    "returnBitChecks": 293,
+    "completeLinearMemoryChecks": 293,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 293,
+    "comparison": "Every comparison asserts the exact float32 bit pattern of the result (or that both results are NaN), all 67,108,864 bytes of linear memory, and the stack pointer. Thresholds, signed zero, subnormals, infinities and 240 pseudo-random bit patterns are covered.",
+    "limitations": [
+      "No row traps because the function only reads no linear memory beyond the immutable table baked into the JS constants.",
+      "The four-entry atan(hi)/atan(lo) table and five polynomial coefficients are literal constants from the original data segment.",
+      "This function is part of the 4,245 client functions; the ledger has 329 client bodies recovered and 3,916 remain machine code."
+    ]
+  }
+}

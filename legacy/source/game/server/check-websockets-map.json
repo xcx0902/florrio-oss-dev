@@ -1,0 +1,61 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/check-websockets.mjs",
+  "implementationSha256": "292797b806d8041e3e03bc106d6bae3b2b65df190ea8855cffb013f3620cd0c4",
+  "factory": "createCheckWebSocketsHook",
+  "functionIds": [
+    660
+  ],
+  "dependencies": [
+    14
+  ],
+  "functions": [
+    {
+      "id": 660,
+      "name": "cp6CheckWebSockets",
+      "originalSymbol": "cp6CheckWebSockets",
+      "signature": " (type $t15)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        14
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 197419
+        },
+        "source": {
+          "path": "source/game/server/check-websockets.mjs",
+          "line": 27
+        },
+        "test": "test/server-check-websockets.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 5,
+      "notes": "Drains pending websocket events through the emscripten asm-const dispatcher selector 22639/operation 5170. Kind 1 calls +48 with (handler,&payload,&word); kinds 2/3 call +24/+72; kind 4 ends the pump and runs the close path (+96) freeing frame+20; kind 0 skips close; other kinds free the payload. Exact payload frees, stack and OOB RuntimeError preserved."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-check-websockets.test.mjs",
+    "report": "reports/server-check-websockets-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 11,
+    "completeLinearMemoryChecks": 11,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 11,
+    "trappingComparisons": 4,
+    "comparison": "Eleven scenarios: empty list, no-event socket, two sockets across event kinds 1-5, kind 4 with and without close handler, no-event-with-close skipping close, null-function traps for kinds 1/2/3 and close, malformed socket pointer OOB. Callback dispatch is observed through native counter 604. Each compares outcome/error, complete memory and stack.",
+    "limitations": [
+      "Payload/vtable pointer OOB distinct from the malformed socket pointer is not exercised.",
+      "Host dispatcher throwing, cyclic lists and node-next OOB are not exercised.",
+      "free 14 remains native.",
+      "Ledger: 212 server bodies recovered and 522 remain machine code."
+    ]
+  }
+}

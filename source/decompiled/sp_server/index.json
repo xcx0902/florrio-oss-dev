@@ -1,0 +1,2938 @@
+[
+  {
+    "function": "free",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "memcpy",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "malloc",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_17",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_18",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "destroyLibcppString",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "operatorNewOrAbort",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "readClock",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "deleteObject",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_23",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "clearThreeWords",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_25",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_26",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_27",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_28",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "memset",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_30",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "cxaGuardRelease",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "cxaGuardAcquire",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_33",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_34",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_35",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_36",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_37",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_38",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_39",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_40",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_41",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_42",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_43",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_44",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_45",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_46",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_47",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_48",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_49",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_50",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_51",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_52",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_53",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_54",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_55",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "initializeEntityDefinition",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "memcmp",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_58",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_59",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_60",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_61",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_62",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_63",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_64",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_65",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_66",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_67",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_68",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_69",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_70",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_71",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_72",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_73",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_74",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_75",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_76",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_77",
+    "file": "functions-0000-0063.dcmp"
+  },
+  {
+    "function": "function_78",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_79",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_80",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_81",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_82",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_83",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_84",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_85",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_86",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_87",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_88",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_89",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_90",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_91",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_92",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_93",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_94",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_95",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_96",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_97",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "BasicR0PetalVirtualSlot0",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_99",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_100",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_101",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_102",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "getEntityDefinition",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "strlen",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_105",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_106",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_107",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_108",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_109",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_110",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_111",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_112",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_113",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_114",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_115",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_116",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "returnTrue",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_118",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "basicPetalOrbit",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "reverseByteRange",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_121",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_122",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_123",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_124",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_125",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_126",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_127",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_128",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_129",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_130",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_131",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_132",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_133",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_134",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_135",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_136",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_137",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_138",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_139",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_140",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_141",
+    "file": "functions-0064-0127.dcmp"
+  },
+  {
+    "function": "function_142",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_143",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "spawnEntity",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_145",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_146",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_147",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_148",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_149",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_150",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_151",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "noopThreeArgs",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_153",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_154",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_155",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_156",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_157",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_158",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_159",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_160",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_161",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_162",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_163",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_164",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_165",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_166",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_167",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_168",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_169",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_170",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "noopTwoArgs",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_172",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_173",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_174",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_175",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_176",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_177",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_178",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_179",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_180",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_181",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_182",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_183",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_184",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_185",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_186",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_187",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_188",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_189",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_190",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_191",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_192",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_193",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_194",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_195",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_196",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_197",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_198",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_199",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_200",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_201",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_202",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_203",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_204",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_205",
+    "file": "functions-0128-0191.dcmp"
+  },
+  {
+    "function": "function_206",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_207",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_208",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_209",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_210",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_211",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_212",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_213",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_214",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_215",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_216",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "setPetalTypeAndCreateBehavior",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_218",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_219",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_220",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_221",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_222",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_223",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_224",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_225",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_226",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_227",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_228",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_229",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_230",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_231",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_232",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_233",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_234",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "createFastR0PetalBehavior",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_236",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_237",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_238",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_239",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_240",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_241",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_242",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_243",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_244",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_245",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_246",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_247",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_248",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_249",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_250",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_251",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_252",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_253",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_254",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_255",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_256",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_257",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_258",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_259",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_260",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_261",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_262",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_263",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_264",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_265",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_266",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_267",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_268",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_269",
+    "file": "functions-0192-0255.dcmp"
+  },
+  {
+    "function": "function_270",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_271",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_272",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_273",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_274",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_275",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_276",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_277",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_278",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "initializeRuntimeAndGameCatalogs",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_280",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "noopFourArgs",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_282",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_283",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_284",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_285",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_286",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_287",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_288",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "main",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_290",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_291",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_292",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_293",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_294",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_295",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_296",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_297",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_298",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_299",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_300",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_301",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_302",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_303",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_304",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_305",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_306",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_307",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_308",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_309",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_310",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_311",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_312",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_313",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_314",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_315",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_316",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_317",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_318",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_319",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_320",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_321",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_322",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_323",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_324",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_325",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_326",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "createWebR2PetalBehavior",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_328",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_329",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_330",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_331",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_332",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_333",
+    "file": "functions-0256-0319.dcmp"
+  },
+  {
+    "function": "function_334",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_335",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_336",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_337",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_338",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_339",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_340",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_341",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_342",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_343",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_344",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_345",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_346",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_347",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_348",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_349",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_350",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_351",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_352",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_353",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_354",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_355",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_356",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_357",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_358",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_359",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_360",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_361",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_362",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_363",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "createStingerR1PetalBehavior",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_365",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_366",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_367",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_368",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_369",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_370",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_371",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_372",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_373",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_374",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_375",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_376",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_377",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_378",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_379",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_380",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_381",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_382",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_383",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "createCactusR2PetalBehavior",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_385",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_386",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_387",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_388",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_389",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_390",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_391",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_392",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_393",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_394",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_395",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_396",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "createEquippedPetal",
+    "file": "functions-0320-0383.dcmp"
+  },
+  {
+    "function": "function_398",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_399",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_400",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_401",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_402",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_403",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_404",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_405",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_406",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_407",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_408",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_409",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_410",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "PeasR2PetalInitialize",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "RoseR1PetalInitialize",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "fastFamilyPetalOrbit",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "FastR0PetalInitialize",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_415",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_416",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_417",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_418",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_419",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_420",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_421",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_422",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_423",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_424",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_425",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_426",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_427",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_428",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_429",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_430",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "PeasR4PetalOrbit",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "PeasR4PetalInitialize",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "BasicR0PetalInitialize",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "RiceR3PetalInitialize",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "CornR3PetalInitialize",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_436",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_437",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_438",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_439",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_440",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_441",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_442",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_443",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_444",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_445",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_446",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_447",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_448",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_449",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_450",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_451",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_452",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_453",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_454",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_455",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_456",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_457",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_458",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_459",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_460",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_461",
+    "file": "functions-0384-0447.dcmp"
+  },
+  {
+    "function": "function_462",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_463",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_464",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_465",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_466",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_467",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_468",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_469",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_470",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_471",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_472",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_473",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_474",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_475",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_476",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_477",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_478",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_479",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_480",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_481",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_482",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_483",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_484",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_485",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_486",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_487",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_488",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_489",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_490",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_491",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_492",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_493",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_494",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_495",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_496",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_497",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_498",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_499",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "createPeasR4PetalBehavior",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_501",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_502",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_503",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_504",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_505",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_506",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_507",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_508",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "createBasicR5PetalBehavior",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_510",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_511",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_512",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_513",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_514",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_515",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_516",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_517",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_518",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "createSaltR2PetalBehavior",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_520",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_521",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_522",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_523",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_524",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_525",
+    "file": "functions-0448-0511.dcmp"
+  },
+  {
+    "function": "function_526",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_527",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_528",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createRiceR3PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_530",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_531",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_532",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createCornR3PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_534",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_535",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_536",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_537",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_538",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createHoneyR2PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_540",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_541",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createLeafR1PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_543",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_544",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createYinYangR3PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_546",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_547",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_548",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_549",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_550",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_551",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createHeaviestR3PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_553",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_554",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_555",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_556",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_557",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createAntennaeR4PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_559",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_560",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_561",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_562",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_563",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_564",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createRoseR2PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_566",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_567",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_568",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_569",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_570",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_571",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createDandelionR2PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_573",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_574",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_575",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_576",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_577",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_578",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createCactusR3PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_580",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_581",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_582",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createEggR3PetalBehavior",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_584",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_585",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_586",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_587",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_588",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "function_589",
+    "file": "functions-0512-0575.dcmp"
+  },
+  {
+    "function": "createEggR4PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_591",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_592",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createPollenR3PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_594",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_595",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_596",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_597",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createBubbleR2PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_599",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_600",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_601",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createBasicR0PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_603",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_604",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_605",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_606",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_607",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_608",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_609",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_610",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_611",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createHeavyR0PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_613",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createRockR2PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_615",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_616",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_617",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_618",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_619",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_620",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createSquareR5PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_622",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_623",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_624",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_625",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createRoseR1PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_627",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_628",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createIrisR1PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_630",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_631",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_632",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_633",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createWingR2PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_635",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_636",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_637",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_638",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_639",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_640",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_641",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createMissileR2PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createPeasR2PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_644",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_645",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_646",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_647",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createPeasR3PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "function_649",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createFasterR2PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "createRoseR3PetalBehavior",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "destroyLocalServer",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "destroyLocalServerString",
+    "file": "functions-0576-0639.dcmp"
+  },
+  {
+    "function": "spServerThink",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "spServerSend",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "spServerInit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "spServerFlush",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "destroyTimeoutRegistry",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "cp6TimeoutFire",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "cp6CheckWebSockets",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "heavyPetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "HeavyR0PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "rockPetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "RockR2PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "RoseR1PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "IrisR1PetalVirtualSlot4",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "IrisR1PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "IrisR1PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "WingR2PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "WingR2PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "MissileR2PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "MissileR2PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "function_673",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "function_674",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "function_675",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "PeasR2PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "function_677",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "function_678",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "function_679",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "PeasR3PetalVirtualSlot4",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "PeasR3PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "RoseR3PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "createNoPetalBehavior",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "BubbleR2PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "BubbleR2PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "PollenR3PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "PollenR3PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "DandelionR2PetalVirtualSlot4",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "DandelionR2PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "DandelionR2PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "CactusR3PetalVirtualSlot5",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "CactusR3PetalVirtualSlot4",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "EggR3PetalOrbit",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "EggR3PetalInitialize",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "function_695",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "function_696",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeSpiderEntity22",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeLadybugEntity21",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeLadybugEntity20",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeSquareEntity19",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeEvilCentipedeEntity18",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeEvilCentipedeEntity17",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeCentipedeEntity16",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeCentipedeEntity15",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeHornetEntity14",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeMassiveBeetleEntity13",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeBeetleEntity12",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeAntHoleEntity11",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeQueenAntEntity10",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeSoldierAntEntity9",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeWorkerAntEntity8",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeBabyAntEntity7",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeBeeEntity6",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeMassiveLadybugEntity5",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeLadybugEntity4",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeCactusEntity3",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeBoulderEntity2",
+    "file": "functions-0640-0703.dcmp"
+  },
+  {
+    "function": "initializeRockEntity1",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "EggR4PetalOrbit",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "EggR4PetalInitialize",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_721",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_722",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "RoseR2PetalOrbit",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "RoseR2PetalInitialize",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "HeaviestR3PetalOrbit",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "HeaviestR3PetalInitialize",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "StingerR1PetalInitialize",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "YinYangR3PetalInitialize",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_729",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_730",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_731",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "WebR2PetalVirtualSlot6",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "WebR2PetalOrbit",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "WebR2PetalInitialize",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_735",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_736",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_737",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "HoneyR2PetalVirtualSlot4",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "LeafR1PetalInitialize",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "CactusR2PetalInitialize",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_741",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_742",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_743",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_744",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_745",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "function_746",
+    "file": "functions-0704-0733.dcmp"
+  },
+  {
+    "function": "PeasR4PetalVirtualSlot4",
+    "file": "functions-0704-0733.dcmp"
+  }
+]

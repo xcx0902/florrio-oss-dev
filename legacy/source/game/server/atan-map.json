@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/atan.mjs",
+  "implementationSha256": "7c9ba067a89e18a3c93b7011b26bce051da0c4fec2ab5706d54a8fbbbf542076",
+  "factory": "createAtanHook",
+  "functionIds": [
+    383
+  ],
+  "functions": [
+    {
+      "id": 383,
+      "name": "atan",
+      "originalSymbol": "function_383",
+      "signature": " (type $t24) (param $p0 f64) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 87088
+        },
+        "source": {
+          "path": "source/game/server/atan.mjs",
+          "line": 56
+        },
+        "test": "test/server-atan.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Four-interval fdlibm atan: small passthrough, medium odd polynomial, four tangent-subtraction reductions with stored high/low pi multiples."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-atan.test.mjs",
+    "report": "reports/server-atan-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 50115,
+    "completeLinearMemoryChecks": 115,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 50115,
+    "trappingComparisons": 0,
+    "comparison": "115 exact edge/boundary cases compare raw bits, stack pointer and complete memory; 50,000 deterministic random-bit cases compare raw bits.",
+    "limitations": [
+      "Signalling-NaN quieting is covered by fuzz but not asserted separately.",
+      "Ledger: 230 server bodies recovered and 504 remain machine code."
+    ]
+  }
+}

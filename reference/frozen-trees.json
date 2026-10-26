@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "note": "Transport of the existing frozen trees; no reference asset or manifest was refrozen.",
+  "file": "frozen-trees.tar.gz",
+  "bytes": 3636314,
+  "sha256": "f901e1835407079c1090a469e7b5784fa27645fa10c565c5dc1b4e2ba9c24cbd",
+  "trees": [
+    "dist",
+    "dist-readable",
+    "dist-reference"
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/errno-parse-wrappers.mjs",
+  "implementationSha256": "90b7d4c3341cc7210e71f9069c6c0674c62151494f91bacbb92b97ab34efd578",
+  "factory": "createErrnoParseWrapperHooks",
+  "functionIds": [
+    223,
+    296
+  ],
+  "functions": [
+    {
+      "id": 223,
+      "name": "parseWithErrno124",
+      "originalSymbol": "function_223",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        82,
+        124
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/errno-parse-wrappers.mjs",
+          "line": 27
+        },
+        "test": "test/server-errno-parse-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        82,
+        124
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Preserves errno around 124 and returns its result."
+    },
+    {
+      "id": 296,
+      "name": "parseWithErrno184",
+      "originalSymbol": "function_296",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "unrecoveredStaticDependencyIds": [
+        82,
+        184
+      ],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/errno-parse-wrappers.mjs",
+          "line": 42
+        },
+        "test": "test/server-errno-parse-wrappers.test.mjs"
+      },
+      "originalDirectDependencies": [
+        82,
+        184
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Preserves errno around 184 and returns its result."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-errno-parse-wrappers.test.mjs",
+    "report": "reports/server-errno-parse-wrappers-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 0,
+    "memoryBytesPerCompleteCheck": 0,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Two argument sets per wrapper compare result, stack and memory outside the dead frame.",
+    "limitations": [
+      "Parsers 124/184 and errno helper 82 remain machine code. Ledger: 498 server bodies recovered and 236 remain machine code."
+    ]
+  }
+}

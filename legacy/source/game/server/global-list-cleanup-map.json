@@ -1,0 +1,76 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/global-list-cleanup.mjs",
+  "implementationSha256": "e1d2ff6754e3d695a0a0368de89985dcba48802191875bcf88bc3bdfee25e830",
+  "factory": "createGlobalListCleanupHooks",
+  "functionIds": [
+    448,
+    464
+  ],
+  "functions": [
+    {
+      "id": 448,
+      "name": "cleanupStringList",
+      "originalSymbol": "function_448",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/global-list-cleanup.mjs",
+          "line": 19
+        },
+        "test": "test/server-global-list-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walks 8548348 freeing long-string members and nodes, then releases 8548340."
+    },
+    {
+      "id": 464,
+      "name": "cleanupNodeList",
+      "originalSymbol": "function_464",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/global-list-cleanup.mjs",
+          "line": 36
+        },
+        "test": "test/server-global-list-cleanup.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Walks 8548284 freeing nodes, then releases 8548276."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-global-list-cleanup.test.mjs",
+    "report": "reports/server-global-list-cleanup-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 2,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2,
+    "trappingComparisons": 0,
+    "comparison": "Each cleanup runs with a real one-node list, comparing complete allocator memory and stack.",
+    "limitations": [
+      "Long-string member free paths (negative size bytes) are not exercised.",
+      "Ledger: 439 server bodies recovered and 295 remain machine code."
+    ]
+  }
+}

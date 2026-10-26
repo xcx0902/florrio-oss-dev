@@ -1,0 +1,228 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/row-blit.mjs",
+  "implementationSha256": "84bdbcc75dcc97b7ed52888a3c81fbfd10ab6fa38e893c80bb6c2ffcfb8d947e",
+  "factory": "createRowBlitHooks",
+  "functionIds": [
+    969,
+    971,
+    973,
+    975,
+    2117,
+    2124,
+    2154,
+    2161
+  ],
+  "functions": [
+    {
+      "id": 969,
+      "name": "blitProfile969",
+      "originalSymbol": "function_969",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 219705
+        },
+        "source": {
+          "path": "source/game/client/row-blit.mjs",
+          "line": 99
+        },
+        "test": "test/client-row-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 971,
+      "name": "blitProfile971",
+      "originalSymbol": "function_971",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 220074
+        },
+        "source": {
+          "path": "source/game/client/row-blit.mjs",
+          "line": 100
+        },
+        "test": "test/client-row-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 973,
+      "name": "blitProfile973",
+      "originalSymbol": "function_973",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 220443
+        },
+        "source": {
+          "path": "source/game/client/row-blit.mjs",
+          "line": 101
+        },
+        "test": "test/client-row-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 975,
+      "name": "blitProfile975",
+      "originalSymbol": "function_975",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 220812
+        },
+        "source": {
+          "path": "source/game/client/row-blit.mjs",
+          "line": 102
+        },
+        "test": "test/client-row-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2117,
+      "name": "blitProfile2117",
+      "originalSymbol": "function_2117",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 553089
+        },
+        "source": {
+          "path": "source/game/client/row-blit.mjs",
+          "line": 103
+        },
+        "test": "test/client-row-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2124,
+      "name": "blitProfile2124",
+      "originalSymbol": "function_2124",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 554834
+        },
+        "source": {
+          "path": "source/game/client/row-blit.mjs",
+          "line": 104
+        },
+        "test": "test/client-row-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2154,
+      "name": "blitProfile2154",
+      "originalSymbol": "function_2154",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 563382
+        },
+        "source": {
+          "path": "source/game/client/row-blit.mjs",
+          "line": 105
+        },
+        "test": "test/client-row-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 2161,
+      "name": "blitProfile2161",
+      "originalSymbol": "function_2161",
+      "signature": " (type $t2) (param $p0 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 565127
+        },
+        "source": {
+          "path": "source/game/client/row-blit.mjs",
+          "line": 106
+        },
+        "test": "test/client-row-blit.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-row-blit.test.mjs",
+    "report": "reports/client-row-blit-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 224,
+    "trappingComparisons": 16,
+    "completeLinearMemoryChecks": 224,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 224,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 8,
+      "boundary": 8,
+      "edges": 0
+    },
+    "argumentRows": [
+      "two rows of three scaled pixels, three stride fields and a scale flag",
+      "the same descriptor shifted by four bytes with scaling off",
+      "eight zeroed descriptors",
+      "eight addresses at 0x3ffffff",
+      "192 combinations of scale 0/1, rows 0/1/2/3 and width 0/1/3"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. The eight profiles differ only in channel extraction (BGR vs AGR), multiplier assignment and output byte order.",
+    "limitations": [
+      "Multipliers 32/64/128 exercise the unsigned divide by 255; all 0..255 values use the same formula.",
+      "Rows above three use the same outer decrement loop.",
+      "Width zero exercises the empty-row path that reuses the previous counter.",
+      "These eight functions are part of the 4,245 client functions; the ledger has 306 client bodies recovered and 3,939 remain machine code."
+    ]
+  }
+}

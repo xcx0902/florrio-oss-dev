@@ -1,0 +1,115 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/wide-math.mjs",
+  "implementationSha256": "e0dbb7641803520cb07ef67320e391349298f292ae678386be8b88cc4bfe569b",
+  "factory": "createWideMathHooks",
+  "functionIds": [
+    434,
+    442,
+    541
+  ],
+  "functions": [
+    {
+      "id": 434,
+      "name": "multiply128Low",
+      "originalSymbol": "function_434",
+      "signature": " (type $t20) (param $p0 i32) (param $p1 i64) (param $p2 i64) (param $p3 i64) (param $p4 i64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 16423
+        },
+        "source": {
+          "path": "source/game/client/wide-math.mjs",
+          "line": 66
+        },
+        "test": "test/client-wide-math.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 442,
+      "name": "shiftLeft128",
+      "originalSymbol": "function_442",
+      "signature": " (type $t40) (param $p0 i32) (param $p1 i64) (param $p2 i64) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 17029
+        },
+        "source": {
+          "path": "source/game/client/wide-math.mjs",
+          "line": 76
+        },
+        "test": "test/client-wide-math.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 541,
+      "name": "shiftRight128",
+      "originalSymbol": "function_541",
+      "signature": " (type $t40) (param $p0 i32) (param $p1 i64) (param $p2 i64) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 44609
+        },
+        "source": {
+          "path": "source/game/client/wide-math.mjs",
+          "line": 79
+        },
+        "test": "test/client-wide-math.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-wide-math.test.mjs",
+    "report": "reports/client-wide-math-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 49,
+    "trappingComparisons": 3,
+    "completeLinearMemoryChecks": 49,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 49,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 0,
+      "boundary": 3,
+      "shifts": 0,
+      "multiply": 0
+    },
+    "argumentRows": [
+      "128-bit values at destination 0x100000 and 13/67-bit shifts",
+      "the same destinations shifted by four bytes",
+      "all-zero pointers and operands",
+      "destination 0x3ffffff",
+      "seventeen shift counts spanning 0, 31, 32, 63, 64, 65, 127, 128, 129, 192, 255, -1 and 0x7fffffff",
+      "three wide multiply edge products"
+    ],
+    "comparison": "Every comparison asserts the return value or trap constructor/message, all 67,108,864 bytes of linear memory, and the stack pointer. The three boundary comparisons trap on the first qword store. The shift matrix covers every distinction made by the native 64-bit branch and the six-bit shift mask, not every possible i32 count.",
+    "limitations": [
+      "The shift matrix samples all shift-count classes but not all 2^32 i32 counts.",
+      "The multiply cases sample edge operands plus the four generic rows, not all 2^256 input pairs.",
+      "Recovered names describe arithmetic, not original compiler or C++ symbols.",
+      "These three functions are part of the 4,245 client functions; the current ledger has 194 client bodies recovered and 4,051 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/parser-and-rounding.mjs",
+  "implementationSha256": "62d2d90da6f20a5ad14e566d593217b4aacd4723f38a88293b86ffc99e584def",
+  "factory": "createParserAndRoundingHooks",
+  "functionIds": [
+    70,
+    82,
+    110,
+    212
+  ],
+  "functions": [
+    {
+      "id": 70,
+      "name": "skipNumericPrefix",
+      "originalSymbol": "function_70",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/parser-and-rounding.mjs",
+          "line": 11
+        },
+        "test": "test/server-parser-and-rounding.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 82,
+      "name": "setStreamErrorState",
+      "originalSymbol": "function_82",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/parser-and-rounding.mjs",
+          "line": 11
+        },
+        "test": "test/server-parser-and-rounding.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 110,
+      "name": "writeIntegerPrefixAndSuffix",
+      "originalSymbol": "function_110",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/parser-and-rounding.mjs",
+          "line": 11
+        },
+        "test": "test/server-parser-and-rounding.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    },
+    {
+      "id": 212,
+      "name": "roundFloat",
+      "originalSymbol": "function_212",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/parser-and-rounding.mjs",
+          "line": 11
+        },
+        "test": "test/server-parser-and-rounding.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Call-free body recovered instruction-for-instruction."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-parser-and-rounding.test.mjs",
+    "report": "reports/server-parser-and-rounding-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 56,
+    "completeLinearMemoryChecks": 56,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 56,
+    "trappingComparisons": 0,
+    "comparison": "Prefix/error-state cases plus 22 float values with 5 formatting variants compare result, complete memory and stack pointer.",
+    "limitations": [
+      "NaN payloads are not compared bit-for-bit beyond Object.is.",
+      "Ledger: 346 server bodies recovered and 388 remain machine code."
+    ]
+  }
+}

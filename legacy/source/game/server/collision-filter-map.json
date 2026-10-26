@@ -1,0 +1,52 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/collision-filter.mjs",
+  "implementationSha256": "b1b362af1c7d52ce1a6105119858a7bfd5b37f959409d8b3e8432e5b48ef6765",
+  "factory": "createCollisionFilterHook",
+  "functionIds": [
+    394
+  ],
+  "functions": [
+    {
+      "id": 394,
+      "name": "countMatchingLayers",
+      "originalSymbol": "function_394",
+      "signature": " (type $t9) (param i32 i32 i32 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 95412
+        },
+        "source": {
+          "path": "source/game/server/collision-filter.mjs",
+          "line": 86
+        },
+        "test": "test/server-collision-filter.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Counts set collision-layer flags whose threshold exceeds the probe and whose side threshold does not; 30 layers, 18 with side slots, plus an ignore-ranges bypass."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-collision-filter.test.mjs",
+    "report": "reports/server-collision-filter-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 682,
+    "completeLinearMemoryChecks": 1364,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 682,
+    "trappingComparisons": 0,
+    "comparison": "All 256 byte-0 flag combinations, single/all bits for bytes 1-3, threshold and side boundaries for every layer, ignore-ranges mode and 120 mixed records compare count, complete memory and stack pointer.",
+    "limitations": [
+      "Out-of-bounds owner/pointer states and invalid flag layouts are not exercised.",
+      "Ledger: 242 server bodies recovered and 492 remain machine code."
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/memory-fill.mjs",
+  "implementationSha256": "44e818eabcb053eb33f7c9d429c9fee32a14e8015e860809245c835e2235d1d5",
+  "factory": "createMemoryFillHook",
+  "functionIds": [
+    325
+  ],
+  "functions": [
+    {
+      "id": 325,
+      "name": "fillMemory",
+      "originalSymbol": "function_325",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/memory-fill.mjs",
+          "line": 9
+        },
+        "test": "test/server-memory-fill.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Fills count bytes with the low byte of value and returns destination."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-memory-fill.test.mjs",
+    "report": "reports/server-memory-fill-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 9,
+    "completeLinearMemoryChecks": 9,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 9,
+    "trappingComparisons": 0,
+    "comparison": "Three counts x three byte values compare result, complete memory and stack.",
+    "limitations": [
+      "Ledger: 423 server bodies recovered and 311 remain machine code."
+    ]
+  }
+}

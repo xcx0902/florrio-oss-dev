@@ -1,0 +1,120 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/runtime-primitives.mjs",
+  "implementationSha256": "debcc40af18ab4b9fd85a3259f688a5b78fef75c5a3745583cd97edbdddb0689",
+  "factory": "createClientRuntimePrimitiveHooks",
+  "functionIds": [
+    363,
+    366,
+    373
+  ],
+  "functions": [
+    {
+      "id": 363,
+      "name": "copyMemory",
+      "originalSymbol": "function_363",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 1271
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 248
+        },
+        "source": {
+          "path": "source/game/client/runtime-primitives.mjs",
+          "line": 38
+        },
+        "test": "test/client-runtime-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "copyWithin"
+      ],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 366,
+      "name": "compareMemory",
+      "originalSymbol": "function_366",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 1862
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 449
+        },
+        "source": {
+          "path": "source/game/client/runtime-primitives.mjs",
+          "line": 91
+        },
+        "test": "test/client-runtime-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 373,
+      "name": "roundF64",
+      "originalSymbol": "function_373",
+      "signature": " (type $t24) (param $p0 f64) (result f64)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 5261
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 1453
+        },
+        "source": {
+          "path": "source/game/client/runtime-primitives.mjs",
+          "line": 101
+        },
+        "test": "test/client-runtime-primitives.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "testGroups": 6,
+    "fullMemoryComparisons": 682,
+    "memoryBytesPerComparison": 67108864,
+    "scalarComparisons": 25864,
+    "roundingScalarComparisons": 24584,
+    "unsignedByteScalarComparisons": 1280,
+    "returnStackHostEventsAndTraps": true,
+    "roundingRawResultBits": true,
+    "testLog": "reports/tests.tap"
+  },
+  "semantics": {
+    "copy": {
+      "hostThreshold": 512,
+      "hostImport": "a.Fa",
+      "alignedBlockBytes": 64,
+      "wordBytes": 4,
+      "otherwiseGroupedByteStores": 4,
+      "tail": "forward byte stores",
+      "integerAddresses": "unsigned32 wrap for pointer arithmetic; immediate access offsets do not wrap"
+    },
+    "comparison": "first unsigned-byte difference; count0 accesses neither pointer",
+    "rounding": "nearest f64 integer with half ties away from zero; retains signed zero and tested NaN payloads"
+  },
+  "limitations": [
+    "The complete native bodies363/366/373 are recovered. Large copy intentionally uses the original typed JavaScript host import; its copyWithin semantics remain external.",
+    "Pointer, overlap, trap and exponent tests are bounded; the source is compared with the retained artifact rather than substituting an abstract standard-library contract."
+  ],
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

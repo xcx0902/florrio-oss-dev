@@ -1,0 +1,67 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "implementation": "source/game/client/window-check.mjs",
+  "implementationSha256": "d77661f62d2d1aea158645f3c579e506938842121533a3bb1388c8fc1ec45f0f",
+  "factory": "createWindowCheckHooks",
+  "functionIds": [
+    2058
+  ],
+  "functions": [
+    {
+      "id": 2058,
+      "name": "fiveWindowValidity",
+      "originalSymbol": "function_2058",
+      "signature": " (type $t4) (param $p0 i32) (param $p1 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 502201
+        },
+        "source": {
+          "path": "source/game/client/window-check.mjs",
+          "line": 36
+        },
+        "test": "test/client-window-check.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-window-check.test.mjs",
+    "report": "reports/client-window-check-tests.tap",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 73,
+    "trappingComparisons": 0,
+    "completeLinearMemoryChecks": 73,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 73,
+    "trapBreakdown": {
+      "safe": 0,
+      "overlap": 0,
+      "zero": 0,
+      "boundary": 0,
+      "edges": 0
+    },
+    "argumentRows": [
+      "four ordinary argument pairs",
+      "the pairs shifted by four bytes",
+      "zeros",
+      "addresses at 0x3ffffff",
+      "23 packed values against three static-table cases"
+    ],
+    "comparison": "Every comparison asserts the return value, all 67,108,864 bytes of linear memory, and the stack pointer. The small-argument table branch leaves the validity flag at 1; the nibble branch derives it from the high nibble.",
+    "limitations": [
+      "Packed values above 4 repeat the nibble path.",
+      "Static table offsets 0-16 cover the five small arguments.",
+      "No argument row traps, so trap behavior is unexercised.",
+      "This function is part of the 4,245 client functions; the ledger has 311 client bodies recovered and 3,934 remain machine code."
+    ]
+  }
+}

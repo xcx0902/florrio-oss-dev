@@ -1,0 +1,149 @@
+{
+  "client": {
+    "147": {
+      "name": "unwindMainLoop",
+      "evidence": "source/javascript/client.js wasmImports.Nb throws unwind; main calls it immediately after setMainLoop.",
+      "confidence": "high"
+    },
+    "257": {
+      "name": "setMainLoopByTableIndex",
+      "evidence": "source/javascript/client.js wasmImports.Pd looks up wasmTable slot and passes function/fps/simulateInfiniteLoop to setMainLoop.",
+      "confidence": "high"
+    },
+    "361": {
+      "name": "noopTwoArguments",
+      "evidence": "func361 body contains only nop.",
+      "confidence": "high"
+    },
+    "369": {
+      "name": "acquireStaticInitializationGuard",
+      "evidence": "func369 tests guard state and records pending initialization; paired with370 around lazy static registries.",
+      "confidence": "medium"
+    },
+    "370": {
+      "name": "releaseStaticInitializationGuard",
+      "evidence": "func370 commits the one-time initialization state used by369.",
+      "confidence": "medium"
+    },
+    "371": {
+      "name": "allocateOrAbort",
+      "evidence": "func371 calls malloc and abort import if its result is zero.",
+      "confidence": "high"
+    },
+    "378": {
+      "name": "stringLength",
+      "evidence": "func378 scans bytes for NUL and returns pointer difference.",
+      "confidence": "high"
+    },
+    "382": {
+      "name": "fillMemory",
+      "evidence": "func382 writes repeated low byte, returns initial destination; used to zero allocations and tables.",
+      "confidence": "high"
+    },
+    "391": {
+      "name": "getEntityDefinition",
+      "evidence": "func391 lazily constructs records at384096 using441; returns384096+116*type for type1..22, else0.",
+      "confidence": "high"
+    },
+    "441": {
+      "name": "initializeEntityDefinition",
+      "evidence": "func441 writes name/descriptions, byte32 count and eight-byte entries, callbacks at100/104; called by391 for each entity.",
+      "confidence": "high"
+    },
+    "623": {
+      "name": "renderPetalTooltip",
+      "evidence": "func623 uses52-byte petal records at382064, builds rarity text Common/Unusual/Rare/Epic/Legendary/Mythic and tooltip content.",
+      "confidence": "medium"
+    },
+    "702": {
+      "name": "receiveTransportPacket",
+      "evidence": "func702 wraps transport context and forwards pointer/length to1119.",
+      "confidence": "high"
+    },
+    "824": {
+      "name": "initializeClientRuntimeAndPetalCatalog",
+      "evidence": "export Nf / wasm_call_ctors initializes39 contiguous52-byte petal definitions at382064, plus runtime data.",
+      "confidence": "high"
+    },
+    "1095": {
+      "name": "clientFrame",
+      "evidence": "main registers table slot247 using imported a.Pd; elem slot247=1095. Frame reads dimensions/time, processes events, updates and renders game/UI, resets wheel accumulator.",
+      "confidence": "high"
+    },
+    "1096": {
+      "name": "initializeGameTransportOnce",
+      "evidence": "func1096 checks7784472; single-player branch loads worker string10619=sp_server.js and posts8439=sp_server_init; other branch zeroes game context.",
+      "confidence": "high"
+    },
+    "1118": {
+      "name": "acknowledgeAndDeliverTransportPacket",
+      "evidence": "func1118 type1 path parses two varints and sends a reply through transport virtual slot4, then delivers pointer/length to callback at transport+48.",
+      "confidence": "high"
+    },
+    "1119": {
+      "name": "decompressAndDeliverTransportPacket",
+      "evidence": "func1119 bypasses non-type2 frames to1118; type2 reads u32 decoded length, decodes literal/match token stream, validates length, recursively dispatches and frees temporary buffer.",
+      "confidence": "high"
+    },
+    "1764": {
+      "name": "allocateZeroedArray",
+      "evidence": "func1764 multiplies unsigned element count/size with overflow handling, calls malloc and zero fill.",
+      "confidence": "high"
+    },
+    "3191": {
+      "name": "handleWebRTCOpen",
+      "evidence": "export _f; finds channel by id in hash map7910228; transitions state at+104 from1 to2 and invokes open callback at+24.",
+      "confidence": "high"
+    },
+    "3223": {
+      "name": "handleWebRTCMessage",
+      "evidence": "export $f; finds channel by id and forwards raw bytes/length through702.",
+      "confidence": "high"
+    },
+    "3234": {
+      "name": "handleWebRTCClosed",
+      "evidence": "export ag; finds channel by id, closes nonzero state and invokes error/close callbacks according to second parameter.",
+      "confidence": "high"
+    },
+    "3278": {
+      "name": "fireTimeoutCallback",
+      "evidence": "export Sf; looks up timeout id in registry7932796, invokes stored callback, removes map node.",
+      "confidence": "high"
+    },
+    "3299": {
+      "name": "acceptClipboardText",
+      "evidence": "export Zf; forwards UTF8 pointer to active backend clipboard callback or copies into fallback storage.",
+      "confidence": "high"
+    },
+    "3310": {
+      "name": "accumulateMouseWheel",
+      "evidence": "export Rf adds incoming f64 to memory163840. Differential test in test/client-semantics.test.mjs.",
+      "confidence": "high"
+    },
+    "3331": {
+      "name": "setForcedServerId",
+      "evidence": "export Yf copies supplied string to439180, clears paired string439192 and sets439176=0.",
+      "confidence": "high"
+    },
+    "3342": {
+      "name": "requestDisconnect",
+      "evidence": "export Xf sets byte7784496=1; clientFrame observes it. Differential test in test/client-semantics.test.mjs.",
+      "confidence": "high"
+    },
+    "3353": {
+      "name": "pollWebSocketEvents",
+      "evidence": "export Wf loops registry441352, calls ASM_CONST140574 to pop browser events, invokes callback by event id1..4, frees payload, restarts if registry mutates.",
+      "confidence": "high"
+    },
+    "3375": {
+      "name": "handleCanvasContextLost",
+      "evidence": "export Tf scans renderer list441324 for canvas context id, removes regenerable cached contexts, decrements count441320; logs nonregenerable cases.",
+      "confidence": "high"
+    },
+    "3386": {
+      "name": "shouldConfirmBrowserQuit",
+      "evidence": "export Uf returns0 when callback439168 absent, else calls its vtable slot6 with callback object as this. Differential test in test/client-semantics.test.mjs.",
+      "confidence": "high"
+    }
+  }
+}

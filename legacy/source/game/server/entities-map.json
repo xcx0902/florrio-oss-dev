@@ -1,0 +1,386 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/entities.mjs",
+  "hookExport": "createEntityHooks",
+  "functionIds": [
+    56,
+    216,
+    415,
+    417,
+    697,
+    698,
+    699,
+    700,
+    701,
+    702,
+    703,
+    704,
+    705,
+    706,
+    707,
+    708,
+    709,
+    710,
+    711,
+    712,
+    713,
+    714,
+    715,
+    716,
+    717,
+    718
+  ],
+  "functions": [
+    {
+      "id": 56,
+      "name": "initializeEntityDefinition",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Species definition constructor; field28 meaning unresolved."
+    },
+    {
+      "id": 216,
+      "name": "function_216",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Healing rules and clamps; original tracked setter and original indirect petal callbacks."
+    },
+    {
+      "id": 415,
+      "name": "function_415",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Full original body recovered with explicit shared helper dependencies."
+    },
+    {
+      "id": 417,
+      "name": "function_417",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Full original body recovered with explicit shared helper dependencies."
+    },
+    {
+      "id": 697,
+      "name": "initializeSpiderEntity22",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Full original body recovered with explicit shared helper dependencies."
+    },
+    {
+      "id": 698,
+      "name": "initializeLadybugEntity21",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 699,
+      "name": "initializeLadybugEntity20",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 700,
+      "name": "initializeSquareEntity19",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Full original body recovered with explicit shared helper dependencies."
+    },
+    {
+      "id": 701,
+      "name": "initializeEvilCentipedeEntity18",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 702,
+      "name": "initializeEvilCentipedeEntity17",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 703,
+      "name": "initializeCentipedeEntity16",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 704,
+      "name": "initializeCentipedeEntity15",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 705,
+      "name": "initializeHornetEntity14",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Full original body recovered with explicit shared helper dependencies."
+    },
+    {
+      "id": 706,
+      "name": "initializeMassiveBeetleEntity13",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization plus human-recovered beetle/rock tuning."
+    },
+    {
+      "id": 707,
+      "name": "initializeBeetleEntity12",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization plus human-recovered beetle/rock tuning."
+    },
+    {
+      "id": 708,
+      "name": "initializeAntHoleEntity11",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Full original body recovered with explicit shared helper dependencies."
+    },
+    {
+      "id": 709,
+      "name": "initializeQueenAntEntity10",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 710,
+      "name": "initializeSoldierAntEntity9",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 711,
+      "name": "initializeWorkerAntEntity8",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 712,
+      "name": "initializeBabyAntEntity7",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 713,
+      "name": "initializeBeeEntity6",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Full original body recovered with explicit shared helper dependencies."
+    },
+    {
+      "id": 714,
+      "name": "initializeMassiveLadybugEntity5",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 715,
+      "name": "initializeLadybugEntity4",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization and family variant selection; family tuning body remains a dependency."
+    },
+    {
+      "id": 716,
+      "name": "initializeCactusEntity3",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Full original body recovered with explicit shared helper dependencies."
+    },
+    {
+      "id": 717,
+      "name": "initializeBoulderEntity2",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization plus human-recovered beetle/rock tuning."
+    },
+    {
+      "id": 718,
+      "name": "initializeRockEntity1",
+      "implementation": "entities.mjs",
+      "status": "executable-human-recovered-body",
+      "scope": "Component creation/initialization plus human-recovered beetle/rock tuning."
+    }
+  ],
+  "dependencies": [
+    {
+      "id": 14,
+      "name": "free",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 15,
+      "name": "memcpy",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 16,
+      "name": "malloc",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 18,
+      "name": "function_18",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 25,
+      "name": "function_25",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 26,
+      "name": "function_26",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 64,
+      "name": "function_64",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 65,
+      "name": "function_65",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 67,
+      "name": "function_67",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 68,
+      "name": "function_68",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 102,
+      "name": "function_102",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 106,
+      "name": "function_106",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 114,
+      "name": "function_114",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 115,
+      "name": "function_115",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 116,
+      "name": "function_116",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 128,
+      "name": "function_128",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 143,
+      "name": "function_143",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 205,
+      "name": "function_205",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 206,
+      "name": "function_206",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 207,
+      "name": "function_207",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 208,
+      "name": "function_208",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 209,
+      "name": "function_209",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 210,
+      "name": "function_210",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 211,
+      "name": "function_211",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 265,
+      "name": "function_265",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 266,
+      "name": "function_266",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 416,
+      "name": "function_416",
+      "status": "delegated-to-shared-runtime-function"
+    },
+    {
+      "id": 418,
+      "name": "function_418",
+      "status": "delegated-to-shared-runtime-function"
+    }
+  ],
+  "verification": {
+    "command": "node --test test/server-entities.test.mjs",
+    "tests": 6,
+    "differentialCalls": 271,
+    "compared": "full 64 MiB linear memory, return value, stack global, host callback order/arguments",
+    "oracle": "unaltered original instructions; only additional function/global exports"
+  },
+  "unresolved": {
+    "familyTuningFunctionIds": [
+      205,
+      208,
+      210
+    ],
+    "sharedAiFunctionIds": [
+      114,
+      115
+    ],
+    "spawnFunctionIds": [
+      143,
+      144
+    ],
+    "damageFunctionIds": [
+      43
+    ],
+    "other": "Shared allocators, tracked setters, registration, serializers and downstream simulation remain explicit dependencies. This module alone is not the complete readable game."
+  }
+}

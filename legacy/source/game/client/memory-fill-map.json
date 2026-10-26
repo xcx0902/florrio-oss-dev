@@ -1,0 +1,113 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/memory-fill.mjs",
+  "implementationSha256": "e0d26cd7810e34fff694d79f16b3cf0c0535002a259b67f660916c2fd68bfb4a",
+  "factory": "createClientMemoryFillHooks",
+  "functionIds": [
+    382,
+    865
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after client double trig after parent review and passing differential tests.",
+  "functions": [
+    {
+      "id": 382,
+      "name": "fillMemory",
+      "originalSymbol": "fillMemory",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 7507,
+          "endLine": 7692
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0000-0063.dcmp",
+          "line": 2127
+        },
+        "source": {
+          "path": "source/game/client/memory-fill.mjs",
+          "line": 29
+        },
+        "test": "test/client-memory-fill.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    },
+    {
+      "id": 865,
+      "name": "fillMemoryByte",
+      "originalSymbol": "function_865",
+      "signature": " (type $t5) (param $p0 i32) (param $p1 i32) (param $p2 i32) (result i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 182128,
+          "endLine": 182135
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0448-0511.dcmp",
+          "line": 3737
+        },
+        "source": {
+          "path": "source/game/client/memory-fill.mjs",
+          "line": 89
+        },
+        "test": "test/client-memory-fill.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "fillMemory"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "abi": "382 and 865 take three i32 parameters and return the original pointer. 382(pointer, byte, count) stores the low byte; 865(pointer, count, value) masks value with 255 and forwards it in the swapped 382 argument order. Both return through the WASM export's i32 coercion. Invalid effective addresses trap with WebAssembly.RuntimeError after retaining any earlier stores.",
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-memory-fill.test.mjs",
+    "report": "reports/client-memory-fill-tests.tap",
+    "reportSha256": "671a0b2b01c9bb848600cdf87325176529e7d332d7458ff6fab57336e74b5b61",
+    "testSourceSha256": "e6b590f5c22419d4ca0fb45a21b00e8dc4a1bd02822b61653b2381023eec7d20",
+    "testGroups": 4,
+    "pass": 4,
+    "fail": 0,
+    "oracleComparisons": 2839,
+    "trappingComparisons": 13,
+    "completeLinearMemoryChecks": 33,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 2839,
+    "wideningThresholds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      24,
+      25,
+      31,
+      32,
+      33
+    ],
+    "alignmentOffsets": 8,
+    "comparison": "Each comparison checks the returned i32, the stack pointer and every byte in a window spanning 32 bytes before and after the requested range. Two deterministic full-suite checkpoints plus all 19 wraparound/boundary cases and all 12 wrapper cases compare complete 64 MiB linear memory, including stores made before a trap.",
+    "limitations": [
+      "Oracle inputs are deterministic samples, not exhaustive over every i32 count/pointer or all 64 MiB destinations.",
+      "Most comparisons check the affected window; 33 calls compare the complete linear memory.",
+      "The wrapper 865 is recovered together with its only callee; no other unrecovered dependency remains.",
+      "The recovered function is the client artifact's fillMemory, not a claim that every caller has already been rewritten."
+    ]
+  }
+}

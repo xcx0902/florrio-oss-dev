@@ -1,0 +1,75 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/component-release.mjs",
+  "implementationSha256": "61021cef60dc9b84668dd4aa611842ff1d81607570398ed0184e48a9757883a7",
+  "factory": "createComponentReleaseHook",
+  "functionIds": [
+    421,
+    425
+  ],
+  "functions": [
+    {
+      "id": 421,
+      "name": "releaseComponentSlot",
+      "originalSymbol": "function_421",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/component-release.mjs",
+          "line": 20
+        },
+        "test": "test/server-component-release.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Frees two indexed deferred slots, publishes host generation into both component tables and slot+112."
+    },
+    {
+      "id": 425,
+      "name": "releaseComponentSlotWide",
+      "originalSymbol": "function_425",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/component-release.mjs",
+          "line": 48
+        },
+        "test": "test/server-component-release.test.mjs"
+      },
+      "originalDirectDependencies": [
+        14
+      ],
+      "originalIndirectCallSites": 0,
+      "notes": "Same release with a 96-byte back-reference and +144 mirror."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-component-release.test.mjs",
+    "report": "reports/server-component-release-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 4,
+    "completeLinearMemoryChecks": 4,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 4,
+    "trappingComparisons": 0,
+    "comparison": "Both slot variants with null and synthetic linked records compare complete memory and stack.",
+    "limitations": [
+      "Deferred slots are empty in all cases. Ledger: 459 server bodies recovered and 275 remain machine code."
+    ]
+  }
+}

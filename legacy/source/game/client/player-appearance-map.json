@@ -1,0 +1,238 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/player-appearance.mjs",
+  "implementationSha256": "98a8aa1e491555f2056ef546a6c0e864dd432252cafe36ec2c3bc5dd3707b296",
+  "factory": "createPlayerAppearanceHooks",
+  "functionIds": [
+    1100
+  ],
+  "functions": [
+    {
+      "id": 1100,
+      "name": "drawPlayerAppearance",
+      "originalSymbol": "function_1100",
+      "signature": " (type $t102) (param $p0 i32) (param $p1 f32) (param $p2 i32) (param $p3 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": false,
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 420306,
+          "endLine": 424976
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0704-0767.dcmp",
+          "line": 30377
+        },
+        "source": {
+          "path": "source/game/client/player-appearance.mjs",
+          "line": 97
+        },
+        "test": "test/client-player-appearance.test.mjs"
+      },
+      "originalDirectDependencies": [
+        "function_375",
+        "emscripten_asm_const_int",
+        "function_373",
+        "function_366",
+        "function_395",
+        "function_690"
+      ],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "phases": [
+    {
+      "name": "updateAttackAndDefendAmounts",
+      "watLine": 420319,
+      "watEndLine": 420407,
+      "description": "Smooth attack and defend flags into the persistent appearance state.",
+      "sourceLine": 125
+    },
+    {
+      "name": "blendBodyColors",
+      "watLine": 420408,
+      "watEndLine": 420557,
+      "description": "Blend default, action and flash colors, retaining guarded unsigned conversion.",
+      "sourceLine": 159
+    },
+    {
+      "name": "setBodyFill",
+      "watLine": 420558,
+      "watEndLine": 420665,
+      "description": "Select rounded line caps, body line width, fill color and optional grayscale.",
+      "sourceLine": 215
+    },
+    {
+      "name": "setBodyStroke",
+      "watLine": 420666,
+      "watEndLine": 420884,
+      "description": "Compute the shaded outline and optional grayscale color.",
+      "sourceLine": 263
+    },
+    {
+      "name": "drawBody",
+      "watLine": 420885,
+      "watEndLine": 421679,
+      "description": "Draw the alternate model path or circular body, then fill and stroke it.",
+      "sourceLine": 363
+    },
+    {
+      "name": "drawFlagFourDecoration",
+      "watLine": 421680,
+      "watEndLine": 422945,
+      "description": "Draw the decoration selected by appearance flag mask 4 and restore the drawing state.",
+      "sourceLine": 596
+    },
+    {
+      "name": "prepareEyeContext",
+      "watLine": 422946,
+      "watEndLine": 422971,
+      "description": "Store original pointers used by the eye renderer.",
+      "sourceLine": 986
+    },
+    {
+      "name": "saveFaceDrawingState",
+      "watLine": 422972,
+      "watEndLine": 423032,
+      "description": "Save the canvas and the 64-byte software drawing state.",
+      "sourceLine": 995
+    },
+    {
+      "name": "updateEyeExpression",
+      "watLine": 423033,
+      "watEndLine": 423158,
+      "description": "Smooth the first expression flag unless attack, defend, death or the extra action flag suppresses it.",
+      "sourceLine": 1012
+    },
+    {
+      "name": "drawEyes",
+      "watLine": 423159,
+      "watEndLine": 424165,
+      "description": "Draw the polygonal expression or place each eye through the original eye renderer.",
+      "sourceLine": 1074
+    },
+    {
+      "name": "restoreFaceDrawingState",
+      "watLine": 424166,
+      "watEndLine": 424208,
+      "description": "Restore the face drawing state and canvas.",
+      "sourceLine": 1404
+    },
+    {
+      "name": "translateMouth",
+      "watLine": 424209,
+      "watEndLine": 424287,
+      "description": "Translate the mouth origin by ten units, retaining all expanded f32 affine products.",
+      "sourceLine": 1418
+    },
+    {
+      "name": "drawAlternateModelMouth",
+      "watLine": 424288,
+      "watEndLine": 424458,
+      "description": "Draw the mouth geometry selected by appearance model one.",
+      "sourceLine": 1448
+    },
+    {
+      "name": "updateMouthCurve",
+      "watLine": 424459,
+      "watEndLine": 424526,
+      "description": "Smooth the persistent mouth curve from the expression and death flags.",
+      "sourceLine": 1504
+    },
+    {
+      "name": "drawMouth",
+      "watLine": 424527,
+      "watEndLine": 424972,
+      "description": "Draw the mouth quadratic curve with grayscale outline and exact transform synchronization.",
+      "sourceLine": 1540
+    }
+  ],
+  "dependencies": [
+    {
+      "id": 366,
+      "name": "compareMemory"
+    },
+    {
+      "id": 373,
+      "name": "roundF64"
+    },
+    {
+      "id": 375,
+      "name": "powF64"
+    },
+    {
+      "id": 395,
+      "name": "fillAndStrokeCurrentPath"
+    },
+    {
+      "id": 690,
+      "name": "drawEye"
+    }
+  ],
+  "hostImport": {
+    "module": "a",
+    "name": "a",
+    "purpose": "Canvas bridge with original ABI argument records"
+  },
+  "layout": {
+    "scratchFrameBytes": 2624,
+    "appearanceState": {
+      "mouthCurve": 16,
+      "eyeExpression": 20,
+      "attackAmount": 24,
+      "defendAmount": 28
+    },
+    "parameters": {
+      "flags": 0,
+      "dead": 1,
+      "attack": 2,
+      "defend": 3,
+      "extraActionFlag": 4,
+      "flashRed": 5,
+      "flashGreen": 6,
+      "flashBlue": 7,
+      "flashAmount": 8,
+      "eyeParameter": 12,
+      "model": 16
+    },
+    "renderer": {
+      "matrix": 0,
+      "cachedMatrix": 24,
+      "transformDirty": 48,
+      "lineCapMode": 49,
+      "lineJoinMode": 50,
+      "alpha": 56,
+      "grayscale": 69,
+      "contextId": 96
+    }
+  },
+  "validation": {
+    "testGroups": 9,
+    "oracleComparisons": 33,
+    "fullMemoryCheckpoints": 388,
+    "memoryBytesPerComparison": 67108864,
+    "capturedPackets": 15,
+    "capturedFrameCheckpoints": 60,
+    "modelFlagActionCombinations": 256,
+    "nonfiniteCases": 64,
+    "pointerTraps": 3,
+    "hostFaults": 16,
+    "overlappingMemoryCases": 6,
+    "liveHostMutation": true,
+    "reentrantHostCallback": true,
+    "combinedActiveClient": true,
+    "testCommand": "node --test --test-reporter=tap test/client-player-appearance.test.mjs",
+    "testLog": "reports/tests.tap",
+    "registration": "Candidate source body; parent task owns registry/build integration."
+  },
+  "limitations": [
+    "The complete original body1100 is recovered; powF64 (375), drawEye (690), the Canvas host and other named callees remain explicit dependencies. This report does not claim their transitive recovery.",
+    "Flag mask 4 and model 1 are described by their observed drawing branches without assigning unconfirmed product or cosmetic names.",
+    "Finite fixtures compare all shared memory, decoded Canvas calls, traps and stack state. They do not prove every arbitrary alias or browser pixel output.",
+    "Registered by the parent task after review and original-WASM differential tests; current build/browser identity is in reports/current-verification.json."
+  ],
+  "dependencyClosureDefinition": "Every statically reachable internal WASM body through direct calls is recovered; external host callback reentry is outside this graph, and any indirect-call site conservatively makes the result false."
+}

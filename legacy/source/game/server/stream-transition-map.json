@@ -1,0 +1,49 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/stream-transition.mjs",
+  "implementationSha256": "17852504bdef3353d8fc80969c7525d2baa68e57802a56c0a486144a9baa81de",
+  "factory": "createStreamTransitionHook",
+  "functionIds": [
+    221
+  ],
+  "functions": [
+    {
+      "id": 221,
+      "name": "transitionStreamState",
+      "originalSymbol": "function_221",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat"
+        },
+        "source": {
+          "path": "source/game/server/stream-transition.mjs",
+          "line": 12
+        },
+        "test": "test/server-stream-transition.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Sets +16/+24/+36 on first token; replaces pending mode 2 on repeats; marks +54 and counts mismatches otherwise."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-stream-transition.test.mjs",
+    "report": "reports/server-stream-transition-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 36,
+    "completeLinearMemoryChecks": 36,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 36,
+    "trappingComparisons": 0,
+    "comparison": "3 current values x 3 incoming values x 4 pending modes compare result, complete memory and stack pointer.",
+    "limitations": [
+      "Ledger: 361 server bodies recovered and 373 remain machine code."
+    ]
+  }
+}

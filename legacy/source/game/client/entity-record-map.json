@@ -1,0 +1,80 @@
+{
+  "artifact": "web/client.wasm",
+  "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
+  "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+  "implementation": "source/game/client/entity-record.mjs",
+  "implementationSha256": "8c0a7072a927aceeadaeaccc19d660b43743cda6ff2b59904ba720984e783aa4",
+  "factory": "createEntityRecordHooks",
+  "functionIds": [
+    618
+  ],
+  "candidateOnly": false,
+  "registration": "Registered in source/runtime/registry.mjs after entity-definition after parent review and passing differential tests.",
+  "functions": [
+    {
+      "id": 618,
+      "name": "moveEntityRecord",
+      "originalSymbol": "function_618",
+      "signature": " (type $t0) (param $p0 i32) (param $p1 i32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "reaEvidenceId": "ev_04342e4c580ccf87f0ef0dbcccd3cd9507572a0b364eac5298499dd7bc166c80",
+        "wat": {
+          "path": "source/wasm/client.wat",
+          "line": 76115,
+          "endLine": 76378
+        },
+        "decompiled": {
+          "path": "source/decompiled/client/functions-0256-0319.dcmp",
+          "line": 84
+        },
+        "source": {
+          "path": "source/game/client/entity-record.mjs",
+          "line": 81
+        },
+        "test": "test/client-entity-record.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0
+    }
+  ],
+  "layout": {
+    "bytes": 116,
+    "fields": [
+      { "offset": 0, "type": "u32", "meaning": "name pointer" },
+      { "offset": 4, "type": "u8", "meaning": "description count" },
+      { "offset": 8, "type": "u32[count]", "meaning": "description pointer array" },
+      { "offset": 24, "type": "u64", "meaning": "shape qword" },
+      { "offset": 32, "type": "u8", "meaning": "drop count" },
+      { "offset": 36, "type": "u64[count]", "meaning": "drop qwords" },
+      { "offset": 100, "type": "u32", "meaning": "first callback" },
+      { "offset": 104, "type": "u32", "meaning": "second callback" },
+      { "offset": 108, "type": "u64", "meaning": "flags, marker, and tail scale bytes" }
+    ]
+  },
+  "abi": "618 is a void move constructor, (destination: i32, source: i32) -> (). It reads the source name before clearing the destination description count, stores the destination count as zero, stores the name, copies source bytes [8, 8 + 4*descriptionCount) in increasing dword chunks, writes the saved description count, and clears the source count. It then reads the source qword at +24, clears the destination drop count at +32, stores that qword at destination +24, copies source bytes [36, 36 + 8*dropCount) in increasing qword chunks, writes the drop count at destination +32 (rereading source +32 after a nonzero copy), clears source +32, and finally copies the qwords at +108 and +100. Counts are u8 so a copy may extend past 116 bytes. Unaligned and overlapping ranges are permitted. Computed array base pointers use wrapping i32.add, but every field and unrolled memarg offset is added without wrapping; an effective address that crosses 2^32 or the 64 MiB memory end traps with WebAssembly.RuntimeError after all earlier stores remain visible. The native body has a leading 1..7 chunk loop followed by eight-chunk unrolled groups; the recovered body preserves that read-before-write order, including the conditional reread of source +32.",
+  "validation": {
+    "command": "node --test --test-reporter=tap test/client-entity-record.test.mjs",
+    "report": "reports/client-entity-record-tests.tap",
+    "reportSha256": "ec5d341aebc0f777688a86866688687c85d1a343472013edaf0e257f9343db5d",
+    "testSourceSha256": "e3852decfa69312b452d5105383a874d9bc0690282b8808bfe566447771137ef",
+    "testGroups": 3,
+    "pass": 3,
+    "fail": 0,
+    "oracleComparisons": 272,
+    "trappingComparisons": 21,
+    "completeLinearMemoryChecks": 272,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 272,
+    "descriptionCountSamples": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 254, 255],
+    "comparison": "Every comparison checks the return value or trap constructor/message, the stack pointer, and all 67,108,864 bytes of linear memory. Inputs cover 25 diagonal count pairs, 81 crossed count pairs, 36 overlapping destination offsets with four count pairs, 22 boundary and trap placements including addresses that wrap a computed base pointer and effective addresses that cross the 2^32 boundary, and wrapped source/destination addresses.",
+    "limitations": [
+      "The 272 comparisons sample representative count values and all residue classes rather than enumerating all 65,536 description/drop count pairs.",
+      "The overlap matrix uses 36 destination offsets on a fixed record pair rather than every possible pair of addresses in the 64 MiB space.",
+      "The recovered function is an equivalent of shipped WASM function 618, not the original C++ source or its original identifiers.",
+      "Native 391 reproduces its five calls to 618 inline while writing the catalog; it does not dispatch this recovered hook during browser initialization, so browser execution of 618 is not claimed."
+    ]
+  }
+}

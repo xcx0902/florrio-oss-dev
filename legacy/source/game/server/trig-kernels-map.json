@@ -1,0 +1,76 @@
+{
+  "artifact": "web/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "implementation": "source/game/server/trig-kernels.mjs",
+  "implementationSha256": "5225e80e6e0d2e7dfc37661aebbfc30f531a0620870d6431290c73f281104310",
+  "factory": "createTrigKernelHooks",
+  "functionIds": [
+    80,
+    81
+  ],
+  "functions": [
+    {
+      "id": 80,
+      "name": "cosineKernel",
+      "originalSymbol": "function_80",
+      "signature": " (type $t27) (param $p0 f64) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 17903
+        },
+        "source": {
+          "path": "source/game/server/trig-kernels.mjs",
+          "line": 28
+        },
+        "test": "test/server-trig-kernels.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Minimax cosine polynomial in f64: 1 + x^2*(-0.499999997) + x^4*0.04166662 + x^6*(2.439e-5*x^2 - 0.00138868), demoted to f32."
+    },
+    {
+      "id": 81,
+      "name": "sineKernel",
+      "originalSymbol": "function_81",
+      "signature": " (type $t27) (param $p0 f64) (result f32)",
+      "bodyRecovered": true,
+      "transitiveRecoveryComplete": true,
+      "unrecoveredStaticDependencyIds": [],
+      "evidence": {
+        "wat": {
+          "path": "source/wasm/sp_server.wat",
+          "line": 17932
+        },
+        "source": {
+          "path": "source/game/server/trig-kernels.mjs",
+          "line": 39
+        },
+        "test": "test/server-trig-kernels.test.mjs"
+      },
+      "originalDirectDependencies": [],
+      "originalIndirectCallSites": 0,
+      "notes": "Minimax sine polynomial in f64: x + x^3*(0.00833333*x^2 - 0.1666667) + x^7*(2.718e-6*x^2 - 0.000198393), demoted to f32."
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap test/server-trig-kernels.test.mjs",
+    "report": "reports/server-trig-kernels-tests.tap",
+    "testGroups": 1,
+    "pass": 1,
+    "fail": 0,
+    "oracleComparisons": 34,
+    "completeLinearMemoryChecks": 2,
+    "memoryBytesPerCompleteCheck": 67108864,
+    "stackPointerChecks": 34,
+    "trappingComparisons": 0,
+    "comparison": "Seventeen angles from -100 to 100, including zero, tiny values, multiples of pi/2 and plus/minus 100, are evaluated through both kernels. Each compares exact f32 result bits and the stack pointer; both kernels are verified read-only.",
+    "limitations": [
+      "These kernels are polynomial approximations valid for the small angles used by the server; large-argument reduction is performed by callers.",
+      "Ledger: 207 server bodies recovered and 527 remain machine code."
+    ]
+  }
+}
