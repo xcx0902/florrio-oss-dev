@@ -22,9 +22,11 @@ namespace engine {
                                        std::uint8_t instance_count = 1,
                                        std::uint8_t orbit_index = 0);
 
-/** Assign the orbit index for one loadout instance the way original function 85
- * walks all eight slots (existing handles first, configured instances reserve a
- * position, flag41 slots share one position across their instances). */
+/** Recompute all petal orbit indices after a loadout mutation, mirroring
+ * original function 85 (including configured missing instances and flag41
+ * shared positions). */
+void assign_petal_orbit_indices(World& world);
+
 [[nodiscard]] std::uint8_t petal_orbit_index(const World& world, std::uint8_t slot,
                                              std::uint8_t instance);
 
@@ -40,6 +42,9 @@ void update_petal_orbit(World& world, const PetalOrbitState& state, double step_
 /** Advance all petal orbits. Orbit radii follow the current input buttons and
  * each petal's recovered orbit profile; Wing uses its wave track. */
 void update_petal_orbits(World& world, double step_milliseconds);
+
+/** Consume an equipped Peas petal into four launched children. */
+bool consume_peas_attack(World& world, EntityHandle petal_handle, EntityHandle owner);
 
 /** Spawn all configured instances for every equipped loadout slot. */
 std::size_t spawn_loadout_petals(World& world);

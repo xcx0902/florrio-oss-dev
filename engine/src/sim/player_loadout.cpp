@@ -363,6 +363,7 @@ void PlayerLoadout::clear() {
   pending_cache_count_ = 0;
   score_ = f32(0.0F);
   orbit_phase_ = f32(0.0F);
+  orbit_positions_ = 0U;
 }
 
 } // namespace engine

@@ -71,7 +71,13 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
                      attacker_entity != nullptr ? attacker_entity->type_id : 0U);
   if (kind == EntityKind::kPlayer || kind == EntityKind::kMob) {
     entity->killer_name = killer_name_for(world, attacker);
-    world.set_last_killer(attacker, entity->killer_name);
+    // Original updateKillerName writes the destroying entity's name into the
+    // player's own replicated string field. Keep the world-level copy for the
+    // local death payload only: mobs keep dying (and may die with no attacker)
+    // after the player, and those later deaths must not erase or replace the
+    // name the death screen is about to show.
+    if (kind == EntityKind::kPlayer && target == world.player())
+      world.set_last_killer(attacker, entity->killer_name);
   }
 
   if (kind == EntityKind::kPetal) {
@@ -97,6 +103,7 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
     PlayerProfile retained_profile = world.profile();
     const LootResult loot = retain_player_loot(retained_profile, world.random());
     world.profile().set_lost_items(loot.lost_count, loot.lost);
+    world.set_last_death_kept(std::span<const std::uint16_t>(loot.retained.data(), loot.retained_count));
     std::vector<std::uint16_t> retained(loot.retained.begin(),
                                         loot.retained.begin() + loot.retained_count);
     (void)spawn_loot_drops(world, retained, position, target);

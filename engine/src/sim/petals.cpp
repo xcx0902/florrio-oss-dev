@@ -67,24 +67,87 @@ std::uint8_t petal_orbit_index(const World& world, std::uint8_t slot,
   return orbit_index;
 }
 
+void assign_petal_orbit_indices(World& world) {
+  auto& loadout = world.loadout();
+  const auto& slots = loadout.slots();
+  std::uint8_t orbit_index = 0;
+  const auto petal_state = [&world](EntityHandle handle) -> PetalOrbitState* {
+    if (!handle.valid()) return nullptr;
+    for (auto& state : world.petals())
+      if (state.handle == handle) return &state;
+    return nullptr;
+  };
+  for (std::uint8_t slot = 0; slot < 8U; ++slot) {
+    const std::uint16_t type = slots[slot].type_id;
+    if (type == 0U || type > 38U) {
+      // Still write the boundary counter for empty slots.
+    } else {
+      const PetalDefault* definition = nullptr;
+      for (const auto& petal : petal_defaults())
+        if (petal.type_id == type) { definition = &petal; break; }
+      if (definition != nullptr && definition->flags[0] == 0U) {
+        if (definition->flags[1] != 0U) {
+          bool position_used = false;
+          for (std::uint8_t instance = 0; instance < 3U; ++instance) {
+            const EntityHandle handle = loadout.handle(slot, instance);
+            PetalOrbitState* state = petal_state(handle);
+            if (state != nullptr) state->orbit_index = orbit_index;
+            if (instance < 2U) {
+              // An existing slot entity without a petal component does not
+              // reserve an orbit position; only a missing entity does.
+              if (state != nullptr) position_used = true;
+              else if (!handle.valid() && definition->instances_per_slot > instance)
+                position_used = true;
+            } else if (state != nullptr) {
+              ++orbit_index;
+            } else if (handle.valid()) {
+              // A live slot entity without a petal component consumes only the
+              // position already claimed by its earlier instances.
+              if (position_used) ++orbit_index;
+            } else {
+              position_used = position_used || definition->instances_per_slot > 2U;
+              if (position_used) ++orbit_index;
+            }
+          }
+        } else {
+          for (std::uint8_t instance = 0; instance < 3U; ++instance) {
+            const EntityHandle handle = loadout.handle(slot, instance);
+            PetalOrbitState* state = petal_state(handle);
+            if (state != nullptr) {
+              state->orbit_index = orbit_index;
+              ++orbit_index;
+            } else if (!handle.valid() && definition->instances_per_slot > instance) {
+              ++orbit_index;
+            }
+          }
+        }
+      }
+    }
+    const std::uint8_t level = world.profile().level();
+    const std::uint8_t unlocked = level < 15U ? 5U : level < 30U ? 6U : level < 45U ? 7U : 8U;
+    if (static_cast<std::uint8_t>(slot + 1U) == unlocked)
+      loadout.set_orbit_positions(orbit_index);
+  }
+}
+
 double petal_orbit_angle(const World& world, std::uint8_t orbit_index) {
   const std::uint8_t active = active_slot_count(world);
   // Original loadout+292 stores the number of occupied orbit positions at
-  // the active-slot boundary, not the number of slots. Multi-instance petals
-  // (Twin/Triplet) therefore widen every other petal's spacing instead of
-  // sharing the old five/eight-slot denominator and overlapping.
-  std::uint8_t orbit_positions = 0;
-  const auto& loadout_slots = world.loadout().slots();
-  for (std::uint8_t slot = 0; slot < active && slot < loadout_slots.size(); ++slot) {
-    const std::uint16_t type = loadout_slots[slot].type_id;
-    if (type == 0U || type > 38U) continue;
-    const PetalDefault* definition = nullptr;
-    for (const auto& petal : petal_defaults())
-      if (petal.type_id == type) { definition = &petal; break; }
-    if (definition == nullptr || definition->flags[0] != 0U) continue;
-    const std::uint8_t count = loadout_slots[slot].count == 0U ? 1U : loadout_slots[slot].count;
-    orbit_positions = static_cast<std::uint8_t>(orbit_positions
-      + (definition->flags[1] != 0U ? 1U : count));
+  // the active-slot boundary. Use it when available; derive it from the same
+  // configured-instance rules for callers before the first assignment.
+  std::uint8_t orbit_positions = world.loadout().orbit_positions();
+  if (orbit_positions == 0U) {
+    const auto& loadout_slots = world.loadout().slots();
+    for (std::uint8_t slot = 0; slot < active && slot < loadout_slots.size(); ++slot) {
+      const std::uint16_t type = loadout_slots[slot].type_id;
+      if (type == 0U || type > 38U) continue;
+      const PetalDefault* definition = nullptr;
+      for (const auto& petal : petal_defaults())
+        if (petal.type_id == type) { definition = &petal; break; }
+      if (definition == nullptr || definition->flags[0] != 0U) continue;
+      if (definition->flags[1] != 0U) ++orbit_positions;
+      else orbit_positions = static_cast<std::uint8_t>(orbit_positions + definition->instances_per_slot);
+    }
   }
   const double slots = orbit_positions > 1U ? static_cast<double>(orbit_positions) : 1.0;
   const double angle = static_cast<double>(orbit_index) * kTau / slots
@@ -145,6 +208,7 @@ void update_petal_orbit(World& world, const PetalOrbitState& state, double step_
 }
 
 void update_petal_orbits(World& world, double step_milliseconds) {
+  assign_petal_orbit_indices(world);
   const std::uint8_t buttons = static_cast<std::uint8_t>(world.input().buttons & 0xFFU);
   const Entity* player = world.entities().get(world.player());
   // Rose consumption erases its own orbit record. Advance before processing,
@@ -155,6 +219,21 @@ void update_petal_orbits(World& world, double step_milliseconds) {
     if (world.entities().get(state.handle) == nullptr) continue;
     if (player != nullptr) state.center = player->position;
     const auto profile = static_cast<OrbitProfile>(state.profile);
+    // Original Peas orbit callbacks (676/681/431): after the petal has been
+    // equipped for 500 ms, holding attack consumes it into four children. The
+    // generic orbit radius stays at 65; only defend pulls it to 40.
+    if ((state.type_id == 11U || state.type_id == 12U || state.type_id == 34U)
+        && (buttons & 1U) != 0U && state.behavior_state == 0U
+        && world.time_ms() - state.behavior_started_at_ms > 500.0) {
+      const EntityHandle petal_handle = state.handle;
+      Entity* petal = world.entities().get(petal_handle);
+      const EntityHandle owner = petal != nullptr
+        ? EntityHandle{petal->owner} : EntityHandle{};
+      state.behavior_state = 1U;
+      (void)consume_peas_attack(world, petal_handle, owner);
+      --index;
+      continue;
+    }
     if (is_rose_orbit_function(state.orbit_function)) {
       state.orbit_radius = rose_orbit_radius(buttons);
     } else if (profile == OrbitProfile::kWing) {
@@ -281,6 +360,7 @@ EntityHandle spawn_petal(World& world, std::uint16_t type_id, Vec2 center,
 }
 
 std::size_t spawn_loadout_petals(World& world) {
+  assign_petal_orbit_indices(world);
   const Entity* player = world.entities().get(world.player());
   if (player != nullptr && player->health.value <= 0.0F) return 0;
   std::size_t spawned = 0;
@@ -311,6 +391,7 @@ std::size_t spawn_loadout_petals(World& world) {
       ++spawned;
     }
   }
+  assign_petal_orbit_indices(world);
   return spawned;
 }
 

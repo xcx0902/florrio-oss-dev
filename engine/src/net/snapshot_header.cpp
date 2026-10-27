@@ -113,10 +113,11 @@ void OriginalSnapshotWriter::write_mask_domain_fields(EntityHandle handle, std::
                                                       bool include_camera_x, bool include_camera_y,
                                                       bool include_angle,
                                                       std::optional<std::uint8_t> activity_flags,
-                                                      bool include_visual_x, bool include_visual_y) {
+                                                      bool include_visual_x, bool include_visual_y,
+                                                      bool mark_arrival) {
   const auto raw = pack_snapshot_angle(angle_radians);
   updates_.write_u32_le(handle.to_wire());
-  updates_.write_u8(55U); // flags=1 (component mask) XOR 54
+  updates_.write_u8(static_cast<std::uint8_t>((mark_arrival ? 129U : 1U) ^ 54U));
   updates_.write_u32_le(component_mask);
   updates_.write_varint32(2U);
   updates_.write_u8(species_id);

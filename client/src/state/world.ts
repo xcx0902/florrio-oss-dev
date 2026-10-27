@@ -26,6 +26,17 @@ export interface EntityState extends EntitySnapshot {
   readonly arrivalMarked?: boolean;
 }
 
+/** Fields of the native controller record (component 478) that survive the
+ * player's death and drive the death/menu HUD. */
+export interface DeathMetadata {
+  readonly killerName: string;
+  readonly keptCount: number;
+  readonly keptItems: readonly number[];
+  readonly score: number;
+  readonly respawnLevel: number;
+  readonly viewerHandle?: number;
+}
+
 export interface VisualEventState {
   readonly handle: number;
   readonly index: number;
@@ -277,6 +288,63 @@ export class WorldState {
 
   get(handle: number): EntityState | undefined { return this.entities.get(handle); }
   all(): IterableIterator<EntityState> { return this.entities.values(); }
+  /** The controller record is the only entity carrying field 56 (viewer
+   * handle); its death fields remain after the controlled body is removed. */
+  controller(): EntityState | undefined {
+    for (const entity of this.entities.values())
+      if ((entity.referenceFields?.[56] ?? entity.varintFields?.[56]) !== undefined && entity.byteFields?.[20] !== undefined)
+        return entity;
+    // The original controller storage record is not a gameplay entity. A
+    // few snapshots merge its profile fields onto the controlled body when
+    // both records use the same wire slot; keep that body usable as the
+    // death metadata source instead of showing the menu fallbacks.
+    const body = this.playerEntity();
+    return body && (body.byteFields?.[34] !== undefined || body.byteFields?.[47] !== undefined
+      || body.floatFields?.[21] !== undefined || body.stringFields?.[6] !== undefined
+      || body.byteArrayFields?.[16] !== undefined) ? body : undefined;
+  }
+  deathMetadata(): DeathMetadata {
+    const controller = this.controller();
+    // The archive's standalone controller record carries these values as
+    // sparse fields. The live domain transport scopes the same values onto the
+    // controlled body's dense group 72, so accept either representation.
+    const dense = controller?.denseFields;
+    const denseString = (field: number): string | undefined => {
+      const value = dense?.[field];
+      return typeof value === 'string' ? value : undefined;
+    };
+    const denseNumber = (field: number): number | undefined => {
+      const value = dense?.[field];
+      return typeof value === 'number' ? value : undefined;
+    };
+    const items = Array.from({ length: 10 }, () => 0);
+    for (const entry of controller?.byteArrayFields?.[16] ?? [])
+      if (entry.index >= 0 && entry.index < items.length) items[entry.index] = entry.value;
+    if (!controller?.byteArrayFields?.[16]) {
+      const packed = dense?.[16];
+      if (Array.isArray(packed)) for (let index = 0; index < items.length; ++index)
+        if (typeof packed[index] === 'number') items[index] = packed[index] & 255;
+    }
+    // Original retainPlayerLoot puts the kept stack in this component and
+    // caps it at three; the menu line reads "respawn ... with:" from it.
+    const keptCount = Math.max(0, Math.min(10,
+      controller?.byteFields?.[34] ?? denseNumber(34) ?? 0));
+    return {
+      killerName: controller?.stringFields?.[6] ?? denseString(6) ?? '',
+      keptCount,
+      keptItems: items.slice(0, keptCount),
+      score: controller?.floatFields?.[21] ?? denseNumber(21) ?? 0,
+      respawnLevel: controller?.byteFields?.[47] ?? denseNumber(47) ?? 0,
+      viewerHandle: controller?.referenceFields?.[56] ?? controller?.varintFields?.[56]
+        ?? denseNumber(56),
+    };
+  }
+  /** First controlled body, including a health-0 corpse. */
+  playerEntity(): EntityState | undefined {
+    for (const entity of this.entities.values())
+      if ((entity.kind ?? entity.typeId) === 1) return entity;
+    return undefined;
+  }
   /** Authoritative deletion is immediate: the old 150 ms retiring window made
    * killed mobs/petals flash back into view before disappearing. */
   *renderable(_now: number): IterableIterator<EntityState> {

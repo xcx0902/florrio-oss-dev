@@ -155,6 +155,37 @@ test('complete gallery catalogues, drop labels and every discovered row match th
   assert.equal(actual.petals.length, 38);
 });
 
+test('gallery scrollbars follow the pointer while dragged', async t => {
+  const page = await menuPage(t);
+  const result = await page.evaluate(async () => {
+    const layout = await import('/render/menu-layout.js');
+    const samples = [];
+    for (const panel of ['Petals', 'Mobs', 'Changelog']) {
+      window.menu.open(panel);
+      window.menu.advance(1600);
+      const content = layout.menuContentRect(panel, window.menu.height, window.menu.panelAlphas[panel]);
+      const max = layout.menuScrollMax(panel, window.menu.height, window.menu.discoveredMobs);
+      const track = Math.fround(content.height - 8);
+      const thumb = Math.fround(track * Math.fround(content.height / (content.height + max)));
+      const x = content.x + content.width - 7;
+      const top = content.y + 4 + thumb / 2;
+      const scale = window.menu.scale;
+      window.menu.pointerDown(x * scale, top * scale);
+      window.menu.pointerDrag(x * scale, (content.y + content.height - 4) * scale, true);
+      const bottom = window.menu.scroll[panel];
+      window.menu.pointerDrag(x * scale, content.y * scale, true);
+      window.menu.pointerDrag(x * scale, content.y * scale, false);
+      samples.push({ panel, max, bottom, top: window.menu.scroll[panel] });
+    }
+    return samples;
+  });
+  for (const sample of result) {
+    assert.ok(sample.max > 0, `${sample.panel} has a scrollbar`);
+    assert.ok(sample.bottom > sample.max * 0.9, `${sample.panel} thumb drags to the bottom: ${sample.bottom}/${sample.max}`);
+    assert.equal(sample.top, 0, `${sample.panel} thumb drags back to the top`);
+  }
+});
+
 test('panels independently fade and slide while opening, switching and closing', async t => {
   const page = await menuPage(t);
   const samples = await page.evaluate(async () => {

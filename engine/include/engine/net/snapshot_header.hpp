@@ -74,7 +74,8 @@ class OriginalSnapshotWriter {
                                 bool include_camera_x = true, bool include_camera_y = true,
                                 bool include_angle = true,
                                 std::optional<std::uint8_t> activity_flags = std::nullopt,
-                                bool include_visual_x = true, bool include_visual_y = true);
+                                bool include_visual_x = true, bool include_visual_y = true,
+                                bool mark_arrival = false);
   /** Generic interpolated float field. Field ids 5/7/24/28/49/59 are known. */
   void write_mask_float_field(EntityHandle handle, std::uint32_t component_mask,
                               std::uint32_t field, float value);

@@ -4,6 +4,8 @@
 #include "engine/sim/ai.hpp"
 #include "engine/sim/movement.hpp"
 #include "engine/sim/species_attacks.hpp"
+#include "engine/sim/spawn.hpp"
+#include "engine/sim/petals.hpp"
 #include <cmath>
 #include <cstddef>
 #include <new>
@@ -519,6 +521,31 @@ extern "C" std::uint32_t sp_server_debug_set_entity_field(
     default: return 0U;
   }
   entity->bounds_dirty = true;
+  return 1U;
+}
+
+
+/** Development cheat: spawn a mob by catalogue id at a world position. */
+extern "C" std::uint32_t sp_server_debug_spawn_mob(std::uint32_t type_id, float x, float y) {
+  const engine::EntityHandle handle = engine::spawn_entity_from_defaults(
+    api().world(), engine::EntityKind::kMob, static_cast<std::uint16_t>(type_id),
+    engine::Vec2(engine::f32(x), engine::f32(y)));
+  return handle.valid() ? handle.raw : 0U;
+}
+
+/** Development cheat: replace one loadout slot and respawn it immediately. */
+extern "C" std::uint32_t sp_server_debug_set_loadout_slot(std::uint32_t slot,
+                                                           std::uint32_t type_id) {
+  if (slot >= 8U || type_id > 65535U) return 0U;
+  auto& world = api().world();
+  if (!world.player().valid()) return 0U;
+  if (!world.loadout().change_slot_type(world, world.profile(),
+        static_cast<std::uint8_t>(slot), static_cast<std::uint16_t>(type_id))) return 0U;
+  for (std::uint8_t instance = 0; instance < 3U; ++instance) {
+    world.loadout().set_pending(static_cast<std::uint8_t>(slot), instance, false);
+    world.loadout().set_pending_timer(static_cast<std::uint8_t>(slot), instance, 0U);
+  }
+  (void)engine::spawn_loadout_petals(world);
   return 1U;
 }
 

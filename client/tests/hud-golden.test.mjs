@@ -414,7 +414,8 @@ test('death event presentation is time-driven, repeatable, and removed on respaw
     assert.ok(texts(context).includes('You were destroyed by:'));
     assert.ok(texts(context).includes('Ladybug'));
     assert.ok(texts(context).includes('(press enter to continue)'));
-    assert.ok(texts(context).includes('You will respawn at level 12 with:'));
+    // The respawn line belongs to the return-to-menu screen, not the death HUD.
+    assert.ok(!texts(context).some(text => text.startsWith('You will respawn')));
     const amount = Math.fround(1 - Math.pow(0.95, elapsedMilliseconds * 0.06));
     assert.ok(context.find('setGlobalAlpha', alpha => Math.abs(alpha - amount * 0.25) < 1e-7));
   }

@@ -8,6 +8,8 @@ import {
   type MenuPanel, type MenuRenderState,
 } from '../render/menu-layout.js';
 
+const f = Math.fround;
+
 function storage(key: string): string | undefined {
   try { return localStorage.getItem(key) ?? undefined; } catch { return undefined; }
 }
@@ -106,8 +108,10 @@ export class MenuControls {
   }
   open(panel: MenuPanel | undefined): void {
     this.panel = panel;
+    this.scrollDrag = undefined;
     this.resetHover();
   }
+  private scrollDrag?: { panel: MenuPanel; offset: number };
   private resetHover(): void {
     this.hoveredTab = undefined; this.hoveredPetal = undefined; this.hoveredMob = undefined; this.hoveredMobDrop = undefined;
   }
@@ -154,6 +158,22 @@ export class MenuControls {
         && point.y >= close.y && point.y <= close.y + close.height) {
       this.open(undefined); return true;
     }
+    if (this.panel !== 'Settings') {
+      const content = menuContentRect(this.panel, this.height, alpha);
+      const max = menuScrollMax(this.panel, this.height, this.discoveredMobs);
+      if (max > 0 && point.x >= content.x + content.width - 14
+          && point.x <= content.x + content.width && point.y >= content.y
+          && point.y <= content.y + content.height) {
+        const track = f(content.height - 8);
+        const thumb = f(track * f(content.height / (content.height + max)));
+        const top = f(content.y + 4 + f((track - thumb) * (this.scroll[this.panel] / max)));
+        const offset = point.y >= top - 4 && point.y <= top + thumb + 4
+          ? point.y - top : thumb * 0.5;
+        this.scrollDrag = { panel: this.panel, offset };
+        this.dragScroll(point.y);
+        return true;
+      }
+    }
     if (this.panel === 'Settings') {
       const row = settingsRowAt(point.x, point.y, this.height, alpha);
       if (row !== undefined) {
@@ -166,6 +186,26 @@ export class MenuControls {
     const panel = menuPanelRect(this.panel, this.height, alpha);
     return point.x >= panel.x && point.x <= panel.x + panel.width
       && point.y >= panel.y && point.y <= panel.y + panel.height;
+  }
+  /** Continue a scrollbar drag while the left button is held. */
+  pointerDrag(x: number, y: number, down: boolean): void {
+    if (!down) { this.scrollDrag = undefined; return; }
+    if (!this.scrollDrag) return;
+    this.pointerMove(x, y);
+    this.dragScroll(this.pointerY);
+  }
+  private dragScroll(y: number): void {
+    const drag = this.scrollDrag;
+    if (!drag) return;
+    const alpha = this.panelAlphas[drag.panel];
+    const content = menuContentRect(drag.panel, this.height, alpha);
+    const max = menuScrollMax(drag.panel, this.height, this.discoveredMobs);
+    const track = f(content.height - 8);
+    const thumb = f(track * f(content.height / (content.height + max)));
+    const travel = f(track - thumb);
+    if (!(max > 0) || !(travel > 0)) return;
+    const thumbTop = f(y - drag.offset - content.y - 4);
+    this.scroll[drag.panel] = Math.max(0, Math.min(max, f(f(thumbTop / travel) * max)));
   }
   wheel(deltaY: number): boolean {
     if (!this.panel || this.panel === 'Settings') return false;

@@ -48,8 +48,9 @@ test('menu and death overlays contain their text', () => {
   const menu = texts({ menu: true, animationTime: 2880, menuSeed: 2432940084 });
   for (const label of ['florr.io', 'Settings', 'Petals', 'Mobs', 'Changelog']) assert.ok(menu.includes(label), label);
   const death = texts({ deathState: { elapsedMilliseconds: 1000, killerName: 'Ladybug', respawnLevel: 12 } });
-  for (const label of ['You were destroyed by:', 'Ladybug', '(press enter to continue)', 'You will respawn at level 12']) {
+  for (const label of ['You were destroyed by:', 'Ladybug', '(press enter to continue)']) {
     assert.ok(death.includes(label), label);
   }
+  assert.ok(!death.some(text => text.startsWith('You will respawn')), 'the death HUD has no respawn line');
   assert.ok(!texts({}).some(text => /destroyed|continue|respawn/.test(text)), 'respawn removes the death overlay');
 });

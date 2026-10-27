@@ -480,14 +480,16 @@ std::vector<std::uint8_t> WorkerApi::original_client_snapshot_bytes(std::uint32_
       original_client_viewer_scale_ = f32(wide ? 0.63F : 0.9F);
     }
   }
-  std::array<std::uint8_t, 10> lost{};
-  for (std::size_t i = 0; i < lost.size(); ++i)
-    lost[i] = static_cast<std::uint8_t>(world_.profile().lost_items()[i]);
+  // Original retainPlayerLoot writes the kept stack at frame+25 and its count
+  // at frame+24; the client renders this list after "You will respawn ... with:".
+  std::array<std::uint8_t, 10> kept{};
+  for (std::size_t i = 0; i < kept.size(); ++i)
+    kept[i] = static_cast<std::uint8_t>(world_.last_death_kept()[i]);
   record(original_client_controller_handle(), 1U << 5U,
     {byte(1U, 0U), scalar(5U, original_client_viewer_position_.x.value),
-     string(6U, world_.last_killer_name()), array(16U, lost), byte(20U, 0U),
+     string(6U, world_.last_killer_name()), array(16U, kept), byte(20U, 0U),
      scalar(21U, world_.last_death_score().value), scalar(24U, original_client_viewer_position_.y.value),
-     scalar(32U, original_client_viewer_scale_.value), byte(34U, world_.profile().lost_count()),
+     scalar(32U, original_client_viewer_scale_.value), byte(34U, world_.last_death_kept_count()),
      byte(47U, world_.last_death_level()),
      integer(56U, controlled != nullptr ? controlled->handle.to_wire() : 0U)}, true);
 
@@ -742,6 +744,12 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
     const auto previous_angle = domain_angle_values_.find(entity.handle.to_wire());
     const bool angle_changed = previous_angle == domain_angle_values_.end()
       || previous_angle->second != angle_value;
+    // A newly spawned pickup is introduced with the archive's arrival bit so
+    // the client replays its birth animation. Pickups that were already in
+    // view keep full scale, matching the original first-snapshot behaviour.
+    const bool arriving = entity.kind == EntityKind::kDrop
+      && !domain_known_.contains(entity.handle.raw)
+      && world_.tick() <= entity.spawn_tick + 1U;
     writer.write_mask_domain_fields(entity.handle, mask,
       entity.kind == EntityKind::kPlayer ? entity.player_look : static_cast<std::uint8_t>(entity.type_id),
       static_cast<std::uint8_t>(entity.kind),
@@ -750,7 +758,7 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
       entity.angle.value, entity.health.value, entity.max_health.value, entity.collision_radius.value,
       entity.death_processed ? 1U : 0U, camera_x_changed, camera_y_changed, angle_changed,
       entity.ai.enabled ? std::optional<std::uint8_t>(entity.ai.activity_flags) : std::nullopt,
-      visual_x_changed, visual_y_changed);
+      visual_x_changed, visual_y_changed, arriving);
     domain_camera_bits_[entity.handle.to_wire()] = camera_bits;
     domain_position_revisions_[entity.handle.to_wire()] = position_revisions;
     domain_angle_values_[entity.handle.to_wire()] = angle_value;
@@ -801,6 +809,28 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
     if (!write_dense_values(writer, entity) && default_dense_groups_
         && camera_x_changed && camera_y_changed && angle_changed)
       write_default_dense_values(writer, entity);
+    if (entity.kind == EntityKind::kPlayer && entity.death_processed) {
+      // The archived client reads death statistics from control component 478,
+      // a standalone record that the domain transport does not carry. Emit the
+      // same fields on the controlled body so the death screen and the respawn
+      // menu retain the original killer/lost-item/score data. These records
+      // intentionally follow the dense defaults, whose group 72 writes zeros.
+      writer.write_mask_string_field(entity.handle, mask, 6U, entity.killer_name);
+      // These are the kept petals (at most three), not the discarded stack:
+      // the respawn line lists what the player will start with.
+      const auto& kept_items = world_.last_death_kept();
+      for (std::uint32_t index = 0; index < 10U; ++index)
+        writer.write_mask_byte_array_field(entity.handle, mask, 16U, index,
+          static_cast<std::uint8_t>(kept_items[index]));
+      writer.write_mask_float_field(entity.handle, mask, 21U,
+        world_.last_death_score().value);
+      writer.write_mask_byte_field(entity.handle, mask, 34U,
+        static_cast<std::uint8_t>(world_.last_death_kept_count()));
+      writer.write_mask_byte_field(entity.handle, mask, 47U,
+        static_cast<std::uint8_t>(world_.last_death_level()));
+      writer.write_mask_reference_field(entity.handle, mask, 56U,
+        entity.handle.to_wire());
+    }
   }
   domain_known_ = std::move(visible);
   return writer.finish();

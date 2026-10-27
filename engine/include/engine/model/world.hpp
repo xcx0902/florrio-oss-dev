@@ -17,6 +17,7 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <span>
 #include <vector>
 
 namespace engine {
@@ -185,6 +186,8 @@ class World {
     time_ms_ = 0.0;
     last_death_score_ = f32(0.0F);
     last_death_level_ = 0;
+    last_death_kept_.fill(0);
+    last_death_kept_count_ = 0;
     width_ = f32(50000.0F);
     height_ = f32(4000.0F);
     auto_populate_ = false;
@@ -231,6 +234,8 @@ class World {
     time_ms_ = 0.0;
     last_death_score_ = f32(0.0F);
     last_death_level_ = 0;
+    last_death_kept_.fill(0);
+    last_death_kept_count_ = 0;
     width_ = f32(50000.0F);
     height_ = f32(4000.0F);
     auto_populate_ = false;
@@ -454,9 +459,16 @@ class World {
   void set_time_ms(double value) { time_ms_ = value; }
   [[nodiscard]] f32 last_death_score() const { return last_death_score_; }
   [[nodiscard]] std::uint8_t last_death_level() const { return last_death_level_; }
+  [[nodiscard]] const std::array<std::uint16_t, 10>& last_death_kept() const { return last_death_kept_; }
+  [[nodiscard]] std::uint8_t last_death_kept_count() const { return last_death_kept_count_; }
   void set_last_death(f32 score, std::uint8_t level) {
     last_death_score_ = score;
     last_death_level_ = level;
+  }
+  void set_last_death_kept(std::span<const std::uint16_t> kept) {
+    last_death_kept_.fill(0);
+    last_death_kept_count_ = static_cast<std::uint8_t>(std::min(kept.size(), last_death_kept_.size()));
+    std::copy_n(kept.begin(), last_death_kept_count_, last_death_kept_.begin());
   }
   void set_last_killer(EntityHandle handle, std::string name) {
     last_killer_ = handle;
@@ -525,6 +537,8 @@ class World {
   double time_ms_ = 0.0;
   f32 last_death_score_;
   std::uint8_t last_death_level_ = 0;
+  std::array<std::uint16_t, 10> last_death_kept_{};
+  std::uint8_t last_death_kept_count_ = 0;
   EntityHandle last_killer_{};
   std::string last_killer_name_;
   EntityHandle player_;

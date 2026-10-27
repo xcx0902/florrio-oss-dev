@@ -8,7 +8,7 @@ import { hudRenderer, drawMenuPreviewHud } from './hud.js';
 import type { HudState } from './hud.js';
 import { MenuAnimation, menuSeed, caretAlpha } from './menu-animation.js';
 import { PETAL_INFO } from '../schema/petals.js';
-import { drawPetalIcon } from './entity-art.js';
+import { drawPetalCard, drawPetalIcon } from './entity-art.js';
 import { drawMenuPanels } from './menu-panels.js';
 import { PETAL_GALLERY_TYPES, petalCellRect, mobDropRect, menuPanelRect, type MenuRenderState } from './menu-layout.js';
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
@@ -220,7 +220,8 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
                          status: string, pixelRatio = 1, now = 0, seed?: number,
                          worldPass?: MenuPreviewPass, previewState?: HudState, interactive = false,
                          petalDiscoveries = 0, menuState?: MenuRenderState,
-                         petalTypes?: readonly number[]): void {
+                         petalTypes?: readonly number[],
+                         respawn?: { readonly level: number; readonly items: readonly number[] }): void {
   const scale = f(Math.max(0.7, f(Math.max(width * 0.000521, height * 0.000926))));
   const ui = f(scale * pixelRatio), raster = f(ui * 2.4);
   const w = Math.ceil(f(width / scale)), h = Math.ceil(f(height / scale));
@@ -275,12 +276,30 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
       centered ? y : f(y + f(f(font * 1.4) * 0.5)), 1, false);
   };
   base();
-  let howY = Math.trunc(h / 2) + 100;
-  label('How to play', 30, Math.trunc(w / 2), howY);
-  howY = f(howY + f(30 * 1.4)); label('Use mouse to move', 16, Math.trunc(w / 2), howY);
-  howY = f(howY + f(16 * 1.4)); label('Left click to attack', 16, Math.trunc(w / 2), howY);
-  howY = f(howY + f(16 * 1.4)); label('Right click to defend', 16, Math.trunc(w / 2), howY);
-  label('florr.io', 80, Math.trunc(w / 2), Math.trunc(h / 4));
+  const centerX = Math.trunc(w / 2);
+  if (respawn) {
+    // Original menu respawn block: centered under the name input. The item
+    // row uses the same 60-unit cards and 70-unit pitch as the galleries.
+    const items = respawn.items.filter(type => PETAL_INFO[type]);
+    label(`You will respawn at level ${respawn.level} with:`,
+      16, centerX, f(h / 2 + 65.7));
+    const pitch = 70, size = 60;
+    let cardX = centerX - f((items.length - 1) * pitch / 2);
+    for (const type of items) {
+      context.save();
+      context.setTransform(ui, 0, 0, ui, f(ui * cardX), f(ui * f(h / 2 + 114.5)));
+      drawPetalCard(context, type, size, `menu-respawn:${type}`);
+      context.restore();
+      cardX = f(cardX + pitch);
+    }
+  } else {
+    let howY = Math.trunc(h / 2) + 100;
+    label('How to play', 30, centerX, howY);
+    howY = f(howY + f(30 * 1.4)); label('Use mouse to move', 16, centerX, howY);
+    howY = f(howY + f(16 * 1.4)); label('Left click to attack', 16, centerX, howY);
+    howY = f(howY + f(16 * 1.4)); label('Right click to defend', 16, centerX, howY);
+  }
+  label('florr.io', 80, centerX, Math.trunc(h / 4));
 
   for (const discord of [true, false]) {
     context.save(); context.setLineJoin('round'); context.setLineWidth(5);
@@ -305,11 +324,11 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
   base(); context.save(); context.setGlobalAlpha(0);
   label('Connecting...', 48, f(w * 0.5), -200); context.restore();
   context.save(); context.setGlobalAlpha(1); base();
-  const centerX = f(w * 0.5), inputY = Math.trunc(h / 4) + 200;
-  label('This pretty little flower is called...', 20, centerX, f(inputY + f(20 * -1.4) * 1.1), false);
+  const inputCenterX = f(w * 0.5), inputY = Math.trunc(h / 4) + 200;
+  label('This pretty little flower is called...', 20, inputCenterX, f(inputY + f(20 * -1.4) * 1.1), false);
   label(/error|unavailable|timeout|failed|closed|refused/i.test(status) ? status : '(press enter to spawn)',
-    14, centerX, inputY + 55, false);
-  const left = f(centerX - 200);
+    14, inputCenterX, inputY + 55, false);
+  const left = f(inputCenterX - 200);
   context.save(); context.setLineJoin('round'); context.setFillRgb(238, 238, 238);
   context.setTransform(f(ui * 400), 0, 0, f(ui * 50), f(ui * left), f(ui * inputY)); context.fillRect(0, 0, 1, 1);
   context.setStrokeRgb(0, 0, 0); context.setLineWidth(5);

@@ -66,14 +66,13 @@ test('all source rarities retain their RGB values', () => {
   const cases = [
     [1, 'Common', [126, 239, 109]], [6, 'Unusual', [255, 230, 93]],
     [4, 'Rare', [94, 77, 227]], [15, 'Epic', [134, 31, 222]],
-    [23, 'Legendary', [222, 31, 31]], [5, 'Mythic', [222, 31, 101]],
+    [23, 'Legendary', [222, 31, 31]], [5, 'Unique', [222, 31, 101]],
   ];
   for (const [type, rarity, rgb] of cases) {
     const result = render({ slots: [type], hoveredSlot: 0 });
     assert.equal(result.texts[0], PETAL_INFO[type].name);
     assert.equal(result.texts[1], rarity);
     assert.ok(result.tooltip.some(([op, args]) => op === 'setStrokeRgb' && args.every((value, index) => value === rgb[index])));
-    assert.ok(!result.texts.includes('Unique'));
   }
 });
 
@@ -94,7 +93,7 @@ test('storage hover uses authoritative storage contents and wraps inside viewpor
     const result = render({ width, height, pixelRatio, slots: [1, 1, 1, 1, 1, 6], storageSlots: [5],
       hoveredSlot: 5, pointerX, pointerY });
     assert.equal(result.texts[0], 'Square');
-    assert.equal(result.texts[1], 'Mythic');
+    assert.equal(result.texts[1], 'Unique');
     assert.equal(result.texts.slice(2).join(' '), PETAL_INFO[5].description);
     const coordinates = result.tooltip.filter(([op]) => ['moveTo', 'lineTo', 'quadraticCurveTo'].includes(op)).flatMap(([, args]) => args);
     for (let index = 0; index < coordinates.length; index += 2) {

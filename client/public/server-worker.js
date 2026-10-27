@@ -96,6 +96,17 @@ self.onmessage = async event => {
       if (originalMode) exports.sp_server_flush_original();
       else exports.sp_server_flush();
       break;
+    case 'sp_server_debug_spawn_mob': {
+      const view = new DataView(exports.memory.buffer, pointer, length);
+      exports.sp_server_debug_spawn_mob(view.getUint16(0, true),
+        view.getFloat32(2, true), view.getFloat32(6, true));
+      break;
+    }
+    case 'sp_server_debug_set_loadout_slot': {
+      const view = new Uint8Array(exports.memory.buffer, pointer, length);
+      exports.sp_server_debug_set_loadout_slot(view[0], view[1] | (view[2] << 8));
+      break;
+    }
     default: throw new Error(`invalid worker function to call: ${funcName}`);
   }
   if (pointer) exports.free(pointer);

@@ -81,6 +81,8 @@ void split_peas(World& world, EntityHandle petal_handle, EntityHandle owner) {
     world.schedule_deferred_launch(world.time_ms() + 1.0,
                                    f32::from_double(phase), std::move(children));
   }
+  // Equipped Peas own a slot/handle; temporary split children do not.
+  (void)on_petal_destroyed(world, petal_handle);
   (void)world.destroy(petal_handle);
 }
 
@@ -132,6 +134,14 @@ void hatch_egg(World& world, EntityHandle petal_handle, std::uint16_t hatchling_
 }
 
 } // namespace
+
+bool consume_peas_attack(World& world, EntityHandle petal_handle, EntityHandle owner) {
+  Entity* petal = world.entities().get(petal_handle);
+  if (petal == nullptr) return false;
+  if (petal->type_id != 11U && petal->type_id != 12U && petal->type_id != 34U) return false;
+  split_peas(world, petal_handle, owner);
+  return true;
+}
 
 void on_petal_hit(World& world, EntityHandle petal_handle, EntityHandle target_handle,
                   EntityHandle attacker) {

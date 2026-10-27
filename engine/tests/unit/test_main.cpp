@@ -2817,6 +2817,77 @@ void test_multi_instance_orbit_spacing() {
   CHECK(world.petals()[2].orbit_index == world.petals()[0].orbit_index);
 }
 
+void test_orbit_reindex_after_removal() {
+  engine::World world;
+  world.initialize();
+  CHECK(engine::spawn_player_default(world, "reindex", engine::make_default_profile()).valid());
+  for (std::uint8_t slot = 0; slot < 5; ++slot)
+    world.profile().set_inventory(slot, static_cast<std::uint16_t>(slot + 1));
+  world.profile().set_inventory_count(5);
+  world.loadout().clear();
+  for (std::uint8_t slot = 0; slot < 5; ++slot)
+    CHECK(world.loadout().equip(slot, static_cast<std::uint16_t>(slot + 1)));
+  CHECK(engine::spawn_loadout_petals(world) == 5U);
+  CHECK(world.loadout().change_slot_type(world, world.profile(), 2, 0));
+  engine::assign_petal_orbit_indices(world);
+  CHECK(world.petals().size() == 4U);
+  CHECK(world.loadout().orbit_positions() == 4U);
+  std::array<std::uint8_t, 4> indices{};
+  for (std::size_t index = 0; index < world.petals().size(); ++index)
+    indices[index] = world.petals()[index].orbit_index;
+  std::sort(indices.begin(), indices.end());
+  CHECK(indices[0] == 0U && indices[1] == 1U && indices[2] == 2U && indices[3] == 3U);
+}
+
+void test_flag41_slot_without_component_keeps_shared_position() {
+  engine::World world;
+  world.initialize();
+  CHECK(engine::spawn_player_default(world, "rose-slot", engine::make_default_profile()).valid());
+  world.profile().set_inventory(0, 24);
+  world.profile().set_inventory(1, 1);
+  world.profile().set_inventory_count(2);
+  world.loadout().clear();
+  CHECK(world.loadout().equip(0, 24));
+  CHECK(world.loadout().equip(1, 1));
+  CHECK(engine::spawn_loadout_petals(world) == 4U);
+  // Replace Rose's third instance with a live entity that has no petal
+  // component. Original function 85 adds only the already-used shared
+  // position, so Basic remains at orbit 1 instead of jumping to 2.
+  const engine::EntityHandle componentless = engine::spawn_entity(
+    world, engine::EntityKind::kPetal, 1U, engine::Vec2{engine::f32(20.0F), engine::f32(0.0F)},
+    engine::f32(14.0F), 0U, 0U);
+  CHECK(componentless.valid());
+  world.loadout().set_handle(0, 2, componentless);
+  engine::assign_petal_orbit_indices(world);
+  const engine::EntityHandle basic = world.loadout().handle(1, 0);
+  engine::PetalOrbitState* basic_state = nullptr;
+  for (auto& state : world.petals()) if (state.handle == basic) basic_state = &state;
+  CHECK(basic_state != nullptr);
+  CHECK(basic_state->orbit_index == 1U);
+}
+
+void test_peas_attack_consumes_petal() {
+  engine::World world;
+  world.initialize();
+  CHECK(engine::spawn_player_default(world, "peas", engine::make_default_profile()).valid());
+  world.profile().set_inventory(0, 11);
+  world.profile().set_inventory_count(1);
+  world.loadout().clear();
+  CHECK(world.loadout().equip(0, 11));
+  CHECK(engine::spawn_loadout_petals(world) == 1U);
+  const engine::EntityHandle pea = world.petals()[0].handle;
+  world.advance_tick(600.0);
+  world.apply_input(1U, engine::f32(0.0F), engine::f32(0.0F));
+  engine::update_petal_orbits(world, 16.0);
+  CHECK(world.entities().get(pea) == nullptr);
+  std::uint32_t children = 0;
+  for (const auto& entity : world.entities().entities())
+    if (entity.active && entity.kind == engine::EntityKind::kPetal && entity.type_id == 11)
+      ++children;
+  CHECK(children == 4U);
+  CHECK(world.run_deferred_launches(world.time_ms() + 1.0) >= 1U);
+}
+
 void test_twin_widens_orbit_spacing() {
   engine::World world;
   world.initialize();
@@ -3176,8 +3247,10 @@ void test_attribution_and_legendary() {
   const engine::Entity* attributed_corpse = world.entities().get(mob);
   CHECK(attributed_corpse != nullptr);
   CHECK(attributed_corpse->death_processed);
-  CHECK(world.last_killer() == player);
-  CHECK(world.last_killer_name() == "p");
+  // The replicated killer-name field belongs to player deaths only (original
+  // updateKillerName); a mob dying to the player must not populate it.
+  CHECK(!world.last_killer().valid());
+  CHECK(world.last_killer_name().empty());
   CHECK(world.profile().level() > 0U || world.profile().experience().value > 0.0F);
 
   // Legendary (rarity 5) duplicate suppression: another active loadout or an
@@ -4046,6 +4119,12 @@ void test_attribution_death_and_pickups() {
   CHECK(petal_count > 0U);
   CHECK(world.last_death_score().value == 123.0F);
   CHECK(world.last_death_level() == 7U);
+  CHECK(world.last_killer_name() == "Ladybug");
+  // Mobs keep dying after the player. Their killer names are per-entity; the
+  // local death payload must retain the entity that actually killed the
+  // player instead of being overwritten by later unattributed mob deaths.
+  (void)engine::damage_entity(world, attacker, world.entities().get(attacker)->health);
+  CHECK(world.last_killer_name() == "Ladybug");
   for (const auto petal : owned_petals) {
     const engine::Entity* child_corpse = world.entities().get(petal);
     CHECK(child_corpse != nullptr);
@@ -5317,6 +5396,9 @@ int main(int argc, char** argv) {
   runTest("test_contact_combat_and_loot", test_contact_combat_and_loot);
   runTest("test_multi_instance_orbit_spacing", test_multi_instance_orbit_spacing);
   runTest("test_twin_widens_orbit_spacing", test_twin_widens_orbit_spacing);
+  runTest("test_orbit_reindex_after_removal", test_orbit_reindex_after_removal);
+  runTest("test_flag41_slot_without_component_keeps_shared_position", test_flag41_slot_without_component_keeps_shared_position);
+  runTest("test_peas_attack_consumes_petal", test_peas_attack_consumes_petal);
   runTest("test_rose_healing", test_rose_healing);
   runTest("test_rose_contracts_orbit_and_heals_promptly", test_rose_contracts_orbit_and_heals_promptly);
   runTest("test_rose_timer_arms_at_full_health", test_rose_timer_arms_at_full_health);

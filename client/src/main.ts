@@ -53,7 +53,8 @@ declare global {
       resume(): void;
       start(): Promise<void>;
       readonly ui: { readonly started: boolean; readonly inventoryOpen: boolean; readonly selectedSlot: number; readonly dead: boolean; readonly status: string; readonly menuPanel: string | undefined; readonly movementDisabled: boolean; readonly name: string;
-        readonly keyboardSlot: number | undefined; readonly keyboardHint: number; readonly keyboardHighlightAlpha: number };
+        readonly keyboardSlot: number | undefined; readonly keyboardHint: number; readonly keyboardHighlightAlpha: number;
+        readonly menuScroll: Readonly<Record<string, number>> };
       setSnapshot(entities: readonly EntitySnapshot[], events?: readonly SnapshotEvent[]): void;
       /** Apply a decoded state at an explicit client clock. Used by the visual
        * runner to feed the same two-tick interpolation window as the golden. */
@@ -86,7 +87,7 @@ window.__florr = {
   resume: () => { frozen = false; pendingRenderCamera = undefined; camera.clearOverride(); },
   start: async () => startGame(),
   get ui() { return { started, inventoryOpen, selectedSlot, dead, status, menuPanel: menuControls.panel, movementDisabled,
-    name: menuControls.name.value, keyboardSlot, keyboardHint, keyboardHighlightAlpha }; },
+    name: menuControls.name.value, keyboardSlot, keyboardHint, keyboardHighlightAlpha, menuScroll: menuControls.renderState().scroll }; },
   suicide: async () => { await server.send(inputEncoder.suicide()); },
   restart: async () => { await restartGame(); },
   setCamera: (x, y, zoom, offsetX, offsetY) => { camera.setCamera(x, y, zoom, offsetX, offsetY); },
@@ -177,6 +178,13 @@ let keyboardHighlightAlpha = 0, keyboardHighlightReady = false;
 let deleteAlpha = 0;
 let entryAt: number | undefined;
 let entryCanvas: HTMLCanvasElement | undefined;
+let exitAt: number | undefined;
+let exitCanvas: HTMLCanvasElement | undefined;
+let exitFrame = 0;
+let menuRespawn: { level: number; items: readonly number[] } | undefined;
+let lastDeathMetadata = { killerName: '', keptCount: 0, keptItems: [] as readonly number[], score: 0, respawnLevel: 0 };
+let lastSlots: number[] = [1, 1, 1, 1, 1];
+let lastLevel = 1;
 let helperPlayer: { x: number; y: number } | undefined;
 let status = 'Connecting…';
 let dpr = 1;
@@ -194,11 +202,8 @@ function resize(): void {
 }
 
 function localPlayer(): { entity: EntityState; kind: number } | null {
-  for (const entity of world.all()) {
-    const kind = entity.kind ?? entity.typeId;
-    if (kind === 1 && entity.health > 0) return { entity, kind };
-  }
-  return null;
+  const entity = world.playerEntity();
+  return entity !== undefined && entity.health > 0 ? { entity, kind: entity.kind ?? entity.typeId } : null;
 }
 
 async function startGame(): Promise<void> {
@@ -211,7 +216,9 @@ async function startGame(): Promise<void> {
   petalTransfers.reset();
   movementHelper.reset();
   helperPlayer = undefined;
-  entryAt = undefined; entryCanvas = undefined; hintExpand = 0;
+  entryAt = undefined; entryCanvas = undefined; exitAt = undefined; exitCanvas = undefined;
+  exitFrame = 0;
+  menuRespawn = undefined; hintExpand = 0;
   keyboardHint = 0; keyboardHighlightReady = false; keyboardHighlightAlpha = 0;
   dragSlot = dragInventorySlot = undefined; petalMotion.reset();
   status = 'Entering the garden…';
@@ -229,6 +236,7 @@ async function restartGame(): Promise<void> {
   started = true;
   dead = false;
   deathAt = undefined;
+  menuRespawn = undefined;
   status = 'Respawning…';
   try {
     await server.send(inputEncoder.restart());
@@ -238,6 +246,17 @@ async function restartGame(): Promise<void> {
 }
 
 function continueToMenu(): void {
+  // Preserve the final death frame for the closing iris. The menu is rendered
+  // underneath it and remains visible outside the shrinking circle.
+  if (!exitCanvas) exitCanvas = document.createElement('canvas');
+  exitCanvas.width = canvas.width; exitCanvas.height = canvas.height;
+  exitCanvas.getContext('2d')?.drawImage(canvas, 0, 0);
+  exitAt = performance.now();
+  exitFrame = 0;
+  // The original menu always carries the respawn line after a death, even
+  // when no petal survived ("with:" is part of the native format string).
+  menuRespawn = { level: lastDeathMetadata.respawnLevel || lastLevel,
+    items: [...lastDeathMetadata.keptItems] };
   started = enteredWorld = dead = false;
   deathAt = undefined; inventoryOpen = movementDisabled = false;
   dragSlot = dragInventorySlot = undefined;
@@ -309,6 +328,33 @@ async function tickServer(): Promise<void> {
   }
 }
 
+
+async function ensureServer(): Promise<void> {
+  if (!serverInitialized) { await server.init(); serverInitialized = true; }
+}
+function installDevelopmentCheats(): void {
+  if (!new URLSearchParams(location.search).has('cheat')) return;
+  void import('./dev/cheat.js').then(({ installCheatPanel }) => installCheatPanel({
+    coordinates: () => {
+      const player = localPlayer();
+      return player ? { x: player.entity.x, y: player.entity.y } : undefined;
+    },
+    loadout: () => hotbarTypes.slice(0, 8),
+    setPetal: async (slot, type) => {
+      await ensureServer();
+      const bytes = new Uint8Array([slot & 255, type & 255, (type >>> 8) & 255]);
+      await server.request('sp_server_debug_set_loadout_slot', bytes);
+    },
+    spawnMob: async (type, x, y) => {
+      await ensureServer();
+      const bytes = new Uint8Array(10);
+      const view = new DataView(bytes.buffer);
+      view.setUint16(0, type, true); view.setFloat32(2, x, true); view.setFloat32(6, y, true);
+      await server.request('sp_server_debug_spawn_mob', bytes);
+    },
+  }));
+}
+
 async function boot(): Promise<void> {
   resize();
   window.addEventListener('resize', resize);
@@ -320,6 +366,7 @@ async function boot(): Promise<void> {
   document.getElementById('status')?.remove();
   menuControls.name.focus({ preventScroll: true });
   window.setInterval(() => { void tickServer(); }, 50);
+  installDevelopmentCheats();
   requestAnimationFrame(frame);
 }
 
@@ -393,6 +440,7 @@ function handleMenuPointer(): void {
   menuControls.pointerMove(pointer.position.x, pointer.position.y);
   const press = pointer.consumeLeftPress();
   if (press) menuControls.pointerDown(press.x, press.y);
+  menuControls.pointerDrag(pointer.position.x, pointer.position.y, pointer.buttons.left);
   pointer.consumeLeftRelease();
   pointer.consumeRightClick();
   pointer.consumeDoubleClick();
@@ -490,6 +538,49 @@ function drawEntryTransition(now: number): void {
   if (progress >= 1) { entryAt = undefined; entryCanvas = undefined; }
 }
 
+
+/** Original death→menu transition: the captured death frame remains inside a
+ * circular iris while the menu is revealed outside it. The radius decays with
+ * the source's pow(.95, delta*0.06) curve; the ring is five UI units wide. */
+function drawExitTransition(): void {
+  // Original clientFrame's iris: a cubic ease over 62.5 rendered frames in the
+  // menu's logical space, never wall-clock time. The black band shrinks with
+  // the same progress after the first 41 frames.
+  const width = canvas.clientWidth, height = canvas.clientHeight;
+  if (width <= 0 || height <= 0) { exitAt = undefined; exitCanvas = undefined; return; }
+  const scale = Math.fround(Math.max(0.7, Math.fround(Math.max(width * 0.000521, height * 0.000926))));
+  const ui = Math.fround(scale * dpr);
+  const logicalWidth = Math.ceil(Math.fround(width / scale));
+  const logicalHeight = Math.ceil(Math.fround(height / scale));
+  const cx = logicalWidth * 0.5, cy = logicalHeight * 0.5;
+  exitFrame += 1;
+  const remaining = 1 - exitFrame / 62.5;
+  if (remaining <= 0) { exitAt = undefined; exitCanvas = undefined; return; }
+  const radius = Math.fround(Math.hypot(logicalWidth, logicalHeight) * 0.5
+    * Math.pow(remaining, 3));
+  context2d.save();
+  context2d.beginPath();
+  context2d.setTransform(ui, 0, 0, ui, 0, 0);
+  context2d.arc(cx, cy, radius, 0, Math.PI * 2, true);
+  context2d.clip();
+  context2d.setTransform(ui * logicalWidth, 0, 0, ui * logicalHeight, 0, 0);
+  if (exitCanvas) context2d.drawImage(exitCanvas, 0, 0, 1, 1);
+  context2d.restore();
+  // The original paints the menu clipped *outside* the iris and then fills a
+  // black band around the circle. Its width is 5 for the first 41 frames and
+  // then shrinks to 0.12 as the iris closes; our menu is already on screen, so
+  // paint the equivalent band as an annulus. Filling the outer circle while
+  // the inner clip is active would hide the captured death frame entirely.
+  const band = Math.min(5, 15 * remaining);
+  context2d.save();
+  context2d.setTransform(ui, 0, 0, ui, 0, 0);
+  context2d.beginPath();
+  context2d.arc(cx, cy, radius + band, 0, Math.PI * 2);
+  context2d.arc(cx, cy, radius, 0, Math.PI * 2, true);
+  context2d.fillStyle = '#000'; context2d.fill();
+  context2d.restore();
+}
+
 /** Inventory grid hit test, matching the geometry in `render/ui.ts`. */
 function inventoryHover(): number | undefined {
   if (!inventoryOpen) return undefined;
@@ -517,6 +608,18 @@ function frame(now: number): void {
   // menu's hidden world/HUD, then the following frame enters the garden.
   const menuFrame = !enteredWorld;
   const player = localPlayer();
+  const deathInfo = world.deathMetadata();
+  // The controller record is reaped together with the corpse one second after
+  // death, but the native death screen and the menu keep the last received
+  // values. Snapshot on the first dead frame and never replace them with the
+  // empty post-reap record while the overlay/menu are still showing.
+  if (!dead) lastDeathMetadata = deathInfo;
+  const corpse = world.playerEntity();
+  if (corpse !== undefined && started && enteredWorld && corpse.health <= 0) {
+    if (!dead) lastDeathMetadata = deathInfo;
+    dead = true;
+    deathAt ??= now;
+  }
   if (menuFrame && player !== null) entryAt = now;
   // The native hint only opens from the small bottom pill; once opened the
   // pointer may travel through the taller inventory safe area.
@@ -617,6 +720,8 @@ function frame(now: number): void {
   let playerHudState: HudState | undefined;
   if (player) {
     const displaySlots = playerLoadoutSlots(player.entity) ?? loadoutSlots(world.all(), 16);
+    lastSlots = displaySlots.slice();
+    lastLevel = player.entity.level ?? 1;
     inventoryTypes = displaySlots;
     hotbarTypes.splice(0, hotbarTypes.length, ...displaySlots);
     menuControls.discover(displaySlots, [...world.all()]
@@ -670,6 +775,7 @@ function frame(now: number): void {
       width: canvas.clientWidth, height: canvas.clientHeight,
       mobile: mobileUi, petalDiscoveries: menuControls.petalDiscoveryCount,
       menuState: menuControls.renderState(), menuPetalTypes: menuControls.discoveredPetals,
+      menuRespawn,
       menuPreviewState: playerHudState,
       menuPreview: (preview, view) => {
         menuCamera.resize(view.width, view.height, view.pixelRatio);
@@ -683,9 +789,16 @@ function frame(now: number): void {
     drawWorld(renderContext, world, camera, now);
     drawMovementGuide();
     drawFrameHud({
-      health: 0, maxHealth: 100, level: 1, pixelRatio: dpr,
-      chat: world.chat, death: true, slots: [1, 1, 1, 1, 1], selectedSlot,
-      deathState: { elapsedMilliseconds: Math.max(0, now - (deathAt ?? now)) },
+      health: 0, maxHealth: 100, level: lastLevel, pixelRatio: dpr,
+      chat: world.chat, death: true, slots: lastSlots, selectedSlot,
+      flowers: 0, flowerEntries: [],
+      deathState: {
+        elapsedMilliseconds: Math.max(0, now - (deathAt ?? now)),
+        killerName: lastDeathMetadata.killerName || 'A mysterious entity',
+        respawnLevel: lastDeathMetadata.respawnLevel || lastLevel,
+        score: lastDeathMetadata.score,
+        keptSlots: lastSlots,
+      },
       width: canvas.clientWidth, height: canvas.clientHeight,
       mobile: mobileUi,
     });
@@ -695,6 +808,7 @@ function frame(now: number): void {
     drawFrameHud(playerHudState!);
   }
   if (entryAt !== undefined && player !== null) drawEntryTransition(now);
+  if (exitAt !== undefined && !enteredWorld) drawExitTransition();
   requestAnimationFrame(frame);
 }
 

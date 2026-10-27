@@ -8,7 +8,9 @@ export type ServerFunction =
   | 'sp_server_init'
   | 'sp_server_send'
   | 'sp_server_think'
-  | 'sp_server_flush';
+  | 'sp_server_flush'
+  | 'sp_server_debug_spawn_mob'
+  | 'sp_server_debug_set_loadout_slot';
 
 export interface WorkerRequest {
   readonly funcName: ServerFunction;

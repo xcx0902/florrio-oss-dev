@@ -32,6 +32,8 @@ export interface HudDeathState {
   readonly elapsedMilliseconds: number;
   readonly killerName?: string;
   readonly respawnLevel?: number;
+  /** Last death score (controller field 21). */
+  readonly score?: number;
   readonly keptSlots?: readonly number[];
 }
 
@@ -98,6 +100,8 @@ export interface HudState {
   readonly status?: string;
   readonly animationTime?: number;
   readonly menuSeed?: number;
+  /** Death→menu line: level and the items shown under "with:". */
+  readonly menuRespawn?: { readonly level: number; readonly items: readonly number[] };
   /** Canvas-native menu panel state and discovered-petal pool. */
   readonly menuState?: MenuRenderState;
   readonly menuPetalTypes?: readonly number[];
@@ -703,6 +707,9 @@ function drawHudLayer(context: HudContext, state: HudState, layout: HudLayout, c
   context.save(); baseTransform(context, layout);
   drawLabelBox(context, { text: 'florr.io', font: 32, rasterScale: raster },
     15, 15, f(measureLabel('florr.io', 32) + 14), f(32 * 1.4), false);
+  // Original763's dead-body branch draws only the logo and flower panel; the
+  // map, level bar, hint and normal hotbar are absent.
+  if (state.death) { context.restore(); return; }
   drawMap(context, state, layout, raster); drawLevelBar(context, state, layout, raster);
   drawHint(context, state, layout, raster); drawHotbar(context, state, layout, raster);
   drawInventory(context, state, layout, raster); drawChat(context, state, layout, raster); context.restore();
@@ -806,19 +813,19 @@ function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayou
   context.save(); baseTransform(context, layout, ratio); context.setFillRgb(0, 0, 0); context.setGlobalAlpha(amount * 0.25);
   context.fillRect(0, 0, layout.logicalWidth, layout.logicalHeight); context.setGlobalAlpha(1);
   const centerX = Math.trunc(layout.logicalWidth / 2);
-  const centerY = Math.trunc(layout.logicalHeight / 2) - (1 - amount) * layout.logicalHeight;
+  const centerY = Math.trunc(layout.logicalHeight / 2) - 7.857143;
   const raster = f(f(layout.scale * ratio) * 2.4);
   baseTransform(context, layout, ratio, centerX, centerY);
   // clientFrame draws the retained petals behind the dead flower, then the
   // dead face at 1.5x, rotated -0.2 radians. Artwork stays in entity-art.
-  const retained = state.deathState?.keptSlots ?? [];
-  const petalPositions = [[35, 20], [-25, 25], [-32, 5], [-10, -15], [30, -5]] as const;
-  retained.slice(0, 5).forEach((type, index) => {
-    if (!type) return;
-    const [x, y] = petalPositions[index];
-    context.save(); baseTransform(context, layout, ratio, centerX + x * 1.5, centerY + y * 1.5, 1.5);
-    drawPetalInstance(context, type, 10); context.restore();
-  });
+  // Five generic Basic petals ring the dead face: three behind it and two in
+  // front. The client draws them even when the retained inventory differs.
+  const behind = [[-48, 7.5], [-15, -22.5], [45, -7.5]] as const;
+  const front = [[-15, 45], [52.5, 30]] as const;
+  for (const [x, y] of behind) {
+    context.save(); baseTransform(context, layout, ratio, centerX + x, centerY + y, 1.5);
+    drawPetalInstance(context, 1, 10); context.restore();
+  }
   context.save();
   const faceScale = f(f(layout.scale * ratio) * 1.5);
   context.setTransform(f(faceScale * 0.980067), f(faceScale * -0.198669),
@@ -828,20 +835,30 @@ function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayou
   label(context, 'You were destroyed by:', 18, raster, 0, -120);
   label(context, state.deathState?.killerName ?? 'A mysterious entity', 24, raster, 0, -90);
   label(context, state.mobile ? '(tap to continue)' : '(press enter to continue)', 18, raster, 0, 90);
-  if (state.deathState?.respawnLevel !== undefined) {
-    label(context, `You will respawn at level ${state.deathState.respawnLevel}${state.deathState.keptSlots?.length ? ' with:' : ''}`,
-      16, raster, 0, 55);
+  for (const [x, y] of front) {
+    context.save(); baseTransform(context, layout, ratio, centerX + x, centerY + y, 1.5);
+    drawPetalInstance(context, 1, 10); context.restore();
   }
   const kept = state.deathState?.keptSlots ?? [];
   const scaled = ratio === 1 ? layout : { ...layout, scale: f(layout.scale * ratio) };
   let left = 20;
-  kept.forEach((type, index) => {
-    if (!type) return;
-    const size = index < layout.equippedCount ? 60 : 50;
-    filledSlot(context, type, left + size * 0.5,
-      layout.logicalHeight - 45 + (1 - amount) * layout.logicalHeight, size, scaled, raster, 1, `retained:${index}`);
-    left += size + 10;
-  });
+  for (let index = 0; index < layout.equippedCount; index += 1) {
+    const type = kept[index] ?? 0;
+    filledSlot(context, type, left + 30, layout.logicalHeight - 37.142857, 60, scaled, raster, 1, `retained:${index}`);
+    left += 70;
+  }
+  // Original763 prints the retained death statistics at the bottom-left in
+  // the HUD's logical space, independent of the sliding item row.
+  baseTransform(context, layout, ratio);
+  const statsRaster = f(f(layout.scale * ratio) * 2.4);
+  for (const [text, font, top] of [
+    ['Stats', 24, layout.logicalHeight - 152.142857],
+    [`Points: ${formatScore(state.deathState?.score ?? 0)}`, 16, layout.logicalHeight - 118.142857],
+    [`Level: ${state.deathState?.respawnLevel ?? state.level ?? 1}`, 16, layout.logicalHeight - 96.142857],
+  ] as const) {
+    drawLabelBox(context, { text, font, rasterScale: statsRaster }, 20, top,
+      f(measureLabel(text, font) + Math.trunc(f(f(font * 0.12) * 2)) * 2), f(font * 1.4), false);
+  }
   context.restore();
 }
 
@@ -912,7 +929,7 @@ export function drawHud(native: Canvas2DContext, state: HudState): void {
   if (state.menu) {
     drawMenu(native, layout.width, layout.height, state.status ?? '', ratio, state.animationTime ?? 0,
       state.menuSeed, state.menuPreview, state.menuPreviewState, state.interactiveMenu, state.petalDiscoveries ?? 0,
-      state.menuState, state.menuPetalTypes); return;
+      state.menuState, state.menuPetalTypes, state.menuRespawn); return;
   }
   const context = hudRenderer(native);
   context.save(); context.save();
@@ -927,8 +944,10 @@ export function drawHud(native: Canvas2DContext, state: HudState): void {
     drawHudLayer(context, state, ratio === 1 ? layout : { ...layout, scale: f(layout.scale * ratio) }, false);
     context.setGlobalAlpha(1);
   }
-  drawFlowerPanel(context, state, layout, ratio);
-  drawHotbarTooltip(context, state, layout, ratio);
+  drawFlowerPanel(context, state.death
+    ? { ...state, flowers: 0, flowerEntries: [] }
+    : state, layout, ratio);
+  if (!state.death) drawHotbarTooltip(context, state, layout, ratio);
   if (state.death || state.deathState) drawDeathOverlay(context, state, layout, ratio);
   context.restore(); context.restore();
 }

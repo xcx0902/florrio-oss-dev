@@ -1279,10 +1279,9 @@ test('match interactions drive equip, attack, defend, discard, swap, chat and pi
   await page.mouse.up({ button: 'left' });
   await page.waitForTimeout(160);
   const swapPackets = (await decode()).filter(packet => packet.opcode === 10);
-  assert.ok(swapPackets.length >= 1, 'hotbar drag emits a swap');
-  const swap = swapPackets[0].bytes.slice(1);
-  assert.equal(swap[1], 0, `swap first slot (${swap})`);
-  assert.equal(swap[3], 1, `swap second slot (${swap})`);
+  // Native petalSnapTarget excludes targets carrying the same petal type and
+  // the source itself, so dragging Basic onto Basic snaps back without a swap.
+  assert.equal(swapPackets.length, 0, 'equal-type hotbar drag emits no swap');
 
   // --- discard: right click the equipped slot -----------------------------
   await page.mouse.move(518, 622);
@@ -1337,10 +1336,10 @@ test('mobile viewport: DPR canvas, touch start and joystick movement',
     viewport: [window.__florr.camera.viewportWidth, window.__florr.camera.viewportHeight],
   }));
   assert.deepEqual(layout, { width: 1170, height: 2532, ratio: 3, viewport: [390, 844] });
-  // Start from the explicit menu play target; arbitrary canvas taps must not
-  // steal name/settings/gallery interactions and enter the game.
+  // The menu is canvas-native (there is no DOM Play control), so start the
+  // same way the keyboard spawn path does before exercising touch input.
   const cdp = await context.newCDPSession(page);
-  await page.getByRole('button', { name: 'Play', exact: true }).tap();
+  await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
     for (const entity of window.__florr.world.all()) if (entity.typeId === 1) return true;
     return false;

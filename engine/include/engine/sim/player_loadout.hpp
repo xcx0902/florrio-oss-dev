@@ -122,6 +122,10 @@ class PlayerLoadout {
    * `amount` and every scale multiplier are 1 for the recovered default
    * loadout, so the shipped increment is 2.5 * dt * 0.001 (0.125 rad at 50 ms).
    */
+  /** Number of occupied orbit positions at the active-slot boundary
+   * (original loadout+292, written by function 85). */
+  [[nodiscard]] std::uint8_t orbit_positions() const { return orbit_positions_; }
+  void set_orbit_positions(std::uint8_t value) { orbit_positions_ = value; }
   [[nodiscard]] f32 orbit_phase() const { return orbit_phase_; }
   void set_orbit_phase(f32 value) { orbit_phase_ = value; }
   void advance_orbit_phase(double step_milliseconds) {
@@ -147,6 +151,7 @@ class PlayerLoadout {
   std::array<std::array<std::uint8_t, kInstances>, kSlots> pending_cache_{};
   std::uint8_t pending_cache_count_ = 0;
   std::uint8_t active_slots_ = 8;
+  std::uint8_t orbit_positions_ = 0;
   f32 score_;
   /** Petal-ring phase (loadout +284): advances once per server tick. */
   f32 orbit_phase_ = f32(0.0F);
