@@ -385,8 +385,11 @@ function drawPetalShape(context: Canvas2DContext, type: number, _icon: boolean, 
       setFill(context, petalColor(type)); setStroke(context, petalColor(type)); context.setLineWidth(5);
       context.fill(); context.stroke(); return;
     case 11: case 12: case 34: {
-      const r = type === 34 ? 10 : 7, offset = type === 34 ? 7 : 6;
-      for (const x of [offset,-offset]) for (const y of [offset,-offset]) petalDisc(context,type,r,x,y);
+      // Original petal renderer 3628: four radius-7 lobes on a six-unit cross,
+      // painted one at a time (fill + 3px stroke) so the cluster reads as one
+      // connected four-lobed pea. All three types share this texture.
+      for (const [x, y] of [[6, 0], [0, 6], [-6, 0], [0, -6]] as const)
+        petalDisc(context, type, 7, x, y);
       return;
     }
     case 13: case 21: case 33:

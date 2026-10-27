@@ -536,6 +536,10 @@ std::vector<std::uint8_t> WorkerApi::original_client_snapshot_bytes(std::uint32_
         fields.push_back(array(60U, inventory));
         fields.push_back(array(61U, world_.loadout().recharge_progress(), true));
         fields.push_back(byte(62U, world_.profile().level()));
+        const std::uint8_t zone = world_.zone_progress();
+        if (zone != 0U || original_client_zone_progress_ != 0U)
+          fields.push_back(byte(63U, zone));
+        original_client_zone_progress_ = zone;
       } else if (entity.kind == EntityKind::kPetal) {
         mask = 0x03184040U; // original393 equipped-petal probe
         fields.erase(std::remove_if(fields.begin(), fields.end(), [](const Field& field) {
@@ -762,7 +766,11 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
     domain_camera_bits_[entity.handle.to_wire()] = camera_bits;
     domain_position_revisions_[entity.handle.to_wire()] = position_revisions;
     domain_angle_values_[entity.handle.to_wire()] = angle_value;
-    if (full_field_framing_) write_full_fields(writer, entity, mask);
+    if (full_field_framing_) {
+      write_full_fields(writer, entity, mask);
+      if (entity.kind == EntityKind::kPlayer && world_.zone_progress() != 0U)
+        writer.write_mask_byte_field(entity.handle, mask, 63U, world_.zone_progress());
+    }
     if (entity.kind == EntityKind::kDrop && !full_field_framing_) {
       writer.write_mask_byte_field(entity.handle, mask, 22U, static_cast<std::uint8_t>(entity.type_id));
       writer.write_mask_byte_field(entity.handle, mask, 54U, entity.pickup_collected ? 1U : 0U);
@@ -790,6 +798,12 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
       }
       writer.write_mask_byte_field(entity.handle, mask, 62U,
         world_.profile().level());
+      if (!full_field_framing_) {
+        const std::uint8_t zone = world_.zone_progress();
+        if (zone != 0U || domain_zone_progress_ != 0U)
+          writer.write_mask_byte_field(entity.handle, mask, 63U, zone);
+        domain_zone_progress_ = zone;
+      }
       DomainLoadoutValues loadout;
       for (std::size_t slot = 0; slot < loadout.inventory.size(); ++slot)
         loadout.inventory[slot] = static_cast<std::uint8_t>(world_.loadout().slots()[slot].type_id);

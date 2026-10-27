@@ -43,6 +43,16 @@ void update_petal_orbit(World& world, const PetalOrbitState& state, double step_
  * each petal's recovered orbit profile; Wing uses its wave track. */
 void update_petal_orbits(World& world, double step_milliseconds);
 
+/** Advance the shared loadout ring phase (loadout+284) with the original
+ * YinYang direction table and Faster count contribution. */
+void advance_loadout_orbit_phase(World& world, double step_milliseconds);
+
+/** Update the overlevel zone countdown and progress. When the timer reaches
+ * its limit equipped petals stop recharging/spawning and take the original
+ * per-tick damage. */
+void update_zone_restriction(World& world, double step_milliseconds);
+void damage_zone_locked_petals(World& world, double step_milliseconds);
+
 /** Consume an equipped Peas petal into four launched children. */
 bool consume_peas_attack(World& world, EntityHandle petal_handle, EntityHandle owner);
 
@@ -54,6 +64,11 @@ std::size_t refresh_loadout_petals(World& world, double step_milliseconds);
 
 /** Remove a destroyed petal from its orbit list and start its slot recharge. */
 bool on_petal_destroyed(World& world, EntityHandle handle);
+
+/** Release a petal from its loadout slot without starting the recharge timer.
+ * Original detachFromSlot is used by Peas, Pollen and Web projectiles; the
+ * detached entity keeps flying for its remaining lifetime. */
+bool detach_petal_from_slot(World& world, EntityHandle handle);
 
 /** Remove every spawned instance belonging to a loadout slot. */
 void remove_slot_petals(World& world, std::uint8_t slot);

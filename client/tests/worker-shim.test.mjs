@@ -1157,7 +1157,7 @@ test('single-player loop: menu -> garden -> move -> attack', async () => {
   await page.close();
 });
 
-test('match interactions drive equip, attack, defend, discard, swap, chat and pickup', async () => {
+test('match interactions drive equip, attack, defend, no-discard, swap, chat and pickup', async () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   // Capture the exact opcode stream the UI hands to the worker. This is the
   // end-to-end seam: DOM input -> main.ts -> InputPacketEncoder -> worker.
@@ -1283,15 +1283,14 @@ test('match interactions drive equip, attack, defend, discard, swap, chat and pi
   // the source itself, so dragging Basic onto Basic snaps back without a swap.
   assert.equal(swapPackets.length, 0, 'equal-type hotbar drag emits no swap');
 
-  // --- discard: right click the equipped slot -----------------------------
+  // --- no discard: right click the equipped slot is inert ------------------
   await page.mouse.move(518, 622);
   await page.mouse.down({ button: 'right' });
   await page.waitForTimeout(60);
   await page.mouse.up({ button: 'right' });
   await page.waitForTimeout(160);
   const discardPackets = (await decode()).filter(packet => packet.opcode === 8);
-  assert.ok(discardPackets.length >= 1, 'right click emits a discard');
-  assert.equal(discardPackets[0].bytes[2], 0, `discard slot 0 (${discardPackets[0].bytes})`);
+  assert.equal(discardPackets.length, 0, 'right click does not discard');
 
   // --- chat: a server chat event becomes HUD chat state -------------------
   const chat = await page.evaluate(() => {

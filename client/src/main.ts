@@ -17,7 +17,7 @@ import { wrapContext } from './render/canvas2d/context.js';
 import { drawWorld } from './render/world.js';
 import { PetalTransfers } from './render/petal-transfers.js';
 import { PetalMotionState } from './render/petal-motion.js';
-import { menuCloseRect, settingsRowAt } from './render/menu-layout.js';
+import { menuCloseRect, menuContentRect, menuScrollMax, settingsRowAt } from './render/menu-layout.js';
 import { MovementHelper } from './render/movement-helper.js';
 import { drawHud, createHudState, getHudLayout, equippedSlotCount, type HudState, hotbarSlotAt, inventorySlotAt } from './render/ui.js';
 import { SilentAudioBus } from './audio/audio.js';
@@ -143,7 +143,15 @@ function applyPacket(packet: Uint8Array, at: number): boolean {
 }
 const pointer = new PointerInput(canvas);
 canvas.addEventListener('wheel', event => {
-  if (!started && menuControls.wheel(event.deltaY)) event.preventDefault();
+  // Original cp6_mouse_wheel: deltaY/175, multiplied by three for the
+  // Chrome wheelDeltaY convention, then adjusted for line/page delta modes.
+  const legacyWheel = event as WheelEvent & { wheelDeltaY?: number };
+  let delta = event.deltaY / 175;
+  if (legacyWheel.wheelDeltaY !== undefined ? legacyWheel.wheelDeltaY === -3 * event.deltaY
+      : event.deltaMode === 0) delta *= 3;
+  if (event.deltaMode === 1) delta /= 18;
+  else if (event.deltaMode === 2) delta /= 1000;
+  if (!started && menuControls.wheel(delta)) event.preventDefault();
 }, { passive: false });
 const keyboard = new KeyboardInput();
 const touch = new TouchJoystick(canvas);
@@ -489,12 +497,7 @@ function handleHotbarPointer(): void {
     dragSlot = undefined;
     dragInventorySlot = undefined;
   }
-  if (pointer.consumeRightClick()) {
-    const slot = slotAtPointer();
-    if (typeof slot === 'number' && slot < hotbarTypes.length) {
-      void server.send(inputEncoder.discard(slot, hotbarTypes[slot]));
-    }
-  }
+  pointer.consumeRightClick();
   if (pointer.consumeDoubleClick()) {
     const slot = slotAtPointer();
     if (typeof slot === 'number' && slot < hotbarTypes.length && slot !== selectedSlot) {
@@ -670,6 +673,13 @@ function frame(now: number): void {
       clickable ||= menuHover.pointerX >= close.x && menuHover.pointerX <= close.x + close.width
         && menuHover.pointerY >= close.y && menuHover.pointerY <= close.y + close.height;
       clickable ||= menuHover.panel === 'Settings' && settingsRowAt(menuHover.pointerX, menuHover.pointerY, height, alpha) !== undefined;
+      if (menuHover.panel !== 'Settings') {
+        const content = menuContentRect(menuHover.panel, height, alpha);
+        const max = menuScrollMax(menuHover.panel, height, menuHover.mobs);
+        clickable ||= max > 0 && menuHover.pointerX >= content.x + content.width - 14
+          && menuHover.pointerX <= content.x + content.width
+          && menuHover.pointerY >= content.y && menuHover.pointerY <= content.y + content.height;
+      }
     }
   } else if (!dead) {
     const hovered = hoveredSlot();
@@ -700,7 +710,11 @@ function frame(now: number): void {
     playerTransform.get(player.entity, now, pan);
     const hitAt = world.hitTime(player.entity.handle);
     if (hitAt !== undefined) camera.markHit(hitAt);
-    camera.follow(target.x, target.y, delta, pan.x, pan.y, now);
+    // Original updateCamera scans the equipped petal slots: Antennae widens
+    // the view from a 0.9 to a 0.63 scene scale.
+    const equipped = Math.min(16, equippedSlotCount(player.entity.level ?? 1));
+    const antennae = (playerLoadoutSlots(player.entity) ?? []).slice(0, equipped).includes(25);
+    camera.follow(target.x, target.y, delta, pan.x, pan.y, now, antennae ? 0.63 : 0.9);
     status = '';
     dead = false;
     deathAt = undefined;
@@ -730,6 +744,10 @@ function frame(now: number): void {
     playerHudState = {
       health: player.entity.health, maxHealth: player.entity.maxHealth,
       level: player.entity.level ?? 1, levelProgress: player.entity.levelProgress,
+      zoneProgress: typeof (player.entity.byteFields?.[63] ?? player.entity.denseByteFields?.[63]
+        ?? player.entity.denseFields?.[63]) === 'number'
+        ? (player.entity.byteFields?.[63] ?? player.entity.denseByteFields?.[63]
+          ?? player.entity.denseFields?.[63]) as number : 0,
       score: player.entity.score, pixelRatio: dpr, chat: world.chat,
       scoreTransition: player.entity.receivedScoreAt === undefined ? undefined
         : { previous: player.entity.previousScore ?? player.entity.score ?? 0,

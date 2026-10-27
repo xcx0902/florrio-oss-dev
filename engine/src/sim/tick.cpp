@@ -95,15 +95,23 @@ void tick(World& world, double delta_milliseconds) {
   world.record_phase("effects");
   (void)world.update_area_effects();
   world.record_phase("area-effects");
-  // Original updateEquippedPetals writes loadout+284 before updatePetalOrbits
-  // reads it, so the ring phase advances first.
-  world.loadout().advance_orbit_phase(delta_milliseconds);
-  world.record_phase("petal-phase");
-  // Original updateEquippedPetals both recharges/spawns petals and advances the
-  // ring phase before updatePetalOrbits; a petal recharged this tick therefore
-  // integrates in the same tick (death scenario, 8400 ms: spawn at the owner
-  // plus one movement step).
-  (void)refresh_loadout_petals(world, delta_milliseconds);
+  // Original updateEquippedPetals computes the overlevel zone countdown first.
+  // At the limit it skips the ring phase, slot recharge and all spawning, then
+  // damages the petals that are still equipped.
+  update_zone_restriction(world, delta_milliseconds);
+  if (!world.zone_petals_disabled()) {
+    // Original updateEquippedPetals writes loadout+284 before updatePetalOrbits
+    // reads it, so the ring phase advances first.
+    advance_loadout_orbit_phase(world, delta_milliseconds);
+    world.record_phase("petal-phase");
+    // Original updateEquippedPetals both recharges/spawns petals and advances
+    // the ring phase before updatePetalOrbits; a petal recharged this tick
+    // therefore integrates in the same tick (death scenario, 8400 ms: spawn at
+    // the owner plus one movement step).
+    (void)refresh_loadout_petals(world, delta_milliseconds);
+  } else {
+    damage_zone_locked_petals(world, delta_milliseconds);
+  }
   world.record_phase("loadout-petals");
   update_petal_orbits(world, delta_milliseconds);
   world.record_phase("petal-orbits");

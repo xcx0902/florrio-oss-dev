@@ -259,7 +259,16 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
     }
     return EntityHandle{};
   }
-  if (defaults->dynamicRadius) return EntityHandle{};
+  if (defaults->dynamicRadius) {
+    // Dynamic-radius species have no fixed spawn row. The cheat/debug spawn
+    // path must still create them through their real initializers.
+    switch (type_id) {
+      case 1U: return spawn_rock(world, position, false, world.random());
+      case 2U: return spawn_rock(world, position, true, world.random());
+      case 3U: return spawn_cactus(world, position, world.random());
+      default: return EntityHandle{};
+    }
+  }
   const EntityHandle handle = spawn_entity(world, kind, type_id, position, f32(defaults->radius),
     defaults->flags95, defaults->flags93);
   if (!handle.valid()) return handle;

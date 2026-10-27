@@ -188,6 +188,9 @@ class World {
     last_death_level_ = 0;
     last_death_kept_.fill(0);
     last_death_kept_count_ = 0;
+    zone_timer_ms_ = f32(0.0F);
+    zone_progress_ = 0;
+    zone_disabled_ = false;
     width_ = f32(50000.0F);
     height_ = f32(4000.0F);
     auto_populate_ = false;
@@ -236,6 +239,9 @@ class World {
     last_death_level_ = 0;
     last_death_kept_.fill(0);
     last_death_kept_count_ = 0;
+    zone_timer_ms_ = f32(0.0F);
+    zone_progress_ = 0;
+    zone_disabled_ = false;
     width_ = f32(50000.0F);
     height_ = f32(4000.0F);
     auto_populate_ = false;
@@ -266,6 +272,14 @@ class World {
   [[nodiscard]] f32 width() const { return width_; }
   [[nodiscard]] f32 height() const { return height_; }
   void set_dimensions(f32 width, f32 height) { width_ = width; height_ = height; }
+  /** Zone timer at loadout+288. Overleveled time accumulates while the player
+   * is left of minimumLevelZoneX; it drains at one tenth speed otherwise. */
+  [[nodiscard]] f32 zone_timer_ms() const { return zone_timer_ms_; }
+  void set_zone_timer_ms(f32 value) { zone_timer_ms_ = value; }
+  [[nodiscard]] bool zone_petals_disabled() const { return zone_disabled_; }
+  void set_zone_petals_disabled(bool value) { zone_disabled_ = value; }
+  [[nodiscard]] std::uint8_t zone_progress() const { return zone_progress_; }
+  void set_zone_progress(std::uint8_t value) { zone_progress_ = value; }
   [[nodiscard]] bool compact() const { return compact_; }
   void set_compact(bool compact) { compact_ = compact; }
   [[nodiscard]] bool auto_populate() const { return auto_populate_; }
@@ -548,6 +562,9 @@ class World {
   PlayerProfile profile_;
   f32 width_ = f32(50000.0F);
   f32 height_ = f32(4000.0F);
+  f32 zone_timer_ms_ = f32(0.0F);
+  std::uint8_t zone_progress_ = 0;
+  bool zone_disabled_ = false;
   bool compact_ = false;
   bool auto_populate_ = false;
   std::uint64_t tick_ = 0;

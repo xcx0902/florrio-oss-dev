@@ -41,6 +41,8 @@ export interface HudState {
   readonly health: number;
   readonly maxHealth: number;
   readonly level: number;
+  /** Native zone timer byte (field 63), 0..255. */
+  readonly zoneProgress?: number;
   readonly chat?: readonly string[];
   readonly pixelRatio?: number;
   /** CSS viewport dimensions; the backing canvas includes pixelRatio. */
@@ -694,6 +696,23 @@ function getHudSurface(width: number, height: number): typeof hudSurface {
   return hudSurface;
 }
 
+function drawZoneWarning(context: HudContext, state: HudState, layout: HudLayout, raster: number): void {
+  const progress = Math.max(0, Math.min(1, (state.zoneProgress ?? 0) / 255));
+  if (progress <= 0) return;
+  const remaining = Math.max(1, Math.ceil((1 - progress) * 45));
+  const first = 'You are overleveled for this zone';
+  const second = progress >= 1 ? 'You will be unable to attack'
+    : `You will be unable to attack in ${remaining} seconds`;
+  const x = layout.logicalWidth / 2, y = layout.logicalHeight * 0.22;
+  context.save(); context.setGlobalAlpha(0.55);
+  context.setFillRgb(0, 0, 0);
+  context.fillRect(x - 190, y - 26, 380, 52);
+  context.setGlobalAlpha(1);
+  label(context, first, 20, raster, x, y - 12, 1, { fill: '#FF8080' });
+  label(context, second, 16, raster, x, y + 13, 1, { fill: '#FFD0D0' });
+  context.restore();
+}
+
 function drawHudLayer(context: HudContext, state: HudState, layout: HudLayout, clear = true): void {
   const raster = f(layout.scale * 2.4);
   if (clear) {
@@ -712,7 +731,8 @@ function drawHudLayer(context: HudContext, state: HudState, layout: HudLayout, c
   if (state.death) { context.restore(); return; }
   drawMap(context, state, layout, raster); drawLevelBar(context, state, layout, raster);
   drawHint(context, state, layout, raster); drawHotbar(context, state, layout, raster);
-  drawInventory(context, state, layout, raster); drawChat(context, state, layout, raster); context.restore();
+  drawInventory(context, state, layout, raster); drawChat(context, state, layout, raster);
+  drawZoneWarning(context, state, layout, raster); context.restore();
 }
 
 let panelSurface: { canvas: RasterCanvas; key: string } | undefined;

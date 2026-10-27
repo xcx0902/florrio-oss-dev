@@ -115,6 +115,11 @@ class WorkerApi {
     std::array<std::uint64_t, 2> position_revisions{};
   };
   std::unordered_map<std::uint32_t, OriginalClientRecord> original_client_records_;
+  /** Last zone-progress byte sent to the archived client. Kept so the field is
+   * emitted once more with zero after the flower leaves an overleveled zone. */
+  std::uint8_t original_client_zone_progress_ = 0;
+  /** Same clear-once behaviour for the compact domain stream. */
+  std::uint8_t domain_zone_progress_ = 0;
   bool original_client_enabled_ = false;
   bool original_client_viewer_started_ = false;
   Vec2 original_client_viewer_position_;

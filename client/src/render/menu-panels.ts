@@ -119,7 +119,12 @@ function drawMobGallery(context: Canvas2DContext, state: MenuRenderState, height
     const rect = mobRowRect(index, height, state.mobs), y = f(rect.y - scroll);
     if (y + rect.height < content.y || y > content.y + content.height) continue;
     roundedRect(context, rect.x, y, rect.width, rect.height, 5); context.setFillRgb(73, 129, 177); context.fill();
-    if (!state.mobs.includes(type)) { label(context, '???', 18, rect.x + 10, y + 10, raster); continue; }
+    if (!state.mobs.includes(type)) {
+      const size = 36;
+      label(context, '?', size, f(rect.x + f((rect.width - measureLabel('?', size)) / 2)),
+        f(y + f((rect.height - f(size * 1.4)) / 2)), raster);
+      continue;
+    }
     label(context, MOB_INFO[type].name, 18, rect.x + 10, y + 10, raster);
     label(context, RARITY_NAMES[MOB_GALLERY[type].rarity], 14, rect.x + 10, f(y + 10 + f(18 * 1.4)), raster, hex(rarityRgb(MOB_GALLERY[type].rarity)));
     let lineY = f(y + 10 + f(f(18 * 1.4) + f(14 * 1.4)) + 5);

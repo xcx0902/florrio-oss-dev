@@ -1,4 +1,5 @@
 import type { Canvas2DContext } from './canvas2d/context.js';
+import { PETAL_INFO } from '../schema/petals.js';
 import type { EntityState, WorldState } from '../state/world.js';
 import { interpolateEntity } from '../state/interpolation.js';
 import { isOutsideWorldViewport, playerWorldPosition } from '../state/world-transform.js';
@@ -298,6 +299,7 @@ function drawEntityBlock(
       break;
     case 3:
       drawPetalInstance(context, species, radius, now, entity.handle);
+      if (PETAL_INFO[species]?.rarity === 5) drawUniquePetalParticles(context, radius, now, entity.handle);
       break;
     case 4:
       drawDrop(context, entity.byteFields?.[22] ?? entity.denseByteFields?.[22]
@@ -390,5 +392,22 @@ export function drawWorld(context: Canvas2DContext, world: WorldState, camera: C
 
   context.restore();
   context.restore();
+  context.restore();
+}
+
+/** Unique petals trail three slow orbiting sparkles in world space. */
+function drawUniquePetalParticles(context: Canvas2DContext, radius: number, now: number, seed: number): void {
+  const f = Math.fround;
+  context.save();
+  for (let index = 0; index < 3; index++) {
+    const phase = f(now * 0.0016 + seed * 1.7 + index * 2.0943951);
+    const orbit = f(f(Math.max(1, radius)) * 1.18);
+    const x = f(f(Math.cos(phase)) * orbit);
+    const y = f(f(Math.sin(phase)) * orbit);
+    const alpha = Math.max(0, Math.min(1, f(0.4 + 0.4 * Math.sin(f(now * 0.006 + index * 1.3)))));
+    context.setGlobalAlpha(alpha);
+    context.setFillRgb(255, 246, 180);
+    context.beginPath(); context.arc(x, y, 1.7, 0, Math.PI * 2); context.fill();
+  }
   context.restore();
 }

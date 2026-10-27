@@ -207,6 +207,69 @@ void update_petal_orbit(World& world, const PetalOrbitState& state, double step_
   entity->velocity.y += acceleration * unit_y;
 }
 
+void advance_loadout_orbit_phase(World& world, double step_milliseconds) {
+  const auto& slots = world.loadout().slots();
+  const std::uint8_t active = std::min<std::uint8_t>(
+    8U, static_cast<std::uint8_t>(world.profile().active_slots()));
+  std::uint32_t yinyang = 0;
+  std::uint32_t faster = 0;
+  for (std::uint8_t slot = 0; slot < active && slot < slots.size(); ++slot) {
+    if (slots[slot].type_id == 28U) ++yinyang;
+    if (slots[slot].type_id == 14U && !world.loadout().pending(slot, 0U)) ++faster;
+  }
+  // Original data $d0 read at address 1024: 1, -1, 0, 1, -1, 0, 1, -1, 5.
+  static constexpr f32 kYinYangDirection[9] = {
+    f32(1.0F), f32(-1.0F), f32(0.0F), f32(1.0F), f32(-1.0F),
+    f32(0.0F), f32(1.0F), f32(-1.0F), f32(5.0F),
+  };
+  const f32 direction = kYinYangDirection[yinyang % 9U];
+  const double increment = (2.5 + 0.8 * static_cast<double>(faster))
+    * static_cast<double>(direction.value) * step_milliseconds * 0.001;
+  world.loadout().set_orbit_phase(f32::from_double(
+    increment + static_cast<double>(world.loadout().orbit_phase().value)));
+}
+
+void update_zone_restriction(World& world, double step_milliseconds) {
+  const Entity* player = world.entities().get(world.player());
+  if (player == nullptr) return;
+  const int level = static_cast<int>(world.profile().level());
+  double fraction = 0.0;
+  bool limited = true;
+  if (level >= 45) fraction = 0.9;
+  else if (level >= 30) fraction = 0.6;
+  else if (level >= 15) fraction = 0.3;
+  else limited = false;
+  const double width = static_cast<double>(world.width().value);
+  const double minimum_x = limited
+    ? (-width * 0.5) + fraction * width : -std::numeric_limits<double>::infinity();
+  const bool overleveled = static_cast<double>(player->position.x.value) < minimum_x;
+  const double threshold = 45000.0;
+  double timer = static_cast<double>(world.zone_timer_ms().value);
+  timer += overleveled ? step_milliseconds : -(step_milliseconds * 0.1);
+  timer = std::clamp(timer, 0.0, threshold);
+  world.set_zone_timer_ms(f32::from_double(timer));
+  world.set_zone_petals_disabled(timer >= threshold);
+  const double progress = std::clamp(timer * 255.0 / threshold, 0.0, 255.0);
+  world.set_zone_progress(static_cast<std::uint8_t>(progress));
+}
+
+void damage_zone_locked_petals(World& world, double) {
+  if (!world.zone_petals_disabled()) return;
+  // Original zone loop kills every equipped instance as soon as the timer is
+  // capped (function_43 with health 0), then unlinks the slot handle.
+  std::vector<EntityHandle> destroyed;
+  for (const PetalOrbitState& state : world.petals()) {
+    Entity* petal = world.entities().get(state.handle);
+    if (petal == nullptr || !petal->active) continue;
+    petal->health = f32(0.0F);
+    destroyed.push_back(state.handle);
+  }
+  for (const EntityHandle handle : destroyed) {
+    (void)world.destroy(handle);
+    (void)on_petal_destroyed(world, handle);
+  }
+}
+
 void update_petal_orbits(World& world, double step_milliseconds) {
   assign_petal_orbit_indices(world);
   const std::uint8_t buttons = static_cast<std::uint8_t>(world.input().buttons & 0xFFU);
@@ -219,12 +282,15 @@ void update_petal_orbits(World& world, double step_milliseconds) {
     if (world.entities().get(state.handle) == nullptr) continue;
     if (player != nullptr) state.center = player->position;
     const auto profile = static_cast<OrbitProfile>(state.profile);
+    const std::uint16_t type = state.type_id;
+    const bool defend = (buttons & 2U) != 0U;
+    const double held_ms = world.time_ms() - state.behavior_started_at_ms;
     // Original Peas orbit callbacks (676/681/431): after the petal has been
     // equipped for 500 ms, holding attack consumes it into four children. The
-    // generic orbit radius stays at 65; only defend pulls it to 40.
-    if ((state.type_id == 11U || state.type_id == 12U || state.type_id == 34U)
+    // callback always reports radius 65; only defend pulls it to 40.
+    if ((type == 11U || type == 12U || type == 34U)
         && (buttons & 1U) != 0U && state.behavior_state == 0U
-        && world.time_ms() - state.behavior_started_at_ms > 500.0) {
+        && held_ms > 500.0) {
       const EntityHandle petal_handle = state.handle;
       Entity* petal = world.entities().get(petal_handle);
       const EntityHandle owner = petal != nullptr
@@ -234,12 +300,110 @@ void update_petal_orbits(World& world, double step_milliseconds) {
       --index;
       continue;
     }
-    if (is_rose_orbit_function(state.orbit_function)) {
+    // Bubble (684) stays at radius 60 and, while defending for 500 ms,
+    // transfers its stored momentum to the flower before popping itself.
+    if (type == 18U) {
+      state.orbit_radius = f32(60.0F);
+      if (state.behavior_state == 0U && defend && held_ms > 500.0) {
+        const EntityHandle petal_handle = state.handle;
+        Entity* petal = world.entities().get(petal_handle);
+        Entity* owner = petal != nullptr
+          ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
+        if (petal != nullptr && owner != nullptr) {
+          state.behavior_state = 1U;
+          const double dx = static_cast<double>(owner->position.x.value)
+                          - static_cast<double>(petal->position.x.value);
+          const double dy = static_cast<double>(owner->position.y.value)
+                          - static_cast<double>(petal->position.y.value);
+          const double length = std::sqrt(dx * dx + dy * dy);
+          double impulse_x = 1.4;
+          double impulse_y = 0.0;
+          if (!(length < 2.220446049250313e-16)) {
+            impulse_x = dx * 1.4 / length;
+            impulse_y = dy * 1.4 / length;
+          }
+          owner->velocity.x += impulse_x;
+          owner->velocity.y += impulse_y;
+          (void)damage_entity(world, petal_handle, petal->health, EntityHandle{});
+          --index;
+          continue;
+        }
+      }
+    } else if (type == 19U) {
+      // Pollen (686): attack/defend launches it away from the flower after
+      // 500 ms, detaches the slot and gives it a 4.5-5.5 s ground lifetime.
+      state.orbit_radius = f32(65.0F);
+      if (state.behavior_state == 0U && (buttons & 3U) != 0U && held_ms > 500.0) {
+        const EntityHandle petal_handle = state.handle;
+        Entity* petal = world.entities().get(petal_handle);
+        Entity* owner = petal != nullptr
+          ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
+        if (petal != nullptr && owner != nullptr) {
+          state.behavior_state = 1U;
+          const double dx = static_cast<double>(petal->position.x.value)
+                          - static_cast<double>(owner->position.x.value);
+          const double dy = static_cast<double>(petal->position.y.value)
+                          - static_cast<double>(owner->position.y.value);
+          const double length = std::sqrt(dx * dx + dy * dy);
+          double impulse_x = 0.5;
+          double impulse_y = 0.0;
+          if (!(length < 2.220446049250313e-16)) {
+            impulse_x = dx * 0.5 / length;
+            impulse_y = dy * 0.5 / length;
+          }
+          const double direction = (buttons & 1U) != 0U ? 1.0 : -1.0;
+          petal->velocity.x += impulse_x * direction;
+          petal->velocity.y += impulse_y * direction;
+          const f32 draw = f32(static_cast<float>(world.random().next() - 1U));
+          const f32 lifetime = f32(f32(draw.value * f32(1000.0 / 2147483648.0).value).value
+                                   + 4500.0F);
+          petal->lifetime_remaining_ms = static_cast<double>(lifetime.value);
+          (void)detach_petal_from_slot(world, petal_handle);
+          --index;
+          continue;
+        }
+      }
+    } else if (type == 29U || type == 30U) {
+      // Web (733): radius 65 normally, 40 while defending. Attack releases the
+      // web outward after 500 ms and arms its 650 ms projectile lifetime.
+      state.orbit_radius = defend ? f32(40.0F) : f32(65.0F);
+      if (state.behavior_state == 0U && (buttons & 1U) != 0U && held_ms > 500.0) {
+        const EntityHandle petal_handle = state.handle;
+        Entity* petal = world.entities().get(petal_handle);
+        Entity* owner = petal != nullptr
+          ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
+        if (petal != nullptr && owner != nullptr) {
+          state.behavior_state = 1U;
+          double dx = static_cast<double>(petal->position.x.value)
+                    - static_cast<double>(owner->position.x.value);
+          double dy = static_cast<double>(petal->position.y.value)
+                    - static_cast<double>(owner->position.y.value);
+          const double length = std::sqrt(dx * dx + dy * dy);
+          f32 impulse_x(2.2F);
+          f32 impulse_y(0.0F);
+          if (!(length < 2.220446049250313e-16)) {
+            impulse_x = f32((dx / length) * 2.2);
+            impulse_y = f32((dy / length) * 2.2);
+          }
+          petal->velocity.x += static_cast<double>(impulse_x.value);
+          petal->velocity.y += static_cast<double>(impulse_y.value);
+          petal->lifetime_remaining_ms = 650.0;
+          (void)detach_petal_from_slot(world, petal_handle);
+          --index;
+          continue;
+        }
+      }
+    } else if (type == 22U || type == 23U) {
+      // Egg callbacks always report radius 65 and never respond to buttons.
+      state.orbit_radius = f32(65.0F);
+    } else if (is_rose_orbit_function(state.orbit_function)) {
       state.orbit_radius = rose_orbit_radius(buttons);
     } else if (profile == OrbitProfile::kWing) {
       state.phase = f32::from_double(static_cast<double>(state.phase.value)
         + step_milliseconds * 0.005);
       state.orbit_radius = wing_orbit_radius(buttons, state.phase);
+    } else if (type == 11U || type == 12U || type == 34U || type == 25U) {
+      state.orbit_radius = defend ? f32(40.0F) : f32(65.0F);
     } else {
       state.orbit_radius = orbit_radius(profile, buttons);
     }
@@ -368,6 +532,21 @@ std::size_t spawn_loadout_petals(World& world) {
   auto& slots = world.loadout().slots();
   for (std::uint8_t slot = 0; slot < active && slot < slots.size(); ++slot) {
     PetalSlot& value = slots[slot];
+    // Original petal flag +40 disables the orbit entity completely. Antennae
+    // is worn on the flower instead: it contributes only its appearance bit
+    // and the widened camera. Spawning a petal here would make it orbit.
+    bool hidden = false;
+    for (const auto& definition : petal_defaults()) {
+      if (definition.type_id != value.type_id) continue;
+      hidden = definition.flags[0] != 0U;
+      break;
+    }
+    if (hidden) {
+      value.instances.fill(EntityHandle{});
+      for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance)
+        world.loadout().clear_handle(slot, instance);
+      continue;
+    }
     if (!value.ready()) continue;
     for (std::uint8_t instance = 0; instance < value.count && instance < 3; ++instance) {
       if (world.loadout().pending(slot, instance)) continue;
@@ -399,7 +578,35 @@ std::size_t refresh_loadout_petals(World& world, double step_milliseconds) {
   world.loadout().advance(step_milliseconds);
   const auto spawned = spawn_loadout_petals(world);
   world.loadout().refresh_recharge_progress(world);
+  // Antennae sets appearance flag 4 (the native head decoration). Preserve
+  // the attack/defend bits maintained by apply_input.
+  if (Entity* player = world.entities().get(world.player()); player != nullptr) {
+    bool antennae = false;
+    const auto& slots = world.loadout().slots();
+    for (std::size_t slot = 0; slot < world.profile().active_slots() && slot < slots.size(); ++slot)
+      antennae = antennae || slots[slot].type_id == 25U;
+    player->player_expression = static_cast<std::uint8_t>(
+      antennae ? (player->player_expression | 4U) : (player->player_expression & ~4U));
+  }
   return spawned;
+}
+
+bool detach_petal_from_slot(World& world, EntityHandle handle) {
+  auto& petals = world.petals();
+  const auto it = std::find_if(petals.begin(), petals.end(),
+    [handle](const PetalOrbitState& state) { return state.handle == handle; });
+  if (it == petals.end()) return false;
+  const std::uint8_t slot_index = it->slot;
+  const std::uint8_t instance = it->instance;
+  petals.erase(it);
+  auto& slots = world.loadout().slots();
+  if (slot_index < slots.size()) {
+    PetalSlot& slot = slots[slot_index];
+    if (instance < slot.instances.size()) slot.instances[instance] = EntityHandle{};
+    world.loadout().clear_handle(slot_index, instance);
+    // No recharge: the original immediately respawns another instance.
+  }
+  return true;
 }
 
 bool on_petal_destroyed(World& world, EntityHandle handle) {

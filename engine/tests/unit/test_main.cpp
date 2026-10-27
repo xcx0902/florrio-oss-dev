@@ -203,6 +203,34 @@ void test_world_tick() {
   CHECK(world.entities().active_count() == 0);
 }
 
+void test_zone_restriction() {
+  engine::World world;
+  world.initialize();
+  world.set_auto_populate(false);
+  const engine::EntityHandle player = engine::spawn_player_default(
+    world, "zone", engine::make_default_profile(), false);
+  CHECK(player.valid());
+  world.profile().set_level(60);
+  engine::Entity* entity = world.entities().get(player);
+  CHECK(entity != nullptr);
+  entity->set_position_x(engine::f32(-24000.0F));
+  entity->set_position_y(engine::f32(0.0F));
+  (void)engine::spawn_loadout_petals(world);
+  CHECK(!world.petals().empty());
+  for (int index = 0; index < 60; ++index) {
+    engine::update_zone_restriction(world, 1000.0);
+    engine::damage_zone_locked_petals(world, 1000.0);
+  }
+  CHECK(world.zone_petals_disabled());
+  CHECK(world.zone_progress() == 255U);
+  CHECK(world.petals().empty());
+  entity->set_position_x(engine::f32(30000.0F));
+  for (int index = 0; index < 10; ++index)
+    engine::update_zone_restriction(world, 1000.0);
+  CHECK(!world.zone_petals_disabled());
+  CHECK(world.zone_progress() < 255U);
+}
+
 void test_petal_orbit() {
   CHECK(engine::orbit_radius(engine::OrbitProfile::kBasic, 0) == engine::f32(65.0F));
   CHECK(engine::orbit_radius(engine::OrbitProfile::kBasic, 1) == engine::f32(130.0F));
@@ -1773,7 +1801,7 @@ void test_worker_api() {
   CHECK(spawned.valid());
   CHECK(api.occupied(engine::Vec2(engine::f32(100.0F), engine::f32(0.0F))));
   CHECK(!api.occupied(engine::Vec2(engine::f32(2000.0F), engine::f32(0.0F))));
-  CHECK(!api.spawn(engine::EntityKind::kMob, 1, engine::Vec2(engine::f32(5000.0F), engine::f32(0.0F))).valid());
+  CHECK(!api.spawn(engine::EntityKind::kMob, 0, engine::Vec2(engine::f32(5000.0F), engine::f32(0.0F))).valid());
   const auto bytes = api.snapshot_bytes(7);
   CHECK(bytes.size() > 2);
   CHECK(bytes[0] == 1);
@@ -2368,9 +2396,9 @@ void test_entity_spawn_defaults() {
 
   engine::World world;
   world.initialize();
-  CHECK(!engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 3,
+  CHECK(engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 3,
     engine::Vec2(engine::f32(10.0F), engine::f32(20.0F))).valid());
-  CHECK(!engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 1,
+  CHECK(engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 1,
     engine::Vec2(engine::f32(0.0F), engine::f32(0.0F))).valid());
 }
 
@@ -4087,7 +4115,10 @@ void test_area_effects_and_deferred_launch() {
   CHECK(world.deferred_launches().size() == 1U);
   CHECK(world.run_deferred_launches(0.0) == 1U);
   CHECK(world.deferred_launches().empty());
-  CHECK(std::fabs(world.entities().get(children[0])->position.y.value - 1.4F) < 0.01F);
+  CHECK(std::fabs(world.entities().get(children[0])->velocity.y - 1.4) < 0.01F);
+  CHECK(std::fabs(world.entities().get(children[0])->acceleration.y - 0.6) < 0.01F);
+  CHECK(std::fabs(world.entities().get(children[0])->velocity.x) < 0.01F);
+  CHECK(std::fabs(world.entities().get(children[0])->position.y.value) < 0.01F);
 }
 
 void test_attribution_death_and_pickups() {
@@ -5371,6 +5402,7 @@ int main(int argc, char** argv) {
   runTest("test_player_loadout", test_player_loadout);
   runTest("test_populate_world", test_populate_world);
   runTest("test_petals", test_petals);
+  runTest("test_zone_restriction", test_zone_restriction);
   runTest("test_petal_orbit", test_petal_orbit);
   runTest("test_spawn_and_movement", test_spawn_and_movement);
   runTest("test_collision", test_collision);

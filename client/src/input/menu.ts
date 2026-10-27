@@ -26,6 +26,7 @@ export class MenuControls {
   private readonly discoveries = new Set<number>();
   private readonly mobs = new Set<number>();
   private readonly scroll: Record<MenuPanel, number> = { Settings: 0, Petals: 0, Mobs: 0, Changelog: 0 };
+  private readonly scrollTarget: Record<MenuPanel, number> = { Settings: 0, Petals: 0, Mobs: 0, Changelog: 0 };
   private scale = 0.7;
   private width = 1280 / 0.7;
   private height = 720;
@@ -205,7 +206,9 @@ export class MenuControls {
     const travel = f(track - thumb);
     if (!(max > 0) || !(travel > 0)) return;
     const thumbTop = f(y - drag.offset - content.y - 4);
-    this.scroll[drag.panel] = Math.max(0, Math.min(max, f(f(thumbTop / travel) * max)));
+    const value = Math.max(0, Math.min(max, f(f(thumbTop / travel) * max)));
+    this.scroll[drag.panel] = value;
+    this.scrollTarget[drag.panel] = value;
   }
   wheel(deltaY: number): boolean {
     if (!this.panel || this.panel === 'Settings') return false;
@@ -213,11 +216,24 @@ export class MenuControls {
     if (this.pointerX < content.x || this.pointerX > content.x + content.width
         || this.pointerY < content.y || this.pointerY > content.y + content.height) return false;
     const max = menuScrollMax(this.panel, this.height, this.discoveredMobs);
-    this.scroll[this.panel] = Math.max(0, Math.min(max, this.scroll[this.panel] + deltaY));
+    this.scrollTarget[this.panel] = Math.max(0, Math.min(max, this.scrollTarget[this.panel] + deltaY));
     return true;
   }
   advance(delta: number, pressed = false): void {
     const step = Math.max(0, Math.min(1, 1 - Math.pow(0.7, Math.fround(delta) * 0.06)));
+    // Only the visible panel scrolls; evaluating hidden Changelog layout here
+    // would measure text before the menu surface exists and reorder native
+    // offscreen allocations.
+    if (this.panel !== undefined) {
+      const panel = this.panel;
+      const max = menuScrollMax(panel, this.height, this.discoveredMobs);
+      const target = Math.max(0, Math.min(max, this.scrollTarget[panel]));
+      this.scrollTarget[panel] = target;
+      const current = this.scroll[panel];
+      const scrollStep = Math.max(0, Math.min(1, 1 - Math.pow(0.72, Math.fround(delta) * 0.06)));
+      this.scroll[panel] = Math.abs(target - current) < 0.01 ? target
+        : Math.fround(current + (target - current) * scrollStep);
+    }
     for (const panel of MENU_TABS) {
       const target = +(this.panel === panel), current = this.panelAlphas[panel];
       this.panelAlphas[panel] = Math.fround(Math.abs(current - target) < 1e-7 ? target : current + (target - current) * step);

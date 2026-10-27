@@ -99,7 +99,8 @@ export class CameraState {
   /** Follow the already-interpolated player target and pan offset. */
   markHit(at: number): void { if (Number.isFinite(at)) this.hitAt = Math.max(this.hitAt, at); }
 
-  follow(targetX: number, targetY: number, deltaMs: number, panX = 0, panY = 0, at?: number): void {
+  follow(targetX: number, targetY: number, deltaMs: number, panX = 0, panY = 0, at?: number,
+         targetScale = PLAYER_SCALE): void {
     if (this.manual) return;
     const elapsed = Math.max(0, deltaMs);
     this.clock = at ?? this.clock + elapsed;
@@ -129,7 +130,7 @@ export class CameraState {
     const zoomAlpha = 1 - Math.pow(ZOOM_SMOOTHING, elapsed * 0.06);
     if (elapsed > 0) {
       this.pinnedZoom = undefined;
-      this.scale = Math.fround(this.scale + (Math.fround(PLAYER_SCALE) - this.scale) * zoomAlpha);
+      this.scale = Math.fround(this.scale + (Math.fround(targetScale) - this.scale) * zoomAlpha);
     }
   }
 

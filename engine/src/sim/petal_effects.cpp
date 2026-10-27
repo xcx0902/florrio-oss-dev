@@ -54,16 +54,13 @@ void split_peas(World& world, EntityHandle petal_handle, EntityHandle owner) {
   const Vec2 position = petal->position;
   const auto* combat = Catalog::instance().petal_combat(type);
   if (combat == nullptr) return;
-  // Original 676/681/431: four children at sqrt(72) around the parent, then a
-  // deferred radial launch one millisecond later (callback 272).
-  const double spawn_radius = std::sqrt(72.0);
+  // Original 676/681/431: every child starts on the parent, receives its petal
+  // component, and is then displaced around a random-phase cross at sqrt(72).
+  // The radial launch is a separate callback one millisecond later.
   std::vector<EntityHandle> children;
   children.reserve(4);
   for (std::uint32_t index = 0; index < 4U; ++index) {
-    const double angle = static_cast<double>(index) * kTau / 4.0;
-    const Vec2 offset(f32::from_double(std::cos(angle) * spawn_radius),
-                      f32::from_double(std::sin(angle) * spawn_radius));
-    const EntityHandle child = spawn_entity(world, EntityKind::kPetal, type, position + offset,
+    const EntityHandle child = spawn_entity(world, EntityKind::kPetal, type, position,
                                             f32(combat->drawRadius));
     if (!child.valid()) break;
     Entity* entity = world.entities().get(child);
@@ -77,12 +74,26 @@ void split_peas(World& world, EntityHandle petal_handle, EntityHandle owner) {
     children.push_back(child);
   }
   if (!children.empty()) {
-    const double phase = static_cast<double>(world.random().next_fraction().value) * kTau;
-    world.schedule_deferred_launch(world.time_ms() + 1.0,
-                                   f32::from_double(phase), std::move(children));
+    // f32(f32((next - 1) >>> 0) * f32(2*pi / 2^31)) from original 217.
+    const f32 draw = f32(static_cast<float>(world.random().next() - 1U));
+    const f32 phase = f32(draw.value * f32(kTau / 2147483648.0).value);
+    const f32 step = f32(kTau / static_cast<double>(children.size()));
+    const f32 spawn_radius = f32(std::sqrt(72.0));
+    f32 angle = phase;
+    for (const EntityHandle handle : children) {
+      angle = f32(step.value + angle.value);
+      Entity* child = world.entities().get(handle);
+      if (child == nullptr) continue;
+      const f32 offset_x = f32(std::cos(static_cast<double>(angle.value)) * spawn_radius.value);
+      const f32 offset_y = f32(std::sin(static_cast<double>(angle.value)) * spawn_radius.value);
+      child->set_position_x(f32(offset_x.value + position.x.value));
+      child->set_position_y(f32(offset_y.value + position.y.value));
+      child->bounds_dirty = true;
+    }
+    world.schedule_deferred_launch(world.time_ms() + 1.0, phase, std::move(children));
   }
   // Equipped Peas own a slot/handle; temporary split children do not.
-  (void)on_petal_destroyed(world, petal_handle);
+  (void)detach_petal_from_slot(world, petal_handle);
   (void)world.destroy(petal_handle);
 }
 
@@ -130,6 +141,10 @@ void hatch_egg(World& world, EntityHandle petal_handle, std::uint16_t hatchling_
       entity->ai.home = position;
     }
   }
+  // The egg is consumed by its one-shot hatch callback. Clearing the equipped
+  // handle here is what starts the slot recharge; without it the loadout sees
+  // a dead instance and immediately respawns another egg every tick.
+  (void)on_petal_destroyed(world, petal_handle);
   (void)world.destroy(petal_handle);
 }
 

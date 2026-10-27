@@ -376,20 +376,22 @@ std::size_t World::run_deferred_launches(double now_ms) {
     last_launch_order_.push_back(launch.sequence);
     const std::size_t count = launch.children.size();
     if (count == 0U) continue;
-    const double step = kTau / static_cast<double>(count);
-    double angle = static_cast<double>(launch.phase.value);
+    const f32 step = f32(kTau / static_cast<double>(count));
+    f32 angle = launch.phase;
     for (const EntityHandle handle : launch.children) {
-      angle = step + angle;
+      angle = f32(step.value + angle.value);
       Entity* child = entities_.get(handle);
       if (child == nullptr) continue;
-      const f32 cosine = f32::from_double(std::cos(angle));
-      const f32 sine = f32::from_double(std::sin(angle));
-      child->set_position_x(f32::from_double(static_cast<double>(child->position.x.value)
-        + static_cast<double>(cosine.value * 1.4F)));
-      child->set_position_y(f32::from_double(static_cast<double>(child->position.y.value)
-        + static_cast<double>(sine.value * 1.4F)));
-      child->velocity.x += static_cast<double>(cosine.value * 0.6F);
-      child->velocity.y += static_cast<double>(sine.value * 0.6F);
+      // Original launchPeas only adds an impulse to velocity (+40/+48) and
+      // acceleration (+56/+64); the radial offset was written by splitPeas.
+      const f32 impulse_x = f32(std::cos(static_cast<double>(angle.value)) * 1.4F);
+      const f32 impulse_y = f32(std::sin(static_cast<double>(angle.value)) * 1.4F);
+      const f32 accel_x = f32(std::cos(static_cast<double>(angle.value)) * 0.6F);
+      const f32 accel_y = f32(std::sin(static_cast<double>(angle.value)) * 0.6F);
+      child->velocity.x += static_cast<double>(impulse_x.value);
+      child->velocity.y += static_cast<double>(impulse_y.value);
+      child->acceleration.x += static_cast<double>(accel_x.value);
+      child->acceleration.y += static_cast<double>(accel_y.value);
       child->bounds_dirty = true;
     }
     ++launched;
