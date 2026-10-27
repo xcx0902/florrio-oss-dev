@@ -1,15 +1,18 @@
 import type { Canvas2DContext } from './canvas2d/context.js';
-import { PETAL_INFO } from '../schema/petals.js';
 import type { EntityState, WorldState } from '../state/world.js';
 import { interpolateEntity } from '../state/interpolation.js';
 import { isOutsideWorldViewport, playerWorldPosition } from '../state/world-transform.js';
 import type { CameraState } from '../state/camera.js';
 import { advanceSpeciesAnimation, createSpeciesAnimationState, type SpeciesAnimationState } from './species-animation.js';
+import { createArtRandom, createUniqueTrail, drawUniqueTrail, type UniqueTrail } from './petal-effects.js';
 import {
   drawDrop,
   createDropVisualState,
   advanceDropVisualState,
   drawPetalInstance,
+  drawHornetMissile,
+  drawLaunchedPea,
+  drawGroundWeb,
   drawPlayerFace,
   drawPlayerHealthBar,
   drawSpecies,
@@ -26,12 +29,15 @@ const f = Math.fround;
 interface ArenaBoundary { left: number; right: number; top: number; bottom: number; level: number; at: number }
 const arenaBoundaries = new WeakMap<WorldState, ArenaBoundary>();
 interface PlayerVisual { face: PlayerFaceState; health: PlayerHealthBarState; fresh: boolean }
+interface PetalVisual { phase: number; trail: UniqueTrail; webProgress: number }
 interface WorldVisuals {
   at: number;
   players: Map<number, PlayerVisual>;
   species: Map<number, SpeciesAnimationState>;
   drops: Map<number, DropVisualState>;
   dropRandom: number;
+  petals: Map<number, PetalVisual>;
+  randomAngle: () => number;
 }
 const worldVisuals = new WeakMap<WorldState, WorldVisuals>();
 
@@ -129,6 +135,17 @@ interface VisibleEntity {
 
 const speciesOf = (entity: EntityState): number => entity.speciesId ?? entity.typeId;
 
+/** Original1015 declaration ordinals, in native760 render priority order.
+ * The domain's identity component is metadata, so only projectile/petal
+ * declarations select these models. A species id cannot distinguish them. */
+function petalRenderComponent(entity: EntityState): number {
+  if (entity.kind !== 3 && entity.kind !== 5) return 0;
+  const mask = entity.componentMask ?? 0;
+  for (const [ordinal, offset] of [[18,108],[5,68],[7,76],[12,92]])
+    if (mask & (1 << (ordinal-1))) return offset;
+  return entity.kind === 3 ? 76 : 108;
+}
+
 /** Entities that belong to the static background layer in the archived
  * renderer: rocks, boulders, cacti, ant holes and squares. */
 function isBackgroundEntity(entity: EntityState): boolean {
@@ -138,6 +155,7 @@ function isBackgroundEntity(entity: EntityState): boolean {
 
 function drawLayer(entity: EntityState): number {
   if (entity.kind === 4) return 0;
+  if (petalRenderComponent(entity) === 92) return 1;
   if (entity.kind === 3) return 2;
   if (entity.kind === 1) return 4;
   if (isBackgroundEntity(entity)) return 1;
@@ -262,6 +280,8 @@ function drawEntityBlock(
   flash: number,
   animation: SpeciesAnimationState,
   dropVisual: DropVisualState | undefined,
+  petalVisual: PetalVisual,
+  randomAngle: () => number,
 ): void {
   const { entity } = item;
   const species = speciesOf(entity);
@@ -275,6 +295,17 @@ function drawEntityBlock(
     && entity.kind !== 4;
   setEntityTransform(context, camera, item.screenX, item.screenY, item.angle, rotate);
   if (fadeAt !== undefined) context.transform?.(f(1 + fade), 0, 0, f(1 + fade), 0, 0);
+  const renderComponent = petalRenderComponent(entity);
+  if (renderComponent === 108) drawHornetMissile(context,flash);
+  else if (renderComponent === 68) {
+    const flags = entity.byteFields?.[9] ?? entity.denseByteFields?.[9] ?? entity.denseFields?.[9] ?? 0;
+    drawLaunchedPea(context,species,flash,typeof flags === 'number' ? flags : 0);
+  } else if (renderComponent === 92) {
+    const progress = petalVisual.webProgress;
+    petalVisual.webProgress = f(Math.abs(progress-1) < 1e-7 ? 1
+      : progress+(1-progress)*(1-Math.pow(0.7,f(deltaMs)*0.06)));
+    drawGroundWeb(context,petalVisual.webProgress);
+  } else {
   switch (entity.kind) {
     case 1:
       const field = (index: number): number => {
@@ -297,19 +328,17 @@ function drawEntityBlock(
         flash,
       });
       break;
-    case 3:
-      drawPetalInstance(context, species, radius, now, entity.handle);
-      if (PETAL_INFO[species]?.rarity === 5) drawUniquePetalParticles(context, radius, now, entity.handle);
+    case 3: {
+      if (species === 35) drawUniqueTrail(context,petalVisual.trail,deltaMs,item.x,item.y,randomAngle);
+      if ([11,12,34].includes(species)) petalVisual.phase = f(petalVisual.phase + f(deltaMs)*0.001);
+      drawPetalInstance(context, species, radius, now, entity.handle, petalVisual.phase);
+      if (species === 5) petalVisual.phase = f(petalVisual.phase + f(deltaMs)*0.0003);
       break;
+    }
     case 4:
       drawDrop(context, entity.byteFields?.[22] ?? entity.denseByteFields?.[22]
         ?? (typeof entity.denseFields?.[22] === 'number' ? entity.denseFields[22] : undefined) ?? species,
         14, Infinity, dropVisual);
-      break;
-    case 5:
-      // Projectiles inherit their shooter's species on the wire. Hornet
-      // stingers are painted as the Missile petal, never as a second Hornet.
-      drawPetalInstance(context, 10, Math.max(8, radius), now, entity.handle);
       break;
     default:
       // Entity-table artwork seeds use the packed index/generation handle;
@@ -319,6 +348,7 @@ function drawEntityBlock(
       const animationTime = species >= 7 && species <= 13 && species !== 11 ? animation.time : now;
       drawSpecies(context, species, artworkSeed, radius, animationTime, flash, animation);
       break;
+  }
   }
   context.restore();
 }
@@ -335,7 +365,7 @@ export function drawWorld(context: Canvas2DContext, world: WorldState, camera: C
   const visible = collectVisible(world, camera, now);
   let visuals = worldVisuals.get(world);
   if (!visuals || now < visuals.at) visuals = { at: now - 16, players: new Map(), species: new Map(),
-    drops: new Map(), dropRandom: 1 };
+    drops: new Map(), dropRandom: 1, petals: new Map(), randomAngle: createArtRandom() };
   const deltaMs = Math.max(0, now - visuals.at);
   visuals.at = now;
   worldVisuals.set(world, visuals);
@@ -364,6 +394,8 @@ export function drawWorld(context: Canvas2DContext, world: WorldState, camera: C
     if (!world.get(handle) && !renderedHandles.has(handle)) visuals.players.delete(handle);
   for (const handle of visuals.species.keys())
     if (!world.get(handle) && !renderedHandles.has(handle)) visuals.species.delete(handle);
+  for (const handle of visuals.petals.keys())
+    if (!world.get(handle) && !renderedHandles.has(handle)) visuals.petals.delete(handle);
 
   // Health bars are the first entity layer in the archived frame.
   context.save();
@@ -384,30 +416,20 @@ export function drawWorld(context: Canvas2DContext, world: WorldState, camera: C
       animation = createSpeciesAnimationState();
       visuals.species.set(item.entity.handle, animation);
     }
+    let petal = visuals.petals.get(item.entity.handle);
+    if (!petal) {
+      petal = { phase: petalRenderComponent(item.entity) === 76 && [5,11,12,34].includes(speciesOf(item.entity))
+        ? visuals.randomAngle() : 0,
+        trail: createUniqueTrail(), webProgress: item.entity.arrivalMarked ? 0 : 1 };
+      visuals.petals.set(item.entity.handle,petal);
+    }
     drawEntityBlock(context, camera, item, now, deltaMs,
       item.entity.kind === 1 ? playerVisual(item.entity.handle) : undefined, flash, animation,
-      visuals.drops.get(item.entity.handle));
+      visuals.drops.get(item.entity.handle),petal,visuals.randomAngle);
     if (item.entity.kind === 1) playerVisual(item.entity.handle).fresh = false;
   }
 
   context.restore();
   context.restore();
-  context.restore();
-}
-
-/** Unique petals trail three slow orbiting sparkles in world space. */
-function drawUniquePetalParticles(context: Canvas2DContext, radius: number, now: number, seed: number): void {
-  const f = Math.fround;
-  context.save();
-  for (let index = 0; index < 3; index++) {
-    const phase = f(now * 0.0016 + seed * 1.7 + index * 2.0943951);
-    const orbit = f(f(Math.max(1, radius)) * 1.18);
-    const x = f(f(Math.cos(phase)) * orbit);
-    const y = f(f(Math.sin(phase)) * orbit);
-    const alpha = Math.max(0, Math.min(1, f(0.4 + 0.4 * Math.sin(f(now * 0.006 + index * 1.3)))));
-    context.setGlobalAlpha(alpha);
-    context.setFillRgb(255, 246, 180);
-    context.beginPath(); context.arc(x, y, 1.7, 0, Math.PI * 2); context.fill();
-  }
   context.restore();
 }

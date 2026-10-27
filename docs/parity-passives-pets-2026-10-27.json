@@ -1,0 +1,545 @@
+{
+  "originalWasm": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "passives": [
+    {
+      "types": [
+        1
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.02083206176758,
+        "maximum": 100,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        2
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.02083206176758,
+        "maximum": 100,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        14
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.02083206176758,
+        "maximum": 100,
+        "phase": 0.16500000655651093
+      }
+    },
+    {
+      "types": [
+        14,
+        14
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.02083206176758,
+        "maximum": 100,
+        "phase": 0.20499999821186066
+      }
+    },
+    {
+      "types": [
+        26
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.02083206176758,
+        "maximum": 100,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        26,
+        26
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.02083206176758,
+        "maximum": 100,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        14,
+        26
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.02083206176758,
+        "maximum": 100,
+        "phase": 0.16500000655651093
+      }
+    },
+    {
+      "types": [
+        32
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.07083511352539,
+        "maximum": 100,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        32,
+        32
+      ],
+      "before": {
+        "health": 50,
+        "maximum": 100,
+        "phase": 0
+      },
+      "after": {
+        "health": 50.12083435058594,
+        "maximum": 100,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        13
+      ],
+      "before": {
+        "health": 60,
+        "maximum": 120,
+        "phase": 0
+      },
+      "after": {
+        "health": 60.025001525878906,
+        "maximum": 120,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        21
+      ],
+      "before": {
+        "health": 60,
+        "maximum": 120,
+        "phase": 0
+      },
+      "after": {
+        "health": 60.025001525878906,
+        "maximum": 120,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        33
+      ],
+      "before": {
+        "health": 70,
+        "maximum": 140,
+        "phase": 0
+      },
+      "after": {
+        "health": 70.02916717529297,
+        "maximum": 140,
+        "phase": 0.125
+      }
+    },
+    {
+      "types": [
+        13,
+        21,
+        33
+      ],
+      "before": {
+        "health": 90,
+        "maximum": 180,
+        "phase": 0
+      },
+      "after": {
+        "health": 90.0374984741211,
+        "maximum": 180,
+        "phase": 0.125
+      }
+    }
+  ],
+  "pending": [
+    {
+      "type": 14,
+      "health": 50.02083206176758,
+      "maximum": 100,
+      "phase": 0.125
+    },
+    {
+      "type": 32,
+      "health": 50.02083206176758,
+      "maximum": 100,
+      "phase": 0.125
+    },
+    {
+      "type": 13,
+      "health": 50.02083206176758,
+      "maximum": 100,
+      "phase": 0.125
+    },
+    {
+      "type": 21,
+      "health": 50.02083206176758,
+      "maximum": 100,
+      "phase": 0.125
+    },
+    {
+      "type": 33,
+      "health": 50.02083206176758,
+      "maximum": 100,
+      "phase": 0.125
+    }
+  ],
+  "eggs": [
+    {
+      "type": 22,
+      "delay": 1000,
+      "egg": 853516,
+      "pet": 854012,
+      "eligibility": {
+        "petToWild": 1,
+        "petToOwner": 0,
+        "petToSibling": 0,
+        "wildToPet": 0,
+        "wildToWild": 0,
+        "wildParent": 0,
+        "wildOwner": 419020,
+        "petParent": 0,
+        "petOwner": 850540
+      },
+      "contact": {
+        "healthBefore": 40,
+        "contactDamage": 10,
+        "healthAfter": 30,
+        "sameRoot": false
+      },
+      "guardArrival": 0,
+      "series": [
+        {
+          "elapsed": 0,
+          "slot": 853516,
+          "egg": true,
+          "health": 50,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": null,
+          "radius": null,
+          "guard": null,
+          "leash": null
+        },
+        {
+          "elapsed": 1000,
+          "slot": 853516,
+          "egg": true,
+          "health": 50,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": null,
+          "radius": null,
+          "guard": null,
+          "leash": null
+        },
+        {
+          "elapsed": 1001,
+          "slot": 854012,
+          "egg": false,
+          "health": 40,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": 1,
+          "radius": 1000,
+          "guard": 300,
+          "leash": 1000
+        },
+        {
+          "elapsed": 2151,
+          "slot": 854012,
+          "egg": false,
+          "health": 40,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": 0,
+          "radius": 1000,
+          "guard": 300,
+          "leash": 1000
+        },
+        {
+          "stage": "pet defeated",
+          "slot": 854012,
+          "egg": false,
+          "health": 0,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": 0,
+          "radius": 1000,
+          "guard": 300,
+          "leash": 1000
+        },
+        {
+          "stage": "first recharge tick",
+          "slot": 0,
+          "egg": false,
+          "health": null,
+          "pending": 0,
+          "timer": 50,
+          "owner": 0,
+          "parent": 0,
+          "aggressive": null,
+          "radius": null,
+          "guard": null,
+          "leash": null
+        }
+      ]
+    },
+    {
+      "type": 23,
+      "delay": 2500,
+      "egg": 853516,
+      "pet": 854012,
+      "eligibility": {
+        "petToWild": 1,
+        "petToOwner": 0,
+        "petToSibling": 0,
+        "wildToPet": 0,
+        "wildToWild": 0,
+        "wildParent": 0,
+        "wildOwner": 419020,
+        "petParent": 0,
+        "petOwner": 850540
+      },
+      "contact": {
+        "healthBefore": 40,
+        "contactDamage": 10,
+        "healthAfter": 30,
+        "sameRoot": false
+      },
+      "guardArrival": 0,
+      "series": [
+        {
+          "elapsed": 0,
+          "slot": 853516,
+          "egg": true,
+          "health": 50,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": null,
+          "radius": null,
+          "guard": null,
+          "leash": null
+        },
+        {
+          "elapsed": 2500,
+          "slot": 853516,
+          "egg": true,
+          "health": 50,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": null,
+          "radius": null,
+          "guard": null,
+          "leash": null
+        },
+        {
+          "elapsed": 2501,
+          "slot": 854012,
+          "egg": false,
+          "health": 40,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": 1,
+          "radius": 1000,
+          "guard": 300,
+          "leash": 1000
+        },
+        {
+          "elapsed": 3651,
+          "slot": 854012,
+          "egg": false,
+          "health": 40,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": 0,
+          "radius": 1000,
+          "guard": 300,
+          "leash": 1000
+        },
+        {
+          "stage": "pet defeated",
+          "slot": 854012,
+          "egg": false,
+          "health": 0,
+          "pending": 0,
+          "timer": 0,
+          "owner": 850540,
+          "parent": 0,
+          "aggressive": 0,
+          "radius": 1000,
+          "guard": 300,
+          "leash": 1000
+        },
+        {
+          "stage": "first recharge tick",
+          "slot": 0,
+          "egg": false,
+          "health": null,
+          "pending": 0,
+          "timer": 50,
+          "owner": 0,
+          "parent": 0,
+          "aggressive": null,
+          "radius": null,
+          "guard": null,
+          "leash": null
+        }
+      ]
+    }
+  ],
+  "zoneDisabledPets": [
+    {
+      "type": 22,
+      "pet": 854012,
+      "playerX": -24856.76953125,
+      "healthBefore": 40,
+      "healthAfter": 0,
+      "slot": 0,
+      "elapsedRecharge": 50,
+      "zoneTimer": 45000,
+      "cachedProgressBefore": 65535,
+      "cachedProgress": 0,
+      "afterRecharge": {
+        "slot": 0,
+        "elapsedRecharge": 1000,
+        "cachedProgress": 0
+      },
+      "reenabledCharged": {
+        "slot": 854508,
+        "cachedProgress": 65535
+      },
+      "reenabledPartial": {
+        "slot": 0,
+        "elapsedRecharge": 100,
+        "cachedProgress": 6553
+      }
+    },
+    {
+      "type": 23,
+      "pet": 854012,
+      "playerX": -24856.76953125,
+      "healthBefore": 40,
+      "healthAfter": 0,
+      "slot": 0,
+      "elapsedRecharge": 50,
+      "zoneTimer": 45000,
+      "cachedProgressBefore": 65535,
+      "cachedProgress": 0,
+      "afterRecharge": {
+        "slot": 0,
+        "elapsedRecharge": 1000,
+        "cachedProgress": 0
+      },
+      "reenabledCharged": {
+        "slot": 854508,
+        "cachedProgress": 65535
+      },
+      "reenabledPartial": {
+        "slot": 0,
+        "elapsedRecharge": 100,
+        "cachedProgress": 6553
+      }
+    }
+  ],
+  "discardedPets": [
+    {
+      "type": 22,
+      "pet": 854012,
+      "healthBefore": 40,
+      "healthAfterDiscard": 0,
+      "slot": 0,
+      "slotType": 0,
+      "backpackCount": 1,
+      "backpackType": 22,
+      "afterOwnerDeath": {
+        "ownerHealth": 0,
+        "petHealth": 0
+      }
+    },
+    {
+      "type": 23,
+      "pet": 854012,
+      "healthBefore": 40,
+      "healthAfterDiscard": 0,
+      "slot": 0,
+      "slotType": 0,
+      "backpackCount": 1,
+      "backpackType": 23,
+      "afterOwnerDeath": {
+        "ownerHealth": 0,
+        "petHealth": 0
+      }
+    }
+  ],
+  "passed": true
+}

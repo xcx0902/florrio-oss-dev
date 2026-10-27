@@ -33,6 +33,7 @@ export interface DeathMetadata {
   readonly keptCount: number;
   readonly keptItems: readonly number[];
   readonly score: number;
+  readonly deathLevel: number;
   readonly respawnLevel: number;
   readonly viewerHandle?: number;
 }
@@ -325,8 +326,8 @@ export class WorldState {
       if (Array.isArray(packed)) for (let index = 0; index < items.length; ++index)
         if (typeof packed[index] === 'number') items[index] = packed[index] & 255;
     }
-    // Original retainPlayerLoot puts the kept stack in this component and
-    // caps it at three; the menu line reads "respawn ... with:" from it.
+    // The first three eligible petals become ground drops. Controller field
+    // 16 contains up to ten remaining survivors for the next spawn.
     const keptCount = Math.max(0, Math.min(10,
       controller?.byteFields?.[34] ?? denseNumber(34) ?? 0));
     return {
@@ -334,7 +335,11 @@ export class WorldState {
       keptCount,
       keptItems: items.slice(0, keptCount),
       score: controller?.floatFields?.[21] ?? denseNumber(21) ?? 0,
-      respawnLevel: controller?.byteFields?.[47] ?? denseNumber(47) ?? 0,
+      deathLevel: controller?.byteFields?.[47] ?? denseNumber(47) ?? 0,
+      // Field 47 is the level at death; field 1 is the remembered spawn
+      // level. The original menu clamps the latter to a minimum of one.
+      respawnLevel: Math.max(1, controller?.byteFields?.[1] ?? denseNumber(1)
+        ?? Math.floor((controller?.byteFields?.[47] ?? denseNumber(47) ?? 0) * 3 / 4)),
       viewerHandle: controller?.referenceFields?.[56] ?? controller?.varintFields?.[56]
         ?? denseNumber(56),
     };

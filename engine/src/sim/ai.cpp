@@ -47,22 +47,6 @@ double wrap_pi(double value) {
   return wrapped;
 }
 
-bool same_root(const World& world, EntityHandle first, EntityHandle second) {
-  // Original 168 walks entity+236 (the manager fallback handle) before the
-  // owner chain. Every spawned mob carries the same manager pointer, so two
-  // mobs always resolve to the same controlling root and can never target each
-  // other; only the player is a distinct root. The domain models that manager
-  // identity directly for mob/mob pairs.
-  const Entity* first_entity = world.entities().get(first);
-  const Entity* second_entity = world.entities().get(second);
-  if (first_entity == nullptr || second_entity == nullptr) return false;
-  if (first_entity->kind == EntityKind::kMob && second_entity->kind == EntityKind::kMob)
-    return true;
-  const EntityHandle a = controlling_root(world, first);
-  const EntityHandle b = controlling_root(world, second);
-  return a.valid() && b.valid() && a == b;
-}
-
 f32 random_fraction(ServerRng& rng) {
   return f32(static_cast<float>(rng.next() - 1U)) * f32(0x1p-31f);
 }
@@ -147,6 +131,18 @@ EntityHandle controlling_root(const World& world, EntityHandle handle) {
   return handle;
 }
 
+bool same_controlling_root(const World& world, EntityHandle first, EntityHandle second) {
+  const EntityHandle a = controlling_root(world, first);
+  const EntityHandle b = controlling_root(world, second);
+  const Entity* root_a = world.entities().get(a);
+  const Entity* root_b = world.entities().get(b);
+  if (root_a == nullptr || root_b == nullptr) return false;
+  if (a == b) return true;
+  // The domain has no manager entity. Uncontrolled mob roots all represent
+  // that one original controller; pets instead end at their owning player.
+  return root_a->kind == EntityKind::kMob && root_b->kind == EntityKind::kMob;
+}
+
 bool target_eligible(const World& world, const Entity& seeker, const Entity& target) {
   if (target.health.value <= 0.0F) return false;
   if (!is_actor(target)) return false;
@@ -166,7 +162,7 @@ bool target_eligible(const World& world, const Entity& seeker, const Entity& tar
         return false;
     }
   }
-  return !same_root(world, seeker.handle, target.handle);
+  return !same_controlling_root(world, seeker.handle, target.handle);
 }
 
 std::size_t alert_nearby(World& world, EntityHandle attacker, f32 radius) {
@@ -217,10 +213,8 @@ EntityHandle find_target(const World& world, const SpatialQuery& query,
     const Entity* entity = world.entities().get(handle);
     if (entity == nullptr || !entity->active || entity->handle == seeker_handle) continue;
     if (!is_actor(*entity)) continue;
-    // Original 197 skips controlled entities with a live fallback handle.
-    if ((entity->entity_flags & 64U) != 0U
-        && entity->owner != std::numeric_limits<std::uint32_t>::max())
-      continue;
+    // Original 197 tests entity+224, not the ordinary +236 owner handle.
+    // An Egg pet has +224 == 0 and remains an eligible actor.
     const double distance = distance_squared_d(seeker->position, entity->position);
     if (distance >= static_cast<double>(radius.value) * static_cast<double>(radius.value)) continue;
     const bool candidate_is_player = entity->kind == EntityKind::kPlayer;
@@ -665,7 +659,7 @@ void update_ai(World& world, double delta_milliseconds) {
           }
           if (need_wander) {
             const f32 first = random_fraction(world.random());
-            const f32 second = random_fraction(world.random());
+            const f32 second(static_cast<float>(world.random().next() - 1U));
             const f32 amount = f32(first.value
               * static_cast<float>(static_cast<double>(ai.guard_radius.value) * 0.9));
             const f32 angle = f32(second.value * kRandomAngleScale);
@@ -689,8 +683,10 @@ void update_ai(World& world, double delta_milliseconds) {
         const f32 max_y = f32(top.value - radius.value);
         ai.guard_point.x = f32(std::clamp(ai.guard_point.x.value, min_x.value, max_x.value));
         ai.guard_point.y = f32(std::clamp(ai.guard_point.y.value, min_y.value, max_y.value));
-        const f32 distance = distance_squared(entity->position, ai.guard_point);
-        if (distance.value < 2500.0F) {
+        const double distance = distance_squared_d(entity->position, ai.guard_point);
+        if (distance < 2500.0) {
+          // Original 654 clears AI+184 on arrival, before idle wave/turn.
+          ai.guard_active = false;
           move_speed = ai.idle_speed;
         } else {
           move_speed = ai.chase_speed;

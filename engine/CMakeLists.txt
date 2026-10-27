@@ -21,6 +21,8 @@ add_library(engine_core STATIC
   src/sim/damage.cpp
   src/sim/petal_effects.cpp
   src/sim/petals.cpp
+  src/sim/passives.cpp
+  src/sim/pets.cpp
   src/sim/player.cpp
   src/sim/player_loadout.cpp
   src/sim/spatial.cpp
@@ -49,16 +51,36 @@ target_compile_options(engine_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=
 enable_testing()
 add_test(NAME engine_tests COMMAND engine_tests)
 
+add_executable(engine_death_lifecycle_tests tests/unit/test_death_lifecycle.cpp)
+target_link_libraries(engine_death_lifecycle_tests PRIVATE engine_core)
+target_compile_options(engine_death_lifecycle_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+add_test(NAME engine_death_lifecycle_tests COMMAND engine_death_lifecycle_tests)
+
 # Keep R04 simulation regressions independent of the shared publisher suite.
 add_executable(engine_sim_tests tests/unit/test_r04_sim.cpp)
 target_link_libraries(engine_sim_tests PRIVATE engine_core)
 target_compile_options(engine_sim_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
 add_test(NAME engine_sim_tests COMMAND engine_sim_tests)
 
+add_executable(engine_projectile_tests tests/unit/test_projectiles.cpp)
+target_link_libraries(engine_projectile_tests PRIVATE engine_core)
+target_compile_options(engine_projectile_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+add_test(NAME engine_projectile_tests COMMAND engine_projectile_tests)
+
+add_executable(engine_poison_flash_tests tests/unit/test_poison_flash.cpp)
+target_link_libraries(engine_poison_flash_tests PRIVATE engine_core)
+target_compile_options(engine_poison_flash_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+add_test(NAME engine_poison_flash_tests COMMAND engine_poison_flash_tests)
+
 add_executable(engine_rose_tests tests/unit/test_rose.cpp)
 target_link_libraries(engine_rose_tests PRIVATE engine_core)
 target_compile_options(engine_rose_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
 add_test(NAME engine_rose_tests COMMAND engine_rose_tests)
+
+add_executable(engine_passives_pets_tests tests/unit/test_passives_pets.cpp)
+target_link_libraries(engine_passives_pets_tests PRIVATE engine_core)
+target_compile_options(engine_passives_pets_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+add_test(NAME engine_passives_pets_tests COMMAND engine_passives_pets_tests)
 
 add_executable(engine_peer_visibility_tests tests/unit/test_peer_visibility.cpp)
 target_link_libraries(engine_peer_visibility_tests PRIVATE engine_core)

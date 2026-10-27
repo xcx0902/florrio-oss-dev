@@ -216,7 +216,10 @@ export class MenuControls {
     if (this.pointerX < content.x || this.pointerX > content.x + content.width
         || this.pointerY < content.y || this.pointerY > content.y + content.height) return false;
     const max = menuScrollMax(this.panel, this.height, this.discoveredMobs);
-    this.scrollTarget[this.panel] = Math.max(0, Math.min(max, this.scrollTarget[this.panel] + deltaY));
+    // Native func626 converts the normalized browser wheel into 75 content
+    // units before storing its float32 scroll target (the panel scale is 1).
+    this.scrollTarget[this.panel] = Math.max(0, Math.min(max,
+      f(this.scrollTarget[this.panel] + f(deltaY * 75))));
     return true;
   }
   advance(delta: number, pressed = false): void {
@@ -230,9 +233,8 @@ export class MenuControls {
       const target = Math.max(0, Math.min(max, this.scrollTarget[panel]));
       this.scrollTarget[panel] = target;
       const current = this.scroll[panel];
-      const scrollStep = Math.max(0, Math.min(1, 1 - Math.pow(0.72, Math.fround(delta) * 0.06)));
-      this.scroll[panel] = Math.abs(target - current) < 0.01 ? target
-        : Math.fround(current + (target - current) * scrollStep);
+      const scrollStep = Math.max(0, Math.min(1, 1 - Math.pow(0.8, Math.fround(delta) * 0.06)));
+      this.scroll[panel] = Math.fround(current + (target - current) * scrollStep);
     }
     for (const panel of MENU_TABS) {
       const target = +(this.panel === panel), current = this.panelAlphas[panel];

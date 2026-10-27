@@ -94,11 +94,16 @@ async function openClient(t, dimensions = viewport, deviceScaleFactor = 1, menuS
   await page.addInitScript(menuStorage => {
     if (menuStorage) localStorage.setItem('florr-menu', JSON.stringify(menuStorage));
     window.__menuRegressionPackets = [];
+    window.__menuRegressionPacketTicks = [];
+    window.__menuRegressionThinkCount = 0;
     const post = Worker.prototype.postMessage;
     Worker.prototype.postMessage = function (...args) {
       const message = args[0];
-      if (message?.funcName === 'sp_server_send' && message.data)
+      if (message?.funcName === 'sp_server_think') window.__menuRegressionThinkCount += 1;
+      if (message?.funcName === 'sp_server_send' && message.data) {
         window.__menuRegressionPackets.push(Array.from(message.data));
+        window.__menuRegressionPacketTicks.push(window.__menuRegressionThinkCount);
+      }
       return Reflect.apply(post, this, args);
     };
   }, menuStorage);
@@ -647,6 +652,8 @@ test('death: protocol suicide, keyboard Enter to menu, then immediate Enter whil
   { timeout: 25000 }, async t => {
     const page = await openClient(t);
     const first = await startWithEnter(page, 'First Flower');
+    const firstSpawnIndex = (await commands(page)).findIndex(packet => packet.opcode === 6);
+    const firstSpawnTick = await page.evaluate(index => window.__menuRegressionPacketTicks[index], firstSpawnIndex);
     await page.evaluate(() => window.__florr.suicide()); // Real opcode 3; fixture only.
     await waitForState(page, () => window.__florr.ui.dead
       && ![...window.__florr.world.all()].some(entity => entity.kind === 1 && entity.health > 0),
@@ -668,13 +675,18 @@ test('death: protocol suicide, keyboard Enter to menu, then immediate Enter whil
     await waitForState(page, previous => window.__florr.ui.started && !window.__florr.ui.dead
       && [...window.__florr.world.all()].some(entity => entity.kind === 1
         && entity.handle !== previous && entity.health > 0),
-    first.handle, 'immediate second Enter must eventually spawn after the old corpse is deleted');
+    first.handle, 'immediate second Enter must eventually spawn after corpse deletion and the original cooldown');
     state = await readState(page);
     const second = state.player;
     assert.equal(state.ui.started, true);
     assert.equal(state.ui.dead, false);
     assert.notEqual(second.handle, first.handle, 'the next keyboard Enter creates a new server body');
     const actions = (await commands(page)).slice(marker).filter(packet => [4, 6].includes(packet.opcode));
-    assert.deepEqual(actions.map(packet => [packet.opcode, packet.name]), [[6, 'First Flower']],
-      'the second Enter follows the normal menu spawn protocol exactly once');
+    assert.equal(actions.length, 1, 'the second Enter sends exactly one spawn after the engine cooldown');
+    assert.equal(actions[0].opcode, 6);
+    assert.equal(actions[0].name, 'First Flower');
+    const replayIndex = (await commands(page)).findIndex((packet, index) => index >= marker && packet.opcode === 6);
+    const replayTick = await page.evaluate(index => window.__menuRegressionPacketTicks[index], replayIndex);
+    assert.equal(replayTick - firstSpawnTick, 50,
+      'queued respawn waits exactly fifty completed 50ms engine steps, independent of wall time');
   });

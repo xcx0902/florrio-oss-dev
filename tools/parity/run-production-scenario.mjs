@@ -305,18 +305,23 @@ async function runScenario(scenario, profile) {
           /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
       });
       const hotbar = slot => ({ x: (layout.equippedX + slot * 90) * layout.scale, y: layout.equippedY * layout.scale });
-      record.actions.push({ name: 'equip-geometry', layout, discard: hotbar(2), target: hotbar(2) });
+      const discard = { x: (layout.storageX + 8 * 65) * layout.scale, y: layout.storageY * layout.scale };
+      const drag = async (source, target) => {
+        await page.mouse.move(source.x, source.y);
+        await page.mouse.down({ button: 'left' });
+        try {
+          await advance(5);
+          await page.mouse.move(target.x, target.y, { steps: 8 });
+          await advance(5);
+        } finally { await page.mouse.up({ button: 'left' }); }
+        await advance(8);
+      };
+      record.actions.push({ name: 'equip-geometry', layout, discard, source: hotbar(0), target: hotbar(2) });
       const preDiscard = await page.evaluate(readState);
-      await page.mouse.move(hotbar(2).x, hotbar(2).y);
-      await page.mouse.down({ button: 'right' }); await advance(5);
-      await page.mouse.up({ button: 'right' }); await advance(8);
+      await drag(hotbar(2), discard);
       const before = await page.evaluate(readState);
       record.actions.push({ name: 'discard', slot: 2, beforeSlots: preDiscard.slots, afterSlots: before.slots });
-      await key('KeyI'); await advance(4);
-      const inventory = { x: profile.viewport.width / 2 - 198 + 12 + 28, y: profile.viewport.height / 2 - 125 + 44 + 28 };
-      await page.mouse.move(inventory.x, inventory.y); await page.mouse.down({ button: 'left' }); await advance(4);
-      await page.mouse.move(hotbar(2).x, hotbar(2).y); await advance(4);
-      await page.mouse.up({ button: 'left' }); await advance(8);
+      await drag(hotbar(0), hotbar(2));
       const after = await page.evaluate(readState);
       record.actions.push({ name: 'equip', source: 0, target: 2, beforeSlots: before.slots, afterSlots: after.slots });
       await capture('equip-roundtrip');

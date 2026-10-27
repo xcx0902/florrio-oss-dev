@@ -8,7 +8,9 @@
 
 namespace engine {
 
-/** Retained and lost petal types produced by the player death loot pass. */
+/** Historical names: `retained` is ground loot (at most three), while `lost`
+ * is the controller's respawn survivors (at most ten). Neither list replaces
+ * the corpse's carried inventory. */
 struct LootResult {
   std::array<std::uint16_t, 3> retained{};
   std::uint8_t retained_count = 0;
@@ -23,9 +25,11 @@ struct LootResult {
                                                           bool compact);
 
 /** Original player death retention pass: group equipped/inventory petals by
- * rarity, shuffle each group, skip Basic and a 10% roll, retain up to three,
- * lose up to ten, and convert 1% of retained rarity>=2 petals to Pollen (19). */
-[[nodiscard]] LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng);
+ * rarity, shuffle each group, skip Basic and a 10% roll, drop the first three,
+ * save the next ten for respawn, and convert 1% of ground rarity>=2 petals to
+ * Pollen (19). The profile argument is scratch storage; pass a copy at death. */
+[[nodiscard]] LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng,
+                                           ServerRng& shuffle_rng);
 
 /** Spawn one pickup entity for a petal type with the original pickup radius
  * (35), lifetime (32s, or 42/52/62/62s by rarity 2..5) and radial impulse.

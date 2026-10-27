@@ -2771,7 +2771,8 @@ void test_loot_retention() {
   profile.set_inventory_count(5);
   profile.push_backpack(2);
   engine::ServerRng rng(7);
-  const engine::LootResult result = engine::retain_player_loot(profile, rng);
+  engine::ServerRng shuffle_rng(1);
+  const engine::LootResult result = engine::retain_player_loot(profile, rng, shuffle_rng);
   CHECK(result.retained_count <= 3);
   CHECK(result.lost_count <= 10);
   for (std::uint8_t index = 0; index < result.retained_count; ++index) CHECK(result.retained[index] != 1);
@@ -3132,6 +3133,9 @@ void test_worker_api_default_spawn() {
   CHECK(api.world().entities().get(first) == nullptr);
   CHECK(!api.world().player().valid());
   engine::ByteWriter reopen;
+  // Death releases the corpse after 1000ms; original peer+288 independently
+  // blocks the next spawn until 2500ms after the previous successful spawn.
+  while (api.world().time_ms() < 2500.0) api.think();
   reopen.write_varint32(4);
   reopen.write_varint32(6);
   for (const char byte : std::string("default")) reopen.write_u8(static_cast<std::uint8_t>(byte));
@@ -3157,9 +3161,11 @@ void test_worker_api_default_spawn() {
   if (second_corpse == nullptr) return;
   CHECK(second_corpse->death_processed);
   CHECK(second_corpse->health.value == 0.0F);
-  CHECK(second_corpse->death_time_ms == api.world().time_ms() + 1000.0);
+  // Original opcode 3 calls damage43 synchronously in send(). think() above
+  // already advanced 50ms toward that existing deadline.
+  CHECK(second_corpse->death_time_ms == api.world().time_ms() + 950.0);
   CHECK(api.world().player() == second);
-  for (unsigned step = 0; step < 19U; ++step) api.think();
+  for (unsigned step = 0; step < 18U; ++step) api.think();
   CHECK(api.world().entities().get(second) != nullptr);
   CHECK(api.world().player() == second);
   CHECK(api.world().time_ms() == second_corpse->death_time_ms - 50.0);
@@ -3167,6 +3173,7 @@ void test_worker_api_default_spawn() {
   CHECK(api.world().entities().get(second) == nullptr);
   CHECK(!api.world().player().valid());
   engine::ByteWriter restart;
+  while (api.world().time_ms() < 5000.0) api.think();
   restart.write_varint32(6);
   restart.write_varint32(4);
   std::vector<std::uint8_t> restart_packet = restart.bytes();
@@ -3394,12 +3401,24 @@ void test_petal_special_effects() {
   CHECK(web.valid());
   if (engine::Entity* petal = world.entities().get(web)) petal->owner = player.raw;
   engine::on_petal_hit(world, web, mob, player);
-  CHECK(engine::has_effect(*mob_entity, engine::EffectType::kSlow));
+  CHECK(world.area_effects().empty()); // Original732 is a death callback.
+  world.set_time_ms(550.0);
+  for (auto& state : world.petals()) {
+    if (state.handle != web) continue;
+    CHECK(engine::update_projectile_petal_orbit(world, state, 1U));
+    break;
+  }
+  auto* launched_web = world.entities().get(web);
+  CHECK(launched_web != nullptr && launched_web->lifetime_remaining_ms == 650.0);
+  if (launched_web == nullptr) return;
+  (void)engine::damage_entity(world, web, launched_web->health, player);
   bool web_tag = false;
   for (const auto& entity : world.entities().entities())
-    if (entity.active && entity.kind == engine::EntityKind::kProjectile && entity.type_id == 29)
+    if (entity.active && entity.kind == engine::EntityKind::kProjectile && entity.has_tag_component)
       web_tag = true;
   CHECK(web_tag);
+  (void)world.update_area_effects();
+  CHECK(engine::slow_multiplier(*mob_entity).value == 0.25F);
 
   const engine::EntityHandle cactus = engine::spawn_petal(world, 21, engine::Vec2{},
     engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
@@ -3414,22 +3433,40 @@ void test_petal_special_effects() {
   if (engine::Entity* petal = world.entities().get(peas)) petal->owner = player.raw;
   const std::size_t before = world.entities().active_count();
   engine::on_petal_hit(world, peas, mob, player);
-  CHECK(world.entities().get(peas) == nullptr);
-  CHECK(world.entities().active_count() >= before + 3); // four children minus the consumed petal
-
-  const engine::EntityHandle egg = engine::spawn_petal(world, 22, engine::Vec2{},
-    engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
-  CHECK(egg.valid());
-  if (engine::Entity* petal = world.entities().get(egg)) {
-    petal->owner = player.raw;
-    petal->behavior_cooldown_ms = 0.0;
+  CHECK(world.entities().get(peas) != nullptr);
+  CHECK(world.entities().active_count() == before);
+  world.set_time_ms(1100.0);
+  for (auto& state : world.petals()) {
+    if (state.handle != peas) continue;
+    CHECK(engine::update_projectile_petal_orbit(world, state, 1U));
+    break;
   }
-  engine::update_petal_behaviors(world, 16.0);
-  CHECK(world.entities().get(egg) == nullptr);
-  bool hatched = false;
-  for (const auto& entity : world.entities().entities())
-    if (entity.active && entity.kind == engine::EntityKind::kMob && entity.type_id == 9) hatched = true;
-  CHECK(hatched);
+  CHECK(world.entities().get(peas) == nullptr);
+  CHECK(world.entities().active_count() == before + 3); // four children minus the consumed petal
+
+  engine::World eggs;
+  eggs.initialize();
+  eggs.set_auto_populate(false);
+  const auto egg_owner = engine::spawn_player_default(eggs, "egg", engine::make_default_profile(), false);
+  eggs.loadout().clear();
+  CHECK(eggs.loadout().equip(0U, 22U));
+  CHECK(engine::spawn_loadout_petals(eggs) == 1U);
+  const auto egg = eggs.loadout().handle(0U, 0U);
+  for (unsigned frame = 0; frame < 20U; ++frame) {
+    engine::tick(eggs, 50.0);
+    CHECK(eggs.loadout().handle(0U, 0U) == egg); // strict >1000 ms, after AI
+  }
+  engine::tick(eggs, 50.0);
+  const auto pet = eggs.loadout().handle(0U, 0U);
+  CHECK(pet.valid() && pet != egg);
+  const auto* hatchling = eggs.entities().get(pet);
+  CHECK(hatchling != nullptr);
+  if (hatchling != nullptr) {
+    CHECK(hatchling->kind == engine::EntityKind::kMob && hatchling->type_id == 9U);
+    CHECK(hatchling->owner == egg_owner.raw);
+  }
+  CHECK(eggs.entities().get(egg) != nullptr && eggs.entities().get(egg)->health.value == 0.0F);
+  CHECK(eggs.loadout().slots()[0].recharge_remaining_ms == 0.0);
 }
 
 void test_domain_profile_snapshot() {
@@ -3544,7 +3581,7 @@ void test_player_loadout_replication() {
           }
         } else if (field == 8U) (void)reader.read_u16_le();
         else if (field == 58U) (void)reader.read_varint32();
-        else if (field == 2U || field == 11U || field == 12U || field == 26U || field == 31U || field == 36U || field == 38U || field == 62U)
+        else if (field == 2U || field == 9U || field == 11U || field == 12U || field == 26U || field == 31U || field == 36U || field == 38U || field == 50U || field == 62U)
           (void)reader.read_u8();
         else {
           const auto value = reader.read_f32_le().value();
@@ -3779,15 +3816,22 @@ void test_domain_boot_visibility() {
     }
     CHECK(flags == 1U);
     if (flags != 1U) return;
-    CHECK(reader.read_u32_le().value() == engine::OriginalSnapshotWriter::kDefaultDenseComponentMask);
+    const auto component_mask = reader.read_u32_le().value();
+    const auto* entity = api.world().entities().get(handle);
+    CHECK(component_mask == engine::OriginalSnapshotWriter::kDefaultDenseComponentMask
+      || (entity != nullptr && entity->kind == engine::EntityKind::kPetal
+          && component_mask == (engine::OriginalSnapshotWriter::kDefaultDenseComponentMask | (1U << 6U))));
     std::uint32_t field = 0U;
     for (auto delta = reader.read_varint32().value(); delta != 0U;
          delta = reader.read_varint32().value()) {
       field += delta;
       switch (field) {
         case 2: ++base_records; [[fallthrough]];
-        case 11: case 12: case 22: case 26: case 31: case 36: case 38: case 54: case 62:
+        case 9: case 11: case 12: case 22: case 26: case 31: case 36: case 38: case 54: case 62:
           (void)reader.read_u8().value(); break;
+        case 50:
+          CHECK(entity != nullptr && entity->kind == engine::EntityKind::kPetal);
+          CHECK(reader.read_u8().value() == entity->type_id); break;
         case 5: case 7: case 24: case 28: case 49: case 53: case 55: case 59:
           (void)reader.read_f32_le().value(); break;
         case 8: (void)reader.read_u16_le().value(); break;
@@ -4388,7 +4432,7 @@ void test_domain_dense_player_wire_boundaries() {
     CHECK(reader.read_varint32().value() == sequence);
     CHECK(reader.read_varint32().value() == 7U);
     CHECK(reader.read_varint32().value() == 0U); // deletes
-    const unsigned expected_records = sequence == 127U ? 12U : 7U;
+    const unsigned expected_records = sequence == 127U ? 13U : 8U;
     CHECK(reader.read_varint32().value() == expected_records);
     CHECK(reader.read_varint32().value() == 0U); // events
     unsigned dense_count = 0;
@@ -4396,6 +4440,7 @@ void test_domain_dense_player_wire_boundaries() {
     unsigned loadout_count = 0;
     unsigned lifecycle_count = 0;
     unsigned inventory_count = 0, recharge_count = 0;
+    unsigned render_count = 0;
     for (unsigned record = 0; record < expected_records; ++record) {
       const auto handle = engine::EntityHandle::from_wire(reader.read_u32_le().value());
       const auto* entity = api.world().entities().get(handle);
@@ -4435,12 +4480,15 @@ void test_domain_dense_player_wire_boundaries() {
         CHECK(flags == 1U);
         // All profile records preserve the entire dense declaration, not just
         // bit 29. The last declaration determines the following dense length.
-        CHECK(reader.read_u32_le().value() == engine::OriginalSnapshotWriter::kDefaultDenseComponentMask);
+        const auto component_mask = reader.read_u32_le().value();
+        CHECK(component_mask == engine::OriginalSnapshotWriter::kDefaultDenseComponentMask
+          || (handle == petal && component_mask ==
+              (engine::OriginalSnapshotWriter::kDefaultDenseComponentMask | (1U << 6U))));
         std::uint32_t field = 0;
         for (auto delta = reader.read_varint32().value(); delta != 0U;
              delta = reader.read_varint32().value()) {
           field += delta;
-          if (field == 2U || field == 11U || field == 12U || field == 26U || field == 31U || field == 36U || field == 38U || field == 62U) {
+          if (field == 2U || field == 11U || field == 12U || field == 26U || field == 31U || field == 36U || field == 38U || field == 50U || field == 62U) {
             const auto value = reader.read_u8().value();
             if (field == 2U) CHECK(value == (handle == player ? 40U : entity->type_id));
             if (field == 11U) { CHECK(handle == petal); CHECK(value == 2U); ++loadout_count; }
@@ -4453,6 +4501,11 @@ void test_domain_dense_player_wire_boundaries() {
               ++lifecycle_count;
             }
             if (field == 62U) { CHECK(handle == player); CHECK(value == 1U); ++profile_count; }
+            if (field == 50U) {
+              CHECK(handle == petal && value == 3U);
+              CHECK((component_mask & (1U << 6U)) != 0U);
+              ++render_count;
+            }
           } else if (field == 5U || field == 7U || field == 24U || field == 28U || field == 49U
                      || field == 53U || field == 55U || field == 59U) {
             const auto value = reader.read_f32_le().value();
@@ -4489,6 +4542,7 @@ void test_domain_dense_player_wire_boundaries() {
     CHECK(recharge_count == (sequence == 127U ? 8U : 0U));
     CHECK(loadout_count == 2U);
     CHECK(lifecycle_count == 3U);
+    CHECK(render_count == 1U);
     CHECK(reader.error() == engine::ParseError::kNone);
     CHECK(reader.eof());
   }
@@ -4554,8 +4608,15 @@ void test_input_discard_deletion_then_swap() {
   engine::ByteWriter discard;
   discard.write_varint32(2U); discard.write_varint32(8U);
   discard.write_varint32(2U); discard.write_varint32(1U); send(discard);
-  CHECK(api.world().entities().get(discarded) == nullptr);
+  // Original125 damages the slot occupant through43. Its healthless body
+  // remains visible for1000ms, then the ordinary removal is replicated.
+  const auto* discarded_body = api.world().entities().get(discarded);
+  CHECK(discarded_body != nullptr);
+  CHECK(discarded_body != nullptr && discarded_body->health.value == 0.0F);
+  for (int tick = 0; tick < 19; ++tick) api.think();
+  CHECK(api.world().entities().get(discarded) != nullptr);
   api.think();
+  CHECK(api.world().entities().get(discarded) == nullptr);
   api.enqueue_domain_snapshot(2U);
   const auto output = api.flush();
   CHECK(output.size() == 1U);
@@ -5037,6 +5098,9 @@ void test_web_tag_domain_side_effects() {
   CHECK(petal_entity != nullptr);
   petal_entity->owner = player.raw;
   engine::on_petal_hit(world, petal, target, player);
+  CHECK(world.area_effects().empty());
+  petal_entity->petal_launched = true; // state1 set by original733 on release
+  (void)engine::damage_entity(world, petal, petal_entity->health, player);
   engine::EntityHandle tag{};
   for (const auto& entity : world.entities().entities()) {
     if (entity.active && entity.kind == engine::EntityKind::kProjectile && entity.type_id == 29U) {
@@ -5047,7 +5111,10 @@ void test_web_tag_domain_side_effects() {
   CHECK(tag.valid());
   const engine::Entity* tag_entity = world.entities().get(tag);
   CHECK(tag_entity != nullptr);
+  if (tag_entity == nullptr) return;
   CHECK(tag_entity->collision_radius.value == 50.0F);
+  CHECK(tag_entity->position.x.value == 30.0F);
+  CHECK(tag_entity->lifetime_remaining_ms == 12000.0);
   CHECK(tag_entity->health.value == 5.0F);
   CHECK(tag_entity->max_health.value == 5.0F);
   CHECK(tag_entity->physics_flag50);
@@ -5057,7 +5124,8 @@ void test_web_tag_domain_side_effects() {
   CHECK((tag_entity->entity_flags & 8U) != 0U);
   CHECK((tag_entity->world_flags & 128U) != 0U);
   CHECK(tag_entity->packet_epoch_a != 0U);
-  CHECK(engine::has_effect(*world.entities().get(target), engine::EffectType::kSlow));
+  (void)world.update_area_effects();
+  CHECK(engine::slow_multiplier(*world.entities().get(target)).value == 0.25F);
   const auto& areas = world.area_effects();
   bool found = false;
   for (const auto& area : areas) {

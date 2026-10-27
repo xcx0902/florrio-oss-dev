@@ -1,6 +1,7 @@
 import { ServerWorkerClient } from './net/worker.js';
 import { InputPacketEncoder } from './net/input.js';
 import { WorldState, type EntityState } from './state/world.js';
+import { DeathLifecycle } from './state/death.js';
 import { CameraState } from './state/camera.js';
 import { interpolateCameraTarget } from './state/interpolation.js';
 import { getPointerMovement, updatePanState } from './state/pan.js';
@@ -31,6 +32,7 @@ if (!foundContext) throw new Error('Canvas2D unavailable');
 const context2d: CanvasRenderingContext2D = foundContext;
 
 const world = new WorldState();
+const deathLifecycle = new DeathLifecycle();
 const camera = new CameraState();
 const menuCamera = new CameraState();
 const hudState = createHudState();
@@ -100,6 +102,7 @@ window.__florr = {
   setSnapshot: (entities, events = []) => {
     injectedSequence += 1;
     world.reset();
+    deathLifecycle.reset();
     camera.reset();
     hudState.reset();
     playerTransform.invalidate();
@@ -139,6 +142,7 @@ function applyPacket(packet: Uint8Array, at: number): boolean {
   });
   if (decoder.lastIndex === 1) world.apply(snapshot, at);
   else world.applyPartial(snapshot, at);
+  deathLifecycle.observe(world);
   return true;
 }
 const pointer = new PointerInput(canvas);
@@ -165,6 +169,10 @@ let running = true;
 let started = false;
 let serverInitialized = false;
 let pendingSpawn: string | undefined;
+let pendingRestart = false;
+let completedServerTicks = 0;
+let nextSpawnTick = 0;
+let spawnSentTick: number | undefined;
 let enteredWorld = false;
 let dead = false;
 let deathAt: number | undefined;
@@ -190,7 +198,7 @@ let exitAt: number | undefined;
 let exitCanvas: HTMLCanvasElement | undefined;
 let exitFrame = 0;
 let menuRespawn: { level: number; items: readonly number[] } | undefined;
-let lastDeathMetadata = { killerName: '', keptCount: 0, keptItems: [] as readonly number[], score: 0, respawnLevel: 0 };
+let lastDeathMetadata = { killerName: '', keptCount: 0, keptItems: [] as readonly number[], score: 0, deathLevel: 0, respawnLevel: 1 };
 let lastSlots: number[] = [1, 1, 1, 1, 1];
 let lastLevel = 1;
 let helperPlayer: { x: number; y: number } | undefined;
@@ -217,6 +225,7 @@ function localPlayer(): { entity: EntityState; kind: number } | null {
 async function startGame(): Promise<void> {
   if (started) return;
   started = true;
+  deathLifecycle.reset();
   inventoryOpen = false;
   menuControls.open(undefined); menuControls.show(false);
   pointer.reset(); keyboard.clearPressed();
@@ -233,24 +242,20 @@ async function startGame(): Promise<void> {
   try {
     if (!serverInitialized) { await server.init(); serverInitialized = true; }
     pendingSpawn = menuControls.name.value.trim();
+    pendingRestart = false;
   } catch {
     status = 'Server unavailable';
   }
 }
 
-/** Death → respawn. The original client sends opcode 4 and the server rebuilds
- * the default player on the next tick. */
+/** Diagnostic local restart shares the pending spawn/cooldown path. Opcode4
+ * is the engine's compatibility entry point for the original restart request. */
 async function restartGame(): Promise<void> {
   started = true;
-  dead = false;
-  deathAt = undefined;
   menuRespawn = undefined;
   status = 'Respawning…';
-  try {
-    await server.send(inputEncoder.restart());
-  } catch {
-    status = 'Server unavailable';
-  }
+  pendingSpawn = menuControls.name.value.trim();
+  pendingRestart = true;
 }
 
 function continueToMenu(): void {
@@ -273,6 +278,7 @@ function continueToMenu(): void {
   entryAt = undefined; entryCanvas = undefined;
   keyboardSlot = undefined;
   pendingSpawn = undefined;
+  pendingRestart = false;
   pointer.reset(); keyboard.clearPressed();
   status = ''; menuControls.show(true);
   menuControls.name.focus({ preventScroll: true });
@@ -290,15 +296,16 @@ async function tickServer(): Promise<void> {
     } else if (started && enteredWorld && player === null && enter) {
       continueToMenu();
     }
-    // A dead body remains authoritative for one second. Opcode 6 is ignored
-    // while it exists, so send after its deletion instead of losing a fast
-    // menu → play transition to the server's has-player gate.
-    if (started && pendingSpawn !== undefined && ![...world.all()].some(entity => entity.kind === 1)) {
-      await server.send(inputEncoder.spawn(pendingSpawn));
-      pendingSpawn = undefined;
+    // Original spawn has two gates: the one-second corpse and a 2500ms
+    // cooldown measured from the last successful spawn. This manual worker
+    // advances exactly 50ms per completed think(), so even a stalled tab sends
+    // one request at the engine's deadline. Retain it until a healthy body arrives.
+    if (started && pendingSpawn !== undefined && spawnSentTick === undefined
+      && completedServerTicks >= nextSpawnTick
+      && ![...world.all()].some(entity => entity.kind === 1)) {
+      await server.send(pendingRestart ? inputEncoder.restart() : inputEncoder.spawn(pendingSpawn));
+      spawnSentTick = completedServerTicks;
     }
-    const now = performance.now();
-    void now;
     if (started && player !== null) {
       let { angle, strength } = pointerMovement;
       if (movementDisabled || menuControls.keyboardMovement) strength = 0;
@@ -320,10 +327,17 @@ async function tickServer(): Promise<void> {
       await server.send(inputEncoder.input(buttons, angle, strength));
     }
     await server.think();
+    completedServerTicks += 1;
     await server.requestStream('sp_server_flush', undefined, packet => {
       if (!applyPacket(packet, performance.now())) throw new Error('invalid server snapshot');
     });
     if (started && localPlayer() !== null) {
+      if (pendingSpawn !== undefined) {
+        nextSpawnTick = (spawnSentTick ?? completedServerTicks) + 50;
+        pendingSpawn = undefined;
+        pendingRestart = false;
+        spawnSentTick = undefined;
+      }
       status = '';
       dead = false;
     } else if (started) {
@@ -612,14 +626,18 @@ function frame(now: number): void {
   const menuFrame = !enteredWorld;
   const player = localPlayer();
   const deathInfo = world.deathMetadata();
-  // The controller record is reaped together with the corpse one second after
-  // death, but the native death screen and the menu keep the last received
-  // values. Snapshot on the first dead frame and never replace them with the
-  // empty post-reap record while the overlay/menu are still showing.
-  if (!dead) lastDeathMetadata = deathInfo;
+  // Capture on receipt as well as RAF: a worker flush can deliver corpse and
+  // removal together. Keep the first death's complete inventory/statistics.
+  deathLifecycle.observe(world);
+  const retainedDeath = deathLifecycle.snapshot;
+  if (deathLifecycle.dead && retainedDeath) {
+    lastDeathMetadata = retainedDeath.metadata;
+    lastSlots = [...retainedDeath.slots];
+    lastLevel = retainedDeath.level;
+  } else if (!dead) lastDeathMetadata = deathInfo;
+  const deathProgress = deathLifecycle.advance(delta);
   const corpse = world.playerEntity();
   if (corpse !== undefined && started && enteredWorld && corpse.health <= 0) {
-    if (!dead) lastDeathMetadata = deathInfo;
     dead = true;
     deathAt ??= now;
   }
@@ -812,8 +830,9 @@ function frame(now: number): void {
       flowers: 0, flowerEntries: [],
       deathState: {
         elapsedMilliseconds: Math.max(0, now - (deathAt ?? now)),
+        progress: deathProgress,
         killerName: lastDeathMetadata.killerName || 'A mysterious entity',
-        respawnLevel: lastDeathMetadata.respawnLevel || lastLevel,
+        respawnLevel: lastDeathMetadata.deathLevel || lastLevel,
         score: lastDeathMetadata.score,
         keptSlots: lastSlots,
       },

@@ -54,6 +54,8 @@ const sources = [
   'engine/src/sim/damage.cpp',
   'engine/src/sim/petal_effects.cpp',
   'engine/src/sim/petals.cpp',
+  'engine/src/sim/passives.cpp',
+  'engine/src/sim/pets.cpp',
   'engine/src/sim/player.cpp',
   'engine/src/sim/player_loadout.cpp',
   'engine/src/sim/spatial.cpp',

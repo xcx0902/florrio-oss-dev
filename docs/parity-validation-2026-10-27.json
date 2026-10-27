@@ -1,0 +1,773 @@
+{
+  "schema": 1,
+  "scope": "Confirmed fixes and bounded original-WASM/frame comparisons; not universal whole-game pixel equivalence.",
+  "generatedAt": "2026-10-27T17:11:00.778Z",
+  "delivery": {
+    "output": "dist-next",
+    "files": 142,
+    "bytes": 1310112,
+    "sourceIdentity": {
+      "sha256": "f255a532a4d2b906e6a959983d58958cec371777332f20c4d06c245f4086da63",
+      "fileCount": 745
+    },
+    "serverWasm": {
+      "path": "server.wasm",
+      "bytes": 273641,
+      "sha256": "322eafbeae533bd8989f408a906e0da7c600c09724f804397fc5db382e75c246"
+    }
+  },
+  "deliveryVerification": {
+    "passed": true,
+    "files": 142,
+    "totals": {
+      "files": 142,
+      "bytes": 1310112
+    },
+    "issues": []
+  },
+  "frozenReferences": {
+    "passed": true,
+    "trees": [
+      "web",
+      "dist",
+      "dist-readable",
+      "dist-reference"
+    ],
+    "keyFiles": 15,
+    "totals": {
+      "recovered": 3850,
+      "remaining": 1129
+    },
+    "issues": []
+  },
+  "tests": {
+    "nativeCtest": {
+      "passed": 11,
+      "total": 11,
+      "unit": "targets"
+    },
+    "client": {
+      "passed": 264,
+      "total": 264
+    },
+    "javascript": {
+      "initial": {
+        "passed": 938,
+        "total": 940,
+        "failed": 2
+      },
+      "initialFailureReason": "Sandbox EPERM when listening on 127.0.0.1",
+      "permissionEnabledRerun": {
+        "passed": 2,
+        "total": 2
+      }
+    },
+    "productionAcceptanceRules": {
+      "passed": 29,
+      "total": 29
+    }
+  },
+  "originalProjectileComparison": {
+    "passed": true,
+    "callbackFrames": 240,
+    "lifecycleFrames": 800,
+    "splitChildren": 36,
+    "originalMasks": [
+      {
+        "type": 11,
+        "mask": "0x03184050",
+        "field9": 0
+      },
+      {
+        "type": 12,
+        "mask": "0x03184050",
+        "field9": 1
+      },
+      {
+        "type": 34,
+        "mask": "0x03184050",
+        "field9": 3
+      },
+      {
+        "type": 29,
+        "mask": "0x03184800"
+      }
+    ],
+    "originalWasm": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+    "scope": "Exact native/original callback velocity, acceleration, f32 orientation and lifetime; every 50ms tick of equipped state and recharge wire progress for eight projectile types. No pixel or whole-world equivalence claim."
+  },
+  "originalPoisonComparison": {
+    "passed": true,
+    "options": [
+      {
+        "flags": 0,
+        "loss": 1,
+        "hit": true
+      },
+      {
+        "flags": 1,
+        "loss": 1,
+        "hit": false
+      },
+      {
+        "flags": 255,
+        "loss": 1,
+        "hit": false
+      },
+      {
+        "flags": 256,
+        "loss": 1,
+        "hit": true
+      },
+      {
+        "flags": 257,
+        "loss": 1,
+        "hit": false
+      },
+      {
+        "flags": 65280,
+        "loss": 1,
+        "hit": true
+      }
+    ],
+    "poison": [
+      {
+        "at": 50,
+        "hit": true
+      },
+      {
+        "at": 100,
+        "hit": false
+      },
+      {
+        "at": 150,
+        "hit": false
+      },
+      {
+        "at": 200,
+        "hit": false
+      },
+      {
+        "at": 250,
+        "hit": false
+      },
+      {
+        "at": 300,
+        "hit": false
+      },
+      {
+        "at": 350,
+        "hit": false
+      },
+      {
+        "at": 400,
+        "hit": false
+      },
+      {
+        "at": 450,
+        "hit": false
+      },
+      {
+        "at": 500,
+        "hit": false
+      },
+      {
+        "at": 550,
+        "hit": false
+      },
+      {
+        "at": 600,
+        "hit": false
+      },
+      {
+        "at": 650,
+        "hit": true
+      },
+      {
+        "at": 700,
+        "hit": false
+      },
+      {
+        "at": 750,
+        "hit": false
+      },
+      {
+        "at": 800,
+        "hit": false
+      },
+      {
+        "at": 850,
+        "hit": false
+      },
+      {
+        "at": 900,
+        "hit": false
+      },
+      {
+        "at": 950,
+        "hit": false
+      },
+      {
+        "at": 1000,
+        "hit": false
+      },
+      {
+        "at": 1050,
+        "hit": false
+      },
+      {
+        "at": 1100,
+        "hit": false
+      },
+      {
+        "at": 1150,
+        "hit": false
+      },
+      {
+        "at": 1200,
+        "hit": false
+      },
+      {
+        "at": 1250,
+        "hit": true
+      }
+    ],
+    "originalWasm": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+    "scope": "Native43 low-byte notification suppression and native654 600ms poison notification gate; damage continues every tick."
+  },
+  "production": {
+    "passed": true,
+    "stable": true,
+    "changedDuringRun": false,
+    "sourceMatchesDelivery": true,
+    "completeCoverage": true,
+    "evidence": {
+      "runId": "2026-10-27T17-09-07.033Z-1a1c0927",
+      "source": {
+        "sha256": "f255a532a4d2b906e6a959983d58958cec371777332f20c4d06c245f4086da63",
+        "fileCount": 745
+      },
+      "client": {
+        "sha256": "9a2e1c41029ddba5659f4e7e5b3c99b11c52fee49da7efdb93f0de88102f062c",
+        "fileCount": 142
+      },
+      "oracle": {
+        "sha256": "b5afad64309cec5692a69cda1ab68b35dfd165309d1a516745190371021776ec",
+        "fileCount": 722
+      }
+    },
+    "target": {
+      "sha256": "59dd1c0521d25ade536e9e292d209180ee0ee70432c9dfe6de79900141665ce2"
+    },
+    "rootManifestSha256": "0fca88fe94bf17cc7ad192f328b094370da5edc37be067ec085216c9d0cdb762",
+    "rootWasmSha256": "322eafbeae533bd8989f408a906e0da7c600c09724f804397fc5db382e75c246",
+    "equivalence": false,
+    "recordings": [
+      {
+        "scenario": "boot-menu",
+        "profile": "desktop",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "boot-menu",
+        "profile": "retina",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "boot-menu",
+        "profile": "touch",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "mobileUi": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "garden-idle",
+        "profile": "desktop",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "garden-idle",
+        "profile": "retina",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "garden-idle",
+        "profile": "touch",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "mobileUi": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "move",
+        "profile": "desktop",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "moved": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "move",
+        "profile": "retina",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "moved": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "move",
+        "profile": "touch",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "mobileUi": true,
+          "moved": true,
+          "touchMoved": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "attack",
+        "profile": "desktop",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "attackBit": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "attack",
+        "profile": "retina",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "attackBit": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "attack",
+        "profile": "touch",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "mobileUi": true,
+          "attackBit": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "equip",
+        "profile": "desktop",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "equipOpcode": true,
+          "discardOpcode": true,
+          "discardStateChanged": true,
+          "equipmentStateChanged": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "equip",
+        "profile": "retina",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "equipOpcode": true,
+          "discardOpcode": true,
+          "discardStateChanged": true,
+          "equipmentStateChanged": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "equip",
+        "profile": "touch",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "mobileUi": true,
+          "equipOpcode": true,
+          "discardOpcode": true,
+          "discardStateChanged": true,
+          "equipmentStateChanged": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "damage",
+        "profile": "desktop",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "healthChanged": true,
+          "hitEventDecoded": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "damage",
+        "profile": "retina",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "healthChanged": true,
+          "hitEventDecoded": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "damage",
+        "profile": "touch",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "mobileUi": true,
+          "healthChanged": true,
+          "hitEventDecoded": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "death",
+        "profile": "desktop",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "deathObserved": true,
+          "menuReturnObserved": true,
+          "restartObserved": true,
+          "restartOpcode": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "death",
+        "profile": "retina",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "deathObserved": true,
+          "menuReturnObserved": true,
+          "restartObserved": true,
+          "restartOpcode": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "death",
+        "profile": "touch",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "mobileUi": true,
+          "deathObserved": true,
+          "menuReturnObserved": true,
+          "restartObserved": true,
+          "restartOpcode": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "spawn",
+        "profile": "desktop",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "populated": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "spawn",
+        "profile": "retina",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "populated": true
+        },
+        "errors": []
+      },
+      {
+        "scenario": "spawn",
+        "profile": "touch",
+        "passed": true,
+        "checks": {
+          "actualWorker": true,
+          "noFixtureInjection": true,
+          "noErrors": true,
+          "renderedAtMultipleTimes": true,
+          "framebuffer": true,
+          "finiteState": true,
+          "productionDecode": true,
+          "snapshotTransport": true,
+          "cameraFollows": true,
+          "started": true,
+          "menu": true,
+          "mobileUi": true,
+          "populated": true
+        },
+        "errors": []
+      }
+    ],
+    "temporaryArtifacts": "/tmp/florr-production-final2"
+  }
+}

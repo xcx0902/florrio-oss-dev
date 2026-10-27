@@ -186,6 +186,46 @@ test('gallery scrollbars follow the pointer while dragged', async t => {
   }
 });
 
+test('gallery wheel distance and every following frame match original func626', async t => {
+  const original = await loadOriginal('client', { functionIds: [626] });
+  const view = new DataView(original.memory.buffer);
+  const scroll = 5000000, rect = 5002000, config = 5002100, viewport = 5002200;
+  const page = await menuPage(t);
+  for (const panel of ['Petals', 'Mobs', 'Changelog']) {
+    const geometry = await page.evaluate(async panel => {
+      const layout = await import('/render/menu-layout.js');
+      window.menu.open(panel); window.menu.advance(1600);
+      const content = layout.menuContentRect(panel, window.menu.height);
+      window.menu.pointerMove((content.x + 20) * window.menu.scale,
+        (content.y + 20) * window.menu.scale);
+      return { width: content.width, height: content.height,
+        max: layout.menuScrollMax(panel, window.menu.height, window.menu.discoveredMobs) };
+    }, panel);
+    new Uint8Array(original.memory.buffer, scroll, 1024).fill(0);
+    view.setUint32(7908828, scroll, true); view.setUint32(7908840, 1, true);
+    view.setUint32(scroll + 36, 1, true);
+    view.setFloat32(scroll + 232, -1, true); view.setFloat32(scroll + 236, -1, true);
+    view.setFloat32(scroll + 304, 1, true);
+    [1, 0, 0, geometry.width, geometry.height].forEach((value, index) =>
+      view.setFloat32(rect + index * 4, value, true));
+    view.setFloat32(viewport + 12, geometry.width, true);
+    view.setFloat32(viewport + 16, geometry.height, true);
+    for (const [delta, elapsed] of [[1, 16], [0, 16], [0, 33], [0.5, 16], [-0.25, 8], [100, 16], [-100, 16], [0, 16]]) {
+      view.setFloat64(163840, delta, true);
+      original.call(626, scroll, elapsed, rect, geometry.width,
+        geometry.height + geometry.max, viewport, config);
+      const expected = view.getFloat32(scroll + 292, true);
+      const actual = await page.evaluate(({ panel, delta, elapsed }) => {
+        if (delta) window.menu.wheel(delta);
+        window.menu.advance(elapsed);
+        return window.menu.renderState().scroll[panel];
+      }, { panel, delta, elapsed });
+      assert.ok(Math.abs(actual - expected) < 0.0002,
+        `${panel}: wheel ${delta}, ${elapsed} ms: ${actual} != original ${expected}`);
+    }
+  }
+});
+
 test('panels independently fade and slide while opening, switching and closing', async t => {
   const page = await menuPage(t);
   const samples = await page.evaluate(async () => {

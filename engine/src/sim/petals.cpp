@@ -1,4 +1,5 @@
 #include "engine/sim/petals.hpp"
+#include "engine/sim/petal_effects.hpp"
 #include "engine/catalog/petal_defaults.hpp"
 #include "engine/model/catalog.hpp"
 #include "engine/sim/petal_orbit.hpp"
@@ -8,6 +9,7 @@
 #include "engine/sim/ai.hpp"
 #include "engine/sim/loot.hpp"
 #include "engine/sim/effects.hpp"
+#include "engine/sim/pets.hpp"
 #include "pickups.hpp"
 #include <algorithm>
 #include <cmath>
@@ -253,21 +255,23 @@ void update_zone_restriction(World& world, double step_milliseconds) {
   world.set_zone_progress(static_cast<std::uint8_t>(progress));
 }
 
-void damage_zone_locked_petals(World& world, double) {
+void damage_zone_locked_petals(World& world, double step_milliseconds) {
   if (!world.zone_petals_disabled()) return;
-  // Original zone loop kills every equipped instance as soon as the timer is
-  // capped (function_43 with health 0), then unlinks the slot handle.
-  std::vector<EntityHandle> destroyed;
-  for (const PetalOrbitState& state : world.petals()) {
-    Entity* petal = world.entities().get(state.handle);
-    if (petal == nullptr || !petal->active) continue;
-    petal->health = f32(0.0F);
-    destroyed.push_back(state.handle);
+  // Original 654 sweeps all 8x3 equipped handles, including hatched pets that
+  // no longer have an orbit record. Damage runs the ordinary corpse path.
+  for (std::uint8_t slot = 0U; slot < 8U; ++slot) {
+    for (std::uint8_t instance = 0U; instance < PlayerLoadout::kInstances; ++instance) {
+      const auto handle = world.loadout().handle(slot, instance);
+      Entity* entity = world.entities().get(handle);
+      if (entity == nullptr || entity->health.value <= 0.0F) continue;
+      (void)damage_entity(world, handle, entity->health, EntityHandle{});
+    }
   }
-  for (const EntityHandle handle : destroyed) {
-    (void)world.destroy(handle);
-    (void)on_petal_destroyed(world, handle);
-  }
+  refresh_egg_pet_slots(world);
+  // Original advances recharge in this same slot sweep, while blocking new
+  // spawns. It does not hold an Egg's timer at zero after the pet is defeated.
+  world.loadout().advance(step_milliseconds);
+  world.loadout().refresh_recharge_progress(world);
 }
 
 void update_petal_orbits(World& world, double step_milliseconds) {
@@ -285,18 +289,7 @@ void update_petal_orbits(World& world, double step_milliseconds) {
     const std::uint16_t type = state.type_id;
     const bool defend = (buttons & 2U) != 0U;
     const double held_ms = world.time_ms() - state.behavior_started_at_ms;
-    // Original Peas orbit callbacks (676/681/431): after the petal has been
-    // equipped for 500 ms, holding attack consumes it into four children. The
-    // callback always reports radius 65; only defend pulls it to 40.
-    if ((type == 11U || type == 12U || type == 34U)
-        && (buttons & 1U) != 0U && state.behavior_state == 0U
-        && held_ms > 500.0) {
-      const EntityHandle petal_handle = state.handle;
-      Entity* petal = world.entities().get(petal_handle);
-      const EntityHandle owner = petal != nullptr
-        ? EntityHandle{petal->owner} : EntityHandle{};
-      state.behavior_state = 1U;
-      (void)consume_peas_attack(world, petal_handle, owner);
+    if (update_projectile_petal_orbit(world, state, buttons)) {
       --index;
       continue;
     }
@@ -330,72 +323,17 @@ void update_petal_orbits(World& world, double step_milliseconds) {
         }
       }
     } else if (type == 19U) {
-      // Pollen (686): attack/defend launches it away from the flower after
-      // 500 ms, detaches the slot and gives it a 4.5-5.5 s ground lifetime.
       state.orbit_radius = f32(65.0F);
-      if (state.behavior_state == 0U && (buttons & 3U) != 0U && held_ms > 500.0) {
-        const EntityHandle petal_handle = state.handle;
-        Entity* petal = world.entities().get(petal_handle);
-        Entity* owner = petal != nullptr
-          ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
-        if (petal != nullptr && owner != nullptr) {
-          state.behavior_state = 1U;
-          const double dx = static_cast<double>(petal->position.x.value)
-                          - static_cast<double>(owner->position.x.value);
-          const double dy = static_cast<double>(petal->position.y.value)
-                          - static_cast<double>(owner->position.y.value);
-          const double length = std::sqrt(dx * dx + dy * dy);
-          double impulse_x = 0.5;
-          double impulse_y = 0.0;
-          if (!(length < 2.220446049250313e-16)) {
-            impulse_x = dx * 0.5 / length;
-            impulse_y = dy * 0.5 / length;
-          }
-          const double direction = (buttons & 1U) != 0U ? 1.0 : -1.0;
-          petal->velocity.x += impulse_x * direction;
-          petal->velocity.y += impulse_y * direction;
-          const f32 draw = f32(static_cast<float>(world.random().next() - 1U));
-          const f32 lifetime = f32(f32(draw.value * f32(1000.0 / 2147483648.0).value).value
-                                   + 4500.0F);
-          petal->lifetime_remaining_ms = static_cast<double>(lifetime.value);
-          (void)detach_petal_from_slot(world, petal_handle);
-          --index;
-          continue;
-        }
-      }
-    } else if (type == 29U || type == 30U) {
-      // Web (733): radius 65 normally, 40 while defending. Attack releases the
-      // web outward after 500 ms and arms its 650 ms projectile lifetime.
+    } else if (type == 10U || type == 20U || type == 29U || type == 30U) {
       state.orbit_radius = defend ? f32(40.0F) : f32(65.0F);
-      if (state.behavior_state == 0U && (buttons & 1U) != 0U && held_ms > 500.0) {
-        const EntityHandle petal_handle = state.handle;
-        Entity* petal = world.entities().get(petal_handle);
-        Entity* owner = petal != nullptr
-          ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
-        if (petal != nullptr && owner != nullptr) {
-          state.behavior_state = 1U;
-          double dx = static_cast<double>(petal->position.x.value)
-                    - static_cast<double>(owner->position.x.value);
-          double dy = static_cast<double>(petal->position.y.value)
-                    - static_cast<double>(owner->position.y.value);
-          const double length = std::sqrt(dx * dx + dy * dy);
-          f32 impulse_x(2.2F);
-          f32 impulse_y(0.0F);
-          if (!(length < 2.220446049250313e-16)) {
-            impulse_x = f32((dx / length) * 2.2);
-            impulse_y = f32((dy / length) * 2.2);
-          }
-          petal->velocity.x += static_cast<double>(impulse_x.value);
-          petal->velocity.y += static_cast<double>(impulse_y.value);
-          petal->lifetime_remaining_ms = 650.0;
-          (void)detach_petal_from_slot(world, petal_handle);
-          --index;
-          continue;
-        }
-      }
     } else if (type == 22U || type == 23U) {
       // Egg callbacks always report radius 65 and never respond to buttons.
       state.orbit_radius = f32(65.0F);
+      if (held_ms > (type == 22U ? 1000.0 : 2500.0)
+          && hatch_equipped_egg(world, state.handle, type == 22U ? 9U : 12U)) {
+        --index;
+        continue;
+      }
     } else if (is_rose_orbit_function(state.orbit_function)) {
       state.orbit_radius = rose_orbit_radius(buttons);
     } else if (profile == OrbitProfile::kWing) {
@@ -496,6 +434,8 @@ EntityHandle spawn_petal(World& world, std::uint16_t type_id, Vec2 center,
   entity->contact_damage = f32(combat->damage);
   entity->health = f32(combat->health);
   entity->max_health = f32(combat->health);
+  // Original 726 writes physics+40 mass 4 for Heaviest (other petals use 1).
+  if (type_id == 26U) entity->mass = f32(4.0F);
   entity->loadout_slot = slot;
   entity->loadout_instance = instance;
   PetalOrbitState state;
@@ -575,6 +515,7 @@ std::size_t spawn_loadout_petals(World& world) {
 }
 
 std::size_t refresh_loadout_petals(World& world, double step_milliseconds) {
+  refresh_egg_pet_slots(world);
   world.loadout().advance(step_milliseconds);
   const auto spawned = spawn_loadout_petals(world);
   world.loadout().refresh_recharge_progress(world);
@@ -610,6 +551,10 @@ bool detach_petal_from_slot(World& world, EntityHandle handle) {
 }
 
 bool on_petal_destroyed(World& world, EntityHandle handle) {
+  // Original 43 invokes petal virtual slot6 even after a launched Web has
+  // detached its equipped handle. Dispatch before looking up the orbit.
+  const Entity* entity = world.entities().get(handle);
+  if (entity != nullptr && entity->health.value <= 0.0F) on_petal_death(world, handle);
   auto& petals = world.petals();
   const auto it = std::find_if(petals.begin(), petals.end(),
     [handle](const PetalOrbitState& state) { return state.handle == handle; });

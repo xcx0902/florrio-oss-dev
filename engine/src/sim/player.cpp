@@ -2,6 +2,8 @@
 #include "engine/model/catalog.hpp"
 #include "engine/sim/loot.hpp"
 #include "engine/sim/progression.hpp"
+#include "engine/sim/passives.hpp"
+#include "engine/sim/effects.hpp"
 #include "engine/sim/spatial.hpp"
 #include "engine/sim/spawn.hpp"
 #include <algorithm>
@@ -45,7 +47,8 @@ void award_player_experience(World& world, f32 amount) {
   Entity* player = world.entities().get(world.player());
   if (player == nullptr || player->health.value <= 0.0F) return;
   for (unsigned level = previous_level + 1U; level <= world.profile().level(); ++level) {
-    const f32 maximum = player_level_max_health(static_cast<std::uint8_t>(level));
+    const f32 maximum = player_level_max_health(static_cast<std::uint8_t>(level))
+      + equipped_max_health_bonus(world, static_cast<std::uint8_t>(level));
     // 145 uses f32(maximum * currentHealth) / previousMaximum, once per
     // level; collapsing several gains into a single ratio loses rounding.
     player->health = player->max_health.value <= 0.0F ? maximum
@@ -85,6 +88,18 @@ PlayerProfile make_default_profile() {
   return profile;
 }
 
+PlayerProfile make_respawn_profile(const World& world) {
+  PlayerProfile profile;
+  profile.set_level(std::max<std::uint8_t>(1U,
+    static_cast<std::uint8_t>((world.last_death_level() * 3U) / 4U)));
+  std::uint8_t count = world.last_death_kept_count();
+  for (std::uint8_t index = 0; index < count; ++index)
+    profile.set_inventory(index, world.last_death_kept()[index]);
+  while (count < profile.active_slots()) profile.set_inventory(count++, 1U);
+  profile.set_inventory_count(count);
+  return profile;
+}
+
 void apply_player_controls(World& world, double delta_milliseconds) {
   Entity* player = world.entities().get(world.player());
   if (player == nullptr || player->health.value <= 0.0F) return;
@@ -111,14 +126,18 @@ void regenerate_players(World& world, double delta_milliseconds) {
   for (auto& entity : world.entities().entities()) {
     if (!entity.active || entity.kind != EntityKind::kPlayer) continue;
     if (entity.health.value <= 0.0F) continue;
-    const f32 maximum = entity.max_health;
+    const f32 maximum = player_level_max_health(world.profile().level())
+      + equipped_max_health_bonus(world, world.profile().level());
     // Original tick calls 145 even with an unchanged maximum: the f32
     // multiply/divide can change health by one ULP before regeneration.
-    if (maximum.value > 0.0F)
-      entity.health = (maximum * entity.health) / maximum;
+    entity.health = entity.max_health.value > 0.0F
+      ? (maximum * entity.health) / entity.max_health : maximum;
+    entity.max_health = maximum;
     // Original 216 receives an f32 healing amount, then adds it in f32.
+    if (blocks_healing(entity)) continue;
     const f32 amount = f32::from_double(delta_milliseconds
-      * static_cast<double>(maximum.value) * 4.166666666666667e-06);
+      * static_cast<double>(maximum.value) * 4.166666666666667e-06
+      + equipped_leaf_healing(world, delta_milliseconds));
     const f32 next = entity.health + amount;
     entity.health = next < maximum ? next : maximum;
   }
@@ -157,11 +176,27 @@ EntityHandle spawn_player_default(World& world, std::string_view name, PlayerPro
     if (!SpatialQuery::from_world(world).occupied({position.x, position.y}, clearance)) break;
   }
   const bool rare = allow_rare_starter && world.random().next_fraction() < f32(0.00005F);
-  if (rare) profile.set_inventory(0, 35);
+  if (rare) {
+    // Original spawn restores survivors first, then fills the active row. The
+    // rare starter can replace the first filler, never a surviving petal.
+    for (std::uint8_t slot = 0; slot < profile.active_slots(); ++slot) {
+      if (profile.inventory(slot) != 1U) continue;
+      if (!legendary_exists(world, EntityHandle{}, 35U)) profile.set_inventory(slot, 35U);
+      break;
+    }
+  }
   const EntityHandle handle = spawn_player(world, name, position, PlayerConfig{});
   if (!handle.valid()) return handle;
   world.profile() = profile;
   world.loadout().restore_from_profile(profile);
+  // Original spawn repeatedly awards exactly the XP missing to reach the
+  // remembered level. It recreates cumulative points, with zero partial XP.
+  f32 score(0.0F);
+  for (std::uint8_t level = 1; level < profile.level(); ++level)
+    score += experience_threshold(level);
+  world.loadout().set_score(score);
+  world.loadout().set_active_slots(profile.active_slots());
+  world.set_last_death_kept({});
   if (Entity* player = world.entities().get(handle)) {
     player->max_health = player_level_max_health(profile.level());
     player->health = player->max_health;

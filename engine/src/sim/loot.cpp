@@ -8,14 +8,9 @@ namespace engine {
 
 namespace {
 
-std::uint32_t next_random(std::uint32_t& state) {
-  state = ServerRng::successor(state);
-  return state;
-}
-
 /** libc++ std::shuffle with minstd_rand + independent_bits_engine, as recovered
  * from the death path. `state` is the independent engine's Park-Miller state. */
-void shuffle_petals(std::uint16_t* data, std::size_t count, std::uint32_t& state) {
+void shuffle_petals(std::uint16_t* data, std::size_t count, ServerRng& rng) {
   if (count < 2) return;
   for (std::size_t position = 0; position + 1 < count; ++position) {
     const std::size_t range = count - position;
@@ -27,7 +22,7 @@ void shuffle_petals(std::uint16_t* data, std::size_t count, std::uint32_t& state
         std::floor(2147483646.0 / static_cast<double>(1U << bits))) << bits;
       std::uint32_t sample = 0;
       do {
-        do { sample = next_random(state) - 1U; } while (sample >= ceiling);
+        do { sample = rng.next() - 1U; } while (sample >= ceiling);
         choice = sample & mask;
       } while (choice >= range);
     }
@@ -64,7 +59,7 @@ std::vector<std::uint16_t> roll_entity_loot(ServerRng& rng, std::uint16_t type_i
   return result;
 }
 
-LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng) {
+LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng& shuffle_rng) {
   LootResult result;
   std::array<std::vector<std::uint16_t>, 6> groups;
   const std::uint8_t size = profile.inventory_size();
@@ -83,13 +78,12 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng) {
     const std::uint16_t petal = profile.backpack()[index];
     if (petal != 0) groups[std::min<std::uint32_t>(rarity_of(petal), 5U)].push_back(petal);
   }
-  std::uint32_t shuffle_state = 1U;
   std::uint32_t retained = 0;
   std::uint32_t lost = 0;
   for (int tier = 5; tier >= 0; --tier) {
     auto& group = groups[static_cast<std::size_t>(tier)];
     if (group.empty()) continue;
-    shuffle_petals(group.data(), group.size(), shuffle_state);
+    shuffle_petals(group.data(), group.size(), shuffle_rng);
     for (const std::uint16_t petal : group) {
       if (petal == 1) continue;
       if (rng.next_fraction() < f32(0.1F)) continue;

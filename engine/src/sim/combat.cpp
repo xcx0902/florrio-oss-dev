@@ -101,9 +101,11 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
     // window. retainPlayerLoot writes a separate loot component and the peer's
     // lost-item list; it does not replace the carried inventory in-place.
     PlayerProfile retained_profile = world.profile();
-    const LootResult loot = retain_player_loot(retained_profile, world.random());
+    const LootResult loot = retain_player_loot(retained_profile, world.random(), world.death_shuffle_random());
     world.profile().set_lost_items(loot.lost_count, loot.lost);
-    world.set_last_death_kept(std::span<const std::uint16_t>(loot.retained.data(), loot.retained_count));
+    // The first three eligible petals are ground loot. The remainder (up to
+    // ten, historically named `lost`) belongs to the controller and respawns.
+    world.set_last_death_kept(std::span<const std::uint16_t>(loot.lost.data(), loot.lost_count));
     std::vector<std::uint16_t> retained(loot.retained.begin(),
                                         loot.retained.begin() + loot.retained_count);
     (void)spawn_loot_drops(world, retained, position, target);
@@ -199,7 +201,8 @@ struct Last {
 Last last{};
 } // namespace damage_debug
 
-DamageResult damage_entity(World& world, EntityHandle target, f32 amount, EntityHandle attacker) {
+DamageResult damage_entity(World& world, EntityHandle target, f32 amount, EntityHandle attacker,
+                           std::uint16_t options) {
   if (amount.value > 0.0F) {
     damage_debug::last.valid = true;
     damage_debug::last.target = target.raw;
@@ -215,10 +218,13 @@ DamageResult damage_entity(World& world, EntityHandle target, f32 amount, Entity
   entity->health -= amount;
   if (entity->health.value < 0.0F) entity->health = f32(0.0F);
   const bool died = entity->health.value <= 0.0F;
-  entity->hit_epoch = static_cast<std::uint32_t>(world.tick() + 1U);
   (void)alert_to_attacker(world, target, attacker);
-  if (amount.value > 0.0F)
+  // Original43's low option byte suppresses notification only. Health,
+  // attacker propagation and death still run; the high byte is independent.
+  if (amount.value > 0.0F && (options & 0xFFU) == 0U) {
+    entity->hit_epoch = static_cast<std::uint32_t>(world.tick() + 1U);
     world.record_hit(target, attacker, amount, entity->health);
+  }
   if (died) kill_entity(world, target, attacker);
   return {entity->health, died};
 }
@@ -552,16 +558,12 @@ std::size_t resolve_contacts(World& world) {
         }
       }
       const f32 scale = level_damage_scale(world, a.handle, b.handle);
-      // The shipped resolver separates mob/mob overlaps but only applies
-      // contact damage when a player or petal participates (probed: overlapping
-      // ladybug/centipede keep full health across the first tick).
-      const bool mob_pair = a.kind == EntityKind::kMob && b.kind == EntityKind::kMob;
       // Original 162 passes controlling-root equality to 390; its damage
       // tail has no attack-button, movement or AI-aggression gate. Production
       // move tick305 proves an idle Basic petal and worker Ant kill each other.
       // Ordinary mobs share the world's manager root, so their contacts remain
       // non-damaging even when the bodies have different immediate owners.
-      const bool suppress_damage = mob_pair;
+      const bool suppress_damage = same_controlling_root(world, a.handle, b.handle);
       const f32 damage_to_a = suppress_damage ? f32(0.0F) : b.contact_damage * scale;
       const f32 damage_to_b = suppress_damage ? f32(0.0F) : a.contact_damage * scale;
       const EntityHandle a_handle = a.handle;

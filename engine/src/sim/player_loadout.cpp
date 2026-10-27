@@ -134,6 +134,21 @@ bool PlayerLoadout::discard(PlayerProfile& profile, std::uint8_t slot,
   return true;
 }
 
+bool PlayerLoadout::discard(World& world, PlayerProfile& profile, std::uint8_t slot,
+                            std::uint16_t expected_type) {
+  if (slot >= kSlots || slot >= profile.inventory_size()) return false;
+  const auto& value = slots_[slot];
+  if (value.count == 0U || value.type_id != expected_type
+      || Catalog::instance().petal(value.type_id) == nullptr) return false;
+  // Original opcode8 ends in 125: damage the occupant while its equipped
+  // handle is still reachable, then clear the slot. A hatched pet has no
+  // orbit record, so remove_slot_petals cannot retire it after this reset.
+  clear_handles(&world, slot);
+  const bool discarded = discard(profile, slot, expected_type);
+  if (discarded) invalidate_packet_cache(world);
+  return discarded;
+}
+
 bool PlayerLoadout::swap(std::uint8_t first, std::uint16_t first_type,
                          std::uint8_t second, std::uint16_t second_type) {
   if (first >= kSlots || second >= kSlots) return false;
@@ -340,6 +355,12 @@ void PlayerLoadout::refresh_recharge_progress(const World& world) {
       const Entity* petal = world.entities().get(handles_[slot][instance]);
       if (petal != nullptr && petal->health.value > 0.0F) continue;
       if (definition->flag40 != 0U) continue;
+      // Original 654 advances the elapsed timer but publishes zero for an
+      // equipped slot whose zone restriction currently blocks spawning.
+      if (world.zone_petals_disabled()) {
+        recharge_progress_[slot] = 0U;
+        continue;
+      }
       const float duration = pending_[slot][instance] != 0U
         ? std::max(2500.0F, combat->rechargeMilliseconds) : combat->rechargeMilliseconds;
       const float remaining = pending_[slot][instance] != 0U

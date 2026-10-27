@@ -10,6 +10,7 @@
 #include "engine/net/dense_fields.hpp"
 #include "engine/sim/tick.hpp"
 #include "engine/sim/progression.hpp"
+#include "engine/sim/combat.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -17,6 +18,18 @@
 namespace engine {
 
 namespace {
+
+// Original1015 ordinals: 5 -> entity+68, 7 -> +76, 12 -> +92,
+// 18 -> +108. Split Peas retain component7/type50 and add component5/flags9.
+std::uint32_t projectile_render_component(const Entity& entity) {
+  if (entity.kind == EntityKind::kPetal) {
+    const bool peas = entity.type_id == 11U || entity.type_id == 12U || entity.type_id == 34U;
+    return peas && entity.petal_launched ? 5U : 7U;
+  }
+  if (entity.kind == EntityKind::kProjectile)
+    return entity.has_tag_component && (entity.type_id == 29U || entity.type_id == 30U) ? 12U : 18U;
+  return 0U;
+}
 
 /** Original167: circle bounds include attached children. Keep the original
  * f32 min+diameter construction, rather than replacing it with center+radius.
@@ -135,6 +148,7 @@ void WorkerApi::init(bool populate) {
   clock_ = FixedStepClock{};
   output_.clear();
   last_sequence_ = 0;
+  next_spawn_time_ms_ = 0.0;
   original_sequence_ = 0;
   original_client_known_.clear();
   original_client_records_.clear();
@@ -190,41 +204,43 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
       emit_event(9U, payload);
       continue;
     }
-    if (command.opcode == 4U && !has_player) {
-      // Original opcode 4 requests a restart. In a live session the restart
-      // path creates the default player (the observed golden trace spawns at
-      // the restart packet, before any opcode 6 arrives).
+    if (command.opcode == 4U && !has_player && world_.time_ms() >= next_spawn_time_ms_) {
+      // Compatibility entry point for local restart. Original opcode4 itself
+      // schedules a transport/game restart; use the same spawn state and gate
+      // as opcode6 instead of preserving the previous life.
       const bool fresh = world_.profile().level() == 0
         && world_.profile().inventory_count() == 0;
-      const PlayerProfile profile = fresh ? make_default_profile() : world_.profile();
+      const PlayerProfile profile = fresh ? make_default_profile() : make_respawn_profile(world_);
       reserve_spawn_placeholder(world_);
-      (void)spawn_player_default(world_, command.text, profile, fresh);
+      (void)spawn_player_default(world_, command.text, profile);
       (void)spawn_loadout_petals(world_);
+      if (world_.player().valid()) next_spawn_time_ms_ = world_.time_ms() + 2500.0;
       continue;
     }
-    if (command.opcode == 6U && !has_player) {
+    if (command.opcode == 6U && !has_player && world_.time_ms() >= next_spawn_time_ms_) {
       reserve_spawn_placeholder(world_);
       if (player_spawn_configured_) {
         (void)spawn_player(world_, command.text, player_position_, player_config_);
       } else {
         const bool fresh = world_.profile().level() == 0
           && world_.profile().inventory_count() == 0;
-        const PlayerProfile profile = fresh ? make_default_profile() : world_.profile();
-        (void)spawn_player_default(world_, command.text, profile, fresh);
+        const PlayerProfile profile = fresh ? make_default_profile() : make_respawn_profile(world_);
+        (void)spawn_player_default(world_, command.text, profile);
       }
       (void)spawn_loadout_petals(world_);
+      if (world_.player().valid()) next_spawn_time_ms_ = world_.time_ms() + 2500.0;
       continue;
     }
     if (command.opcode == 3U && world_.player().valid()) {
       if (command.argument == 0U) {
         if (Entity* player = world_.entities().get(world_.player()))
-          player->health = f32(0.0F);
+          (void)damage_entity(world_, player->handle, player->health, EntityHandle{});
       }
       continue;
     }
     if (command.opcode == 8U && world_.player().valid()) {
       const std::uint8_t slot = static_cast<std::uint8_t>(command.slot_a);
-      if (world_.loadout().discard(world_.profile(), slot,
+      if (world_.loadout().discard(world_, world_.profile(), slot,
                                    static_cast<std::uint16_t>(command.value_a)))
         remove_slot_petals(world_, slot);
       continue;
@@ -480,13 +496,16 @@ std::vector<std::uint8_t> WorkerApi::original_client_snapshot_bytes(std::uint32_
       original_client_viewer_scale_ = f32(wide ? 0.63F : 0.9F);
     }
   }
-  // Original retainPlayerLoot writes the kept stack at frame+25 and its count
-  // at frame+24; the client renders this list after "You will respawn ... with:".
+  // Original retainPlayerLoot writes survivors to peer+28/count+96. Its
+  // separate first-three list is ground loot, not the respawn inventory.
   std::array<std::uint8_t, 10> kept{};
   for (std::size_t i = 0; i < kept.size(); ++i)
     kept[i] = static_cast<std::uint8_t>(world_.last_death_kept()[i]);
   record(original_client_controller_handle(), 1U << 5U,
-    {byte(1U, 0U), scalar(5U, original_client_viewer_position_.x.value),
+    {byte(1U, controlled != nullptr && controlled->health.value > 0.0F
+        ? static_cast<std::uint8_t>(world_.profile().level() * 3U / 4U)
+        : static_cast<std::uint8_t>(world_.last_death_level() * 3U / 4U)),
+     scalar(5U, original_client_viewer_position_.x.value),
      string(6U, world_.last_killer_name()), array(16U, kept), byte(20U, 0U),
      scalar(21U, world_.last_death_score().value), scalar(24U, original_client_viewer_position_.y.value),
      scalar(32U, original_client_viewer_scale_.value), byte(34U, world_.last_death_kept_count()),
@@ -545,6 +564,10 @@ std::vector<std::uint8_t> WorkerApi::original_client_snapshot_bytes(std::uint32_
         fields.erase(std::remove_if(fields.begin(), fields.end(), [](const Field& field) {
           return field.id == 14U;
         }), fields.end());
+        if (projectile_render_component(entity) == 5U) {
+          mask = 0x03184050U; // original393 split-child probe: components5 AND7
+          fields.push_back(byte(9U, entity.petal_render_flags));
+        }
         fields.push_back(byte(50U, static_cast<std::uint8_t>(entity.type_id)));
       } else if (entity.kind == EntityKind::kDrop) {
         mask = 0x03100001U; // original43 loot -> original393 probe
@@ -580,10 +603,12 @@ std::vector<std::uint8_t> WorkerApi::original_client_snapshot_bytes(std::uint32_
         if (entity.type_id >= 7U && entity.type_id <= 10U)
           fields.push_back(byte(17U, entity.ai.variant));
       } else if (entity.kind == EntityKind::kProjectile) {
-        // The original projectile record carries its petal paint type so the
-        // client can render Hornet stingers as Missile art, not the Hornet.
-        mask |= 1U << 17U;
-        fields.push_back(byte(50U, static_cast<std::uint8_t>(entity.type_id)));
+        if (projectile_render_component(entity) == 12U) {
+          mask = 0x03184800U; // original393 ground Web: component12, no petal type
+          fields.erase(std::remove_if(fields.begin(), fields.end(), [](const Field& field) {
+            return field.id == 14U;
+          }), fields.end());
+        } else mask |= 1U << 17U;
       }
       record(entity.handle, mask, std::move(fields), false, &entity);
     }
@@ -751,7 +776,7 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
     // A newly spawned pickup is introduced with the archive's arrival bit so
     // the client replays its birth animation. Pickups that were already in
     // view keep full scale, matching the original first-snapshot behaviour.
-    const bool arriving = entity.kind == EntityKind::kDrop
+    const bool arriving = (entity.kind == EntityKind::kDrop || projectile_render_component(entity) == 12U)
       && !domain_known_.contains(entity.handle.raw)
       && world_.tick() <= entity.spawn_tick + 1U;
     writer.write_mask_domain_fields(entity.handle, mask,
@@ -830,8 +855,7 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
       // menu retain the original killer/lost-item/score data. These records
       // intentionally follow the dense defaults, whose group 72 writes zeros.
       writer.write_mask_string_field(entity.handle, mask, 6U, entity.killer_name);
-      // These are the kept petals (at most three), not the discarded stack:
-      // the respawn line lists what the player will start with.
+      // Controller survivors: up to ten, after the first three ground drops.
       const auto& kept_items = world_.last_death_kept();
       for (std::uint32_t index = 0; index < 10U; ++index)
         writer.write_mask_byte_array_field(entity.handle, mask, 16U, index,
@@ -842,8 +866,27 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
         static_cast<std::uint8_t>(world_.last_death_kept_count()));
       writer.write_mask_byte_field(entity.handle, mask, 47U,
         static_cast<std::uint8_t>(world_.last_death_level()));
+      writer.write_mask_byte_field(entity.handle, mask, 1U,
+        static_cast<std::uint8_t>((entity.health.value > 0.0F
+          ? world_.profile().level() : world_.last_death_level()) * 3U / 4U));
       writer.write_mask_reference_field(entity.handle, mask, 56U,
         entity.handle.to_wire());
+    }
+    // Keep the fixed dense payload's plan unchanged. Publish the native art
+    // declaration after it: adding group 68/76 before the dense record would
+    // make its decoder consume bytes that payload does not contain.
+    const auto render_component = projectile_render_component(entity);
+    if (render_component != 0U) {
+      const auto render_mask = mask | (1U << (render_component - 1U))
+        | (render_component == 5U ? 1U << 6U : 0U);
+      if (render_component == 5U) {
+        writer.write_mask_byte_field(entity.handle, render_mask, 9U, entity.petal_render_flags);
+        writer.write_mask_byte_field(entity.handle, render_mask, 50U,
+          static_cast<std::uint8_t>(entity.type_id));
+      } else if (render_component == 7U)
+        writer.write_mask_byte_field(entity.handle, render_mask, 50U,
+          static_cast<std::uint8_t>(entity.type_id));
+      else writer.write_mask_entity(entity.handle, render_mask);
     }
   }
   domain_known_ = std::move(visible);

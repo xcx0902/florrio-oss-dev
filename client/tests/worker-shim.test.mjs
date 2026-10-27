@@ -9,6 +9,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { parse as parseYaml } from 'yaml';
 import { pathToFileURL } from 'node:url';
 import { DENSE_GROUPS, DENSE_GROUP_SPECS, DENSE_GROUP_COMPONENTS, densePresentForMask, FIELD_COMPONENTS } from '../public/state/field-types.js';
+import { RenderingCanvas } from './helpers/rendering-oracle.mjs';
+import { drawWorld } from '../public/render/world.js';
+import { WorldState } from '../public/state/world.js';
+import { CameraState } from '../public/state/camera.js';
 
 const root = path.resolve(process.env.CLIENT_ROOT || 'client/public');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.map': 'application/json' };
@@ -156,6 +160,88 @@ test('engine worker responds to init/think/flush', async () => {
   assert.equal(result.messages[2].finalResponse, false);
   assert.ok(result.messages[3].finalResponse === true);
   assert.ok(result.messages.every(message => message.error === undefined));
+});
+
+test('real worker publishes special petal launch, recharge and artwork components', { timeout: 120000 }, async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin + '/index.html', { waitUntil: 'load' });
+    const results = await page.evaluate(async () => {
+      const { ServerWorkerClient } = await import('/net/worker.js');
+      const { InputPacketEncoder } = await import('/net/input.js');
+      const { OriginalBareSnapshotDecoder } = await import('/state/snapshot.js');
+      const { WorldState } = await import('/state/world.js');
+      const { playerSlotProgress } = await import('/state/loadout.js');
+      const { DENSE_GROUPS, DENSE_GROUP_SPECS } = await import('/state/field-types.js');
+      const output = [];
+      for (const type of [10, 11, 12, 34, 19, 20, 29, 30]) {
+        const worker = new ServerWorkerClient('server-worker.js?manual=1');
+        try {
+          const input = new InputPacketEncoder(), world = new WorldState();
+          const decoder = new OriginalBareSnapshotDecoder(DENSE_GROUPS.map(group => ({
+            offset: group.offset, specs: DENSE_GROUP_SPECS[group.offset] ?? [],
+          })));
+          await worker.init();
+          await worker.send(input.spawn('Special petal integration'));
+          for (let slot = 0; slot < 5; slot++)
+            await worker.request('sp_server_debug_set_loadout_slot', new Uint8Array([slot, slot === 0 ? type : 0, 0]));
+          await worker.send(input.input(1, 0, 0));
+          const result = { type, launch: null, ground: null, splitCount: 0, cooling: false, recharged: false };
+          let originalHandles;
+          for (let tick = 1; tick <= 120; tick++) {
+            await worker.think();
+            await worker.requestStream('sp_server_flush', undefined, bytes => {
+              const snapshot = decoder.decode(bytes);
+              if (!snapshot) throw new Error(`undecodable special petal snapshot: ${type}/${tick}`);
+              world.applyPartial(snapshot, tick * 50);
+            });
+            const entities = [...world.all()].filter(entity => entity.speciesId === type && entity.health > 0);
+            if (!originalHandles) originalHandles = new Set(entities.map(entity => entity.handle));
+            const launched = entities.filter(entity => entity.kind === 3 && (entity.componentMask & (1 << 4)) !== 0);
+            result.splitCount = Math.max(result.splitCount, launched.length);
+            if (!result.launch && launched.length) result.launch = structuredClone(launched[0]);
+            if (!result.ground) result.ground = structuredClone(entities.find(entity => entity.kind === 5) ?? null);
+            const player = [...world.all()].find(entity => entity.kind === 1 && entity.health > 0);
+            const progress = player && playerSlotProgress(player)?.[0];
+            if (progress !== undefined && progress < 1) result.cooling = true;
+            if (result.cooling && progress === 1) result.recharged = true;
+            // Aimed/Pollen/Web keep their entity's historical slot byte after
+            // detaching. The authoritative slot recharge proves release.
+            if (!result.launch && tick > 10 && progress < 1)
+              result.launch = structuredClone(entities.find(entity => entity.kind === 3 && originalHandles.has(entity.handle)) ?? null);
+          }
+          output.push(result);
+        } finally { worker.terminate(); }
+      }
+      return output;
+    });
+    for (const result of results) {
+      assert.ok(result.launch, `${result.type}: detached projectile passes through real WASM and decoder`);
+      assert.ok(result.cooling, `${result.type}: authoritative recharge starts`);
+      assert.ok(result.recharged, `${result.type}: authoritative recharge completes`);
+      if ([11, 12, 34].includes(result.type)) {
+        assert.equal(result.splitCount, 4, `${result.type}: four separate children`);
+        assert.ok(result.launch.componentMask & (1 << 4), `${result.type}: native single-Pea component`);
+        assert.equal(result.launch.byteFields[9], result.type === 11 ? 0 : result.type === 12 ? 1 : 3);
+        const world = new WorldState(), camera = new CameraState(), context = new RenderingCanvas();
+        camera.setCamera(0, 0, 1);
+        world.apply({ sequence: 1, serverTime: 0, events: [], entities: [{ ...result.launch, x: 0, y: 0 }] }, 0);
+        drawWorld(context, world, camera, 0);
+        assert.equal(context.paints.filter(paint => paint.op === 'fill' && paint.path[0]?.[0] === 'arc').length, 1,
+          `${result.type}: production drawWorld renders each launched child as one Pea`);
+      }
+      if ([29, 30].includes(result.type)) {
+        assert.ok(result.ground, `${result.type}: ground Web survives the projectile`);
+        assert.ok(result.ground.componentMask & (1 << 11), `${result.type}: native ground-Web component`);
+        const world = new WorldState(), camera = new CameraState(), context = new RenderingCanvas();
+        camera.setCamera(0, 0, 1);
+        world.apply({ sequence: 1, serverTime: 0, events: [], entities: [{ ...result.ground, x: 0, y: 0 }] }, 0);
+        drawWorld(context, world, camera, 0);
+        assert.ok(context.paints.some(paint => paint.path.filter(op => op[0] === 'quadraticCurveTo').length === 65),
+          `${result.type}: production drawWorld renders five scalloped rings`);
+      }
+    }
+  } finally { await page.close(); }
 });
 
 

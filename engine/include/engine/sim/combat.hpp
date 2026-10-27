@@ -12,7 +12,8 @@ struct DamageResult {
  * domain runs once: petals start slot recharge, mobs roll loot and award
  * experience to the attacker's owner, and players retain loot. */
 DamageResult damage_entity(World& world, EntityHandle target, f32 amount,
-                           EntityHandle attacker = EntityHandle{});
+                           EntityHandle attacker = EntityHandle{},
+                           std::uint16_t options = 0U);
 
 /** Contact pass: overlapping non-allied bodies push apart and exchange their
  * physics +44 contact damage. The original collision resolver applies damage

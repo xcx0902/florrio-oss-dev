@@ -257,6 +257,8 @@ struct Entity {
   std::array<Effect, kMaxEffects> effects{};
   std::uint8_t effect_count = 0;
   std::uint8_t effect_flags = 0;
+  /** Original effects+40/+48: last poison feedback, independent of damage. */
+  double poison_hit_time_ms = -std::numeric_limits<double>::infinity();
   std::array<std::uint8_t, 4> layer_flags{};
   std::array<std::uint32_t, kCollisionLayerCount> layer_thresholds{};
   std::array<std::uint32_t, kCollisionLayerCount> layer_sides{};
@@ -267,6 +269,10 @@ struct Entity {
   std::uint32_t hit_epoch = 0;
   std::uint32_t last_hit_epoch = 0;
   std::uint32_t hit_count = 0;
+  /** Projectile petal callback state; independent of the equipped slot. */
+  bool petal_launched = false;
+  /** Original render+8 flags written by Peas split (0, 1 or 3). */
+  std::uint8_t petal_render_flags = 0;
   double behavior_cooldown_ms = 0.0;
   /** Creation epoch used by the archived peer's one-tick arrival marker. */
   std::uint64_t spawn_tick = 0;

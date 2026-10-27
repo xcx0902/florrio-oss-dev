@@ -104,6 +104,8 @@ class WorkerApi {
   FixedStepClock clock_;
   OutputQueue output_;
   std::uint32_t last_sequence_ = 0;
+  /** Original peer+288: no second spawn within 2500ms of a successful spawn. */
+  double next_spawn_time_ms_ = 0.0;
   std::uint32_t original_sequence_ = 0;
   /** Wire handles already introduced to the archived client. Later ticks send
    * field-only updates for these entities; new handles carry the component

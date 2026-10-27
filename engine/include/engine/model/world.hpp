@@ -254,6 +254,14 @@ class World {
   [[nodiscard]] const MinstdRng& rng() const { return rng_; }
   [[nodiscard]] ServerRng& random() { return random_; }
   [[nodiscard]] const ServerRng& random() const { return random_; }
+  /** Original retainPlayerLoot has a separate, once-initialized minstd stream.
+   * Original130 obtains four host entropy bytes; seed modulo INT_MAX, zero->1.
+   * Host entropy is not shared with this deterministic reconstruction: seed1
+   * is the bounded fixture default. Callers can supply an explicit raw seed. */
+  void seed_death_shuffle(std::uint32_t entropy) {
+    death_shuffle_.seed(entropy % 2147483647U);
+  }
+  [[nodiscard]] ServerRng& death_shuffle_random() { return death_shuffle_; }
   [[nodiscard]] ComponentStore& components() { return components_; }
   [[nodiscard]] const ComponentStore& components() const { return components_; }
   [[nodiscard]] const PlayerInput& input() const { return input_; }
@@ -533,6 +541,7 @@ class World {
   EntityPool entities_;
   MinstdRng rng_;
   ServerRng random_{285456437U};
+  ServerRng death_shuffle_{1U};
   ComponentStore components_;
   PlayerInput input_;
   std::vector<PetalOrbitState> petals_;

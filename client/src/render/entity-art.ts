@@ -363,7 +363,7 @@ function petalPolygon(context: Canvas2DContext, radius: number, sides: number, i
  * different multiplicities (Twin/Triplet/Peas); neither is a generic disc.
  * Coordinates/colours are checked against the actual catalogue vtables in
  * client.wasm, not against the old eight-scene golden's social-media paths. */
-function drawPetalShape(context: Canvas2DContext, type: number, _icon: boolean, _now: number, seed = type): void {
+function drawPetalShape(context: Canvas2DContext, type: number, _icon: boolean, _now: number, seed = type, phase = _now * 0.001): void {
   switch (type) {
     case 4: case 36: {
       // The original creates one irregular polygon per instance.
@@ -381,15 +381,19 @@ function drawPetalShape(context: Canvas2DContext, type: number, _icon: boolean, 
         local.quadraticCurveTo(10,0,0,-15); local.closePath(); petalPaint(local,type);
       }); return;
     case 10:
+      context.setLineJoin('round');
       context.beginPath(); context.moveTo(11,0); context.lineTo(-11,-6); context.lineTo(-11,6); context.closePath();
       setFill(context, petalColor(type)); setStroke(context, petalColor(type)); context.setLineWidth(5);
       context.fill(); context.stroke(); return;
     case 11: case 12: case 34: {
-      // Original petal renderer 3628: four radius-7 lobes on a six-unit cross,
-      // painted one at a time (fill + 3px stroke) so the cluster reads as one
-      // connected four-lobed pea. All three types share this texture.
-      for (const [x, y] of [[6, 0], [0, 6], [-6, 0], [0, -6]] as const)
-        petalDisc(context, type, 7, x, y);
+      // Native3628/3649/4283: diagonal offsets, independent fill/stroke per
+      // pea, and a persistent random initial phase in the world. Native4283
+      // uses radius 10 and offset 7 for the Legendary cluster.
+      const offset = type === 34 ? 7 : 6, radius = type === 34 ? 10 : 7;
+      inLocal(context, local => {
+        for (const [x, y] of [[offset, offset], [-offset, offset], [offset, -offset], [-offset, -offset]])
+          inLocal(local, pea => petalDisc(pea, type, radius), 1, 0, x, y);
+      }, 1, _icon ? 0 : Math.fround(phase));
       return;
     }
     case 13: case 21: case 33:
@@ -419,6 +423,7 @@ function drawPetalShape(context: Canvas2DContext, type: number, _icon: boolean, 
       context.beginPath();context.ellipse(0,0,type===22?11:13,type===22?15:17,0,0,TAU);
       petalPaint(context,type);return;
     case 25:
+      context.setLineJoin('round');
       context.setLineCap('round');
       inLocal(context, local=>{
         for(const sign of [-1,1]) {
@@ -460,13 +465,63 @@ function drawPetalShape(context: Canvas2DContext, type: number, _icon: boolean, 
   }
 }
 
-export function drawPetalInstance(context: Canvas2DContext, type: number, radius = PETAL_INFO[type]?.radius ?? 10, now = 0, seed = type): void {
+export function drawPetalInstance(context: Canvas2DContext, type: number, radius = PETAL_INFO[type]?.radius ?? 10, now = 0, seed = type, phase?: number): void {
   if (!type || !PETAL_INFO[type]) return;
   const base = PETAL_INFO[type]?.radius ?? 10;
   const scale = Number.isFinite(radius) && radius > 0 ? radius / base : 1;
-  if (type === 9) inLocal(context,local=>drawPetalShape(local,type,false,now,seed),scale,now * 0.01);
-  else if (scale===1) drawPetalShape(context,type,false,now,seed);
-  else inLocal(context,local=>drawPetalShape(local,type,false,now,seed),scale);
+  const draw = (local: Canvas2DContext): void => drawPetalShape(local,type,false,now,seed,phase);
+  if (type === 9) inLocal(context,draw,scale,now * 0.01);
+  else if (type === 5) inLocal(context,draw,scale,phase ?? now * 0.0003);
+  else if (scale===1) draw(context);
+  else inLocal(context,draw,scale);
+}
+
+/** Native760 component+108. Hornet projectiles have their own fixed 1.3
+ * transform, round caps/joins and 5-unit stroke, independent of collider size. */
+export function drawHornetMissile(context: Canvas2DContext, flash = 0): void {
+  inLocal(context, local => {
+    local.setLineCap('round'); local.setLineJoin('round'); local.setLineWidth(5);
+    const color = flashColor(rgb(51,51,51), flash);
+    setFill(local, color); setStroke(local, color);
+    local.beginPath(); local.moveTo(11,0); local.lineTo(-11,-6); local.lineTo(-11,6);
+    local.closePath(); local.fill(); local.stroke();
+  }, Math.fround(1.3));
+}
+
+/** Split Peas use native760 component+68, not the catalogue cluster. */
+export function drawLaunchedPea(context: Canvas2DContext, type: number, flash = 0,
+  flags = type === 34 ? 3 : type === 12 ? 1 : 0): void {
+  const color = flashColor(petalColor(flags & 1 ? 12 : 11), flash);
+  context.beginPath(); context.arc(0,0,flags & 2 ? 10 : 7,0,TAU);
+  setFill(context,color); context.fill(); setStroke(context,shade(color));
+  context.setLineWidth(3); context.stroke();
+}
+
+/** Native760 component+92: five scalloped rings and thirteen 55-unit spokes.
+ * The original caches this path in a 120-unit bitmap. Keep its actual geometry
+ * here so a ground Web can never be scaled into a collider-sized Missile. */
+export function drawGroundWeb(context: Canvas2DContext, progress = 1): void {
+  const f = Math.fround, step = TAU / 13;
+  inLocal(context, local => {
+    local.setGlobalAlpha((local.getGlobalAlpha?.() ?? 1) * progress * 0.5);
+    local.setLineJoin('round'); local.setLineCap('round'); local.setLineWidth(3);
+    local.setStrokeRgb(255,255,255); local.beginPath();
+    const point = (index: number, radius: number): readonly [number,number] => {
+      const angle = f(index * step);
+      return [f(f(Math.cos(angle)) * radius), f(f(Math.sin(angle)) * radius)];
+    };
+    for (let radius = 10; radius <= 50; radius += 10) {
+      local.moveTo(radius,0);
+      for (let index = 0; index < 13; index++) {
+        const a = point(index,radius), b = point(index+1,radius);
+        const x = f(a[0]+b[0]), y = f(a[1]+b[1]), length = f(Math.sqrt(x*x+y*y));
+        local.quadraticCurveTo(f(f(x*0.5)-f(f(x/length)*5)), f(f(y*0.5)-f(f(y/length)*5)), b[0],b[1]);
+      }
+      local.closePath();
+    }
+    for (let index = 0; index < 13; index++) { local.moveTo(0,0); local.lineTo(...point(index,55)); }
+    local.stroke();
+  }, Math.fround(progress));
 }
 export function drawPetalIcon(context: Canvas2DContext, type: number, scale = 1): void {
   const info = PETAL_INFO[type]; if (!type || !info) return;

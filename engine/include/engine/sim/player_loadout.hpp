@@ -30,6 +30,10 @@ class PlayerLoadout {
   bool equip(std::uint8_t slot, std::uint16_t type_id);
   bool discard(std::uint8_t slot, std::uint16_t expected_type);
   bool discard(PlayerProfile& profile, std::uint8_t slot, std::uint16_t expected_type);
+  /** Original opcode8 retires the equipped occupant before resetting its
+   * slot, including a hatched Egg's mob handle. */
+  bool discard(World& world, PlayerProfile& profile, std::uint8_t slot,
+               std::uint16_t expected_type);
   bool swap(std::uint8_t first, std::uint16_t first_type,
             std::uint8_t second, std::uint16_t second_type);
   bool swap(PlayerProfile& profile, std::uint8_t first, std::uint16_t first_type,

@@ -469,6 +469,9 @@ void test_death_retains_last_view_and_restart_replaces_it() {
   require(api.despawn(player), "remove controlled body");
   const auto dead = snapshot(api, 3U);
   require(dead.has(old_nearby) && !dead.has(origin) && dead.removes(player), "post-death peer retains its final viewport");
+  // This snapshot fixture keeps geometry fixed. Expire the independent 2500ms
+  // spawn gate before testing replacement of the retained visibility query.
+  api.world().set_time_ms(2500.0);
   const std::array<std::uint8_t, 2> restart{{2U, 4U}};
   require(api.send(restart, {}), "restart input accepted");
   const auto next = api.world().player();

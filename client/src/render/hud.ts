@@ -30,10 +30,13 @@ export interface FlowerEntry {
  * so rendering a frame twice never advances or replays an event. */
 export interface HudDeathState {
   readonly elapsedMilliseconds: number;
+  /** Native binary32 animation state, advanced once per render frame. */
+  readonly progress?: number;
   readonly killerName?: string;
   readonly respawnLevel?: number;
   /** Last death score (controller field 21). */
   readonly score?: number;
+  /** Full carried inventory at death, including reserve slots. */
   readonly keptSlots?: readonly number[];
 }
 
@@ -43,6 +46,10 @@ export interface HudState {
   readonly level: number;
   /** Native zone timer byte (field 63), 0..255. */
   readonly zoneProgress?: number;
+  /** Retained native warning visibility and radial countdown, advanced once
+   * per rendered frame by createHudState. */
+  readonly zoneWarningAlpha?: number;
+  readonly zoneCountdownProgress?: number;
   readonly chat?: readonly string[];
   readonly pixelRatio?: number;
   /** CSS viewport dimensions; the backing canvas includes pixelRatio. */
@@ -143,12 +150,13 @@ export interface HudFrameState {
  */
 export function createHudState(): HudFrameState {
   let progress = 0;
+  let zoneAlpha = 0, zoneCountdown = 0;
   const scores: number[] = [];
   const recharges: number[] = [];
   const rechargeTypes: (number | undefined)[] = [];
   let lastTime: number | undefined;
   return {
-    reset() { progress = 0; scores.length = 0; recharges.length = 0; rechargeTypes.length = 0; lastTime = undefined; },
+    reset() { progress = 0; zoneAlpha = 0; zoneCountdown = 0; scores.length = 0; recharges.length = 0; rechargeTypes.length = 0; lastTime = undefined; },
     update(target, nowMilliseconds, deltaMilliseconds) {
       const now = Number.isFinite(nowMilliseconds) ? nowMilliseconds : lastTime ?? 0;
       const repeated = lastTime !== undefined && now <= lastTime;
@@ -157,6 +165,13 @@ export function createHudState(): HudFrameState {
       const amount = clamp(1 - Math.pow(0.8, delta * 0.06));
       lastTime = Math.max(lastTime ?? now, now);
       if (target.menu) return target;
+      if (!repeated) {
+        const warning = +zoneWarningVisible(target);
+        zoneAlpha = f(zoneAlpha + clamp(1 - Math.pow(0.7, delta * 0.06)) * (warning - zoneAlpha));
+        // client1095 uses the literal 0.003922 rather than 1/255.
+        const countdown = f((target.zoneProgress ?? 0) * 0.003922);
+        zoneCountdown = f(zoneCountdown + amount * (countdown - zoneCountdown));
+      }
       const approach = (current: number, value: number): number =>
         repeated ? current : f(Math.abs(current - value) < 1e-7 ? value : current + amount * (value - current));
       if (target.levelProgress !== undefined) progress = approach(progress, f(clamp(target.levelProgress)));
@@ -183,7 +198,8 @@ export function createHudState(): HudFrameState {
         }
         return recharges[index] ?? 1;
       });
-      return { ...target, levelProgress: progress, flowerEntries: entries, slotProgress };
+      return { ...target, levelProgress: progress, flowerEntries: entries, slotProgress,
+        zoneWarningAlpha: zoneAlpha, zoneCountdownProgress: zoneCountdown };
     },
   };
 }
@@ -696,20 +712,55 @@ function getHudSurface(width: number, height: number): typeof hudSurface {
   return hudSurface;
 }
 
+/** client588 rounds the level boundary to the nearest 50 world units.
+ * The warning follows current position, while field63 can take 450 seconds
+ * to drain after returning to the correct zone. */
+function zoneWarningVisible(state: HudState): boolean {
+  if (state.death) return false;
+  if (state.playerX === undefined || !(state.arenaWidth! > 0)) return (state.zoneProgress ?? 0) > 0;
+  if (state.level < 15) return false;
+  // These are f64 constants containing the promoted float32 fractions in
+  // WAT, not the shorter decimal spellings in the decompiler output.
+  const fraction = f(state.level < 30 ? 0.3 : state.level < 45 ? 0.6 : 0.9);
+  const cells = f(f((state.arenaWidth! * fraction) - state.arenaWidth! * 0.5) * f(0.02));
+  const boundary = Math.sign(cells) * Math.floor(Math.abs(cells) + 0.5) * 50;
+  return state.playerX < boundary;
+}
+
 function drawZoneWarning(context: HudContext, state: HudState, layout: HudLayout, raster: number): void {
-  const progress = Math.max(0, Math.min(1, (state.zoneProgress ?? 0) / 255));
-  if (progress <= 0) return;
-  const remaining = Math.max(1, Math.ceil((1 - progress) * 45));
-  const first = 'You are overleveled for this zone';
-  const second = progress >= 1 ? 'You will be unable to attack'
-    : `You will be unable to attack in ${remaining} seconds`;
-  const x = layout.logicalWidth / 2, y = layout.logicalHeight * 0.22;
-  context.save(); context.setGlobalAlpha(0.55);
-  context.setFillRgb(0, 0, 0);
-  context.fillRect(x - 190, y - 26, 380, 52);
-  context.setGlobalAlpha(1);
-  label(context, first, 20, raster, x, y - 12, 1, { fill: '#FF8080' });
-  label(context, second, 16, raster, x, y + 13, 1, { fill: '#FFD0D0' });
+  const alpha = state.zoneWarningAlpha ?? +zoneWarningVisible(state);
+  if (alpha < 0.0001) return;
+  const lines = [
+    { text: 'MOVE RIGHT ->', font: 20, fill: '#FFAAAA' },
+    { text: 'You are overleveled for this zone', font: 14, fill: '#FFFFFF' },
+    { text: 'You will be unable to attack', font: 14, fill: '#FFFFFF' },
+  ];
+  const widths = lines.map(({ text, font }) => f(f(measureLabel(text, font))
+    + Math.trunc(f(f(font * 0.12) * 2)) * 2));
+  const width = Math.max(...widths);
+  const height = lines.reduce((sum, { font }) => f(sum + f(font * f(1.1))), 0);
+  const left = f(layout.logicalWidth * 0.5 - f(width * 0.5));
+  const top = f(f(layout.logicalHeight * 0.5 - 170) + f(height * 0.5));
+  context.save(); context.setGlobalAlpha(alpha * 0.5);
+  context.setFillRgb(0, 0, 0); context.beginPath();
+  const x = left - 5, y = top - 5, right = x + width + 10, bottom = y + height + 10;
+  context.moveTo(x + 5, y); context.lineTo(right - 5, y);
+  context.quadraticCurveTo(right, y, right, y + 5); context.lineTo(right, bottom - 5);
+  context.quadraticCurveTo(right, bottom, right - 5, bottom); context.lineTo(x + 5, bottom);
+  context.quadraticCurveTo(x, bottom, x, bottom - 5); context.lineTo(x, y + 5);
+  context.quadraticCurveTo(x, y, x + 5, y); context.closePath(); context.fill();
+  context.setGlobalAlpha(alpha);
+  let labelTop = f(top - 2);
+  lines.forEach((spec, index) => {
+    drawLabelBox(context, { ...spec, rasterScale: raster }, left, labelTop, widths[index], f(spec.font * 1.4));
+    labelTop = f(labelTop + f(spec.font * f(1.1)));
+  });
+  const cx = f(left + width - 30), cy = f(top + f(height * 0.5));
+  context.beginPath(); context.arc(cx, cy, 22, -1.5707963705062866, -7.853981677685873, true);
+  context.setFillRgb(51, 51, 51); context.fill();
+  const progress = state.zoneCountdownProgress ?? f((state.zoneProgress ?? 0) * 0.003922);
+  context.beginPath(); context.arc(cx, cy, 18, -1.5707963705062866, progress * -6.283185307179586 - 1.5707963705062866, true);
+  context.lineTo(cx, cy); context.closePath(); context.setFillRgb(170, 51, 51); context.fill();
   context.restore();
 }
 
@@ -829,54 +880,65 @@ function drawFlowerPanel(context: HudContext, state: HudState, layout: HudLayout
 function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayout, ratio: number): void {
   // clientFrame interpolates 159188 toward 1 with pow(.95, dt * .06).
   const elapsed = state.deathState?.elapsedMilliseconds;
-  const amount = f(elapsed === undefined ? 1 : 1 - Math.pow(0.95, Math.max(0, Number.isFinite(elapsed) ? elapsed : 0) * 0.06));
+  const amount = state.deathState?.progress
+    ?? f(elapsed === undefined ? 1 : 1 - Math.pow(0.95, Math.max(0, Number.isFinite(elapsed) ? elapsed : 0) * 0.06));
   context.save(); baseTransform(context, layout, ratio); context.setFillRgb(0, 0, 0); context.setGlobalAlpha(amount * 0.25);
   context.fillRect(0, 0, layout.logicalWidth, layout.logicalHeight); context.setGlobalAlpha(1);
   const centerX = Math.trunc(layout.logicalWidth / 2);
-  const centerY = Math.trunc(layout.logicalHeight / 2) - 7.857143;
+  const displacement = f(f(1 - amount) * layout.logicalHeight);
+  const centerY = f(Math.trunc(layout.logicalHeight / 2) - displacement);
   const raster = f(f(layout.scale * ratio) * 2.4);
   baseTransform(context, layout, ratio, centerX, centerY);
   // clientFrame draws the retained petals behind the dead flower, then the
   // dead face at 1.5x, rotated -0.2 radians. Artwork stays in entity-art.
-  // Five generic Basic petals ring the dead face: three behind it and two in
-  // front. The client draws them even when the retained inventory differs.
-  const behind = [[-48, 7.5], [-15, -22.5], [45, -7.5]] as const;
-  const front = [[-15, 45], [52.5, 30]] as const;
-  for (const [x, y] of behind) {
+  // Native1095 snapshots the actual loadout. Slots 2/3/4 appear behind the
+  // face, 1/0 in front; Antennae's definition suppresses its world instance.
+  const kept = state.deathState?.keptSlots ?? [];
+  const behind = [[2, -48, 7.5], [3, -15, -22.5], [4, 45, -7.5]] as const;
+  const front = [[1, -15, 45], [0, 52.5, 30]] as const;
+  for (const [slot, x, y] of behind) {
+    const type = kept[slot] ?? 0;
+    if (!type || type === 25 || !PETAL_INFO[type]) continue;
     context.save(); baseTransform(context, layout, ratio, centerX + x, centerY + y, 1.5);
-    drawPetalInstance(context, 1, 10); context.restore();
+    drawPetalInstance(context, type, PETAL_INFO[type].radius); context.restore();
   }
   context.save();
   const faceScale = f(f(layout.scale * ratio) * 1.5);
-  context.setTransform(f(faceScale * 0.980067), f(faceScale * -0.198669),
-    f(faceScale * 0.198669), f(faceScale * 0.980067),
+  // Exact f32 constants from native1095 (WAT 333929/333939).
+  const cosine = 0.9800665974617004, sine = 0.19866932928562164;
+  context.setTransform(f(faceScale * cosine), f(faceScale * -sine),
+    f(faceScale * sine), f(faceScale * cosine),
     f(f(layout.scale * ratio) * centerX), f(f(layout.scale * ratio) * centerY));
   drawPlayerFace(context, { dead: true }); context.restore();
   label(context, 'You were destroyed by:', 18, raster, 0, -120);
   label(context, state.deathState?.killerName ?? 'A mysterious entity', 24, raster, 0, -90);
   label(context, state.mobile ? '(tap to continue)' : '(press enter to continue)', 18, raster, 0, 90);
-  for (const [x, y] of front) {
+  for (const [slot, x, y] of front) {
+    const type = kept[slot] ?? 0;
+    if (!type || type === 25 || !PETAL_INFO[type]) continue;
     context.save(); baseTransform(context, layout, ratio, centerX + x, centerY + y, 1.5);
-    drawPetalInstance(context, 1, 10); context.restore();
+    drawPetalInstance(context, type, PETAL_INFO[type].radius); context.restore();
   }
-  const kept = state.deathState?.keptSlots ?? [];
   const scaled = ratio === 1 ? layout : { ...layout, scale: f(layout.scale * ratio) };
+  const rowY = displacement;
   let left = 20;
-  for (let index = 0; index < layout.equippedCount; index += 1) {
+  for (let index = 0; index < 16; index += 1) {
     const type = kept[index] ?? 0;
-    filledSlot(context, type, left + 30, layout.logicalHeight - 37.142857, 60, scaled, raster, 1, `retained:${index}`);
-    left += 70;
+    if (!type || !PETAL_INFO[type]) continue;
+    const size = index < layout.equippedCount ? 60 : 50;
+    filledSlot(context, type, left + size / 2, layout.logicalHeight - 45 + rowY, size, scaled, raster, 1, `retained:${index}`);
+    left += size + 10;
   }
-  // Original763 prints the retained death statistics at the bottom-left in
-  // the HUD's logical space, independent of the sliding item row.
+  // Native1095 prints the retained death statistics at the bottom-left in
+  // the HUD's logical space. Statistics and item row slide up together.
   baseTransform(context, layout, ratio);
   const statsRaster = f(f(layout.scale * ratio) * 2.4);
   for (const [text, font, top] of [
-    ['Stats', 24, layout.logicalHeight - 152.142857],
-    [`Points: ${formatScore(state.deathState?.score ?? 0)}`, 16, layout.logicalHeight - 118.142857],
-    [`Level: ${state.deathState?.respawnLevel ?? state.level ?? 1}`, 16, layout.logicalHeight - 96.142857],
+    ['Stats', 24, layout.logicalHeight - 160],
+    [`Points: ${formatScore(state.deathState?.score ?? 0)}`, 16, layout.logicalHeight - 126],
+    [`Level: ${state.deathState?.respawnLevel ?? state.level ?? 1}`, 16, layout.logicalHeight - 104],
   ] as const) {
-    drawLabelBox(context, { text, font, rasterScale: statsRaster }, 20, top,
+    drawLabelBox(context, { text, font, rasterScale: statsRaster }, 20, top + rowY,
       f(measureLabel(text, font) + Math.trunc(f(f(font * 0.12) * 2)) * 2), f(font * 1.4), false);
   }
   context.restore();

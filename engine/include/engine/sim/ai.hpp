@@ -60,4 +60,9 @@ std::size_t alert_to_attacker(World& world, EntityHandle target, EntityHandle at
 /** Follow owner/parent links to the controlling root. */
 [[nodiscard]] EntityHandle controlling_root(const World& world, EntityHandle handle);
 
+/** Original 168/162 root equality, including the shared wild-mob manager.
+ * Player-owned pets resolve through their player, rather than that manager. */
+[[nodiscard]] bool same_controlling_root(const World& world, EntityHandle first,
+                                         EntityHandle second);
+
 } // namespace engine

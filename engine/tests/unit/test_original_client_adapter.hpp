@@ -209,6 +209,9 @@ void corpse_and_restart() {
   CHECK(removed.records.at(controller).values.at(56U) == 0U);
   CHECK(std::find(removed.removed.begin(), removed.removed.end(), body.to_wire()) != removed.removed.end());
   const std::array<std::uint8_t, 2> restart{3U, 4U}; CHECK(api.send(restart, {}));
+  CHECK(!api.world().player().valid()); // Corpse removal does not expire the spawn cooldown.
+  while (api.world().time_ms() < 2500.0) api.think();
+  const std::array<std::uint8_t, 2> ready_restart{4U, 4U}; CHECK(api.send(ready_restart, {}));
   const auto reopened = decode(api.original_client_snapshot_bytes(4U));
   CHECK(api.world().player() != body);
   CHECK(reopened.records.at(controller).values.at(56U) == api.world().player().to_wire());

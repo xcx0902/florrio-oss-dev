@@ -36,6 +36,10 @@ struct PlayerConfig {
  * 0.00005 rare-starter roll is performed by spawn_player_default. */
 [[nodiscard]] PlayerProfile make_default_profile();
 
+/** Original post-death spawn: floor(3*level/4), minimum level 1, no partial
+ * XP, controller's surviving items followed by Basic fillers. */
+[[nodiscard]] PlayerProfile make_respawn_profile(const World& world);
+
 /** Original applyPlayerControls movement impulse: once per tick, the stored
  * pointer direction/strength adds a velocity impulse of dt * 2.5 * 0.001,
  * scaled by strength * 0.005 only while strength < 200. */
