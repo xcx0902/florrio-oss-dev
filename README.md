@@ -118,6 +118,21 @@ node serve.mjs
 
 旧交付树不能代表当前源码；构建和交付完整性检查也不能替代 `test:all:twice` 的最终验收。
 
+### 仓库只跟踪源码
+
+构建产物、录制结果和验收证据都已在 `.gitignore` 中忽略，且不在任何提交历史里；新克隆需要按需重新生成：
+
+| 路径 | 生成方式 |
+| --- | --- |
+| `dist/`、`dist-readable/`、`dist-reference/` | `node tools/prepare-reference.mjs` 从 `reference/frozen-trees.tar.gz` 还原 |
+| `client/public/` 下的 `*.js`、`*.d.ts`、`*.js.map`、`server.wasm` | `npm run build:client`、`npm run build:engine:wasm` |
+| `dist-next/` | `npm run build:dist-next` |
+| `build/`、`engine/build-*/` | `npm run build:engine` 等 CMake 构建 |
+| `tests/parity/` 下的录制、截图与 `report.json` | `node tools/parity/run-scenario.mjs --all --update`、`npm run parity:client:update` 等，见 [`docs/parity.md`](docs/parity.md) |
+| `legacy/reports/`、`reports/runs/` | 验收运行（`npm run test:all`）时写入 |
+
+`client/public/index.html`、`client/public/server-worker.js` 与 `client/public/fonts/` 是手写源码，仍然被跟踪。
+
 默认运行 `dist-next`（纯 C++/TS 交付树）。浏览器会自动打开
 `http://127.0.0.1:8477/`。要回滚到冻结的 oracle 树用
 `node serve.mjs --reference`。等画面出现主菜单后：
