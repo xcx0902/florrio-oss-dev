@@ -1,6 +1,9 @@
 # Sources only. Everything below is generated locally and must not be
 # committed; rebuild it with the npm scripts when a checkout needs it.
 
+# Editor
+.vscode/
+
 # Dependencies and local tool caches
 node_modules/
 tools/vendor/
