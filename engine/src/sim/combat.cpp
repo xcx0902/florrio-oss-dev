@@ -31,14 +31,27 @@ EntityHandle owner_player(const World& world, EntityHandle attacker) {
 }
 
 std::string killer_name_for(const World& world, EntityHandle attacker) {
-  const EntityHandle owner = owner_player(world, attacker);
-  if (owner.valid() && owner == world.player() && !world.player_name().empty())
-    return world.player_name();
-  const Entity* entity = world.entities().get(attacker);
-  if (entity == nullptr) return {};
-  if (entity->kind == EntityKind::kPlayer && !world.player_name().empty())
-    return world.player_name();
-  if (!entity->killer_name.empty()) return entity->killer_name;
+  // Original 43 copies the *destroying entity's own name string* (entity+160).
+  // Petals and projectiles inherit their owner's name; mobs and flowers use
+  // their catalog/player name. An entity's killer_name is the name of whoever
+  // killed that entity, so it must never be reused here: a mob that the player
+  // had just killed would otherwise report the player's own flower name.
+  EntityHandle source = attacker;
+  bool rooted = false;
+  for (std::uint32_t guard = 0; guard < 16U; ++guard) {
+    const Entity* entity = world.entities().get(source);
+    if (entity == nullptr) return {};
+    if (entity->kind == EntityKind::kPlayer) return world.player_name();
+    if (entity->kind == EntityKind::kMob) { rooted = true; break; }
+    if (entity->kind != EntityKind::kPetal && entity->kind != EntityKind::kProjectile) break;
+    if (entity->owner == std::numeric_limits<std::uint32_t>::max()) break;
+    source = EntityHandle{entity->owner};
+  }
+  // A petal/projectile with no owner chain is nameless in the original name
+  // component; do not invent a catalog name for it.
+  if (!rooted) return {};
+  const Entity* entity = world.entities().get(source);
+  if (entity == nullptr || entity->type_id == 0U) return {};
   const auto* definition = Catalog::instance().entity(entity->type_id);
   return definition == nullptr ? std::string{} : std::string(definition->name);
 }

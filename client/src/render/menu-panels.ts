@@ -120,7 +120,9 @@ function drawMobGallery(context: Canvas2DContext, state: MenuRenderState, height
     if (y + rect.height < content.y || y > content.y + content.height) continue;
     roundedRect(context, rect.x, y, rect.width, rect.height, 5); context.setFillRgb(73, 129, 177); context.fill();
     if (!state.mobs.includes(type)) {
-      const size = 36;
+      // Original gallery uses its 16-unit default label font; 36 made the
+      // placeholder more than three times too tall.
+      const size = 16;
       label(context, '?', size, f(rect.x + f((rect.width - measureLabel('?', size)) / 2)),
         f(y + f((rect.height - f(size * 1.4)) / 2)), raster);
       continue;

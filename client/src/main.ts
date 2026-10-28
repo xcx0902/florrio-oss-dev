@@ -842,7 +842,6 @@ function frame(now: number): void {
     drawFrameHud({
       health: 0, maxHealth: 100, level: lastLevel, pixelRatio: dpr,
       chat: world.chat, death: true, slots: lastSlots, selectedSlot,
-      flowers: 0, flowerEntries: [],
       deathState: {
         elapsedMilliseconds: Math.max(0, now - (deathAt ?? now)),
         progress: deathProgress,

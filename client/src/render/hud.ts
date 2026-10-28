@@ -50,6 +50,8 @@ export interface HudState {
    * per rendered frame by createHudState. */
   readonly zoneWarningAlpha?: number;
   readonly zoneCountdownProgress?: number;
+  /** Death transition: level bar/hotbar recede from 0 to 400 logical units. */
+  readonly hudSlide?: number;
   readonly chat?: readonly string[];
   readonly pixelRatio?: number;
   /** CSS viewport dimensions; the backing canvas includes pixelRatio. */
@@ -151,12 +153,13 @@ export interface HudFrameState {
 export function createHudState(): HudFrameState {
   let progress = 0;
   let zoneAlpha = 0, zoneCountdown = 0;
+  let hudSlide = 0;
   const scores: number[] = [];
   const recharges: number[] = [];
   const rechargeTypes: (number | undefined)[] = [];
   let lastTime: number | undefined;
   return {
-    reset() { progress = 0; zoneAlpha = 0; zoneCountdown = 0; scores.length = 0; recharges.length = 0; rechargeTypes.length = 0; lastTime = undefined; },
+    reset() { progress = 0; zoneAlpha = 0; zoneCountdown = 0; hudSlide = 0; scores.length = 0; recharges.length = 0; rechargeTypes.length = 0; lastTime = undefined; },
     update(target, nowMilliseconds, deltaMilliseconds) {
       const now = Number.isFinite(nowMilliseconds) ? nowMilliseconds : lastTime ?? 0;
       const repeated = lastTime !== undefined && now <= lastTime;
@@ -166,11 +169,19 @@ export function createHudState(): HudFrameState {
       lastTime = Math.max(lastTime ?? now, now);
       if (target.menu) return target;
       if (!repeated) {
-        const warning = +zoneWarningVisible(target);
-        zoneAlpha = f(zoneAlpha + clamp(1 - Math.pow(0.7, delta * 0.06)) * (warning - zoneAlpha));
-        // client1095 uses the literal 0.003922 rather than 1/255.
-        const countdown = f((target.zoneProgress ?? 0) * 0.003922);
-        zoneCountdown = f(zoneCountdown + amount * (countdown - zoneCountdown));
+        if (target.death) {
+          // Native1095 retreats the level bar/hotbar by 400 logical units
+          // with the same pow(0.9, dt * .06) curve as the level bar's shield
+          // and the death overlay. Existing death UI is otherwise frozen.
+          hudSlide = f(hudSlide + clamp(1 - Math.pow(0.9, delta * 0.06)) * (400 - hudSlide));
+        } else {
+          hudSlide = 0;
+          const warning = +zoneWarningVisible(target);
+          zoneAlpha = f(zoneAlpha + clamp(1 - Math.pow(0.7, delta * 0.06)) * (warning - zoneAlpha));
+          // client1095 uses the literal 0.003922 rather than 1/255.
+          const countdown = f((target.zoneProgress ?? 0) * 0.003922);
+          zoneCountdown = f(zoneCountdown + amount * (countdown - zoneCountdown));
+        }
       }
       const approach = (current: number, value: number): number =>
         repeated ? current : f(Math.abs(current - value) < 1e-7 ? value : current + amount * (value - current));
@@ -199,7 +210,7 @@ export function createHudState(): HudFrameState {
         return recharges[index] ?? 1;
       });
       return { ...target, levelProgress: progress, flowerEntries: entries, slotProgress,
-        zoneWarningAlpha: zoneAlpha, zoneCountdownProgress: zoneCountdown };
+        zoneWarningAlpha: zoneAlpha, zoneCountdownProgress: zoneCountdown, hudSlide };
     },
   };
 }
@@ -345,8 +356,8 @@ function unitRect(context: Canvas2DContext, scale: number,
 }
 
 let mapBorder: Path2D | undefined;
-function drawMap(context: HudContext, state: HudState, layout: HudLayout, raster: number): void {
-  const left = layout.logicalWidth - (state.mobile ? 350 : 300);
+function drawMap(context: HudContext, state: HudState, layout: HudLayout, raster: number, slide = 0): void {
+  const left = layout.logicalWidth - (state.mobile ? 350 : 300) + slide;
   const top = layout.logicalHeight - 120;
   context.save(); context.setLineCap('round'); context.setLineJoin('round'); context.save();
   const colors = [[30, 167, 97], [167, 167, 30], [167, 39, 30], [85, 85, 85]] as const;
@@ -375,10 +386,10 @@ function drawMap(context: HudContext, state: HudState, layout: HudLayout, raster
   context.restore();
 }
 
-function drawLevelBar(context: HudContext, state: HudState, layout: HudLayout, raster: number): void {
+function drawLevelBar(context: HudContext, state: HudState, layout: HudLayout, raster: number, slide = 0): void {
   const progress = clamp(state.levelProgress ?? 0);
   const y = layout.logicalHeight - 110;
-  context.save(); context.setLineCap('round'); context.beginPath(); baseTransform(context, layout);
+  context.save(); context.setLineCap('round'); context.beginPath(); baseTransform(context, layout, 1, -slide, 0);
   context.moveTo(0, y); context.lineTo(300, y); context.setLineWidth(40);
   context.setStrokeRgb(51, 51, 51); context.stroke();
   context.setGlobalAlpha(clamp(progress * 30)); context.setLineWidth(clamp(progress * 30) * 34);
@@ -780,13 +791,24 @@ function drawHudLayer(context: HudContext, state: HudState, layout: HudLayout, c
   context.save(); baseTransform(context, layout);
   drawLabelBox(context, { text: 'florr.io', font: 32, rasterScale: raster },
     15, 15, f(measureLabel('florr.io', 32) + 14), f(32 * 1.4), false);
-  // Original763's dead-body branch draws only the logo and flower panel; the
-  // map, level bar, hint and normal hotbar are absent.
-  if (state.death) { context.restore(); return; }
-  drawMap(context, state, layout, raster); drawLevelBar(context, state, layout, raster);
-  drawHint(context, state, layout, raster); drawHotbar(context, state, layout, raster);
-  drawInventory(context, state, layout, raster); drawChat(context, state, layout, raster);
-  drawZoneWarning(context, state, layout, raster); context.restore();
+  // Original763 keeps the HUD alive while the death overlay rises: the level
+  // bar recedes left, the map and flower panel recede right, and the hotbar
+  // (with its hint) drops by 400 logical units. The inventory closes.
+  const slide = state.death ? state.hudSlide ?? 0 : 0;
+  const shifted = slide > 0 ? {
+    ...layout,
+    logicalHeight: f(layout.logicalHeight + slide),
+    equippedY: f(layout.equippedY + slide),
+    storageY: f(layout.storageY + slide),
+  } : layout;
+  drawMap(context, state, layout, raster, slide);
+  drawLevelBar(context, state, layout, raster, slide);
+  drawHint(context, state, shifted, raster);
+  drawHotbar(context, state, shifted, raster);
+  if (!state.death) drawInventory(context, state, layout, raster);
+  drawChat(context, state, layout, raster);
+  drawZoneWarning(context, state, layout, raster);
+  context.restore();
 }
 
 let panelSurface: { canvas: RasterCanvas; key: string } | undefined;
@@ -853,10 +875,11 @@ function drawPanelContent(context: HudContext, entries: readonly FlowerEntry[], 
   context.restore();
 }
 
-function drawFlowerPanel(context: HudContext, state: HudState, layout: HudLayout, ratio: number): void {
+function drawFlowerPanel(context: HudContext, state: HudState, layout: HudLayout, ratio: number,
+                         slide = 0): void {
   const entries = flowerEntries(state), count = state.flowers ?? state.flowerEntries?.length ?? 1;
   context.save();
-  const x = layout.logicalWidth - 230;
+  const x = layout.logicalWidth - 230 + slide;
   if (canvasAvailable()) {
     // The native panel cache compares displayed strings and score fractions,
     // rather than invalidating on each fractional step toward a score target.
@@ -1029,9 +1052,7 @@ export function drawHud(native: Canvas2DContext, state: HudState): void {
     drawHudLayer(context, state, ratio === 1 ? layout : { ...layout, scale: f(layout.scale * ratio) }, false);
     context.setGlobalAlpha(1);
   }
-  drawFlowerPanel(context, state.death
-    ? { ...state, flowers: 0, flowerEntries: [] }
-    : state, layout, ratio);
+  drawFlowerPanel(context, state, layout, ratio, state.death ? state.hudSlide ?? 0 : 0);
   if (!state.death) drawHotbarTooltip(context, state, layout, ratio);
   if (state.death || state.deathState) drawDeathOverlay(context, state, layout, ratio);
   context.restore(); context.restore();

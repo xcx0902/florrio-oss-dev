@@ -281,7 +281,10 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
     // Original menu respawn block: centered under the name input. The item
     // row uses the same 60-unit cards and 70-unit pitch as the galleries.
     const items = respawn.items.filter(type => PETAL_INFO[type]);
-    label(`You will respawn at level ${respawn.level} with:`,
+    // String 23467 ("... with:") is selected only when the survivor count is
+    // nonzero; otherwise the original draws 18891 ("...at level %d").
+    const survivors = items.length > 0 ? ' with:' : '';
+    label(`You will respawn at level ${respawn.level}${survivors}`,
       16, centerX, f(h / 2 + 65.7));
     const pitch = 70, size = 60;
     let cardX = centerX - f((items.length - 1) * pitch / 2);

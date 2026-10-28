@@ -4303,6 +4303,36 @@ void test_attribution_death_and_pickups() {
   CHECK(world.pickups().empty());
 }
 
+void test_killer_name_uses_attacker_identity() {
+  {
+    engine::World world;
+    world.initialize();
+    world.set_auto_populate(false);
+    const engine::EntityHandle player = engine::spawn_player_default(
+      world, "hero", engine::make_default_profile(), false);
+    const engine::EntityHandle attacker = engine::spawn_entity_from_defaults(
+      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
+    CHECK(player.valid());
+    CHECK(attacker.valid());
+    // Original43 reads attacker+160 (the attacker's own name), not the
+    // attacker's stored killer. A mob killed by the player must still report
+    // "Ladybug" if its death throes finish the player.
+    world.entities().get(attacker)->killer_name = "hero";
+    (void)engine::damage_entity(world, player, world.entities().get(player)->health, attacker);
+    CHECK(world.last_killer_name() == "Ladybug");
+  }
+  {
+    engine::World world;
+    world.initialize();
+    world.set_auto_populate(false);
+    const engine::EntityHandle player = engine::spawn_player_default(
+      world, "", engine::make_default_profile(), false);
+    CHECK(player.valid());
+    (void)engine::damage_entity(world, player, world.entities().get(player)->health, player);
+    CHECK(world.last_killer_name().empty());
+  }
+}
+
 void test_loadout_exact_layout() {
   engine::World world;
   world.initialize();
@@ -5590,6 +5620,7 @@ int main(int argc, char** argv) {
   runTest("test_quadtree_order_and_collision_bounds", test_quadtree_order_and_collision_bounds);
   runTest("test_area_effects_and_deferred_launch", test_area_effects_and_deferred_launch);
   runTest("test_attribution_death_and_pickups", test_attribution_death_and_pickups);
+  runTest("test_killer_name_uses_attacker_identity", test_killer_name_uses_attacker_identity);
   runTest("test_loadout_exact_layout", test_loadout_exact_layout);
   runTest("test_alert_to_attacker_is_local", test_alert_to_attacker_is_local);
   runTest("test_ai_recovered_species_profiles", test_ai_recovered_species_profiles);
