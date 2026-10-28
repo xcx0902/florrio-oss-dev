@@ -140,6 +140,66 @@ if (opacity <= 0)
 随后等级条向左、装备栏向下、地图与花朵面板向右移动；约 400 逻辑单位后全部离场，
 最终只剩 logo、死亡遮罩、统计栏和保留花瓣行。
 
+### 6. 重开后留存花瓣卡片没有悬浮 tooltip
+
+原版 `clientFrame`（`function_1095`）的菜单分支在逐张绘制重开卡片时，
+先按 `func623` 入队 tooltip，再调用 `func587` 画卡片。WAT 中每张卡片的
+tooltip 条件与缓动为：
+
+```wasm
+local.get $l0
+f32.load offset=384              ;; 卡片自己的 tooltip alpha
+...
+local.get $l0
+i32.load offset=44
+i32.const 7908840
+i32.load
+i32.eq                           ;; 属于本地玩家
+local.get $l0
+i32.load8_u offset=37
+i32.const 0
+i32.ne
+i32.and                          ;; 当前鼠标悬浮
+...
+f64.const 0.7
+local.get $l63                   ;; f32 delta
+f64.promote_f32
+f64.const 0.06
+f64.mul
+call $pow
+f64.sub                          ;; 1 - pow(0.7, dt*0.06)
+```
+
+原版在卡片本地矩阵中调用
+`renderPetalTooltip(..., 0.0f, -40.0f)`，所以 tooltip 底部中心对齐卡片中心
+上方 40 逻辑单位；绘制仍在菜单末尾统一执行，位于姓名输入框之后。
+
+用原版 `client.wasm` 注入菜单状态（等级 45，幸存 `Rose`/`Stinger`/`Lily`
+三张卡）做逐像素探测：
+
+- 卡片中心：x = 590.8、639.8、688.8 CSS px，y = 440.3 CSS px；
+- 命中框：x = 570–611、619–660、668–709，y = 420–461，即 60 逻辑单位的
+  卡片本体，不是额外扩大的热区；
+- 鼠标移入首张卡后，`+384` alpha 首帧为 `0.2899415194988251`，随后按
+  `1 - pow(0.7, dt*0.06)` 收敛到 1；移出后按同一曲线回到 0；
+- `Rose` tooltip 的外框为 x = 433–748、y = 363–421 CSS px，覆盖姓名输入框
+  下缘；修复后的重建页面在同一坐标得到逐像素相同的外框。
+
+修复：
+
+- `client/src/render/menu-layout.ts` 提取重开卡片布局与 60×60 命中框；
+- `client/src/input/menu.ts` 在 `pointerMove` 中命中卡片，按原版公式推进
+  `respawnTooltips`（按下鼠标不抑制，图鉴才抑制）；
+- `client/src/render/menu.ts` 的 `drawMenuRespawnTooltips` 在输入框之后绘制
+  队列中的 tooltip，alpha 阈值 `> 0.0001`；
+- `client/src/main.ts` 在死亡回主页时同步 `menuControls.setRespawn`，重开或
+  新一局开始时清空，模拟原版重建卡片记录并清零 `+384`。
+
+回归：`node --test client/tests/menu-controls.test.mjs` 11/11 通过；新增用例
+锁定首帧 alpha、卡片索引/类型、tooltip 面板像素，以及移出后不再绘制。
+`node --test client/tests/ui-tooltip.test.mjs client/tests/death-lifecycle.test.mjs`
+全部通过；`menu-interactions` 的死亡路径用例也通过。
+
 ## 回归结果
 
 - `./build/engine/engine_tests --tap`：全部通过；新增

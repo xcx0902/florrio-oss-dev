@@ -10,7 +10,8 @@ import { MenuAnimation, menuSeed, caretAlpha, type MenuInputPresentation } from 
 import { PETAL_INFO } from '../schema/petals.js';
 import { drawPetalCard, drawPetalInstance } from './entity-art.js';
 import { drawMenuPanels } from './menu-panels.js';
-import { PETAL_GALLERY_TYPES, petalCellRect, mobDropRect, menuPanelRect, type MenuRenderState } from './menu-layout.js';
+import { PETAL_GALLERY_TYPES, petalCellRect, mobDropRect, menuPanelRect,
+  menuRespawnCardAnchor, MENU_RESPAWN_CARD_SIZE, MENU_RESPAWN_TOOLTIP_Y, type MenuRenderState } from './menu-layout.js';
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
 import { drawPetalTooltipAt } from './tooltip.js';
 
@@ -133,14 +134,12 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
     const survivors = items.length > 0 ? ' with:' : '';
     label(`You will respawn at level ${respawn.level}${survivors}`,
       16, centerX, f(h / 2 + 65.7));
-    const pitch = 70, size = 60;
-    let cardX = centerX - f((items.length - 1) * pitch / 2);
-    for (const type of items) {
+    for (const [index, type] of items.entries()) {
+      const anchor = menuRespawnCardAnchor(index, items.length, w, h);
       context.save();
-      context.setTransform(ui, 0, 0, ui, f(ui * cardX), f(ui * f(h / 2 + 114.5)));
-      drawPetalCard(context, type, size, `menu-respawn:${type}`);
+      context.setTransform(ui, 0, 0, ui, f(ui * anchor.x), f(ui * anchor.y));
+      drawPetalCard(context, type, MENU_RESPAWN_CARD_SIZE, `menu-respawn:${type}`);
       context.restore();
-      cardX = f(cardX + pitch);
     }
   } else {
     let howY = Math.trunc(h / 2) + 100;
@@ -203,6 +202,32 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
       width, height, scale, pixelRatio, tooltip.alpha);
     context.restore();
   }
+}
+
+/** Survivor-card tooltips belong to the menu's final queue, after the input
+ * pass; they are not part of drawMenu's panel layer. */
+export function drawMenuRespawnTooltips(native: Canvas2DContext, width: number, height: number,
+                                        pixelRatio: number,
+                                        respawn: { readonly level: number; readonly items: readonly number[] } | undefined,
+                                        menuState: MenuRenderState | undefined): void {
+  if (!respawn || !menuState?.respawnTooltips?.length) return;
+  const items = respawn.items.filter(type => PETAL_INFO[type]);
+  if (!items.length) return;
+  const scale = f(Math.max(0.7, f(Math.max(width * 0.000521, height * 0.000926))));
+  const w = Math.ceil(f(width / scale)), h = Math.ceil(f(height / scale));
+  const context = hudRenderer(native);
+  context.save();
+  for (const tooltip of menuState.respawnTooltips) {
+    if (tooltip.alpha <= 0.0001 || tooltip.index < 0 || tooltip.index >= items.length) continue;
+    const type = items[tooltip.index];
+    if (type !== tooltip.type) continue;
+    const anchor = menuRespawnCardAnchor(tooltip.index, items.length, w, h);
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    drawPetalTooltipAt(context, type, anchor.x * scale,
+      f(anchor.y + MENU_RESPAWN_TOOLTIP_Y) * scale,
+      width, height, scale, pixelRatio, tooltip.alpha);
+  }
+  context.restore();
 }
 
 /** Kept separate from the captured menu iris so the input can continue its

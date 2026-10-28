@@ -46,14 +46,19 @@ async function menuPage(t, { width = 1280, height = 720, deviceScaleFactor = 1, 
     const font = new FontFace('Ubuntu', 'url(/ubuntu.woff2)');
     await font.load(); document.fonts.add(font);
     const { MenuControls } = await import('/input/menu.js');
-    const { drawMenu } = await import('/render/menu.js');
+    const { drawMenu, drawMenuRespawnTooltips } = await import('/render/menu.js');
     const { wrapContext } = await import('/render/canvas2d/context.js');
     const canvas = document.getElementById('background'), ratio = devicePixelRatio;
     canvas.width = width * ratio; canvas.height = height * ratio;
     canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
     const menu = new MenuControls(); menu.resize(width, height); menu.show(true);
-    window.drawMenuCanvas = () => drawMenu(wrapContext(canvas.getContext('2d')), width, height, '', ratio,
-      1000, 2432940084, undefined, undefined, true, menu.petalDiscoveryCount, menu.renderState(), menu.discoveredPetals);
+    const context = wrapContext(canvas.getContext('2d'));
+    window.menuRespawn = undefined;
+    window.drawMenuCanvas = () => drawMenu(context, width, height, '', ratio,
+      1000, 2432940084, undefined, undefined, true, menu.petalDiscoveryCount, menu.renderState(),
+      menu.discoveredPetals, window.menuRespawn);
+    window.drawMenuTooltips = () => drawMenuRespawnTooltips(context, width, height, ratio,
+      window.menuRespawn, menu.renderState());
     window.menu = menu;
     window.drawMenuCanvas();
   }, { stored, width, height });
@@ -283,6 +288,47 @@ test('all four opening and switching sequences retain every frozen WASM alpha sa
     // The oracle settles for 100 frames and moves to the next tab for two.
     await page.evaluate(() => { for (let frame = 0; frame < 102; frame++) window.menu.advance(16); });
   }
+});
+
+test('retained-petal cards reveal their tooltip only while hovered', async t => {
+  const page = await menuPage(t);
+  const hovered = await page.evaluate(() => {
+    window.menuRespawn = { level: 45, items: [6, 7, 8] };
+    window.menu.setRespawn(window.menuRespawn.items);
+    // 3-card row at 1280x720: 49 CSS px pitch, first centre at 590.8/440.3.
+    window.menu.pointerMove(590.8, 440.3);
+    window.menu.advance(16);
+    const firstAlpha = window.menu.renderState().respawnTooltips[0]?.alpha;
+    for (let frame = 0; frame < 29; frame++) window.menu.advance(16);
+    window.drawMenuCanvas();
+    const canvas = document.getElementById('background');
+    const context = canvas.getContext('2d');
+    const before = Array.from(context.getImageData(440, 410, 1, 1).data);
+    window.drawMenuTooltips();
+    const after = Array.from(context.getImageData(440, 410, 1, 1).data);
+    return { state: window.menu.renderState(), firstAlpha, before, after };
+  });
+  assert.equal(hovered.firstAlpha, 0.2899415194988251, 'first frame matches native f32 easing');
+  assert.equal(hovered.state.respawnTooltips.length, 1);
+  assert.equal(hovered.state.respawnTooltips[0].index, 0);
+  assert.equal(hovered.state.respawnTooltips[0].type, 6);
+  assert.ok(hovered.state.respawnTooltips[0].alpha > 0.999, 'alpha eases to the native target');
+  assert.ok(hovered.after[0] < hovered.before[0] * 0.75,
+    `native tooltip panel is painted above the menu: ${JSON.stringify(hovered)}`);
+
+  const left = await page.evaluate(() => {
+    window.menu.pointerMove(100, 100);
+    for (let frame = 0; frame < 60; frame++) window.menu.advance(16);
+    window.drawMenuCanvas();
+    const canvas = document.getElementById('background');
+    const context = canvas.getContext('2d');
+    const before = Array.from(context.getImageData(440, 410, 1, 1).data);
+    window.drawMenuTooltips();
+    const after = Array.from(context.getImageData(440, 410, 1, 1).data);
+    return { state: window.menu.renderState(), before, after };
+  });
+  assert.equal(left.state.respawnTooltips.length, 0);
+  assert.deepEqual(left.after, left.before, 'no tooltip once the pointer leaves the card');
 });
 
 test('name typing, IME and persistence work without leaking game keys', async t => {

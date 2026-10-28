@@ -21,7 +21,7 @@ import { PetalMotionState } from './render/petal-motion.js';
 import { menuCloseRect, menuContentRect, menuScrollMax, settingsRowAt } from './render/menu-layout.js';
 import { MovementHelper } from './render/movement-helper.js';
 import { MenuInputAnimation } from './render/menu-animation.js';
-import { drawMenuInput } from './render/menu.js';
+import { drawMenuInput, drawMenuRespawnTooltips } from './render/menu.js';
 import { drawHud, createHudState, getHudLayout, equippedSlotCount, type HudState, hotbarSlotAt, inventorySlotAt } from './render/ui.js';
 import { SilentAudioBus } from './audio/audio.js';
 
@@ -239,7 +239,7 @@ async function startGame(): Promise<void> {
   helperPlayer = undefined;
   entryAt = undefined; entryCanvas = undefined; exitAt = undefined; exitCanvas = undefined;
   exitFrame = 0;
-  menuRespawn = undefined; hintExpand = 0;
+  menuRespawn = undefined; menuControls.setRespawn(undefined); hintExpand = 0;
   keyboardHint = 0; keyboardHighlightReady = false; keyboardHighlightAlpha = 0;
   dragSlot = dragInventorySlot = undefined; petalMotion.reset();
   status = 'Entering the garden…';
@@ -257,7 +257,7 @@ async function startGame(): Promise<void> {
 async function restartGame(): Promise<void> {
   menuInputAnimation.requestSpawn();
   started = true;
-  menuRespawn = undefined;
+  menuRespawn = undefined; menuControls.setRespawn(undefined);
   status = 'Respawning…';
   pendingSpawn = menuControls.name.value.trim();
   pendingRestart = true;
@@ -275,6 +275,7 @@ function continueToMenu(): void {
   // when no petal survived ("with:" is part of the native format string).
   menuRespawn = { level: lastDeathMetadata.respawnLevel || lastLevel,
     items: [...lastDeathMetadata.keptItems] };
+  menuControls.setRespawn(menuRespawn.items);
   started = enteredWorld = dead = false;
   deathAt = undefined; inventoryOpen = movementDisabled = false;
   dragSlot = dragInventorySlot = undefined;
@@ -885,6 +886,10 @@ function frame(now: number): void {
     drawMenuInput(renderContext, canvas.clientWidth, canvas.clientHeight, status,
       dpr, now + animationOffset, !started, menuInput);
     renderContext.restore();
+  }
+  if (menuFrame) {
+    drawMenuRespawnTooltips(renderContext, canvas.clientWidth, canvas.clientHeight, dpr,
+      menuRespawn, menuControls.renderState());
   }
   if (exitAt !== undefined && !enteredWorld) drawExitTransition();
   requestAnimationFrame(frame);

@@ -5,6 +5,7 @@ import { MOB_GALLERY } from '../schema/mob-gallery.js';
 import type { MenuInputPresentation } from '../render/menu-animation.js';
 import {
   MENU_TABS, PETAL_GALLERY_TYPES, MOB_GALLERY_TYPES, menuCloseRect, menuContentRect, menuPanelRect, menuScrollMax, menuTabAt,
+  menuRespawnCardRect,
   petalCellAt, mobRowAt, mobDropRect, settingsRowAt,
   type MenuPanel, type MenuRenderState,
 } from '../render/menu-layout.js';
@@ -43,6 +44,10 @@ export class MenuControls {
   private readonly panelAlphas: Record<MenuPanel, number> = { Settings: 0, Petals: 0, Mobs: 0, Changelog: 0 };
   private hoveredMobDrop: { mob: number; index: number } | undefined;
   private readonly mobDropAlphas = new Map<string, number>();
+  /** Survivor row, in native rebuild order: record types and +384 alphas. */
+  private respawnItems: readonly number[] = [];
+  private respawnAlphas: number[] = [];
+  private hoveredRespawn: number | undefined;
 
   constructor() {
     this.root.id = 'menu-controls';
@@ -103,6 +108,16 @@ export class MenuControls {
     this.root.style.display = visible ? 'block' : 'none';
     if (!visible) this.name.blur();
   }
+  /** Native rebuilds the card records when the survivor list changes, which
+   * also resets every +384 tooltip alpha; preserve that boundary. */
+  setRespawn(items: readonly number[] | undefined): void {
+    const next = (items ?? []).filter(type => PETAL_INFO[type]);
+    if (next.length === this.respawnItems.length
+        && next.every((type, index) => type === this.respawnItems[index])) return;
+    this.respawnItems = next;
+    this.respawnAlphas = new Array(next.length).fill(0);
+    this.hoveredRespawn = undefined;
+  }
   resize(width: number, height: number): void {
     this.scale = Math.fround(Math.max(0.7, Math.fround(Math.max(width * 0.000521, height * 0.000926))));
     this.width = Math.ceil(Math.fround(width / this.scale));
@@ -136,6 +151,7 @@ export class MenuControls {
   private scrollDrag?: { panel: MenuPanel; offset: number };
   private resetHover(): void {
     this.hoveredTab = undefined; this.hoveredPetal = undefined; this.hoveredMob = undefined; this.hoveredMobDrop = undefined;
+    this.hoveredRespawn = undefined;
   }
   private logical(x: number, y: number): { x: number; y: number } {
     return { x: x / this.scale, y: y / this.scale };
@@ -145,6 +161,15 @@ export class MenuControls {
     this.pointerX = point.x; this.pointerY = point.y;
     this.hoveredTab = menuTabAt(point.x, point.y, this.height);
     this.hoveredPetal = undefined; this.hoveredMob = undefined; this.hoveredMobDrop = undefined;
+    this.hoveredRespawn = undefined;
+    for (let index = 0; index < this.respawnItems.length; index++) {
+      const rect = menuRespawnCardRect(index, this.respawnItems.length, this.width, this.height);
+      if (point.x >= rect.x && point.x <= rect.x + rect.width
+          && point.y >= rect.y && point.y <= rect.y + rect.height) {
+        this.hoveredRespawn = index;
+        break;
+      }
+    }
     if (!this.panel) return;
     if (this.panel === 'Petals') {
       const index = petalCellAt(point.x, point.y, this.height, this.scroll.Petals, this.panelAlphas.Petals);
@@ -269,6 +294,15 @@ export class MenuControls {
       if (alpha > 0) this.tooltipAlphas.set(type, alpha);
       else this.tooltipAlphas.delete(type);
     }
+    // Respawn cards use the same easing but their native target is only
+    // `f[37] != 0` (the hover flag); unlike the galleries, a held mouse button
+    // does not suppress it.
+    for (let index = 0; index < this.respawnItems.length; index++) {
+      const target = +(this.hoveredRespawn === index);
+      const current = this.respawnAlphas[index] ?? 0;
+      this.respawnAlphas[index] = Math.fround(Math.abs(current - target) < 1e-7
+        ? target : current + (target - current) * step);
+    }
     const hovered = this.hoveredMobDrop && `${this.hoveredMobDrop.mob}:${this.hoveredMobDrop.index}`;
     if (hovered && !this.mobDropAlphas.has(hovered)) this.mobDropAlphas.set(hovered, 0);
     for (const [key, current] of this.mobDropAlphas) {
@@ -283,6 +317,10 @@ export class MenuControls {
       hoveredTab: this.hoveredTab, hoveredPetal: this.hoveredPetal, hoveredMob: this.hoveredMob,
       petalTooltips: [...this.tooltipAlphas].map(([type, alpha]) => ({ type, alpha })),
       mobDropTooltips: [...this.mobDropAlphas].map(([key, alpha]) => { const [mob, index] = key.split(':').map(Number); return { mob, index, alpha }; }),
+      respawnTooltips: this.respawnItems.flatMap((type, index) => {
+        const alpha = this.respawnAlphas[index] ?? 0;
+        return alpha > 0 ? [{ index, type, alpha }] : [];
+      }),
       settings: { keyboardMovement: this.keyboardMovement, movementHelper: this.movementHelper },
       discoveries: [...this.discoveries], mobs: [...this.mobs],
       scroll: { ...this.scroll },

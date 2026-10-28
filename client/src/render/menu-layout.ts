@@ -23,6 +23,7 @@ export interface MenuRenderState {
   readonly hoveredMob?: number;
   readonly petalTooltips?: readonly { readonly type: number; readonly alpha: number }[];
   readonly mobDropTooltips?: readonly { readonly mob: number; readonly index: number; readonly alpha: number }[];
+  readonly respawnTooltips?: readonly { readonly index: number; readonly type: number; readonly alpha: number }[];
   readonly settings: MenuSettingsState;
   readonly discoveries: readonly number[];
   readonly mobs: readonly number[];
@@ -37,6 +38,30 @@ export const MENU_TAB_WIDTHS: Readonly<Record<MenuPanel, number>> = {
   Settings: 100, Petals: 100, Mobs: 100, Changelog: 120,
 };
 export const MENU_PANEL_BOTTOM = 969;
+/** Respawn row: 60-unit cards on a 70-unit pitch, centred under the input. */
+export const MENU_RESPAWN_CARD_SIZE = 60;
+export const MENU_RESPAWN_CARD_PITCH = 70;
+/** Card centre, relative to half the logical viewport height. */
+export const MENU_RESPAWN_CARD_Y = 114.5;
+/** Native623 is called with (0, -40) in the card's local space. */
+export const MENU_RESPAWN_TOOLTIP_Y = -40;
+
+export function menuRespawnCardAnchor(index: number, count: number,
+                                     width: number, height: number): { x: number; y: number } {
+  const centerX = Math.trunc(width / 2);
+  let x = f(centerX - f((count - 1) * MENU_RESPAWN_CARD_PITCH / 2));
+  for (let i = 0; i < index; i++) x = f(x + MENU_RESPAWN_CARD_PITCH);
+  return { x, y: f(height / 2 + MENU_RESPAWN_CARD_Y) };
+}
+
+export function menuRespawnCardRect(index: number, count: number,
+                                    width: number, height: number): Rect {
+  const anchor = menuRespawnCardAnchor(index, count, width, height);
+  const half = MENU_RESPAWN_CARD_SIZE / 2;
+  return { x: f(anchor.x - half), y: f(anchor.y - half),
+    width: MENU_RESPAWN_CARD_SIZE, height: MENU_RESPAWN_CARD_SIZE };
+}
+
 export const MENU_PANEL_DIMENSIONS: Readonly<Record<MenuPanel, { x: number; width: number; height: number }>> = {
   Settings: { x: 10, width: 239.583878, height: 163.600006 },
   Petals: { x: 10, width: 336, height: 370 },
