@@ -20,6 +20,8 @@ import { PetalTransfers } from './render/petal-transfers.js';
 import { PetalMotionState } from './render/petal-motion.js';
 import { menuCloseRect, menuContentRect, menuScrollMax, settingsRowAt } from './render/menu-layout.js';
 import { MovementHelper } from './render/movement-helper.js';
+import { MenuInputAnimation } from './render/menu-animation.js';
+import { drawMenuInput } from './render/menu.js';
 import { drawHud, createHudState, getHudLayout, equippedSlotCount, type HudState, hotbarSlotAt, inventorySlotAt } from './render/ui.js';
 import { SilentAudioBus } from './audio/audio.js';
 
@@ -40,6 +42,7 @@ const playerTransform = new PlayerWorldTransformCache();
 const petalTransfers = new PetalTransfers();
 const petalMotion = new PetalMotionState();
 const movementHelper = new MovementHelper();
+const menuInputAnimation = new MenuInputAnimation();
 const mobileUi = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 // The archived camera starts at scale 1.0 and relaxes to 0.9, which projects
 // to 0.666667 -> 0.6 pixels per world unit at 1280 x 720. The 0.600205 value
@@ -224,6 +227,7 @@ function localPlayer(): { entity: EntityState; kind: number } | null {
 
 async function startGame(): Promise<void> {
   if (started) return;
+  menuInputAnimation.requestSpawn();
   started = true;
   deathLifecycle.reset();
   inventoryOpen = false;
@@ -251,6 +255,7 @@ async function startGame(): Promise<void> {
 /** Diagnostic local restart shares the pending spawn/cooldown path. Opcode4
  * is the engine's compatibility entry point for the original restart request. */
 async function restartGame(): Promise<void> {
+  menuInputAnimation.requestSpawn();
   started = true;
   menuRespawn = undefined;
   status = 'Respawning…';
@@ -767,7 +772,10 @@ function frame(now: number): void {
     dead = true;
     deathAt ??= now;
   }
-  menuControls.show(!started && !frozen);
+  const menuInput = menuInputAnimation.advance(now, delta, world.lastSequence > 0,
+    menuFrame, getHudLayout(canvas.clientWidth, canvas.clientHeight).logicalHeight, mobileUi);
+  if (frozen) menuControls.show(false);
+  else menuControls.presentInput(menuInput, !started);
   // A same-camera recording belongs to this drawing pass. Native input above
   // uses the previous rendered camera, before updateCamera installs this one.
   if (pendingRenderCamera) {
@@ -838,7 +846,7 @@ function frame(now: number): void {
       width: canvas.clientWidth, height: canvas.clientHeight,
       mobile: mobileUi, petalDiscoveries: menuControls.petalDiscoveryCount,
       menuState: menuControls.renderState(), menuPetalTypes: menuControls.discoveredPetals,
-      menuRespawn,
+      menuRespawn, separateMenuInput: !frozen,
       menuPreviewState: playerHudState,
       menuPreview: (preview, view) => {
         menuCamera.resize(view.width, view.height, view.pixelRatio);
@@ -872,6 +880,12 @@ function frame(now: number): void {
     drawFrameHud(playerHudState!);
   }
   if (entryAt !== undefined && player !== null) drawEntryTransition(now);
+  if (!frozen && menuInput.active && menuInput.opacity > 0.0001) {
+    renderContext.save();
+    drawMenuInput(renderContext, canvas.clientWidth, canvas.clientHeight, status,
+      dpr, now + animationOffset, !started, menuInput);
+    renderContext.restore();
+  }
   if (exitAt !== undefined && !enteredWorld) drawExitTransition();
   requestAnimationFrame(frame);
 }

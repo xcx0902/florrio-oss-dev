@@ -79,7 +79,9 @@ export function drawPetalTooltipAt(context: Canvas2DContext, type: number,
   let lineTop = contentTop - 2;
   drawLabelBox(context, { text: titleText, font: titleFont, rasterScale,
     fill: '#FFFFFF', stroke: '#000000' },
-    contentLeft, lineTop, titleWidth, titleFont * 1.4, false);
+    // Native623 supplies [-2] as the per-line offsets to 691/1099. Only
+    // the title receives it, compensating its larger outline margin.
+    contentLeft - 2, lineTop, titleWidth, titleFont * 1.4, false);
   lineTop += titleFont * 1.1;
   const color = rarityRgb(info.rarity);
   context.setFillRgb(color[0], color[1], color[2]);

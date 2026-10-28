@@ -2,6 +2,7 @@
  * the flower-name input, which needs real text editing and IME support. */
 import { MOB_INFO, PETAL_INFO } from '../schema/petals.js';
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
+import type { MenuInputPresentation } from '../render/menu-animation.js';
 import {
   MENU_TABS, PETAL_GALLERY_TYPES, MOB_GALLERY_TYPES, menuCloseRect, menuContentRect, menuPanelRect, menuScrollMax, menuTabAt,
   petalCellAt, mobRowAt, mobDropRect, settingsRowAt,
@@ -30,7 +31,9 @@ export class MenuControls {
   private scale = 0.7;
   private width = 1280 / 0.7;
   private height = 720;
-  private visible = true;
+  private visible = false;
+  private inputOffset = 0;
+  private inputY: number | undefined;
   private pointerX = 0;
   private pointerY = 0;
   private hoveredTab: MenuPanel | undefined;
@@ -43,6 +46,7 @@ export class MenuControls {
 
   constructor() {
     this.root.id = 'menu-controls';
+    this.root.hidden = true;
     this.root.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;font-family:Ubuntu,sans-serif';
     this.name.id = 'player-name';
     this.name.setAttribute('aria-label', 'Flower name');
@@ -103,9 +107,26 @@ export class MenuControls {
     this.scale = Math.fround(Math.max(0.7, Math.fround(Math.max(width * 0.000521, height * 0.000926))));
     this.width = Math.ceil(Math.fround(width / this.scale));
     this.height = Math.ceil(Math.fround(height / this.scale));
-    const s = this.scale, y = Math.trunc(this.height / 4) + 200;
+    this.positionInput();
+  }
+  private positionInput(): void {
+    const s = this.scale, y = (this.inputY ?? Math.trunc(this.height / 4) + 200) + this.inputOffset;
     Object.assign(this.name.style, { left: `${(this.width / 2 - 195) * s}px`, top: `${(y + 5) * s}px`,
       width: `${390 * s}px`, height: `${40 * s}px`, fontSize: `${32 * s}px` });
+  }
+  presentInput(presentation: MenuInputPresentation, interactive: boolean): void {
+    this.inputY = presentation.inputY;
+    this.inputOffset = presentation.offsetY;
+    this.positionInput();
+    this.visible = interactive;
+    const hidden = presentation.active === false || presentation.opacity <= 0.0001;
+    const revealed = this.root.hidden && !hidden;
+    this.root.hidden = hidden;
+    this.root.style.display = this.root.hidden ? 'none' : 'block';
+    this.root.style.opacity = String(presentation.opacity);
+    this.name.style.pointerEvents = interactive ? 'auto' : 'none';
+    if (!interactive) this.name.blur();
+    else if (revealed) this.name.focus({ preventScroll: true });
   }
   open(panel: MenuPanel | undefined): void {
     this.panel = panel;

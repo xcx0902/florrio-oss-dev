@@ -120,6 +120,8 @@ export interface HudState {
   /** Canvas-native menu panel state and discovered-petal pool. */
   readonly menuState?: MenuRenderState;
   readonly menuPetalTypes?: readonly number[];
+  /** The frame owner can draw the moving input after capturing the menu. */
+  readonly separateMenuInput?: boolean;
   /** Authoritative normalized XP progress from snapshot field 58. */
   readonly levelProgress?: number;
   readonly flowers?: number;
@@ -557,7 +559,10 @@ function drawHotbar(context: HudContext, state: HudState, layout: HudLayout, ras
   // layout.scale already includes this HUD surface's DPR. Effect positions
   // remain in native logical units, so apply that scale exactly once.
   const effectViewport = { width: layout.width, height: layout.height, level: state.level,
-    mobile: state.mobile, uiScale: layout.scale, pixelRatio: 1 };
+    mobile: state.mobile, uiScale: layout.scale, pixelRatio: 1,
+    // Native1095 translates the renderer used by every803 card, including
+    // settled pickups and retired cards. Their own flight anchors stay put.
+    offsetY: state.death ? state.hudSlide ?? 0 : 0 };
   for (let index = 0; index < layout.equippedCount; index++) emptySlot(context, layout,
     layout.equippedX + index * 90, layout.equippedY, 70);
   for (let index = 0; index <= 8; index++) emptySlot(context, layout,
@@ -597,9 +602,12 @@ function drawHotbar(context: HudContext, state: HudState, layout: HudLayout, ras
   if (hint > 0) {
     context.save(); baseTransform(context, layout); context.setGlobalAlpha(hint);
     for (let index = 0; index < layout.equippedCount; index++)
-      label(context, `[${index + 1}]`, 14, raster, layout.equippedX + index * 90,
-        layout.equippedY - 55 - (1 - hint) * 5);
-    label(context, '[T]', 14, raster, layout.storageX + 8 * 65, layout.storageY - 55 - (1 - hint) * 5);
+      label(context, `[${index + 1}]`, 16, raster, layout.equippedX + index * 90,
+        layout.equippedY - 70 / 2 - 15);
+    // Native804 moves Delete's hint beside the box once the equipped row
+    // reaches six slots; the hint's alpha never changes its coordinates.
+    label(context, '[T]', 16, raster, layout.storageX + 8 * 65 + (layout.equippedCount >= 6 ? 40 : 0),
+      layout.storageY - 50 / 2 + (layout.equippedCount >= 6 ? 8 : -15));
     context.setGlobalAlpha(1); context.restore();
   }
   const deleteAlpha = clamp(state.deleteAlpha ?? (state.draggedSlot !== undefined ? 1 : hint));
@@ -965,6 +973,9 @@ function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayou
   const cardY = layout.logicalHeight - 45 + rowY;
   const tooltipAlpha = state.deathState?.tooltipAlpha;
   const tooltips: { type: number; centerX: number; size: number; alpha: number }[] = [];
+  // Gameplay's HUD already establishes this join. The independent death
+  // pass must establish it too, as original587 does on a cold renderer.
+  context.save(); context.setLineJoin('round');
   let left = 20;
   for (let index = 0; index < 16; index += 1) {
     const type = kept[index] ?? 0;
@@ -980,6 +991,7 @@ function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayou
     filledSlot(context, type, centerX, cardY, size, scaled, raster, 1, `retained:${index}`);
     left += size + 10;
   }
+  context.restore();
   // Native1095 prints the retained death statistics at the bottom-left in
   // the HUD's logical space. Statistics and item row slide up together.
   baseTransform(context, layout, ratio);
@@ -1070,7 +1082,7 @@ export function drawHud(native: Canvas2DContext, state: HudState): void {
   if (state.menu) {
     drawMenu(native, layout.width, layout.height, state.status ?? '', ratio, state.animationTime ?? 0,
       state.menuSeed, state.menuPreview, state.menuPreviewState, state.interactiveMenu, state.petalDiscoveries ?? 0,
-      state.menuState, state.menuPetalTypes, state.menuRespawn); return;
+      state.menuState, state.menuPetalTypes, state.menuRespawn, state.separateMenuInput ? false : undefined); return;
   }
   const context = hudRenderer(native);
   context.save(); context.save();

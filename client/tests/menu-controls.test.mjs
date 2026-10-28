@@ -114,6 +114,25 @@ test('gallery hit tests only expose discovered petals and mobs for tooltips', as
   await page.evaluate(() => window.drawMenuCanvas());
 });
 
+test('the editable name follows the canvas presentation while entering and leaving the menu', async t => {
+  const page = await menuPage(t);
+  const sample = async (offsetY, opacity, interactive) => page.evaluate(({ offsetY, opacity, interactive }) => {
+    window.menu.presentInput({ inputY: 457, offsetY, opacity }, interactive);
+    const input = document.getElementById('player-name'), root = document.getElementById('menu-controls');
+    return { top: parseFloat(input.style.top), opacity: Number(root.style.opacity), hidden: root.hidden,
+      events: input.style.pointerEvents, focused: document.activeElement === input };
+  }, { offsetY, opacity, interactive });
+  const dropping = await sample(-200, .5, true);
+  assert.ok(Math.abs(dropping.top - (457 - 200 + 5) * Math.fround(.7)) < .0001);
+  assert.equal(dropping.opacity, .5); assert.equal(dropping.events, 'auto');
+  const leaving = await sample(-300, .3, false);
+  assert.equal(leaving.hidden, false, 'name remains drawn during ascent');
+  assert.equal(leaving.events, 'none'); assert.equal(leaving.focused, false);
+  assert.equal((await sample(-657, 0, false)).hidden, true);
+  const returning = await sample(-100, .8, true);
+  assert.equal(returning.hidden, false); assert.equal(returning.focused, true);
+});
+
 test('complete gallery catalogues, drop labels and every discovered row match the original client', async t => {
   const fixture = JSON.parse(await readFile(new URL('client/tests/fixtures/menu-details-native.json', root), 'utf8'));
   const original = await loadOriginal('client', { functionIds: [391] }); original.call(391, 1);

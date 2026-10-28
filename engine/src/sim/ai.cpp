@@ -543,11 +543,16 @@ std::size_t alert_to_attacker(World& world, EntityHandle target, EntityHandle at
     damaged->ai.returning = false;
     ++changed;
   }
-  // The original then invokes the entity's damage callbacks. In the domain
-  // model attached children with AI are the observable callback targets.
-  for (const EntityHandle child : damaged->children) {
+  // Original423 recursively checks the same aggression gates on every
+  // descendant. Passive centipede segments must not acquire attacker aggro.
+  std::vector<EntityHandle> descendants(damaged->children.begin(), damaged->children.end());
+  for (std::size_t index = 0; index < descendants.size(); ++index) {
+    const EntityHandle child = descendants[index];
     Entity* child_entity = world.entities().get(child);
-    if (child_entity == nullptr || !child_entity->ai.enabled) continue;
+    if (child_entity == nullptr) continue;
+    descendants.insert(descendants.end(), child_entity->children.begin(), child_entity->children.end());
+    if (!child_entity->ai.enabled
+        || !(child_entity->ai.aggressive || child_entity->ai.can_alert)) continue;
     if (!child_entity->ai.target.valid()
         && target_eligible(world, *child_entity, *world.entities().get(actor))) {
       child_entity->ai.target = actor;
@@ -573,7 +578,12 @@ void update_ai(World& world, double delta_milliseconds) {
     // facing come from the 401 chain constraint instead. This applies even
     // when the predecessor has no live AI record (the original then skips the
     // segment for this tick as well).
-    if (ai.predecessor.valid()) continue;
+    if (ai.predecessor.valid()) {
+      const Entity* predecessor = world.entities().get(ai.predecessor);
+      if (predecessor != nullptr && predecessor->ai.enabled)
+        ai.target = predecessor->ai.target;
+      continue;
+    }
 
     ai.attack_cooldown_ms = f32(std::max(
       static_cast<double>(ai.attack_cooldown_ms.value) - delta_milliseconds, 0.0));

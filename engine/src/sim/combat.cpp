@@ -75,6 +75,10 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
   if (entity == nullptr || entity->death_processed) return;
   if (!attacker.valid() && entity->last_attacker.valid()) attacker = entity->last_attacker;
   entity->death_processed = true;
+  // Original43 calls424 immediately, a full second before corpse removal.
+  // Leave the ordinary owner/children alive, but let the next segment steer
+  // independently on the next AI tick instead of following the dead head.
+  world.detach_linked_entities(target);
   const EntityKind kind = entity->kind;
   const Vec2 position = entity->position;
   const std::uint16_t type_id = entity->type_id;

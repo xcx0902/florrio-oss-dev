@@ -315,26 +315,36 @@ class World {
   }
   [[nodiscard]] const std::deque<DeathRecord>& deaths() const { return deaths_; }
 
+  /** Original424 detaches the entity+212 constraint links at health death,
+   * independently of ordinary ownership. Centipede links have +76 clear,
+   * so a surviving next segment becomes a root even after a middle death. */
+  void detach_linked_entities(EntityHandle handle) {
+    for (const EntityHandle linked : ai_entities()) {
+      if (Entity* segment = entities_.get(linked)) {
+        if (linked == handle || segment->ai.predecessor == handle)
+          segment->ai.predecessor = EntityHandle{};
+      }
+    }
+  }
+
   [[nodiscard]] bool destroy(EntityHandle handle) {
     Entity* entity = entities_.get(handle);
     if (entity == nullptr) return false;
-    // Original 404/424: every AI child inherits the removed record's owner
-    // (only when the +93 ownership flag is set) before the record disappears.
-    // For a centipede that owner is the preceding segment, so the next segment
-    // stays in the chain; for a head it is none, so the next segment becomes a
-    // root. Leaving predecessor pointing at a released handle made every
-    // remaining segment skip steering and chain constraints forever.
+    detach_linked_entities(handle);
+    // Original404 reparents ordinary ownership only. It must not reconnect
+    // constraint links that original43/424 already detached at health death.
     const bool owned = (entity->entity_flags & 64U) != 0U;
     const std::uint32_t inherited_owner = owned ? entity->owner : kInvalidEntity;
     const EntityHandle inherited_owner_handle{
       inherited_owner == kInvalidEntity ? 0U : inherited_owner};
-    const EntityHandle inherited_predecessor =
-      entity->ai.predecessor.valid() ? inherited_owner_handle : EntityHandle{};
     for (const EntityHandle child : entity->children) {
       if (Entity* child_entity = entities_.get(child)) {
-        child_entity->ai.predecessor = inherited_predecessor;
         child_entity->ai.owner = inherited_owner_handle;
         child_entity->owner = inherited_owner;
+        if (Entity* parent = entities_.get(inherited_owner_handle)) {
+          if (std::find(parent->children.begin(), parent->children.end(), child) == parent->children.end())
+            parent->children.push_back(child);
+        }
       }
     }
     entity->children.clear();

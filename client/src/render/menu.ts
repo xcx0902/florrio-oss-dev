@@ -6,9 +6,9 @@ import { createRasterCanvas, getRasterContext, drawLabel } from './canvas2d/text
 import { wrapContext } from './canvas2d/context.js';
 import { hudRenderer, drawMenuPreviewHud } from './hud.js';
 import type { HudState } from './hud.js';
-import { MenuAnimation, menuSeed, caretAlpha } from './menu-animation.js';
+import { MenuAnimation, menuSeed, caretAlpha, type MenuInputPresentation } from './menu-animation.js';
 import { PETAL_INFO } from '../schema/petals.js';
-import { drawPetalCard, drawPetalIcon } from './entity-art.js';
+import { drawPetalCard, drawPetalInstance } from './entity-art.js';
 import { drawMenuPanels } from './menu-panels.js';
 import { PETAL_GALLERY_TYPES, petalCellRect, mobDropRect, menuPanelRect, type MenuRenderState } from './menu-layout.js';
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
@@ -65,7 +65,8 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
                          worldPass?: MenuPreviewPass, previewState?: HudState, interactive = false,
                          petalDiscoveries = 0, menuState?: MenuRenderState,
                          petalTypes?: readonly number[],
-                         respawn?: { readonly level: number; readonly items: readonly number[] }): void {
+                         respawn?: { readonly level: number; readonly items: readonly number[] },
+                         input?: MenuInputPresentation | false): void {
   const scale = f(Math.max(0.7, f(Math.max(width * 0.000521, height * 0.000926))));
   const ui = f(scale * pixelRatio), raster = f(ui * 2.4);
   const w = Math.ceil(f(width / scale)), h = Math.ceil(f(height / scale));
@@ -110,7 +111,9 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
     } else {
       context.save();
       context.setTransform(f(flowerScale * pixelRatio), 0, 0, f(flowerScale * pixelRatio), f(x * pixelRatio), f(y * pixelRatio));
-      drawPetalIcon(context, type);
+      // The original menu owns one catalogue visual per floating object.
+      // Slot multiplicity belongs to cards; Peas' cluster is one visual.
+      drawPetalInstance(context, type);
       context.restore();
     }
   }
@@ -151,23 +154,7 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
   // Connecting warning remains a submitted bitmap even at zero opacity.
   base(); context.save(); context.setGlobalAlpha(0);
   label('Connecting...', 48, f(w * 0.5), -200); context.restore();
-  context.save(); context.setGlobalAlpha(1); base();
-  const inputCenterX = f(w * 0.5), inputY = Math.trunc(h / 4) + 200;
-  label('This pretty little flower is called...', 20, inputCenterX, f(inputY + f(20 * -1.4) * 1.1), false);
-  label(/error|unavailable|timeout|failed|closed|refused/i.test(status) ? status : '(press enter to spawn)',
-    14, inputCenterX, inputY + 55, false);
-  const left = f(inputCenterX - 200);
-  context.save(); context.setLineJoin('round'); context.setFillRgb(238, 238, 238);
-  context.setTransform(f(ui * 400), 0, 0, f(ui * 50), f(ui * left), f(ui * inputY)); context.fillRect(0, 0, 1, 1);
-  context.setStrokeRgb(0, 0, 0); context.setLineWidth(5);
-  context.setTransform(ui, 0, 0, ui, f(ui * left), f(ui * inputY)); context.strokeRect(0, 0, 400, 50);
-  context.save(); context.setLineCap('square'); context.beginPath(); base();
-  context.rect(f(left + 5), inputY + 5, 390, 40); context.clip(); context.restore();
-  context.save(); context.setGlobalAlpha(interactive ? 0 : caretAlpha(now)); context.beginPath();
-  context.setTransform(ui, 0, 0, ui, f(ui * f(left + 5)), f(ui * (inputY + 5)));
-  context.moveTo(0, 4); context.lineTo(0, 36); context.setLineWidth(3); context.setStrokeRgb(0, 0, 0); context.stroke();
-  context.setLineWidth(2); context.setStrokeRgb(255, 255, 255); context.stroke();
-  context.restore(); context.restore(); context.restore();
+  if (input !== false) paintMenuInput(context, width, height, status, pixelRatio, now, interactive, input);
 
   base();
   context.setLineJoin('round');
@@ -216,4 +203,44 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
       width, height, scale, pixelRatio, tooltip.alpha);
     context.restore();
   }
+}
+
+/** Kept separate from the captured menu iris so the input can continue its
+ * native upward motion over gameplay, and descend on returning to the menu. */
+export function drawMenuInput(native: Canvas2DContext, width: number, height: number,
+                              status: string, pixelRatio = 1, now = 0, interactive = false,
+                              presentation?: MenuInputPresentation): void {
+  paintMenuInput(hudRenderer(native), width, height, status, pixelRatio, now, interactive, presentation);
+}
+
+function paintMenuInput(context: ReturnType<typeof hudRenderer>, width: number, height: number,
+                        status: string, pixelRatio: number, now: number, interactive: boolean,
+                        presentation?: MenuInputPresentation): void {
+  const scale = f(Math.max(0.7, f(Math.max(width * 0.000521, height * 0.000926))));
+  const ui = f(scale * pixelRatio), raster = f(ui * 2.4);
+  const w = Math.ceil(f(width / scale)), h = Math.ceil(f(height / scale));
+  const opacity = presentation?.opacity ?? 1;
+  const shift = f(ui * (presentation?.offsetY ?? 0));
+  const base = (): void => context.setTransform(ui, 0, 0, ui, 0, shift);
+  const label = (text: string, font: number, x: number, y: number): void => {
+    drawLabel(context, { text, font, rasterScale: raster }, x,
+      f(y + f(f(font * 1.4) * 0.5)), 1, false);
+  };
+  context.save(); context.setGlobalAlpha(opacity); base();
+  const inputCenterX = f(w * 0.5), inputY = presentation?.inputY ?? Math.trunc(h / 4) + 200;
+  label('This pretty little flower is called...', 20, inputCenterX, f(inputY + f(20 * -1.4) * 1.1));
+  label(/error|unavailable|timeout|failed|closed|refused/i.test(status) ? status : '(press enter to spawn)',
+    14, inputCenterX, inputY + 55);
+  const left = f(inputCenterX - 200);
+  context.save(); context.setLineJoin('round'); context.setFillRgb(238, 238, 238);
+  context.setTransform(f(ui * 400), 0, 0, f(ui * 50), f(ui * left), f(f(ui * inputY) + shift)); context.fillRect(0, 0, 1, 1);
+  context.setStrokeRgb(0, 0, 0); context.setLineWidth(5);
+  context.setTransform(ui, 0, 0, ui, f(ui * left), f(f(ui * inputY) + shift)); context.strokeRect(0, 0, 400, 50);
+  context.save(); context.setLineCap('square'); context.beginPath(); base();
+  context.rect(f(left + 5), inputY + 5, 390, 40); context.clip(); context.restore();
+  context.save(); context.setGlobalAlpha(interactive ? 0 : opacity * caretAlpha(now)); context.beginPath();
+  context.setTransform(ui, 0, 0, ui, f(ui * f(left + 5)), f(f(ui * (inputY + 5)) + shift));
+  context.moveTo(0, 4); context.lineTo(0, 36); context.setLineWidth(3); context.setStrokeRgb(0, 0, 0); context.stroke();
+  context.setLineWidth(2); context.setStrokeRgb(255, 255, 255); context.stroke();
+  context.restore(); context.restore(); context.restore();
 }

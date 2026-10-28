@@ -119,6 +119,7 @@ export class RenderingCanvas {
   fill() { this.paints.push({ op: 'fill', ...structuredClone(this.state), path: structuredClone(this.path) }); }
   stroke() { this.paints.push({ op: 'stroke', ...structuredClone(this.state), path: structuredClone(this.path) }); }
   fillRect(...args) { this.beginPath(); this.rect(...args); this.fill(); }
+  strokeRect(...args) { this.beginPath(); this.rect(...args); this.stroke(); }
   clip() {} setGlobalCompositeOperation() {} setFont() {} fillText() {} strokeText() {}
   measureText() { return { width: 0 }; } drawImage() {}
   replay(calls) {

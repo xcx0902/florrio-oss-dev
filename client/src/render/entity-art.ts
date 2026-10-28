@@ -531,11 +531,13 @@ export function drawPetalIcon(context: Canvas2DContext, type: number, scale = 1)
   }
   inLocal(context,local=>{
     if (info.instances > 1) for (let index = 0; index < info.instances; index++) {
-      const angle = Math.fround(index * TAU / info.instances);
-      inLocal(local,part=>drawPetalShape(part,type,true,0),1,0,
-        Math.fround(Math.fround(Math.cos(angle)) * 10), Math.fround(Math.fround(Math.sin(angle)) * 10));
-    } else drawPetalShape(local,type,true,0);
-  },scale,angle);
+      const phase = Math.fround(index * 6.283185 / info.instances);
+      // Native587 translates the group first. Each catalogue visual then
+      // applies its own icon rotation, preserving the cluster's orientation.
+      inLocal(local,part=>drawPetalShape(part,type,true,0),1,angle,
+        Math.fround(Math.fround(Math.cos(phase)) * 10), Math.fround(Math.fround(Math.sin(phase)) * 10));
+    } else inLocal(local,part=>drawPetalShape(part,type,true,0),1,angle);
+  },scale);
 }
 
 /** Native pickup visual owned by the world marker, separate from its HUD
@@ -615,6 +617,7 @@ export function drawPetalCard(context: Canvas2DContext, type: number, size = 60,
     Number(34218529646319n >> BigInt(rarity * 8) & 255n),
     Number(111187557834093n >> BigInt(rarity * 8) & 255n));
   const line = f(size / 12), side = f(size - line);
+  local.setLineJoin('round');
   setFill(local, color); fillArtRectangle(local, -side / 2, -side / 2, side, side);
   local.beginPath(); local.rect(-side / 2, -side / 2, side, side);
   local.setLineWidth(line); setStroke(local, shade(color)); local.stroke();

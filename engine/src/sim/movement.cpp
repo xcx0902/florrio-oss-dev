@@ -128,7 +128,11 @@ void constrain_entity(World& world, EntityHandle handle) {
     }
   }
   const std::vector<EntityHandle> children = entity->children;
-  for (const EntityHandle child : children) constrain_entity(world, child);
+  for (const EntityHandle child : children) {
+    const Entity* segment = world.entities().get(child);
+    if (segment != nullptr && segment->ai.predecessor == handle)
+      constrain_entity(world, child);
+  }
 }
 
 } // namespace

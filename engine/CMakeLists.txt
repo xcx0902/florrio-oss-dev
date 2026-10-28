@@ -51,6 +51,11 @@ target_compile_options(engine_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=
 enable_testing()
 add_test(NAME engine_tests COMMAND engine_tests)
 
+add_executable(engine_centipede_tests tests/unit/test_centipede.cpp)
+target_link_libraries(engine_centipede_tests PRIVATE engine_core)
+target_compile_options(engine_centipede_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+add_test(NAME engine_centipede_tests COMMAND engine_centipede_tests)
+
 add_executable(engine_death_lifecycle_tests tests/unit/test_death_lifecycle.cpp)
 target_link_libraries(engine_death_lifecycle_tests PRIVATE engine_core)
 target_compile_options(engine_death_lifecycle_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)

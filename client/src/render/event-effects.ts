@@ -30,6 +30,8 @@ export interface Event14Viewport {
   readonly mobile?: boolean;
   readonly uiScale?: number;
   readonly pixelRatio?: number;
+  /** Logical renderer translation shared with the hotbar during death. */
+  readonly offsetY?: number;
 }
 
 export interface Event14Frame extends Event14Viewport {
@@ -176,11 +178,12 @@ export function drawEvent14Effect(context: Canvas2DContext, effect: Readonly<Eve
   const layout = getHudLayout(viewport.width, viewport.height, viewport.level, viewport.mobile, viewport.uiScale);
   const ratio = Number.isFinite(viewport.pixelRatio) && viewport.pixelRatio! > 0 ? viewport.pixelRatio! : 1;
   const scale = f(layout.scale * ratio), zoom = f(effect.size / 70), projected = f(scale * zoom);
+  const y = f(f(scale * (viewport.offsetY ?? 0)) + f(scale * effect.y));
   const alpha = clamp((context.getGlobalAlpha?.() ?? 1) * effect.opacity);
   const rgb = RARITY_RGB[PETAL_INFO[effect.type].rarity] ?? RARITY_RGB[0];
   context.save();
   context.setGlobalAlpha(alpha);
-  context.setTransform(projected, 0, 0, projected, f(scale * effect.x), f(scale * effect.y));
+  context.setTransform(projected, 0, 0, projected, f(scale * effect.x), y);
   context.setLineJoin('round');
   const line = f(70 * 0.083333), side = f(70 - line);
   context.setFillRgb(...rgb); context.fillRect(-side / 2, -side / 2, side, side);
@@ -198,7 +201,7 @@ export function drawEvent14Effect(context: Canvas2DContext, effect: Readonly<Eve
   context.setStrokeRgb(...rgb.map(value => Math.round(value * 0.81)) as [number, number, number]);
   context.setLineWidth(line); context.stroke();
   context.save();
-  context.setTransform(projected, 0, 0, projected, f(scale * effect.x), f(scale * effect.y - projected * 5));
+  context.setTransform(projected, 0, 0, projected, f(scale * effect.x), f(y - projected * 5));
   const raster = f(scale * 2.4), image = petalArtwork(effect.type, raster);
   if (image) context.drawImage(image, 0, 0, image.width, image.height,
     -image.width / raster / 2, -image.height / raster / 2, image.width / raster, image.height / raster);
@@ -212,7 +215,7 @@ export function drawEvent14Effect(context: Canvas2DContext, effect: Readonly<Eve
     const width = f(label.boxWidth), height = f(14 * 1.4);
     context.setTransform(f(projected * width), 0, 0, f(projected * height),
       f(f(scale * effect.x) + f(projected * f(-width * 0.5))),
-      f(f(scale * effect.y) + f(projected * f(17 - f(height * 0.5)))));
+      f(y + f(projected * f(17 - f(height * 0.5)))));
     context.drawImage(label.canvas, 0, 0, 1, 1);
   } else drawLabel(context, spec, 0, 17);
   context.restore();

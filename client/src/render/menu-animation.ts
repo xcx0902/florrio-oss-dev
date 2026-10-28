@@ -8,6 +8,50 @@ interface Particle { x: number; y: number; scale: number; phase: number; type: n
 const f = Math.fround;
 const UI = f(0.7);
 
+export interface MenuInputPresentation {
+  readonly active: boolean;
+  readonly inputY: number;
+  readonly offsetY: number;
+  readonly opacity: number;
+}
+
+/** client1095 globals 7926820/7926824, updated while the menu overlay draws.
+ * Spawn requests hold for 3000 ms; active gameplay passes extend by 200 ms. */
+export class MenuInputAnimation {
+  private connecting = 1;
+  private withdrawn = 0;
+  private hideUntil = -Infinity;
+  private spawnRequested = false;
+  private overlay = 0;
+
+  /** client1095 commits the spawn request after drawing the current input. */
+  requestSpawn(): void { this.spawnRequested = true; }
+
+  advance(now: number, delta: number, ready: boolean, menu: boolean,
+          logicalHeight: number, mobile = false): MenuInputPresentation {
+    const step = Math.max(0, Math.min(1, 1 - Math.pow(0.9, f(delta) * 0.06)));
+    const approach = (value: number, target: number): number => Math.abs(value - target) < 1e-7
+      ? target : f(value + step * (target - value));
+    // Original7926696 gates the entire menu pass. Once the one-second iris
+    // reaches 0.9999, these input states and their deadline stop advancing.
+    this.overlay = f(Math.max(0, Math.min(1, this.overlay + (menu ? -1 : 1) * f(delta) * 0.001)));
+    const active = this.overlay < 0.9999;
+    if (active) {
+      this.connecting = approach(this.connecting, +!ready);
+      if (!menu) this.hideUntil = Math.max(this.hideUntil, now + 200);
+      const target = +(!menu || now < this.hideUntil);
+      this.withdrawn = approach(this.withdrawn, target);
+      if (this.spawnRequested) {
+        this.hideUntil = now + 3000;
+        this.spawnRequested = false;
+      }
+    }
+    const amount = Math.max(this.connecting, this.withdrawn);
+    const inputY = mobile ? f(logicalHeight * 0.5) : Math.trunc(logicalHeight / 4) + 200;
+    return { active, inputY, offsetY: f(f(-200 - inputY) * amount), opacity: 1 - amount };
+  }
+}
+
 export function menuSeed(): number {
   if (typeof window === 'undefined') return 1;
   const bytes = crypto.getRandomValues(new Uint8Array(4));

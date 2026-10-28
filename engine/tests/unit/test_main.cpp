@@ -5023,9 +5023,8 @@ void test_centipede_exact_chain_and_rare() {
   }
   CHECK(chain == 10U);
 
-  // Native 404/424: removing a segment publishes its own owner (or none) to
-  // every child before the AI record disappears. The next segment becomes the
-  // chain root instead of keeping a predecessor that no longer exists.
+  // Native424 splits constraint links; native404 separately reparents ordinary
+  // ownership. The next segment becomes a root, including middle removal.
   const engine::EntityHandle first_segment = head_entity->children.front();
   const engine::EntityHandle second_segment =
     world.entities().get(first_segment)->children.front();
@@ -5046,9 +5045,10 @@ void test_centipede_exact_chain_and_rare() {
   CHECK(world.destroy(second_segment));
   const engine::Entity* third = world.entities().get(third_segment);
   CHECK(third != nullptr);
-  CHECK(third->ai.predecessor == first_segment);
+  CHECK(!third->ai.predecessor.valid());
   CHECK(third->ai.owner == first_segment);
   CHECK(third->owner == first_segment.raw);
+  CHECK(world.entities().get(first_segment)->children.front() == third_segment);
 
   // Find a seed whose first draw makes the rare (< 1%) roll true.
   std::uint32_t rare_seed = 0;
