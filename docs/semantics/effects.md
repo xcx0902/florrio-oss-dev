@@ -30,8 +30,11 @@ amount = intensity * min(dt, remaining_before) * 0.001
 ```
 
 This is the recovered `storedF32 * duration * 0.001` path in
-`source/game/server/simulation-tick.mjs`. `slow_multiplier` returns the minimum
-slow intensity (1.0 when unaffected); `integrate_movement` scales acceleration
+`source/game/server/simulation-tick.mjs`. `slow_multiplier` starts at `1.0` and
+multiplies every active slow effect's intensity, matching original608's
+`vtable+20` loop; it does not take the minimum. Behaviors that produce velocity
+(original608 player controls and the AI behavior path) apply that multiplier.
+`integrate_movement` (original654) does **not** scale acceleration or velocity
 by it. `heal_entity(world, target, amount)` refuses to heal while a heal-block
 effect is active.
 
@@ -44,7 +47,7 @@ effect is active.
 | 20 Dandelion | slot 4 | heal block 10000 ms |
 | 21 Cactus R3 | slot 4 | poison `20000/3` ms |
 | 21 Cactus R3 | slot 5 (incoming) | poison `4444.444444444444` ms |
-| 29/30 Web | slot 6 | slow 0.5 for 4000 ms |
+| 29/30 Web | slot 6 | slow 0.25 while the web area is attached |
 | 31 Honey | slot 4 | slow 0.5 for 4000 ms |
 | 34 Peas R4 | slot 4 | poison `16000/9` ms |
 
@@ -68,9 +71,10 @@ Special behaviors:
   component (`has_score_component`, epoch = tick+1, value 0), the tag component
   (`has_tag_component`, `entity_flags |= 8`), an effect area
   (`has_effect_area`, `world_flags |= 128`), packet epochs `tick+1`, and a
-  4000 ms lifetime. It owns a shared slow payload with radius 50, intensity
-  0.5 and duration 4000 ms, so contact with the tag applies the same slow as
-  the original `spawnWeb` area.
+  12000 ms lifetime. It owns a shared slow payload with radius 50, intensity
+  0.25 and infinite duration, so contact with the tag applies the same slow as
+  the original `spawnWeb` area. The area link removes the effect when the
+  target leaves; the effect itself has no timer expiry.
 
 Evidence: `source/game/server/petals.mjs` (666/680/688/692/738),
 `source/game/server/petals-special.mjs` (431/676/681/691/693/719/732/747),

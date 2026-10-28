@@ -5,6 +5,8 @@ export interface CheatApi {
   loadout(): readonly number[];
   setPetal(slot: number, type: number): Promise<void>;
   spawnMob(type: number, x: number, y: number): Promise<void>;
+  teleport(x: number, y: number): Promise<void>;
+  setSpeed(multiplier: number): void;
 }
 
 export function installCheatPanel(api: CheatApi): void {
@@ -55,15 +57,29 @@ export function installCheatPanel(api: CheatApi): void {
   const spawnRow = document.createElement('div');
   spawnRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:4px';
   const type = document.createElement('input'); type.type = 'number'; type.value = '1'; type.title = 'mob id';
-  const x = document.createElement('input'); x.type = 'number'; x.step = '1'; x.title = 'x';
-  const y = document.createElement('input'); y.type = 'number'; y.step = '1'; y.title = 'y';
+  const x = document.createElement('input'); x.type = 'number'; x.step = '1'; x.value = '0'; x.title = 'x';
+  const y = document.createElement('input'); y.type = 'number'; y.step = '1'; y.value = '0'; y.title = 'y';
   for (const input of [type, x, y]) input.style.cssText = 'width:100%;box-sizing:border-box;background:#222;color:#fff;border:1px solid #555';
   spawnRow.append(type, x, y); panel.append(spawnRow);
   const spawnButtons = document.createElement('div');
-  spawnButtons.style.cssText = 'display:flex;gap:4px';
+  spawnButtons.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
   const usePlayer = document.createElement('button'); usePlayer.textContent = 'Use player pos';
   const spawn = document.createElement('button'); spawn.textContent = 'Spawn mob';
-  spawnButtons.append(usePlayer, spawn); panel.append(spawnButtons);
+  const teleport = document.createElement('button'); teleport.textContent = 'Teleport';
+  teleport.title = 'Move your flower to the x/y above';
+  spawnButtons.append(usePlayer, spawn, teleport); panel.append(spawnButtons);
+
+  const speedRow = document.createElement('div');
+  speedRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:6px';
+  const speedLabel = document.createElement('label'); speedLabel.textContent = 'Server speed';
+  const speed = document.createElement('select');
+  for (const value of [1, 2, 4, 8]) {
+    const option = document.createElement('option');
+    option.value = String(value); option.textContent = `${value}x`;
+    speed.append(option);
+  }
+  speed.style.cssText = 'background:#222;color:#fff;border:1px solid #555';
+  speedLabel.append(speed); speedRow.append(speedLabel); panel.append(speedRow);
 
   const status = document.createElement('div');
   status.style.cssText = 'margin-top:6px;color:#c9c9c9;white-space:pre-wrap';
@@ -79,11 +95,12 @@ export function installCheatPanel(api: CheatApi): void {
         input.value = String(slots[index] ?? 0);
     });
     const position = api.coordinates();
-    if (position) {
-      coords.textContent = `x ${position.x.toFixed(1)}  y ${position.y.toFixed(1)}`;
-      if (document.activeElement !== x) x.value = String(Math.round(position.x));
-      if (document.activeElement !== y) y.value = String(Math.round(position.y));
-    } else coords.textContent = 'No controlled flower';
+    // Spawn/teleport coordinates are explicit: only "Use player pos" copies
+    // the live position. Periodically overwriting them would make every spawn
+    // land on the player and prevent preparing a destination before moving.
+    coords.textContent = position
+      ? `x ${position.x.toFixed(1)}  y ${position.y.toFixed(1)}`
+      : 'No controlled flower';
   };
   refresh();
   window.setInterval(refresh, 100);
@@ -108,7 +125,7 @@ export function installCheatPanel(api: CheatApi): void {
   });
   usePlayer.addEventListener('click', () => {
     const position = api.coordinates();
-    if (position) { x.value = String(Math.round(position.x)); y.value = String(Math.round(position.y)); }
+    if (position) { x.value = String(position.x); y.value = String(position.y); }
   });
   spawn.addEventListener('click', () => {
     void (async () => {
@@ -118,5 +135,19 @@ export function installCheatPanel(api: CheatApi): void {
         status.textContent = `Spawned mob ${type.value}`;
       } catch (error) { status.textContent = String(error); }
     })();
+  });
+  teleport.addEventListener('click', () => {
+    void (async () => {
+      const tx = Number(x.value) || 0, ty = Number(y.value) || 0;
+      status.textContent = 'Teleporting…';
+      try {
+        await api.teleport(tx, ty);
+        status.textContent = `Teleported to ${tx}, ${ty}`;
+      } catch (error) { status.textContent = String(error); }
+    })();
+  });
+  speed.addEventListener('change', () => {
+    api.setSpeed(Number(speed.value) || 1);
+    status.textContent = `Server speed ${speed.value}x`;
   });
 }

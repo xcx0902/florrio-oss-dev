@@ -107,6 +107,19 @@ self.onmessage = async event => {
       exports.sp_server_debug_set_loadout_slot(view[0], view[1] | (view[2] << 8));
       break;
     }
+    case 'sp_server_debug_set_player_position': {
+      if (!exports.sp_server_player_valid()) throw new Error('no controlled flower');
+      const view = new DataView(exports.memory.buffer, pointer, length);
+      const handle = exports.sp_server_player_handle();
+      if (!exports.sp_server_debug_set_entity_field(handle, 0, view.getFloat32(0, true))
+          || !exports.sp_server_debug_set_entity_field(handle, 1, view.getFloat32(4, true)))
+        throw new Error('teleport target rejected');
+      // A teleport should land exactly on the requested point, not keep the
+      // velocity accumulated before the jump.
+      exports.sp_server_debug_set_entity_field(handle, 2, 0);
+      exports.sp_server_debug_set_entity_field(handle, 3, 0);
+      break;
+    }
     default: throw new Error(`invalid worker function to call: ${funcName}`);
   }
   if (pointer) exports.free(pointer);

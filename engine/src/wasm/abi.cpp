@@ -498,8 +498,9 @@ extern "C" std::uint32_t sp_server_debug_linked_segments(void) {
   return engine::debug_linked_segments(api().world());
 }
 
-/** Controlled parity-fixture mutations. Unlike the read-only state dump these
- * are explicit debug calls, never used by the worker message protocol. */
+/** Controlled fixture mutations. Unlike the read-only state dump these are
+ * explicit debug calls; the worker shim uses the entity-field setter for the
+ * development teleport command and parity fixtures use the raw ABI. */
 extern "C" std::uint32_t sp_server_debug_set_entity_field(
     std::uint32_t handle, std::uint32_t field, double value) {
   engine::Entity* entity = api().world().entities().get(engine::EntityHandle{handle});

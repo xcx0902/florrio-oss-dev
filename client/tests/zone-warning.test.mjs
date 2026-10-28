@@ -67,12 +67,17 @@ test('warning radial indicator matches original func1099 and its actual func2636
   view.setFloat32(record + 4, layout.logicalWidth * 0.5, true);
   view.setFloat32(record + 8, layout.logicalHeight * 0.5 - 170, true);
   view.setUint32(record + 12, labels, true); view.setUint32(record + 16, 3, true);
+  // client.wat 320225-320237 builds the template with qword [0, 65.0];
+  // function691 copies that qword to record +24, so +28 is the 65px gutter.
+  view.setFloat32(record + 24, 0, true); view.setFloat32(record + 28, 65, true);
   view.setUint32(record + 56, 1, true); view.setUint32(record + 48, callback, true);
   view.setUint32(callback, 90324, true);
   for (let index = 0; index < 3; index++) {
     const label = labels + index * 152;
     bytes[label + 120] = 1;
-    view.setFloat32(label + 116, 0, true); // Same no-DOM measurement as the TS recorder.
+    // No DOM canvas here: both sides use the same zero text measurement, so
+    // the comparison isolates the command gutter and callback geometry.
+    view.setFloat32(label + 116, 0, true);
     view.setFloat32(label + 144, 0.12, true);
     view.setFloat32(label + 148, index === 0 ? 20 : 14, true);
   }
@@ -93,6 +98,20 @@ test('warning radial indicator matches original func1099 and its actual func2636
     arcs.forEach((arc, index) => arc.forEach((value, argument) =>
       assert.ok(Math.abs(value - nativeArcs[index][argument]) < 0.00005,
         `progress ${progress}, arc ${index}, argument ${argument}: ${value} != ${nativeArcs[index][argument]}`)));
+    const title = recorded.find(([op, text]) => op === 'fillText' && text === 'MOVE RIGHT ->');
+    assert.ok(title);
+    const boxWidth = (index) =>
+      Math.trunc(f(f(f(index === 0 ? 20 : 14) * 0.12) * 2)) * 2;
+    const widest = Math.max(boxWidth(0), boxWidth(1), boxWidth(2));
+    const arcLeft = f(arcs[0][0] - arcs[0][2]);
+    // drawLabelBox centers the text in its box, so recover the panel's left
+    // edge from the title's text x. Both the title and the widest subtitle must
+    // stay left of the 22px countdown arc; the 65px command gutter guarantees it.
+    const panelLeft = f(title[2] - boxWidth(0) * 0.5);
+    assert.ok(arcLeft - f(panelLeft + widest) >= 8 - 0.0001,
+      `progress ${progress}: widest label right ${panelLeft + widest} overlaps arc left ${arcLeft}`);
+    assert.ok(arcLeft - f(panelLeft + boxWidth(0)) >= 8 - 0.0001,
+      `progress ${progress}: title right ${panelLeft + boxWidth(0)} overlaps arc left ${arcLeft}`);
     assert.ok(recorded.some(([op, text]) => op === 'fillText' && text === 'MOVE RIGHT ->'));
     assert.ok(recorded.some(([op, text]) => op === 'fillText' && text === 'You will be unable to attack'));
     assert.ok(!recorded.some(([op, text]) => op === 'fillText' && /seconds/.test(String(text))));

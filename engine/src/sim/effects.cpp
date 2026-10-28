@@ -222,7 +222,9 @@ f32 slow_multiplier(const Entity& entity) {
   f32 multiplier(1.0F);
   for (const auto& effect : entity.effects) {
     if (!effect.active || effect.type != EffectType::kSlow) continue;
-    if (effect.intensity.value < multiplier.value) multiplier = effect.intensity;
+    // Original608 multiplies every effect's vtable+20 return value into one
+    // float32, starting at 1.0; it does not take the minimum.
+    multiplier = f32(multiplier.value * effect.intensity.value);
   }
   return multiplier;
 }

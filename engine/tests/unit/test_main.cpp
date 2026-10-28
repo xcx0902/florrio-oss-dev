@@ -3243,6 +3243,8 @@ void test_status_effects_and_slow() {
   const engine::EntityHandle player = engine::spawn_player_default(world, "p", engine::make_default_profile());
   const engine::EntityHandle mob = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 4,
     engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
+  const engine::EntityHandle mob2 = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 4,
+    engine::Vec2(engine::f32(200.0F), engine::f32(0.0F)));
   engine::Entity* player_entity = world.entities().get(player);
   CHECK(player_entity != nullptr);
   CHECK(engine::apply_effect(world, player, engine::EffectType::kPoison, engine::f32(10.0F), 1000.0, mob));
@@ -3258,11 +3260,57 @@ void test_status_effects_and_slow() {
   CHECK(engine::heal_entity(world, player, engine::f32(10.0F)).value == suppressed.value);
   CHECK(engine::apply_effect(world, player, engine::EffectType::kSlow, engine::f32(0.5F), 1000.0, mob));
   CHECK(std::fabs(engine::slow_multiplier(*player_entity).value - 0.5F) < 1e-6F);
+  CHECK(engine::apply_effect(world, player, engine::EffectType::kSlow, engine::f32(0.5F), 1000.0, mob2));
+  // Original608 multiplies active slow effects (0.5 * 0.5), not min().
+  CHECK(std::fabs(engine::slow_multiplier(*player_entity).value - 0.25F) < 1e-6F);
   CHECK((engine::effect_flags(*player_entity) & 6U) == 6U);
   (void)engine::update_effects(world, 2000.0);
   CHECK(!engine::has_effect(*player_entity, engine::EffectType::kPoison));
   CHECK(!engine::has_effect(*player_entity, engine::EffectType::kSlow));
   CHECK(!engine::blocks_healing(*player_entity));
+}
+
+void test_slow_scales_player_control_impulse() {
+  engine::World world;
+  world.initialize();
+  const engine::EntityHandle player = engine::spawn_player_default(world, "p", engine::make_default_profile());
+  const engine::EntityHandle source = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 4,
+    engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
+  engine::Entity* entity = world.entities().get(player);
+  CHECK(entity != nullptr);
+  world.apply_input(0, engine::f32(0.0F), engine::f32(100.0F));
+  engine::apply_player_controls(world, 50.0);
+  const double full = entity->velocity.x;
+  CHECK(full > 0.0);
+  entity->velocity.x = 0.0;
+  entity->velocity.y = 0.0;
+  CHECK(engine::apply_effect(world, player, engine::EffectType::kSlow, engine::f32(0.25F), 1000.0, source));
+  engine::apply_player_controls(world, 50.0);
+  CHECK(std::fabs(entity->velocity.x / full - 0.25) < 1e-7);
+  entity->velocity.x = 0.0;
+  engine::apply_player_controls(world, 50.0);
+  CHECK(std::fabs(entity->velocity.x / full - 0.25) < 1e-7);
+}
+
+void test_slow_does_not_scale_integrate_movement() {
+  engine::World world;
+  world.initialize();
+  const engine::EntityHandle mob = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 4,
+    engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+  const engine::EntityHandle source = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 4,
+    engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
+  engine::Entity* entity = world.entities().get(mob);
+  CHECK(entity != nullptr);
+  entity->acceleration.x = 0.01;
+  engine::integrate_movement(world, 50.0);
+  const engine::f32 unslowed = entity->position.x;
+  entity->position.x = engine::f32(0.0F);
+  entity->velocity.x = 0.0;
+  CHECK(engine::apply_effect(world, mob, engine::EffectType::kSlow, engine::f32(0.25F), 1000.0, source));
+  engine::integrate_movement(world, 50.0);
+  // Original654 never multiplies acceleration by the effect multiplier; slow
+  // is applied by the behavior that produces velocity (e.g. original608).
+  CHECK(entity->position.x.value == unslowed.value);
 }
 
 void test_attribution_and_legendary() {
@@ -3418,7 +3466,9 @@ void test_petal_special_effects() {
       web_tag = true;
   CHECK(web_tag);
   (void)world.update_area_effects();
-  CHECK(engine::slow_multiplier(*mob_entity).value == 0.25F);
+  // Honey (0.5) and the web area (0.25) are both active; original608
+  // multiplies the effect multipliers, so the combined value is 0.125.
+  CHECK(engine::slow_multiplier(*mob_entity).value == 0.125F);
 
   const engine::EntityHandle cactus = engine::spawn_petal(world, 21, engine::Vec2{},
     engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
@@ -5087,6 +5137,10 @@ void test_web_tag_domain_side_effects() {
   const engine::EntityHandle player = engine::spawn_player_default(world, "p",
     engine::make_default_profile(), false);
   CHECK(player.valid());
+  // spawn_player_default uses a random garden point; pin it next to the web tag
+  // so this test exercises the player-inside-area branch deterministically.
+  world.entities().get(player)->set_position_x(engine::f32(0.0F));
+  world.entities().get(player)->set_position_y(engine::f32(0.0F));
   const engine::EntityHandle target = engine::spawn_entity_from_defaults(
     world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(40.0F), engine::f32(0.0F)));
   CHECK(target.valid());
@@ -5126,6 +5180,9 @@ void test_web_tag_domain_side_effects() {
   CHECK(tag_entity->packet_epoch_a != 0U);
   (void)world.update_area_effects();
   CHECK(engine::slow_multiplier(*world.entities().get(target)).value == 0.25F);
+  // The player is inside the tag's 50-unit square too; the area pass must slow
+  // the player as well, which is the reported "including yourself" case.
+  CHECK(engine::slow_multiplier(*world.entities().get(player)).value == 0.25F);
   const auto& areas = world.area_effects();
   bool found = false;
   for (const auto& area : areas) {
@@ -5510,6 +5567,8 @@ int main(int argc, char** argv) {
   runTest("test_ai_target_selection", test_ai_target_selection);
   runTest("test_collision_layer_filter", test_collision_layer_filter);
   runTest("test_status_effects_and_slow", test_status_effects_and_slow);
+  runTest("test_slow_scales_player_control_impulse", test_slow_scales_player_control_impulse);
+  runTest("test_slow_does_not_scale_integrate_movement", test_slow_does_not_scale_integrate_movement);
   runTest("test_attribution_and_legendary", test_attribution_and_legendary);
   runTest("test_loadout_restore_and_backpack", test_loadout_restore_and_backpack);
   runTest("test_petal_special_effects", test_petal_special_effects);

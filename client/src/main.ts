@@ -285,6 +285,9 @@ function continueToMenu(): void {
 }
 
 let ticking = false;
+// Development speed control: each real 50ms interval still sends one input
+// packet, but advances this many fixed 50ms engine ticks.
+let serverSpeed = 1;
 async function tickServer(): Promise<void> {
   if (frozen || ticking) return;
   ticking = true;
@@ -326,11 +329,13 @@ async function tickServer(): Promise<void> {
         | (pointer.buttons.right || keyboard.isDown('ShiftLeft') || keyboard.isDown('ShiftRight') ? 2 : 0));
       await server.send(inputEncoder.input(buttons, angle, strength));
     }
-    await server.think();
-    completedServerTicks += 1;
-    await server.requestStream('sp_server_flush', undefined, packet => {
-      if (!applyPacket(packet, performance.now())) throw new Error('invalid server snapshot');
-    });
+    for (let step = 0; step < serverSpeed; step++) {
+      await server.think();
+      completedServerTicks += 1;
+      await server.requestStream('sp_server_flush', undefined, packet => {
+        if (!applyPacket(packet, performance.now())) throw new Error('invalid server snapshot');
+      });
+    }
     if (started && localPlayer() !== null) {
       if (pendingSpawn !== undefined) {
         nextSpawnTick = (spawnSentTick ?? completedServerTicks) + 50;
@@ -373,6 +378,16 @@ function installDevelopmentCheats(): void {
       const view = new DataView(bytes.buffer);
       view.setUint16(0, type, true); view.setFloat32(2, x, true); view.setFloat32(6, y, true);
       await server.request('sp_server_debug_spawn_mob', bytes);
+    },
+    teleport: async (x, y) => {
+      await ensureServer();
+      const bytes = new Uint8Array(8);
+      const view = new DataView(bytes.buffer);
+      view.setFloat32(0, x, true); view.setFloat32(4, y, true);
+      await server.request('sp_server_debug_set_player_position', bytes);
+    },
+    setSpeed: multiplier => {
+      serverSpeed = Math.max(1, Math.min(8, Math.trunc(multiplier) || 1));
     },
   }));
 }

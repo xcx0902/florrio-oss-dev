@@ -75,17 +75,19 @@ those fields once per tick. `apply_player_controls` (called from `tick`) applies
 one impulse per simulation tick:
 
 ```
-acceleration = f32(dt * f32(modifier * 2.5) * 0.001)
-if strength < 200: acceleration = f32(acceleration * f32(strength * 0.005))
-else:              acceleration = f32(acceleration * pow_f64(f32(strength * 0.005), 1.4))
-vx += f32(cos(direction) * acceleration)
-vy += f32(sin(direction) * acceleration)
+modifier = slow_multiplier(player)  # original608: 1.0 * every effect vtable+20
+impulse = f32(dt * f32(modifier * 2.5) * 0.001)
+if strength < 200: impulse = f32(impulse * f32(strength * 0.005))
+vx += f32(cos(direction) * impulse)
+vy += f32(sin(direction) * impulse)
 ```
 
-`PlayerConfig.movement_speed` is the explicit `modifier` (0 means 1). The
-direction is the original wrapped input angle (`fmod(angle, TAU)`), not a
-reconstructed 256-step angle. Every accepted packet overwrites the stored
-strength; there is no first-packet latch.
+`modifier` starts at 1.0 and is multiplied by every active slow effect's
+`vtable+20` intensity (original608). `PlayerConfig.movement_speed` is kept in
+the player record but is not read by `apply_player_controls`. The direction is
+the original wrapped input angle (`fmod(angle, TAU)`), not a reconstructed
+256-step angle. Every accepted packet overwrites the stored strength; there is
+no first-packet latch.
 
 `integrate_movement` follows original `integrateMovement`: positions advance by
 `drag * velocity + dt * acceleration` where `drag = 124.99999999999989 *

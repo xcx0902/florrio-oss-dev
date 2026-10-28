@@ -1,6 +1,5 @@
 #include "engine/sim/movement.hpp"
 #include "engine/sim/bounds.hpp"
-#include "engine/sim/effects.hpp"
 #include <cmath>
 
 namespace engine {
@@ -43,7 +42,6 @@ void integrate_movement(World& world, double delta_milliseconds) {
       entity.angle = f32::from_double(wrap_angle(static_cast<double>(entity.angle.value)
                                                  + static_cast<double>(angular_step.value)));
     }
-    const double slow = static_cast<double>(slow_multiplier(entity).value);
     const double vx = entity.velocity.x;
     const double vy = entity.velocity.y;
     // Acceleration is the original +56/+64 additive impulse: it enters the
@@ -51,8 +49,10 @@ void integrate_movement(World& world, double delta_milliseconds) {
     // velocity. Original 654 writes:
     //   position += drag * velocity + dt * acceleration
     //   velocity  = damping * velocity
-    const double ax = entity.acceleration.x * slow;
-    const double ay = entity.acceleration.y * slow;
+    // Slow effects act where a behavior produces velocity (player controls
+    // and AI), never inside integrateMovement.
+    const double ax = entity.acceleration.x;
+    const double ay = entity.acceleration.y;
     // Original 654 evaluates (drag * velocity + dt * acceleration) first and
     // adds the local position last; the grouping is observable at f32 ULP
     // level for positions in the tens of thousands.

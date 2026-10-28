@@ -737,7 +737,10 @@ function drawZoneWarning(context: HudContext, state: HudState, layout: HudLayout
   ];
   const widths = lines.map(({ text, font }) => f(f(measureLabel(text, font))
     + Math.trunc(f(f(font * 0.12) * 2)) * 2));
-  const width = Math.max(...widths);
+  // The warning command template writes 65.0 at +4; function691 carries that
+  // qword into record+24/+28, so function1099 adds 65 to the widest label.
+  // The extra gutter keeps the countdown arc clear of the text.
+  const width = f(Math.max(...widths) + 65);
   const height = lines.reduce((sum, { font }) => f(sum + f(font * f(1.1))), 0);
   const left = f(layout.logicalWidth * 0.5 - f(width * 0.5));
   const top = f(f(layout.logicalHeight * 0.5 - 170) + f(height * 0.5));

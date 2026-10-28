@@ -10,7 +10,8 @@ export type ServerFunction =
   | 'sp_server_think'
   | 'sp_server_flush'
   | 'sp_server_debug_spawn_mob'
-  | 'sp_server_debug_set_loadout_slot';
+  | 'sp_server_debug_set_loadout_slot'
+  | 'sp_server_debug_set_player_position';
 
 export interface WorkerRequest {
   readonly funcName: ServerFunction;

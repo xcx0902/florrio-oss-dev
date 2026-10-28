@@ -106,10 +106,13 @@ void apply_player_controls(World& world, double delta_milliseconds) {
   if (!(delta_milliseconds > 0.0)) return;
   const PlayerInput& input = world.input();
   const double strength = static_cast<double>(input.strength.value);
-  // acceleration = f32(dt * f32(1.0 * 2.5) * 0.001); behavior modifiers are
-  // 1.0 for the shipped player. The strength scale is skipped at >= 200.
+  // Original608 seeds its multiplier with 1.0, then multiplies the vtable+20
+  // value of every active effect on the player before scaling dt and 0.001.
+  // Web/honey therefore reduce the control impulse itself, not acceleration.
+  const f32 effect_scale = slow_multiplier(*player);
+  const f32 behavior_scale = f32(effect_scale.value * 2.5F);
   const double base = static_cast<double>(f32::from_double(
-    delta_milliseconds * 2.5 * 0.001).value);
+    delta_milliseconds * static_cast<double>(behavior_scale.value) * 0.001).value);
   const f32 impulse = strength < 200.0
     ? f32::from_double(base * static_cast<double>(
         f32::from_double(strength * 0.004999999888241291).value))

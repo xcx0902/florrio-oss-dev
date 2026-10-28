@@ -33,9 +33,10 @@ can read `World::phase_trace()` and assert the exact order:
 9. `petal-phase` — advance the equipped-petal ring phase (loadout +284);
 10. `loadout-petals` — slot recharge, pending timers, missing instance respawn;
 11. `petal-orbits` — input-driven radius, orbit acceleration, Rose heal;
-12. `player-controls` — input-derived acceleration/angle, then
+12. `player-controls` — input-derived velocity impulse and angle, then
 13. `movement` — `dt * acceleration`, `125 * (1 - 0.992^dt)` move,
-    `0.992^dt` damping, slow scaling, arena clamp and bounds invalidation;
+    `0.992^dt` damping, arena clamp and bounds invalidation. Slow multipliers
+    are applied by velocity-producing behaviors, not here;
 14. `drops` — pickup radius, active-slot equip, backpack overflow;
 15. `broadphase`;
 16. `contacts` — layer gate, separation, bilateral contact damage, petal
