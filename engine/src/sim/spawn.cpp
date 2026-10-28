@@ -32,6 +32,7 @@ void set_owner(World& world, EntityHandle child, EntityHandle parent) {
   Entity* entity = world.entities().get(child);
   if (entity == nullptr) return;
   entity->owner = parent.raw;
+  entity->entity_flags |= 64U;
   entity->ai.owner = parent;
   attach_child(world, parent, child);
 }

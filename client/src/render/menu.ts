@@ -16,7 +16,6 @@ import { drawPetalTooltipAt } from './tooltip.js';
 
 const f = Math.fround;
 
-type PathOp = readonly [string, ...number[]];
 export interface MenuPreviewFrame {
   readonly width: number;
   readonly height: number;
@@ -30,149 +29,6 @@ export interface MenuPreviewFrame {
 export type MenuPreviewPass = (context: Canvas2DContext, frame: MenuPreviewFrame) => void | boolean;
 
 let animation: MenuAnimation | undefined;
-
-/** Discord's two eyes, filled before the bubble. */
-const DISCORD_EYES: readonly PathOp[] = [
-  ['moveTo', 104.4, 103.9],
-  ['bezierCurveTo', 98.7, 103.9, 94.2, 108.9, 94.2, 115],
-  ['bezierCurveTo', 94.2, 121.1, 98.8, 126.1, 104.4, 126.1],
-  ['bezierCurveTo', 110.1, 126.1, 114.6, 121.1, 114.6, 115],
-  ['bezierCurveTo', 114.7, 108.9, 110.1, 103.9, 104.4, 103.9],
-  ['closePath'],
-  ['moveTo', 140.9, 103.9],
-  ['bezierCurveTo', 135.2, 103.9, 130.7, 108.9, 130.7, 115],
-  ['bezierCurveTo', 130.7, 121.1, 135.3, 126.1, 140.9, 126.1],
-  ['bezierCurveTo', 146.6, 126.1, 151.1, 121.1, 151.1, 115],
-  ['bezierCurveTo', 151.1, 108.9, 146.6, 103.9, 140.9, 103.9],
-  ['closePath'],
-];
-
-/** Discord's speech bubble with the face cut out by the inner contour. */
-const DISCORD_BUBBLE: readonly PathOp[] = [
-  ['moveTo', 189.5, 20],
-  ['lineTo', 55.5, 20],
-  ['bezierCurveTo', 44.2, 20, 35, 29.2, 35, 40.6],
-  ['lineTo', 35, 175.8],
-  ['bezierCurveTo', 35, 187.2, 44.2, 196.4, 55.5, 196.4],
-  ['lineTo', 168.9, 196.4],
-  ['lineTo', 163.6, 177.9],
-  ['lineTo', 176.4, 189.8],
-  ['lineTo', 188.5, 201],
-  ['lineTo', 210, 220],
-  ['lineTo', 210, 40.6],
-  ['bezierCurveTo', 210, 29.2, 200.8, 20, 189.5, 20],
-  ['closePath'],
-  ['moveTo', 150.9, 150.6],
-  ['bezierCurveTo', 150.9, 150.6, 147.3, 146.3, 144.3, 142.5],
-  ['bezierCurveTo', 157.4, 138.8, 162.4, 130.6, 162.4, 130.6],
-  ['bezierCurveTo', 158.3, 133.3, 154.4, 135.2, 150.9, 136.5],
-  ['bezierCurveTo', 145.9, 138.6, 141.1, 140, 136.4, 140.8],
-  ['bezierCurveTo', 126.8, 142.6, 118, 142.1, 110.5, 140.7],
-  ['bezierCurveTo', 104.8, 139.6, 99.9, 138, 95.8, 136.4],
-  ['bezierCurveTo', 93.5, 135.5, 91, 134.4, 88.5, 133],
-  ['bezierCurveTo', 88.2, 132.8, 87.9, 132.7, 87.6, 132.5],
-  ['bezierCurveTo', 87.4, 132.4, 87.3, 132.3, 87.2, 132.2],
-  ['bezierCurveTo', 85.4, 131.2, 84.4, 130.5, 84.4, 130.5],
-  ['bezierCurveTo', 84.4, 130.5, 89.2, 138.5, 101.9, 142.3],
-  ['bezierCurveTo', 98.9, 146.1, 95.2, 150.6, 95.2, 150.6],
-  ['bezierCurveTo', 73.1, 149.9, 64.7, 135.4, 64.7, 135.4],
-  ['bezierCurveTo', 64.7, 103.2, 79.1, 77.1, 79.1, 77.1],
-  ['bezierCurveTo', 93.5, 66.3, 107.2, 66.6, 107.2, 66.6],
-  ['lineTo', 108.2, 67.8],
-  ['bezierCurveTo', 90.2, 73, 81.9, 80.9, 81.9, 80.9],
-  ['bezierCurveTo', 81.9, 80.9, 84.1, 79.7, 87.8, 78],
-  ['bezierCurveTo', 98.5, 73.3, 107, 72, 110.5, 71.7],
-  ['bezierCurveTo', 111.1, 71.6, 111.6, 71.5, 112.2, 71.5],
-  ['bezierCurveTo', 118.3, 70.7, 125.2, 70.5, 132.4, 71.3],
-  ['bezierCurveTo', 141.9, 72.4, 152.1, 75.2, 162.5, 80.9],
-  ['bezierCurveTo', 162.5, 80.9, 154.6, 73.4, 137.6, 68.2],
-  ['lineTo', 139, 66.6],
-  ['bezierCurveTo', 139, 66.6, 152.7, 66.3, 167.1, 77.1],
-  ['bezierCurveTo', 167.1, 77.1, 181.5, 103.2, 181.5, 135.4],
-  ['bezierCurveTo', 181.5, 135.4, 173, 149.9, 150.9, 150.6],
-  ['closePath'],
-];
-
-/** Reddit's alien glyph (24 x 22). */
-const REDDIT_ALIEN: readonly PathOp[] = [
-  ['moveTo', 24, 11.779],
-  ['bezierCurveTo', 24, 10.32, 22.808, 9.134, 21.343, 9.134],
-  ['bezierCurveTo', 20.628, 9.134, 19.98, 9.42, 19.503, 9.88],
-  ['bezierCurveTo', 17.693, 8.689, 15.244, 7.931, 12.532, 7.834],
-  ['lineTo', 14.015, 3.165],
-  ['lineTo', 18.031, 4.106],
-  ['lineTo', 18.025, 4.164],
-  ['bezierCurveTo', 18.025, 5.357, 19, 6.327, 20.199, 6.327],
-  ['bezierCurveTo', 21.397, 6.327, 22.371, 5.357, 22.371, 4.164],
-  ['bezierCurveTo', 22.371, 2.971, 21.396, 2, 20.199, 2],
-  ['bezierCurveTo', 19.279, 2, 18.495, 2.574, 18.178, 3.379],
-  ['lineTo', 13.849, 2.364],
-  ['bezierCurveTo', 13.66, 2.318, 13.468, 2.427, 13.409, 2.613],
-  ['lineTo', 11.755, 7.82],
-  ['bezierCurveTo', 8.917, 7.854, 6.346, 8.618, 4.455, 9.845],
-  ['bezierCurveTo', 3.981, 9.407, 3.352, 9.133, 2.656, 9.133],
-  ['bezierCurveTo', 1.191, 9.133, 0, 10.32, 0, 11.779],
-  ['bezierCurveTo', 0, 12.749, 0.533, 13.59, 1.317, 14.05],
-  ['bezierCurveTo', 1.265, 14.332, 1.231, 14.617, 1.231, 14.907],
-  ['bezierCurveTo', 1.231, 18.818, 6.039, 22, 11.95, 22],
-  ['bezierCurveTo', 17.861, 22, 22.67, 18.818, 22.67, 14.907],
-  ['bezierCurveTo', 22.67, 14.633, 22.641, 14.363, 22.595, 14.097],
-  ['bezierCurveTo', 23.427, 13.65, 24, 12.785, 24, 11.779],
-  ['closePath'],
-  ['moveTo', 6.776, 13.595],
-  ['bezierCurveTo', 6.776, 12.727, 7.486, 12.02, 8.358, 12.02],
-  ['bezierCurveTo', 9.23, 12.02, 9.939, 12.727, 9.939, 13.595],
-  ['bezierCurveTo', 9.939, 14.463, 9.23, 15.169, 8.358, 15.169],
-  ['bezierCurveTo', 7.486, 15.169, 6.776, 14.463, 6.776, 13.595],
-  ['closePath'],
-  ['moveTo', 15.837, 18.264],
-  ['bezierCurveTo', 15.04, 19.057, 13.789, 19.443, 12.013, 19.443],
-  ['lineTo', 12, 19.44],
-  ['lineTo', 11.987, 19.443],
-  ['bezierCurveTo', 10.21, 19.443, 8.959, 19.057, 8.163, 18.264],
-  ['bezierCurveTo', 8.018, 18.12, 8.018, 17.885, 8.163, 17.741],
-  ['bezierCurveTo', 8.308, 17.596, 8.544, 17.596, 8.689, 17.741],
-  ['bezierCurveTo', 9.339, 18.388, 10.418, 18.702, 11.987, 18.702],
-  ['lineTo', 12, 18.705],
-  ['lineTo', 12.013, 18.702],
-  ['bezierCurveTo', 13.582, 18.702, 14.661, 18.387, 15.311, 17.74],
-  ['bezierCurveTo', 15.456, 17.595, 15.692, 17.596, 15.837, 17.74],
-  ['bezierCurveTo', 15.982, 17.885, 15.982, 18.119, 15.837, 18.264],
-  ['closePath'],
-  ['moveTo', 15.648, 15.169],
-  ['bezierCurveTo', 14.776, 15.169, 14.067, 14.463, 14.067, 13.595],
-  ['bezierCurveTo', 14.067, 12.727, 14.776, 12.02, 15.648, 12.02],
-  ['bezierCurveTo', 16.52, 12.02, 17.229, 12.727, 17.229, 13.595],
-  ['bezierCurveTo', 17.229, 14.463, 16.52, 15.169, 15.648, 15.169],
-  ['closePath'],
-];
-
-function replayPath(context: Pick<Canvas2DContext, 'moveTo' | 'lineTo' | 'quadraticCurveTo' | 'bezierCurveTo' | 'closePath'>,
-                    ops: readonly PathOp[]): void {
-  for (const op of ops) {
-    const name = op[0];
-    if (name === 'moveTo') context.moveTo(op[1], op[2]);
-    else if (name === 'lineTo') context.lineTo(op[1], op[2]);
-    else if (name === 'quadraticCurveTo') context.quadraticCurveTo(op[1], op[2], op[3], op[4]);
-    else if (name === 'bezierCurveTo') context.bezierCurveTo(op[1], op[2], op[3], op[4], op[5], op[6]);
-    else if (name === 'closePath') context.closePath();
-  }
-}
-
-/** Rounded 80x80 social button path centred on the current transform origin. */
-function roundedButton(context: Canvas2DContext): void {
-  context.beginPath();
-  context.moveTo(-35, -40);
-  context.lineTo(35, -40);
-  context.quadraticCurveTo(40, -40, 40, -35);
-  context.lineTo(40, 35);
-  context.quadraticCurveTo(40, 40, 35, 40);
-  context.lineTo(-35, 40);
-  context.quadraticCurveTo(-40, 40, -40, 35);
-  context.lineTo(-40, -35);
-  context.quadraticCurveTo(-40, -40, -35, -40);
-  context.closePath();
-}
 
 /** Rounded UI tab with a 5-unit corner radius. */
 function tabPath(context: Canvas2DContext, left: number, right: number, top: number, bottom: number): void {
@@ -199,18 +55,6 @@ function previewContext(): Canvas2DContext | undefined {
   preview = { context: wrapContext(native) };
   return preview.context;
 }
-let discordEyes: Path2D | undefined, discordBubble: Path2D | undefined;
-function filledPath(context: Canvas2DContext, ops: readonly PathOp[], existing?: Path2D): Path2D | undefined {
-  if (typeof Path2D !== 'undefined') {
-    const path = existing ?? new Path2D();
-    if (!existing) replayPath(path, ops);
-    context.fill(path);
-    return path;
-  }
-  context.beginPath(); replayPath(context, ops); context.fill();
-  return undefined;
-}
-
 /** Original clientFrame's menu branch. The world callback owns the native
  * world pass, including its composite and balanced saves. It receives the
  * cleared 1x1 renderer; viewport dimensions remain those of the main canvas.
@@ -304,25 +148,6 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
   }
   label('florr.io', 80, centerX, Math.trunc(h / 4));
 
-  for (const discord of [true, false]) {
-    context.save(); context.setLineJoin('round'); context.setLineWidth(5);
-    context.setTransform(f(ui * 0.5), 0, 0, f(ui * 0.5), f(ui * (w - (discord ? 40 : 90))), f(ui * 40));
-    roundedButton(context);
-    context.setFillRgb(...(discord ? [114, 137, 218] : [255, 69, 0]) as [number, number, number]); context.fill();
-    context.setStrokeRgb(...(discord ? [92, 111, 177] : [207, 56, 0]) as [number, number, number]); context.stroke();
-    context.setFillRgb(255, 255, 255); context.save();
-    if (discord) {
-      context.setTransform(f(ui * 0.125), 0, 0, f(ui * 0.125),
-        f(f(ui * (w - 40)) + f(f(ui * 0.5) * -30.625)), f(f(ui * 40) + f(f(ui * 0.5) * -30)));
-      discordEyes = filledPath(context, DISCORD_EYES, discordEyes);
-      discordBubble = filledPath(context, DISCORD_BUBBLE, discordBubble);
-    } else {
-      context.setTransform(ui, 0, 0, ui,
-        f(f(ui * (w - 90)) + f(f(ui * 0.5) * -25)), f(f(ui * 40) + f(f(ui * 0.5) * -25)));
-      filledPath(context, REDDIT_ALIEN);
-    }
-    context.restore(); context.restore();
-  }
   // Connecting warning remains a submitted bitmap even at zero opacity.
   base(); context.save(); context.setGlobalAlpha(0);
   label('Connecting...', 48, f(w * 0.5), -200); context.restore();

@@ -27,6 +27,7 @@
 #include "engine/sim/collision_filter.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/sim/loot.hpp"
+#include "engine/sim/movement.hpp"
 #include "engine/sim/progression.hpp"
 #include "engine/sim/damage.hpp"
 #include "engine/sim/effects.hpp"
@@ -5021,6 +5022,33 @@ void test_centipede_exact_chain_and_rare() {
     ++chain;
   }
   CHECK(chain == 10U);
+
+  // Native 404/424: removing a segment publishes its own owner (or none) to
+  // every child before the AI record disappears. The next segment becomes the
+  // chain root instead of keeping a predecessor that no longer exists.
+  const engine::EntityHandle first_segment = head_entity->children.front();
+  const engine::EntityHandle second_segment =
+    world.entities().get(first_segment)->children.front();
+  CHECK(world.destroy(head));
+  CHECK(world.entities().get(head) == nullptr);
+  const engine::Entity* root_segment = world.entities().get(first_segment);
+  CHECK(root_segment != nullptr);
+  CHECK(!root_segment->ai.predecessor.valid());
+  CHECK(!root_segment->ai.owner.valid());
+  CHECK(root_segment->owner == engine::kInvalidEntity);
+  CHECK(engine::debug_linked_roots(world) == 1U);
+  CHECK(engine::debug_linked_segments(world) == 8U);
+  const engine::Entity* tail = world.entities().get(second_segment);
+  CHECK(tail != nullptr);
+  CHECK(tail->ai.predecessor == first_segment);
+  CHECK(tail->ai.owner == first_segment);
+  const engine::EntityHandle third_segment = tail->children.front();
+  CHECK(world.destroy(second_segment));
+  const engine::Entity* third = world.entities().get(third_segment);
+  CHECK(third != nullptr);
+  CHECK(third->ai.predecessor == first_segment);
+  CHECK(third->ai.owner == first_segment);
+  CHECK(third->owner == first_segment.raw);
 
   // Find a seed whose first draw makes the rare (< 1%) roll true.
   std::uint32_t rare_seed = 0;

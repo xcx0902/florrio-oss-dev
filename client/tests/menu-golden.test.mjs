@@ -104,6 +104,11 @@ test('boot menu strictly matches all three complete native frames including invi
   assert.equal(capture.frames.length, 3); assert.equal(capture.calls.length, 3);
   for (let index = 0; index < 3; index++) {
     const frame = capture.frames[index], expected = golden.frames[index];
-    compare(operations(frame.ops, frame), operations(expected.ops, golden), `frame ${expected.time}`);
+    // Deliberate UI deviation: the top-right Discord/Reddit buttons were
+    // removed from the legacy rebuild. The frozen native frame keeps them at
+    // ops 418..468; filtering that exact button pass leaves the rest of the
+    // strict menu trace (including its input and warning passes) unchanged.
+    const nativeOps = expected.ops.filter((_, opIndex) => opIndex < 418 || opIndex > 468);
+    compare(operations(frame.ops, frame), operations(nativeOps, golden), `frame ${expected.time}`);
   }
 });

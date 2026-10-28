@@ -95,14 +95,17 @@ test('storage hover uses authoritative storage contents and wraps inside viewpor
     assert.equal(result.texts[0], 'Square');
     assert.equal(result.texts[1], 'Unique');
     assert.equal(result.texts.slice(2).join(' '), PETAL_INFO[5].description);
+    const layout = getHudLayout(width, height, 1, false);
     const coordinates = result.tooltip.filter(([op]) => ['moveTo', 'lineTo', 'quadraticCurveTo'].includes(op)).flatMap(([, args]) => args);
     for (let index = 0; index < coordinates.length; index += 2) {
-      assert.ok(coordinates[index] >= 8 && coordinates[index] <= width - 8, `x=${coordinates[index]}`);
-      assert.ok(coordinates[index + 1] >= 8 && coordinates[index + 1] <= height - 8, `y=${coordinates[index + 1]}`);
+      assert.ok(coordinates[index] >= 8 && coordinates[index] <= layout.logicalWidth - 8, `x=${coordinates[index]}`);
+      assert.ok(coordinates[index + 1] >= 8 && coordinates[index + 1] <= layout.logicalHeight - 8, `y=${coordinates[index + 1]}`);
     }
-    // The source renderer flushes its logical matrix on the first path point.
+    // func1099 works in logical units under the UI matrix; the logical matrix
+    // is the CSS pixel ratio multiplied once by the HUD scale.
     const transform = result.tooltip.find(([op]) => op === 'setTransform')[1];
-    assert.deepEqual(transform, [pixelRatio, 0, 0, pixelRatio, 0, 0]);
+    const matrix = Math.fround(pixelRatio * layout.scale);
+    assert.deepEqual(transform, [matrix, 0, 0, matrix, 0, 0]);
   }
 });
 

@@ -1,3 +1,5 @@
+import { MOB_INFO, PETAL_INFO } from '../schema/petals.js';
+
 /** Development-only cheat panel. main.ts loads this module only when the page
  * is opened with ?cheat=1, so normal players never see or touch it. */
 export interface CheatApi {
@@ -6,7 +8,6 @@ export interface CheatApi {
   setPetal(slot: number, type: number): Promise<void>;
   spawnMob(type: number, x: number, y: number): Promise<void>;
   teleport(x: number, y: number): Promise<void>;
-  setSpeed(multiplier: number): void;
 }
 
 export function installCheatPanel(api: CheatApi): void {
@@ -27,6 +28,28 @@ export function installCheatPanel(api: CheatApi): void {
   title.textContent = 'CHEAT TOOLS (dev only)';
   title.style.cssText = 'font-weight:bold;color:#ffd84d;margin-bottom:6px';
   panel.append(title);
+
+  // Read-only lookup tables keep the numeric ids usable without leaving the
+  // page. The two scroll areas share the fixed panel height.
+  const tables = document.createElement('div');
+  tables.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px';
+  const makeTable = (heading: string, rows: readonly string[]): void => {
+    const column = document.createElement('div');
+    const label = document.createElement('div');
+    label.textContent = heading;
+    label.style.cssText = 'font-weight:bold;color:#ffd84d;margin-bottom:2px';
+    const body = document.createElement('div');
+    body.style.cssText = 'max-height:150px;overflow:auto;border:1px solid #555;background:#111;padding:2px 3px;white-space:pre';
+    body.textContent = rows.join('\n');
+    column.append(label, body); tables.append(column);
+  };
+  const petalRows = Object.entries(PETAL_INFO)
+    .map(([id, info]) => `${id.padStart(2, ' ')}  ${info.name}`).join('\n');
+  const mobRows = Object.entries(MOB_INFO)
+    .map(([id, info]) => `${id.padStart(2, ' ')}  ${info.name}`).join('\n');
+  makeTable('petal id => name', petalRows.split('\n'));
+  makeTable('mob id => name', mobRows.split('\n'));
+  panel.append(tables);
 
   const loadout = document.createElement('div');
   loadout.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:6px';
@@ -68,18 +91,6 @@ export function installCheatPanel(api: CheatApi): void {
   const teleport = document.createElement('button'); teleport.textContent = 'Teleport';
   teleport.title = 'Move your flower to the x/y above';
   spawnButtons.append(usePlayer, spawn, teleport); panel.append(spawnButtons);
-
-  const speedRow = document.createElement('div');
-  speedRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:6px';
-  const speedLabel = document.createElement('label'); speedLabel.textContent = 'Server speed';
-  const speed = document.createElement('select');
-  for (const value of [1, 2, 4, 8]) {
-    const option = document.createElement('option');
-    option.value = String(value); option.textContent = `${value}x`;
-    speed.append(option);
-  }
-  speed.style.cssText = 'background:#222;color:#fff;border:1px solid #555';
-  speedLabel.append(speed); speedRow.append(speedLabel); panel.append(speedRow);
 
   const status = document.createElement('div');
   status.style.cssText = 'margin-top:6px;color:#c9c9c9;white-space:pre-wrap';
@@ -145,9 +156,5 @@ export function installCheatPanel(api: CheatApi): void {
         status.textContent = `Teleported to ${tx}, ${ty}`;
       } catch (error) { status.textContent = String(error); }
     })();
-  });
-  speed.addEventListener('change', () => {
-    api.setSpeed(Number(speed.value) || 1);
-    status.textContent = `Server speed ${speed.value}x`;
   });
 }

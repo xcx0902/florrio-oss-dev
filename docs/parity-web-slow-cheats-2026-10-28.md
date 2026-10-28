@@ -77,9 +77,11 @@ rasterization is still not claimed to be pixel-identical.
   the existing debug ABI: it resolves the player handle and calls
   `sp_server_debug_set_entity_field(handle, 0|1, value)` for X/Y and then clears
   velocity (fields 2/3), so the flower lands exactly on the requested point.
-- **Server speed** (1x/2x/4x/8x) makes one received input packet advance N fixed 50 ms
-  engine ticks and flush each tick. The wall-clock send cadence stays 50 ms; only
-  simulated time is multiplied. A non-integer or out-of-range value is clamped to 1..8.
+- The former **Server speed** selector was removed. Advancing several engine ticks per
+  received packet changed the simulation time base that the original fixed-step server
+  never exposes; the client now always advances exactly one fixed 50 ms tick per packet.
+- Two read-only mapping tables show `petal id => name` and `mob id => name` so debug
+  spawn/loadout values no longer require consulting generated catalogs by hand.
 
 ## Verification
 
@@ -99,5 +101,5 @@ rasterization is still not claimed to be pixel-identical.
   no issues; `dist-next/server-worker.js` contains the teleport command.
 - Headless browser smoke against `client/public`: a fresh cheat panel kept X/Y at `0/0`
   after the player spawned elsewhere; Teleport moved the flower to the requested area;
-  a typed spawn at `(550, 500)` created a mob within 30 units; selecting `8x` updated the
-  panel status. These checks exercise the production worker path, not a test-only shim.
+  a typed spawn at `(550, 500)` created a mob within 30 units; the mapping tables listed
+  the live petal and mob ids. These checks exercise the production worker path, not a test-only shim.

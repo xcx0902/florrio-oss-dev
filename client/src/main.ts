@@ -285,9 +285,6 @@ function continueToMenu(): void {
 }
 
 let ticking = false;
-// Development speed control: each real 50ms interval still sends one input
-// packet, but advances this many fixed 50ms engine ticks.
-let serverSpeed = 1;
 async function tickServer(): Promise<void> {
   if (frozen || ticking) return;
   ticking = true;
@@ -329,13 +326,11 @@ async function tickServer(): Promise<void> {
         | (pointer.buttons.right || keyboard.isDown('ShiftLeft') || keyboard.isDown('ShiftRight') ? 2 : 0));
       await server.send(inputEncoder.input(buttons, angle, strength));
     }
-    for (let step = 0; step < serverSpeed; step++) {
-      await server.think();
-      completedServerTicks += 1;
-      await server.requestStream('sp_server_flush', undefined, packet => {
-        if (!applyPacket(packet, performance.now())) throw new Error('invalid server snapshot');
-      });
-    }
+    await server.think();
+    completedServerTicks += 1;
+    await server.requestStream('sp_server_flush', undefined, packet => {
+      if (!applyPacket(packet, performance.now())) throw new Error('invalid server snapshot');
+    });
     if (started && localPlayer() !== null) {
       if (pendingSpawn !== undefined) {
         nextSpawnTick = (spawnSentTick ?? completedServerTicks) + 50;
@@ -385,9 +380,6 @@ function installDevelopmentCheats(): void {
       const view = new DataView(bytes.buffer);
       view.setFloat32(0, x, true); view.setFloat32(4, y, true);
       await server.request('sp_server_debug_set_player_position', bytes);
-    },
-    setSpeed: multiplier => {
-      serverSpeed = Math.max(1, Math.min(8, Math.trunc(multiplier) || 1));
     },
   }));
 }
@@ -466,6 +458,26 @@ function hoveredSlot(): number | undefined {
   if (inventoryOpen) return undefined;
   const hotbar = hotbarHover();
   return typeof hotbar === 'number' ? hotbar : undefined;
+}
+
+/** Hit test the retained-card row exactly where drawDeathOverlay places it.
+ * The row begins 400 logical units low and slides to logicalHeight-45. */
+function deathHoveredSlot(amount: number): number | undefined {
+  if (!dead || lastSlots.length === 0) return undefined;
+  const layout = getHudLayout(canvas.clientWidth, canvas.clientHeight, lastLevel, mobileUi);
+  const rowY = (1 - amount) * layout.logicalHeight;
+  const cardY = layout.logicalHeight - 45 + rowY;
+  let left = 20;
+  for (let index = 0; index < 16; index += 1) {
+    const type = lastSlots[index] ?? 0;
+    if (!type) continue;
+    const size = index < layout.equippedCount ? 60 : 50;
+    const centerX = left + size / 2;
+    if (Math.abs(pointer.position.x - centerX * layout.scale) <= size * layout.scale / 2
+      && Math.abs(pointer.position.y - cardY * layout.scale) <= size * layout.scale / 2) return index;
+    left += size + 10;
+  }
+  return undefined;
 }
 
 function hotbarHover(x = pointer.position.x, y = pointer.position.y): number | 'discard' | undefined {
@@ -849,6 +861,7 @@ function frame(now: number): void {
         respawnLevel: lastDeathMetadata.deathLevel || lastLevel,
         score: lastDeathMetadata.score,
         keptSlots: lastSlots,
+        hoveredSlot: deathHoveredSlot(deathProgress),
       },
       width: canvas.clientWidth, height: canvas.clientHeight,
       mobile: mobileUi,

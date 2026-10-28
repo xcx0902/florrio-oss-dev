@@ -142,7 +142,8 @@ void constrain_linked_entities(World& world) {
     if (!entity.active) continue;
     if (entity.children.empty()) continue;
     if (entity.ai.predecessor.valid()) continue;
-    if (entity.type_id != 15U && entity.type_id != 16U && entity.type_id != 17U) continue;
+    if (entity.type_id != 15U && entity.type_id != 16U && entity.type_id != 17U
+        && entity.type_id != 18U) continue;
     roots.push_back(entity.handle);
   }
   for (const EntityHandle root : roots) constrain_entity(world, root);
@@ -152,7 +153,8 @@ std::uint32_t debug_linked_roots(const World& world) {
   std::uint32_t count = 0;
   for (const auto& entity : world.entities().entities())
     if (entity.active && !entity.children.empty() && !entity.ai.predecessor.valid()
-        && (entity.type_id == 15U || entity.type_id == 16U || entity.type_id == 17U)) ++count;
+        && (entity.type_id == 15U || entity.type_id == 16U || entity.type_id == 17U
+            || entity.type_id == 18U)) ++count;
   return count;
 }
 

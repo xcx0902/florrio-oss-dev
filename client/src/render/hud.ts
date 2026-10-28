@@ -38,6 +38,10 @@ export interface HudDeathState {
   readonly score?: number;
   /** Full carried inventory at death, including reserve slots. */
   readonly keptSlots?: readonly number[];
+  /** Occupied retained-card index under the pointer, or undefined. */
+  readonly hoveredSlot?: number;
+  /** Smoothed per-card tooltip alpha from the native 0.7 exponential. */
+  readonly tooltipAlpha?: readonly number[];
 }
 
 export interface HudState {
@@ -154,12 +158,13 @@ export function createHudState(): HudFrameState {
   let progress = 0;
   let zoneAlpha = 0, zoneCountdown = 0;
   let hudSlide = 0;
+  const deathTooltip: number[] = Array(16).fill(0);
   const scores: number[] = [];
   const recharges: number[] = [];
   const rechargeTypes: (number | undefined)[] = [];
   let lastTime: number | undefined;
   return {
-    reset() { progress = 0; zoneAlpha = 0; zoneCountdown = 0; hudSlide = 0; scores.length = 0; recharges.length = 0; rechargeTypes.length = 0; lastTime = undefined; },
+    reset() { progress = 0; zoneAlpha = 0; zoneCountdown = 0; hudSlide = 0; deathTooltip.fill(0); scores.length = 0; recharges.length = 0; rechargeTypes.length = 0; lastTime = undefined; },
     update(target, nowMilliseconds, deltaMilliseconds) {
       const now = Number.isFinite(nowMilliseconds) ? nowMilliseconds : lastTime ?? 0;
       const repeated = lastTime !== undefined && now <= lastTime;
@@ -174,8 +179,15 @@ export function createHudState(): HudFrameState {
           // with the same pow(0.9, dt * .06) curve as the level bar's shield
           // and the death overlay. Existing death UI is otherwise frozen.
           hudSlide = f(hudSlide + clamp(1 - Math.pow(0.9, delta * 0.06)) * (400 - hudSlide));
+          const tooltipStep = clamp(1 - Math.pow(0.7, delta * 0.06));
+          for (let index = 0; index < deathTooltip.length; index += 1) {
+            const goal = target.deathState?.hoveredSlot === index ? 1 : 0;
+            deathTooltip[index] = f(deathTooltip[index]
+              + tooltipStep * (goal - deathTooltip[index]));
+          }
         } else {
           hudSlide = 0;
+          deathTooltip.fill(0);
           const warning = +zoneWarningVisible(target);
           zoneAlpha = f(zoneAlpha + clamp(1 - Math.pow(0.7, delta * 0.06)) * (warning - zoneAlpha));
           // client1095 uses the literal 0.003922 rather than 1/255.
@@ -210,7 +222,8 @@ export function createHudState(): HudFrameState {
         return recharges[index] ?? 1;
       });
       return { ...target, levelProgress: progress, flowerEntries: entries, slotProgress,
-        zoneWarningAlpha: zoneAlpha, zoneCountdownProgress: zoneCountdown, hudSlide };
+        zoneWarningAlpha: zoneAlpha, zoneCountdownProgress: zoneCountdown, hudSlide,
+        deathState: target.deathState && { ...target.deathState, tooltipAlpha: deathTooltip } };
     },
   };
 }
@@ -238,7 +251,9 @@ export function getHudLayout(width = 1280, height = 720, level = 1,
                              mobile = false, uiScale?: number): HudLayout {
   const viewportWidth = Math.max(1, Number.isFinite(width) ? width : 1280);
   const viewportHeight = Math.max(1, Number.isFinite(height) ? height : 720);
-  const auto = Math.min(viewportWidth * 0.000521, viewportHeight * 0.000926);
+  // clientFrame selects the larger of the width/height scale candidates
+  // (WAT select returns the height term when width*0.000521 is smaller).
+  const auto = Math.max(viewportWidth * 0.000521, viewportHeight * 0.000926);
   const requestedScale = f(uiScale ?? NaN);
   const scale = Number.isFinite(requestedScale) && requestedScale > 0
     ? requestedScale : f(mobile ? auto : Math.max(0.7, auto));
@@ -503,15 +518,16 @@ function filledSlot(context: HudContext, type: number, x: number, y: number, siz
   context.stroke(); baseTransform(context, layout, 1, x, y - 5);
   drawPetalIcon(context, type, size / 70);
   context.restore(); context.setTransform(1, 0, 0, 1, 0, 0);
-  // Petal labels are styled after applying the slot scale: their logical
-  // font is already in screen pixels, unlike the other HUD labels.
-  const font = f(f(14 * size / 70) * layout.scale);
-  const logicalFont = f(14 * size / 70);
-  const width = f(f(measureLabel(PETAL_INFO[type].name, logicalFont)
-    + Math.trunc(f(logicalFont * 0.12) * 2) * 2) * layout.scale);
+  // func587 sizes the label from the petal definition's label radius
+  // (n[9] * slotSize / 70), not from its collision radius. The cached font
+  // stays in source units under the HUD matrix, so the bitmap's measured
+  // advance and outline margins are scaled exactly once.
+  const logicalFont = f(PETAL_INFO[type].labelSize * size / 70);
+  const textWidth = measureLabel(PETAL_INFO[type].name, logicalFont);
+  const width = f(f(textWidth + 2 * Math.trunc(f(logicalFont * 0.12 * 2))) * layout.scale);
   const height = f(f(logicalFont * 1.4) * layout.scale);
-  drawLabelBox(context, { text: PETAL_INFO[type].name, font, cacheKey: owner,
-    rasterScale: raster / layout.scale * 0.8825833333333333 },
+  drawLabelBox(context, { text: PETAL_INFO[type].name, font: logicalFont, cacheKey: owner,
+    rasterScale: f(raster * 0.8825833333333333) },
     f(f(layout.scale * x) - f(width * 0.5)),
     f(f(layout.scale * f(y + size * 17 / 70)) - f(height * 0.5)), width, height, false);
   context.restore();
@@ -628,12 +644,11 @@ function drawHotbar(context: HudContext, state: HudState, layout: HudLayout, ras
  * single line or allowed to overflow the viewport at the right/bottom edge. */
 function drawHotbarTooltip(context: HudContext, state: HudState, layout: HudLayout, ratio: number): void {
   if (state.slotMotions && !state.inventoryOpen) {
-    const scale = layout.scale / ratio;
     for (const motion of state.slotMotions) {
       if (motion.tooltipAlpha <= 0) continue;
       context.save(); context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      drawPetalTooltipAt(context, motion.type, motion.x * scale,
-        (motion.y - motion.size / 2 - 10) * scale,
+      drawPetalTooltipAt(context, motion.type, motion.x * layout.scale,
+        (motion.y - motion.size / 2 - 10) * layout.scale,
         layout.width, layout.height, layout.scale, ratio, motion.tooltipAlpha);
       context.restore();
     }
@@ -649,11 +664,11 @@ function drawHotbarTooltip(context: HudContext, state: HudState, layout: HudLayo
   context.setTransform(ratio, 0, 0, ratio, 0, 0);
   const motion = state.slotMotions?.find(value => value.slot === hovered);
   const anchor = motion ?? petalSlotAnchor(layout, hovered);
-  const scale = layout.scale / ratio;
   const inventoryX = layout.width / 2 - 198 + 12 + hovered % 6 * 62 + 28;
   const inventoryY = layout.height / 2 - 125 + 44 + Math.floor(hovered / 6) * 62;
-  drawPetalTooltipAt(context, type, state.inventoryOpen ? inventoryX : anchor.x * scale,
-    state.inventoryOpen ? inventoryY - 10 * scale : (anchor.y - anchor.size / 2 - 10) * scale,
+  drawPetalTooltipAt(context, type,
+    state.inventoryOpen ? inventoryX : anchor.x * layout.scale,
+    state.inventoryOpen ? inventoryY - 10 : (anchor.y - anchor.size / 2 - 10) * layout.scale,
     layout.width, layout.height, layout.scale, ratio);
   context.restore();
 }
@@ -947,12 +962,22 @@ function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayou
   }
   const scaled = ratio === 1 ? layout : { ...layout, scale: f(layout.scale * ratio) };
   const rowY = displacement;
+  const cardY = layout.logicalHeight - 45 + rowY;
+  const tooltipAlpha = state.deathState?.tooltipAlpha;
+  const tooltips: { type: number; centerX: number; size: number; alpha: number }[] = [];
   let left = 20;
   for (let index = 0; index < 16; index += 1) {
     const type = kept[index] ?? 0;
     if (!type || !PETAL_INFO[type]) continue;
     const size = index < layout.equippedCount ? 60 : 50;
-    filledSlot(context, type, left + size / 2, layout.logicalHeight - 45 + rowY, size, scaled, raster, 1, `retained:${index}`);
+    const centerX = left + size / 2;
+    const alpha = tooltipAlpha?.[index] ?? 0;
+    if (alpha > 0.0001) {
+      // Native1095 queues renderPetalTooltip from inside the retained-card
+      // transform but func1099 drains that queue after the cards and stats.
+      tooltips.push({ type, centerX, size, alpha });
+    }
+    filledSlot(context, type, centerX, cardY, size, scaled, raster, 1, `retained:${index}`);
     left += size + 10;
   }
   // Native1095 prints the retained death statistics at the bottom-left in
@@ -966,6 +991,14 @@ function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayou
   ] as const) {
     drawLabelBox(context, { text, font, rasterScale: statsRaster }, 20, top + rowY,
       f(measureLabel(text, font) + Math.trunc(f(f(font * 0.12) * 2)) * 2), f(font * 1.4), false);
+  }
+  for (const tooltip of tooltips) {
+    // Deferred tooltip pass: local (0, -size/2-10) is the card top-centre.
+    context.save(); context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    drawPetalTooltipAt(context, tooltip.type, tooltip.centerX * layout.scale,
+      (cardY - tooltip.size / 2 - 10) * layout.scale,
+      layout.width, layout.height, layout.scale, ratio, tooltip.alpha);
+    context.restore();
   }
   context.restore();
 }

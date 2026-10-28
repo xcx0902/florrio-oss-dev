@@ -318,8 +318,24 @@ class World {
   [[nodiscard]] bool destroy(EntityHandle handle) {
     Entity* entity = entities_.get(handle);
     if (entity == nullptr) return false;
+    // Original 404/424: every AI child inherits the removed record's owner
+    // (only when the +93 ownership flag is set) before the record disappears.
+    // For a centipede that owner is the preceding segment, so the next segment
+    // stays in the chain; for a head it is none, so the next segment becomes a
+    // root. Leaving predecessor pointing at a released handle made every
+    // remaining segment skip steering and chain constraints forever.
+    const bool owned = (entity->entity_flags & 64U) != 0U;
+    const std::uint32_t inherited_owner = owned ? entity->owner : kInvalidEntity;
+    const EntityHandle inherited_owner_handle{
+      inherited_owner == kInvalidEntity ? 0U : inherited_owner};
+    const EntityHandle inherited_predecessor =
+      entity->ai.predecessor.valid() ? inherited_owner_handle : EntityHandle{};
     for (const EntityHandle child : entity->children) {
-      if (Entity* child_entity = entities_.get(child)) child_entity->owner = kInvalidEntity;
+      if (Entity* child_entity = entities_.get(child)) {
+        child_entity->ai.predecessor = inherited_predecessor;
+        child_entity->ai.owner = inherited_owner_handle;
+        child_entity->owner = inherited_owner;
+      }
     }
     entity->children.clear();
     if (entity->owner != kInvalidEntity) {
