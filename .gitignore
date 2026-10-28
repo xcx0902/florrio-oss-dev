@@ -1,9 +1,43 @@
+# Sources only. Everything below is generated locally and must not be
+# committed; rebuild it with the npm scripts when a checkout needs it.
+
+# Dependencies and local tool caches
 node_modules/
+tools/vendor/
+.emcache/
+
+# Delivery and build trees (tools/build.mjs, tools/build-dist-next.mjs,
+# tools/build-engine-wasm.mjs, CMake)
 dist/
 dist-readable/
 dist-reference/
-.DS_Store
-tools/vendor/
+dist-next/
+dist-next.lock
+dist-next.stage-*/
 build/
+engine/build-*/
+
+# Compiled client output (tsc outDir + emscripten wasm). The entry page,
+# worker shim and fonts are authored sources that live beside the output.
+client/public/**/*.js
+!client/public/server-worker.js
+client/public/**/*.js.map
+client/public/**/*.d.ts
+client/public/server.wasm
+client/public/server.wasm.build.json
+
+# Recorded parity traces, screenshots and gate reports
+tests/parity/**/*.json
+tests/parity/**/*.png
+tests/parity/**/*.tap
 tests/parity/current/
-.emcache/
+
+# Verification evidence, run history and archived reports
+legacy/reports/*
+!legacy/reports/.gitkeep
+
+# Frozen reference staging area
+.frozen-reference-stage-*/
+
+# OS noise
+.DS_Store
