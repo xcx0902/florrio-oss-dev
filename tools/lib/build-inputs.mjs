@@ -22,7 +22,7 @@ export async function fileEntries(root, files) {
   }));
 }
 export async function engineInputs(root = '.') {
-  const files = ['.emscripten-version', 'tools/build-engine-wasm.mjs', 'tools/lib/build-inputs.mjs'];
+  const files = ['.emscripten-version', 'tools/build-engine-wasm.mjs', 'tools/lib/build-inputs.mjs', 'engine/sources.cmake'];
   for (const folder of ['engine/src', 'engine/include']) {
     files.push(...(await listFiles(path.join(root, folder))).map(relative => `${folder}/${relative}`));
   }

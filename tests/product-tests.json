@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "description": "Explicit product test inventory. Every entry is a real file; no archive path and no blacklist may appear here.",
+  "suites": {
+    "unit": [
+      "tests/unit/protocol-contracts.test.mjs",
+      "tests/unit/schema-generation.test.mjs"
+    ],
+    "tools": [
+      "tests/tools/delivery.test.mjs",
+      "tests/tools/verification.test.mjs",
+      "tests/tools/test-runner.test.mjs"
+    ],
+    "client-unit": [
+      "client/tests/unit/canvas-context.test.mjs",
+      "client/tests/unit/death-lifecycle.test.mjs",
+      "client/tests/unit/loadout.test.mjs",
+      "client/tests/unit/menu-animation.test.mjs",
+      "client/tests/unit/movement-helper.test.mjs",
+      "client/tests/unit/petal-transfers.test.mjs",
+      "client/tests/unit/snapshot-domain.test.mjs",
+      "client/tests/unit/text-cache.test.mjs",
+      "client/tests/unit/ui-tooltip.test.mjs"
+    ],
+    "client-integration": [
+      "client/tests/integration/death-pickup-regression.test.mjs",
+      "client/tests/integration/event-effects.test.mjs",
+      "client/tests/integration/menu-controls.test.mjs",
+      "client/tests/integration/menu-interactions.test.mjs",
+      "client/tests/integration/snapshot-codec.test.mjs",
+      "client/tests/integration/worker-browser.test.mjs",
+      "client/tests/integration/worker-rpc.test.mjs"
+    ],
+    "integration": [
+      "tests/integration/native-snapshot.test.mjs"
+    ],
+    "delivery": [
+      "client/tests/integration/worker-browser.test.mjs",
+      "client/tests/integration/menu-interactions.test.mjs"
+    ],
+    "engine": {
+      "runner": "ctest",
+      "argv": [
+        "--test-dir",
+        "build/engine",
+        "--output-on-failure",
+        "--no-tests=error"
+      ],
+      "expected": [
+        "engine_tests",
+        "engine_centipede_tests",
+        "engine_death_lifecycle_tests",
+        "engine_sim_tests",
+        "engine_projectile_tests",
+        "engine_poison_flash_tests",
+        "engine_rose_tests",
+        "engine_passives_pets_tests",
+        "engine_peer_visibility_tests",
+        "engine_pickup_arrival_tests"
+      ]
+    }
+  }
+}

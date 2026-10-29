@@ -2,7 +2,7 @@
 
 All notable changes to this reconstruction are documented here. The in-game
 Changelog panel is generated from this file by
-`node tools/gen-menu-content.mjs`; edit the Markdown, not
+`node tools/generate.mjs` (or `npm run schema:generate`); edit the Markdown, not
 `client/src/schema/menu-content.ts`.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).

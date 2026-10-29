@@ -11,9 +11,9 @@ void require(bool condition, const char* message) {
   if (!condition) { std::cerr << message << '\n'; std::exit(1); }
 }
 
-// Native original43/145 + opcode6, game RNG 47, shuffle RNG 1. Reproduce with
-// node engine/tests/oracle/death-lifecycle-evidence.mjs. These are observations
-// from the frozen WASM, not expectations derived from the C++ implementation.
+// Fixed product death-lifecycle scenarios: native original43/145 + opcode6,
+// game RNG 47, shuffle RNG 1. These are committed product expectations, not
+// runtime lookups in the archive or values re-derived from C++.
 struct Case {
   std::uint8_t level, respawn_level;
   float score;

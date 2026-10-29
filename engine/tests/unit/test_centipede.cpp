@@ -147,5 +147,5 @@ void lethal_middle() {
 int main(int argc, char** argv) {
   if (argc == 2 && std::string_view(argv[1]) == "--pursuit-trace") { lethal_head(true); return 0; }
   passive_chain(); evil_chain(true); evil_chain(false); lethal_head(false); lethal_middle();
-  std::cout << "centipede parity: passive chain, inherited pursuit, lethal head/middle damage and corpse lifetime passed\n";
+  std::cout << "centipede domain regression: passive chain, inherited pursuit, lethal head/middle damage and corpse lifetime passed\n";
 }

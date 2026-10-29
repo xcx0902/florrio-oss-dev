@@ -11,20 +11,10 @@
       "rarityIndex": 0,
       "rechargeMilliseconds": 0,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 18,
-        "functionIndex": 683
-      },
-      "virtualTable": {
-        "address": null,
-        "methods": []
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 1,
@@ -35,66 +25,10 @@
       "rarityIndex": 0,
       "rechargeMilliseconds": 2500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 17,
-        "functionIndex": 602
-      },
-      "virtualTable": {
-        "address": 5212,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 100,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 101,
-            "functionIndex": 433
-          },
-          {
-            "slot": 3,
-            "tableIndex": 102,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 2,
@@ -105,66 +39,10 @@
       "rarityIndex": 0,
       "rechargeMilliseconds": 500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 16,
-        "functionIndex": 235
-      },
-      "virtualTable": {
-        "address": 5256,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 108,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 109,
-            "functionIndex": 414
-          },
-          {
-            "slot": 3,
-            "tableIndex": 110,
-            "functionIndex": 413
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 3,
@@ -175,66 +53,10 @@
       "rarityIndex": 0,
       "rechargeMilliseconds": 5500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 15,
-        "functionIndex": 612
-      },
-      "virtualTable": {
-        "address": 5300,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 111,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 112,
-            "functionIndex": 662
-          },
-          {
-            "slot": 3,
-            "tableIndex": 113,
-            "functionIndex": 661
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 4,
@@ -245,66 +67,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 10000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 14,
-        "functionIndex": 614
-      },
-      "virtualTable": {
-        "address": 5344,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 114,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 115,
-            "functionIndex": 664
-          },
-          {
-            "slot": 3,
-            "tableIndex": 116,
-            "functionIndex": 663
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 5,
@@ -315,66 +81,10 @@
       "rarityIndex": 5,
       "rechargeMilliseconds": 2500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 13,
-        "functionIndex": 621
-      },
-      "virtualTable": {
-        "address": 5388,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 117,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 101,
-            "functionIndex": 433
-          },
-          {
-            "slot": 3,
-            "tableIndex": 102,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 6,
@@ -385,66 +95,10 @@
       "rarityIndex": 1,
       "rechargeMilliseconds": 3500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 12,
-        "functionIndex": 626
-      },
-      "virtualTable": {
-        "address": 5432,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 118,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 119,
-            "functionIndex": 412
-          },
-          {
-            "slot": 3,
-            "tableIndex": 120,
-            "functionIndex": 665
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 7,
@@ -455,66 +109,10 @@
       "rarityIndex": 1,
       "rechargeMilliseconds": 4000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 11,
-        "functionIndex": 364
-      },
-      "virtualTable": {
-        "address": 5476,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 121,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 122,
-            "functionIndex": 727
-          },
-          {
-            "slot": 3,
-            "tableIndex": 123,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 8,
@@ -525,66 +123,10 @@
       "rarityIndex": 1,
       "rechargeMilliseconds": 6000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 10,
-        "functionIndex": 629
-      },
-      "virtualTable": {
-        "address": 5520,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 124,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 125,
-            "functionIndex": 668
-          },
-          {
-            "slot": 3,
-            "tableIndex": 126,
-            "functionIndex": 667
-          },
-          {
-            "slot": 4,
-            "tableIndex": 127,
-            "functionIndex": 666
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 9,
@@ -595,66 +137,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 1250,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 9,
-        "functionIndex": 634
-      },
-      "virtualTable": {
-        "address": 5604,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 136,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 137,
-            "functionIndex": 670
-          },
-          {
-            "slot": 3,
-            "tableIndex": 138,
-            "functionIndex": 669
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 10,
@@ -665,66 +151,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 3000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 8,
-        "functionIndex": 642
-      },
-      "virtualTable": {
-        "address": 5648,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 139,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 140,
-            "functionIndex": 672
-          },
-          {
-            "slot": 3,
-            "tableIndex": 141,
-            "functionIndex": 671
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 11,
@@ -735,66 +165,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 7,
-        "functionIndex": 643
-      },
-      "virtualTable": {
-        "address": 5692,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 142,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 143,
-            "functionIndex": 411
-          },
-          {
-            "slot": 3,
-            "tableIndex": 144,
-            "functionIndex": 676
-          },
-          {
-            "slot": 4,
-            "tableIndex": 145,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 12,
@@ -805,66 +179,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 6,
-        "functionIndex": 648
-      },
-      "virtualTable": {
-        "address": 5772,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 153,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 154,
-            "functionIndex": 411
-          },
-          {
-            "slot": 3,
-            "tableIndex": 155,
-            "functionIndex": 681
-          },
-          {
-            "slot": 4,
-            "tableIndex": 156,
-            "functionIndex": 680
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 13,
@@ -875,66 +193,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 5,
-        "functionIndex": 384
-      },
-      "virtualTable": {
-        "address": 5852,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 164,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 165,
-            "functionIndex": 740
-          },
-          {
-            "slot": 3,
-            "tableIndex": 166,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 167,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 168,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 14,
@@ -945,66 +207,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 4,
-        "functionIndex": 650
-      },
-      "virtualTable": {
-        "address": 5896,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 169,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 170,
-            "functionIndex": 414
-          },
-          {
-            "slot": 3,
-            "tableIndex": 171,
-            "functionIndex": 413
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 15,
@@ -1015,66 +221,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 3500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 3,
-        "functionIndex": 651
-      },
-      "virtualTable": {
-        "address": 5940,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 172,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 173,
-            "functionIndex": 412
-          },
-          {
-            "slot": 3,
-            "tableIndex": 174,
-            "functionIndex": 682
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 16,
@@ -1085,66 +235,10 @@
       "rarityIndex": 1,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 2,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 19,
-        "functionIndex": 235
-      },
-      "virtualTable": {
-        "address": 5256,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 108,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 109,
-            "functionIndex": 414
-          },
-          {
-            "slot": 3,
-            "tableIndex": 110,
-            "functionIndex": 413
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 17,
@@ -1155,66 +249,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 3,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 20,
-        "functionIndex": 235
-      },
-      "virtualTable": {
-        "address": 5256,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 108,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 109,
-            "functionIndex": 414
-          },
-          {
-            "slot": 3,
-            "tableIndex": 110,
-            "functionIndex": 413
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 18,
@@ -1225,66 +263,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 3500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 21,
-        "functionIndex": 598
-      },
-      "virtualTable": {
-        "address": 5984,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 175,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 176,
-            "functionIndex": 685
-          },
-          {
-            "slot": 3,
-            "tableIndex": 177,
-            "functionIndex": 684
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 19,
@@ -1295,66 +277,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 3,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 22,
-        "functionIndex": 593
-      },
-      "virtualTable": {
-        "address": 6028,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 178,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 179,
-            "functionIndex": 687
-          },
-          {
-            "slot": 3,
-            "tableIndex": 180,
-            "functionIndex": 686
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 20,
@@ -1365,66 +291,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 2000,
       "instancesPerSlot": 1,
-      "radius": 11,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 26,
-        "functionIndex": 572
-      },
-      "virtualTable": {
-        "address": 6072,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 181,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 182,
-            "functionIndex": 690
-          },
-          {
-            "slot": 3,
-            "tableIndex": 183,
-            "functionIndex": 689
-          },
-          {
-            "slot": 4,
-            "tableIndex": 184,
-            "functionIndex": 688
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 11,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 21,
@@ -1436,66 +306,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 25,
-        "functionIndex": 579
-      },
-      "virtualTable": {
-        "address": 6156,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 190,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 165,
-            "functionIndex": 740
-          },
-          {
-            "slot": 3,
-            "tableIndex": 166,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 191,
-            "functionIndex": 692
-          },
-          {
-            "slot": 5,
-            "tableIndex": 192,
-            "functionIndex": 691
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 22,
@@ -1506,66 +320,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 24,
-        "functionIndex": 583
-      },
-      "virtualTable": {
-        "address": 6200,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 193,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 194,
-            "functionIndex": 694
-          },
-          {
-            "slot": 3,
-            "tableIndex": 195,
-            "functionIndex": 693
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 23,
@@ -1576,66 +334,10 @@
       "rarityIndex": 4,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 23,
-        "functionIndex": 590
-      },
-      "virtualTable": {
-        "address": 6244,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 196,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 197,
-            "functionIndex": 720
-          },
-          {
-            "slot": 3,
-            "tableIndex": 198,
-            "functionIndex": 719
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 24,
@@ -1646,66 +348,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 3500,
       "instancesPerSlot": 3,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 1,
-        "offset44": 11
-      },
-      "factory": {
-        "tableIndex": 27,
-        "functionIndex": 565
-      },
-      "virtualTable": {
-        "address": 6288,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 199,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 200,
-            "functionIndex": 724
-          },
-          {
-            "slot": 3,
-            "tableIndex": 201,
-            "functionIndex": 723
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": true,
+      "extraOrbitRadius": 11
     },
     {
       "typeId": 25,
@@ -1716,66 +362,10 @@
       "rarityIndex": 4,
       "rechargeMilliseconds": 0,
       "instancesPerSlot": 1,
-      "radius": 12,
-      "flags": {
-        "offset40": 1,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 28,
-        "functionIndex": 558
-      },
-      "virtualTable": {
-        "address": 6332,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 202,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 101,
-            "functionIndex": 433
-          },
-          {
-            "slot": 3,
-            "tableIndex": 102,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 12,
+      "orbitHidden": true,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 26,
@@ -1786,66 +376,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 20000,
       "instancesPerSlot": 1,
-      "radius": 12,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 29,
-        "functionIndex": 552
-      },
-      "virtualTable": {
-        "address": 6376,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 203,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 204,
-            "functionIndex": 726
-          },
-          {
-            "slot": 3,
-            "tableIndex": 205,
-            "functionIndex": 725
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 12,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 27,
@@ -1856,66 +390,10 @@
       "rarityIndex": 4,
       "rechargeMilliseconds": 4000,
       "instancesPerSlot": 3,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 1,
-        "offset44": 11
-      },
-      "factory": {
-        "tableIndex": 30,
-        "functionIndex": 364
-      },
-      "virtualTable": {
-        "address": 5476,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 121,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 122,
-            "functionIndex": 727
-          },
-          {
-            "slot": 3,
-            "tableIndex": 123,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": true,
+      "extraOrbitRadius": 11
     },
     {
       "typeId": 28,
@@ -1926,66 +404,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 12,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 32,
-        "functionIndex": 545
-      },
-      "virtualTable": {
-        "address": 6420,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 206,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 207,
-            "functionIndex": 728
-          },
-          {
-            "slot": 3,
-            "tableIndex": 208,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 12,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 29,
@@ -1996,66 +418,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 3000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 31,
-        "functionIndex": 327
-      },
-      "virtualTable": {
-        "address": 6464,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 209,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 210,
-            "functionIndex": 734
-          },
-          {
-            "slot": 3,
-            "tableIndex": 211,
-            "functionIndex": 733
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 212,
-            "functionIndex": 732
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 30,
@@ -2066,66 +432,10 @@
       "rarityIndex": 4,
       "rechargeMilliseconds": 3000,
       "instancesPerSlot": 3,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 1,
-        "offset44": 13
-      },
-      "factory": {
-        "tableIndex": 35,
-        "functionIndex": 327
-      },
-      "virtualTable": {
-        "address": 6464,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 209,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 210,
-            "functionIndex": 734
-          },
-          {
-            "slot": 3,
-            "tableIndex": 211,
-            "functionIndex": 733
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 212,
-            "functionIndex": 732
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": true,
+      "extraOrbitRadius": 13
     },
     {
       "typeId": 31,
@@ -2136,66 +446,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 1700,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 34,
-        "functionIndex": 539
-      },
-      "virtualTable": {
-        "address": 6548,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 217,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 101,
-            "functionIndex": 433
-          },
-          {
-            "slot": 3,
-            "tableIndex": 102,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 218,
-            "functionIndex": 738
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 32,
@@ -2206,66 +460,10 @@
       "rarityIndex": 1,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 33,
-        "functionIndex": 542
-      },
-      "virtualTable": {
-        "address": 6632,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 223,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 224,
-            "functionIndex": 739
-          },
-          {
-            "slot": 3,
-            "tableIndex": 225,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 33,
@@ -2276,66 +474,10 @@
       "rarityIndex": 4,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 3,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 1,
-        "offset44": 15
-      },
-      "factory": {
-        "tableIndex": 41,
-        "functionIndex": 384
-      },
-      "virtualTable": {
-        "address": 5852,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 164,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 165,
-            "functionIndex": 740
-          },
-          {
-            "slot": 3,
-            "tableIndex": 166,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 167,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 168,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": true,
+      "extraOrbitRadius": 15
     },
     {
       "typeId": 34,
@@ -2346,66 +488,10 @@
       "rarityIndex": 4,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 40,
-        "functionIndex": 500
-      },
-      "virtualTable": {
-        "address": 6676,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 226,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 227,
-            "functionIndex": 432
-          },
-          {
-            "slot": 3,
-            "tableIndex": 228,
-            "functionIndex": 431
-          },
-          {
-            "slot": 4,
-            "tableIndex": 229,
-            "functionIndex": 747
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 35,
@@ -2416,66 +502,10 @@
       "rarityIndex": 5,
       "rechargeMilliseconds": 2500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 39,
-        "functionIndex": 509
-      },
-      "virtualTable": {
-        "address": 6756,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 237,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 101,
-            "functionIndex": 433
-          },
-          {
-            "slot": 3,
-            "tableIndex": 102,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 36,
@@ -2487,66 +517,10 @@
       "rarityIndex": 2,
       "rechargeMilliseconds": 2500,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 38,
-        "functionIndex": 519
-      },
-      "virtualTable": {
-        "address": 6800,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 238,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 101,
-            "functionIndex": 433
-          },
-          {
-            "slot": 3,
-            "tableIndex": 102,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 37,
@@ -2557,66 +531,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 0,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 37,
-        "functionIndex": 529
-      },
-      "virtualTable": {
-        "address": 6844,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 239,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 240,
-            "functionIndex": 434
-          },
-          {
-            "slot": 3,
-            "tableIndex": 241,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     },
     {
       "typeId": 38,
@@ -2627,66 +545,10 @@
       "rarityIndex": 3,
       "rechargeMilliseconds": 45000,
       "instancesPerSlot": 1,
-      "radius": 14,
-      "flags": {
-        "offset40": 0,
-        "offset41": 0,
-        "offset44": 0
-      },
-      "factory": {
-        "tableIndex": 36,
-        "functionIndex": 533
-      },
-      "virtualTable": {
-        "address": 6888,
-        "methods": [
-          {
-            "slot": 0,
-            "tableIndex": 99,
-            "functionIndex": 98
-          },
-          {
-            "slot": 1,
-            "tableIndex": 242,
-            "functionIndex": 22
-          },
-          {
-            "slot": 2,
-            "tableIndex": 243,
-            "functionIndex": 435
-          },
-          {
-            "slot": 3,
-            "tableIndex": 244,
-            "functionIndex": 119
-          },
-          {
-            "slot": 4,
-            "tableIndex": 103,
-            "functionIndex": 152
-          },
-          {
-            "slot": 5,
-            "tableIndex": 104,
-            "functionIndex": 281
-          },
-          {
-            "slot": 6,
-            "tableIndex": 105,
-            "functionIndex": 152
-          },
-          {
-            "slot": 7,
-            "tableIndex": 106,
-            "functionIndex": 171
-          },
-          {
-            "slot": 8,
-            "tableIndex": 107,
-            "functionIndex": 152
-          }
-        ]
-      }
+      "labelFontSize": 14,
+      "orbitHidden": false,
+      "sharedOrbit": false,
+      "extraOrbitRadius": 0
     }
   ]
 }

@@ -1,9 +1,7 @@
 /** Minimal recording 2D context used by product rendering tests.
  *
  * It records path commands, paint state and style setters without depending on
- * a browser canvas or on any archived rendering probe. */
-/** Paint recorder retains the CTM and stroke state that older colour-only
- * tests omitted. It can replay recorded command traces and domain art. */
+ * a browser canvas, an archived rendering probe or original function numbers. */
 export class RenderingCanvas {
   constructor() {
     this.paints = []; this.path = []; this.stack = [];
@@ -37,17 +35,4 @@ export class RenderingCanvas {
   strokeRect(...args) { this.beginPath(); this.rect(...args); this.stroke(); }
   clip() {} setGlobalCompositeOperation() {} setFont() {} fillText() {} strokeText() {}
   measureText() { return { width: 0 }; } drawImage() {}
-  replay(calls) {
-    const methods = { 136300:'save', 136329:'restore', 136414:'setTransform', 137186:'setFillRgb',
-      137456:'setStrokeRgb', 137728:'setGlobalAlpha', 137767:'setGlobalAlpha', 138111:'setLineWidth',
-      136878:'beginPath', 136912:'closePath', 137806:'moveTo', 137843:'lineTo', 137880:'quadraticCurveTo',
-      137935:'bezierCurveTo', 137995:'arc', 138047:'ellipse', 136946:'rect', 136661:'fill', 136732:'stroke' };
-    for (const [code, ...args] of calls) {
-      if (code === 138811) this.setLineJoin('round');
-      else if (code === 138730) this.setLineCap('round');
-      else if (code === 'fillPath' || code === 'strokePath') { this.path = args[0]; this[code === 'fillPath' ? 'fill' : 'stroke'](); }
-      else if (methods[code]) this[methods[code]](...args);
-    }
-    return this.paints;
-  }
 }

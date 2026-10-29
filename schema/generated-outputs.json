@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "generatedBy": "tools/generate.mjs",
+  "inputs": [
+    "schema/protocol.yaml",
+    "schema/transport.json",
+    "schema/catalogs/petals.json",
+    "schema/catalogs/entities.json",
+    "schema/catalogs/spawn-rules.json",
+    "schema/catalogs/strings.json",
+    "schema/catalogs/entity-spawn-defaults.json",
+    "schema/catalogs/petal-combat.json",
+    "schema/catalogs/drop-rules.json",
+    "schema/catalogs/gallery-overrides.json",
+    "CHANGELOG.md"
+  ],
+  "outputs": [
+    {
+      "path": "client/src/schema/menu-content.ts",
+      "bytes": 1365,
+      "sha256": "4b7e72aa6351dafe9d6635a2d03ae8e8ced92ceb02645e0122b820dcb3000042"
+    },
+    {
+      "path": "client/src/schema/mob-gallery.ts",
+      "bytes": 5951,
+      "sha256": "bf9e2d845683f5a6e5bd886225ea9cb728f82aecdf6244d2989bddf5f6c7237f"
+    },
+    {
+      "path": "client/src/schema/packet-key.ts",
+      "bytes": 1708,
+      "sha256": "fbc6994a99c40e6e880d7e8de9206cbe3a68fd6407fee75f859bdf4ca4e38050"
+    },
+    {
+      "path": "client/src/schema/petals.ts",
+      "bytes": 8596,
+      "sha256": "041d1c5b5d3754d2e6714e292a68159ba51b90172619942adc867a76a9da0269"
+    },
+    {
+      "path": "client/src/schema/protocol.ts",
+      "bytes": 14425,
+      "sha256": "ef74112df22a160db31148dd940dddb91430fcb602272394e2f4c856b2467e1d"
+    },
+    {
+      "path": "docs/catalogs.md",
+      "bytes": 4289,
+      "sha256": "5c87fc93fdc4154b8b8240edf65fe431672d9785155b6adf3b615a8261360d9d"
+    },
+    {
+      "path": "engine/include/engine/catalog/catalog_types.hpp",
+      "bytes": 1172,
+      "sha256": "927a9efa34c8e9799d944b5f224082aabc1c761ab56afdde7f2d1b07ab3bddd6"
+    },
+    {
+      "path": "engine/include/engine/catalog/drop_chances.hpp",
+      "bytes": 5804,
+      "sha256": "11ab0ede06f2f11edde50bc1229432374b9e25ac4c62aec034c18301d35eb55e"
+    },
+    {
+      "path": "engine/include/engine/catalog/entity_spawn_defaults.hpp",
+      "bytes": 2318,
+      "sha256": "bd26ba9713716ed2ed3dcb2a4d7d1bf6fc4fe78b85a459d8df1afd24baa5cfa2"
+    },
+    {
+      "path": "engine/include/engine/catalog/generated_catalog_data.hpp",
+      "bytes": 24695,
+      "sha256": "45a04d9958b83cf8559d63c2f2ff51eca0475aedd0a0d6b5d415032e829adfac"
+    },
+    {
+      "path": "engine/include/engine/catalog/petal_combat.hpp",
+      "bytes": 3069,
+      "sha256": "5e4cffedcc9a8afacc06cbf2da449f1b23ee644a7d75b532d884a7388f4c64e0"
+    },
+    {
+      "path": "engine/include/engine/net/generated_protocol.hpp",
+      "bytes": 18752,
+      "sha256": "2aa5e4c23b1eb59be899154de910bdaa88f364b8f8fd192ef3e3a6125736adec"
+    },
+    {
+      "path": "engine/include/engine/net/packet_key.hpp",
+      "bytes": 1813,
+      "sha256": "361c4b7f7be5b7b2f1f20b0166b824e584a3026a798a0f7c38ed0a2b51dabd6e"
+    },
+    {
+      "path": "schema/catalogs/drop-chances.json",
+      "bytes": 13089,
+      "sha256": "b7e32576aefdb4a9b5ab9e3e3ba2ff0b57563f92099b13bba47b06510540bc10"
+    },
+    {
+      "path": "schema/generated/protocol-contracts.json",
+      "bytes": 50628,
+      "sha256": "a1bb7a99bd61a962e4b36c4ec5c99022daf89970e9887118c979a5ac4b36c6e5"
+    }
+  ]
+}

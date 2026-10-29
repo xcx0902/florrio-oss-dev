@@ -60,6 +60,13 @@ legacy reports, `dist*`, `tools/vendor`). They are kept on disk when present but
 are gitignored and are **not** part of a fresh clone. Do not treat them as
 repository content.
 
+## 02/03 continuation addendum
+
+Files retired while completing goals 02 and 03 after the early archive are
+recorded append-only in
+[`addenda/02-03-completion/`](addenda/02-03-completion/README.md). That
+addendum does not modify this directory's `inventory.json` or `tree/`.
+
 ## Reading historical evidence
 
 The archive is plain text where possible. Useful entry points:

@@ -1,5 +1,7 @@
 {
-  "schema": 1,
+  "schema": 2,
+  "generatedBy": "tools/generate.mjs",
+  "rules": "schema/catalogs/drop-rules.json",
   "constants": {
     "areaMix": [
       0.15000000596046448,

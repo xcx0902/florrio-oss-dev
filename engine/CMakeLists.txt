@@ -5,34 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(engine_core STATIC
-  src/schema/contracts.cpp
-  src/sim/tick.cpp
-  src/sim/movement.cpp
-  src/sim/bounds.cpp
-  src/sim/spawn.cpp
-  src/sim/collision.cpp
-  src/sim/collision_filter.cpp
-  src/sim/combat.cpp
-  src/sim/effects.cpp
-  src/sim/ai.cpp
-  src/sim/loot.cpp
-  src/sim/progression.cpp
-  src/sim/damage.cpp
-  src/sim/petal_effects.cpp
-  src/sim/petals.cpp
-  src/sim/passives.cpp
-  src/sim/pets.cpp
-  src/sim/player.cpp
-  src/sim/player_loadout.cpp
-  src/sim/spatial.cpp
-  src/sim/quadtree.cpp
-  src/sim/species_attacks.cpp
-  src/net/input.cpp
-  src/net/snapshot_writer.cpp
-  src/net/worker_api.cpp
-  src/wasm/abi.cpp
-)
+include("${CMAKE_CURRENT_SOURCE_DIR}/sources.cmake")
+
+add_library(engine_core STATIC ${ENGINE_CORE_SOURCES})
 target_include_directories(engine_core PUBLIC include)
 target_compile_options(engine_core PRIVATE
   -Wall -Wextra -Werror
@@ -95,25 +70,8 @@ target_link_libraries(engine_pickup_arrival_tests PRIVATE engine_core)
 target_compile_options(engine_pickup_arrival_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
 add_test(NAME engine_pickup_arrival_tests COMMAND engine_pickup_arrival_tests)
 
-# The engine_core translation unit above always compiles generated assertions.
-# Native CTest also compares actual compiler layout with the YAML inputs, so
-# stale generated output cannot pass just because its own assertions agree.
-if(NOT CMAKE_CROSSCOMPILING)
-  find_program(ENGINE_SCHEMA_NODE NAMES node nodejs REQUIRED)
-  set(ENGINE_SCHEMA_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
-  set(ENGINE_SCHEMA_CHECKER "${ENGINE_SCHEMA_ROOT}/tools/check-schema-layouts.mjs")
-  file(GLOB ENGINE_SCHEMA_LAYOUTS CONFIGURE_DEPENDS "${ENGINE_SCHEMA_ROOT}/schema/layout/*.yaml")
-  set(ENGINE_SCHEMA_PROBE "${CMAKE_CURRENT_BINARY_DIR}/schema-contracts-probe.inc")
-  add_custom_command(OUTPUT "${ENGINE_SCHEMA_PROBE}"
-    COMMAND "${ENGINE_SCHEMA_NODE}" "${ENGINE_SCHEMA_CHECKER}" --emit-probe "${ENGINE_SCHEMA_PROBE}"
-    DEPENDS "${ENGINE_SCHEMA_CHECKER}" ${ENGINE_SCHEMA_LAYOUTS}
-    VERBATIM)
-  add_executable(engine_schema_contracts_tests tests/unit/test_schema_contracts.cpp "${ENGINE_SCHEMA_PROBE}")
-  target_link_libraries(engine_schema_contracts_tests PRIVATE engine_core)
-  target_include_directories(engine_schema_contracts_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
-  target_compile_options(engine_schema_contracts_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
-  add_test(NAME engine_schema_contracts
-    COMMAND "${ENGINE_SCHEMA_NODE}" "${ENGINE_SCHEMA_CHECKER}" --check "$<TARGET_FILE:engine_schema_contracts_tests>")
-  add_test(NAME engine_schema_contracts_checker
-    COMMAND "${ENGINE_SCHEMA_NODE}" --test "${CMAKE_CURRENT_SOURCE_DIR}/tests/unit/test_schema_contracts.test.mjs")
-endif()
+# Product cross-endian fixture: real WorkerApi -> snapshot bytes for the TS test.
+add_executable(engine_native_snapshot_fixture
+  ${CMAKE_CURRENT_SOURCE_DIR}/../tests/fixtures/product/protocol/native_fixture.cpp)
+target_link_libraries(engine_native_snapshot_fixture PRIVATE engine_core)
+target_compile_options(engine_native_snapshot_fixture PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)

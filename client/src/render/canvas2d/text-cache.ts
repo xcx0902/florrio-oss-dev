@@ -81,6 +81,11 @@ const measurements = new Map<string, number>();
 let measureContext: RasterContext2D | null | undefined;
 let canvasSupport: boolean | undefined;
 
+/** Release one owner's retained bitmap, returning whether it existed. */
+export function releaseLabel(cacheKey: string | number): boolean {
+  return ownedLabels.delete(cacheKey);
+}
+
 export function canvasAvailable(): boolean {
   if (canvasSupport !== undefined) return canvasSupport;
   try {

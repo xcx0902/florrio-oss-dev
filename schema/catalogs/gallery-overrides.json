@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "description": "Display-only overrides for the mob gallery. Runtime drops are always generated from drop-rules.json and the entity catalog; add an entry here only when the menu must intentionally differ, with a reason.",
+  "overrides": []
+}

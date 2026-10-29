@@ -98,8 +98,8 @@ void timer_boundary() {
   require(world.petals()[0].behavior_state == 3U, "armed contraction continues at full health");
 }
 
-// Compared frame by frame with the original 665/682/723 callbacks by the
-// companion JS oracle. No movement or regeneration pass obscures the callback.
+// Committed frame-by-frame product expectations for the rose callbacks. No
+// movement or regeneration pass obscures the callback.
 void trace() {
   std::printf("[");
   for (const auto type : {6U, 15U, 24U}) {

@@ -2,45 +2,15 @@
 
 ## World
 
-`World` is described by `schema/layout/world.yaml`; the generated C++/TS structs
-in `engine/include/engine/schema/generated.hpp` and
-`client/src/schema/generated.ts` encode these offsets:
+`World` is a current C++ domain type, not a byte-for-byte copy of the retired
+native layout. It owns the entity table, component store, loadout/profile,
+clock, RNG and snapshot bookkeeping. Wire offsets are defined only by
+`schema/protocol.yaml` and the generated protocol views.
 
-| Offset | Field | Confidence |
-| ---: | --- | --- |
-| 0 | arena settings active | high |
-| 1 | arena settings enabled | high |
-| 2 | arena count enabled | high |
-| 95 | flags (bit 8 used by the spawn manager) | high |
-| 312 | component 8 owner/revision/state | high |
-| 624 | arena settings component | high |
-| 1032 | arena settings vector | high |
-| 1488 | arena count component | high |
-| 1632 | arena count vector | high |
-| 2140 | revision counter | high |
-| 68268 | entity revision table A (u32[16384]) | high |
-| 133804 | entity revision table B (u32[16384]) | high |
-| 199340 | entity revision table C (u32[16384]) | high |
-| 264876 | serialization cache entries (8 bytes × 16384) | high |
-| 396092 | entity slots (496 bytes × 16384) | high |
-
-The struct is 8,522,556 bytes. `OutputQueue` and the catalog tables are separate
-globals in `schema/layout/session.yaml`, not members of `World`.
-
-## EntitySlot
-
-| Offset | Field | Confidence |
-| ---: | --- | --- |
-| 0 | world pointer | high |
-| 16 | 32-bit generation handle | high |
-| 20 | intrusive list owner | high |
-| 24 | list previous | high |
-| 28 | list next | high |
-| 92/93/95 | component flag bytes | high |
-| 312/376/464 | tracked marks and revisions | high |
-
-Most component payloads are outside the 496-byte record and are reached through
-world tables. The generated struct fills unnamed gaps with `_padding_0x...`.
+The old absolute-offset World/EntitySlot/PetalDefinition layouts and their
+generated accessors are retired with the original-layout probe. They live under
+`archive/`; no active build includes them. Unknown historical offsets are not
+reintroduced as product struct members.
 
 ## Entity handle
 
@@ -60,17 +30,19 @@ look/expression publication is described in [input.md](input.md).
 
 ## Snapshot writer
 
-`SnapshotWriter::write_world` serializes every active entity in slot order using
-the live mask/dense format. `spawn_entity` marks the allocated slot active; the
-native `test_worker_api` and `test_snapshot_writer_fields` cover spawn, update,
-delete and event blocks. The full framing is in [snapshot.md](snapshot.md).
+`SnapshotWriter::write_world` serializes active entities in slot order using the
+live mask/dense format generated from `schema/protocol.yaml`. The native
+`test_worker_api` and `test_snapshot_writer_fields` cover spawn, update, delete
+and event blocks. Full framing is in [snapshot.md](snapshot.md); the cross-end
+fixture in `tests/integration/native-snapshot.test.mjs` drives real
+`WorkerApi` bytes into the TypeScript decoder.
 
 ## Component store
 
 `engine::ComponentStore` provides 30 type-erased dense pools keyed by the schema
 component id. `ComponentPool<T>::attach` returns a stable index and reuses
-released indices FIFO; `get`/`release` are bounds-checked. The concrete
-component structs and their per-id types remain partly open.
+released indices FIFO; `get`/`release` are bounds-checked. Concrete component
+fields remain domain-owned; only their protocol projection is generated.
 
 ## Initialization anchors
 
@@ -85,9 +57,8 @@ component structs and their per-id types remain partly open.
 The unit test checks 16,384 unique handles and the final LCG state
 `11065635568950165505`.
 
-## Open questions
+## Retired layout material
 
-- Exact meanings of most component fields; keep offsets and confidence.
-- QuadTree field order is low-confidence (`schema/layout/spatial.yaml`); do not
-  use it for production logic until it is confirmed.
-- `field44`, `field108`, `field109`, `field110` names remain offsets.
+The archived layout files and probe are historical evidence only. Current C++
+layout is governed by `engine/src/core/contracts.cpp` (fundamental invariants and
+handle constants), not by absolute offsets copied from the original binary.

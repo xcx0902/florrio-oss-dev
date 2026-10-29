@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "description": "Hand-authored product protocol vectors. Each byte is intentional; the test must not derive expectations by calling the generator that produced the same packet.",
+  "vectors": [
+    {
+      "name": "empty-snapshot-header",
+      "hex": "010903000000",
+      "note": "type=1, sequence=9 varint, ack=3 varint, deletes=0, updates=0, events=0",
+      "sequence": 9,
+      "deletedHandles": [],
+      "entities": [],
+      "events": []
+    },
+    {
+      "name": "bare-activation",
+      "hex": "010c04000100785634123400",
+      "note": "type=1, sequence=12, ack=4, deletes=0, updates=1, events=0; handle 0x12345678 LE; wire flags 0x34 xor 0x36 = 2 (bare); zero-length body",
+      "sequence": 12,
+      "deletedHandles": [],
+      "entities": [
+        { "handle": 305419896, "flags": 2, "typeId": 0 }
+      ],
+      "events": []
+    }
+  ]
+}

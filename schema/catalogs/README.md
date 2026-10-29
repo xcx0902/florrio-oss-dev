@@ -1,35 +1,36 @@
 # Catalogs
 
-Product catalog inputs. `tools/gen-contracts.mjs` compiles them into the C++
-and TypeScript views; runtime code does not read these JSON files.
+Product catalog inputs, compiled by `tools/generate.mjs` into C++ and TypeScript
+views. Runtime code never parses these files directly.
 
-| File | Count | Contents |
+| File | Count | Owns |
 | --- | ---: | --- |
-| `petals.json` | 39 | petal names, descriptions, rarity, recharge and orbit constants |
-| `entities.json` | 23 | entity definitions, component pairs, scale and spawn defaults |
-| `spawn-rules.json` | 20 | weighted spawn bands and areas |
+| `petals.json` | 39 | identity, names/descriptions, rarity, recharge, instances, label font size and orbit flags |
+| `petal-combat.json` | 39 | draw radius, collision radius, damage, health, orbit profile/function |
+| `entities.json` | 23 | identity, scale, droppable petal ids, drop alias and weight, component draw count |
+| `spawn-rules.json` | 20 | weighted spawn bands |
+| `entity-spawn-defaults.json` | 19 | fixed spawn defaults; dynamic species keep their domain formulas |
 | `strings.json` | 99 | deduplicated names and descriptions |
-| `petal-combat.json` | 39 | collision radius, contact damage, health and orbit profile |
-| `drop-chances.json` | 23 | per-entity drop rows |
-| `entity-spawn-defaults.json` | — | native spawn defaults |
-| `client-gallery.json` | — | menu gallery rows |
-| `report.json` | — | catalog counts and validation summary |
+| `drop-rules.json` | 1 | unequal band areas, petal drop mass, summoned children and convergence thresholds |
+| `gallery-overrides.json` | — | only reasoned display differences from derived runtime drops |
 
-Validation:
+`drop-chances.json` is a generated output, not an input. Rarity/recharge/
+instance counts are joined from `petals.json`; they are not duplicated in
+`petal-combat.json`. `petals.ts` uses the definition label size for UI labels and
+the collision radius for world collision; a legitimate zero is preserved.
 
-- petal type ids are dense 0–38;
-- entity type ids are dense 0–22;
-- every spawn target exists;
-- every drop petal type exists;
-- string keys are unique and unique per catalog;
-- every generated C++/TypeScript view matches the current JSON.
+Validation (all performed before writing):
 
-Regenerate and check:
+- petal ids are dense 0–38, entity ids dense 0–22;
+- every petal/entity/drop/spawn/children reference exists;
+- drop aliases are acyclic and do not name themselves;
+- floats are finite and numeric thresholds are in range;
+- every gallery override targets a real entity;
+- every `CHANGELOG.md` release has notes and a valid date-like label.
 
 ```sh
 npm run schema:generate
-ctest --test-dir build/engine -R engine_schema_contracts
+npm run schema:check
 ```
 
-The original catalog extractor, layout probe and their decoded evidence are
-archived. The active build reads only these product JSON files.
+Old catalog extractors, layouts and decoded evidence are archived.

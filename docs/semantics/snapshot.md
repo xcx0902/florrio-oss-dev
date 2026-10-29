@@ -180,7 +180,7 @@ decoded against the live mask/dense contract.
   payload and checks all three blocks.
 - `test_worker_api` spawns a Cactus, checks a domain snapshot, despawns it and
   verifies the delete block, then emits chat event 9.
-- `client/tests/snapshot-domain.test.mjs` covers mask/dense decoding, absent
+- `client/tests/unit/snapshot-domain.test.mjs` covers mask/dense decoding, absent
   groups, component-pointer gating, health/kind projection and malformed input.
 
 ## Open

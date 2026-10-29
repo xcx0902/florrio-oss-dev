@@ -61,8 +61,9 @@ archived original runtime.
 
 ## Tests
 
-`client/tests/*.test.mjs` covers the retained product surface: boot and worker
-shim, snapshot decoding, movement, loadout, petal transfers, death lifecycle,
-event effects, menu animation/interactions, canvas context and tooltip UI.
+`client/tests/unit/` and `client/tests/integration/` cover the retained product
+surface: boot and worker RPC/streaming, snapshot decoding, movement, loadout,
+petal transfers, death lifecycle, event effects, menu animation/interactions,
+canvas context, text cache and tooltip UI.
 Original-WASM comparisons, golden screenshots and parity recordings live under
 [`../archive/`](../archive/README.md) and are not run by the product suite.

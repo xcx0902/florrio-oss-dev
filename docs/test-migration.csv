@@ -1,0 +1,354 @@
+旧路径,旧断言主题,传递依赖,是否执行原件,是否读取旧 golden,状态,当前替代,剩余动作,验证方式
+archive/tree/client/tests/angle-interpolation.test.mjs,angle-interpolation,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/arena-boundary.test.mjs,arena-boundary,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/camera-golden.test.mjs,camera-golden,归档客户端 golden/parity 夹具,否,是,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/camera-input.test.mjs,camera-input,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/camera-projection.test.mjs,camera-projection,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/drop-art.test.mjs,drop-art,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/entity-art.test.mjs,entity-art,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/hud-golden.test.mjs,hud-golden,归档客户端 golden/parity 夹具,否,是,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/menu-golden.test.mjs,menu-golden,归档客户端 golden/parity 夹具,否,是,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/menu-input-parity.test.mjs,menu-input-parity,归档客户端 golden/parity 夹具,否,是,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/pan.test.mjs,pan,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/petal-art.test.mjs,petal-art,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/petal-motion.test.mjs,petal-motion,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/recharge.test.mjs,recharge,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/render-camera.test.mjs,render-camera,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/render-golden.test.mjs,render-golden,归档客户端 golden/parity 夹具,否,是,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/rendering-parity.test.mjs,rendering-parity,归档客户端 golden/parity 夹具,否,是,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/species-animation.test.mjs,species-animation,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/text-cache.test.mjs,text-cache,归档客户端测试 helper,否,否,已核验,client/tests/unit/text-cache.test.mjs,已迁移产品测试,npm run test:client
+archive/tree/client/tests/ui-detail-parity.test.mjs,ui-detail-parity,归档客户端 golden/parity 夹具,否,是,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/world-transform.test.mjs,world-transform,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/client/tests/zone-warning.test.mjs,zone-warning,归档客户端测试 helper,否,否,历史退役,—,旧 golden/parity；当前无等价像素/黄金断言,不进入产品验收；仅保留归档证据
+archive/tree/test/client-affine-channels.test.mjs,client-affine-channels,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-affine-row-blit.test.mjs,client-affine-row-blit,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-affine-sampler.test.mjs,client-affine-sampler,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-affine-scale.test.mjs,client-affine-scale,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-allocate-or-abort.test.mjs,client-allocate-or-abort,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-allocate-zeroed-array.test.mjs,client-allocate-zeroed-array,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-alpha-blit.test.mjs,client-alpha-blit,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-array-and-vtable-destructors.test.mjs,client-array-and-vtable-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-asm-const-callbacks.test.mjs,client-asm-const-callbacks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-asm-const-wrappers.test.mjs,client-asm-const-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-atan.test.mjs,client-atan,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-atanf.test.mjs,client-atanf,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-bitmap-decode.test.mjs,client-bitmap-decode,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-blend-blit.test.mjs,client-blend-blit,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-buffer-helpers.test.mjs,client-buffer-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-buffers.test.mjs,client-buffers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-callable-clone-to-heap.test.mjs,client-callable-clone-to-heap,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-callable-copy-constructors.test.mjs,client-callable-copy-constructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-callable-destructors.test.mjs,client-callable-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-callable-invokers.test.mjs,client-callable-invokers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-channel-blit.test.mjs,client-channel-blit,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-channel-pack.test.mjs,client-channel-pack,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-cleanup-and-config.test.mjs,client-cleanup-and-config,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-clock.test.mjs,client-clock,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-closure-adapter-chains.test.mjs,client-closure-adapter-chains,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-closure-chain-invokers.test.mjs,client-closure-chain-invokers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-closure-invoker-pairs-result.test.mjs,client-closure-invoker-pairs-result,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-closure-invoker-pairs.test.mjs,client-closure-invoker-pairs,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-closure-invoker-single-result.test.mjs,client-closure-invoker-single-result,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-closure-invoker-two-arguments.test.mjs,client-closure-invoker-two-arguments,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-compact-destructors.test.mjs,client-compact-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-component-128-renderer.test.mjs,client-component-128-renderer,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-component-132-renderer.test.mjs,client-component-132-renderer,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-component-148-renderer.test.mjs,client-component-148-renderer,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-components-64-80-renderer.test.mjs,client-components-64-80-renderer,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-composed.test.mjs,client-composed,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-conditionals.test.mjs,client-conditionals,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-config-io.test.mjs,client-config-io,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-double-trig.test.mjs,client-double-trig,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-drawing-primitives.test.mjs,client-drawing-primitives,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-dynamic-call-thunks.test.mjs,client-dynamic-call-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-entity-definition.test.mjs,client-entity-definition,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-entity-growth.test.mjs,client-entity-growth,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-entity-record.test.mjs,client-entity-record,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-entity-renderer.test.mjs,client-entity-renderer,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-entity-snapshot.test.mjs,client-entity-snapshot,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-errno-wrappers.test.mjs,client-errno-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-eye-renderer.test.mjs,client-eye-renderer,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-fixed-address-forwarders.test.mjs,client-fixed-address-forwarders,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-flag-and-field-helpers.test.mjs,client-flag-and-field-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-flag-helpers.test.mjs,client-flag-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-float-array.test.mjs,client-float-array,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-float-field-setters.test.mjs,client-float-field-setters,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-frame.test.mjs,client-frame,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-frexp.test.mjs,client-frexp,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-global-destructors.test.mjs,client-global-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-iconv-init.test.mjs,client-iconv-init,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-indirect-helpers.test.mjs,client-indirect-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-initializers-and-flags.test.mjs,client-initializers-and-flags,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-io-and-alloc.test.mjs,client-io-and-alloc,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-leaf-functions.test.mjs,client-leaf-functions,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-lifecycle-wrappers.test.mjs,client-lifecycle-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-log-markers.test.mjs,client-log-markers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-log-wrappers.test.mjs,client-log-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-materials.test.mjs,client-materials,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-math.test.mjs,client-math,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-mb-to-wc.test.mjs,client-mb-to-wc,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-memory-fill.test.mjs,client-memory-fill,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-misc-tiny-wrappers.test.mjs,client-misc-tiny-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-number-format.test.mjs,client-number-format,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-numeric-wrappers.test.mjs,client-numeric-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-object-constructor.test.mjs,client-object-constructor,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-object-destructors.test.mjs,client-object-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-object-initializers.test.mjs,client-object-initializers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-object-lifecycle-slots.test.mjs,client-object-lifecycle-slots,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-particle-record-variant.test.mjs,client-particle-record-variant,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-particle-record.test.mjs,client-particle-record,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-pending-queue-destructors.test.mjs,client-pending-queue-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-petal-colors.test.mjs,client-petal-colors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-petal-tooltip.test.mjs,client-petal-tooltip,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-pixel-channel-extract.test.mjs,client-pixel-channel-extract,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-pixel-convert.test.mjs,client-pixel-convert,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-pixel-write-modes.test.mjs,client-pixel-write-modes,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-player-appearance.test.mjs,client-player-appearance,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-predicates.test.mjs,client-predicates,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-random-angle.test.mjs,client-random-angle,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-ranges.test.mjs,client-ranges,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-records.test.mjs,client-records,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-refcounted-string-destructors.test.mjs,client-refcounted-string-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-registry-and-lookup.test.mjs,client-registry-and-lookup,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-render-frame.test.mjs,client-render-frame,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-rgb555-write-modes.test.mjs,client-rgb555-write-modes,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-rgb565-write-modes.test.mjs,client-rgb565-write-modes,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-rgba8888-write-modes.test.mjs,client-rgba8888-write-modes,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-row-blit.test.mjs,client-row-blit,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-row-channel-blend-straight.test.mjs,client-row-channel-blend-straight,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-row-channel-blend.test.mjs,client-row-channel-blend,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-runtime-primitives.test.mjs,client-runtime-primitives,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-scaled-channel-blit.test.mjs,client-scaled-channel-blit,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-scan-format.test.mjs,client-scan-format,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-semantics.test.mjs,client-semantics,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-shifts.test.mjs,client-shifts,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-slot-allocators.test.mjs,client-slot-allocators,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-small-accessors.test.mjs,client-small-accessors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-small-wrappers.test.mjs,client-small-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-snapshot-decoder.test.mjs,client-snapshot-decoder,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-snapshots.test.mjs,client-snapshots,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-soft-compare.test.mjs,client-soft-compare,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-span-blend-additive.test.mjs,client-span-blend-additive,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-static-cleanup-loops.test.mjs,client-static-cleanup-loops,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-static-initializer-guards.test.mjs,client-static-initializer-guards,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-static-queue-arrays.test.mjs,client-static-queue-arrays,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-static-table-initializers.test.mjs,client-static-table-initializers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-straight-line.test.mjs,client-straight-line,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-string-and-object-forwarders.test.mjs,client-string-and-object-forwarders,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-string-utils.test.mjs,client-string-utils,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-text-support.test.mjs,client-text-support,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-text.test.mjs,client-text,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-time-converters.test.mjs,client-time-converters,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-timeout-fire.test.mjs,client-timeout-fire,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-transforms.test.mjs,client-transforms,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-transport.test.mjs,client-transport,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-trig.test.mjs,client-trig,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-utf8-advance-wide.test.mjs,client-utf8-advance-wide,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-utf8-advance.test.mjs,client-utf8-advance,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-utf8-decode.test.mjs,client-utf8-decode,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-virtual-destructors.test.mjs,client-virtual-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-chain-thunks.test.mjs,client-vtable-chain-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-constructors.test.mjs,client-vtable-constructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-forward-thunks.test.mjs,client-vtable-forward-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-index-forward-thunks.test.mjs,client-vtable-index-forward-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-indexed-callback-thunks.test.mjs,client-vtable-indexed-callback-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-indexed-chain-thunks.test.mjs,client-vtable-indexed-chain-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-invokers.test.mjs,client-vtable-invokers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-pair-thunks.test.mjs,client-vtable-pair-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-quad-dispatch-thunks.test.mjs,client-vtable-quad-dispatch-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-reordered-chain-thunks.test.mjs,client-vtable-reordered-chain-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-vtable-thunks.test.mjs,client-vtable-thunks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-wasm-probe.test.mjs,client-wasm-probe,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-wide-math.test.mjs,client-wide-math,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-window-check.test.mjs,client-window-check,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/client-wrappers.test.mjs,client-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/javascript-recovery.test.mjs,javascript-recovery,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/original-client-checks.test.mjs,original-client-checks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/original-client-state.test.mjs,original-client-state,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/production-state.test.mjs,production-state,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/protocol-contracts.test.mjs,protocol-contracts,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,tests/unit/protocol-contracts.test.mjs,已迁移到产品协议/传输契约测试,npm run test:unit
+archive/tree/test/runtime-integration.test.mjs,runtime-integration,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,tests/integration/native-snapshot.test.mjs,已迁移为原生 WorkerApi -> TS 解码器集成测试,npm run test:integration
+archive/tree/test/server-abi-leaf-helpers.test.mjs,server-abi-leaf-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-abort-helpers.test.mjs,server-abort-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-allocation.test.mjs,server-allocation,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-atan.test.mjs,server-atan,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-bool-string.test.mjs,server-bool-string,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-bump-allocator.test.mjs,server-bump-allocator,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-byte-move.test.mjs,server-byte-move,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-byte-range-compare.test.mjs,server-byte-range-compare,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-catalog-initializers-2.test.mjs,server-catalog-initializers-2,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,tests/unit/schema-generation.test.mjs + engine tests,目录初始化改由生成数据与 Catalog 测试覆盖,npm run test:unit && npm run test:engine
+archive/tree/test/server-catalog-initializers.test.mjs,server-catalog-initializers,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,tests/unit/schema-generation.test.mjs + engine tests,目录初始化改由生成数据与 Catalog 测试覆盖,npm run test:unit && npm run test:engine
+archive/tree/test/server-cell-attachment.test.mjs,server-cell-attachment,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-check-websockets.test.mjs,server-check-websockets,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-clock.test.mjs,server-clock,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-collision-filter.test.mjs,server-collision-filter,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-combat.test.mjs,server-combat,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-component-release.test.mjs,server-component-release,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-components.test.mjs,server-components,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-container-end.test.mjs,server-container-end,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-cosine-correction.test.mjs,server-cosine-correction,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-damage.test.mjs,server-damage,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-delete-guard.test.mjs,server-delete-guard,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-depth-comparator.test.mjs,server-depth-comparator,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-effects.test.mjs,server-effects,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-entities.test.mjs,server-entities,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-entity-definitions.test.mjs,server-entity-definitions,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-entity-flag-reset.test.mjs,server-entity-flag-reset,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-errno-category.test.mjs,server-errno-category,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-errno-more-wrappers.test.mjs,server-errno-more-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-errno-parse-wrappers.test.mjs,server-errno-parse-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-facet-write.test.mjs,server-facet-write,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-file-seek.test.mjs,server-file-seek,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-float-format-suffix.test.mjs,server-float-format-suffix,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-format-padding.test.mjs,server-format-padding,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-format-time-output.test.mjs,server-format-time-output,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-format-time.test.mjs,server-format-time,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-four-record-sort.test.mjs,server-four-record-sort,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-frame-wrappers.test.mjs,server-frame-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-free-block.test.mjs,server-free-block,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-frexp.test.mjs,server-frexp,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-function-invoker.test.mjs,server-function-invoker,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-global-buffer-cleanup.test.mjs,server-global-buffer-cleanup,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-global-cleanup.test.mjs,server-global-cleanup,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-global-flag-reset.test.mjs,server-global-flag-reset,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-global-list-cleanup.test.mjs,server-global-list-cleanup,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-global-locale-cache.test.mjs,server-global-locale-cache,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-global-pointer-vector-cleanup.test.mjs,server-global-pointer-vector-cleanup,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-growth-factor.test.mjs,server-growth-factor,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-initialization.test.mjs,server-initialization,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-inline-storage.test.mjs,server-inline-storage,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-input.test.mjs,server-input,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-int-to-long-double.test.mjs,server-int-to-long-double,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-int64-parse-limits.test.mjs,server-int64-parse-limits,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-lifecycle-helpers.test.mjs,server-lifecycle-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-loadout.test.mjs,server-loadout,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-locale-callbacks-wide.test.mjs,server-locale-callbacks-wide,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-callbacks.test.mjs,server-locale-callbacks,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-delete.test.mjs,server-locale-delete,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-facet-cleanup.test.mjs,server-locale-facet-cleanup,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-facet-getters.test.mjs,server-locale-facet-getters,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-facet-loop.test.mjs,server-locale-facet-loop,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-facet-release.test.mjs,server-locale-facet-release,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-object-lifetime.test.mjs,server-locale-object-lifetime,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-stream-state.test.mjs,server-locale-stream-state,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-locale-wide-forward.test.mjs,server-locale-wide-forward,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-long-double-converters.test.mjs,server-long-double-converters,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-mbrtowc.test.mjs,server-mbrtowc,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-memcmp.test.mjs,server-memcmp,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-memory-copy.test.mjs,server-memory-copy,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-memory-fill.test.mjs,server-memory-fill,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-minus-string.test.mjs,server-minus-string,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-movable-record.test.mjs,server-movable-record,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-number-parse.test.mjs,server-number-parse,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-object-cleanup-chain.test.mjs,server-object-cleanup-chain,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-object-deleters.test.mjs,server-object-deleters,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-object-initializer.test.mjs,server-object-initializer,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-object-method-dispatch.test.mjs,server-object-method-dispatch,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-object-wrappers.test.mjs,server-object-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-ownership.test.mjs,server-ownership,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-packed-key-sort-five.test.mjs,server-packed-key-sort-five,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-packed-key-sort.test.mjs,server-packed-key-sort,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-parser-and-rounding.test.mjs,server-parser-and-rounding,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-petal-factories.test.mjs,server-petal-factories,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-petal-lifecycle.test.mjs,server-petal-lifecycle,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-petal-world.test.mjs,server-petal-world,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-petals-special.test.mjs,server-petals-special,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-petals.test.mjs,server-petals,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-random-int.test.mjs,server-random-int,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-random-state.test.mjs,server-random-state,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-range-copy.test.mjs,server-range-copy,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-record-sort.test.mjs,server-record-sort,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-refcount-helpers.test.mjs,server-refcount-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-release-storage.test.mjs,server-release-storage,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-rem-pio2-large.test.mjs,server-rem-pio2-large,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-rem-pio2.test.mjs,server-rem-pio2,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-rem-pio2f.test.mjs,server-rem-pio2f,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-replay.test.mjs,server-replay,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-scalar-helpers.test.mjs,server-scalar-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-scalbn.test.mjs,server-scalbn,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-scan-utilities.test.mjs,server-scan-utilities,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-semantics.test.mjs,server-semantics,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-sequence-and-table-helpers.test.mjs,server-sequence-and-table-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-simulation-tick.test.mjs,server-simulation-tick,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-simulation.test.mjs,server-simulation,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-sine-offset.test.mjs,server-sine-offset,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-singleton-getters.test.mjs,server-singleton-getters,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-small-accessors.test.mjs,server-small-accessors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-small-memory.test.mjs,server-small-memory,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-sort-four.test.mjs,server-sort-four,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-sort3-and-state.test.mjs,server-sort3-and-state,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-spatial-ai.test.mjs,server-spatial-ai,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-spawn-components.test.mjs,server-spawn-components,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-spawn-manager-192.test.mjs,server-spawn-manager-192,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-state-comparator.test.mjs,server-state-comparator,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-state-trap.test.mjs,server-state-trap,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,engine/tests/unit/test_main.cpp + cases/,领域行为由原生 engine_tests 覆盖；低层原件 ABI 断言不再保留,npm run test:engine
+archive/tree/test/server-static-object-lifecycle.test.mjs,server-static-object-lifecycle,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-block-write.test.mjs,server-stream-block-write,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-buffer-primitives.test.mjs,server-stream-buffer-primitives,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-flag-update.test.mjs,server-stream-flag-update,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-get-char.test.mjs,server-stream-get-char,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-handle-ops.test.mjs,server-stream-handle-ops,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-putback.test.mjs,server-stream-putback,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-read-char.test.mjs,server-stream-read-char,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-read-line.test.mjs,server-stream-read-line,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-read-word-record.test.mjs,server-stream-read-word-record,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-seek.test.mjs,server-stream-seek,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-state-primitives.test.mjs,server-stream-state-primitives,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-status-equality.test.mjs,server-stream-status-equality,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-status.test.mjs,server-stream-status,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-transition.test.mjs,server-stream-transition,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-write-byte.test.mjs,server-stream-write-byte,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-write-copy.test.mjs,server-stream-write-copy,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-stream-write-word.test.mjs,server-stream-write-word,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-and-sequence-primitives.test.mjs,server-string-and-sequence-primitives,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-append.test.mjs,server-string-append,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-assignment-adapters.test.mjs,server-string-assignment-adapters,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-construction-wrapper.test.mjs,server-string-construction-wrapper,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-copy-assignment.test.mjs,server-string-copy-assignment,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-copy-constructor.test.mjs,server-string-copy-constructor,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-destructor.test.mjs,server-string-destructor,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-fill-construct.test.mjs,server-string-fill-construct,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-identity-equality.test.mjs,server-string-identity-equality,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-length-assignment.test.mjs,server-string-length-assignment,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-length-setter.test.mjs,server-string-length-setter,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-member-assign.test.mjs,server-string-member-assign,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-move.test.mjs,server-string-move,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-object-wrappers.test.mjs,server-string-object-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-range-construct.test.mjs,server-string-range-construct,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-resize.test.mjs,server-string-resize,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-table-destruction.test.mjs,server-string-table-destruction,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-utilities.test.mjs,server-string-utilities,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-string-validate.test.mjs,server-string-validate,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-table-transcoders.test.mjs,server-table-transcoders,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-three-word-float-compare.test.mjs,server-three-word-float-compare,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-timeout-fire.test.mjs,server-timeout-fire,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-timeout-registry.test.mjs,server-timeout-registry,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-transforms.test.mjs,server-transforms,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-trig-kernels.test.mjs,server-trig-kernels,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-two-digit-year.test.mjs,server-two-digit-year,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-type-check.test.mjs,server-type-check,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-uint-to-long-double.test.mjs,server-uint-to-long-double,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-unicode-codecs.test.mjs,server-unicode-codecs,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-utf16-to-utf8.test.mjs,server-utf16-to-utf8,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-utf8-decode.test.mjs,server-utf8-decode,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-utf8-encode-codepoint.test.mjs,server-utf8-encode-codepoint,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-utf8-scan.test.mjs,server-utf8-scan,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-utf8-to-utf16.test.mjs,server-utf8-to-utf16,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-vector-at.test.mjs,server-vector-at,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-vector-helpers.test.mjs,server-vector-helpers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-vector-object-destructor.test.mjs,server-vector-object-destructor,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-virtual-base-wrappers.test.mjs,server-virtual-base-wrappers,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-vtable-destructors.test.mjs,server-vtable-destructors,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-wide-bool-string.test.mjs,server-wide-bool-string,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-wide-float-compare.test.mjs,server-wide-float-compare,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-wide-multiply.test.mjs,server-wide-multiply,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-wide-shift.test.mjs,server-wide-shift,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/server-wide-string-constructor.test.mjs,server-wide-string-constructor,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/source-build.test.mjs,source-build,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/tools-delivery.test.mjs,tools-delivery,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,tests/tools/delivery.test.mjs,已迁移到产品交付工具测试,npm run test:tools
+archive/tree/test/tools-engineering.test.mjs,tools-engineering,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/tools-release-rehearsal.test.mjs,tools-release-rehearsal,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据
+archive/tree/test/tools-runner.test.mjs,tools-runner,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,tests/tools/verification.test.mjs,已迁移到验收失败路径测试,npm run test:tools
+archive/tree/test/tools-verification.test.mjs,tools-verification,原版 WASM/ABI 探针或旧 oracle,否（使用当前产品）,否,已核验,tests/tools/verification.test.mjs,已迁移到验收失败路径测试,npm run test:tools
+archive/tree/test/verification-gates.test.mjs,verification-gates,原版 WASM/ABI 探针或旧 oracle,是,否,历史退役,—,原版 WASM/ABI 探针或旧 oracle；产品路径不读取归档,不进入产品验收；仅保留归档证据

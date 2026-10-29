@@ -61,9 +61,12 @@ npm run build:dist-next     # package dist-next/
 ```sh
 npm run test:unit           # protocol/wire unit tests
 npm run test:tools          # delivery and verification tool tests
-npm run test:engine         # native build + 12 CTest targets
-npm run test:client         # typecheck + retained client tests
+npm run test:engine         # native build + 10 CTest targets
+npm run test:client         # typecheck + client unit/integration suites
+npm run test:integration    # native WorkerApi fixture -> TS decoder
+npm run build:dist-next     # packaged delivery tree
 npm run verify:dist-next    # delivery manifest, hashes and source identity
+npm run test:delivery       # dist-next worker/menu smoke
 ```
 
 The client tests launch a real Chromium and load `client/public` or `dist-next`
@@ -83,12 +86,13 @@ The runner performs, in order:
 4. protocol unit tests;
 5. tool tests;
 6. CTest;
-7. retained client tests;
-8. `dist-next` packaging;
-9. delivery identity and integrity checks;
-10. delivery smoke tests against the packaged tree;
-11. entrypoint smoke with a real Worker, keyboard and mouse;
-12. Chromium browser matrix.
+7. client unit and integration suites;
+8. native WorkerApi -> TS integration fixture;
+9. `dist-next` packaging;
+10. delivery identity and integrity checks;
+11. delivery smoke tests against the packaged tree;
+12. entrypoint smoke with a real Worker, keyboard and mouse;
+13. Chromium browser matrix.
 
 It writes `reports/current-verification.json`. A failed or interrupted run does
 not produce a passing record. `reports/` is gitignored; attach the JSON and the
@@ -100,8 +104,8 @@ The archive is not an input. To prove it, copy the source tree without
 `archive/` (and without generated output), then run the same commands:
 
 ```sh
-rsync -a --exclude archive --exclude build --exclude dist-next \
-  --exclude node_modules --exclude reports --exclude .git \
+rsync -a --exclude archive --exclude build --exclude 'dist*' \
+  --exclude node_modules --exclude reports --exclude .git --exclude .emcache \
   ./ /tmp/florrio-product/
 cd /tmp/florrio-product
 npm ci

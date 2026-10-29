@@ -12,12 +12,12 @@
       "scale": 0,
       "petalTypeIds": [],
       "componentDrawCount": 0,
-      "field100": 0,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 0,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 1,
@@ -33,12 +33,12 @@
         4
       ],
       "componentDrawCount": 3,
-      "field100": 51,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 51,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 2,
@@ -54,12 +54,12 @@
         26
       ],
       "componentDrawCount": 3,
-      "field100": 52,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 52,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 3,
@@ -77,12 +77,12 @@
         33
       ],
       "componentDrawCount": 5,
-      "field100": 53,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 53,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 4,
@@ -100,12 +100,12 @@
         18
       ],
       "componentDrawCount": 5,
-      "field100": 54,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 54,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 5,
@@ -122,12 +122,12 @@
         15
       ],
       "componentDrawCount": 4,
-      "field100": 55,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 10
+      "opaque100": 55,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 10
     },
     {
       "typeId": 6,
@@ -146,12 +146,12 @@
         31
       ],
       "componentDrawCount": 6,
-      "field100": 56,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 56,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 7,
@@ -169,12 +169,12 @@
         37
       ],
       "componentDrawCount": 5,
-      "field100": 57,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 57,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 8,
@@ -192,12 +192,12 @@
         38
       ],
       "componentDrawCount": 5,
-      "field100": 58,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 58,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 9,
@@ -215,12 +215,12 @@
         17
       ],
       "componentDrawCount": 5,
-      "field100": 59,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 59,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 10,
@@ -239,12 +239,12 @@
         27
       ],
       "componentDrawCount": 6,
-      "field100": 60,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 60,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 11,
@@ -260,12 +260,12 @@
         22
       ],
       "componentDrawCount": 3,
-      "field100": 61,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 61,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 12,
@@ -282,12 +282,12 @@
         17
       ],
       "componentDrawCount": 4,
-      "field100": 62,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 62,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 13,
@@ -304,12 +304,12 @@
         23
       ],
       "componentDrawCount": 4,
-      "field100": 63,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 63,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 14,
@@ -328,12 +328,12 @@
         25
       ],
       "componentDrawCount": 6,
-      "field100": 64,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 2
+      "opaque100": 64,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 2
     },
     {
       "typeId": 15,
@@ -352,12 +352,12 @@
         17
       ],
       "componentDrawCount": 6,
-      "field100": 65,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 65,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 16,
@@ -369,12 +369,12 @@
       "scale": 3,
       "petalTypeIds": [],
       "componentDrawCount": 6,
-      "field100": 66,
-      "field104": 0,
-      "field108": 0,
-      "field109": 15,
-      "field110": 15,
-      "field112": 1
+      "opaque100": 66,
+      "opaque104": 0,
+      "opaque108": 0,
+      "dropAliasOf": 15,
+      "opaque110": 15,
+      "dropWeight": 1
     },
     {
       "typeId": 17,
@@ -391,12 +391,12 @@
         17
       ],
       "componentDrawCount": 4,
-      "field100": 67,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 67,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 18,
@@ -408,12 +408,12 @@
       "scale": 5,
       "petalTypeIds": [],
       "componentDrawCount": 4,
-      "field100": 68,
-      "field104": 0,
-      "field108": 0,
-      "field109": 17,
-      "field110": 17,
-      "field112": 1
+      "opaque100": 68,
+      "opaque104": 0,
+      "opaque108": 0,
+      "dropAliasOf": 17,
+      "opaque110": 17,
+      "dropWeight": 1
     },
     {
       "typeId": 19,
@@ -427,12 +427,12 @@
         5
       ],
       "componentDrawCount": 1,
-      "field100": 69,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 69,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 20,
@@ -451,12 +451,12 @@
         28
       ],
       "componentDrawCount": 6,
-      "field100": 70,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 70,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     },
     {
       "typeId": 21,
@@ -475,12 +475,12 @@
         17
       ],
       "componentDrawCount": 6,
-      "field100": 71,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 0.20000000298023224
+      "opaque100": 71,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 0.20000000298023224
     },
     {
       "typeId": 22,
@@ -498,12 +498,12 @@
         30
       ],
       "componentDrawCount": 5,
-      "field100": 72,
-      "field104": 0,
-      "field108": 1,
-      "field109": 0,
-      "field110": 0,
-      "field112": 1
+      "opaque100": 72,
+      "opaque104": 0,
+      "opaque108": 1,
+      "dropAliasOf": 0,
+      "opaque110": 0,
+      "dropWeight": 1
     }
   ]
 }

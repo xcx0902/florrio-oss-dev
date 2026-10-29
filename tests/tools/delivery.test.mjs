@@ -15,7 +15,7 @@ async function fixture(t) {
   t.after(() => rm(root, { recursive: true, force: true }));
   for (const folder of ['client/src', 'client/public', 'engine/src', 'engine/include', 'tools/lib', 'tools/verification'])
     await mkdir(path.join(root, folder), { recursive: true });
-  for (const file of ['.emscripten-version', 'tools/build-engine-wasm.mjs', 'tools/lib/build-inputs.mjs', 'tools/verification/io.mjs'])
+  for (const file of ['.emscripten-version', 'engine/sources.cmake', 'tools/build-engine-wasm.mjs', 'tools/lib/build-inputs.mjs', 'tools/verification/io.mjs'])
     await cp(path.join(repo, file), path.join(root, file));
   const config = { compilerOptions: { target: 'ES2022', module: 'ES2022', lib: ['ES2022'],
     rootDir: 'src', outDir: 'public', declaration: true, sourceMap: true, types: [] }, include: ['src/**/*.ts'] };

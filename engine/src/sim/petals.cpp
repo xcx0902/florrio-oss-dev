@@ -1,6 +1,5 @@
 #include "engine/sim/petals.hpp"
 #include "engine/sim/petal_effects.hpp"
-#include "engine/catalog/petal_defaults.hpp"
 #include "engine/model/catalog.hpp"
 #include "engine/sim/petal_orbit.hpp"
 #include "engine/sim/spawn.hpp"
@@ -46,14 +45,12 @@ std::uint8_t petal_orbit_index(const World& world, std::uint8_t slot,
   for (std::uint8_t index = 0; index < 8U; ++index) {
     const std::uint16_t type = slots[index].type_id;
     if (type == 0U || type > 38U) continue;
-    const PetalDefault* definition = nullptr;
-    for (const auto& petal : petal_defaults())
-      if (petal.type_id == type) { definition = &petal; break; }
+    const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
     if (definition == nullptr) continue;
     // definition+40 disables the orbit slot entirely.
-    if (definition->flags[0] != 0U) continue;
+    if (definition->orbitHidden) continue;
     const std::uint8_t count = slots[index].count == 0U ? 1U : slots[index].count;
-    if (definition->flags[1] != 0U) {
+    if (definition->sharedOrbit) {
       // flag41: instances share one orbital position.
       if (index == slot) return orbit_index;
       if (count != 0U) ++orbit_index;
@@ -84,11 +81,9 @@ void assign_petal_orbit_indices(World& world) {
     if (type == 0U || type > 38U) {
       // Still write the boundary counter for empty slots.
     } else {
-      const PetalDefault* definition = nullptr;
-      for (const auto& petal : petal_defaults())
-        if (petal.type_id == type) { definition = &petal; break; }
-      if (definition != nullptr && definition->flags[0] == 0U) {
-        if (definition->flags[1] != 0U) {
+      const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
+      if (definition != nullptr && !definition->orbitHidden) {
+        if (definition->sharedOrbit) {
           bool position_used = false;
           for (std::uint8_t instance = 0; instance < 3U; ++instance) {
             const EntityHandle handle = loadout.handle(slot, instance);
@@ -98,7 +93,7 @@ void assign_petal_orbit_indices(World& world) {
               // An existing slot entity without a petal component does not
               // reserve an orbit position; only a missing entity does.
               if (state != nullptr) position_used = true;
-              else if (!handle.valid() && definition->instances_per_slot > instance)
+              else if (!handle.valid() && definition->instancesPerSlot > instance)
                 position_used = true;
             } else if (state != nullptr) {
               ++orbit_index;
@@ -107,7 +102,7 @@ void assign_petal_orbit_indices(World& world) {
               // position already claimed by its earlier instances.
               if (position_used) ++orbit_index;
             } else {
-              position_used = position_used || definition->instances_per_slot > 2U;
+              position_used = position_used || definition->instancesPerSlot > 2U;
               if (position_used) ++orbit_index;
             }
           }
@@ -118,7 +113,7 @@ void assign_petal_orbit_indices(World& world) {
             if (state != nullptr) {
               state->orbit_index = orbit_index;
               ++orbit_index;
-            } else if (!handle.valid() && definition->instances_per_slot > instance) {
+            } else if (!handle.valid() && definition->instancesPerSlot > instance) {
               ++orbit_index;
             }
           }
@@ -143,12 +138,10 @@ double petal_orbit_angle(const World& world, std::uint8_t orbit_index) {
     for (std::uint8_t slot = 0; slot < active && slot < loadout_slots.size(); ++slot) {
       const std::uint16_t type = loadout_slots[slot].type_id;
       if (type == 0U || type > 38U) continue;
-      const PetalDefault* definition = nullptr;
-      for (const auto& petal : petal_defaults())
-        if (petal.type_id == type) { definition = &petal; break; }
-      if (definition == nullptr || definition->flags[0] != 0U) continue;
-      if (definition->flags[1] != 0U) ++orbit_positions;
-      else orbit_positions = static_cast<std::uint8_t>(orbit_positions + definition->instances_per_slot);
+      const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
+      if (definition == nullptr || definition->orbitHidden) continue;
+      if (definition->sharedOrbit) ++orbit_positions;
+      else orbit_positions = static_cast<std::uint8_t>(orbit_positions + definition->instancesPerSlot);
     }
   }
   const double slots = orbit_positions > 1U ? static_cast<double>(orbit_positions) : 1.0;
@@ -167,8 +160,8 @@ Vec2 orbit_position(Vec2 center, f32 radius, f32 angle) {
 }
 
 f32 petal_radius(std::uint16_t type_id) {
-  for (const auto& petal : petal_defaults())
-    if (petal.type_id == type_id) return f32(petal.radius);
+  const auto* petal = Catalog::instance().petal(type_id);
+  if (petal != nullptr) return f32(petal->labelFontSize);
   return f32(0.0F);
 }
 
@@ -392,11 +385,10 @@ void update_petal_orbits(World& world, double step_milliseconds) {
 PetalSlot make_petal_slot(std::uint16_t type_id) {
   PetalSlot slot;
   slot.type_id = type_id;
-  for (const auto& petal : petal_defaults()) {
-    if (petal.type_id != type_id) continue;
-    slot.count = petal.instances_per_slot;
+  const auto* petal = Catalog::instance().petal(type_id);
+  if (petal != nullptr) {
+    slot.count = petal->instancesPerSlot;
     slot.recharge_remaining_ms = 0.0;
-    break;
   }
   return slot;
 }
@@ -454,11 +446,9 @@ EntityHandle spawn_petal(World& world, std::uint16_t type_id, Vec2 center,
   state.instance_count = instance_count == 0 ? 1 : instance_count;
   if (type_id == 22U) entity->behavior_cooldown_ms = 1000.0;
   else if (type_id == 23U) entity->behavior_cooldown_ms = 2500.0;
-  for (const auto& petal : petal_defaults()) {
-    if (petal.type_id != type_id) continue;
-    if (petal.flags[1] != 0U) state.extra_radius = f32(petal.flags[2]);
-    break;
-  }
+  const auto* petal = Catalog::instance().petal(type_id);
+  if (petal != nullptr && petal->sharedOrbit)
+    state.extra_radius = f32(petal->extraOrbitRadius);
   world.petals().push_back(state);
   return handle;
 }
@@ -476,11 +466,8 @@ std::size_t spawn_loadout_petals(World& world) {
     // is worn on the flower instead: it contributes only its appearance bit
     // and the widened camera. Spawning a petal here would make it orbit.
     bool hidden = false;
-    for (const auto& definition : petal_defaults()) {
-      if (definition.type_id != value.type_id) continue;
-      hidden = definition.flags[0] != 0U;
-      break;
-    }
+    const auto* definition = Catalog::instance().petal(value.type_id);
+    hidden = definition != nullptr && definition->orbitHidden;
     if (hidden) {
       value.instances.fill(EntityHandle{});
       for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance)

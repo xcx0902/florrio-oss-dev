@@ -5,8 +5,9 @@ pickup spawner. `engine/src/sim/loot.cpp` holds the product pieces.
 
 ## Entity drop tables
 
-`schema/catalogs/drop-chances.json` is the finalized per-entity table. The
-historical derivation algorithm:
+`schema/catalogs/drop-chances.json` is a generated per-entity table. The
+active derivation lives in `tools/schema/drop-chances.mjs` and reads only
+`drop-rules.json` plus the product catalogs:
 
 1. Build eight spawn-band histograms from the weighted spawn rules, including
    summoned children (Ant Hole → Baby/Worker/Soldier/Queen Ant; Centipede →
@@ -23,7 +24,7 @@ historical derivation algorithm:
 6. Alias species inherit the finalized table, then entries are sorted by
    ascending chance.
 
-The derivation tool is archived; the runtime reads only the committed table.
+The archived derivation is historical evidence only; the active runtime reads the generated C++ table.
 
 ## Spawn-time loot attachment
 

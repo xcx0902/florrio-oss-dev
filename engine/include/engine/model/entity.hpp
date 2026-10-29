@@ -167,7 +167,7 @@ struct EntityBounds {
 };
 
 /** Domain entity. This is deliberately not a view over the original 496-byte
- * record; offsets live only in engine/schema/generated.hpp. */
+ * record; protocol offsets live only in the generated protocol views. */
 struct Entity {
   EntityHandle handle;
   EntityKind kind = EntityKind::kNone;

@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readFile, writeFile, mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import ts from 'typescript';
-import { parseProtocol, compileProtocol, generateProtocolCpp, generateProtocolTs } from '../../tools/lib/protocol-contracts.mjs';
+import { parseProtocol, compileProtocol, generateProtocolCpp, generateProtocolTs } from '../../tools/schema/protocol.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const source = await readFile(path.join(root, 'schema/protocol.yaml'), 'utf8');
@@ -19,7 +19,7 @@ const read = relative => readFile(path.join(root, relative), 'utf8');
 test('generated C++/TS and saved protocol exactly match YAML, covering 63 fields and 19 groups', async () => {
   assert.equal(await read('engine/include/engine/net/generated_protocol.hpp'), generateProtocolCpp(contract));
   assert.equal(await read('client/src/schema/protocol.ts'), generateProtocolTs(contract));
-  assert.deepEqual(JSON.parse(await read('schema/generated/contracts.json')).protocol, contract);
+  assert.deepEqual(JSON.parse(await read('schema/generated/protocol-contracts.json')).protocol, contract);
   assert.equal(contract.fields.length, 63);
   assert.equal(contract.denseGroups.length, 19);
   assert.deepEqual(contract.denseGroups.find(group => group.offset === -16).fields,
@@ -77,30 +77,6 @@ for (const [name, change, expected] of [
 
 test('duplicate YAML keys are rejected rather than silently replacing protocol fields', () => {
   assert.throws(() => parseProtocol('output:\n  snapshot: {}\n  snapshot: {}\n'), /unique|duplicate/i);
-});
-
-test('protocol-only check is read-only and detects stale generated output without changing other contracts', async () => {
-  const fixture = path.join(temporary, 'check');
-  for (const directory of ['schema/generated', 'engine/include/engine/net', 'client/src/schema'])
-    await mkdir(path.join(fixture, directory), { recursive: true });
-  const files = ['schema/protocol.yaml', 'schema/generated/contracts.json', 'engine/include/engine/net/generated_protocol.hpp', 'client/src/schema/protocol.ts'];
-  for (const file of files) await writeFile(path.join(fixture, file), await read(file));
-  const command = ['tools/gen-contracts.mjs', '--protocol-only', '--check'];
-  const run = args => spawnSync(process.execPath, [path.join(root, args[0]), ...args.slice(1)], { cwd: fixture, encoding: 'utf8' });
-  assert.equal(run(command).status, 0);
-  const generated = path.join(fixture, files[2]);
-  await writeFile(generated, '// stale\n');
-  const before = await Promise.all(files.map(file => readFile(path.join(fixture, file), 'utf8')));
-  const result = run(command);
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /stale/);
-  assert.deepEqual(await Promise.all(files.map(file => readFile(path.join(fixture, file), 'utf8'))), before);
-  const saved = JSON.parse(before[1]);
-  assert.equal(run(command.slice(0, -1)).status, 0);
-  assert.deepEqual(await readFile(generated, 'utf8'), generateProtocolCpp(contract));
-  const after = JSON.parse(await readFile(path.join(fixture, files[1]), 'utf8'));
-  delete saved.protocol; delete after.protocol;
-  assert.deepEqual(after, saved);
 });
 
 let fixturePromise;

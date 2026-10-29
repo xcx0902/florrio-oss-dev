@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "description": "Product drop distribution rules: unequal spawn-band areas, petal drop mass by rarity, summoned-child contributions, and numeric convergence thresholds.",
+  "areaMix": [
+    0.15000000596046448,
+    0.15000000596046448,
+    0.07499998807907104,
+    0.07500001788139343,
+    0.04999999205271403,
+    0.04999999205271403,
+    0.012500002980232239,
+    0.012500002980232239
+  ],
+  "petalDropMass": [
+    50000,
+    15000,
+    2500,
+    100,
+    5,
+    1
+  ],
+  "referenceSpecies": 19,
+  "children": {
+    "11": [
+      [
+        7,
+        5
+      ],
+      [
+        8,
+        8
+      ],
+      [
+        9,
+        26
+      ],
+      [
+        10,
+        1
+      ]
+    ],
+    "15": [
+      [
+        16,
+        9.399999618530273
+      ]
+    ],
+    "17": [
+      [
+        18,
+        9.399999618530273
+      ]
+    ]
+  },
+  "chanceFloor": 1e-05,
+  "saturationChance": 0.9,
+  "maxIterations": 64
+}

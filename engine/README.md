@@ -76,12 +76,15 @@ storage before calling `init(true)`.
 
 ## Tests
 
-- `engine_tests` (`tests/unit/test_main.cpp`) covers core math, pool/world,
-  protocol, snapshot fields and WorkerApi domain snapshots.
+- `engine_tests` (`tests/unit/test_main.cpp`) is a thin runner; its 115 cases
+  live in `tests/unit/cases/` grouped by core, entity pool, spawn/loadout,
+  snapshot codec, WorkerApi, catalog, AI, domain snapshot, combat, dense
+  framing and tail invariants.
 - Domain suites cover centipede, death lifecycle, simulation, projectiles,
   poison flash, rose, passives/pets, peer visibility and pickup arrival.
-- `engine_schema_contracts` compares generated C++ sizes/offsets with the
-  layout probe; `engine_schema_contracts_checker` validates the probe file.
+- CTest registers ten targets. The retired layout/schema probe targets are not
+  registered; `tools/run-tests.mjs engine` fails if the CTest inventory differs
+  from `tests/product-tests.json`.
 
 Native tests use the same `WorkerApi`, `domain_snapshot_bytes()` and C ABI entry
 points as the wasm product, so a passing native suite exercises the shipping

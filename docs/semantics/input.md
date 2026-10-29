@@ -135,7 +135,7 @@ one send buffer behave like the server loop.
 
 `test_input_decoder` in `engine/tests/unit/test_main.cpp` covers opcode 12
 fields, the byte layouts of discard/swap, handshake/name strings, restart/bench
-and the sanitized-float bit test. `client/tests/worker-shim.test.mjs` exercises
+and the sanitized-float bit test. `client/tests/integration/worker-browser.test.mjs` exercises
 the client encoder end to end through the worker.
 
 ## Malformed and truncated packets
@@ -173,7 +173,7 @@ No shipped command sets it, so the domain reader does not implement it.
 opcode 6; `input(buttons, angle, strength)` emits opcode 12 with little-endian
 binary32 angle/strength; `restart()`/`benchCycle()` emit opcodes 4/13;
 `discard(slot, petal)`/`swap(...)` emit 8/10; `suicide(argument = 0)` emits
-opcode 3. `client/tests/worker-shim.test.mjs` exercises spawn, input and restart
+opcode 3. `client/tests/integration/worker-browser.test.mjs` exercises spawn, input and restart
 through the real worker. `client/src/schema/packet-key.ts` is generated from
 `schema/transport.json` and holds the 256-byte repeating key.
 

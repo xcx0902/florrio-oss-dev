@@ -55,14 +55,11 @@ try {
     if (!await execute(name, 'npm', ['run', name])) throw new Error(`cannot validate: ${name} failed`);
   }
   report.evidence = { ...await evidence(), runId };
-  if (!await execute('unit', process.execPath, ['--test', 'tests/unit/protocol-contracts.test.mjs'])) throw new Error('unit contracts failed');
-  if (!await execute('tools', process.execPath, ['--test', 'tests/tools/delivery.test.mjs', 'tests/tools/verification.test.mjs'])) throw new Error('tool regressions failed');
-  if (!await execute('engine', 'ctest', ['--test-dir', 'build/engine', '--output-on-failure', '--no-tests=error'])) throw new Error('engine tests failed');
-  if (!await execute('client', process.execPath, ['--test-concurrency=1', '--test', 'client/tests/canvas-context.test.mjs',
-    'client/tests/death-lifecycle.test.mjs', 'client/tests/death-pickup-regression.test.mjs', 'client/tests/event-effects.test.mjs',
-    'client/tests/loadout.test.mjs', 'client/tests/menu-animation.test.mjs', 'client/tests/menu-controls.test.mjs',
-    'client/tests/menu-interactions.test.mjs', 'client/tests/movement-helper.test.mjs', 'client/tests/petal-transfers.test.mjs',
-    'client/tests/snapshot-domain.test.mjs', 'client/tests/ui-tooltip.test.mjs', 'client/tests/worker-shim.test.mjs'])) throw new Error('client tests failed');
+  if (!await execute('unit', process.execPath, ['tools/run-tests.mjs', 'unit'])) throw new Error('unit contracts failed');
+  if (!await execute('tools', process.execPath, ['tools/run-tests.mjs', 'tools'])) throw new Error('tool regressions failed');
+  if (!await execute('engine', process.execPath, ['tools/run-tests.mjs', 'engine'])) throw new Error('engine tests failed');
+  if (!await execute('client', process.execPath, ['tools/run-tests.mjs', 'client'])) throw new Error('client tests failed');
+  if (!await execute('integration', process.execPath, ['tools/run-tests.mjs', 'integration'])) throw new Error('integration tests failed');
   if (!await execute('package', process.execPath, ['tools/build-dist-next.mjs', '--skip-build'])) throw new Error('cannot package delivery tree');
   const manifest = JSON.parse(await readFile('dist-next/build-manifest.json'));
   report.delivery = { sha256: sha256(await readFile('dist-next/build-manifest.json')),
@@ -70,7 +67,7 @@ try {
     treeSha256: (await treeIdentity('.', ['dist-next'])).sha256 };
   if (!await execute('delivery integrity', process.execPath, ['tools/verify-dist-next.mjs'])) throw new Error('delivery integrity failed');
   if (!await execute('delivery smoke', process.execPath, ['tools/run-tap.mjs', 'delivery', 'reports/delivery-tests.tap',
-    '--', process.execPath, '--test-concurrency=1', '--test', '--test-reporter=tap', 'client/tests/worker-shim.test.mjs', 'client/tests/menu-interactions.test.mjs'],
+    '--', process.execPath, 'tools/run-tests.mjs', 'delivery', '--test-reporter=tap'],
     { extraEnv: { CLIENT_ROOT: 'dist-next' } })) throw new Error('delivery smoke failed');
   if (!await execute('entrypoint smoke', process.execPath, ['tools/smoke-entrypoints.mjs'], { extraEnv: { CLIENT_ROOT: 'dist-next' } })) throw new Error('entrypoint smoke failed');
   if (!await execute('browser matrix', process.execPath, ['tools/browser-matrix.mjs'], { extraEnv: { CLIENT_ROOT: 'dist-next' } })) throw new Error('browser matrix failed');

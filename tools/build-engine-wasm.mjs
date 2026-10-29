@@ -38,34 +38,10 @@ const staging = path.join(path.dirname(output), `.engine-${randomUUID()}.wasm`);
 const lock = await open(output + '.lock', 'wx');
 try {
 
-const sources = [
-  'engine/src/schema/contracts.cpp',
-  'engine/src/sim/tick.cpp',
-  'engine/src/sim/movement.cpp',
-  'engine/src/sim/bounds.cpp',
-  'engine/src/sim/spawn.cpp',
-  'engine/src/sim/collision.cpp',
-  'engine/src/sim/collision_filter.cpp',
-  'engine/src/sim/combat.cpp',
-  'engine/src/sim/effects.cpp',
-  'engine/src/sim/ai.cpp',
-  'engine/src/sim/loot.cpp',
-  'engine/src/sim/progression.cpp',
-  'engine/src/sim/damage.cpp',
-  'engine/src/sim/petal_effects.cpp',
-  'engine/src/sim/petals.cpp',
-  'engine/src/sim/passives.cpp',
-  'engine/src/sim/pets.cpp',
-  'engine/src/sim/player.cpp',
-  'engine/src/sim/player_loadout.cpp',
-  'engine/src/sim/spatial.cpp',
-  'engine/src/sim/quadtree.cpp',
-  'engine/src/sim/species_attacks.cpp',
-  'engine/src/net/input.cpp',
-  'engine/src/net/snapshot_writer.cpp',
-  'engine/src/net/worker_api.cpp',
-  'engine/src/wasm/abi.cpp',
-];
+const sourceList = await readFile(path.join(root, 'engine/sources.cmake'), 'utf8');
+const sources = [...sourceList.matchAll(/^\s+(src\/[^\s#]+\.cpp)\s*$/gm)]
+  .map(match => `engine/${match[1]}`);
+if (sources.length === 0) throw new Error('engine/sources.cmake lists no translation units');
 const command = [
   compiler,
   '-std=c++20', '-O2', '-I', 'engine/include',

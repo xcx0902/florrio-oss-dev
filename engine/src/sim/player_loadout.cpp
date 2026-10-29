@@ -37,13 +37,13 @@ void PlayerLoadout::refresh_pending_cache() {
       continue;
     }
     const auto* petal = Catalog::instance().petal(type);
-    if (petal == nullptr || petal->flag40 != 0U) {
+    if (petal == nullptr || petal->orbitHidden) {
       if (slot + 1U == active_slots_) pending_cache_count_ = order;
       continue;
     }
     const std::uint8_t instances = static_cast<std::uint8_t>(
       std::min<std::uint32_t>(petal->instancesPerSlot, kInstances));
-    if (petal->flag41 != 0U) {
+    if (petal->sharedOrbit) {
       // Original function 85's special branch: every live instance shares the
       // same cache index; the index advances once for the whole slot.
       std::uint8_t carry = 0;
@@ -354,7 +354,7 @@ void PlayerLoadout::refresh_recharge_progress(const World& world) {
     for (std::uint8_t instance = 0; instance < std::min<std::uint32_t>(combat->instancesPerSlot, kInstances); ++instance) {
       const Entity* petal = world.entities().get(handles_[slot][instance]);
       if (petal != nullptr && petal->health.value > 0.0F) continue;
-      if (definition->flag40 != 0U) continue;
+      if (definition->orbitHidden) continue;
       // Original 654 advances the elapsed timer but publishes zero for an
       // equipped slot whose zone restriction currently blocks spawning.
       if (world.zone_petals_disabled()) {

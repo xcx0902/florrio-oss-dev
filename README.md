@@ -103,11 +103,12 @@ src/schema/     生成的协议/目录类型（勿手改）
 
 细节见 [`client/README.md`](client/README.md)。
 
-### `schema/` — 协议、布局与目录
+### `schema/` — 协议、传输与目录
 
-`schema/protocol.yaml`、`schema/layout/*.yaml` 和 `schema/catalogs/*.json`
-生成 C++/TS 访问器与文档。修改 schema 后运行 `npm run schema:generate`。
-原始布局探针和证据表已归档，不再是生成输入。
+`schema/protocol.yaml`、`schema/transport.json` 和 `schema/catalogs/*.json`
+由 `tools/generate.mjs` 校验并生成 C++/TS 视图与文档。修改后运行
+`npm run schema:generate`；`npm run schema:check` 做只读一致性检查。
+原始布局探针、旧生成器和证据表已归档，不再是生成输入。
 
 ## 仓库结构
 
@@ -132,9 +133,11 @@ npm run build:engine:wasm   # emcc -> client/public/server.wasm
 npm run build:client        # tsc -> client/public
 npm run test:unit           # 协议/线格式单元测试
 npm run test:tools          # 构建/校验工具测试
-npm run test:client         # 保留的产品客户端测试
+npm run test:client         # 客户端单元 + 集成测试
+npm run test:integration    # 原生 WorkerApi -> TS 解码器
 npm run build:dist-next     # 完整交付树
 npm run verify:dist-next    # 交付完整性
+npm run test:delivery       # dist-next 交付冒烟
 npm run test:all            # 全流程验收，写 reports/current-verification.json
 ```
 
