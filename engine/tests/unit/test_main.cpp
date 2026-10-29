@@ -461,6 +461,26 @@ void test_spawn_table() {
   for (std::size_t index = 0; index < table.band(0).entries.size(); ++index) {
     CHECK(table.band(0).entries[index].entity_type == expected_band0[index]);
   }
+  // The three rarest catalogue rows are present with their exact binary32
+  // weights. This is the direct check that the spawn table did not drop
+  // low-weight rules while grouping regions.
+  const auto has_entry = [&table](std::uint8_t band, std::uint16_t type) {
+    for (const auto& entry : table.band(band).entries)
+      if (entry.entity_type == type) return true;
+    return false;
+  };
+  CHECK(has_entry(0, 5) && has_entry(1, 5));
+  CHECK(!has_entry(2, 5));
+  for (std::uint8_t band = 3; band < 8; ++band) {
+    CHECK(has_entry(band, 11));
+    CHECK(has_entry(band, 17));
+  }
+  for (const auto& entry : table.band(0).entries)
+    if (entry.entity_type == 5) CHECK(entry.weight.value == 0.000199999995F);
+  for (const auto& entry : table.band(3).entries) {
+    if (entry.entity_type == 11) CHECK(entry.weight.value == 0.00200000009F);
+    if (entry.entity_type == 17) CHECK(entry.weight.value == 0.00100000005F);
+  }
   engine::ServerRng sequence(1);
   CHECK(sequence.next() == 48271U);
   CHECK(sequence.next() == 182605794U);
@@ -5188,6 +5208,130 @@ void test_ant_hole_exact_children() {
   CHECK(counts[11] == 1);
 }
 
+void test_ant_hole_release() {
+  engine::World world;
+  world.initialize();
+  world.set_auto_populate(false);
+  world.random().seed(787621659U);
+  const engine::EntityHandle hole = engine::spawn_entity_from_defaults(
+    world, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
+  CHECK(hole.valid());
+  CHECK(world.random().state() == 52603575U);
+  CHECK(world.ant_hole_releases().size() == 1U);
+  CHECK(world.ant_hole_releases()[0].release_index == 0U);
+
+  std::array<int, 23> counts{};
+  const auto recount = [&]() {
+    counts.fill(0);
+    for (const auto& entity : world.entities().entities()) {
+      if (entity.active && entity.kind == engine::EntityKind::kMob
+          && entity.type_id < counts.size()) ++counts[entity.type_id];
+    }
+  };
+  recount();
+  CHECK(counts[7] == 3);
+  CHECK(counts[8] == 2);
+  CHECK(counts[9] == 1);
+  CHECK(counts[11] == 1);
+
+  // 280/300 = 0.9333: entries 0 (0.97) and 1 (0.95) pass, entry 2 (0.93)
+  // stops the loop. Each baby/worker spawn draws 9 construction values plus
+  // one release angle.
+  engine::Entity* hole_entity = world.entities().get(hole);
+  hole_entity->health = engine::f32(280.0F);
+  engine::release_ant_hole_ants(world);
+  CHECK(world.ant_hole_releases()[0].release_index == 2U);
+  std::uint32_t expected = 52603575U;
+  for (int draw = 0; draw < 2 * 9; ++draw) expected = engine::ServerRng::successor(expected);
+  CHECK(world.random().state() == expected);
+  recount();
+  CHECK(counts[7] == 4);
+  CHECK(counts[8] == 3);
+  CHECK(counts[9] == 1);
+  CHECK(counts[10] == 0);
+
+  int released = 0;
+  for (const auto& entity : world.entities().entities()) {
+    if (!entity.active || entity.kind != engine::EntityKind::kMob) continue;
+    if (entity.type_id < 7U || entity.type_id > 8U) continue;
+    if (entity.position.x.value != 100.0F || entity.position.y.value != 100.0F) continue;
+    CHECK(entity.owner == hole.raw);
+    CHECK(entity.ai.owner == hole);
+    CHECK(entity.entity_flags == 98U);
+    CHECK(entity.spawn_band == 255U);
+    const double speed = std::sqrt(entity.velocity.x * entity.velocity.x
+                                 + entity.velocity.y * entity.velocity.y);
+    CHECK(std::fabs(speed - 0.25F) < 1e-6F);
+    ++released;
+  }
+  CHECK(released == 7); // five starting baby/worker children plus two released ants
+
+  // 20/300 = 0.0667: entries 2..27 pass, including the queen at entry 18.
+  hole_entity = world.entities().get(hole);
+  hole_entity->health = engine::f32(20.0F);
+  engine::release_ant_hole_ants(world);
+  CHECK(world.ant_hole_releases()[0].release_index == 28U);
+  recount();
+  CHECK(counts[7] == 5);
+  CHECK(counts[8] == 8);
+  CHECK(counts[9] == 20);
+  CHECK(counts[10] == 1);
+
+  // Zero health drains the final five soldier entries (28..32).
+  hole_entity = world.entities().get(hole);
+  hole_entity->health = engine::f32(0.0F);
+  engine::release_ant_hole_ants(world);
+  CHECK(world.ant_hole_releases()[0].release_index == 33U);
+  recount();
+  CHECK(counts[7] == 5);
+  CHECK(counts[8] == 8);
+  CHECK(counts[9] == 25);
+  CHECK(counts[10] == 1);
+  int ants = 0;
+  for (const auto& entity : world.entities().entities()) {
+    if (!entity.active || entity.kind != engine::EntityKind::kMob) continue;
+    if (entity.type_id >= 7U && entity.type_id <= 10U) ++ants;
+  }
+  CHECK(ants == 39); // six starting children plus 33 table entries
+
+  // The tick hook runs after movement and before contact damage.
+  engine::World ticked;
+  ticked.initialize();
+  ticked.set_auto_populate(false);
+  ticked.random().seed(787621659U);
+  const engine::EntityHandle ticked_hole = engine::spawn_entity_from_defaults(
+    ticked, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
+  CHECK(ticked_hole.valid());
+  ticked.entities().get(ticked_hole)->health = engine::f32(280.0F);
+  engine::tick(ticked, 50.0);
+  std::array<int, 23> ticked_counts{};
+  for (const auto& entity : ticked.entities().entities()) {
+    if (entity.active && entity.kind == engine::EntityKind::kMob
+        && entity.type_id < ticked_counts.size()) ++ticked_counts[entity.type_id];
+  }
+  CHECK(ticked_counts[7] == 4);
+  CHECK(ticked_counts[8] == 3);
+  CHECK(ticked_counts[9] == 1);
+
+  // Destruction removes the release record, so a reused slot cannot release.
+  CHECK(ticked.destroy(ticked_hole));
+  CHECK(ticked.ant_hole_releases().empty());
+
+  // Equality releases: 291/300 rounds to the same binary32 value as entry 0.
+  engine::World edge;
+  edge.initialize();
+  edge.set_auto_populate(false);
+  const engine::EntityHandle edge_hole = engine::spawn_entity_from_defaults(
+    edge, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
+  CHECK(edge_hole.valid());
+  edge.entities().get(edge_hole)->health = engine::f32(292.0F);
+  engine::release_ant_hole_ants(edge);
+  CHECK(edge.ant_hole_releases()[0].release_index == 0U);
+  edge.entities().get(edge_hole)->health = engine::f32(291.0F);
+  engine::release_ant_hole_ants(edge);
+  CHECK(edge.ant_hole_releases()[0].release_index == 1U);
+}
+
 void test_web_tag_domain_side_effects() {
   engine::World world;
   world.initialize();
@@ -5499,7 +5643,7 @@ void test_tick_phase_trace() {
   static const char* expected[] = {
     "regenerate-players", "drops", "petal-behaviors", "linked-constraints", "population", "ai",
     "deferred-launches", "effects", "area-effects", "petal-phase", "loadout-petals",
-    "petal-orbits", "player-controls", "movement", "broadphase", "contacts",
+    "petal-orbits", "player-controls", "movement", "ant-hole-release", "broadphase", "contacts",
     "reap-dead", "expire-drops", "corpse-sweep", "hit-flush",
   };
   CHECK(world.phase_trace().size() == std::size(expected));
@@ -5660,6 +5804,7 @@ int main(int argc, char** argv) {
   runTest("test_ai_round_before_remainder", test_ai_round_before_remainder);
   runTest("test_ai_activity_branch_and_wire", test_ai_activity_branch_and_wire);
   runTest("test_ant_hole_exact_children", test_ant_hole_exact_children);
+  runTest("test_ant_hole_release", test_ant_hole_release);
   runTest("test_web_tag_domain_side_effects", test_web_tag_domain_side_effects);
   runTest("test_world_frame_tracks_tick", test_world_frame_tracks_tick);
   runTest("test_simulation_frame_layout", test_simulation_frame_layout);

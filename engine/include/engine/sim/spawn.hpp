@@ -117,6 +117,9 @@ struct CactusBody { f32 radius; f32 health; };
 /** Fill the eight ordinary bands to their area targets. Existing mobs are
  * counted by `Entity::spawn_band`; only the deficit is spawned. */
 std::vector<EntityHandle> replenish_population(World& world, const SpawnTable& table);
+/** Original tick's ant-hole release loop. Reads the live health ratio and
+ * spawns the remaining table entries at the hole position, in spawn order. */
+void release_ant_hole_ants(World& world);
 /** Initial population fill: spawn exactly the area target per band, counting
  * parent spawns only (children carry spawn_band 255). */
 std::vector<EntityHandle> populate_world(World& world, const SpawnTable& table);

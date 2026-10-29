@@ -37,21 +37,26 @@ can read `World::phase_trace()` and assert the exact order:
 13. `movement` — `dt * acceleration`, `125 * (1 - 0.992^dt)` move,
     `0.992^dt` damping, arena clamp and bounds invalidation. Slow multipliers
     are applied by velocity-producing behaviors, not here;
-14. `drops` — pickup radius, active-slot equip, backpack overflow;
-15. `broadphase`;
-16. `contacts` — layer gate, separation, bilateral contact damage, petal
+14. `ant-hole-release` — original `654`'s 4848/4852 table walk, after movement
+    and before contact damage: every hole whose current health ratio has
+    crossed the next threshold releases one ant (and its 0.25-unit velocity
+    scatter) at the hole position. A hit resolved by `contacts` in this tick is
+    therefore released on the next tick;
+15. `drops` — pickup radius, active-slot equip, backpack overflow;
+16. `broadphase`;
+17. `contacts` — layer gate, separation, bilateral contact damage, petal
     callbacks; candidates are visited in a **loose-quadtree** order (a body
     descends only when its AABB is fully contained by the child, capacity 4,
     max depth 9, node body list then NW/SW/NE/SE), which reproduces the
     original tick-1 ladybug leaf and cuts the first-tick delta from 0.5265 to
     0.1844;
-17. `reap-dead` — death domain for health <= 0 outside the damage path, stale
+18. `reap-dead` — death domain for health <= 0 outside the damage path, stale
     orbit cleanup;
-18. `expire-drops` — drop and short-lived projectile lifetimes;
-19. `corpse-sweep` — destroy health-0 mob/petal entities whose one-second
+19. `expire-drops` — drop and short-lived projectile lifetimes;
+20. `corpse-sweep` — destroy health-0 mob/petal entities whose one-second
     corpse deadline has passed;
-20. `hit-flush` — move hit messages whose target became known;
-21. `advance_tick(0.0)` — increments the tick without moving the domain clock.
+21. `hit-flush` — move hit messages whose target became known;
+22. `advance_tick(0.0)` — increments the tick without moving the domain clock.
 
 Original `updateEquippedPetals` both advances the ring phase and recharges /
 respawns petals before `updatePetalOrbits`; a petal recharged this tick

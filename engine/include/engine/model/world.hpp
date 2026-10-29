@@ -144,6 +144,14 @@ struct DeferredLaunch {
   std::uint64_t sequence = 0;
 };
 
+/** Original ant-hole species component (species+136, 12-byte pool record).
+ * The world keeps the same append/swap-remove order as the original dense
+ * component vector; `release_index` is the next entry in the 4848/4852 table. */
+struct AntHoleRelease {
+  EntityHandle entity{};
+  std::uint32_t release_index = 0;
+};
+
 /** Last decoded player input. */
 struct PlayerInput {
   std::uint32_t buttons = 0;
@@ -180,6 +188,7 @@ class World {
     phase_trace_.clear();
     pickups_.clear();
     ai_order_.clear();
+    ant_hole_releases_.clear();
     known_entities_.clear();
     pending_hit_events_.clear();
     deaths_.clear();
@@ -231,6 +240,7 @@ class World {
     phase_trace_.clear();
     pickups_.clear();
     ai_order_.clear();
+    ant_hole_releases_.clear();
     known_entities_.clear();
     pending_hit_events_.clear();
     deaths_.clear();
@@ -366,6 +376,7 @@ class World {
     entity->effect_flags = 0;
     unregister_pickup(handle);
     unregister_ai(handle);
+    unregister_ant_hole(handle);
     known_entities_.erase(handle.raw);
     pending_hit_events_.erase(
       std::remove_if(pending_hit_events_.begin(), pending_hit_events_.end(),
@@ -469,6 +480,28 @@ class World {
     }
   }
   [[nodiscard]] const std::vector<EntityHandle>& ai_entities() const { return ai_order_; }
+
+  /** Original ant-hole release registry: append on species initialization,
+   * swap with the tail on destruction. The iteration order is the order in
+   * which holes were spawned, which determines RNG assignment when several
+   * holes cross a threshold in the same tick. */
+  void register_ant_hole(EntityHandle handle) {
+    if (!handle.valid()) return;
+    for (const auto& entry : ant_hole_releases_) {
+      if (entry.entity == handle) return;
+    }
+    ant_hole_releases_.push_back(AntHoleRelease{handle, 0U});
+  }
+  void unregister_ant_hole(EntityHandle handle) {
+    for (std::size_t index = 0; index < ant_hole_releases_.size(); ++index) {
+      if (ant_hole_releases_[index].entity != handle) continue;
+      ant_hole_releases_[index] = ant_hole_releases_.back();
+      ant_hole_releases_.pop_back();
+      return;
+    }
+  }
+  [[nodiscard]] std::vector<AntHoleRelease>& ant_hole_releases() { return ant_hole_releases_; }
+  [[nodiscard]] const std::vector<AntHoleRelease>& ant_hole_releases() const { return ant_hole_releases_; }
 
   /** Area-effect domain (original world+24780 vector and function 271). */
   std::shared_ptr<EffectPayload> replace_area_effect(EntityHandle owner, f32 scale,
@@ -582,6 +615,7 @@ class World {
   std::vector<std::uint32_t> phase_draws_;
   std::vector<EntityHandle> pickups_;
   std::vector<EntityHandle> ai_order_;
+  std::vector<AntHoleRelease> ant_hole_releases_;
   std::deque<DeathRecord> deaths_;
   double time_ms_ = 0.0;
   f32 last_death_score_;

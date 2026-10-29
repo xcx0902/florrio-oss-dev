@@ -232,6 +232,85 @@ segment is owned by the previous one, records `ai.predecessor`, and carries
 `spawn_band = 255`. Bounds and `spawnAreaBlocked` are checked before every
 segment; the first rejection stops the chain (the original returns).
 
+## Ant Hole release table
+
+`initializeAntHoleEntity11` creates a 12-byte companion at `species+136` and
+appends it to the world's dense vector at `world+468` (count `+0`, storage
+`+8` in the original; the engine stores `AntHoleRelease` records in
+`World::ant_hole_releases()`). The companion's `+8` field is the next release
+index, initially zero. The six children spawned by the initializer are **not**
+table entries; they are created before the first tick observes the hole.
+
+Every tick, after the movement-integration loop and before contact damage
+(original `654`, immediately after the active-entity movement loop), the
+server walks the dense vector in creation order. For each hole with
+`release_index <= 32` it computes `health / max_health` as binary32 and loops:
+
+```
+if (ratio > threshold[release_index]) stop;
+type = 7 + speciesOffset[release_index];
+spawnEntity(holeWorld + 1936, type, hole.x, hole.y, -1);
+draw one RNG value; add 0.25*(cos,sin)(angle) to the child's velocity;
+link the child to the hole; ++release_index;
+```
+
+The comparison is exactly `ratio > threshold`: equality releases. The table at
+`4848` (f32 threshold) and `4852` (species offset) is 33 entries, stride 8. A
+byte-exact probe gives the species sequence
+
+```
+7,8,7,8,8,8,9,9,9,9,8,9,9,9,9,8,9,9,10,9,9,9,9,9,9,9,9,9,9,9,9,9,9
+```
+
+and thresholds `0.97, 0.95, 0.93, 0.90, 0.87, 0.83, 0.80, 0.77, 0.73, 0.67,
+0.63, 0.60, 0.57, 0.53, 0.47, 0.44, 0.41, 0.38, 0.36, 0.32, 0.30, 0.27, 0.24,
+0.20, 0.26, 0.16, 0.10, 0.07, 0.04, 0.02, 0, 0, 0` (binary32 values; the
+0.26/0.20 pair is intentionally out of order in the original table and is
+preserved). Entry 18 is the Queen Ant (type 10). At zero health all 33 entries
+release: 2 baby, 6 worker, 24 soldier and 1 queen, in addition to the six
+starting children.
+
+The engine attaches each released child to the hole with `set_owner`, so the
+child carries the original `entity_flags` bit 64, `owner`/`ai.owner`, and is in
+`hole.children`; it keeps `spawn_band = 255`, so it never counts as a
+population parent. `World::destroy(hole)` removes the companion record, and a
+reused slot cannot release from the old state.
+
+## Rare rows and the fixed seed
+
+The three species called out in the bug report are present in the catalogue and
+in every band where the original table puts them:
+
+| species | bands | weight | expected initial count at 797 parents |
+| --- | --- | ---: | ---: |
+| Massive Ladybug (5) | 0, 1 | 0.000199999995 | 0.0595 |
+| Ant Hole (11) | 3, 4, 5, 6, 7 | 0.00200000009 | 1.70 |
+| Evil Centipede (17) | 3, 4, 5, 6, 7 | 0.00100000005 | 0.85 |
+
+These weights match original descriptors at `8547824 + n*16` byte-for-byte and
+`SpawnTable::from_catalog` keeps them. The default parity seed `285456437`
+(the original test fixture's post-`randomGet` state) produces an initial world
+with zero of all three. That is a valid outcome: the probability of all three
+being absent from one 797-parent world is about 7%. Because this project uses a
+fixed seed for deterministic replay, every new session repeats that one
+outcome; the original browser uses host entropy. Do not raise these weights or
+drop the rows to make the fixed fixture more interesting; that would diverge
+from the original table. Any entropy change must be an explicit production
+mode and must not alter the parity fixture.
+
+Population is **deficit-only**, so waiting does not create new parents: a rare
+row can only be selected when a parent in its band dies and `function 400`
+refills that slot. Killing a child (Ant Hole ant, Centipede segment, band 255)
+never creates a parent deficit. Averaged over random parent kills, the chance
+per replacement is `1/13391` for Massive Ladybug, `1/468` for Ant Hole and
+`1/936` for Evil Centipede. At one parent kill per second those are about 3.7
+hours, 7.8 minutes and 15.6 minutes on average; the 50% points are 9,282, 324
+and 648 kills. Farming only bands 3-7 raises Ant Hole/Evil Centipede to about
+`1/257` and `1/514` per kill, while Massive Ladybug is only in bands 0-1
+(`1/4033` conditional). A fixed seed additionally fixes the order of these
+draws, so a long gap is possible even when the long-run rate is correct.
+
+
 ## Open
 
 - Exact per-species `configure_*` RNG draw counts. The domain matches the

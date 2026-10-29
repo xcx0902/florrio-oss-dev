@@ -3,6 +3,7 @@
 #include "engine/sim/bounds.hpp"
 #include "engine/sim/spatial.hpp"
 #include "engine/model/catalog.hpp"
+#include <bit>
 #include <cmath>
 
 namespace engine {
@@ -35,6 +36,57 @@ void set_owner(World& world, EntityHandle child, EntityHandle parent) {
   entity->entity_flags |= 64U;
   entity->ai.owner = parent;
   attach_child(world, parent, child);
+}
+
+/** Original 4848/4852: 33 health-ratio thresholds and the species offset added
+ * to 7. The entries were probed from the original data section byte-for-byte;
+ * the species sequence is 7,8,7,8,8,8,9,9,9,9,8,9,9,9,9,8,9,9,10,9,... . */
+constexpr std::array<std::uint32_t, 33> kAntHoleThresholdBits{{
+  0x3f7851ecU, 0x3f733333U, 0x3f6e147bU, 0x3f666666U, 0x3f5eb852U,
+  0x3f547ae1U, 0x3f4ccccdU, 0x3f451eb8U, 0x3f3ae148U, 0x3f2b851fU,
+  0x3f2147aeU, 0x3f19999aU, 0x3f11eb85U, 0x3f07ae14U, 0x3ef0a3d7U,
+  0x3ee147aeU, 0x3ed1eb85U, 0x3ec28f5cU, 0x3eb851ecU, 0x3ea3d70aU,
+  0x3e99999aU, 0x3e8a3d71U, 0x3e75c28fU, 0x3e4ccccdU, 0x3e851eb8U,
+  0x3e23d70aU, 0x3dcccccdU, 0x3d8f5c29U, 0x3d23d70aU, 0x3ca3d70aU,
+  0x00000000U, 0x00000000U, 0x00000000U,
+}};
+constexpr std::array<std::uint8_t, 33> kAntHoleSpeciesOffsets{{
+  0U, 1U, 0U, 1U, 1U, 1U, 2U, 2U, 2U, 2U, 1U, 2U, 2U, 2U, 2U, 1U, 2U,
+  2U, 3U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U,
+}};
+
+void release_ant_hole_ants_impl(World& world) {
+  // Original tick keeps the companion object at species+136 and visits the
+  // world's dense component vector by index. The vector is append-only during
+  // entity creation; the loop below never creates another ant hole.
+  for (AntHoleRelease& release : world.ant_hole_releases()) {
+    Entity* hole = world.entities().get(release.entity);
+    if (hole == nullptr || !hole->active || hole->type_id != 11U) continue;
+    while (release.release_index <= 32U) {
+      const std::uint32_t index = release.release_index;
+      const float ratio = hole->health.value / hole->max_health.value;
+      const float threshold = std::bit_cast<float>(kAntHoleThresholdBits[index]);
+      // Original: if (ratio > threshold) stop; otherwise spawn this entry.
+      if (ratio > threshold) break;
+      const std::uint16_t type = static_cast<std::uint16_t>(kAntHoleSpeciesOffsets[index] + 7U);
+      const EntityHandle child = spawn_entity_from_defaults(
+        world, EntityKind::kMob, type, hole->position);
+      if (!child.valid()) break;
+      // Original 654 draws one angle after spawnEntity and adds the 0.25-unit
+      // scatter to the transform velocity (+40/+48), leaving the child at the
+      // hole's position for its first frame.
+      const f32 sample = f32(static_cast<float>(world.random().next() - 1U));
+      const f32 angle = f32(sample.value * kRandomAngleScale);
+      set_owner(world, child, hole->handle);
+      if (Entity* child_entity = world.entities().get(child)) {
+        child_entity->velocity.x += static_cast<double>(
+          f32(std::cos(static_cast<double>(angle.value)) * 0.25).value);
+        child_entity->velocity.y += static_cast<double>(
+          f32(std::sin(static_cast<double>(angle.value)) * 0.25).value);
+      }
+      ++release.release_index;
+    }
+  }
 }
 
 /** Original 144 draws one server-RNG value for every component pair of the
@@ -109,6 +161,8 @@ void spawn_centipede_segments(World& world, EntityHandle head, bool evil, bool r
 }
 
 } // namespace
+
+void release_ant_hole_ants(World& world) { release_ant_hole_ants_impl(world); }
 
 SpawnTable SpawnTable::from_catalog() {
   SpawnTable table;
@@ -312,6 +366,9 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
     entity->ai.timer_deadline_ms = world.time_ms() + entity->ai.timer_interval_ms;
   if (entity->ai.enabled) world.register_ai(handle);
   if (type_id == 11U) {
+    // The original species component is linked into the world's dense release
+    // vector before initializeAntHole spawns its six starting children.
+    world.register_ant_hole(handle);
     // initializeAntHole calls the child spawner in this exact caste order:
     // three baby ants, two workers, one soldier. Original 143 spawns each child
     // at the hole world position, draws one RNG value for a 0.25-unit velocity
@@ -321,14 +378,16 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
       const EntityHandle child = spawn_entity_from_defaults(world, EntityKind::kMob, caste, position);
       if (!child.valid()) break;
       const f32 sample = f32(static_cast<float>(world.random().next() - 1U));
+      set_owner(world, child, handle);
       const f32 angle = f32(sample.value * kRandomAngleScale);
       if (Entity* child_entity = world.entities().get(child)) {
+        // Original 143 adds the 0.25-unit scatter to the transform velocity
+        // (+40/+48); the child's position remains the hole centre.
         child_entity->velocity.x += static_cast<double>(
           f32(std::cos(static_cast<double>(angle.value)) * 0.25).value);
         child_entity->velocity.y += static_cast<double>(
           f32(std::sin(static_cast<double>(angle.value)) * 0.25).value);
       }
-      set_owner(world, child, handle);
     }
   }
   if (type_id == 15U || type_id == 17U) {

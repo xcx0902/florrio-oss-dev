@@ -119,6 +119,12 @@ void tick(World& world, double delta_milliseconds) {
   world.record_phase("player-controls");
   integrate_movement(world, delta_milliseconds);
   world.record_phase("movement");
+  // Original tick finishes the entity movement loop, then drains each ant
+  // hole's 4848/4852 release table using the health ratio it has reached.
+  // Contact damage for this tick resolves afterwards, so a hit taken in this
+  // tick releases on the next one, matching the original phase order.
+  release_ant_hole_ants(world);
+  world.record_phase("ant-hole-release");
   world.record_phase("broadphase");
   update_contact_tree(world);
   (void)resolve_contacts(world);
