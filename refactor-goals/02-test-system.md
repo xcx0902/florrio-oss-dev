@@ -1,10 +1,18 @@
 # 02：归档 oracle/parity，重建产品自己的回归体系
 
-> 状态：待实施。本次只阅读测试源码，没有运行测试；以下数量是文件盘点，不是通过数。
+> 状态：`08e6b5b` 已完成部分测试归档、迁出及 helper 提取，产品覆盖和完整入口仍待核验补齐。本次仅作静态核对和文档更新，未运行测试。
+
+## T00. 提前归档后的实际执行方式
+
+此次存在**「先做了 01-archive-and-disable」的顺序错误**，当前先按 [10/R03](10-continuation-after-early-archive.md#r03-先补-02-的最低产品回归再改数据和生成器) 补最低产品回归，再按 R06 补跨端与完整发现入口。旧文件不在活跃目录不构成阻塞：整文件归档查 `archive/tree/`，混合文件中删除的测试块查 `git show cc17564:原路径`。
+
+当前已有 `tests/unit/protocol-contracts.test.mjs`、两个 `tests/tools/` 文件和 `recording-canvas.mjs`，应对照原断言核验，不重复搬迁。活跃客户端顶层测试现有 13 个；整文件归档的 `text-cache.test.mjs` 需要重建纯产品 harness，不能复制其会加载原版的共享初始化。新增用例必须同步接入 `tools/run-verification.mjs` 的现有硬编码清单，避免完整验收遗漏。
+
+下文 T01/T02 中的原数量、旧路径与初筛结果来自归档前基点，作为迁移审计清单保留。后续按“已迁移待核验、待补齐、历史退役、已核验”逐项登记；不能把旧文件不存在或剩余用例通过视为本章全部完成。
 
 ## T01. 按依赖和断言内容拆分，避免误删产品回归
 
-根 `test/` 当前有 331 个 `*.test.mjs`；静态关键字初筛发现其中 324 个直接提到旧来源或 parity，剩余文件也包含间接依赖。例如 `server-petal-world.test.mjs`、`server-replay.test.mjs` 经 `helpers/server-world.mjs` 使用旧 JS 实现，`server-state-comparator.test.mjs` 直接导入 parity 比较器。不能把“未出现 loadOriginal”当作可保留依据。
+归档前根 `test/` 有 331 个 `*.test.mjs`；静态关键字初筛发现其中 324 个直接提到旧来源或 parity，剩余文件也包含间接依赖。例如 `server-petal-world.test.mjs`、`server-replay.test.mjs` 经 `helpers/server-world.mjs` 使用旧 JS 实现，`server-state-comparator.test.mjs` 直接导入 parity 比较器。不能把“未出现 loadOriginal”当作可保留依据。
 
 建立迁移表：每个测试记录测试文件、断言主题、传递依赖、是否执行原件、是否读取旧 golden、目标文件与保留理由。混合文件细分到测试块，不用跳过标记掩盖未完成迁移。
 
@@ -22,7 +30,7 @@
 
 ## T02. 客户端测试必须处理混合文件和间接 golden
 
-`client/tests/` 当前有 35 个顶层 `*.test.mjs`。其中 23 个直接命中原版/逆向/parity 引用；还有未命中该初筛规则、实际读取旧快照的文件。具体措施：
+归档前 `client/tests/` 有 35 个顶层 `*.test.mjs`。其中 23 个直接命中原版/逆向/parity 引用；还有未命中该初筛规则、实际读取旧快照的文件。以下措施逐项对照当前迁移结果，已迁出者核验，未保留的产品覆盖重新编写：
 
 1. `angle-interpolation.test.mjs`、`petal-art.test.mjs`、`drop-art.test.mjs`、`rendering-parity.test.mjs`、`menu-input-parity.test.mjs`、`ui-detail-parity.test.mjs` 等原版比较部分完整归档。
 2. `text-cache.test.mjs` 中旧 `func444`、WASM 导出和 `source/game/client/text.mjs` 比较归档；缓存 owner 隔离、文本变化重绘、尺寸变化、资源释放等产品行为迁为纯客户端测试。
