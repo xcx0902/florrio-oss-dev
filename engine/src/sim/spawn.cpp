@@ -246,7 +246,7 @@ EntityHandle spawn_rock(World& world, Vec2 position, bool massive, ServerRng& rn
   return spawn_rock_impl(world, position, massive, rng, false);
 }
 
-EntityHandle spawn_rock_function144(World& world, Vec2 position, bool massive, ServerRng& rng) {
+EntityHandle spawn_rock_with_component_draws(World& world, Vec2 position, bool massive, ServerRng& rng) {
   return spawn_rock_impl(world, position, massive, rng, true);
 }
 
@@ -282,7 +282,7 @@ EntityHandle spawn_cactus(World& world, Vec2 position, ServerRng& rng) {
   return spawn_cactus_impl(world, position, rng, false);
 }
 
-EntityHandle spawn_cactus_function144(World& world, Vec2 position, ServerRng& rng) {
+EntityHandle spawn_cactus_with_component_draws(World& world, Vec2 position, ServerRng& rng) {
   return spawn_cactus_impl(world, position, rng, true);
 }
 
@@ -434,10 +434,10 @@ std::vector<EntityHandle> populate_world(
         [&query](const SpawnPosition& position) { return query.occupied(position); },
         [&world](const SpawnBandEntry& entry, const SpawnPosition& position) {
           if (entry.entity_type == 1 || entry.entity_type == 2)
-            return spawn_rock_function144(world, Vec2(position.x, position.y),
+            return spawn_rock_with_component_draws(world, Vec2(position.x, position.y),
                                         entry.entity_type == 2, world.random());
           if (entry.entity_type == 3)
-            return spawn_cactus_function144(world, Vec2(position.x, position.y), world.random());
+            return spawn_cactus_with_component_draws(world, Vec2(position.x, position.y), world.random());
           return spawn_entity_from_defaults(world, EntityKind::kMob, entry.entity_type,
                                             Vec2(position.x, position.y));
         });
@@ -484,10 +484,10 @@ std::vector<EntityHandle> spawn_population_band(World& world, const SpawnTable& 
       [&query](const SpawnPosition& position) { return query.occupied(position); },
       [&world](const SpawnBandEntry& entry, const SpawnPosition& position) {
         if (entry.entity_type == 1 || entry.entity_type == 2)
-          return spawn_rock_function144(world, Vec2(position.x, position.y),
+          return spawn_rock_with_component_draws(world, Vec2(position.x, position.y),
                                       entry.entity_type == 2, world.random());
         if (entry.entity_type == 3)
-          return spawn_cactus_function144(world, Vec2(position.x, position.y), world.random());
+          return spawn_cactus_with_component_draws(world, Vec2(position.x, position.y), world.random());
         return spawn_entity_from_defaults(world, EntityKind::kMob, entry.entity_type,
                                           Vec2(position.x, position.y));
       });

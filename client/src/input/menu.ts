@@ -33,6 +33,7 @@ export class MenuControls {
   private width = 1280 / 0.7;
   private height = 720;
   private visible = false;
+  private dismissed = false;
   private inputOffset = 0;
   private inputY: number | undefined;
   private pointerX = 0;
@@ -104,6 +105,7 @@ export class MenuControls {
   show(visible: boolean): void {
     if (this.visible === visible) return;
     this.visible = visible;
+    this.dismissed = !visible;
     this.root.hidden = !visible;
     this.root.style.display = visible ? 'block' : 'none';
     if (!visible) this.name.blur();
@@ -134,7 +136,8 @@ export class MenuControls {
     this.inputOffset = presentation.offsetY;
     this.positionInput();
     this.visible = interactive;
-    const hidden = presentation.active === false || presentation.opacity <= 0.0001;
+    if (interactive) this.dismissed = false;
+    const hidden = this.dismissed || presentation.active === false || presentation.opacity <= 0.0001;
     const revealed = this.root.hidden && !hidden;
     this.root.hidden = hidden;
     this.root.style.display = this.root.hidden ? 'none' : 'block';

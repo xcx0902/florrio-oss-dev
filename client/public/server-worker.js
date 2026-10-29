@@ -16,7 +16,6 @@ let wasmMemory = null;
 let tickTimer = null;
 const parameters = new URL(self.location.href).searchParams;
 const manualTick = parameters.has('manual');
-const originalMode = parameters.has('original');
 
 
 const wasi = {
@@ -92,10 +91,7 @@ self.onmessage = async event => {
       break;
     case 'sp_server_send': exports.sp_server_send(pointer, length); break;
     case 'sp_server_think': exports.sp_server_think(); break;
-    case 'sp_server_flush':
-      if (originalMode) exports.sp_server_flush_original();
-      else exports.sp_server_flush();
-      break;
+    case 'sp_server_flush': exports.sp_server_flush(); break;
     case 'sp_server_debug_spawn_mob': {
       const view = new DataView(exports.memory.buffer, pointer, length);
       exports.sp_server_debug_spawn_mob(view.getUint16(0, true),

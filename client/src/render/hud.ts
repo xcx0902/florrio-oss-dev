@@ -150,9 +150,8 @@ export interface HudFrameState {
   reset(): void;
 }
 
-/** Per-HUD presentation memory from clientFrame (func1095).
- * WAT 322313–322360 stores XP at 156932; 329792–329850 stores scores by
- * leaderboard rank at 7931252. Both start at zero, use a double-precision
+/** Per-HUD presentation memory. XP and scores are stored by leaderboard
+ * rank. Both start at zero, use a double-precision
  * exponential with an f32 frame delta, snap within 1e-7, then store f32.
  * Drawing stays pure: callers explicitly advance this state once per frame.
  */
@@ -254,7 +253,7 @@ export function getHudLayout(width = 1280, height = 720, level = 1,
   const viewportWidth = Math.max(1, Number.isFinite(width) ? width : 1280);
   const viewportHeight = Math.max(1, Number.isFinite(height) ? height : 720);
   // clientFrame selects the larger of the width/height scale candidates
-  // (WAT select returns the height term when width*0.000521 is smaller).
+  // (the height term wins when width*0.000521 is smaller).
   const auto = Math.max(viewportWidth * 0.000521, viewportHeight * 0.000926);
   const requestedScale = f(uiScale ?? NaN);
   const scale = Number.isFinite(requestedScale) && requestedScale > 0
@@ -754,7 +753,7 @@ function zoneWarningVisible(state: HudState): boolean {
   if (state.playerX === undefined || !(state.arenaWidth! > 0)) return (state.zoneProgress ?? 0) > 0;
   if (state.level < 15) return false;
   // These are f64 constants containing the promoted float32 fractions in
-  // WAT, not the shorter decimal spellings in the decompiler output.
+  // exact f32 values, not shorter decimal spellings.
   const fraction = f(state.level < 30 ? 0.3 : state.level < 45 ? 0.6 : 0.9);
   const cells = f(f((state.arenaWidth! * fraction) - state.arenaWidth! * 0.5) * f(0.02));
   const boundary = Math.sign(cells) * Math.floor(Math.abs(cells) + 0.5) * 50;
@@ -771,8 +770,8 @@ function drawZoneWarning(context: HudContext, state: HudState, layout: HudLayout
   ];
   const widths = lines.map(({ text, font }) => f(f(measureLabel(text, font))
     + Math.trunc(f(f(font * 0.12) * 2)) * 2));
-  // The warning command template writes 65.0 at +4; function691 carries that
-  // qword into record+24/+28, so function1099 adds 65 to the widest label.
+  // The warning template reserves 65.0 for the widest label; the HUD adds it
+  // to the label width when laying out the warning row.
   // The extra gutter keeps the countdown arc clear of the text.
   const width = f(Math.max(...widths) + 65);
   const height = lines.reduce((sum, { font }) => f(sum + f(font * f(1.1))), 0);
@@ -814,7 +813,7 @@ function drawHudLayer(context: HudContext, state: HudState, layout: HudLayout, c
   context.save(); baseTransform(context, layout);
   drawLabelBox(context, { text: 'florr.io', font: 32, rasterScale: raster },
     15, 15, f(measureLabel('florr.io', 32) + 14), f(32 * 1.4), false);
-  // Original763 keeps the HUD alive while the death overlay rises: the level
+  // The HUD stays alive while the death overlay rises: the level
   // bar recedes left, the map and flower panel recede right, and the hotbar
   // (with its hint) drops by 400 logical units. The inventory closes.
   const slide = state.death ? state.hudSlide ?? 0 : 0;
@@ -852,7 +851,7 @@ function formatScore(score: number): string {
   const scaled = value * power, floor = Math.floor(scaled);
   // At one decimal place only quarter-integers are exact binary ties.
   // Multiplying by ten can erase which side of a midpoint the double was
-  // on (2450 * .001 is above 2.45), so otherwise round the original value.
+  // on (2450 * .001 is above 2.45), so otherwise round the expected value.
   const exactTie = scaled - floor === 0.5 && (places === 0 || Number.isInteger(value * 4));
   const roundedTie = floor + (places === 0 ? 0 : floor % 2);
   const formatted = exactTie ? (roundedTie / power).toFixed(places) : value.toFixed(places);
@@ -953,7 +952,7 @@ function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayou
   }
   context.save();
   const faceScale = f(f(layout.scale * ratio) * 1.5);
-  // Exact f32 constants from native1095 (WAT 333929/333939).
+  // Exact f32 layout constants.
   const cosine = 0.9800665974617004, sine = 0.19866932928562164;
   context.setTransform(f(faceScale * cosine), f(faceScale * -sine),
     f(faceScale * sine), f(faceScale * cosine),
@@ -974,7 +973,7 @@ function drawDeathOverlay(context: HudContext, state: HudState, layout: HudLayou
   const tooltipAlpha = state.deathState?.tooltipAlpha;
   const tooltips: { type: number; centerX: number; size: number; alpha: number }[] = [];
   // Gameplay's HUD already establishes this join. The independent death
-  // pass must establish it too, as original587 does on a cold renderer.
+  // pass must establish it too on a cold renderer.
   context.save(); context.setLineJoin('round');
   let left = 20;
   for (let index = 0; index < 16; index += 1) {

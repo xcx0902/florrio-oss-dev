@@ -4,9 +4,9 @@
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/petals.hpp"
 #include "engine/net/input.hpp"
-#include "engine/net/snapshot.hpp"
-#include "engine/net/snapshot_header.hpp"
-#include "engine/net/original_snapshot.hpp"
+#include "engine/net/snapshot_writer.hpp"
+#include "engine/net/snapshot_writer.hpp"
+
 #include "engine/net/dense_fields.hpp"
 #include "engine/sim/tick.hpp"
 #include "engine/sim/progression.hpp"
@@ -75,7 +75,7 @@ void reserve_spawn_placeholder(World& world) {
 /** Emit every sparse field id (1..63) using the recovered wire types. Dense
  * groups remain available through their dedicated writers; this covers the
  * complete 1015 field table for live domain records. */
-void write_full_fields(OriginalSnapshotWriter& writer, const Entity& entity,
+void write_full_fields(SnapshotWriter& writer, const Entity& entity,
                        std::uint32_t mask) {
   const EntityHandle handle = entity.handle;
   writer.write_mask_byte_field(handle, mask, 1U, entity.world_flags);
@@ -149,18 +149,6 @@ void WorkerApi::init(bool populate) {
   output_.clear();
   last_sequence_ = 0;
   next_spawn_time_ms_ = 0.0;
-  original_sequence_ = 0;
-  original_client_known_.clear();
-  original_client_records_.clear();
-  original_client_enabled_ = false;
-  original_client_viewer_started_ = false;
-  original_client_viewer_position_ = Vec2{};
-  original_client_viewer_scale_ = f32(1.0F);
-  original_client_sequence_ = 0;
-  original_client_queued_tick_ = 0;
-  original_client_event_tick_ = std::numeric_limits<std::uint64_t>::max();
-  original_client_output_.clear();
-  original_client_pending_events_.clear();
   domain_score_bits_.clear();
   domain_camera_bits_.clear();
   domain_position_revisions_.clear();
@@ -280,17 +268,7 @@ void WorkerApi::think() {
 
 std::deque<OutputPacket> WorkerApi::flush() { return output_.drain(); }
 
-std::vector<std::uint8_t> WorkerApi::snapshot_bytes(std::uint32_t sequence) {
-  SnapshotWriter writer(sequence);
-  for (const EntityHandle handle : pending_deletes_) writer.write_delete(handle);
-  pending_deletes_.clear();
-  for (const auto& event : pending_events_) writer.write_event(event.first, event.second);
-  pending_events_.clear();
-  writer.write_world(world_);
-  return writer.finish();
-}
-
-bool WorkerApi::write_dense_values(OriginalSnapshotWriter& writer, const Entity& entity) {
+bool WorkerApi::write_dense_values(SnapshotWriter& writer, const Entity& entity) {
     const auto values_it = snapshot_values_.find(entity.handle.to_wire());
     if (entity.snapshot_dense_group != 0 && values_it != snapshot_values_.end()) {
       const SnapshotValues& values = values_it->second;
@@ -393,267 +371,16 @@ bool WorkerApi::write_dense_values(OriginalSnapshotWriter& writer, const Entity&
     }
     return false;}
 
-void WorkerApi::write_default_dense_values(OriginalSnapshotWriter& writer, const Entity& entity) {
+void WorkerApi::write_default_dense_values(SnapshotWriter& writer, const Entity& entity) {
   if (entity.snapshot_dense_group != 0) return;
   if (snapshot_values_.find(entity.handle.to_wire()) != snapshot_values_.end()) return;
   if (snapshot_byte_values_.find(entity.handle.to_wire()) != snapshot_byte_values_.end()) return;
   writer.write_dense_default_groups(entity);
 }
 
-std::vector<std::uint8_t> WorkerApi::original_snapshot_bytes(std::uint32_t sequence, std::uint32_t reliable_ack) {
-  OriginalSnapshotWriter writer;
-  writer.begin(sequence, reliable_ack);
-  for (const EntityHandle handle : pending_deletes_) writer.write_delete(handle);
-  pending_deletes_.clear();
-  for (const auto& event : pending_events_) writer.write_event(event.first, event.second);
-  pending_events_.clear();
-  for (const auto& entity : world_.entities().entities()) {
-    if (!entity.active) continue;
-    if (write_dense_values(writer, entity)) continue;
-    writer.write_bare_entity(entity.handle);
-  }
-  return writer.finish();
-}
-
-std::vector<std::uint8_t> WorkerApi::original_snapshot_next(std::uint32_t reliable_ack) {
-  return original_snapshot_bytes(original_sequence_++, reliable_ack);
-}
-
-std::vector<std::uint8_t> WorkerApi::original_client_snapshot_bytes(std::uint32_t sequence,
-                                                                     std::uint32_t reliable_ack) {
-  original_client_enabled_ = true;
-  OriginalClientSnapshotWriter writer;
-  writer.begin(sequence, reliable_ack == std::numeric_limits<std::uint32_t>::max()
-    ? last_sequence_ : reliable_ack);
-  using Field = OriginalClientSnapshotWriter::Field;
-  const auto byte = [](std::uint32_t id, std::uint8_t value) {
-    return Field{id, {value}};
-  };
-  const auto scalar = [](std::uint32_t id, float value) {
-    ByteWriter out; out.write_f32_le(value); return Field{id, out.bytes()};
-  };
-  const auto integer = [](std::uint32_t id, std::uint32_t value) {
-    ByteWriter out; out.write_u32_le(value); return Field{id, out.bytes()};
-  };
-  const auto varint = [](std::uint32_t id, std::uint32_t value) {
-    ByteWriter out; out.write_varint32(value); return Field{id, out.bytes()};
-  };
-  const auto string = [](std::uint32_t id, const std::string& value) {
-    ByteWriter out; for (char c : value) out.write_u8(static_cast<std::uint8_t>(c));
-    out.write_u8(0U); return Field{id, out.bytes()};
-  };
-  const auto array = [](std::uint32_t id, const auto& values, bool shorts = false) {
-    ByteWriter out;
-    for (const auto value : values) {
-      out.write_varint32(0U); // (consecutive index delta 1) XOR 1
-      if (shorts) out.write_varint32(value); else out.write_u8(static_cast<std::uint8_t>(value));
-    }
-    out.write_varint32(1U); return Field{id, out.bytes()};
-  };
-  std::unordered_set<std::uint32_t> current;
-  const auto record = [&](EntityHandle handle, std::uint32_t mask,
-                          std::vector<Field> fields, bool marked = false,
-                          const Entity* entity = nullptr) {
-    const auto wire = handle.to_wire();
-    current.insert(wire);
-    const auto found = original_client_records_.find(wire);
-    const bool fresh = found == original_client_records_.end();
-    auto& previous = original_client_records_[wire];
-    std::vector<Field> changed;
-    for (auto& field : fields) {
-      const bool revision_changed = entity != nullptr
-        && ((field.id == 49U && previous.position_revisions[0] != entity->position_x_revision)
-         || (field.id == 28U && previous.position_revisions[1] != entity->position_y_revision));
-      if (fresh || previous.fields[field.id] != field.bytes || revision_changed)
-        changed.push_back(field);
-      previous.fields[field.id] = std::move(field.bytes);
-    }
-    // Original simulation-tick marks a newly introduced pickup only while
-    // its creation epoch is at most one tick old. Entering an old pickup's
-    // viewport must not replay its birth animation.
-    const bool arriving = fresh && entity != nullptr && entity->kind == EntityKind::kDrop
-      && world_.tick() <= entity->spawn_tick + 1U;
-    if (fresh || !changed.empty()) writer.write_record(handle, mask, changed, fresh, marked || arriving);
-    previous.mask = mask;
-    if (entity != nullptr)
-      previous.position_revisions = {entity->position_x_revision, entity->position_y_revision};
-    original_client_known_.insert(wire);
-  };
-  // Original ctor477 is the world-ready gate. It must never be inferred from
-  // a gameplay entity or from the domain field26 extension.
-  record(original_client_world_handle(), 1U << 15U,
-    {byte(11U, 1U), byte(12U, 0U), scalar(19U, world_.width().value),
-     scalar(42U, world_.height().value), scalar(45U, 50.0F), byte(46U, 0U)}, true);
-
-  const Entity* controlled = world_.entities().get(world_.player());
-  if (controlled != nullptr && controlled->active) {
-    original_client_viewer_started_ = true;
-    if (controlled->health.value > 0.0F) {
-      original_client_viewer_position_ = controlled->position;
-      bool wide = false;
-      for (std::size_t i = 0; i < world_.profile().active_slots(); ++i)
-        wide = wide || world_.loadout().slots()[i].type_id == 25U;
-      original_client_viewer_scale_ = f32(wide ? 0.63F : 0.9F);
-    }
-  }
-  // Original retainPlayerLoot writes survivors to peer+28/count+96. Its
-  // separate first-three list is ground loot, not the respawn inventory.
-  std::array<std::uint8_t, 10> kept{};
-  for (std::size_t i = 0; i < kept.size(); ++i)
-    kept[i] = static_cast<std::uint8_t>(world_.last_death_kept()[i]);
-  record(original_client_controller_handle(), 1U << 5U,
-    {byte(1U, controlled != nullptr && controlled->health.value > 0.0F
-        ? static_cast<std::uint8_t>(world_.profile().level() * 3U / 4U)
-        : static_cast<std::uint8_t>(world_.last_death_level() * 3U / 4U)),
-     scalar(5U, original_client_viewer_position_.x.value),
-     string(6U, world_.last_killer_name()), array(16U, kept), byte(20U, 0U),
-     scalar(21U, world_.last_death_score().value), scalar(24U, original_client_viewer_position_.y.value),
-     scalar(32U, original_client_viewer_scale_.value), byte(34U, world_.last_death_kept_count()),
-     byte(47U, world_.last_death_level()),
-     integer(56U, controlled != nullptr ? controlled->handle.to_wire() : 0U)}, true);
-
-  if (original_client_viewer_started_) {
-    const f32 width = f32(1920.0F) / original_client_viewer_scale_ + f32(200.0F);
-    const f32 height = f32(1080.0F) / original_client_viewer_scale_ + f32(200.0F);
-    const f32 left = width * f32(-0.5F) + original_client_viewer_position_.x;
-    const f32 top = height * f32(-0.5F) + original_client_viewer_position_.y;
-    const Aabb view{left, top, left + width, top + height};
-    for (const auto& entity : world_.entities().entities()) {
-      if (!entity.active || (&entity != controlled && !peer_body_bounds(world_, entity).intersects(view))) continue;
-      // Masks independently recovered through original function393. Components
-      // 20/21/25/26/28 are health, visual, lifecycle, radius and effects.
-      std::uint32_t mask = (1U << 14U) | (1U << 19U) | (1U << 20U)
-        | (1U << 24U) | (1U << 25U) | (1U << 27U);
-      std::vector<Field> fields{scalar(7U, entity.collision_radius.value),
-        scalar(28U, entity.position.y.value), scalar(49U, entity.position.x.value),
-        scalar(53U, entity.health.value), scalar(55U, entity.max_health.value),
-        byte(14U, entity.effect_flags), byte(38U, entity.death_processed ? 1U : 0U)};
-      ByteWriter angle; angle.write_u16_le(pack_snapshot_angle(entity.angle.value));
-      fields.push_back({8U, angle.bytes()});
-      const EntityHandle owner{entity.owner};
-      // Original entity+224 is the spatial parent (field23), whereas +236 is
-      // attribution/ownership (field57). Sim positions are already absolute.
-      // Captured original petals have parent=0 and owner=controlled body.
-      fields.push_back(integer(23U, 0U));
-      fields.push_back(integer(57U, entity.owner != UINT32_MAX && owner.valid() ? owner.to_wire() : 0U));
-      if (entity.kind == EntityKind::kPlayer) {
-        mask |= (1U << 18U) | (1U << 29U);
-        fields.push_back(byte(2U, entity.player_look));
-        fields.push_back(byte(26U, 0U)); // archived model; domain kind26 is independent
-        fields.push_back(byte(31U, entity.player_expression));
-        for (auto& field : fields)
-          if (field.id == 57U) field = integer(57U, original_client_controller_handle().to_wire());
-        fields.push_back(string(48U, world_.player_name()));
-        const float threshold = experience_threshold(world_.profile().level()).value;
-        const auto xp = threshold > 0.0F ? static_cast<std::uint32_t>(std::clamp(
-          world_.profile().experience().value * 65535.0F / threshold, 0.0F, 65535.0F)) : 0U;
-        fields.push_back(varint(58U, xp));
-        fields.push_back(scalar(59U, world_.loadout().score().value));
-        std::array<std::uint8_t, 16> inventory{};
-        for (std::size_t i = 0; i < inventory.size(); ++i)
-          inventory[i] = static_cast<std::uint8_t>(world_.loadout().slots()[i].type_id);
-        fields.push_back(array(60U, inventory));
-        fields.push_back(array(61U, world_.loadout().recharge_progress(), true));
-        fields.push_back(byte(62U, world_.profile().level()));
-        const std::uint8_t zone = world_.zone_progress();
-        if (zone != 0U || original_client_zone_progress_ != 0U)
-          fields.push_back(byte(63U, zone));
-        original_client_zone_progress_ = zone;
-      } else if (entity.kind == EntityKind::kPetal) {
-        mask = 0x03184040U; // original393 equipped-petal probe
-        fields.erase(std::remove_if(fields.begin(), fields.end(), [](const Field& field) {
-          return field.id == 14U;
-        }), fields.end());
-        if (projectile_render_component(entity) == 5U) {
-          mask = 0x03184050U; // original393 split-child probe: components5 AND7
-          fields.push_back(byte(9U, entity.petal_render_flags));
-        }
-        fields.push_back(byte(50U, static_cast<std::uint8_t>(entity.type_id)));
-      } else if (entity.kind == EntityKind::kDrop) {
-        mask = 0x03100001U; // original43 loot -> original393 probe
-        fields.erase(std::remove_if(fields.begin(), fields.end(), [](const Field& field) {
-          return field.id == 14U || field.id == 23U || field.id == 57U
-            || field.id == 53U || field.id == 55U;
-        }), fields.end());
-        fields.push_back(byte(22U, static_cast<std::uint8_t>(entity.type_id)));
-        fields.push_back(byte(54U, entity.pickup_collected ? 1U : 0U));
-      } else if (entity.kind == EntityKind::kMob) {
-        mask |= 1U << 13U;
-        fields.push_back(byte(43U, static_cast<std::uint8_t>(entity.type_id)));
-        switch (entity.type_id) {
-          case 1: case 2: mask = 0x0B1C6004U; break;
-          case 3: mask = 0x0B5C6000U; break;
-          case 4: case 5: case 20: case 21: mask = 0x0B1C7002U; break;
-          case 6: mask = 0x1B1C6002U; break;
-          case 7: case 8: case 9: case 10: mask = 0x0B1C6202U; break;
-          case 11: mask |= 1U << 11U; break;
-          case 12: case 13: mask = 0x0B1D6002U; break;
-          case 14: mask = 0x0B9C6002U; break;
-          case 15: case 16: case 17: case 18: mask = 0x0B3C6002U; break;
-          case 19: mask |= 1U << 8U; break;
-          case 22: mask = 0x0B1C600AU; break;
-          default: break;
-        }
-        if (entity.ai.enabled) {
-          mask |= 1U << 1U;
-          fields.push_back(byte(36U, entity.ai.activity_flags));
-        }
-        mask |= 1U << 18U;
-        fields.push_back(string(48U, ""));
-        if (entity.type_id >= 7U && entity.type_id <= 10U)
-          fields.push_back(byte(17U, entity.ai.variant));
-      } else if (entity.kind == EntityKind::kProjectile) {
-        if (projectile_render_component(entity) == 12U) {
-          mask = 0x03184800U; // original393 ground Web: component12, no petal type
-          fields.erase(std::remove_if(fields.begin(), fields.end(), [](const Field& field) {
-            return field.id == 14U;
-          }), fields.end());
-        } else mask |= 1U << 17U;
-      }
-      record(entity.handle, mask, std::move(fields), false, &entity);
-    }
-  }
-  for (auto it = original_client_records_.begin(); it != original_client_records_.end();) {
-    if (current.contains(it->first)) { ++it; continue; }
-    writer.write_delete(EntityHandle::from_wire(it->first));
-    original_client_known_.erase(it->first);
-    it = original_client_records_.erase(it);
-  }
-  for (const auto& event : original_client_pending_events_)
-    writer.write_event(event.first, event.second);
-  original_client_pending_events_.clear();
-  if (original_client_event_tick_ != world_.tick()) {
-    for (const HitEvent& hit : world_.hit_events()) {
-      if (!current.contains(hit.target.to_wire())) continue;
-      ByteWriter payload; payload.write_u32_le(hit.target.to_wire());
-      writer.write_event(11U, payload.bytes());
-    }
-    for (const auto& transfer : world_.loadout().pickup_transfers()) {
-      if (!current.contains(transfer.drop.to_wire())) continue;
-      ByteWriter payload; payload.write_u32_le(transfer.drop.to_wire());
-      payload.write_u8(transfer.slot);
-      writer.write_event(14U, payload.bytes());
-    }
-    original_client_event_tick_ = world_.tick();
-  }
-  return writer.finish();
-}
-
-std::deque<OutputPacket> WorkerApi::flush_original_client() {
-  original_client_enabled_ = true;
-  if (world_.tick() > original_client_queued_tick_) {
-    original_client_output_.push_back(OutputPacket{
-      original_client_snapshot_bytes(++original_client_sequence_)});
-    original_client_queued_tick_ = world_.tick();
-  }
-  auto packets = std::move(original_client_output_);
-  original_client_output_.clear();
-  return packets;
-}
-
 std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequence,
                                                            std::uint32_t reliable_ack) {
-  OriginalSnapshotWriter writer;
+  SnapshotWriter writer;
   writer.begin(sequence, reliable_ack);
   // Original 654 beginSnapshot only queries spatial entities after the local
   // viewer component (+120) has a controlled body (+100). At boot the world
@@ -684,8 +411,8 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
         wide_view = wide_view || slots[index].type_id == 25U;
       domain_viewer_scale_ = f32(wide_view ? 0.63F : 0.9F);
     }
-    // beginSnapshot, WAT155342–156212: both divisions, additions and
-    // origin offsets store f32. Query192 uses inclusive rectangle overlap.
+    // Both divisions, additions and origin offsets store f32; the rectangle
+    // query uses inclusive overlap.
     const f32 width = f32(1920.0F) / domain_viewer_scale_ + f32(200.0F);
     const f32 height = f32(1080.0F) / domain_viewer_scale_ + f32(200.0F);
     const f32 left = width * f32(-0.5F) + domain_viewer_position_.x;
@@ -756,7 +483,7 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
   for (const auto& entity : world_.entities().entities()) {
     if (!entity.active || !visible.contains(entity.handle.raw)) continue;
     const std::uint32_t mask = default_dense_groups_
-      ? OriginalSnapshotWriter::kDefaultDenseComponentMask : kDomainMask;
+      ? SnapshotWriter::kDefaultDenseComponentMask : kDomainMask;
     const std::array<std::uint32_t, 2> camera_bits{{entity.position.x.bits(), entity.position.y.bits()}};
     const auto previous_camera = domain_camera_bits_.find(entity.handle.to_wire());
     const bool camera_x_changed = previous_camera == domain_camera_bits_.end()
@@ -773,7 +500,7 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
     const auto previous_angle = domain_angle_values_.find(entity.handle.to_wire());
     const bool angle_changed = previous_angle == domain_angle_values_.end()
       || previous_angle->second != angle_value;
-    // A newly spawned pickup is introduced with the archive's arrival bit so
+    // A newly spawned pickup is introduced with the arrival bit so
     // the client replays its birth animation. Pickups that were already in
     // view keep full scale, matching the original first-snapshot behaviour.
     const bool arriving = (entity.kind == EntityKind::kDrop || projectile_render_component(entity) == 12U)
@@ -893,16 +620,7 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
   return writer.finish();
 }
 
-void WorkerApi::enqueue_snapshot(std::uint32_t sequence) {
-  (void)output_.enqueue(OutputPacket{snapshot_bytes(sequence)});
-}
-
 void WorkerApi::enqueue_domain_snapshot(std::uint32_t sequence) {
-  if (original_client_enabled_ && world_.tick() > original_client_queued_tick_) {
-    original_client_output_.push_back(OutputPacket{
-      original_client_snapshot_bytes(++original_client_sequence_)});
-    original_client_queued_tick_ = world_.tick();
-  }
   (void)output_.enqueue(OutputPacket{domain_snapshot_bytes(sequence)});
 }
 
@@ -1086,8 +804,6 @@ bool WorkerApi::occupied(Vec2 position) const {
 
 void WorkerApi::emit_event(std::uint8_t opcode, std::span<const std::uint8_t> payload) {
   pending_events_.emplace_back(opcode, std::vector<std::uint8_t>(payload.begin(), payload.end()));
-  if (original_client_enabled_)
-    original_client_pending_events_.emplace_back(opcode, std::vector<std::uint8_t>(payload.begin(), payload.end()));
 }
 
 bool WorkerApi::despawn(EntityHandle handle) {

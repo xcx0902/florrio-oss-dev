@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Exercise the actual default and --reference serve.mjs entrypoints. */
+/** Exercise the actual default serve.mjs entrypoint. */
 import { spawn } from 'node:child_process';
 import net from 'node:net';
 import path from 'node:path';
@@ -19,7 +19,6 @@ const browser = await chromium.launch({ executablePath: chromiumExecutable(), he
 try {
   for (const entry of [
     { name: 'default', root: 'dist-next', args: [], worker: 'server-worker.js', wasm: 'server.wasm' },
-    { name: 'reference', root: 'web', args: ['--reference'], worker: 'sp_server.js', wasm: 'sp_server.wasm' },
   ]) {
     const reservation = net.createServer();
     await new Promise((resolve, reject) => { reservation.once('error', reject); reservation.listen(0, '127.0.0.1', resolve); });
@@ -109,7 +108,7 @@ try {
     }
   }
   report.stable = sameEvidence(initial, await evidence()) && delivery.sha256 === (await treeIdentity('.', ['dist-next'])).sha256;
-  report.passed = report.stable && report.entries.length === 2 && report.entries.every(entry => entry.passed);
+  report.passed = report.stable && report.entries.length === 1 && report.entries.every(entry => entry.passed);
 } catch (error) {
   report.error = error.stack ?? String(error);
 } finally {

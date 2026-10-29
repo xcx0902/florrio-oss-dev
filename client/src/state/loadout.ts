@@ -25,7 +25,7 @@ export function playerSlotProgress(player: EntitySnapshot): number[] | undefined
  * not a 120ms interpolated field. A decrease snaps before the exponential;
  * an increase eases from the retained f32 value. New visuals start at 1.
  * The original WASM snaps within 1e-7, then stores f32. delta is the actual
- * render-frame delta (func587, WAT 63890–63945).
+ * render-frame delta.
  */
 export function advanceSlotRecharge(current: number, target: number, deltaMilliseconds: number): number {
   const f = Math.fround;

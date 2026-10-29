@@ -1,0 +1,19 @@
+# The archive keeps historical material for manual reading only. None of it is
+# an input to the product build. Locally generated recordings and reports that
+# were present when the migration ran are kept on disk but not offered as
+# repository content: a fresh clone does not contain them.
+
+.DS_Store
+
+tree/legacy/reports/*
+!tree/legacy/reports/.gitkeep
+
+tree/tests/parity/**/*.json
+tree/tests/parity/**/*.png
+tree/tests/parity/**/*.tap
+tree/tests/parity/current/
+
+tree/dist/
+tree/dist-readable/
+tree/dist-reference/
+tree/tools/vendor/

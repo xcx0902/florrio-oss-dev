@@ -1,8 +1,10 @@
 # Protocol
 
-Source of truth: [`schema/protocol.yaml`](../schema/protocol.yaml). This document
-summarizes the worker envelope, input packet, output packet and snapshot framing.
-It is a contract description, not a claim that every command field is known.
+Source of truth: [`schema/protocol.yaml`](../schema/protocol.yaml) for framing and
+[`schema/transport.json`](../schema/transport.json) for the packet XOR key. This
+document summarizes the worker envelope, input packet, output packet and
+snapshot framing. It describes the implemented product contract, not every
+historical reverse-engineering observation.
 
 ## 1. Worker envelope
 
@@ -26,29 +28,29 @@ interface WorkerResponse {
 }
 ```
 
-| Function | wasm index | Behavior |
-| --- | ---: | --- |
-| `sp_server_init` | 656 | initialize world/catalogs, schedule the 50 ms tick, flush initial output |
-| `sp_server_send` | 655 | decode one input packet and apply its commands |
-| `sp_server_think` | 654 | one 20 Hz simulation tick |
-| `sp_server_flush` | 657 | drain the output queue, send a final empty response, free packets |
+| Function | Behavior |
+| --- | --- |
+| `sp_server_init` | initialize world/catalogs and the 50 ms tick; flush initial output |
+| `sp_server_send` | decode one input packet and apply its commands |
+| `sp_server_think` | one 20 Hz simulation tick |
+| `sp_server_flush` | drain the output queue, send a final empty response, free packets |
 
-The archived `sp_server.js` glue dispatches `Module["_" + funcName]`, copies
-`data` into a malloc buffer, and posts the response with the request's
-`callbackId`. The parity facade in
-[`tools/parity/deterministic-worker.js`](../tools/parity/deterministic-worker.js)
-implements the same envelope around the original wasm.
+`server-worker.js` dispatches the exported C function, copies `data` into a
+malloc buffer, and posts each response with the request's `callbackId`.
+Intermediate packets use `finalResponse: false`; the empty completion uses
+`finalResponse: true`.
 
 ## 2. Input packet
 
 - Maximum length: 65,536 bytes.
-- First stage: in-place rolling XOR with the 256-byte key at address 4,576.
+- First stage: in-place rolling XOR with the 256-byte key in
+  `schema/transport.json` (`packetXor.keyHex`).
 - Then: unsigned LEB128 sequence number (at most five bytes), used to suppress
   duplicate/stale commands.
-- Then: one or more commands. The original dispatcher handles opcodes 0, 2, 3,
-  4, 5, 6, 7, 8, 10, 12 and 13; 1, 9 and 11 are reserved/unknown.
+- Then: one or more commands. Implemented opcodes are 0, 2, 3, 4, 5, 6, 7, 8,
+  10, 12 and 13; 1, 9 and 11 are reserved.
 
-| Opcode | Role | Known fields |
+| Opcode | Role | Fields |
 | ---: | --- | --- |
 | 0 | handshake string | string |
 | 2 | alternative handshake string | string |
@@ -62,47 +64,38 @@ implements the same envelope around the original wasm.
 | 12 | input buttons/angle/strength | buttons, angle, strength |
 | 13 | bench cycling | — |
 
-Field-level wire types for opcodes 8/10/12/13 are not fully proven; see
-`reports/server-input.md` and `source/game/server/input.mjs` for the recovered
-control flow.
+Opcode 12 angle uses binary64 constants and is normalized before use. Name
+strings are trimmed and UTF-8 truncated on the spawn path.
 
 ## 3. Output packet
 
-The output queue is a `u8` count at 8,545,512 and a pointer array at 8,545,516,
-capacity 16. Each packet object has:
-
-| Offset | Field |
-| ---: | --- |
-| +4 | payload length |
-| +12 | heap payload pointer, or zero for inline |
-| +16 | inline payload, 4,096 bytes |
-
-`sp_server_flush` sends intermediate packets with `finalResponse: false`, then
-one final empty response with `finalResponse: true`, then frees every packet and
-clears the queue.
+The engine keeps a bounded queue of packets. `sp_server_flush` sends every
+queued payload with `finalResponse: false`, then one final empty response with
+`finalResponse: true`, then frees the packets and clears the queue.
 
 Payload first byte selects the decoder:
 
 | Type | Meaning |
 | ---: | --- |
-| 0 | handshake (medium confidence) |
+| 0 | handshake |
 | 1 | entity snapshot |
 | 5 | events |
-| 2 | unknown |
+| 2 | unknown/reserved |
 
 ## 4. Entity snapshot
 
 - Sequence: varint, duplicate suppression.
-- Payload after the sequence is XORed with the 256-byte key at address 32,272.
+- Payload after the sequence is XORed with the 256-byte snapshot key from
+  `schema/transport.json`.
 - Reliable acknowledgement: varint, followed by an ordered-queue binary search.
 - Entity handle: 32-bit, low 14 bits index, high 18 bits generation; wire form is
   rotated left by 14 bits.
 - Entity deletes: count + handles.
 - Entity updates: count + handle + component declarations + field values.
 - Events: count + opcode payloads.
-- Trailing framing: preserved, not fully named.
+- Trailing framing: preserved by the decoder.
 
-Component model: 30 components, 63 sparse fields, 19 dense groups, and dense
+Component model: 30 components, 63 sparse fields, 19 dense groups; dense
 component 30 has six extra fields (58–63). Component declaration flags:
 
 | Flag | Meaning |
@@ -114,14 +107,14 @@ component 30 has six extra fields (58–63). Component declaration flags:
 | 128 | mark entity byte 44 bit 0 |
 
 Event opcodes 9 (chat string), 11 (entity time) and 14 (visual) are decoded;
-2–8, 10, 12 and 13 hit the original `unreachable` path.
+2–8, 10, 12 and 13 are not emitted by the current server.
 
-## 5. Evidence
+Field 2 is the species id, field 26 is the entity kind (a permanent domain
+extension), and fields 53/55 are health/maximum health. The full field ->
+component projection is in `schema/protocol.yaml`.
 
-- `source/javascript/sp_server.js` — worker glue.
-- `reports/server-behavior.md` — init/think/send/flush and queue layout.
-- `reports/server-input.md` — recovered opcode dispatcher.
-- `reports/client-snapshots.md`, `reports/client-entity-snapshot.md`,
-  `reports/client-snapshot-decoder.md` — snapshot/event decoding.
-- `source/game/client/entity-snapshot-map.json` — 63 field records with wire
-  types and interpolation rules.
+## 5. Validation
+
+`DecodeError` rejects truncated packets, non-canonical varints, unknown opcodes,
+trailing bytes in a command and non-finite f32 values. The worker shim reports a
+decode failure as an error response; it never falls back to a second framing.

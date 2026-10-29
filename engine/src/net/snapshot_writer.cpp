@@ -1,4 +1,4 @@
-#include "engine/net/snapshot_header.hpp"
+#include "engine/net/snapshot_writer.hpp"
 #include "engine/net/angle.hpp"
 #include <cmath>
 
@@ -58,7 +58,7 @@ std::vector<std::uint8_t> SnapshotPacketBuilder::finish() const {
   return writer.bytes();
 }
 
-void OriginalSnapshotWriter::begin(std::uint32_t sequence, std::uint32_t reliable_ack) {
+void SnapshotWriter::begin(std::uint32_t sequence, std::uint32_t reliable_ack) {
   sequence_ = sequence;
   reliable_ack_ = reliable_ack;
   deletes_ = ByteWriter{};
@@ -69,19 +69,19 @@ void OriginalSnapshotWriter::begin(std::uint32_t sequence, std::uint32_t reliabl
   event_count_ = 0;
 }
 
-void OriginalSnapshotWriter::write_delete(EntityHandle handle) {
+void SnapshotWriter::write_delete(EntityHandle handle) {
   deletes_.write_u32_le(handle.to_wire());
   ++delete_count_;
 }
 
-void OriginalSnapshotWriter::write_bare_entity(EntityHandle handle) {
+void SnapshotWriter::write_bare_entity(EntityHandle handle) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(52U); // flags=2 (skip declarations) XOR 54
   updates_.write_u8(0); // sparse field delta terminator
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_entity(EntityHandle handle, std::uint32_t component_mask) {
+void SnapshotWriter::write_mask_entity(EntityHandle handle, std::uint32_t component_mask) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U); // flags=1 (component mask) XOR 54
   updates_.write_u32_le(component_mask);
@@ -89,7 +89,7 @@ void OriginalSnapshotWriter::write_mask_entity(EntityHandle handle, std::uint32_
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_byte_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_byte_field(EntityHandle handle, std::uint32_t component_mask,
                                                    std::uint32_t field, std::uint8_t value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U); // flags=1 XOR 54
@@ -100,11 +100,11 @@ void OriginalSnapshotWriter::write_mask_byte_field(EntityHandle handle, std::uin
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_float_field5(EntityHandle handle, std::uint32_t component_mask, float value) {
+void SnapshotWriter::write_mask_float_field5(EntityHandle handle, std::uint32_t component_mask, float value) {
   write_mask_float_field(handle, component_mask, 5, value);
 }
 
-void OriginalSnapshotWriter::write_mask_domain_fields(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_domain_fields(EntityHandle handle, std::uint32_t component_mask,
                                                       std::uint8_t species_id, std::uint8_t kind,
                                                       std::uint8_t variant, float x, float y,
                                                       float angle_radians, float health,
@@ -163,13 +163,13 @@ void OriginalSnapshotWriter::write_mask_domain_fields(EntityHandle handle, std::
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_float_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_float_field(EntityHandle handle, std::uint32_t component_mask,
                                                     std::uint32_t field, float value) {
   const FloatField single{field, value};
   write_mask_float_fields(handle, component_mask, {&single, 1});
 }
 
-void OriginalSnapshotWriter::write_mask_float_fields(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_float_fields(EntityHandle handle, std::uint32_t component_mask,
                                                      std::span<const FloatField> fields) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U); // flags=1 XOR 54
@@ -184,7 +184,7 @@ void OriginalSnapshotWriter::write_mask_float_fields(EntityHandle handle, std::u
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_double_field35(EntityHandle handle, std::uint32_t component_mask, double value) {
+void SnapshotWriter::write_mask_double_field35(EntityHandle handle, std::uint32_t component_mask, double value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U); // flags=1 XOR 54
   updates_.write_u32_le(component_mask);
@@ -194,7 +194,7 @@ void OriginalSnapshotWriter::write_mask_double_field35(EntityHandle handle, std:
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_double_field18(EntityHandle handle, std::uint32_t component_mask, double value) {
+void SnapshotWriter::write_mask_double_field18(EntityHandle handle, std::uint32_t component_mask, double value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
   updates_.write_u32_le(component_mask);
@@ -204,7 +204,7 @@ void OriginalSnapshotWriter::write_mask_double_field18(EntityHandle handle, std:
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_float_field27(EntityHandle handle, std::uint32_t component_mask, float value) {
+void SnapshotWriter::write_mask_float_field27(EntityHandle handle, std::uint32_t component_mask, float value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
   updates_.write_u32_le(component_mask);
@@ -214,7 +214,7 @@ void OriginalSnapshotWriter::write_mask_float_field27(EntityHandle handle, std::
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_varint_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_varint_field(EntityHandle handle, std::uint32_t component_mask,
                                                      std::uint32_t field, std::uint32_t value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -225,7 +225,7 @@ void OriginalSnapshotWriter::write_mask_varint_field(EntityHandle handle, std::u
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_float_field45(EntityHandle handle, std::uint32_t component_mask, float value) {
+void SnapshotWriter::write_mask_float_field45(EntityHandle handle, std::uint32_t component_mask, float value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
   updates_.write_u32_le(component_mask);
@@ -235,7 +235,7 @@ void OriginalSnapshotWriter::write_mask_float_field45(EntityHandle handle, std::
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_reference_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_reference_field(EntityHandle handle, std::uint32_t component_mask,
                                                        std::uint32_t field, std::uint32_t target) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -246,7 +246,7 @@ void OriginalSnapshotWriter::write_mask_reference_field(EntityHandle handle, std
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_string_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_string_field(EntityHandle handle, std::uint32_t component_mask,
                                                      std::uint32_t field, std::string_view value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -258,7 +258,7 @@ void OriginalSnapshotWriter::write_mask_string_field(EntityHandle handle, std::u
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_string_array_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_string_array_field(EntityHandle handle, std::uint32_t component_mask,
                                                            std::uint32_t field, std::uint32_t index,
                                                            std::string_view value) {
   updates_.write_u32_le(handle.to_wire());
@@ -273,12 +273,12 @@ void OriginalSnapshotWriter::write_mask_string_array_field(EntityHandle handle, 
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_string_field4(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_string_field4(EntityHandle handle, std::uint32_t component_mask,
                                                       std::string_view value) {
   write_mask_string_field(handle, component_mask, 4, value);
 }
 
-void OriginalSnapshotWriter::write_mask_byte_array_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_byte_array_field(EntityHandle handle, std::uint32_t component_mask,
                                                          std::uint32_t field, std::uint32_t index, std::uint8_t value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -291,7 +291,7 @@ void OriginalSnapshotWriter::write_mask_byte_array_field(EntityHandle handle, st
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_varint_array_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_varint_array_field(EntityHandle handle, std::uint32_t component_mask,
                                                            std::uint32_t field, std::uint32_t index, std::uint32_t value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -304,7 +304,7 @@ void OriginalSnapshotWriter::write_mask_varint_array_field(EntityHandle handle, 
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_short_array_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_short_array_field(EntityHandle handle, std::uint32_t component_mask,
                                                           std::uint32_t field, std::uint32_t index, std::uint16_t value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -317,12 +317,12 @@ void OriginalSnapshotWriter::write_mask_short_array_field(EntityHandle handle, s
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_byte_array_field60(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_byte_array_field60(EntityHandle handle, std::uint32_t component_mask,
                                                            std::uint32_t index, std::uint8_t value) {
   write_mask_byte_array_field(handle, component_mask, 60, index, value);
 }
 
-void OriginalSnapshotWriter::write_mask_loadout_fields(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_loadout_fields(EntityHandle handle, std::uint32_t component_mask,
     const std::array<std::uint8_t, 16>& inventory,
     const std::array<std::uint16_t, 8>& recharge,
     bool inventory_changed, bool recharge_changed) {
@@ -350,7 +350,7 @@ void OriginalSnapshotWriter::write_mask_loadout_fields(EntityHandle handle, std:
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_sparse_entity(EntityHandle handle, std::span<const std::uint32_t> ordinals) {
+void SnapshotWriter::write_sparse_entity(EntityHandle handle, std::span<const std::uint32_t> ordinals) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(54U); // flags=0 XOR 54
   std::uint32_t previous = 0;
@@ -363,13 +363,13 @@ void OriginalSnapshotWriter::write_sparse_entity(EntityHandle handle, std::span<
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_bit_field(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_bit_field(EntityHandle handle, std::uint32_t component_mask,
                                                   std::uint32_t field, bool value) {
   const BitField single{field, value};
   write_mask_bit_fields(handle, component_mask, {&single, 1});
 }
 
-void OriginalSnapshotWriter::write_mask_bit_fields(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_bit_fields(EntityHandle handle, std::uint32_t component_mask,
                                                    std::span<const BitField> fields) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -384,7 +384,7 @@ void OriginalSnapshotWriter::write_mask_bit_fields(EntityHandle handle, std::uin
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_angle_field8(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_angle_field8(EntityHandle handle, std::uint32_t component_mask,
                                                      std::uint16_t raw) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -395,7 +395,7 @@ void OriginalSnapshotWriter::write_mask_angle_field8(EntityHandle handle, std::u
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_handle_array_field3(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_handle_array_field3(EntityHandle handle, std::uint32_t component_mask,
                                                             std::uint32_t index, std::uint32_t target) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -408,7 +408,7 @@ void OriginalSnapshotWriter::write_mask_handle_array_field3(EntityHandle handle,
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_mask_float_angle8(EntityHandle handle, std::uint32_t component_mask,
+void SnapshotWriter::write_mask_float_angle8(EntityHandle handle, std::uint32_t component_mask,
                                                      float field5, std::uint16_t angle_raw) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
@@ -421,34 +421,34 @@ void OriginalSnapshotWriter::write_mask_float_angle8(EntityHandle handle, std::u
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_chat_event(std::string_view text) {
+void SnapshotWriter::write_chat_event(std::string_view text) {
   events_.write_u8(9U);
   for (const char byte : text) events_.write_u8(static_cast<std::uint8_t>(byte));
   events_.write_u8(0);
   ++event_count_;
 }
 
-void OriginalSnapshotWriter::write_entity_time_event(EntityHandle handle) {
+void SnapshotWriter::write_entity_time_event(EntityHandle handle) {
   events_.write_u8(11U);
   events_.write_u32_le(handle.to_wire());
   ++event_count_;
 }
 
-void OriginalSnapshotWriter::write_visual_event(EntityHandle handle, std::uint8_t index) {
+void SnapshotWriter::write_visual_event(EntityHandle handle, std::uint8_t index) {
   events_.write_u8(14U);
   events_.write_u32_le(handle.to_wire());
   events_.write_u8(index);
   ++event_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_byte_group(EntityHandle handle, std::span<const std::uint8_t> values) {
+void SnapshotWriter::write_dense_byte_group(EntityHandle handle, std::span<const std::uint8_t> values) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U); // flags=8 XOR 54
   for (const std::uint8_t value : values) updates_.write_u8(value);
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_byte_groups(
+void SnapshotWriter::write_dense_byte_groups(
     EntityHandle handle, std::span<const std::span<const std::uint8_t>> groups) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
@@ -457,14 +457,14 @@ void OriginalSnapshotWriter::write_dense_byte_groups(
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_float_group(EntityHandle handle, std::span<const float> values) {
+void SnapshotWriter::write_dense_float_group(EntityHandle handle, std::span<const float> values) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U); // flags=8 XOR 54
   for (const float value : values) updates_.write_f32_le(value);
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_health_angle_groups(
+void SnapshotWriter::write_dense_health_angle_groups(
     EntityHandle handle, float health, float max_health, std::uint16_t angle_raw,
     float angle, float radius) {
   updates_.write_u32_le(handle.to_wire());
@@ -477,7 +477,7 @@ void OriginalSnapshotWriter::write_dense_health_angle_groups(
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_default_groups(const Entity& entity) {
+void SnapshotWriter::write_dense_default_groups(const Entity& entity) {
   const auto raw = pack_snapshot_angle(entity.angle.value);
   updates_.write_u32_le(entity.handle.to_wire());
   updates_.write_u8(62U); // flags=8 (dense) XOR 54
@@ -516,7 +516,7 @@ void OriginalSnapshotWriter::write_dense_default_groups(const Entity& entity) {
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_string_group(EntityHandle handle, std::string_view value) {
+void SnapshotWriter::write_dense_string_group(EntityHandle handle, std::string_view value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
   for (const char byte : value) updates_.write_u8(static_cast<std::uint8_t>(byte));
@@ -524,7 +524,7 @@ void OriginalSnapshotWriter::write_dense_string_group(EntityHandle handle, std::
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_angle_float_group(EntityHandle handle, std::uint16_t angle_raw,
+void SnapshotWriter::write_dense_angle_float_group(EntityHandle handle, std::uint16_t angle_raw,
                                                            float first, float second) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
@@ -534,7 +534,7 @@ void OriginalSnapshotWriter::write_dense_angle_float_group(EntityHandle handle, 
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_group152_base(EntityHandle handle, std::uint8_t field2,
+void SnapshotWriter::write_dense_group152_base(EntityHandle handle, std::uint8_t field2,
                                                        std::uint8_t field26, std::uint8_t field31,
                                                        std::uint32_t field58) {
   updates_.write_u32_le(handle.to_wire());
@@ -546,7 +546,7 @@ void OriginalSnapshotWriter::write_dense_group152_base(EntityHandle handle, std:
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_bit_group(EntityHandle handle, std::span<const bool> values) {
+void SnapshotWriter::write_dense_bit_group(EntityHandle handle, std::span<const bool> values) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
   std::uint8_t byte = 0;
@@ -564,7 +564,7 @@ void OriginalSnapshotWriter::write_dense_bit_group(EntityHandle handle, std::spa
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_float_bit_group(EntityHandle handle, float value, bool bit_value) {
+void SnapshotWriter::write_dense_float_bit_group(EntityHandle handle, float value, bool bit_value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
   updates_.write_f32_le(value);
@@ -572,7 +572,7 @@ void OriginalSnapshotWriter::write_dense_float_bit_group(EntityHandle handle, fl
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_reference_group(EntityHandle handle, std::uint32_t first,
+void SnapshotWriter::write_dense_reference_group(EntityHandle handle, std::uint32_t first,
                                                          std::uint32_t second) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
@@ -581,7 +581,7 @@ void OriginalSnapshotWriter::write_dense_reference_group(EntityHandle handle, st
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_group_minus27(
+void SnapshotWriter::write_dense_group_minus27(
     EntityHandle handle, std::string_view field4, std::uint32_t field15, double field18,
     std::string_view field25, float field27, bool field33, double field35, std::uint32_t field41,
     std::uint32_t field44, std::uint32_t field51) {
@@ -602,7 +602,7 @@ void OriginalSnapshotWriter::write_dense_group_minus27(
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_group_minus16(
+void SnapshotWriter::write_dense_group_minus16(
     EntityHandle handle, std::span<const std::uint32_t> field3,
     std::span<const std::string_view> field10, std::uint8_t field11, std::uint8_t field12,
     float field19, std::uint32_t field30, std::span<const std::uint32_t> field39,
@@ -626,7 +626,7 @@ void OriginalSnapshotWriter::write_dense_group_minus16(
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_group72(
+void SnapshotWriter::write_dense_group72(
     EntityHandle handle, std::uint8_t field1, float field5, std::string_view field6,
     std::span<const std::uint8_t> field16, std::uint8_t field20, float field21,
     float field24, float field32, std::uint8_t field34, std::uint8_t field47,
@@ -648,7 +648,7 @@ void OriginalSnapshotWriter::write_dense_group72(
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_group152_extended(
+void SnapshotWriter::write_dense_group152_extended(
     EntityHandle handle, std::uint8_t field2, std::uint8_t field26, std::uint8_t field31,
     std::uint32_t field58, float field59, std::span<const std::uint8_t> field60,
     std::span<const std::uint16_t> field61, std::uint8_t field62, std::uint8_t field63) {
@@ -666,19 +666,19 @@ void OriginalSnapshotWriter::write_dense_group152_extended(
   ++update_count_;
 }
 
-void OriginalSnapshotWriter::write_dense_byte_group52(EntityHandle handle, std::uint8_t field22,
+void SnapshotWriter::write_dense_byte_group52(EntityHandle handle, std::uint8_t field22,
                                                       std::uint8_t field54) {
   const std::array<std::uint8_t, 2> values{{field22, field54}};
   write_dense_byte_group(handle, values);
 }
 
-void OriginalSnapshotWriter::write_event(std::uint8_t opcode, std::span<const std::uint8_t> payload) {
+void SnapshotWriter::write_event(std::uint8_t opcode, std::span<const std::uint8_t> payload) {
   events_.write_u8(opcode);
   events_.write_bytes(payload);
   ++event_count_;
 }
 
-std::vector<std::uint8_t> OriginalSnapshotWriter::finish() const {
+std::vector<std::uint8_t> SnapshotWriter::finish() const {
   ByteWriter writer;
   write_snapshot_header(writer, {sequence_, reliable_ack_});
   writer.write_varint32(delete_count_);

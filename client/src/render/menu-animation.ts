@@ -1,4 +1,4 @@
-/** Time-driven menu flowers recovered from clientFrame (original 1095).
+/** Time-driven menu flowers used by the menu frame.
  * New flowers enter at x=-50 every 200 ms. Scale is uniform [0.5,2], forward
  * speed is 100*scale units/s, and y bobs by 20*sin(seconds+phase). The fixed
  * 16 ms animation step preserves f32 integration independently of display Hz.
@@ -32,7 +32,7 @@ export class MenuInputAnimation {
     const step = Math.max(0, Math.min(1, 1 - Math.pow(0.9, f(delta) * 0.06)));
     const approach = (value: number, target: number): number => Math.abs(value - target) < 1e-7
       ? target : f(value + step * (target - value));
-    // Original7926696 gates the entire menu pass. Once the one-second iris
+    // The menu gate covers the entire menu pass. Once the one-second iris
     // reaches 0.9999, these input states and their deadline stop advancing.
     this.overlay = f(Math.max(0, Math.min(1, this.overlay + (menu ? -1 : 1) * f(delta) * 0.001)));
     const active = this.overlay < 0.9999;
@@ -123,7 +123,7 @@ export class MenuAnimation {
   }
 }
 
-/** Original text caret opacity; absolute clock is in milliseconds. */
+/** Text caret opacity; absolute clock is in milliseconds. */
 export function caretAlpha(now: number): number {
   return Math.sqrt(0.5 - Math.cos(Math.max(0, now) * 0.013) * 0.5);
 }

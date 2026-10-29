@@ -1,21 +1,8 @@
 schema: 1
 name: worker-protocol
 confidence: medium
-source:
-  artifact: web/sp_server.wasm
-  sha256: 75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d
-  clientArtifact: web/client.wasm
-  clientSha256: c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1
-  evidence:
-    - source/javascript/sp_server.js
-    - source/javascript/client.js
-    - reports/server-behavior.md
-    - reports/server-input.md
-    - reports/client-snapshots.md
-    - reports/client-entity-snapshot.md
-    - reports/client-snapshot-decoder.md
 notes:
-  - This is a byte-level contract assembled from the original worker glue, the recovered input entry point and the recovered snapshot decoder.
+  - This is the product's byte-level worker contract; generated C++/TypeScript views are the runtime source.
   - Fields whose exact wire type has not been proven are marked confidence medium and described by role, not invented names.
 
 worker:
@@ -30,15 +17,14 @@ worker:
       - { name: finalResponse, type: bool, confidence: high, note: "true completes the callback; false is an intermediate packet" }
       - { name: data, type: bytes, optional: true, confidence: high }
   functions:
-    - { name: sp_server_init, wasmIndex: 656, args: [0, 0], confidence: high, behavior: "initialize world and catalogs, schedule the 50 ms tick, flush initial output" }
-    - { name: sp_server_send, wasmIndex: 655, args: [pointer, length], confidence: high, behavior: "decode one client input packet and apply its commands" }
-    - { name: sp_server_think, wasmIndex: 654, args: [], confidence: high, behavior: "one 20 Hz simulation tick" }
-    - { name: sp_server_flush, wasmIndex: 657, args: [0, 0], confidence: high, behavior: "drain the output queue, send one final empty response, free packets" }
+    - { name: sp_server_init, args: [0, 0], confidence: high, behavior: "initialize world and catalogs, schedule the 50 ms tick, flush initial output" }
+    - { name: sp_server_send, args: [pointer, length], confidence: high, behavior: "decode one client input packet and apply its commands" }
+    - { name: sp_server_think, args: [], confidence: high, behavior: "one 20 Hz simulation tick" }
+    - { name: sp_server_flush, args: [0, 0], confidence: high, behavior: "drain the output queue, send one final empty response, free packets" }
 
 input:
   maxPacketBytes: 65536
   xor:
-    keyAddress: 4576
     keyLength: 256
     algorithm: rolling-xor
     confidence: high
@@ -67,13 +53,11 @@ input:
     - { opcode: 9, name: reserved-9, confidence: medium }
     - { opcode: 11, name: reserved-11, confidence: medium }
   fieldNotes:
-    - "Opcode 12 angle uses the original binary64 constants and is normalized as the original bit test does."
-    - "Name strings are trimmed and UTF-8 truncated on the original spawn path."
+    - "Opcode 12 angle uses fixed binary64 constants and a bit-level normalization test."
+    - "Name strings are trimmed and UTF-8 truncated on the spawn path."
 
 output:
   queue:
-    countAddress: 8545512
-    pointersAddress: 8545516
     capacity: 16
     confidence: high
   packet:
@@ -92,34 +76,25 @@ output:
       - { type: 2, name: unknown-2, confidence: low }
   snapshot:
     sequence: varint
-    xorKeyAddress: 32272
     xorKeyLength: 256
     reliableAck: varint
     framing:
       entityFlagsXor: 54
       componentDeltaXor: 1
-    # Dense value widths/component mappings are shared. Sparse field framing
-    # is deliberately NOT wire-equivalent across these two packet formats.
+    # Dense value widths and component mappings are shared by every packet.
     sparseModes:
-      nativeSparse:
-        packetFormat: archived-client
-        fieldDeltaXor: 1
-        indexDeltaXor: 1
-        indexedFields: [3, 4, 10, 16, 25, 33, 35, 39, 60, 61]
-        field26Role: player-model
       domainSparse:
         packetFormat: domain-counted
         fieldDeltaXor: 0
         indexDeltaXor: 0
         indexedFields: [3, 10, 16, 25, 39, 60, 61]
         field26Role: entity-kind
-        note: "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md. Shared value widths do not assert native semantic equivalence."
-      # Decoded zero terminates both field and index lists; its encoded byte
-      # is the corresponding mode's XOR value. Fields4/33/35 are scalar only
-      # in domainSparse. Indexed counts below describe component storage,
-      # not an added validation bound on the existing domain stream.
+        note: "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md."
+      # Decoded zero terminates both field and index lists. Fields4/33/35 are
+      # scalar. Indexed counts below describe component storage, not an added
+      # validation bound on the existing domain stream.
     domainExtensions:
-      - { field: 26, name: entity-kind, type: byte, permanent: true, originalRole: player-model, note: "Domain packets retain the permanent kind byte; the archived-client adapter writes the original model byte separately." }
+      - { field: 26, name: entity-kind, type: byte, permanent: true, note: "Domain packets retain the permanent kind byte; field 2 carries the catalog species." }
     entityHandle:
       bits: 32
       indexMask: 16383
@@ -144,7 +119,7 @@ output:
         128: mark entity byte 44 bit 0
       confidence: high
     fieldComponents:
-      # Original1015: byteFields/floatFields/interpolatedFields/arrayFields and
+      # Sparse field groups:
       # readField branches. Constructor 0 denotes an inline component, not an
       # unverified/default mapping. Domain field26 remains a permanent kind byte.
       1: { constructor: 478, offset: 8 }
@@ -238,7 +213,7 @@ output:
       varintArray: [39]
       shortArray: [61]
       confidence: high
-      note: "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing; domainSparse is not the native wire contract."
+      note: "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing."
     denseGroups:
       - { offset: 52, component: 1, fields: [22, 54] }
       - { offset: 56, component: 2, fields: [36] }
@@ -256,7 +231,7 @@ output:
       - { offset: 124, component: 22, fields: [29, 40] }
       - { offset: 136, component: 25, fields: [38] }
       - { offset: 140, component: 26, fields: [7] }
-      # Original1015 readDenseFields includes BOTH 44/51. WAT 258947,
+      # Dense decoding includes both 44/51.
       # 259155, 259334 stores state+1600/1604/1608 = inline27+88/92/96.
       - { offset: -27, component: 27, fields: [4, 15, 18, 25, 27, 33, 35, 41, 44, 51] }
       - { offset: 144, component: 28, fields: [14] }

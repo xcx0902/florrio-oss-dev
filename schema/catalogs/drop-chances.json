@@ -1,11 +1,5 @@
 {
   "schema": 1,
-  "source": {
-    "artifact": "web/sp_server.wasm",
-    "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
-    "algorithm": "source/game/server/initialization.mjs initializeCatalog",
-    "evidence": "source/wasm/sp_server.wat 192700..193300"
-  },
   "constants": {
     "areaMix": [
       0.15000000596046448,

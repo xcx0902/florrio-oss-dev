@@ -1,6 +1,6 @@
 /** Reimplementation of the archived client's outlined-text cache.
  *
- * The original rasterizes every label once into an offscreen canvas at a
+ * The renderer rasterizes every label once into an offscreen canvas at a
  * multiple of the logical font size (`projectedScale = 2.4 * max(|a|,|b|,|c|,|d|)`
  * of the active Canvas2D transform), then draws that canvas through
  * `drawImage(canvas, 0, 0, 1, 1)` with a unit-scale transform. The cached
@@ -8,7 +8,7 @@
  * characteristic soft glyph edges in the golden screenshots.
  *
  * The cache width/height formulas below mirror the recovered wasm text module
- * (`rasterizeLabel` / `drawTextLabel` in source/game/client/text.mjs):
+ * (`rasterizeLabel` / `drawTextLabel`):
  *   height = trunc(fontPixels * 1.4)
  *   width  = trunc(measure(text @ fontPixels) + 2 * rasterScale * trunc(2 * outline))
  * The label itself is centred in that bitmap at (width / 2, height / 2).
@@ -119,7 +119,7 @@ function measureNative(text: string, font: number): number {
   return width;
 }
 
-/** Width of `text` at `font` px in the original Ubuntu face (func385). */
+/** Width of `text` at `font` px in the Ubuntu face. */
 export function measureLabel(text: string, font: number): number {
   return Math.fround(measureNative(text, font));
 }
@@ -148,7 +148,7 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
   }
 
   // The renderer stores the unquantized font/scale in f32. Only the host's
-  // CSS font string is quantized; bitmap dimensions use the original value.
+  // CSS font string is quantized; bitmap dimensions use the raster value.
   const fontPixels = Math.fround(Math.fround(spec.font) * Math.fround(spec.rasterScale));
   const margin = Math.trunc(Math.fround(Math.fround(spec.font * outline) * 2));
   const textWidth = measureLabel(spec.text, spec.font);
@@ -222,7 +222,7 @@ function currentTransform(context: Canvas2DContext): Affine {
   return { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
 }
 
-/** Draw the cached bitmap exactly like the original `drawCachedCanvas`: a
+/** Draw the cached bitmap exactly like a cached canvas draw: a
  * unit image through a composed transform (not the 5-argument drawImage
  * form). Chrome takes the same filtering path for both clients this way. */
 function drawUnitImage(context: Canvas2DContext, image: CanvasImageSource,

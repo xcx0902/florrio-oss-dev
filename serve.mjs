@@ -1,22 +1,15 @@
 #!/usr/bin/env node
 /**
- * Legacy Florr.io 本地单机版 —— 静态服务器
- *
- * 只做一件事：把 ./web 目录用正确的 MIME 类型跑起来，让浏览器能加载
- * client.wasm 与 sp_server.js（Web Worker 本地服务端）。
- *
- * 游戏自身的单机逻辑完全跑在客户端：client.js 检测到主机名为 localhost
- * 时，会 new Worker("sp_server.js") 把整局游戏的服务端拉起来，因此
- * 全程不需要任何外部网络。
+ * 本地静态服务器：以正确的 MIME 类型提供 dist-next 交付树。
  *
  * 用法：
- *   node serve.mjs               # 默认运行 dist-next（纯 C++/TS 交付树）
- *   node serve.mjs --port 9000   # 指定端口
- *   node serve.mjs --no-open     # 不自动打开浏览器
- *   node serve.mjs --host 0.0.0.0  # 开放到局域网（请注意安全）
- *   node serve.mjs --root dist    # 运行还原源码构建版
- *   node serve.mjs --next         # 显式选择 dist-next（默认）
- *   node serve.mjs --reference    # 回滚到 web（冻结的 oracle 树）
+ *   node serve.mjs                  # 默认运行 dist-next
+ *   node serve.mjs --port 9000      # 指定端口
+ *   node serve.mjs --no-open        # 不自动打开浏览器
+ *   node serve.mjs --host 0.0.0.0   # 开放到局域网（请注意安全）
+ *   node serve.mjs --root dist-next # 指定其他构建输出目录
+ *
+ * archive/ 是只读历史资料，不允许作为静态站点根目录。
  */
 
 import http from 'node:http';
@@ -28,8 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// R29: the semantic rebuild (`dist-next`) is the default entry. The frozen
-// oracle tree stays reachable with --reference / --root web.
+// The rebuilt C++/TypeScript delivery tree is the only supported entry.
 let ROOT = path.join(__dirname, 'dist-next');
 
 const MIME = {
@@ -60,8 +52,6 @@ function parseArgs(argv) {
     else if (a === '--host') opts.host = argv[++i];
     else if (a === '--no-open') opts.open = false;
     else if (a === '--root') opts.root = argv[++i];
-    else if (a === '--next') opts.root = 'dist-next';
-    else if (a === '--reference') opts.root = 'web';
     else if (a === '--help' || a === '-h') opts.help = true;
     else if (/^\d+$/.test(a)) opts.port = Number(a);
   }
@@ -146,6 +136,11 @@ function openBrowser(url) {
 
 const opts = parseArgs(process.argv.slice(2));
 ROOT = path.resolve(__dirname, opts.root);
+const archiveRoot = path.join(__dirname, 'archive');
+if (ROOT === archiveRoot || ROOT.startsWith(archiveRoot + path.sep)) {
+  console.error('archive/ 是只读历史资料，不能作为站点根目录。');
+  process.exit(1);
+}
 if (opts.help) {
   console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('*/')[0].replace(/^#!.*\n/, ''));
   process.exit(0);

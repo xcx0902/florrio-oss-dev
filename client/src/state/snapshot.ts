@@ -3,7 +3,7 @@ import type { DenseFieldSpec } from './field-types.js';
 
 export type DenseValue = number | string | readonly number[] | readonly string[];
 
-/** Original event opcodes decoded by function 1015. */
+/** Event opcodes decoded by the snapshot reader. */
 export type SnapshotEvent =
   | { readonly opcode: 9; readonly text: string }
   | { readonly opcode: 11; readonly handle: number }
@@ -12,7 +12,7 @@ export type SnapshotEvent =
 export interface EntitySnapshot {
   readonly handle: number;
   /** Domain kind for the accepted domain record (1 player, 2 mob, 3
-   * petal, 4 drop). The original species id is `speciesId`. */
+   * petal, 4 drop). The catalog species id is `speciesId`. */
   readonly typeId: number;
   readonly kind?: number;
   readonly speciesId?: number;
@@ -86,9 +86,9 @@ interface DomainProjection {
   readonly score?: number;
 }
 
-/** Project protocol fields through the generated component locations. Original
- * constructor IDs and layout offsets belong to the schema table, not domain
- * projection logic. Field 26 remains the accepted permanent domain extension. */
+/** Project protocol fields through the generated component locations. Component
+ * ids and layout offsets belong to the schema table, not domain projection
+ * logic. Field 26 remains the accepted permanent domain extension. */
 function projectDomain(
   components: Readonly<Record<number, Readonly<Record<number, unknown>>>>,
   denseFields?: Readonly<Record<number, DenseValue>>,
@@ -134,7 +134,7 @@ export interface Snapshot {
   readonly events: readonly SnapshotEvent[];
 }
 
-/** Decode the original event block: opcode 9 chat, 11 entity time, 14 visual. */
+/** Decode the event block: opcode 9 chat, 11 hit clock, 14 petal transfer. */
 export function decodeSnapshotEvents(reader: Reader, count: number): SnapshotEvent[] | null {
   const events: SnapshotEvent[] = [];
   for (let index = 0; index < count; ++index) {
@@ -153,8 +153,8 @@ export function decodeSnapshotEvents(reader: Reader, count: number): SnapshotEve
 }
 
 /** Decoder boundary. Field metadata comes from schema/protocol.yaml. Reader
- * implementations distinguish the domain sparse framing, original dense
- * field widths, and the separate fixed-record diagnostic skeleton. */
+ * implementations distinguish the domain sparse framing, the dense field
+ * widths and the separate dense-group diagnostic framing. */
 export interface SnapshotDecoder {
   decode(bytes: Uint8Array): Snapshot | null;
 }
@@ -243,7 +243,7 @@ export interface SnapshotHeader {
   readonly reliableAck: number;
 }
 
-/** Decode the original type-1 header: type, sequence, reliable ack. */
+/** Decode the type-1 header: type, sequence, reliable ack. */
 export function decodeSnapshotHeader(bytes: Uint8Array): SnapshotHeader | null {
   try {
     const reader = new Reader(bytes);
@@ -262,7 +262,7 @@ export interface SnapshotBlockCounts {
   readonly events: number;
 }
 
-/** Header plus the three original block counts. Entry bodies are not decoded. */
+/** Header plus the three block counts. Entry bodies are not decoded. */
 export function decodeSnapshotBlockCounts(bytes: Uint8Array): SnapshotBlockCounts | null {
   try {
     const reader = new Reader(bytes);
@@ -280,7 +280,7 @@ export function decodeSnapshotBlockCounts(bytes: Uint8Array): SnapshotBlockCount
 }
 
 /** Decode original-style bare entity activations (flags=2, no fields). */
-export class OriginalBareSnapshotDecoder implements SnapshotDecoder {
+export class BareSnapshotDecoder implements SnapshotDecoder {
   private readonly masks = new Map<number, number>();
   /** Native component-pointer presence: the original decoder reads dense
    * groups only when the component constructor at the entity offset exists.
@@ -496,7 +496,7 @@ export class OriginalBareSnapshotDecoder implements SnapshotDecoder {
 
   decode(bytes: Uint8Array): Snapshot | null {
     // Failed speculative decoding must not alter the component table used by
-    // the next valid packet (or another decoder in CompositeSnapshotDecoder).
+    // the next valid packet.
     const masks = new Map(this.masks);
     const pointers = new Map([...this.componentPointers].map(([handle, set]) => [handle, new Set(set)]));
     const snapshot = this.decodePacket(bytes);
@@ -541,42 +541,6 @@ export class OriginalBareSnapshotDecoder implements SnapshotDecoder {
     }
   }
 }
-
-export class SkeletonSnapshotDecoder implements SnapshotDecoder {
-  decode(bytes: Uint8Array): Snapshot | null {
-    try {
-      const reader = new Reader(bytes);
-      if (reader.u8() !== 1) return null;
-      const sequence = reader.varint();
-      reader.varint(); // reliable ack
-      const deletes = reader.varint();
-      const updates = reader.varint();
-      const events = reader.varint();
-      const deletedHandles: number[] = [];
-      for (let index = 0; index < deletes; ++index) deletedHandles.push(reader.u32());
-      const entities: EntitySnapshot[] = [];
-      for (let index = 0; index < updates; ++index) {
-        const handle = reader.u32();
-        const typeId = reader.u8();
-        if (typeId < 1 || typeId > 4 || handle === 0) return null;
-        const x = reader.f32();
-        const y = reader.f32();
-        const angle = reader.f32();
-        const health = reader.f32();
-        const maxHealth = reader.f32();
-        const level = reader.u8();
-        entities.push({ handle, typeId, kind: typeId, x, y, angle, health, maxHealth,
-          healthKnown: true, maxHealthKnown: true, level, flags: 0 });
-      }
-      const decodedEvents = decodeSnapshotEvents(reader, events);
-      if (decodedEvents === null || !reader.eof) return null;
-      return { sequence, serverTime: 0, entities, events: decodedEvents, deletedHandles };
-    } catch {
-      return null;
-    }
-  }
-}
-
 
 /** Dense field specs for the types implemented by DenseGroupDecoder. */
 
@@ -724,23 +688,5 @@ export class DensePlanDecoder implements SnapshotDecoder {
     } catch {
       return null;
     }
-  }
-}
-
-
-/** Tries each decoder in order; exposes which one accepted the packet. */
-export class CompositeSnapshotDecoder implements SnapshotDecoder {
-  lastIndex = -1;
-  constructor(private readonly decoders: readonly SnapshotDecoder[]) {}
-  decode(bytes: Uint8Array): Snapshot | null {
-    for (let index = 0; index < this.decoders.length; ++index) {
-      const snapshot = this.decoders[index].decode(bytes);
-      if (snapshot !== null) {
-        this.lastIndex = index;
-        return snapshot;
-      }
-    }
-    this.lastIndex = -1;
-    return null;
   }
 }

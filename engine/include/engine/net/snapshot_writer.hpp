@@ -47,7 +47,7 @@ class SnapshotPacketBuilder {
 /** Transitional original-style writer for bare entity activations. A bare
  * update writes handle, flags=2 (skip declarations) and the sparse-field
  * terminator; component declarations/fields are the next step. */
-class OriginalSnapshotWriter {
+class SnapshotWriter {
  public:
   void begin(std::uint32_t sequence, std::uint32_t reliable_ack = 0);
   void write_delete(EntityHandle handle);

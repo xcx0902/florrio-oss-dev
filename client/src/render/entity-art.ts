@@ -3,7 +3,7 @@
  *
  * Every routine draws at the local origin of one entity. The caller installs
  * the per-entity camera/position/angle transform and owns its save/restore.
- * Species geometry follows source/game/client and source/wasm/client.wat,
+ * Species geometry follows the client renderer's art definitions,
  * with native WASM paint comparisons and read-only golden Path2D checks.
  */
 import type { Canvas2DContext } from './canvas2d/context.js';
@@ -54,7 +54,7 @@ const setStroke = (context: Canvas2DContext, color: Rgb): void => {
 };
 
 /** Remaining hit blend, 1 at impact and 0 after 150 ms. The first 15 ms
- * are white, followed by red. WAT 1040/1044 truncate f32 channels. */
+ * are white, followed by red. Channels are truncated to f32. */
 export function flashColor(base: Rgb, amount: number): Rgb {
   if (!(amount > 0)) return base;
   const f = Math.fround;
@@ -169,7 +169,7 @@ function drawPlayerEye(context: Canvas2DContext, x: number, y: number, gaze: Pla
   setStroke(context, ink); context.setLineWidth(0.5); context.stroke();
 }
 
-/** Domain port of original1100 and eye690: state smoothing, action colours,
+/** State smoothing, action colours,
  * double-blended hit rim, expressions and gaze. No captured glint positions. */
 export function drawPlayerFace(context: Canvas2DContext, options: PlayerFaceOptions = {}): void {
   const f = Math.fround, attacking = options.attacking === true, defending = options.defending === true;
@@ -247,7 +247,7 @@ export function drawPlayerFace(context: Canvas2DContext, options: PlayerFaceOpti
   if (options.preserveContext) context.restore();
 }
 
-/** Persistent native renderer fields +792/+796/+800 (function763). */
+/** Persistent renderer state fields. */
 export interface PlayerHealthBarState {
   healthRatio: number;
   trailingRatio: number;
@@ -262,13 +262,13 @@ export interface PlayerHealthBarOptions {
   readonly immediate?: boolean;
   readonly grayscale?: boolean;
 }
-/** Native491 explicitly zeros +792/+796/+800 (WAT 28313–28319).
+/** The render state explicitly zeros +792/+796/+800.
  * A full red trail comes from prior frames or the visual's immediate flag. */
 export function createPlayerHealthBarState(): PlayerHealthBarState {
   return { healthRatio: 0, trailingRatio: 0, alpha: 0 };
 }
 
-/** Native763 health layer, WAT 139656–141386. The caller owns the entity
+/** Health layer. The caller owns the entity
  * transform and persistent state. Alpha eases once per rendered frame; ratio
  * easing uses elapsed milliseconds. Omitting state draws the settled ratios;
  * provide a per-entity state to reproduce damage/healing/fade history. */
@@ -730,7 +730,7 @@ function inLocalTransform(context: Canvas2DContext, draw: (local: Canvas2DContex
   context.setTransform(...matrix);
 }
 
-/** Original410 composes every rectangle from the same caller matrix and
+/** Every rectangle is composed from the same caller matrix and
  * restores it without a Canvas save. Expanded zero products retain native
  * f32 grouping (including signed zero and nonfinite propagation). */
 function fillArtRectangle(context: Canvas2DContext, x: number, y: number, width: number, height: number): void {
@@ -823,7 +823,7 @@ function drawStripedBug(context: Canvas2DContext, flash: number, hornet: boolean
   context.beginPath(); context.ellipse(0, 0, 30, 20, 0, 0, TAU);
   setFill(context, body); context.fill();
   context.save(); context.clip(); setFill(context, dark);
-  // Native function410 rectangles are drawn from right to left.
+  // Warning rectangles are drawn from right to left.
   const native = context as SpeciesContext;
   if (native.transform && !native.getTransform) {
     // Legacy bridges cannot restore a logical matrix without a Canvas save.

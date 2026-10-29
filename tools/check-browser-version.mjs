@@ -11,5 +11,5 @@ const browser = await chromium.launch({ executablePath: chromiumExecutable(), he
 try {
   const actual = browser.version();
   if (actual !== expected) throw new Error(`Chrome ${expected} is required by .chromium-version; got ${actual}. Set CHROME_PATH to the pinned executable.`);
-  console.log(`Chrome ${actual}: matches the archived-client golden pin`);
+  console.log(`Chrome ${actual}: matches the pinned version`);
 } finally { await browser.close(); }

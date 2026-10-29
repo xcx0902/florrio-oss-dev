@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { parse as parseYaml } from 'yaml';
 import { pathToFileURL } from 'node:url';
 import { DENSE_GROUPS, DENSE_GROUP_SPECS, DENSE_GROUP_COMPONENTS, densePresentForMask, FIELD_COMPONENTS } from '../public/state/field-types.js';
-import { RenderingCanvas } from './helpers/rendering-oracle.mjs';
+import { RenderingCanvas } from './helpers/recording-canvas.mjs';
 import { drawWorld } from '../public/render/world.js';
 import { WorldState } from '../public/state/world.js';
 import { CameraState } from '../public/state/camera.js';
@@ -169,7 +169,7 @@ test('real worker publishes special petal launch, recharge and artwork component
     const results = await page.evaluate(async () => {
       const { ServerWorkerClient } = await import('/net/worker.js');
       const { InputPacketEncoder } = await import('/net/input.js');
-      const { OriginalBareSnapshotDecoder } = await import('/state/snapshot.js');
+      const { BareSnapshotDecoder } = await import('/state/snapshot.js');
       const { WorldState } = await import('/state/world.js');
       const { playerSlotProgress } = await import('/state/loadout.js');
       const { DENSE_GROUPS, DENSE_GROUP_SPECS } = await import('/state/field-types.js');
@@ -178,7 +178,7 @@ test('real worker publishes special petal launch, recharge and artwork component
         const worker = new ServerWorkerClient('server-worker.js?manual=1');
         try {
           const input = new InputPacketEncoder(), world = new WorldState();
-          const decoder = new OriginalBareSnapshotDecoder(DENSE_GROUPS.map(group => ({
+          const decoder = new BareSnapshotDecoder(DENSE_GROUPS.map(group => ({
             offset: group.offset, specs: DENSE_GROUP_SPECS[group.offset] ?? [],
           })));
           await worker.init();
@@ -389,28 +389,17 @@ test('original snapshot header decoder reads type, sequence and ack', async () =
   assert.deepEqual(result, { sequence: 9, reliableAck: 3 });
 });
 
-test('original snapshot block counts decode', async () => {
-  const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
-  const result = await page.evaluate(async () => {
-    const { decodeSnapshotBlockCounts } = await import('/state/snapshot.js');
-    return decodeSnapshotBlockCounts(new Uint8Array([1, 12, 4, 1, 0, 2]));
-  });
-  await page.close();
-  assert.deepEqual(result, { sequence: 12, reliableAck: 4, deletes: 1, updates: 0, events: 2 });
-});
-
 test('original bare update decoder reads handle and flags', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { OriginalBareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
     const bytes = new Uint8Array([1, 12, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 52, 0]);
-    const snapshot = new OriginalBareSnapshotDecoder().decode(bytes);
+    const snapshot = new BareSnapshotDecoder().decode(bytes);
     const maskBytes = new Uint8Array([1, 13, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 0]);
-    const maskSnapshot = new OriginalBareSnapshotDecoder().decode(maskBytes);
+    const maskSnapshot = new BareSnapshotDecoder().decode(maskBytes);
     const fieldBytes = new Uint8Array([1, 14, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 1, 0x7A, 0]);
-    const fieldSnapshot = new OriginalBareSnapshotDecoder().decode(fieldBytes);
+    const fieldSnapshot = new BareSnapshotDecoder().decode(fieldBytes);
     const floatBytes = new Uint8Array([
       1, 15, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0,
       5, 0, 0, 0xC0, 0x3F,
@@ -418,54 +407,54 @@ test('original bare update decoder reads handle and flags', async () => {
       17, 0, 0, 0x60, 0x40,
       0,
     ]);
-    const floatSnapshot = new OriginalBareSnapshotDecoder().decode(floatBytes);
+    const floatSnapshot = new BareSnapshotDecoder().decode(floatBytes);
     const staticBytes = new Uint8Array([1, 16, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 19, 0, 0, 0x90, 0x40, 0]);
-    const staticSnapshot = new OriginalBareSnapshotDecoder().decode(staticBytes);
+    const staticSnapshot = new BareSnapshotDecoder().decode(staticBytes);
     const doubleBytes = new Uint8Array([1, 17, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0x02, 0x40, 0]);
-    const doubleSnapshot = new OriginalBareSnapshotDecoder().decode(doubleBytes);
+    const doubleSnapshot = new BareSnapshotDecoder().decode(doubleBytes);
     const field18Bytes = new Uint8Array([1, 18, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0x0A, 0x40, 0]);
-    const field18Snapshot = new OriginalBareSnapshotDecoder().decode(field18Bytes);
+    const field18Snapshot = new BareSnapshotDecoder().decode(field18Bytes);
     const field27Bytes = new Uint8Array([1, 19, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 27, 0, 0, 0xB0, 0x40, 0]);
-    const field27Snapshot = new OriginalBareSnapshotDecoder().decode(field27Bytes);
+    const field27Snapshot = new BareSnapshotDecoder().decode(field27Bytes);
     const stringBytes = new Uint8Array([1, 20, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 4, 0x68, 0x69, 0, 0]);
-    const stringSnapshot = new OriginalBareSnapshotDecoder().decode(stringBytes);
+    const stringSnapshot = new BareSnapshotDecoder().decode(stringBytes);
     const byte2Bytes = new Uint8Array([1, 21, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 2, 0xAB, 0]);
-    const byte2Snapshot = new OriginalBareSnapshotDecoder().decode(byte2Bytes);
+    const byte2Snapshot = new BareSnapshotDecoder().decode(byte2Bytes);
     const arrayBytes = new Uint8Array([1, 22, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 60, 3, 0xCD, 0, 0]);
-    const arraySnapshot = new OriginalBareSnapshotDecoder().decode(arrayBytes);
+    const arraySnapshot = new BareSnapshotDecoder().decode(arrayBytes);
     const varintArrayBytes = new Uint8Array([1, 23, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 39, 2, 200, 1, 0, 0]);
-    const varintArraySnapshot = new OriginalBareSnapshotDecoder().decode(varintArrayBytes);
+    const varintArraySnapshot = new BareSnapshotDecoder().decode(varintArrayBytes);
     const shortArrayBytes = new Uint8Array([1, 24, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 61, 1, 239, 253, 2, 0, 0]);
-    const shortArraySnapshot = new OriginalBareSnapshotDecoder().decode(shortArrayBytes);
+    const shortArraySnapshot = new BareSnapshotDecoder().decode(shortArrayBytes);
     const varint30Bytes = new Uint8Array([1, 27, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 30, 0xAC, 2, 0]);
-    const varint30Snapshot = new OriginalBareSnapshotDecoder().decode(varint30Bytes);
+    const varint30Snapshot = new BareSnapshotDecoder().decode(varint30Bytes);
     const reference23Bytes = new Uint8Array([1, 28, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 23, 0x44, 0x33, 0x22, 0x11, 0]);
-    const reference23Snapshot = new OriginalBareSnapshotDecoder().decode(reference23Bytes);
+    const reference23Snapshot = new BareSnapshotDecoder().decode(reference23Bytes);
     const string48Bytes = new Uint8Array([1, 29, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 48, 0x61, 0x62, 0x63, 0, 0]);
-    const string48Snapshot = new OriginalBareSnapshotDecoder().decode(string48Bytes);
+    const string48Snapshot = new BareSnapshotDecoder().decode(string48Bytes);
     const stringArray25Bytes = new Uint8Array([1, 30, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 25, 2, 0x78, 0x79, 0, 0, 0]);
-    const stringArray25Snapshot = new OriginalBareSnapshotDecoder().decode(stringArray25Bytes);
+    const stringArray25Snapshot = new BareSnapshotDecoder().decode(stringArray25Bytes);
     const float45Bytes = new Uint8Array([1, 31, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 45, 0, 0, 0xD0, 0x40, 0]);
-    const float45Snapshot = new OriginalBareSnapshotDecoder().decode(float45Bytes);
+    const float45Snapshot = new BareSnapshotDecoder().decode(float45Bytes);
     const sparseBytes = new Uint8Array([1, 32, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 54, 0, 3, 1, 0]);
-    const sparseSnapshot = new OriginalBareSnapshotDecoder().decode(sparseBytes);
+    const sparseSnapshot = new BareSnapshotDecoder().decode(sparseBytes);
     const bitBytes = new Uint8Array([1, 33, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 33, 1, 0]);
-    const bitSnapshot = new OriginalBareSnapshotDecoder().decode(bitBytes);
+    const bitSnapshot = new BareSnapshotDecoder().decode(bitBytes);
     const angleBytes = new Uint8Array([1, 34, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 8, 0, 0x80, 0]);
-    const angleSnapshot = new OriginalBareSnapshotDecoder().decode(angleBytes);
+    const angleSnapshot = new BareSnapshotDecoder().decode(angleBytes);
     const handleArrayBytes = new Uint8Array([1, 35, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 3, 1, 0xBE, 0xBA, 0xFE, 0xCA, 0, 0]);
-    const handleArraySnapshot = new OriginalBareSnapshotDecoder().decode(handleArrayBytes);
+    const handleArraySnapshot = new BareSnapshotDecoder().decode(handleArrayBytes);
     const mixedBytes = new Uint8Array([1, 36, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 5, 0, 0, 0xC0, 0x3F, 3, 0, 0x40, 0]);
-    const mixedSnapshot = new OriginalBareSnapshotDecoder().decode(mixedBytes);
+    const mixedSnapshot = new BareSnapshotDecoder().decode(mixedBytes);
     const field13Bytes = new Uint8Array([1, 39, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 13, 0, 0, 0xF0, 0x40, 0]);
-    const field13Snapshot = new OriginalBareSnapshotDecoder().decode(field13Bytes);
+    const field13Snapshot = new BareSnapshotDecoder().decode(field13Bytes);
     const eventsBytes = new Uint8Array([
       1, 40, 4, 0, 0, 3,
       9, 0x68, 0x69, 0,
       11, 0x78, 0x56, 0x34, 0x12,
       14, 0x78, 0x56, 0x34, 0x12, 2,
     ]);
-    const eventsSnapshot = new OriginalBareSnapshotDecoder().decode(eventsBytes);
+    const eventsSnapshot = new BareSnapshotDecoder().decode(eventsBytes);
     return {
       bare: snapshot?.entities.map(entity => ({ handle: entity.handle, typeId: entity.typeId })) ?? null,
       mask: maskSnapshot?.entities.map(entity => ({ handle: entity.handle, flags: entity.flags })) ?? null,
@@ -522,57 +511,6 @@ test('original bare update decoder reads handle and flags', async () => {
     field13: [{ 13: 7.5 }],
     eventsOnly: true,
   });
-});
-
-test('snapshot decoder reads the C++ writer skeleton', async () => {
-  const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
-  const result = await page.evaluate(async () => {
-    const { SkeletonSnapshotDecoder } = await import('/state/snapshot.js');
-    const { WorldState } = await import('/state/world.js');
-    const bytes = new Uint8Array(1 + 1 + 4 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1 + 6 + 4 + 5);
-    const view = new DataView(bytes.buffer);
-    let offset = 0;
-    bytes[offset++] = 1;
-    bytes[offset++] = 9;
-    bytes[offset++] = 0; // reliable ack
-    bytes[offset++] = 1; // deletes
-    bytes[offset++] = 1; // updates
-    bytes[offset++] = 3; // events
-    view.setUint32(offset, 0x11111111, true); offset += 4; // deleted handle
-    view.setUint32(offset, 0x12345678, true); offset += 4;
-    bytes[offset++] = 2;
-    view.setFloat32(offset, 7.5, true); offset += 4;
-    view.setFloat32(offset, -8.25, true); offset += 4;
-    view.setFloat32(offset, 0.5, true); offset += 4;
-    view.setFloat32(offset, 42, true); offset += 4;
-    view.setFloat32(offset, 100, true); offset += 4;
-    bytes[offset++] = 5;
-    bytes[offset++] = 9; // chat event
-    bytes[offset++] = 0x68; bytes[offset++] = 0x69; bytes[offset++] = 0;
-    bytes[offset++] = 14; // event opcode
-    view.setUint32(offset, 0x22222222, true); offset += 4;
-    bytes[offset++] = 7; // visual index
-    bytes[offset++] = 11; // entity-time event
-    view.setUint32(offset, 0x33333333, true); offset += 4;
-    const snapshot = new SkeletonSnapshotDecoder().decode(bytes);
-    const world = new WorldState();
-    if (snapshot) world.apply(snapshot, 0);
-    const entity = world.get(0x12345678);
-    return {
-      sequence: snapshot?.sequence ?? null,
-      count: world.count,
-      type: entity?.typeId ?? null,
-      x: entity?.x ?? null,
-      y: entity?.y ?? null,
-      angle: entity?.angle ?? null,
-      health: entity?.health ?? null,
-      maxHealth: entity?.maxHealth ?? null,
-      level: entity?.level ?? null,
-    };
-  });
-  await page.close();
-  assert.deepEqual(result, { sequence: 9, count: 1, type: 2, x: 7.5, y: -8.25, angle: 0.5, health: 42, maxHealth: 100, level: 5 });
 });
 
 test('protocol schema covers all 63 field ordinals', () => {
@@ -1034,13 +972,13 @@ test('original decoder mixes bare and dense updates', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { OriginalBareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
       1, 76, 4, 0, 2, 0,
       0x11, 0x11, 0x11, 0x11, 52, 0,
       0x22, 0x22, 0x22, 0x22, 62, 0x11, 0x22,
     ]);
-    const snapshot = new OriginalBareSnapshotDecoder([
+    const snapshot = new BareSnapshotDecoder([
       { offset: 52, specs: [{ field: 22, type: 'byte' }, { field: 54, type: 'byte' }] },
     ], new Set([52])).decode(packet);
     return snapshot?.entities.map(entity => ({ handle: entity.handle, dense: entity.denseFields ?? null })) ?? null;
@@ -1056,11 +994,11 @@ test('original decoder converts mask angle field 8 to radians', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { OriginalBareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
       1, 77, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 0, 0, 0, 0, 8, 0, 0x40, 0,
     ]);
-    const snapshot = new OriginalBareSnapshotDecoder().decode(packet);
+    const snapshot = new BareSnapshotDecoder().decode(packet);
     return snapshot?.entities[0]?.angle ?? null;
   });
   await page.close();
@@ -1071,9 +1009,9 @@ test('original decoder clamps out-of-range sparse fields', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { OriginalBareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
     const bytes = new Uint8Array([1, 42, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 52, 64, 0x7A, 0]);
-    return new OriginalBareSnapshotDecoder().decode(bytes)?.entities[0]?.byteField1 ?? null;
+    return new BareSnapshotDecoder().decode(bytes)?.entities[0]?.byteField1 ?? null;
   });
   await page.close();
   assert.equal(result, 0x7A);
@@ -1083,12 +1021,12 @@ test('original decoder maps fields 5/24 to world position', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { OriginalBareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
       1, 78, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 0, 0, 0, 0,
       5, 0, 0, 0x48, 0x41, 19, 0, 0, 0x0A, 0x42, 0,
     ]);
-    const entity = new OriginalBareSnapshotDecoder().decode(packet)?.entities[0] ?? null;
+    const entity = new BareSnapshotDecoder().decode(packet)?.entities[0] ?? null;
     return entity ? { x: entity.x, y: entity.y, components: entity.components } : null;
   });
   await page.close();
@@ -1115,22 +1053,6 @@ test('WorldState.applyPartial preserves missing gameplay fields', async () => {
   });
   await page.close();
   assert.deepEqual(result, { x: 10, y: 20, health: 80, maxHealth: 100, flags: 5, angle: Math.PI / 2 });
-});
-
-test('composite decoder falls back to original framing', async () => {
-  const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
-  const result = await page.evaluate(async () => {
-    const { CompositeSnapshotDecoder, OriginalBareSnapshotDecoder, SkeletonSnapshotDecoder } = await import('/state/snapshot.js');
-    const packet = new Uint8Array([
-      1, 79, 4, 0, 1, 0, 0x11, 0x11, 0x11, 0x11, 52, 0,
-    ]);
-    const decoder = new CompositeSnapshotDecoder([new SkeletonSnapshotDecoder(), new OriginalBareSnapshotDecoder()]);
-    const snapshot = decoder.decode(packet);
-    return { lastIndex: decoder.lastIndex, count: snapshot?.entities.length ?? null, handle: snapshot?.entities[0]?.handle ?? null };
-  });
-  await page.close();
-  assert.deepEqual(result, { lastIndex: 1, count: 1, handle: 0x11111111 });
 });
 
 test('WorldState.applyPartial merges dense fields without dropping position', async () => {

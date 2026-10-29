@@ -304,7 +304,7 @@ class World {
   void set_auto_populate(bool value) { auto_populate_ = value; }
 
   /** Diagnostics: the most recent destruction records (kind/type/position).
-   * Read by tools/parity/server-state-trace.mjs to explain count divergence. */
+   * Read by native tests to explain count divergence. */
   struct DeathRecord {
     std::uint64_t tick = 0;
     std::uint16_t type_id = 0;

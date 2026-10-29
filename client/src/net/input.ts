@@ -44,7 +44,7 @@ export class InputPacketEncoder {
   }
 
   /** Opcode 3: suicide. Argument 0 kills the current player; a nonzero value is
-   * ignored by the original server. */
+   * ignored by the server. */
   suicide(argument = 0): Uint8Array {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);

@@ -87,10 +87,9 @@ enum class AiFamily : std::uint8_t {
   kBeetle = 4,
 };
 
-/** Server AI record. The original copies a 92-byte behavior struct into
- * AI+60 (original 114) and keeps the target as an intrusive handle. The field
- * names below are the domain names for the recovered offsets; see
- * docs/semantics/ai.md for the offset table. */
+/** Server AI record. A 92-byte behavior struct lives at AI+60 and keeps the
+ * target as an intrusive handle. The field names below are domain names for
+ * the protocol offsets; see docs/semantics/ai.md for the offset table. */
 /** Behavior-modifier multipliers applied by the AI update. Defaults are 1 so
  * shipped mobs are unchanged; the original vtable exposes speed/turn/attack
  * modifiers for buffs/debuffs and scripted variants. */

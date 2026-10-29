@@ -2,14 +2,19 @@
 
 ## Inputs
 
-- Original artifact: `web/sp_server.wasm`, SHA-256
-  `75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d`.
-- Extracted data: `source/semantic/server-catalogs.json`.
-- Cross-check: `source/semantic/client-catalogs.json`.
+- `schema/catalogs/petals.json` — 39 petal records.
+- `schema/catalogs/entities.json` — 23 entity definitions and drop type ids.
+- `schema/catalogs/spawn-rules.json` — 20 spawn rules.
+- `schema/catalogs/petal-combat.json` — derived combat stats.
+- `schema/catalogs/drop-chances.json` — finalized per-entity drop probabilities.
+
+`tools/gen-contracts.mjs` turns these into the C++/TS views. The JSON files are
+the source; generated headers must not be hand-edited. Historical extraction
+recipes and probe transcripts are in `archive/`.
 
 ## Petals
 
-39 records, 52 bytes each, base 8,545,792.
+39 records of 52 bytes.
 
 | Offset | Field | Type | Confidence |
 | ---: | --- | --- | --- |
@@ -25,13 +30,12 @@
 | 44 | field44 | f32 | medium |
 | 48 | factory table index | u32 | high |
 
-Names are not unique (`Rose` appears at 6/15/24, `Cactus` at 13/21/33,
-`Basic` at 1/35). Type id is the identity; name is display data.
+Names are not unique (`Rose` at 6/15/24, `Cactus` at 13/21/33, `Basic` at 1/35).
+Type id is the identity; name is display data.
 
 ## Entity definitions
 
-23 records, 116 bytes each, base 8,548,368. Slot 22 is built but unreachable
-because the lookup rejects slot > 21.
+23 records of 116 bytes.
 
 | Offset | Field | Type | Confidence |
 | ---: | --- | --- | --- |
@@ -49,11 +53,11 @@ because the lookup rejects slot > 21.
 | 110 | field110 | u8 | high |
 | 112 | secondary scale | f32 | high |
 
-`petalTypeIds` is the low u32 of each component pair at +36 + i*8.
+`petalTypeIds` is the low u32 of each component pair at `36 + i*8`.
 
 ## Spawn rules
 
-20 records, 16 bytes each, base 8,547,824.
+20 records of 16 bytes.
 
 | Offset | Field | Type | Confidence |
 | ---: | --- | --- | --- |
@@ -66,43 +70,38 @@ because the lookup rejects slot > 21.
 ## Verification
 
 ```sh
-node tools/split-catalogs.mjs
-node tools/layout-probe.mjs
+npm run schema:generate
+ctest --test-dir build/engine -R engine_schema_contracts
 ```
 
-`layout-probe` decodes the pristine instance (`p()` + lazy initializer 103) and
-compares every field, every description and every `bytesHex` with the split
-catalogs. Current result: 39/39 petals, 23/23 entities, 20/20 spawn rules,
-0 mismatches.
+The original-layout probe and its frozen record are archived. The active native
+test checks YAML against the current compiler; it does not read the archived
+binary or its decoded bytes.
 
 ## Edge cases
 
 - Duplicate display names are preserved; do not collapse by name.
-- Slot 22 (Spider) exists but is unreachable through the original lookup.
+- Slot 22 (Spider) exists in the table but the catalog lookup rejects slot > 21.
 - Unknown offsets keep offset names (`field44`, `field108`, …), not invented
   product names.
 
-
 ## Drop table
 
-`engine/include/engine/catalog/drop_table.hpp` mirrors each entity
-definition's `petalTypeIds` (23 rows). The finalized mutable probabilities are
-derived by `tools/derive-drop-chances.mjs` into
+`engine/include/engine/catalog/drop_table.hpp` mirrors each entity definition's
+`petalTypeIds` (23 rows). The finalized probabilities are in
 `schema/catalogs/drop-chances.json` and generated as
-`engine/include/engine/catalog/drop_chances.hpp`. The derivation is verified
-against the original initializer: all 102 entries match exactly. See
-`docs/semantics/loot.md` for the algorithm.
+`engine/include/engine/catalog/drop_chances.hpp`. The runtime reads the table;
+the historical derivation tool is archived. See [loot.md](loot.md) for the
+selection algorithm.
 
 ## Petal combat
 
-`tools/derive-petal-combat.mjs` resolves each petal's slot-2 initializer and
-writes `schema/catalogs/petal-combat.json` (collision radius, damage, health,
-orbit profile, attack/defend radii). `tools/gen-contracts.mjs` emits the C++
-view. See `docs/semantics/petals.md`.
-
+`schema/catalogs/petal-combat.json` holds each petal's collision radius, damage,
+health, orbit profile and attack/defend radii. `tools/gen-contracts.mjs` emits
+the C++ view. See [petals.md](petals.md) for the behavior.
 
 ## Petal defaults
 
-`engine/include/engine/catalog/petal_defaults.hpp` mirrors all 39 petal
-catalog rows (type id, radius, recharge, instances per slot, header flags).
-It is data only; petal behavior remains in the petal domain.
+`engine/include/engine/catalog/petal_defaults.hpp` mirrors all 39 petal catalog
+rows (type id, radius, recharge, instances per slot, header flags). It is data
+only; petal behavior remains in the petal domain.

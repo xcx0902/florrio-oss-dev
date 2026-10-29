@@ -107,8 +107,8 @@ function drawArena(context: Canvas2DContext, world: WorldState, camera: CameraSt
   rectangle(0, 0, r, t);
   rectangle(r, 0, f(width - r), b);
   rectangle(l, b, f(width - l), f(height - b));
-  // Original588 rounds the level-band boundary to the nearest 50 units,
-  // halfway away from zero; original763 eases its world coordinate.
+  // The renderer rounds the level-band boundary to the nearest 50 units,
+  // halfway away from zero; the HUD eases its world coordinate.
   const fraction = level < 15 ? undefined : level < 30 ? f(0.3) : level < 45 ? f(0.6) : f(0.9);
   const grid = fraction === undefined ? -ARENA_WIDTH / 100
     : f(f(ARENA_WIDTH * fraction - ARENA_WIDTH / 2) * f(0.02));
@@ -135,7 +135,7 @@ interface VisibleEntity {
 
 const speciesOf = (entity: EntityState): number => entity.speciesId ?? entity.typeId;
 
-/** Original1015 declaration ordinals, in native760 render priority order.
+/** Declaration ordinals in renderer priority order.
  * The domain's identity component is metadata, so only projectile/petal
  * declarations select these models. A species id cannot distinguish them. */
 function petalRenderComponent(entity: EntityState): number {

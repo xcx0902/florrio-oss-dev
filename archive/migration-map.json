@@ -1,0 +1,798 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-10-29T12:38:04.201Z",
+  "sourceCommit": "cc175641d5b056962b528bc44d240f73a56973a4",
+  "dispositions": [
+    "archive",
+    "retain-product",
+    "replace",
+    "remove-generated",
+    "copy"
+  ],
+  "actions": [
+    {
+      "originalPath": "legacy",
+      "archivePath": "legacy",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Original upstream web tree, recovered JS/WASM source, historical reports and the earlier archive manifests leave the active tree."
+    },
+    {
+      "originalPath": "source",
+      "archivePath": "source",
+      "disposition": "archive",
+      "productReplacement": "schema/transport.json (packet XOR key)",
+      "reason": "Reverse-engineering runtime, semantic extracts, decompiled views, recovered source and original asset copies are reference-only. Product data that was still needed is promoted first."
+    },
+    {
+      "originalPath": "reference",
+      "archivePath": "reference",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Frozen upstream identity manifests and transport tarball are historical reference, not build input."
+    },
+    {
+      "originalPath": "test",
+      "archivePath": "test",
+      "disposition": "archive",
+      "productReplacement": "tests/unit/protocol-contracts.test.mjs; tests/tools/",
+      "reason": "Function-level oracle tests. Product contracts were migrated to tests/unit and tests/tools before this move."
+    },
+    {
+      "originalPath": "tests/parity",
+      "archivePath": "tests/parity",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Parity scenarios, goldens, recordings, screenshots and comparators compared against the archived client/engine."
+    },
+    {
+      "originalPath": "engine/tests/oracle",
+      "archivePath": "engine/tests/oracle",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Native oracle evidence and the native-state replay executable; the CMake engine_native_replay target was removed."
+    },
+    {
+      "originalPath": "tools/parity",
+      "archivePath": "tools/parity",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Browser injectors, virtual clocks, trace comparators and parity scenario drivers."
+    },
+    {
+      "originalPath": "tools/probes",
+      "archivePath": "tools/probes",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Live and native menu probes that instantiate archived artifacts."
+    },
+    {
+      "originalPath": "dist",
+      "archivePath": "dist",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Locally generated historical delivery tree. Kept as a sample under archive/tree; also present in reference/frozen-trees.tar.gz. This directory was gitignored, so it is not part of a fresh clone."
+    },
+    {
+      "originalPath": "dist-readable",
+      "archivePath": "dist-readable",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Locally generated readable recovery tree. Kept as a sample under archive/tree; also present in reference/frozen-trees.tar.gz. This directory was gitignored, so it is not part of a fresh clone."
+    },
+    {
+      "originalPath": "dist-reference",
+      "archivePath": "dist-reference",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Locally generated reference build. Kept as a sample under archive/tree; also present in reference/frozen-trees.tar.gz. This directory was gitignored, so it is not part of a fresh clone."
+    },
+    {
+      "originalPath": "tools/vendor",
+      "archivePath": "tools/vendor",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Local vendored dependency cache used only by the archived recovery tooling. Not source history and not part of a fresh clone."
+    },
+    {
+      "originalPath": "tools/gen-menu-content.mjs",
+      "archivePath": "tools/gen-menu-content-from-wasm.mjs",
+      "disposition": "archive",
+      "productReplacement": "tools/gen-menu-content.mjs",
+      "reason": "Old generator parsed the frozen web/client.wasm changelog table. It was replaced by a generator that reads the project CHANGELOG.md; this archive copy is the frozen-WASM version."
+    },
+    {
+      "originalPath": "tools/build.mjs",
+      "archivePath": "tools/build.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/recover-javascript.mjs",
+      "archivePath": "tools/recover-javascript.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/javascript-recovery-names.mjs",
+      "archivePath": "tools/javascript-recovery-names.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/recover-wasm.mjs",
+      "archivePath": "tools/recover-wasm.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/extract-closure-plans.mjs",
+      "archivePath": "tools/extract-closure-plans.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/verify-javascript.mjs",
+      "archivePath": "tools/verify-javascript.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/lib/readable-wasm.mjs",
+      "archivePath": "tools/lib/readable-wasm.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/lib/wasm-binary.mjs",
+      "archivePath": "tools/lib/wasm-binary.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/fetch-upstream.sh",
+      "archivePath": "tools/fetch-upstream.sh",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/reference-manifest.mjs",
+      "archivePath": "tools/reference-manifest.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/refreeze-reference.mjs",
+      "archivePath": "tools/refreeze-reference.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/prepare-reference.mjs",
+      "archivePath": "tools/prepare-reference.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/verify-reference.mjs",
+      "archivePath": "tools/verify-reference.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/archive-legacy.mjs",
+      "archivePath": "tools/archive-legacy.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/inventory-remaining.mjs",
+      "archivePath": "tools/inventory-remaining.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/write-reconstruction-report.mjs",
+      "archivePath": "tools/write-reconstruction-report.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/write-verification-report.mjs",
+      "archivePath": "tools/write-verification-report.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/summarize-evidence.mjs",
+      "archivePath": "tools/summarize-evidence.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/probe-game.mjs",
+      "archivePath": "tools/probe-game.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/probe-entity-defaults.mjs",
+      "archivePath": "tools/probe-entity-defaults.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/probe-menu.mjs",
+      "archivePath": "tools/probe-menu.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/probe-menu-canvas.mjs",
+      "archivePath": "tools/probe-menu-canvas.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/probe-menu-details.mjs",
+      "archivePath": "tools/probe-menu-details.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/layout-probe.mjs",
+      "archivePath": "tools/layout-probe.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/split-catalogs.mjs",
+      "archivePath": "tools/split-catalogs.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/derive-petal-combat.mjs",
+      "archivePath": "tools/derive-petal-combat.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/derive-drop-chances.mjs",
+      "archivePath": "tools/derive-drop-chances.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/collect-release.mjs",
+      "archivePath": "tools/collect-release.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/write-current-verification.mjs",
+      "archivePath": "tools/write-current-verification.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/verification/gates.mjs",
+      "archivePath": "tools/verification/gates.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/verification/report-status.mjs",
+      "archivePath": "tools/verification/report-status.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "tools/verification/release-rehearsal.mjs",
+      "archivePath": "tools/verification/release-rehearsal.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Reverse-engineering, probe, frozen-reference or historical reporting tool; no current product consumer."
+    },
+    {
+      "originalPath": "probe-life.mjs",
+      "archivePath": "probe-life.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Directly calls loadOriginal and archived source/game modules."
+    },
+    {
+      "originalPath": "engine/tests/unit/test_original_client_adapter.hpp",
+      "archivePath": "engine/tests/unit/test_original_client_adapter.hpp",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Independent decoder for OriginalClientSnapshotWriter and the archived original_client_* stream; the implementation and its callers were removed from the product."
+    },
+    {
+      "originalPath": "client/tests/angle-interpolation.test.mjs",
+      "archivePath": "client/tests/angle-interpolation.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/arena-boundary.test.mjs",
+      "archivePath": "client/tests/arena-boundary.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/camera-golden.test.mjs",
+      "archivePath": "client/tests/camera-golden.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/camera-input.test.mjs",
+      "archivePath": "client/tests/camera-input.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/camera-projection.test.mjs",
+      "archivePath": "client/tests/camera-projection.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/drop-art.test.mjs",
+      "archivePath": "client/tests/drop-art.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/entity-art.test.mjs",
+      "archivePath": "client/tests/entity-art.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/hud-golden.test.mjs",
+      "archivePath": "client/tests/hud-golden.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/menu-golden.test.mjs",
+      "archivePath": "client/tests/menu-golden.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/menu-input-parity.test.mjs",
+      "archivePath": "client/tests/menu-input-parity.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/pan.test.mjs",
+      "archivePath": "client/tests/pan.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/petal-art.test.mjs",
+      "archivePath": "client/tests/petal-art.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/petal-motion.test.mjs",
+      "archivePath": "client/tests/petal-motion.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/recharge.test.mjs",
+      "archivePath": "client/tests/recharge.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/render-camera.test.mjs",
+      "archivePath": "client/tests/render-camera.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/render-golden.test.mjs",
+      "archivePath": "client/tests/render-golden.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/rendering-parity.test.mjs",
+      "archivePath": "client/tests/rendering-parity.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/species-animation.test.mjs",
+      "archivePath": "client/tests/species-animation.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/text-cache.test.mjs",
+      "archivePath": "client/tests/text-cache.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/ui-detail-parity.test.mjs",
+      "archivePath": "client/tests/ui-detail-parity.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/world-transform.test.mjs",
+      "archivePath": "client/tests/world-transform.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/zone-warning.test.mjs",
+      "archivePath": "client/tests/zone-warning.test.mjs",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Test input or expected value comes from the archived original, parity golden or source tree; product behaviour remains covered by the retained client suite."
+    },
+    {
+      "originalPath": "client/tests/helpers/rendering-oracle.mjs",
+      "archivePath": "client/tests/helpers/rendering-oracle.mjs",
+      "disposition": "archive",
+      "productReplacement": "client/tests/helpers/recording-canvas.mjs",
+      "reason": "Original-WASM comparison helper; the product recording context was extracted to recording-canvas.mjs."
+    },
+    {
+      "originalPath": "client/tests/helpers/petal-oracle.mjs",
+      "archivePath": "client/tests/helpers/petal-oracle.mjs",
+      "disposition": "archive",
+      "productReplacement": "client/tests/helpers/recording-canvas.mjs",
+      "reason": "Original-WASM comparison helper; the product recording context was extracted to recording-canvas.mjs."
+    },
+    {
+      "originalPath": "client/tests/helpers/drop-oracle.mjs",
+      "archivePath": "client/tests/helpers/drop-oracle.mjs",
+      "disposition": "archive",
+      "productReplacement": "client/tests/helpers/recording-canvas.mjs",
+      "reason": "Original-WASM comparison helper; the product recording context was extracted to recording-canvas.mjs."
+    },
+    {
+      "originalPath": "client/tests/fixtures/menu-details-native.json",
+      "archivePath": "client/tests/fixtures/menu-details-native.json",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Native menu fixture produced from archived artifacts; no retained product test reads it."
+    },
+    {
+      "originalPath": "goal.md",
+      "archivePath": "goal.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "audit.gpt61sol.md",
+      "archivePath": "audit.gpt61sol.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/function-recovery.md",
+      "archivePath": "docs/function-recovery.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity.md",
+      "archivePath": "docs/parity.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/release-acceptance.md",
+      "archivePath": "docs/release-acceptance.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/audit-resolution.md",
+      "archivePath": "docs/audit-resolution.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/legacy.md",
+      "archivePath": "docs/legacy.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/ui-repair.md",
+      "archivePath": "docs/ui-repair.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/schema-coverage.md",
+      "archivePath": "docs/schema-coverage.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/adr/0002-visual-gate.md",
+      "archivePath": "docs/adr/0002-visual-gate.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/semantics/ui-detail-parity.md",
+      "archivePath": "docs/semantics/ui-detail-parity.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-death-2026-10-27.md",
+      "archivePath": "docs/parity-death-2026-10-27.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-death-menu-ui-2026-10-28.md",
+      "archivePath": "docs/parity-death-menu-ui-2026-10-28.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-fixes-2026-10-27.md",
+      "archivePath": "docs/parity-fixes-2026-10-27.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-menu-zone-2026-10-27.md",
+      "archivePath": "docs/parity-menu-zone-2026-10-27.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-passives-pets-2026-10-27.json",
+      "archivePath": "docs/parity-passives-pets-2026-10-27.json",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-passives-pets-2026-10-27.md",
+      "archivePath": "docs/parity-passives-pets-2026-10-27.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-projectiles-2026-10-27.md",
+      "archivePath": "docs/parity-projectiles-2026-10-27.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-rendering-2026-10-27.md",
+      "archivePath": "docs/parity-rendering-2026-10-27.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-tooltip-death-row-2026-10-28.md",
+      "archivePath": "docs/parity-tooltip-death-row-2026-10-28.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-validation-2026-10-27.json",
+      "archivePath": "docs/parity-validation-2026-10-27.json",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "docs/parity-web-slow-cheats-2026-10-28.md",
+      "archivePath": "docs/parity-web-slow-cheats-2026-10-28.md",
+      "disposition": "archive",
+      "productReplacement": null,
+      "reason": "Historical work record, parity report or original-evidence document; product rules live in the rewritten active docs."
+    },
+    {
+      "originalPath": "schema/generated/layout-probe.json",
+      "archivePath": "schema/generated/layout-probe.json",
+      "disposition": "archive",
+      "productReplacement": "schema/layout/*.yaml + engine/tests/unit/test_schema_contracts.cpp",
+      "reason": "Frozen original-layout probe (artifact hash, decoded record bytes and table bases) is historical evidence. The active schema gate now checks only YAML against the compiler."
+    },
+    {
+      "originalPath": "docs/semantics",
+      "archivePath": "docs/semantics",
+      "disposition": "copy",
+      "productReplacement": "docs/semantics",
+      "reason": "Pre-rewrite semantics documents retained as the archived source table for original function numbers, offsets and differential evidence."
+    },
+    {
+      "originalPath": "README.md",
+      "archivePath": "docs/readmes/README.md",
+      "disposition": "copy",
+      "productReplacement": "README.md",
+      "reason": "Pre-rewrite root README specimen."
+    },
+    {
+      "originalPath": "engine/README.md",
+      "archivePath": "docs/readmes/engine-README.md",
+      "disposition": "copy",
+      "productReplacement": "engine/README.md",
+      "reason": "Pre-rewrite engine README specimen."
+    },
+    {
+      "originalPath": "client/README.md",
+      "archivePath": "docs/readmes/client-README.md",
+      "disposition": "copy",
+      "productReplacement": "client/README.md",
+      "reason": "Pre-rewrite client README specimen."
+    },
+    {
+      "originalPath": "schema/README.md",
+      "archivePath": "docs/readmes/schema-README.md",
+      "disposition": "copy",
+      "productReplacement": "schema/README.md",
+      "reason": "Pre-rewrite schema README specimen."
+    }
+  ],
+  "removedCompatibilityLinks": [],
+  "retainedProduct": [
+    {
+      "originalPath": "schema/transport.json",
+      "disposition": "replace",
+      "replaces": "source/semantic/server-catalogs.json#packetXorKeyHex",
+      "reason": "256-byte packet XOR key is product protocol data; generator no longer reads the archive.",
+      "sourceSha256": "8da816c9b5c1530014542b048cfb846db71a924c8fd5f6bacaee166aca4078a3",
+      "sourceArchivePath": "archive/tree/source/semantic/server-catalogs.json"
+    },
+    {
+      "originalPath": "tests/unit/protocol-contracts.test.mjs",
+      "disposition": "replace",
+      "replaces": "test/protocol-contracts.test.mjs",
+      "reason": "Protocol compilation and wire round-trip stay active; original-material assertions were removed."
+    },
+    {
+      "originalPath": "tests/tools/delivery.test.mjs",
+      "disposition": "replace",
+      "replaces": "test/tools-delivery.test.mjs",
+      "reason": "Delivery failure paths stay active."
+    },
+    {
+      "originalPath": "tests/tools/verification.test.mjs",
+      "disposition": "replace",
+      "replaces": "test/tools-runner.test.mjs",
+      "reason": "Runner failure, lock and interruption paths stay active; parity-specific cases moved to the archive."
+    },
+    {
+      "originalPath": "client/tests/helpers/recording-canvas.mjs",
+      "disposition": "replace",
+      "replaces": "client/tests/helpers/rendering-oracle.mjs#RenderingCanvas",
+      "reason": "Product tests need the recording context, not the original-WASM probe."
+    },
+    {
+      "originalPath": "schema/content/changelog.json",
+      "disposition": "replace",
+      "replaces": "client/src/schema/menu-content.ts (original changelog table)",
+      "reason": "Menu updates now describe this project, not the 2020 upstream client."
+    },
+    {
+      "originalPath": "schema/protocol.yaml",
+      "disposition": "replace",
+      "replaces": "schema/protocol.yaml#source block, wasm indices, key address and nativeSparse mode",
+      "reason": "Product wire contract remains; original binary addresses, function indices, evidence lists and the archived-client sparse mode were removed. Text and numeric contract values are unchanged except removed provenance."
+    },
+    {
+      "originalPath": "schema/layout/*.yaml",
+      "disposition": "replace",
+      "replaces": "schema/layout/*.yaml#source blocks",
+      "reason": "Layout definitions remain the compiler-checked product contract; original artifact hashes and recovered-source evidence lists were removed."
+    },
+    {
+      "originalPath": "schema/catalogs/*.json",
+      "disposition": "replace",
+      "replaces": "schema/catalogs/*.json#source and evidence fields",
+      "reason": "Catalog values remain product data; per-record original function indices, offsets, artifact hashes and report paths were removed. The archived probe retains the original bytes."
+    }
+  ],
+  "excludedGenerated": [
+    {
+      "path": "build/",
+      "reason": "Local compiler output; recreated by the product build."
+    },
+    {
+      "path": "dist-next/",
+      "reason": "Product delivery output; recreated by build:dist-next."
+    },
+    {
+      "path": "node_modules/",
+      "reason": "Dependency cache."
+    },
+    {
+      "path": ".emcache/",
+      "reason": "Emscripten cache."
+    }
+  ]
+}

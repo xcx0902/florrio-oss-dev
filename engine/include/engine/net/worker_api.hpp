@@ -1,7 +1,7 @@
 #pragma once
 #include "engine/core/fixed_step.hpp"
 #include "engine/model/world.hpp"
-#include "engine/net/snapshot.hpp"
+#include "engine/net/snapshot_writer.hpp"
 #include "engine/sim/player.hpp"
 #include "engine/sim/spatial.hpp"
 #include "engine/net/protocol.hpp"
@@ -16,8 +16,6 @@
 
 namespace engine {
 
-class OriginalSnapshotWriter;
-
 /** Domain-facing server API behind the four wasm exports. Keeping the mutable
  * world/clock/queue here lets native tests exercise the same path as the ABI
  * without duplicating the worker contract. */
@@ -27,31 +25,10 @@ class WorkerApi {
   [[nodiscard]] bool send(std::span<const std::uint8_t> packet, std::span<const std::uint8_t> key);
   void think();
   [[nodiscard]] std::deque<OutputPacket> flush();
-  [[nodiscard]] std::vector<std::uint8_t> snapshot_bytes(std::uint32_t sequence);
-  [[nodiscard]] std::vector<std::uint8_t> original_snapshot_bytes(std::uint32_t sequence,
-                                                                 std::uint32_t reliable_ack = 0);
-  [[nodiscard]] std::vector<std::uint8_t> original_snapshot_next(std::uint32_t reliable_ack = 0);
-  /** Archived client stream, including independent world/controller records.
-   * An omitted ack uses the actual last accepted input sequence. This stream
-   * has its own known set and never consumes the domain stream's caches. */
-  [[nodiscard]] std::vector<std::uint8_t> original_client_snapshot_bytes(
-      std::uint32_t sequence,
-      std::uint32_t reliable_ack = std::numeric_limits<std::uint32_t>::max());
-  /** Select the archived peer on first call, then drain its per-think queue.
-   * The ABI's original flush should call this instead of hashing the world.
-   * No packet is published before the first simulation tick. */
-  [[nodiscard]] std::deque<OutputPacket> flush_original_client();
-  [[nodiscard]] EntityHandle original_client_world_handle() const {
-    return world_.entities().entities()[0].handle;
-  }
-  [[nodiscard]] EntityHandle original_client_controller_handle() const {
-    return world_.entities().entities()[1].handle;
-  }
   /** Live domain snapshot: fields 2/5/8/24/26/31/53/55, coalesced hit events and
    * pending deletes. This is the path used by `sp_server_think`. */
   [[nodiscard]] std::vector<std::uint8_t> domain_snapshot_bytes(std::uint32_t sequence,
                                                                std::uint32_t reliable_ack = 0);
-  void enqueue_snapshot(std::uint32_t sequence);
   void enqueue_domain_snapshot(std::uint32_t sequence);
   /** Opt-in full 1015 field framing: emit every sparse field type and dense
    * group writer for each live entity. The compact domain subset remains the
@@ -97,40 +74,17 @@ class WorkerApi {
  private:
   /** Write one entity's configured dense group / byte groups / mask fallback.
    * Returns false when the entity has no configured dense representation. */
-  bool write_dense_values(OriginalSnapshotWriter& writer, const Entity& entity);
+  bool write_dense_values(SnapshotWriter& writer, const Entity& entity);
   /** Derived dense groups for a live entity without explicit setter values. */
-  void write_default_dense_values(OriginalSnapshotWriter& writer, const Entity& entity);
+  void write_default_dense_values(SnapshotWriter& writer, const Entity& entity);
   World world_;
   FixedStepClock clock_;
   OutputQueue output_;
   std::uint32_t last_sequence_ = 0;
   /** Original peer+288: no second spawn within 2500ms of a successful spawn. */
   double next_spawn_time_ms_ = 0.0;
-  std::uint32_t original_sequence_ = 0;
-  /** Wire handles already introduced to the archived client. Later ticks send
-   * field-only updates for these entities; new handles carry the component
-   * mask once. */
-  std::unordered_set<std::uint32_t> original_client_known_;
-  struct OriginalClientRecord {
-    std::uint32_t mask = 0;
-    std::array<std::vector<std::uint8_t>, 64> fields;
-    std::array<std::uint64_t, 2> position_revisions{};
-  };
-  std::unordered_map<std::uint32_t, OriginalClientRecord> original_client_records_;
-  /** Last zone-progress byte sent to the archived client. Kept so the field is
-   * emitted once more with zero after the flower leaves an overleveled zone. */
-  std::uint8_t original_client_zone_progress_ = 0;
   /** Same clear-once behaviour for the compact domain stream. */
   std::uint8_t domain_zone_progress_ = 0;
-  bool original_client_enabled_ = false;
-  bool original_client_viewer_started_ = false;
-  Vec2 original_client_viewer_position_;
-  f32 original_client_viewer_scale_ = f32(1.0F);
-  std::uint32_t original_client_sequence_ = 0;
-  std::uint64_t original_client_queued_tick_ = 0;
-  std::uint64_t original_client_event_tick_ = std::numeric_limits<std::uint64_t>::max();
-  std::deque<OutputPacket> original_client_output_;
-  std::vector<std::pair<std::uint8_t, std::vector<std::uint8_t>>> original_client_pending_events_;
   /** Last score sent on this live stream. Repeated field 59 resets the
    * original client's interpolation clock even when its value is equal. */
   std::unordered_map<std::uint32_t, std::uint32_t> domain_score_bits_;
@@ -146,10 +100,10 @@ class WorkerApi {
    * controlled body. Unpopulated native fixtures publish their explicit
    * entities without a session, as before. Retain the viewer after death. */
   bool domain_viewer_started_ = false;
-  /** Original beginSnapshot's per-peer spatial set. Explicit init(false)
-   * fixtures bypass this query; a joined production peer retains its last
-   * position/scale after losing its controlled body. Stream caches belong to
-   * this set, so re-entry must send initial camera/angle/profile fields. */
+  /** Per-peer spatial visibility set. Explicit init(false) fixtures bypass
+   * this query; a joined production peer retains its last position/scale
+   * after losing its controlled body. Stream caches belong to this set, so
+   * re-entry must send initial camera/angle/profile fields. */
   bool domain_visibility_enabled_ = false;
   Vec2 domain_viewer_position_;
   f32 domain_viewer_scale_ = f32(1.0F);

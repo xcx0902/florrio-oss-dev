@@ -1,6 +1,6 @@
 # Generated catalogs
 
-Source: `source/semantic/server-catalogs.json`, split by `tools/split-catalogs.mjs`.
+Source: product catalog inputs under `schema/catalogs/`.
 C++/TS consumers use the generated views; the JSON files remain the source.
 
 ## Petals (39)

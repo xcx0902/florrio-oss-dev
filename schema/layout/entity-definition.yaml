@@ -4,12 +4,6 @@ kind: struct
 confidence: high
 size: 116
 alignment: 4
-source:
-  artifact: web/sp_server.wasm
-  sha256: 75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d
-  evidence:
-    - reports/server-entity-definitions.md
-    - source/semantic/server-catalogs.json
 notes:
   - 23 records of 116 bytes begin at absolute address 8548368.
   - Slot 22 is built but unreachable because the lookup rejects slot > 21.

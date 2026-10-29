@@ -16,7 +16,7 @@ if (args.includes('--out') && (!args[args.indexOf('--out') + 1] || args[args.ind
 const output = path.resolve(args.includes('--out') ? args[args.indexOf('--out') + 1] : 'dist-next');
 const source = path.join(root, 'client/public');
 if (output === root || output === source || source.startsWith(output + path.sep)
-  || ['source', 'engine', 'client', 'reference', 'web', 'upstream', 'legacy', 'dist', 'dist-readable', 'dist-reference', 'schema', 'test', 'tests', 'reports', 'tools', 'build', '.git', '.github', 'node_modules'].some(folder => output === path.join(root, folder) || output.startsWith(path.join(root, folder) + path.sep)))
+  || ['archive', 'engine', 'client', 'schema', 'tests', 'reports', 'tools', 'build', 'docs', 'source', 'reference', 'web', 'upstream', 'legacy', 'dist', 'dist-readable', 'dist-reference', '.git', '.github', 'node_modules'].some(folder => output === path.join(root, folder) || output.startsWith(path.join(root, folder) + path.sep)))
   throw new Error(`Unsafe delivery output: ${output}`);
 await assertVerificationOwner(root);
 await mkdir(path.dirname(output), { recursive: true });
@@ -40,7 +40,7 @@ await cp(source, staging, { recursive: true, filter: name => !name.endsWith('.DS
 const entries = await fileEntries(staging, await listFiles(staging));
 for (const file of ['server.wasm', 'index.html', 'main.js', 'server-worker.js'])
   if (!entries.some(entry => entry.path === file)) throw new Error(`Missing required compiled file ${file}`);
-if (entries.some(entry => /^(source|reports?|tests?|upstream|web)\//.test(entry.path))) throw new Error('Oracle assets in delivery tree');
+if (entries.some(entry => /^(archive|source|reports?|tests?|upstream|web)\//.test(entry.path))) throw new Error('Archived or non-product assets in delivery tree');
 const manifest = {
   schema: 2, name: 'legacy-florr-web-next', generatedAt: new Date().toISOString(), runId: process.env.VERIFY_RUN_ID ?? null,
   source: 'C++20 + TypeScript, validated against source before packaging',
@@ -50,7 +50,7 @@ const manifest = {
   artifacts: entries,
   artifactsSha256: sha256(JSON.stringify(entries)),
   totals: { files: entries.length, bytes: entries.reduce((sum, entry) => sum + entry.bytes, 0) },
-  excludes: ['source/game', 'source/wasm', 'web/', 'upstream/', 'reports/', 'test/'],
+  excludes: ['archive/', 'build/', 'client/src/', 'docs/', 'engine/', 'node_modules/', 'reports/', 'schema/', 'tests/', 'tools/'],
 };
 await writeFile(path.join(staging, 'build-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 if (inputs.sha256 !== (await sourceIdentity(root)).sha256) {

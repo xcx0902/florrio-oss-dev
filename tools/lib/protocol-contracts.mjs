@@ -86,41 +86,35 @@ export function compileProtocol(document) {
   }
   const sparseModes = object(snapshot.sparseModes, 'sparseModes');
   for (const name of Object.keys(sparseModes)) {
-    if (!['nativeSparse', 'domainSparse'].includes(name)) fail(`sparseModes.${name}`, 'unknown sparse mode');
+    if (name !== 'domainSparse') fail(`sparseModes.${name}`, 'unknown sparse mode');
   }
-  const modes = {};
-  for (const name of ['nativeSparse', 'domainSparse']) {
-    const mode = object(sparseModes[name], `sparseModes.${name}`);
-    const native = name === 'nativeSparse';
-    const packetFormat = native ? 'archived-client' : 'domain-counted';
-    const field26Role = native ? 'player-model' : 'entity-kind';
-    if (mode.packetFormat !== packetFormat || mode.field26Role !== field26Role)
-      fail(`sparseModes.${name}`, 'wrong packet format or field26 role');
-    for (const key of ['fieldDeltaXor', 'indexDeltaXor']) {
-      if (integer(mode[key], `sparseModes.${name}.${key}`, 0, 1) !== Number(native))
-        fail(`sparseModes.${name}.${key}`, 'disagrees with the established sparse framing');
-    }
-    const indexedIds = new Set();
-    for (const id of array(mode.indexedFields, `sparseModes.${name}.indexedFields`)) {
-      integer(id, `sparseModes.${name} indexed field`, 1, count);
-      if (!own(indexed, id)) fail(`sparseModes.${name} field ${id}`, 'missing indexed metadata');
-      if (indexedIds.has(id)) fail(`sparseModes.${name} field ${id}`, 'duplicate indexed field');
-      indexedIds.add(id);
-    }
-    for (const field of fields.values()) {
-      const expectedIndexed = native ? own(indexed, field.id) : own(arrayTypes, field.type);
-      if (indexedIds.has(field.id) !== expectedIndexed)
-        fail(`sparseModes.${name} field ${field.id}`, 'wrong indexed/scalar encoding');
-    }
-    modes[name] = {
-      packetFormat, fieldDeltaXor: mode.fieldDeltaXor, indexDeltaXor: mode.indexDeltaXor,
-      fieldTerminator: mode.fieldDeltaXor, indexTerminator: mode.indexDeltaXor, field26Role,
-      fields: [...fields.values()].sort((a, b) => a.id - b.id).map(field => ({
-        field: field.id, encoding: indexedIds.has(field.id) ? 'indexed-update' : 'scalar',
-        valueType: indexedIds.has(field.id) ? field.indexed.element : scalarTypes[field.type],
-      })),
-    };
+  const mode = object(sparseModes.domainSparse, 'sparseModes.domainSparse');
+  if (mode.packetFormat !== 'domain-counted' || mode.field26Role !== 'entity-kind')
+    fail('sparseModes.domainSparse', 'wrong packet format or field26 role');
+  for (const key of ['fieldDeltaXor', 'indexDeltaXor']) {
+    if (integer(mode[key], `sparseModes.domainSparse.${key}`, 0, 1) !== 0)
+      fail(`sparseModes.domainSparse.${key}`, 'disagrees with the established sparse framing');
   }
+  const indexedIds = new Set();
+  for (const id of array(mode.indexedFields, 'sparseModes.domainSparse.indexedFields')) {
+    integer(id, 'sparseModes.domainSparse indexed field', 1, count);
+    if (!own(indexed, id)) fail(`sparseModes.domainSparse field ${id}`, 'missing indexed metadata');
+    if (indexedIds.has(id)) fail(`sparseModes.domainSparse field ${id}`, 'duplicate indexed field');
+    indexedIds.add(id);
+  }
+  for (const field of fields.values()) {
+    const expectedIndexed = own(arrayTypes, field.type);
+    if (indexedIds.has(field.id) !== expectedIndexed)
+      fail(`sparseModes.domainSparse field ${field.id}`, 'wrong indexed/scalar encoding');
+  }
+  const modes = { domainSparse: {
+    packetFormat: 'domain-counted', fieldDeltaXor: 0, indexDeltaXor: 0,
+    fieldTerminator: 0, indexTerminator: 0, field26Role: 'entity-kind',
+    fields: [...fields.values()].sort((a, b) => a.id - b.id).map(field => ({
+      field: field.id, encoding: indexedIds.has(field.id) ? 'indexed-update' : 'scalar',
+      valueType: indexedIds.has(field.id) ? field.indexed.element : scalarTypes[field.type],
+    })),
+  } };
   const seenFields = new Set(), seenOffsets = new Set(), seenComponents = new Set();
   const groups = array(snapshot.denseGroups, 'denseGroups').map((entry, index) => {
     object(entry, `denseGroups[${index}]`);
@@ -174,7 +168,12 @@ export function compileProtocol(document) {
       seen.add(value); names.add(pascal(entry.name));
     }
   };
-  checkEntries(worker.functions, 'wasmIndex', 'worker.functions');
+  const workerNames = new Set();
+  for (const entry of array(worker.functions, 'worker.functions')) {
+    text(entry.name, 'worker.functions.name');
+    if (workerNames.has(pascal(entry.name))) fail('worker.functions', 'duplicate name');
+    workerNames.add(pascal(entry.name));
+  }
   checkEntries(input.commands, 'opcode', 'input.commands');
   checkEntries(snapshot.events, 'opcode', 'snapshot.events');
   checkEntries(output.payload?.types, 'type', 'output.payload.types');
@@ -209,10 +208,9 @@ export function compileProtocol(document) {
 export function generateProtocolTs(contract) {
   const { constants, fields, denseGroups: groups } = contract;
   const lines = ['// Generated by tools/gen-contracts.mjs from schema/protocol.yaml. Do not edit.',
-    '// Shared widths/component mappings do not imply sparse wire or domain semantic equivalence; see SPARSE_MODES.',
-    '// Field26 remains the permanent domain-kind extension; archived-client model semantics are separate.'];
+    '// Shared widths/component mappings describe the domain sparse packet; see SPARSE_MODES.',
+    '// Field26 remains the permanent domain-kind extension.'];
   for (const [name, value] of Object.entries(constants)) lines.push(`export const ${upper(name)} = ${value};`);
-  lines.push(`export const WORKER_FUNCTIONS = ${JSON.stringify(contract.worker.functions)} as const;`);
   lines.push(`export const INPUT_COMMANDS = ${JSON.stringify(contract.input.commands)} as const;`);
   lines.push(`export const SNAPSHOT_EVENTS = ${JSON.stringify(contract.output.snapshot.events)} as const;`);
   lines.push(`export const OUTPUT_PAYLOAD_TYPES = ${JSON.stringify(contract.output.payload.types)} as const;`);
@@ -240,7 +238,7 @@ export function generateProtocolTs(contract) {
 export function generateProtocolCpp(contract) {
   const { fields, denseGroups: groups } = contract;
   const lines = ['// Generated by tools/gen-contracts.mjs from schema/protocol.yaml. Do not edit.',
-    '// Shared widths/component mappings do not imply sparse wire or domain semantic equivalence; see kNativeSparse/kDomainSparse.',
+    '// Shared widths/component mappings describe the domain sparse packet; see kDomainSparse.',
     '#pragma once', '#include <array>', '#include <cstdint>', '#include <span>', '', 'namespace engine::protocol {'];
   for (const [name, value] of Object.entries(contract.constants)) lines.push(`inline constexpr std::uint32_t k${pascal(name)} = ${value}U;`);
   const entries = (type, values, key) => {
@@ -251,10 +249,6 @@ export function generateProtocolCpp(contract) {
   entries('InputOpcode', contract.input.commands, 'opcode');
   entries('SnapshotEventOpcode', contract.output.snapshot.events, 'opcode');
   entries('OutputPayloadType', contract.output.payload.types, 'type');
-  lines.push('struct WorkerFunction { const char* name; std::uint16_t original_index; };');
-  lines.push(`inline constexpr std::array<WorkerFunction, ${contract.worker.functions.length}> kWorkerFunctions{{`);
-  for (const entry of contract.worker.functions) lines.push(`  {${JSON.stringify(entry.name)}, ${entry.wasmIndex}},`);
-  lines.push('}};');
   const typeNames = Object.keys(contract.output.snapshot.fieldTypes).filter(name => name !== 'confidence' && name !== 'note');
   lines.push(`enum class FieldType : std::uint8_t { ${typeNames.map(cppEnum).join(', ')} };`);
   lines.push(`enum class DenseFieldType : std::uint8_t { ${denseTypes.map(cppEnum).join(', ')} };`);

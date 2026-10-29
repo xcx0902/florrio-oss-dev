@@ -15,9 +15,9 @@
 #include "engine/net/input.hpp"
 #include "engine/net/angle.hpp"
 #include "engine/net/protocol.hpp"
-#include "engine/net/snapshot.hpp"
-#include "engine/net/snapshot_header.hpp"
-#include "engine/net/original_snapshot.hpp"
+#include "engine/net/snapshot_writer.hpp"
+#include "engine/net/snapshot_writer.hpp"
+
 #include "engine/net/dense_fields.hpp"
 #include "engine/sim/quadtree.hpp"
 #include "engine/net/worker_api.hpp"
@@ -75,7 +75,6 @@ void runTest(const char* name, void (*body)()) {
   } \
 } while (false)
 
-#include "test_original_client_adapter.hpp"
 
 void test_f32() {
   CHECK(engine::f32(1.0F).bits() == 0x3F800000U);
@@ -380,7 +379,7 @@ void test_cactus_construction() {
   engine::World world;
   world.initialize();
   engine::ServerRng spawn_rng(1383144482U);
-  const auto handle = engine::spawn_cactus_function144(world,
+  const auto handle = engine::spawn_cactus_with_component_draws(world,
     engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)), spawn_rng);
   CHECK(handle.valid());
   const auto* entity = world.entities().get(handle);
@@ -774,91 +773,6 @@ void test_input_decoder() {
   }
 }
 
-void test_snapshot_writer() {
-  engine::SnapshotWriter writer(9);
-  const engine::EntityHandle handle = engine::EntityHandle::from_parts(3, 5);
-  const engine::EntityHandle deleted = engine::EntityHandle::from_parts(2, 4);
-  writer.write_delete(deleted);
-  writer.write_entity(handle, engine::EntityKind::kPlayer,
-    engine::Vec2(engine::f32(1.5F), engine::f32(-2.5F)), engine::f32(0.25F), engine::f32(100.0F),
-    engine::f32(250.0F), 3U);
-  const engine::EntityHandle event_entity = engine::EntityHandle::from_parts(9, 1);
-  engine::ByteWriter event_writer;
-  event_writer.write_u32_le(event_entity.to_wire());
-  event_writer.write_u8(7);
-  writer.write_event(14, event_writer.bytes());
-  engine::ByteWriter time_writer;
-  time_writer.write_u32_le(event_entity.to_wire());
-  writer.write_event(11, time_writer.bytes());
-  const auto bytes = writer.finish();
-  engine::ByteReader reader(bytes);
-  CHECK(reader.read_u8().value() == 1);
-  CHECK(reader.read_varint32().value() == 9);
-  CHECK(reader.read_varint32().value() == 0); // reliable ack
-  CHECK(reader.read_varint32().value() == 1); // deletes
-  CHECK(reader.read_varint32().value() == 1); // updates
-  CHECK(reader.read_varint32().value() == 2); // events
-  CHECK(reader.read_u32_le().value() == deleted.to_wire());
-  CHECK(reader.read_u32_le().value() == handle.to_wire());
-  CHECK(reader.read_u8().value() == static_cast<std::uint8_t>(engine::EntityKind::kPlayer));
-  CHECK(std::fabs(reader.read_f32_le().value() - 1.5F) < 1e-6F);
-  CHECK(std::fabs(reader.read_f32_le().value() + 2.5F) < 1e-6F);
-  CHECK(reader.read_f32_le().value() == 0.25F);
-  CHECK(reader.read_f32_le().value() == 100.0F);
-  CHECK(reader.read_f32_le().value() == 250.0F);
-  CHECK(reader.read_u8().value() == 3);
-  CHECK(reader.read_u8().value() == 14);
-  CHECK(reader.read_u32_le().value() == event_entity.to_wire());
-  CHECK(reader.read_u8().value() == 7);
-  CHECK(reader.read_u8().value() == 11);
-  CHECK(reader.read_u32_le().value() == event_entity.to_wire());
-  CHECK(reader.eof());
-
-  engine::World world;
-  world.initialize();
-  const engine::EntityHandle spawned = engine::spawn_entity(world, engine::EntityKind::kMob, 1,
-    engine::Vec2(engine::f32(7.0F), engine::f32(8.0F)), engine::f32(14.0F));
-  CHECK(spawned.valid());
-  engine::SnapshotWriter world_writer(11);
-  world_writer.write_world(world);
-  const auto world_bytes = world_writer.finish();
-  engine::ByteReader world_reader(world_bytes);
-  CHECK(world_reader.read_u8().value() == 1);
-  CHECK(world_reader.read_varint32().value() == 11);
-  CHECK(world_reader.read_varint32().value() == 0); // reliable ack
-  CHECK(world_reader.read_varint32().value() == 0); // deletes
-  CHECK(world_reader.read_varint32().value() == 1); // updates
-  CHECK(world_reader.read_varint32().value() == 0); // events
-  CHECK(world_reader.read_u32_le().value() == spawned.to_wire());
-  CHECK(world_reader.read_u8().value() == static_cast<std::uint8_t>(engine::EntityKind::kMob));
-  CHECK(world_reader.read_f32_le().value() == 7.0F);
-  CHECK(world_reader.read_f32_le().value() == 8.0F);
-  CHECK(world_reader.read_f32_le().value() == 0.0F);
-  CHECK(world_reader.read_f32_le().value() == 1.0F);
-}
-
-void test_original_client_component_mask() {
-  engine::OriginalClientSnapshotWriter writer;
-  writer.begin(3, 0);
-  const engine::EntityHandle handle = engine::EntityHandle::from_parts(7, 2);
-  const std::uint32_t native_mask = engine::OriginalClientSnapshotWriter::kDefaultComponentMask
-    | (1U << 29); // component 30
-  writer.write_entity(handle, 4, static_cast<std::uint8_t>(engine::EntityKind::kMob), 0,
-                      1.0F, 2.0F, 0.5F, 25.0F, 25.0F, 30.0F, true, native_mask);
-  const auto bytes = engine::OriginalClientSnapshotWriter::decrypt(writer.finish());
-  engine::ByteReader reader(bytes);
-  CHECK(reader.read_u8().value() == 1U);
-  CHECK(reader.read_varint32().value() == 3U);
-  CHECK(reader.read_varint32().value() == 0U);
-  CHECK(reader.read_varint32().value() > 0U); // block length
-  CHECK(reader.read_varint32().value() == 0U); // removal count
-  CHECK(reader.read_u16_le().value() == 0U);  // first pad
-  CHECK(reader.read_u16_le().value() == 0U);  // second pad
-  CHECK(reader.read_u32_le().value() == handle.to_wire());
-  CHECK(reader.read_u8().value() == (1U ^ 54U));
-  CHECK(reader.read_u32_le().value() == native_mask);
-}
-
 void test_snapshot_header() {
   const auto bytes = engine::empty_snapshot(9, 3);
   CHECK(bytes.size() == 6);
@@ -894,8 +808,8 @@ void test_snapshot_header() {
   CHECK(built_reader.eof());
 }
 
-void test_original_snapshot_writer() {
-  engine::OriginalSnapshotWriter writer;
+void test_snapshot_writer_fields() {
+  engine::SnapshotWriter writer;
   writer.begin(12, 4);
   const engine::EntityHandle handle = engine::EntityHandle::from_parts(3, 5);
   writer.write_bare_entity(handle);
@@ -912,7 +826,7 @@ void test_original_snapshot_writer() {
   CHECK(reader.read_u8().value() == 0); // sparse field terminator
   CHECK(reader.eof());
 
-  engine::OriginalSnapshotWriter mask_writer;
+  engine::SnapshotWriter mask_writer;
   mask_writer.begin(13, 4);
   mask_writer.write_mask_entity(handle, 5);
   const auto mask_bytes = mask_writer.finish();
@@ -929,7 +843,7 @@ void test_original_snapshot_writer() {
   CHECK(mask_reader.read_u8().value() == 0);
   CHECK(mask_reader.eof());
 
-  engine::OriginalSnapshotWriter field_writer;
+  engine::SnapshotWriter field_writer;
   field_writer.begin(14, 4);
   field_writer.write_mask_byte_field(handle, 5, 1, 0x7A);
   const auto field_bytes = field_writer.finish();
@@ -948,7 +862,7 @@ void test_original_snapshot_writer() {
   CHECK(field_reader.read_u8().value() == 0);
   CHECK(field_reader.eof());
 
-  engine::OriginalSnapshotWriter float_writer;
+  engine::SnapshotWriter float_writer;
   float_writer.begin(15, 4);
   float_writer.write_mask_float_field5(handle, 5, 1.5F);
   const auto float_bytes = float_writer.finish();
@@ -967,7 +881,7 @@ void test_original_snapshot_writer() {
   CHECK(float_reader.read_u8().value() == 0);
   CHECK(float_reader.eof());
 
-  engine::OriginalSnapshotWriter generic_writer;
+  engine::SnapshotWriter generic_writer;
   generic_writer.begin(16, 4);
   generic_writer.write_mask_float_field(handle, 5, 7, 2.5F);
   const auto generic_bytes = generic_writer.finish();
@@ -986,7 +900,7 @@ void test_original_snapshot_writer() {
   CHECK(generic_reader.read_u8().value() == 0);
   CHECK(generic_reader.eof());
 
-  engine::OriginalSnapshotWriter double_writer;
+  engine::SnapshotWriter double_writer;
   double_writer.begin(17, 4);
   double_writer.write_mask_double_field35(handle, 5, 2.25);
   const auto double_bytes = double_writer.finish();
@@ -1005,7 +919,7 @@ void test_original_snapshot_writer() {
   CHECK(double_reader.read_u8().value() == 0);
   CHECK(double_reader.eof());
 
-  engine::OriginalSnapshotWriter field18_writer;
+  engine::SnapshotWriter field18_writer;
   field18_writer.begin(18, 4);
   field18_writer.write_mask_double_field18(handle, 5, 3.25);
   const auto field18_bytes = field18_writer.finish();
@@ -1024,7 +938,7 @@ void test_original_snapshot_writer() {
   CHECK(field18_reader.read_u8().value() == 0);
   CHECK(field18_reader.eof());
 
-  engine::OriginalSnapshotWriter field27_writer;
+  engine::SnapshotWriter field27_writer;
   field27_writer.begin(19, 4);
   field27_writer.write_mask_float_field27(handle, 5, 5.5F);
   const auto field27_bytes = field27_writer.finish();
@@ -1043,7 +957,7 @@ void test_original_snapshot_writer() {
   CHECK(field27_reader.read_u8().value() == 0);
   CHECK(field27_reader.eof());
 
-  engine::OriginalSnapshotWriter string_writer;
+  engine::SnapshotWriter string_writer;
   string_writer.begin(20, 4);
   string_writer.write_mask_string_field4(handle, 5, "hi");
   const auto string_bytes = string_writer.finish();
@@ -1064,7 +978,7 @@ void test_original_snapshot_writer() {
   CHECK(string_reader.read_u8().value() == 0);
   CHECK(string_reader.eof());
 
-  engine::OriginalSnapshotWriter byte2_writer;
+  engine::SnapshotWriter byte2_writer;
   byte2_writer.begin(21, 4);
   byte2_writer.write_mask_byte_field(handle, 5, 2, 0xAB);
   const auto byte2_bytes = byte2_writer.finish();
@@ -1083,7 +997,7 @@ void test_original_snapshot_writer() {
   CHECK(byte2_reader.read_u8().value() == 0);
   CHECK(byte2_reader.eof());
 
-  engine::OriginalSnapshotWriter array_writer;
+  engine::SnapshotWriter array_writer;
   array_writer.begin(22, 4);
   array_writer.write_mask_byte_array_field60(handle, 5, 2, 0xCD);
   const auto array_bytes = array_writer.finish();
@@ -1104,7 +1018,7 @@ void test_original_snapshot_writer() {
   CHECK(array_reader.read_u8().value() == 0); // field terminator
   CHECK(array_reader.eof());
 
-  engine::OriginalSnapshotWriter varint_array_writer;
+  engine::SnapshotWriter varint_array_writer;
   varint_array_writer.begin(23, 4);
   varint_array_writer.write_mask_varint_array_field(handle, 5, 39, 1, 200);
   const auto varint_array_bytes = varint_array_writer.finish();
@@ -1125,7 +1039,7 @@ void test_original_snapshot_writer() {
   CHECK(varint_array_reader.read_u8().value() == 0);
   CHECK(varint_array_reader.eof());
 
-  engine::OriginalSnapshotWriter short_array_writer;
+  engine::SnapshotWriter short_array_writer;
   short_array_writer.begin(24, 4);
   short_array_writer.write_mask_short_array_field(handle, 5, 61, 0, 0xBEEF);
   const auto short_array_bytes = short_array_writer.finish();
@@ -1146,9 +1060,9 @@ void test_original_snapshot_writer() {
   CHECK(short_array_reader.read_u8().value() == 0);
   CHECK(short_array_reader.eof());
 
-  engine::OriginalSnapshotWriter multi_writer;
+  engine::SnapshotWriter multi_writer;
   multi_writer.begin(26, 4);
-  const std::array<engine::OriginalSnapshotWriter::FloatField, 2> multi_fields{{
+  const std::array<engine::SnapshotWriter::FloatField, 2> multi_fields{{
     {5, 1.5F}, {7, 2.5F},
   }};
   multi_writer.write_mask_float_fields(handle, 5, multi_fields);
@@ -1170,7 +1084,7 @@ void test_original_snapshot_writer() {
   CHECK(multi_reader.read_u8().value() == 0);
   CHECK(multi_reader.eof());
 
-  engine::OriginalSnapshotWriter varint_writer;
+  engine::SnapshotWriter varint_writer;
   varint_writer.begin(27, 4);
   varint_writer.write_mask_varint_field(handle, 5, 30, 300);
   const auto varint_bytes = varint_writer.finish();
@@ -1189,7 +1103,7 @@ void test_original_snapshot_writer() {
   CHECK(varint_reader.read_u8().value() == 0);
   CHECK(varint_reader.eof());
 
-  engine::OriginalSnapshotWriter reference_writer;
+  engine::SnapshotWriter reference_writer;
   reference_writer.begin(28, 4);
   reference_writer.write_mask_reference_field(handle, 5, 23, 0x11223344);
   const auto reference_bytes = reference_writer.finish();
@@ -1208,7 +1122,7 @@ void test_original_snapshot_writer() {
   CHECK(reference_reader.read_u8().value() == 0);
   CHECK(reference_reader.eof());
 
-  engine::OriginalSnapshotWriter string48_writer;
+  engine::SnapshotWriter string48_writer;
   string48_writer.begin(29, 4);
   string48_writer.write_mask_string_field(handle, 5, 48, "abc");
   const auto string48_bytes = string48_writer.finish();
@@ -1230,7 +1144,7 @@ void test_original_snapshot_writer() {
   CHECK(string48_reader.read_u8().value() == 0);
   CHECK(string48_reader.eof());
 
-  engine::OriginalSnapshotWriter string_array_writer;
+  engine::SnapshotWriter string_array_writer;
   string_array_writer.begin(30, 4);
   string_array_writer.write_mask_string_array_field(handle, 5, 25, 1, "xy");
   const auto string_array_bytes = string_array_writer.finish();
@@ -1253,7 +1167,7 @@ void test_original_snapshot_writer() {
   CHECK(string_array_reader.read_u8().value() == 0);
   CHECK(string_array_reader.eof());
 
-  engine::OriginalSnapshotWriter float45_writer;
+  engine::SnapshotWriter float45_writer;
   float45_writer.begin(31, 4);
   float45_writer.write_mask_float_field45(handle, 5, 6.5F);
   const auto float45_bytes = float45_writer.finish();
@@ -1272,7 +1186,7 @@ void test_original_snapshot_writer() {
   CHECK(float45_reader.read_u8().value() == 0);
   CHECK(float45_reader.eof());
 
-  engine::OriginalSnapshotWriter sparse_writer;
+  engine::SnapshotWriter sparse_writer;
   sparse_writer.begin(32, 4);
   const std::array<std::uint32_t, 2> ordinals{{1, 3}};
   sparse_writer.write_sparse_entity(handle, ordinals);
@@ -1292,7 +1206,7 @@ void test_original_snapshot_writer() {
   CHECK(sparse_reader.read_u8().value() == 0);
   CHECK(sparse_reader.eof());
 
-  engine::OriginalSnapshotWriter bit_writer;
+  engine::SnapshotWriter bit_writer;
   bit_writer.begin(33, 4);
   bit_writer.write_mask_bit_field(handle, 5, 33, true);
   const auto bit_bytes = bit_writer.finish();
@@ -1311,9 +1225,9 @@ void test_original_snapshot_writer() {
   CHECK(bit_reader.read_u8().value() == 0);
   CHECK(bit_reader.eof());
 
-  engine::OriginalSnapshotWriter bits_writer;
+  engine::SnapshotWriter bits_writer;
   bits_writer.begin(38, 4);
-  const std::array<engine::OriginalSnapshotWriter::BitField, 2> bit_fields{{
+  const std::array<engine::SnapshotWriter::BitField, 2> bit_fields{{
     {33, true}, {40, false},
   }};
   bits_writer.write_mask_bit_fields(handle, 5, bit_fields);
@@ -1335,7 +1249,7 @@ void test_original_snapshot_writer() {
   CHECK(bits_reader.read_u8().value() == 0);
   CHECK(bits_reader.eof());
 
-  engine::OriginalSnapshotWriter angle_writer;
+  engine::SnapshotWriter angle_writer;
   angle_writer.begin(34, 4);
   angle_writer.write_mask_angle_field8(handle, 5, 0x8000);
   const auto angle_bytes = angle_writer.finish();
@@ -1354,7 +1268,7 @@ void test_original_snapshot_writer() {
   CHECK(angle_reader.read_u8().value() == 0);
   CHECK(angle_reader.eof());
 
-  engine::OriginalSnapshotWriter handle_array_writer;
+  engine::SnapshotWriter handle_array_writer;
   handle_array_writer.begin(35, 4);
   handle_array_writer.write_mask_handle_array_field3(handle, 5, 0, 0xCAFEBABE);
   const auto handle_array_bytes = handle_array_writer.finish();
@@ -1375,7 +1289,7 @@ void test_original_snapshot_writer() {
   CHECK(handle_array_reader.read_u8().value() == 0);
   CHECK(handle_array_reader.eof());
 
-  engine::OriginalSnapshotWriter event_writer;
+  engine::SnapshotWriter event_writer;
   event_writer.begin(37, 4);
   event_writer.write_chat_event("hi");
   event_writer.write_entity_time_event(handle);
@@ -1399,7 +1313,7 @@ void test_original_snapshot_writer() {
   CHECK(event_reader.read_u8().value() == 2);
   CHECK(event_reader.eof());
 
-  engine::OriginalSnapshotWriter dense_writer;
+  engine::SnapshotWriter dense_writer;
   dense_writer.begin(41, 4);
   dense_writer.write_dense_byte_group52(handle, 0x11, 0x22);
   const auto dense_bytes = dense_writer.finish();
@@ -1416,7 +1330,7 @@ void test_original_snapshot_writer() {
   CHECK(dense_reader.read_u8().value() == 0x22);
   CHECK(dense_reader.eof());
 
-  engine::OriginalSnapshotWriter dense56_writer;
+  engine::SnapshotWriter dense56_writer;
   dense56_writer.begin(42, 4);
   const std::array<std::uint8_t, 1> dense56_values{{0x33}};
   dense56_writer.write_dense_byte_group(handle, dense56_values);
@@ -1433,7 +1347,7 @@ void test_original_snapshot_writer() {
   CHECK(dense56_reader.read_u8().value() == 0x33);
   CHECK(dense56_reader.eof());
 
-  engine::OriginalSnapshotWriter dense116_writer;
+  engine::SnapshotWriter dense116_writer;
   dense116_writer.begin(43, 4);
   const std::array<float, 2> dense116_values{{1.25F, 2.5F}};
   dense116_writer.write_dense_float_group(handle, dense116_values);
@@ -1451,7 +1365,7 @@ void test_original_snapshot_writer() {
   CHECK(dense116_reader.read_f32_le().value() == 2.5F);
   CHECK(dense116_reader.eof());
 
-  engine::OriginalSnapshotWriter dense_string_writer;
+  engine::SnapshotWriter dense_string_writer;
   dense_string_writer.begin(44, 4);
   dense_string_writer.write_dense_string_group(handle, "abc");
   const auto dense_string_bytes = dense_string_writer.finish();
@@ -1470,7 +1384,7 @@ void test_original_snapshot_writer() {
   CHECK(dense_string_reader.read_u8().value() == 0);
   CHECK(dense_string_reader.eof());
 
-  engine::OriginalSnapshotWriter dense_mixed_writer;
+  engine::SnapshotWriter dense_mixed_writer;
   dense_mixed_writer.begin(45, 4);
   dense_mixed_writer.write_dense_angle_float_group(handle, 0x4000, 1.5F, 2.5F);
   const auto dense_mixed_bytes = dense_mixed_writer.finish();
@@ -1488,7 +1402,7 @@ void test_original_snapshot_writer() {
   CHECK(dense_mixed_reader.read_f32_le().value() == 2.5F);
   CHECK(dense_mixed_reader.eof());
 
-  engine::OriginalSnapshotWriter dense152_writer;
+  engine::SnapshotWriter dense152_writer;
   dense152_writer.begin(46, 4);
   dense152_writer.write_dense_group152_base(handle, 1, 2, 3, 300);
   const auto dense152_bytes = dense152_writer.finish();
@@ -1507,7 +1421,7 @@ void test_original_snapshot_writer() {
   CHECK(dense152_reader.read_varint32().value() == 300);
   CHECK(dense152_reader.eof());
 
-  engine::OriginalSnapshotWriter dense152x_writer;
+  engine::SnapshotWriter dense152x_writer;
   dense152x_writer.begin(47, 4);
   std::array<std::uint8_t, 16> bytes60{};
   for (std::uint8_t index = 0; index < 16; ++index) bytes60[index] = index;
@@ -1538,7 +1452,7 @@ void test_original_snapshot_writer() {
   CHECK(dense152x_reader.read_u8().value() == 8);
   CHECK(dense152x_reader.eof());
 
-  engine::OriginalSnapshotWriter dense124_writer;
+  engine::SnapshotWriter dense124_writer;
   dense124_writer.begin(48, 4);
   const std::array<bool, 2> dense124_values{{true, false}};
   dense124_writer.write_dense_bit_group(handle, dense124_values);
@@ -1555,7 +1469,7 @@ void test_original_snapshot_writer() {
   CHECK(dense124_reader.read_u8().value() == 1);
   CHECK(dense124_reader.eof());
 
-  engine::OriginalSnapshotWriter dense8_writer;
+  engine::SnapshotWriter dense8_writer;
   dense8_writer.begin(49, 4);
   dense8_writer.write_dense_float_bit_group(handle, 3.5F, true);
   const auto dense8_bytes = dense8_writer.finish();
@@ -1572,7 +1486,7 @@ void test_original_snapshot_writer() {
   CHECK(dense8_reader.read_u8().value() == 1);
   CHECK(dense8_reader.eof());
 
-  engine::OriginalSnapshotWriter dense_ref_writer;
+  engine::SnapshotWriter dense_ref_writer;
   dense_ref_writer.begin(50, 4);
   dense_ref_writer.write_dense_reference_group(handle, 0x11111111, 0x22222222);
   const auto dense_ref_bytes = dense_ref_writer.finish();
@@ -1589,7 +1503,7 @@ void test_original_snapshot_writer() {
   CHECK(dense_ref_reader.read_u32_le().value() == 0x22222222);
   CHECK(dense_ref_reader.eof());
 
-  engine::OriginalSnapshotWriter dense72_writer;
+  engine::SnapshotWriter dense72_writer;
   dense72_writer.begin(51, 4);
   std::array<std::uint8_t, 10> bytes16{};
   for (std::uint8_t index = 0; index < 10; ++index) bytes16[index] = index;
@@ -1619,7 +1533,7 @@ void test_original_snapshot_writer() {
   CHECK(dense72_reader.read_u32_le().value() == 0xABCD);
   CHECK(dense72_reader.eof());
 
-  engine::OriginalSnapshotWriter denseM27_writer;
+  engine::SnapshotWriter denseM27_writer;
   denseM27_writer.begin(52, 4);
   denseM27_writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
   const auto denseM27_bytes = denseM27_writer.finish();
@@ -1646,7 +1560,7 @@ void test_original_snapshot_writer() {
   CHECK(denseM27_reader.read_varint32().value() == 268435457);
   CHECK(denseM27_reader.eof());
 
-  engine::OriginalSnapshotWriter denseM16_writer;
+  engine::SnapshotWriter denseM16_writer;
   denseM16_writer.begin(53, 4);
   std::array<std::uint32_t, 10> handles3{};
   for (std::uint32_t index = 0; index < 10; ++index) handles3[index] = 0x100 + index;
@@ -1707,7 +1621,7 @@ void test_world_initialize() {
     do { generation = expected.next_generation(); } while ((generation & 262143U) == 0U);
   }
   CHECK(world.rng().state() == expected.state());
-  CHECK(world.rng().state() == 11065635568950165505ULL); // layout-probe rngState
+  CHECK(world.rng().state() == 11065635568950165505ULL); // frozen initial RNG state
   CHECK(world.random().state() == 285456437U); // post-constructor RNG state
   CHECK(!world.components().has(0));
   world.apply_input(3, engine::f32(7000.0F), engine::f32(-2.0F));
@@ -1823,545 +1737,14 @@ void test_worker_api() {
   CHECK(api.occupied(engine::Vec2(engine::f32(100.0F), engine::f32(0.0F))));
   CHECK(!api.occupied(engine::Vec2(engine::f32(2000.0F), engine::f32(0.0F))));
   CHECK(!api.spawn(engine::EntityKind::kMob, 0, engine::Vec2(engine::f32(5000.0F), engine::f32(0.0F))).valid());
-  const auto bytes = api.snapshot_bytes(7);
+  const auto bytes = api.domain_snapshot_bytes(7, 0);
   CHECK(bytes.size() > 2);
-  CHECK(bytes[0] == 1);
-  engine::ByteReader reader(bytes);
-  CHECK(reader.read_u8().value() == 1);
-  CHECK(reader.read_varint32().value() == 7);
-  api.enqueue_snapshot(8);
-  const auto packets = api.flush();
-  CHECK(packets.size() == 1);
-  CHECK(packets[0].payload.size() == bytes.size());
+  engine::ByteReader domain_reader(bytes);
+  CHECK(domain_reader.read_u8().value() == 1);
+  CHECK(domain_reader.read_varint32().value() == 7);
 
   CHECK(api.despawn(spawned));
   CHECK(!api.occupied(engine::Vec2(engine::f32(0.0F), engine::f32(0.0F))));
-  const auto delete_bytes = api.snapshot_bytes(9);
-  engine::ByteReader delete_reader(delete_bytes);
-  CHECK(delete_reader.read_u8().value() == 1);
-  CHECK(delete_reader.read_varint32().value() == 9);
-  CHECK(delete_reader.read_varint32().value() == 0); // reliable ack
-  CHECK(delete_reader.read_varint32().value() == 1); // deletes
-  CHECK(delete_reader.read_varint32().value() == 0); // updates
-  CHECK(delete_reader.read_varint32().value() == 0); // events
-  CHECK(delete_reader.read_u32_le().value() == spawned.to_wire());
-  CHECK(delete_reader.eof());
-
-  const std::array<std::uint8_t, 3> chat{'h', 'i', 0};
-  api.emit_event(9, chat);
-  const auto event_bytes = api.snapshot_bytes(10);
-  engine::ByteReader event_reader(event_bytes);
-  CHECK(event_reader.read_u8().value() == 1);
-  CHECK(event_reader.read_varint32().value() == 10);
-  CHECK(event_reader.read_varint32().value() == 0); // ack
-  CHECK(event_reader.read_varint32().value() == 0); // deletes
-  CHECK(event_reader.read_varint32().value() == 0); // updates
-  CHECK(event_reader.read_varint32().value() == 1); // events
-  CHECK(event_reader.read_u8().value() == 9);
-  CHECK(event_reader.read_u8().value() == 'h');
-  CHECK(event_reader.read_u8().value() == 'i');
-  CHECK(event_reader.read_u8().value() == 0);
-  CHECK(event_reader.eof());
-
-  const auto second = api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(2000.0F), engine::f32(0.0F)));
-  CHECK(second.valid());
-  const auto original = api.original_snapshot_bytes(20, 1);
-  engine::ByteReader original_reader(original);
-  CHECK(original_reader.read_u8().value() == 1);
-  CHECK(original_reader.read_varint32().value() == 20);
-  CHECK(original_reader.read_varint32().value() == 1);
-  CHECK(original_reader.read_varint32().value() == 0);
-  CHECK(original_reader.read_varint32().value() == 1);
-  CHECK(original_reader.read_varint32().value() == 0);
-  CHECK(original_reader.read_u32_le().value() == second.to_wire());
-  CHECK(original_reader.read_u8().value() == 52);
-  CHECK(original_reader.read_u8().value() == 0);
-  CHECK(original_reader.eof());
-
-  engine::Entity* live = api.world().entities().get(second);
-  CHECK(live != nullptr);
-  live->snapshot_component_mask = 5;
-  live->snapshot_field5 = engine::f32(1.5F);
-  live->angle = engine::f32(1.5707964F);
-  const auto masked = api.original_snapshot_bytes(25, 1);
-  engine::ByteReader masked_reader(masked);
-  CHECK(masked_reader.read_u8().value() == 1);
-  CHECK(masked_reader.read_varint32().value() == 25);
-  CHECK(masked_reader.read_varint32().value() == 1);
-  CHECK(masked_reader.read_varint32().value() == 0);
-  CHECK(masked_reader.read_varint32().value() == 1);
-  CHECK(masked_reader.read_varint32().value() == 0);
-  CHECK(masked_reader.read_u32_le().value() == second.to_wire());
-  CHECK(masked_reader.read_u8().value() == 55);
-  CHECK(masked_reader.read_u32_le().value() == 5);
-  CHECK(masked_reader.read_varint32().value() == 5);
-  CHECK(masked_reader.read_f32_le().value() == 1.5F);
-  CHECK(masked_reader.read_varint32().value() == 3);
-  CHECK(masked_reader.read_u16_le().value() == 0x3FFF); // original truncates quarter turn
-  CHECK(masked_reader.read_u8().value() == 0);
-  CHECK(masked_reader.eof());
-
-  const auto next = api.original_snapshot_next(2);
-  engine::ByteReader next_reader(next);
-  CHECK(next_reader.read_u8().value() == 1);
-  CHECK(next_reader.read_varint32().value() == 0);
-  CHECK(next_reader.read_varint32().value() == 2);
-  CHECK(next_reader.read_varint32().value() == 0);
-  CHECK(next_reader.read_varint32().value() == 1);
-  CHECK(next_reader.read_varint32().value() == 0);
-  CHECK(next_reader.read_u32_le().value() == second.to_wire());
-  const auto next2 = api.original_snapshot_next(2);
-  engine::ByteReader next2_reader(next2);
-  CHECK(next2_reader.read_u8().value() == 1);
-  CHECK(next2_reader.read_varint32().value() == 1);
-
-  live->snapshot_dense52 = false;
-  live->snapshot_present_groups = 1;
-  live->snapshot_dense52_field22 = 0x55;
-  live->snapshot_dense52_field54 = 0x66;
-  const auto dense_live = api.original_snapshot_bytes(60, 0);
-  engine::ByteReader dense_live_reader(dense_live);
-  CHECK(dense_live_reader.read_u8().value() == 1);
-  CHECK(dense_live_reader.read_varint32().value() == 60);
-  CHECK(dense_live_reader.read_varint32().value() == 0);
-  CHECK(dense_live_reader.read_varint32().value() == 0);
-  CHECK(dense_live_reader.read_varint32().value() == 1);
-  CHECK(dense_live_reader.read_varint32().value() == 0);
-  CHECK(dense_live_reader.read_u32_le().value() == second.to_wire());
-  CHECK(dense_live_reader.read_u8().value() == 62);
-  CHECK(dense_live_reader.read_u8().value() == 0x55);
-  CHECK(dense_live_reader.read_u8().value() == 0x66);
-  CHECK(dense_live_reader.eof());
-
-  live->snapshot_dense52 = false;
-  live->snapshot_present_groups = 0;
-  live->snapshot_component_mask = 0;
-  CHECK(api.set_component_presence(live->handle, 3, true));
-  CHECK(api.set_component_presence(live->handle, 5, true));
-  CHECK(!api.set_component_presence(live->handle, 31, true));
-  live->snapshot_field5 = engine::f32(7.5F);
-  live->angle = engine::f32(3.14159265358979323846F / 2.0F);
-  const auto presence_packet = api.original_snapshot_bytes(61, 0);
-  engine::ByteReader presence_reader(presence_packet);
-  CHECK(presence_reader.read_u8().value() == 1);
-  CHECK(presence_reader.read_varint32().value() == 61);
-  CHECK(presence_reader.read_varint32().value() == 0);
-  CHECK(presence_reader.read_varint32().value() == 0);
-  CHECK(presence_reader.read_varint32().value() == 1);
-  CHECK(presence_reader.read_varint32().value() == 0);
-  CHECK(presence_reader.read_u32_le().value() == live->handle.to_wire());
-  CHECK(presence_reader.read_u8().value() == 55);
-  CHECK(presence_reader.read_u32_le().value() == 20);
-  CHECK(presence_reader.read_varint32().value() == 5);
-  CHECK(presence_reader.read_f32_le().value() == 7.5F);
-  CHECK(presence_reader.read_varint32().value() == 3);
-  CHECK(presence_reader.read_u16_le().value() == 0x3FFF);
-  // The native 30-slot presence table mirrors the wire mask.
-  CHECK(live->component_present(3));
-  CHECK(!live->component_present(4));
-  CHECK(live->component_present(5));
-  CHECK(!live->component_present(0));
-  CHECK(!live->component_present(31));
-
-  CHECK(api.set_snapshot_groups(second, (1U << 1) | (1U << 2)));
-  CHECK(api.set_snapshot_byte(second, 36, 0x33));
-  CHECK(api.set_snapshot_byte(second, 9, 0x44));
-  CHECK(!api.set_snapshot_byte(second, 64, 0x55));
-  const auto live_groups = api.original_snapshot_bytes(66, 0);
-  engine::ByteReader live_groups_reader(live_groups);
-  CHECK(live_groups_reader.read_u8().value() == 1);
-  CHECK(live_groups_reader.read_varint32().value() == 66);
-  CHECK(live_groups_reader.read_varint32().value() == 0);
-  CHECK(live_groups_reader.read_varint32().value() == 0);
-  CHECK(live_groups_reader.read_varint32().value() == 1);
-  CHECK(live_groups_reader.read_varint32().value() == 0);
-  CHECK(live_groups_reader.read_u32_le().value() == second.to_wire());
-  CHECK(live_groups_reader.read_u8().value() == 62);
-  CHECK(live_groups_reader.read_u8().value() == 0x33);
-  CHECK(live_groups_reader.read_u8().value() == 0x44);
-  CHECK(live_groups_reader.eof());
-
-  CHECK(api.set_snapshot_group(second, 120));
-  CHECK(api.set_snapshot_varint(second, 8, 0x4000));
-  CHECK(api.set_snapshot_float(second, 28, 1.5F));
-  CHECK(api.set_snapshot_float(second, 49, 2.5F));
-  const auto typed_group = api.original_snapshot_bytes(67, 0);
-  engine::ByteReader typed_group_reader(typed_group);
-  CHECK(typed_group_reader.read_u8().value() == 1);
-  CHECK(typed_group_reader.read_varint32().value() == 67);
-  CHECK(typed_group_reader.read_varint32().value() == 0);
-  CHECK(typed_group_reader.read_varint32().value() == 0);
-  CHECK(typed_group_reader.read_varint32().value() == 1);
-  CHECK(typed_group_reader.read_varint32().value() == 0);
-  CHECK(typed_group_reader.read_u32_le().value() == second.to_wire());
-  CHECK(typed_group_reader.read_u8().value() == 62);
-  CHECK(typed_group_reader.read_u16_le().value() == 0x4000);
-  CHECK(typed_group_reader.read_f32_le().value() == 1.5F);
-  CHECK(typed_group_reader.read_f32_le().value() == 2.5F);
-  CHECK(typed_group_reader.eof());
-
-  CHECK(api.set_snapshot_group(second, 116));
-  CHECK(api.set_snapshot_float(second, 53, 3.5F));
-  CHECK(api.set_snapshot_float(second, 55, 4.5F));
-  const auto float_group = api.original_snapshot_bytes(68, 0);
-  engine::ByteReader float_group_reader(float_group);
-  CHECK(float_group_reader.read_u8().value() == 1);
-  CHECK(float_group_reader.read_varint32().value() == 68);
-  CHECK(float_group_reader.read_varint32().value() == 0);
-  CHECK(float_group_reader.read_varint32().value() == 0);
-  CHECK(float_group_reader.read_varint32().value() == 1);
-  CHECK(float_group_reader.read_varint32().value() == 0);
-  CHECK(float_group_reader.read_u32_le().value() == second.to_wire());
-  CHECK(float_group_reader.read_u8().value() == 62);
-  CHECK(float_group_reader.read_f32_le().value() == 3.5F);
-  CHECK(float_group_reader.read_f32_le().value() == 4.5F);
-  CHECK(float_group_reader.eof());
-
-  CHECK(api.set_snapshot_group(second, 124));
-  CHECK(api.set_snapshot_bit(second, 29, true));
-  CHECK(api.set_snapshot_bit(second, 40, true));
-  const auto bit_group = api.original_snapshot_bytes(69, 0);
-  engine::ByteReader bit_group_reader(bit_group);
-  CHECK(bit_group_reader.read_u8().value() == 1);
-  CHECK(bit_group_reader.read_varint32().value() == 69);
-  CHECK(bit_group_reader.read_varint32().value() == 0);
-  CHECK(bit_group_reader.read_varint32().value() == 0);
-  CHECK(bit_group_reader.read_varint32().value() == 1);
-  CHECK(bit_group_reader.read_varint32().value() == 0);
-  CHECK(bit_group_reader.read_u32_le().value() == second.to_wire());
-  CHECK(bit_group_reader.read_u8().value() == 62);
-  CHECK(bit_group_reader.read_u8().value() == 3);
-
-  CHECK(api.set_snapshot_group(second, -27));
-  CHECK(api.set_snapshot_string(second, 4, "a"));
-  CHECK(api.set_snapshot_varint(second, 15, 300));
-  CHECK(api.set_snapshot_double(second, 18, 1.5));
-  CHECK(api.set_snapshot_string(second, 25, "b"));
-  CHECK(api.set_snapshot_float(second, 27, 2.5F));
-  CHECK(api.set_snapshot_bit(second, 33, true));
-  CHECK(api.set_snapshot_double(second, 35, 3.5));
-  CHECK(api.set_snapshot_varint(second, 41, 400));
-  CHECK(api.set_snapshot_varint(second, 44, 16385));
-  CHECK(api.set_snapshot_varint(second, 51, 268435457));
-  const auto mixed_group = api.original_snapshot_bytes(70, 0);
-  engine::ByteReader mixed_group_reader(mixed_group);
-  CHECK(mixed_group_reader.read_u8().value() == 1);
-  CHECK(mixed_group_reader.read_varint32().value() == 70);
-  CHECK(mixed_group_reader.read_varint32().value() == 0);
-  CHECK(mixed_group_reader.read_varint32().value() == 0);
-  CHECK(mixed_group_reader.read_varint32().value() == 1);
-  CHECK(mixed_group_reader.read_varint32().value() == 0);
-  CHECK(mixed_group_reader.read_u32_le().value() == second.to_wire());
-  CHECK(mixed_group_reader.read_u8().value() == 62);
-  CHECK(mixed_group_reader.read_u8().value() == 'a');
-  CHECK(mixed_group_reader.read_u8().value() == 0);
-  CHECK(mixed_group_reader.read_varint32().value() == 300);
-  CHECK(mixed_group_reader.read_f64_le().value() == 1.5);
-  CHECK(mixed_group_reader.read_u8().value() == 'b');
-  CHECK(mixed_group_reader.read_u8().value() == 0);
-  CHECK(mixed_group_reader.read_f32_le().value() == 2.5F);
-  CHECK(mixed_group_reader.read_u8().value() == 1);
-  CHECK(mixed_group_reader.read_f64_le().value() == 3.5);
-  CHECK(mixed_group_reader.read_varint32().value() == 400);
-  CHECK(mixed_group_reader.read_varint32().value() == 16385);
-  CHECK(mixed_group_reader.read_varint32().value() == 268435457);
-  CHECK(mixed_group_reader.eof());
-
-  CHECK(api.set_snapshot_group(second, -8));
-  CHECK(api.set_snapshot_float(second, 13, 3.5F));
-  CHECK(api.set_snapshot_bit(second, 37, true));
-  const auto float_bit_group = api.original_snapshot_bytes(71, 0);
-  engine::ByteReader float_bit_reader(float_bit_group);
-  CHECK(float_bit_reader.read_u8().value() == 1);
-  CHECK(float_bit_reader.read_varint32().value() == 71);
-  CHECK(float_bit_reader.read_varint32().value() == 0);
-  CHECK(float_bit_reader.read_varint32().value() == 0);
-  CHECK(float_bit_reader.read_varint32().value() == 1);
-  CHECK(float_bit_reader.read_varint32().value() == 0);
-  CHECK(float_bit_reader.read_u32_le().value() == second.to_wire());
-  CHECK(float_bit_reader.read_u8().value() == 62);
-  CHECK(float_bit_reader.read_f32_le().value() == 3.5F);
-  CHECK(float_bit_reader.read_u8().value() == 1);
-
-  CHECK(api.set_snapshot_group(second, -15));
-  CHECK(api.set_snapshot_reference(second, 23, 0x11111111));
-  CHECK(api.set_snapshot_reference(second, 57, 0x22222222));
-  const auto ref_group = api.original_snapshot_bytes(72, 0);
-  engine::ByteReader ref_reader(ref_group);
-  CHECK(ref_reader.read_u8().value() == 1);
-  CHECK(ref_reader.read_varint32().value() == 72);
-  CHECK(ref_reader.read_varint32().value() == 0);
-  CHECK(ref_reader.read_varint32().value() == 0);
-  CHECK(ref_reader.read_varint32().value() == 1);
-  CHECK(ref_reader.read_varint32().value() == 0);
-  CHECK(ref_reader.read_u32_le().value() == second.to_wire());
-  CHECK(ref_reader.read_u8().value() == 62);
-  CHECK(ref_reader.read_u32_le().value() == 0x11111111);
-  CHECK(ref_reader.read_u32_le().value() == 0x22222222);
-
-  CHECK(api.set_snapshot_group(second, 72));
-  CHECK(api.set_snapshot_byte(second, 1, 9));
-  CHECK(api.set_snapshot_float(second, 5, 1.25F));
-  CHECK(api.set_snapshot_string(second, 6, "n"));
-  std::array<std::uint8_t, 10> live_bytes16{};
-  for (std::uint8_t index = 0; index < 10; ++index) live_bytes16[index] = index;
-  CHECK(api.set_snapshot_byte_array10(second, 16, live_bytes16));
-  CHECK(api.set_snapshot_byte(second, 20, 20));
-  CHECK(api.set_snapshot_float(second, 21, 2.5F));
-  CHECK(api.set_snapshot_float(second, 24, 3.5F));
-  CHECK(api.set_snapshot_float(second, 32, 4.5F));
-  CHECK(api.set_snapshot_byte(second, 34, 34));
-  CHECK(api.set_snapshot_byte(second, 47, 47));
-  CHECK(api.set_snapshot_reference(second, 56, 0xABCD));
-  const auto group72_live = api.original_snapshot_bytes(73, 0);
-  engine::ByteReader group72_reader(group72_live);
-  CHECK(group72_reader.read_u8().value() == 1);
-  CHECK(group72_reader.read_varint32().value() == 73);
-  CHECK(group72_reader.read_varint32().value() == 0);
-  CHECK(group72_reader.read_varint32().value() == 0);
-  CHECK(group72_reader.read_varint32().value() == 1);
-  CHECK(group72_reader.read_varint32().value() == 0);
-  CHECK(group72_reader.read_u32_le().value() == second.to_wire());
-  CHECK(group72_reader.read_u8().value() == 62);
-  CHECK(group72_reader.read_u8().value() == 9);
-  CHECK(group72_reader.read_f32_le().value() == 1.25F);
-  CHECK(group72_reader.read_u8().value() == 'n');
-  CHECK(group72_reader.read_u8().value() == 0);
-  for (std::uint8_t index = 0; index < 10; ++index)
-    CHECK(group72_reader.read_u8().value() == index);
-  CHECK(group72_reader.read_u8().value() == 20);
-  CHECK(group72_reader.read_f32_le().value() == 2.5F);
-  CHECK(group72_reader.read_f32_le().value() == 3.5F);
-  CHECK(group72_reader.read_f32_le().value() == 4.5F);
-  CHECK(group72_reader.read_u8().value() == 34);
-  CHECK(group72_reader.read_u8().value() == 47);
-  CHECK(group72_reader.read_u32_le().value() == 0xABCD);
-  CHECK(group72_reader.eof());
-
-  CHECK(api.set_snapshot_auto_position(second, true));
-  const auto group72_auto = api.original_snapshot_bytes(76, 0);
-  engine::ByteReader auto_reader(group72_auto);
-  CHECK(auto_reader.read_u8().value() == 1);
-  CHECK(auto_reader.read_varint32().value() == 76);
-  (void)auto_reader.read_varint32();
-  CHECK(auto_reader.read_varint32().value() == 0);
-  CHECK(auto_reader.read_varint32().value() == 1);
-  CHECK(auto_reader.read_varint32().value() == 0);
-  CHECK(auto_reader.read_u32_le().value() == second.to_wire());
-  CHECK(auto_reader.read_u8().value() == 62);
-  CHECK(auto_reader.read_u8().value() == 9);
-  CHECK(auto_reader.read_f32_le().value() == 2000.0F);
-  CHECK(auto_reader.read_u8().value() == 'n');
-  CHECK(auto_reader.read_u8().value() == 0);
-  for (std::uint8_t index = 0; index < 10; ++index) (void)auto_reader.read_u8();
-  CHECK(auto_reader.read_u8().value() == 20);
-  CHECK(auto_reader.read_f32_le().value() == 2.5F);
-  CHECK(auto_reader.read_f32_le().value() == 0.0F);
-
-  CHECK(api.set_snapshot_group(second, -16));
-  std::array<std::uint32_t, 10> live_handles{};
-  std::array<std::uint32_t, 10> live_varints{};
-  std::array<std::string, 10> live_strings{};
-  for (std::uint32_t index = 0; index < 10; ++index) {
-    live_handles[index] = 0x100 + index;
-    live_varints[index] = 400 + index;
-    live_strings[index] = std::string("s") + static_cast<char>('0' + index);
-  }
-  CHECK(api.set_snapshot_handle_array(second, 3, live_handles));
-  CHECK(api.set_snapshot_string_array(second, 10, live_strings));
-  CHECK(api.set_snapshot_byte(second, 11, 1));
-  CHECK(api.set_snapshot_byte(second, 12, 2));
-  CHECK(api.set_snapshot_float(second, 19, 1.5F));
-  CHECK(api.set_snapshot_varint(second, 30, 300));
-  CHECK(api.set_snapshot_varint_array(second, 39, live_varints));
-  CHECK(api.set_snapshot_float(second, 42, 2.5F));
-  CHECK(api.set_snapshot_float(second, 45, 3.5F));
-  CHECK(api.set_snapshot_byte(second, 46, 46));
-  CHECK(api.set_snapshot_varint(second, 52, 500));
-  const auto groupM16_live = api.original_snapshot_bytes(74, 0);
-  engine::ByteReader groupM16_reader(groupM16_live);
-  CHECK(groupM16_reader.read_u8().value() == 1);
-  CHECK(groupM16_reader.read_varint32().value() == 74);
-  CHECK(groupM16_reader.read_varint32().value() == 0);
-  CHECK(groupM16_reader.read_varint32().value() == 0);
-  CHECK(groupM16_reader.read_varint32().value() == 1);
-  CHECK(groupM16_reader.read_varint32().value() == 0);
-  CHECK(groupM16_reader.read_u32_le().value() == second.to_wire());
-  CHECK(groupM16_reader.read_u8().value() == 62);
-  for (std::uint32_t index = 0; index < 10; ++index)
-    CHECK(groupM16_reader.read_u32_le().value() == 0x100 + index);
-  for (std::uint32_t index = 0; index < 10; ++index) {
-    CHECK(groupM16_reader.read_u8().value() == 's');
-    CHECK(groupM16_reader.read_u8().value() == static_cast<std::uint8_t>('0' + index));
-    CHECK(groupM16_reader.read_u8().value() == 0);
-  }
-  CHECK(groupM16_reader.read_u8().value() == 1);
-  CHECK(groupM16_reader.read_u8().value() == 2);
-  CHECK(groupM16_reader.read_f32_le().value() == 1.5F);
-  CHECK(groupM16_reader.read_varint32().value() == 300);
-  for (std::uint32_t index = 0; index < 10; ++index)
-    CHECK(groupM16_reader.read_varint32().value() == 400 + index);
-  CHECK(groupM16_reader.read_f32_le().value() == 2.5F);
-  CHECK(groupM16_reader.read_f32_le().value() == 3.5F);
-  CHECK(groupM16_reader.read_u8().value() == 46);
-  CHECK(groupM16_reader.read_varint32().value() == 500);
-  CHECK(groupM16_reader.eof());
-
-  CHECK(api.set_snapshot_group(second, 152));
-  CHECK(api.set_snapshot_byte(second, 2, 2));
-  CHECK(api.set_snapshot_byte(second, 26, 26));
-  CHECK(api.set_snapshot_byte(second, 31, 31));
-  CHECK(api.set_snapshot_varint(second, 58, 58));
-  CHECK(api.set_snapshot_float(second, 59, 1.5F));
-  std::array<std::uint8_t, 16> live_bytes60{};
-  std::array<std::uint16_t, 8> live_shorts61{};
-  for (std::uint8_t index = 0; index < 16; ++index) live_bytes60[index] = index;
-  for (std::uint16_t index = 0; index < 8; ++index) live_shorts61[index] = 0x100 + index;
-  CHECK(api.set_snapshot_byte_array(second, 60, live_bytes60));
-  CHECK(api.set_snapshot_short_array(second, 61, live_shorts61));
-  CHECK(api.set_snapshot_byte(second, 62, 62));
-  CHECK(api.set_snapshot_byte(second, 63, 63));
-  const auto group152_live = api.original_snapshot_bytes(75, 0);
-  engine::ByteReader group152_reader(group152_live);
-  CHECK(group152_reader.read_u8().value() == 1);
-  CHECK(group152_reader.read_varint32().value() == 75);
-  CHECK(group152_reader.read_varint32().value() == 0);
-  CHECK(group152_reader.read_varint32().value() == 0);
-  CHECK(group152_reader.read_varint32().value() == 1);
-  CHECK(group152_reader.read_varint32().value() == 0);
-  CHECK(group152_reader.read_u32_le().value() == second.to_wire());
-  CHECK(group152_reader.read_u8().value() == 126);
-  CHECK(group152_reader.read_u8().value() == 2);
-  CHECK(group152_reader.read_u8().value() == 26);
-  CHECK(group152_reader.read_u8().value() == 31);
-  CHECK(group152_reader.read_varint32().value() == 58);
-  CHECK(group152_reader.read_f32_le().value() == 1.5F);
-  for (std::uint8_t index = 0; index < 16; ++index)
-    CHECK(group152_reader.read_u8().value() == index);
-  for (std::uint16_t index = 0; index < 8; ++index)
-    CHECK(group152_reader.read_varint32().value() == 0x100 + index);
-  CHECK(group152_reader.read_u8().value() == 62);
-  CHECK(group152_reader.read_u8().value() == 63);
-  CHECK(group152_reader.eof());
-
-  engine::OriginalSnapshotWriter multi_dense_writer;
-  multi_dense_writer.begin(65, 4);
-  const std::array<std::uint8_t, 2> group52{{0x11, 0x22}};
-  const std::array<std::uint8_t, 1> group56{{0x33}};
-  const std::array<std::span<const std::uint8_t>, 2> groups{{group52, group56}};
-  multi_dense_writer.write_dense_byte_groups(second, groups);
-  const auto multi_dense_bytes = multi_dense_writer.finish();
-  engine::ByteReader multi_dense_reader(multi_dense_bytes);
-  CHECK(multi_dense_reader.read_u8().value() == 1);
-  CHECK(multi_dense_reader.read_varint32().value() == 65);
-  CHECK(multi_dense_reader.read_varint32().value() == 4);
-  CHECK(multi_dense_reader.read_varint32().value() == 0);
-  CHECK(multi_dense_reader.read_varint32().value() == 1);
-  CHECK(multi_dense_reader.read_varint32().value() == 0);
-  CHECK(multi_dense_reader.read_u32_le().value() == second.to_wire());
-  CHECK(multi_dense_reader.read_u8().value() == 62);
-  CHECK(multi_dense_reader.read_u8().value() == 0x11);
-  CHECK(multi_dense_reader.read_u8().value() == 0x22);
-  CHECK(multi_dense_reader.read_u8().value() == 0x33);
-  CHECK(multi_dense_reader.eof());
-
-  const auto doomed = api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(2500.0F), engine::f32(0.0F)));
-  CHECK(doomed.valid());
-  CHECK(api.despawn(doomed));
-  const auto delete_packet = api.original_snapshot_next(3);
-  engine::ByteReader live_delete_reader(delete_packet);
-  CHECK(live_delete_reader.read_u8().value() == 1);
-  CHECK(live_delete_reader.read_varint32().value() == 2);
-  CHECK(live_delete_reader.read_varint32().value() == 3);
-  CHECK(live_delete_reader.read_varint32().value() == 1); // deletes
-  CHECK(live_delete_reader.read_varint32().value() == 1); // updates
-  CHECK(live_delete_reader.read_varint32().value() == 0); // events
-  CHECK(live_delete_reader.read_u32_le().value() == doomed.to_wire());
-  CHECK(live_delete_reader.read_u32_le().value() == second.to_wire());
-
-  engine::WorkerApi death_api;
-  death_api.init();
-  const auto dead = death_api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(3000.0F), engine::f32(0.0F)));
-  CHECK(dead.valid());
-  death_api.world().entities().get(dead)->type_id = 0U; // no loot-table update
-  death_api.world().entities().get(dead)->health = engine::f32(0.0F);
-  death_api.think();
-  // Original 43 leaves a health-0 corpse in the world for one second and only
-  // deletes the entity when that timer expires.
-  const engine::Entity* dead_entity = death_api.world().entities().get(dead);
-  CHECK(dead_entity != nullptr);
-  CHECK(dead_entity->death_processed);
-  CHECK(dead_entity->death_time_ms >= 1000.0);
-  const auto death_packet = death_api.original_snapshot_bytes(0, 0);
-  engine::ByteReader death_reader(death_packet);
-  CHECK(death_reader.read_u8().value() == 1);
-  CHECK(death_reader.read_varint32().value() == 0);
-  CHECK(death_reader.read_varint32().value() == 0);
-  CHECK(death_reader.read_varint32().value() == 0); // no deletes yet
-
-  engine::WorkerApi reset_api;
-  reset_api.init();
-  const auto transient = reset_api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(4000.0F), engine::f32(0.0F)));
-  CHECK(transient.valid());
-  CHECK(reset_api.despawn(transient));
-  reset_api.init();
-  const auto clean_packet = reset_api.original_snapshot_bytes(0, 0);
-  engine::ByteReader clean_reader(clean_packet);
-  CHECK(clean_reader.read_u8().value() == 1);
-  CHECK(clean_reader.read_varint32().value() == 0);
-  CHECK(clean_reader.read_varint32().value() == 0);
-  CHECK(clean_reader.read_varint32().value() == 0); // deletes
-  CHECK(clean_reader.read_varint32().value() == 0); // updates
-  CHECK(clean_reader.read_varint32().value() == 0); // events
-  CHECK(clean_reader.eof());
-
-  reset_api.configure_player_spawn(
-    engine::PlayerConfig{engine::f32(25.0F), engine::f32(100.0F), engine::f32(100.0F)},
-    engine::Vec2(engine::f32(10.0F), engine::f32(20.0F)));
-  engine::ByteWriter player_input;
-  player_input.write_varint32(1);
-  player_input.write_varint32(6);
-  for (const char byte : std::string("p")) player_input.write_u8(static_cast<std::uint8_t>(byte));
-  player_input.write_u8(0);
-  std::vector<std::uint8_t> player_packet = player_input.bytes();
-  engine::apply_packet_xor(player_packet, key);
-  CHECK(reset_api.send(player_packet, key));
-  CHECK(reset_api.world().player().valid());
-  CHECK(reset_api.world().player_name() == "p");
-  const engine::Entity* player_entity = reset_api.world().entities().get(reset_api.world().player());
-  CHECK(player_entity != nullptr);
-  CHECK(player_entity->kind == engine::EntityKind::kPlayer);
-  CHECK(player_entity->position.x.to_float() == 10.0F);
-  CHECK(player_entity->position.y.to_float() == 20.0F);
-
-  CHECK(reset_api.world().loadout().equip(0, 1));
-  CHECK(reset_api.world().loadout().equip(1, 2));
-  engine::ByteWriter swap_input;
-  swap_input.write_varint32(2);
-  swap_input.write_varint32(10);
-  swap_input.write_u8(0);
-  swap_input.write_u8(1);
-  swap_input.write_u8(1);
-  swap_input.write_u8(2);
-  std::vector<std::uint8_t> swap_packet = swap_input.bytes();
-  engine::apply_packet_xor(swap_packet, key);
-  CHECK(reset_api.send(swap_packet, key));
-  CHECK(reset_api.world().loadout().slots()[0].type_id == 2);
-  CHECK(reset_api.world().loadout().slots()[1].type_id == 1);
-
-  engine::ByteWriter discard_input;
-  discard_input.write_varint32(3);
-  discard_input.write_varint32(8);
-  discard_input.write_u8(0);
-  discard_input.write_u8(2);
-  std::vector<std::uint8_t> discard_packet = discard_input.bytes();
-  engine::apply_packet_xor(discard_packet, key);
-  CHECK(reset_api.send(discard_packet, key));
-  CHECK(reset_api.world().loadout().slots()[0].count == 0);
 }
 
 void test_rock_construction() {
@@ -2396,7 +1779,7 @@ void test_rock_construction() {
   band_world.initialize();
   band_world.random().seed(787621659U);
   const engine::SpawnTable table = engine::SpawnTable::from_catalog();
-  const auto band_handle = engine::spawn_from_band_function144(band_world, table, 0,
+  const auto band_handle = engine::spawn_from_band_with_component_draws(band_world, table, 0,
     [](const engine::SpawnPosition&) { return false; });
   CHECK(band_handle.valid());
   const auto* band_entity = band_world.entities().get(band_handle);
@@ -3889,9 +3272,9 @@ void test_domain_boot_visibility() {
     if (flags != 1U) return;
     const auto component_mask = reader.read_u32_le().value();
     const auto* entity = api.world().entities().get(handle);
-    CHECK(component_mask == engine::OriginalSnapshotWriter::kDefaultDenseComponentMask
+    CHECK(component_mask == engine::SnapshotWriter::kDefaultDenseComponentMask
       || (entity != nullptr && entity->kind == engine::EntityKind::kPetal
-          && component_mask == (engine::OriginalSnapshotWriter::kDefaultDenseComponentMask | (1U << 6U))));
+          && component_mask == (engine::SnapshotWriter::kDefaultDenseComponentMask | (1U << 6U))));
     std::uint32_t field = 0U;
     for (auto delta = reader.read_varint32().value(); delta != 0U;
          delta = reader.read_varint32().value()) {
@@ -4582,9 +3965,9 @@ void test_domain_dense_player_wire_boundaries() {
         // All profile records preserve the entire dense declaration, not just
         // bit 29. The last declaration determines the following dense length.
         const auto component_mask = reader.read_u32_le().value();
-        CHECK(component_mask == engine::OriginalSnapshotWriter::kDefaultDenseComponentMask
+        CHECK(component_mask == engine::SnapshotWriter::kDefaultDenseComponentMask
           || (handle == petal && component_mask ==
-              (engine::OriginalSnapshotWriter::kDefaultDenseComponentMask | (1U << 6U))));
+              (engine::SnapshotWriter::kDefaultDenseComponentMask | (1U << 6U))));
         std::uint32_t field = 0;
         for (auto delta = reader.read_varint32().value(); delta != 0U;
              delta = reader.read_varint32().value()) {
@@ -5160,7 +4543,7 @@ void test_ai_activity_branch_and_wire() {
       CHECK(saw_activity && sparse.eof());
     }
   }
-  engine::OriginalSnapshotWriter dense;
+  engine::SnapshotWriter dense;
   dense.begin(1U); dense.write_dense_default_groups(*entity);
   const auto packet = dense.finish(); engine::ByteReader reader(packet);
   (void)reader.read_u8(); for (unsigned i = 0; i < 5; ++i) (void)reader.read_varint32();
@@ -5736,14 +5119,8 @@ int main(int argc, char** argv) {
   runTest("test_damage_and_effects", test_damage_and_effects);
   runTest("test_petal_orbit_profiles", test_petal_orbit_profiles);
   runTest("test_input_decoder", test_input_decoder);
-  runTest("test_snapshot_writer", test_snapshot_writer);
-  runTest("test_original_client_component_mask", test_original_client_component_mask);
-  runTest("test_archived_metadata_and_fields", archived_adapter_tests::metadata_and_fields);
-  runTest("test_archived_sequence_boundaries", archived_adapter_tests::sequence_boundaries);
-  runTest("test_archived_removals_and_events", archived_adapter_tests::removals_and_events);
-  runTest("test_archived_corpse_and_restart", archived_adapter_tests::corpse_and_restart);
   runTest("test_snapshot_header", test_snapshot_header);
-  runTest("test_original_snapshot_writer", test_original_snapshot_writer);
+  runTest("test_snapshot_writer_fields", test_snapshot_writer_fields);
   runTest("test_dense_field_catalog", test_dense_field_catalog);
   runTest("test_progression", test_progression);
   runTest("test_reward_health_and_level_cap", test_reward_health_and_level_cap);

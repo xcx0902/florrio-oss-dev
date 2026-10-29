@@ -1,4 +1,4 @@
-/** Retained hotbar visuals, following original client func803/1101. All motion
+/** Retained hotbar visuals for event-effect flight and slot attachment. All motion
  * is in logical HUD units, with the same order of binary32 stores as WASM. */
 import type { HudLayout } from './hud.js';
 

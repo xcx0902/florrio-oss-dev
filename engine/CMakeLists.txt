@@ -29,9 +29,7 @@ add_library(engine_core STATIC
   src/sim/quadtree.cpp
   src/sim/species_attacks.cpp
   src/net/input.cpp
-  src/net/snapshot.cpp
-  src/net/snapshot_header.cpp
-  src/net/original_snapshot.cpp
+  src/net/snapshot_writer.cpp
   src/net/worker_api.cpp
   src/wasm/abi.cpp
 )
@@ -119,7 +117,3 @@ if(NOT CMAKE_CROSSCOMPILING)
   add_test(NAME engine_schema_contracts_checker
     COMMAND "${ENGINE_SCHEMA_NODE}" --test "${CMAKE_CURRENT_SOURCE_DIR}/tests/unit/test_schema_contracts.test.mjs")
 endif()
-
-add_executable(engine_native_replay tests/oracle/native-state-replay.cpp)
-target_link_libraries(engine_native_replay PRIVATE engine_core)
-target_compile_options(engine_native_replay PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)

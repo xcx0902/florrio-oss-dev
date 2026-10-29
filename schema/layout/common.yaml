@@ -2,13 +2,6 @@ schema: 1
 name: Common
 kind: types
 confidence: high
-source:
-  artifact: web/sp_server.wasm
-  sha256: 75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d
-  evidence:
-    - source/game/server/initialization.mjs
-    - reports/server-entity-definitions.md
-    - reports/server-behavior.md
 types:
   Vector:
     kind: struct

@@ -4,15 +4,39 @@ import { readFile } from 'node:fs/promises';
 import { chromium } from 'playwright-core';
 import ts from 'typescript';
 import { chromiumExecutable } from '../../tools/lib/chromium.mjs';
-import { loadOriginal } from '../../test/helpers/wasm-probe.mjs';
-import { installCanvasTrace } from '../../tools/parity/canvas-trace.js';
 import { createEvent14Effect, updateEvent14Effect, drawEvent14Effect } from '../public/render/event-effects.js';
 import { createHudState, drawHud, getHudLayout } from '../public/render/ui.js';
 import { PetalMotionState } from '../public/render/petal-motion.js';
-import { RenderingCanvas } from './helpers/rendering-oracle.mjs';
+import { RenderingCanvas } from './helpers/recording-canvas.mjs';
 
 const payload = { index: 2, type: 6, startScreenX: 150.125, startScreenY: 280.25, recharge: 32767 / 65535 };
 const f = Math.fround;
+
+/** Record the Canvas2D calls this test needs to compare cached and cold draws. */
+function installCanvasTrace() {
+  const state = { ops: [] };
+  const canvasIds = new WeakMap();
+  let nextCanvas = 0;
+  const descriptor = canvas => {
+    if (!canvas || (typeof canvas !== 'object')) return canvas;
+    let id = canvasIds.get(canvas);
+    if (id === undefined) { id = nextCanvas++; canvasIds.set(canvas, id); }
+    const name = canvas.id || (typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas ? 'offscreen' : 'canvas');
+    return { kind: 'canvas', id, name, width: canvas.width, height: canvas.height };
+  };
+  window.__canvasTrace = { state, reset() { state.ops.length = 0; } };
+  const prototypes = [CanvasRenderingContext2D.prototype];
+  if (typeof OffscreenCanvasRenderingContext2D !== 'undefined') prototypes.push(OffscreenCanvasRenderingContext2D.prototype);
+  for (const prototype of prototypes) for (const op of ['fillText', 'strokeText', 'measureText', 'drawImage']) {
+    const original = prototype[op];
+    if (typeof original !== 'function') continue;
+    prototype[op] = function (...args) {
+      const recorded = op === 'drawImage' ? args.map(descriptor) : args;
+      state.ops.push([0, op, recorded]);
+      return original.apply(this, args);
+    };
+  }
+}
 const step = delta => 1 - Math.pow(0.8, f(delta) * 0.06);
 
 class Context {
@@ -103,116 +127,6 @@ test('equipped/storage destinations follow current HUD layout, level thresholds,
       assert.equal(effect.opacity, f(step(16)));
     }
   }
-});
-
-/** Run original func803 with artwork type zero to isolate its numerical
- * flight/retirement state from host rasterization. All actual instructions
- * remain unchanged; the domain renderer's nonzero art is tested separately.
- */
-async function nativeFlight(x, y, slotX, slotY, size, type = 0) {
-  let runtime, calls = [];
-  function host(code, signature, pointer) {
-    if (!runtime) return 0;
-    const view = new DataView(runtime.memory.buffer), bytes = new Uint8Array(view.buffer), args = [];
-    let cursor = pointer >>> 2;
-    for (let kind; (kind = bytes[signature++]); cursor++) {
-      if (kind < 105) { if (cursor & 1) cursor++; args.push(view.getFloat64((cursor++ >> 1) * 8, true)); }
-      else args.push(view.getInt32(cursor * 4, true));
-    }
-    if (code === 141250 || code === 141620) return 1;
-    if (code === 141314) return 1000;
-    if (code === 150328) return args[0] % args[1];
-    calls.push([code, ...args.slice(1)]); return 0;
-  }
-  runtime = await loadOriginal('client', { functionIds: [368, 391, 803], imports: { a: { a: host, c: host } } });
-  runtime.call(391, 1);
-  const alloc = length => runtime.call(368, length);
-  const object = alloc(496), frame = alloc(36), roots = alloc(64), slots = alloc(136), sizes = alloc(68);
-  const delta = alloc(4), renderer = alloc(128), scope = alloc(32), reference = alloc(176);
-  const view = new DataView(runtime.memory.buffer), bytes = new Uint8Array(runtime.memory.buffer);
-  const put = (address, value) => view.setInt32(address, value, true);
-  const float = (address, value) => view.setFloat32(address, value, true);
-  for (const [address, length] of [[object, 496], [frame, 36], [roots, 64], [slots, 136], [sizes, 68],
-    [renderer, 128], [scope, 32], [reference, 176]]) bytes.fill(0, address, address + length);
-  [scope, roots, roots + 4, roots + 8, slots, sizes, delta, roots + 32, roots + 36]
-    .forEach((pointer, index) => put(frame + index * 4, pointer));
-  put(roots, reference); put(roots + 4, roots); put(roots + 36, renderer);
-  float(renderer, 1); float(renderer + 12, 1); view.setFloat64(renderer + 56, 1, true);
-  float(scope + 12, 1); float(scope + 16, 1);
-  put(object + 108, -1); put(object + 464, -1); put(437388, 0); bytes[437412] = 0;
-  bytes[object + 20] = type;
-  float(object + 12, x); float(object + 16, y);
-  float(object + 452, slotX); float(object + 456, slotY); float(object + 460, size);
-  return (elapsed, active, slide = 0, scale = 1) => {
-    float(delta, elapsed);
-    float(renderer, scale); float(renderer + 12, scale); float(renderer + 20, f(scale * slide));
-    calls = [];
-    runtime.call(803, frame, object, +active);
-    return { opacity: view.getFloat32(object + 4, true), size: view.getFloat32(object + 8, true),
-      x: view.getFloat32(object + 12, true), y: view.getFloat32(object + 16, true),
-      retiredFrames: bytes[object + 488], calls };
-  };
-}
-
-test('death moves arriving, settled and retired pickup cards with the original803 renderer on every frame', async () => {
-  const viewport = { width: 1280, height: 720, level: 1 }, layout = getHudLayout(1280, 720, 1);
-  for (const slot of [2, 7]) {
-    const equipped = slot < layout.equippedCount;
-    const slotX = f(equipped ? layout.equippedX + slot * 90 : layout.storageX + (slot - layout.equippedCount) * 65);
-    const slotY = f(equipped ? layout.equippedY : layout.storageY);
-    for (const warmup of [0, 120]) for (const retireAfter of [30, Infinity]) {
-      const native = await nativeFlight(payload.startScreenX, payload.startScreenY,
-        slotX, slotY, equipped ? 70 : 50, 6);
-      const effect = createEvent14Effect({ ...payload, index: slot, recharge: 1 });
-      const hud = createHudState();
-      let now = 0;
-      for (let frame = 0; frame < warmup + 80; frame++) {
-        now += 16;
-        const death = frame >= warmup, active = frame < warmup + retireAfter;
-        const state = hud.update({ ...viewport, health: death ? 0 : 100, maxHealth: 100,
-          death, slots: [], slotEffects: [effect] }, now, 16);
-        const expected = native(16, active, state.hudSlide, layout.scale);
-        updateEvent14Effect(effect, { ...viewport, nowMilliseconds: now, deltaMilliseconds: 16, active });
-        if (effect.phase === 'done') break;
-        const reference = new RenderingCanvas(); reference.replay(expected.calls);
-        const actual = new RenderingCanvas(); drawHud(actual, state);
-        const nativeCard = reference.paints.find(p => p.op === 'stroke' && p.path.some(op => op[0] === 'rect'));
-        const card = actual.paints.find(p => p.op === 'stroke' && p.path.some(op => op[0] === 'rect')
-          && p.stroke.every((value, index) => value === nativeCard?.stroke[index]));
-        assert.ok(nativeCard && card, `slot ${slot} frame ${frame}: card painted`);
-        // Native storage cards use a 50-unit rectangle; the domain uses a
-        // 70-unit rectangle scaled by 50/70. Compare the equivalent matrix.
-        const matrix = nativeCard.matrix.map((value, index) => index < 4 && !equipped ? value * 50 / 70 : value);
-        card.matrix.forEach((value, index) => assert.ok(Math.abs(value - matrix[index]) < .0002,
-          `slot ${slot} warmup ${warmup} frame ${frame} matrix ${index}: ${value} != ${matrix[index]}`));
-        for (const key of ['x', 'y', 'size', 'opacity']) assert.equal(effect[key], expected[key],
-          `slot ${slot} frame ${frame}: ${key} retains original flight state`);
-      }
-    }
-  }
-});
-
-test('every flight/fade f32 store agrees with original WASM func803 across varying frame deltas', async () => {
-  const view = { width: 1280, height: 720, level: 1 };
-  const layout = getHudLayout(view.width, view.height, view.level);
-  const x = f(layout.equippedX + payload.index * 90), y = f(layout.equippedY);
-  const native = await nativeFlight(payload.startScreenX, payload.startScreenY, x, y, 70);
-  const effect = createEvent14Effect(payload);
-  let now = 0;
-  for (let index = 0; index < 180; index++) {
-    const delta = [16, 8, 24, 0, 33.333, 4.5, 100][index % 7], active = index < 90;
-    // Distinct frame timestamps also exercise a zero simulation delta.
-    now += Math.max(1, delta);
-    const expected = native(delta, active);
-    updateEvent14Effect(effect, { ...view, nowMilliseconds: now, deltaMilliseconds: delta, active });
-    if (effect.phase === 'done') {
-      assert.ok(expected.opacity <= 0.0001);
-      assert.ok(expected.retiredFrames > 1);
-      break;
-    }
-    for (const key of ['x', 'y', 'size', 'opacity']) assert.equal(effect[key], expected[key], `${key} frame ${index}`);
-  }
-  assert.equal(effect.phase, 'done');
 });
 
 test('clock replay is idempotent; recharge resets down immediately and remembers subsequent targets', () => {

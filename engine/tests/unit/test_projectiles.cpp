@@ -10,7 +10,6 @@
 #include "engine/sim/ai.hpp"
 #include "engine/core/byte_reader.hpp"
 #include "engine/net/worker_api.hpp"
-#include "engine/net/original_snapshot.hpp"
 #include <algorithm>
 #include <array>
 #include <map>
@@ -29,7 +28,6 @@ void require(bool condition, const char* message) {
 } // namespace
 // Use the existing independent archived decoder; it never calls writer/decrypt.
 #define CHECK(condition) require(static_cast<bool>(condition), #condition)
-#include "test_original_client_adapter.hpp"
 #undef CHECK
 namespace {
 engine::EntityHandle setup(engine::World& world, std::uint16_t type) {
@@ -141,58 +139,6 @@ void web_death_and_area() {
     world.entities().get(target)->set_position({engine::f32(500), engine::f32(400)});
     (void)world.update_area_effects();
     require(engine::slow_multiplier(*world.entities().get(target)).value == 1, "leave area removes shared payload");
-  }
-}
-void production_wire_models() {
-  for (const auto type : {11U, 12U, 34U}) {
-    engine::WorkerApi api;
-    api.init(false);
-    auto& world = api.world();
-    const auto owner = setup(world, type);
-    const auto parent = world.loadout().handle(0, 0);
-    const auto equipped = archived_adapter_tests::decode(api.original_client_snapshot_bytes(1));
-    require(equipped.records.at(parent.to_wire()).mask == 0x03184040U, "equipped Peas model mask");
-    world.set_time_ms(550);
-    require(engine::update_projectile_petal_orbit(world, world.petals()[0], 1), "wire Peas split");
-    const auto children = world.deferred_launches()[0].children;
-    const auto split = archived_adapter_tests::decode(api.original_client_snapshot_bytes(2));
-    for (const auto child : children) {
-      const auto& record = split.records.at(child.to_wire());
-      require(record.mask == 0x03184050U, "child declares both component5 and component7");
-      require(record.values.at(9) == (type == 34 ? 3 : type == 12 ? 1 : 0), "render byte is field9 including zero");
-      require(record.values.at(50) == type, "split child retains petal type50");
-      require(record.values.at(38) == 0, "lifecycle byte is independent of render flags");
-      require(record.values.at(57) == owner.to_wire(), "split child owner is published");
-    }
-    engine::update_petal_behaviors(world, 1000);
-    const auto dead = archived_adapter_tests::decode(api.original_client_snapshot_bytes(3));
-    for (const auto child : children) {
-      const auto& record = dead.records.at(child.to_wire());
-      require(record.values.at(38) == 1 && record.values.at(53) == 0, "child expiry publishes ordinary death");
-      require(!record.values.contains(9), "death does not overwrite the render byte");
-    }
-  }
-  for (const auto type : {29U, 30U}) {
-    engine::WorkerApi api;
-    api.init(false);
-    auto& world = api.world();
-    const auto owner = setup(world, type);
-    const auto web = world.loadout().handle(0, 0);
-    world.entities().get(web)->set_position({engine::f32(30), engine::f32(40)});
-    world.set_time_ms(550);
-    require(engine::update_projectile_petal_orbit(world, world.petals()[0], 1), "wire Web releases");
-    (void)engine::damage_entity(world, web, world.entities().get(web)->health);
-    require(world.area_effects().size() == 1, "wire Web death emits one area");
-    const auto ground = world.area_effects()[0].owner;
-    const auto packet = archived_adapter_tests::decode(api.original_client_snapshot_bytes(1));
-    const auto& record = packet.records.at(ground.to_wire());
-    require(record.mask == 0x03184800U, "ground Web exact component12 mask");
-    require(!record.values.contains(50) && !record.values.contains(9) && !record.values.contains(14),
-      "ground Web has neither petal type, Peas flags nor effect-component field");
-    require(record.values.at(7) == 50 && record.values.at(53) == 5 && record.values.at(55) == 5,
-      "ground Web radius and health fields");
-    require(record.values.at(49) == 30 && record.values.at(28) == 40 && record.values.at(57) == owner.to_wire(),
-      "ground Web position and owner fields");
   }
 }
 void controlling_root_full_tick_contacts() {
@@ -320,7 +266,6 @@ int main(int argc, char** argv) {
   release_and_recharge();
   peas_lifecycle();
   web_death_and_area();
-  production_wire_models();
   controlling_root_full_tick_contacts();
   std::puts("Projectile regression checks passed");
 }

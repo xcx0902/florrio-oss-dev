@@ -1,19 +1,18 @@
 #!/usr/bin/env node
-/** Serial acceptance, one source build, immutable report snapshots, one delivery identity. */
+/** Serial product acceptance: build, test, package and bind one delivery identity. */
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { mkdir, open, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { evidence, newRunId, sameEvidence, sha256, treeIdentity } from './verification-evidence.mjs';
-import { atomicWrite, atomicJson, runDirectory } from './verification/io.mjs';
-import { reportPaths } from './verification/gates.mjs';
+import { atomicJson, runDirectory } from './verification/io.mjs';
 
 const runId = newRunId(), token = randomUUID();
 const env = { ...process.env, VERIFY_RUN_ID: runId, VERIFY_LOCK_TOKEN: token };
 await mkdir('reports', { recursive: true });
 const lock = await open('reports/verification.lock', 'wx');
 const folder = runDirectory('.', runId), reportFile = path.join(folder, 'run.json');
-const report = { schema: 3, runId, startedAt: new Date().toISOString(), finishedAt: null, passed: false, steps: [] };
+const report = { schema: 4, runId, startedAt: new Date().toISOString(), finishedAt: null, passed: false, steps: [] };
 let child, interrupted = false;
 const stop = signal => {
   interrupted = true;
@@ -28,33 +27,21 @@ async function publish() {
   await atomicJson(reportFile, report);
   await atomicJson('reports/latest-run.json', report);
 }
-async function execute(name, command, args, { reports = [], extraEnv = {} } = {}) {
+async function execute(name, command, args, { extraEnv = {} } = {}) {
   if (interrupted) throw new Error('Verification interrupted');
-  const step = { name, command: [command, ...args], startedAt: new Date().toISOString(), finishedAt: null, exitCode: null, reports: {} };
+  const step = { name, command: [command, ...args], startedAt: new Date().toISOString(), finishedAt: null, exitCode: null };
   report.steps.push(step); await publish();
   console.log(`[${runId}] ${name}`);
   // npm's CLI path works under Windows as well as POSIX without a shell.
-  if (command === 'npm' && process.env.npm_execpath) { args = [process.env.npm_execpath, ...args]; command = process.execPath; }
+  const actualCommand = command === 'npm' && process.env.npm_execpath ? process.execPath : command;
+  const actualArgs = command === 'npm' && process.env.npm_execpath ? [process.env.npm_execpath, ...args] : args;
   step.exitCode = await new Promise(resolve => {
-    child = spawn(command, args, { env: { ...env, ...extraEnv }, stdio: 'inherit', detached: process.platform !== 'win32' });
+    child = spawn(actualCommand, actualArgs, { env: { ...env, ...extraEnv }, stdio: 'inherit', detached: process.platform !== 'win32' });
     child.once('error', error => { step.error = error.message; resolve(1); });
     child.once('close', (status, signal) => { step.signal = signal; resolve(signal || interrupted ? 1 : status ?? 1); });
   });
   child = null;
   step.finishedAt = new Date().toISOString();
-  for (const name of reports) {
-    const source = reportPaths[name];
-    try {
-      const bytes = await readFile(source);
-      const value = JSON.parse(bytes);
-      if (!value || value.evidence?.runId !== runId || !sameEvidence(value.evidence, report.evidence)
-        || !(Date.parse(value.generatedAt) >= Date.parse(step.startedAt) && Date.parse(value.generatedAt) <= Date.parse(step.finishedAt)))
-        throw new Error('report is missing, stale, or belongs to another run');
-      const relative = `artifacts/${name}.json`;
-      await atomicWrite(path.join(folder, relative), bytes);
-      step.reports[name] = { source, path: relative, sha256: sha256(bytes), generatedAt: value.generatedAt };
-    } catch (error) { step.reports[name] = { source, error: error.message }; step.exitCode = 1; }
-  }
   await publish();
   return step.exitCode === 0;
 }
@@ -68,45 +55,35 @@ try {
     if (!await execute(name, 'npm', ['run', name])) throw new Error(`cannot validate: ${name} failed`);
   }
   report.evidence = { ...await evidence(), runId };
-  if (!await execute('package', process.execPath, ['tools/build-dist-next.mjs', '--skip-build'])) throw new Error('delivery packaging failed');
-  const manifest = await readFile('dist-next/build-manifest.json');
-  report.delivery = { root: 'dist-next', manifestSha256: sha256(manifest),
-    wasmSha256: sha256(await readFile('dist-next/server.wasm')),
-    sha256: (await treeIdentity('.', ['dist-next'])).sha256 };
-  await publish();
-  const node = process.execPath;
-  const checks = [
-    ['browser version', node, ['tools/check-browser-version.mjs']],
-    ['reference', 'npm', ['run', 'test:reference']],
-    ['javascript', 'npm', ['run', 'test:javascript:tap']],
-    ['engine', node, ['tools/run-tap.mjs', 'engine', 'reports/engine-tests.tap', '--', './build/engine/engine_tests', '--tap']],
-    ['native suites', 'ctest', ['--test-dir', 'build/engine', '--output-on-failure', '--no-tests=error']],
-    ['client', node, ['tools/run-tap.mjs', 'client', 'reports/client-tests.tap', '--', node, '--test', '--test-reporter=tap', 'client/tests/*.test.mjs']],
-    ['catalogs', 'npm', ['run', 'catalogs:drops:verify']],
-    ['original parity', 'npm', ['run', 'test:parity'], { reports: ['server', 'originalClient'] }],
-    ['engine state', 'npm', ['run', 'parity:engine-state:strict'], { reports: ['engineState'] }],
-    ['engine soak', 'npm', ['run', 'parity:engine-soak:strict'], { reports: ['engineSoak'] }],
-    ['hornet', node, ['tools/parity/hornet-stinger-trace.mjs'], { reports: ['hornet'] }],
-    ['self consistency', 'npm', ['run', 'parity:client'], { reports: ['next'] }],
-    ['visual', 'npm', ['run', 'parity:visual'], { reports: ['visual'] }],
-    ['canvas', 'npm', ['run', 'parity:canvas'], { reports: ['renderCommands'] }],
-    ['delivery integrity', node, ['tools/verify-dist-next.mjs']],
-    ['delivery smoke', node, ['tools/run-tap.mjs', 'delivery', 'reports/delivery-tests.tap', '--', node, '--test', '--test-reporter=tap', 'client/tests/worker-shim.test.mjs', 'client/tests/menu-interactions.test.mjs'], { extraEnv: { CLIENT_ROOT: 'dist-next' } }],
-    ['entrypoint smoke', node, ['tools/smoke-entrypoints.mjs']],
-    ['browser matrix', node, ['tools/browser-matrix.mjs'], { extraEnv: { CLIENT_ROOT: 'dist-next' } }],
-    ['production', node, ['tools/parity/run-production-scenario.mjs', '--all', '--root', 'dist-next'], { reports: ['production'] }],
-    ['original + engine', 'npm', ['run', 'parity:original-engine:all'], { reports: ['originalEngine'] }],
-    ['performance', node, ['tools/perf-client.mjs', '--root', 'dist-next', '--frames', '600'], { reports: ['performance'] }],
-  ];
-  for (const [name, command, args, options] of checks) await execute(name, command, args, options);
-  report.stable = sameEvidence(report.evidence, await evidence())
-    && report.delivery.sha256 === (await treeIdentity('.', ['dist-next'])).sha256;
-  await publish();
-  await execute('ledger', node, ['tools/write-current-verification.mjs', '--strict']);
-  // Ledger generation is part of the measured interval too.
-  report.stable &&= sameEvidence(report.evidence, await evidence())
-    && report.delivery.sha256 === (await treeIdentity('.', ['dist-next'])).sha256;
+  if (!await execute('unit', process.execPath, ['--test', 'tests/unit/protocol-contracts.test.mjs'])) throw new Error('unit contracts failed');
+  if (!await execute('tools', process.execPath, ['--test', 'tests/tools/delivery.test.mjs', 'tests/tools/verification.test.mjs'])) throw new Error('tool regressions failed');
+  if (!await execute('engine', 'ctest', ['--test-dir', 'build/engine', '--output-on-failure', '--no-tests=error'])) throw new Error('engine tests failed');
+  if (!await execute('client', process.execPath, ['--test-concurrency=1', '--test', 'client/tests/canvas-context.test.mjs',
+    'client/tests/death-lifecycle.test.mjs', 'client/tests/death-pickup-regression.test.mjs', 'client/tests/event-effects.test.mjs',
+    'client/tests/loadout.test.mjs', 'client/tests/menu-animation.test.mjs', 'client/tests/menu-controls.test.mjs',
+    'client/tests/menu-interactions.test.mjs', 'client/tests/movement-helper.test.mjs', 'client/tests/petal-transfers.test.mjs',
+    'client/tests/snapshot-domain.test.mjs', 'client/tests/ui-tooltip.test.mjs', 'client/tests/worker-shim.test.mjs'])) throw new Error('client tests failed');
+  if (!await execute('package', process.execPath, ['tools/build-dist-next.mjs', '--skip-build'])) throw new Error('cannot package delivery tree');
+  const manifest = JSON.parse(await readFile('dist-next/build-manifest.json'));
+  report.delivery = { sha256: sha256(await readFile('dist-next/build-manifest.json')),
+    manifestSha256: manifest.artifactsSha256, wasmSha256: sha256(await readFile('dist-next/server.wasm')),
+    treeSha256: (await treeIdentity('.', ['dist-next'])).sha256 };
+  if (!await execute('delivery integrity', process.execPath, ['tools/verify-dist-next.mjs'])) throw new Error('delivery integrity failed');
+  if (!await execute('delivery smoke', process.execPath, ['tools/run-tap.mjs', 'delivery', 'reports/delivery-tests.tap',
+    '--', process.execPath, '--test-concurrency=1', '--test', '--test-reporter=tap', 'client/tests/worker-shim.test.mjs', 'client/tests/menu-interactions.test.mjs'],
+    { extraEnv: { CLIENT_ROOT: 'dist-next' } })) throw new Error('delivery smoke failed');
+  if (!await execute('entrypoint smoke', process.execPath, ['tools/smoke-entrypoints.mjs'], { extraEnv: { CLIENT_ROOT: 'dist-next' } })) throw new Error('entrypoint smoke failed');
+  if (!await execute('browser matrix', process.execPath, ['tools/browser-matrix.mjs'], { extraEnv: { CLIENT_ROOT: 'dist-next' } })) throw new Error('browser matrix failed');
+  const finalEvidence = await evidence();
+  report.stable = sameEvidence(report.evidence, finalEvidence)
+    && report.delivery.treeSha256 === (await treeIdentity('.', ['dist-next'])).sha256;
   report.passed = !interrupted && report.stable && report.steps.every(step => step.exitCode === 0);
+  await publish();
+  await atomicJson('reports/current-verification.json', {
+    schema: 2, runId, passed: report.passed, status: report.passed ? 'passed' : 'failed', generatedAt: new Date().toISOString(),
+    evidence: report.evidence, delivery: report.delivery, stable: report.stable,
+    steps: report.steps.map(step => ({ name: step.name, exitCode: step.exitCode, startedAt: step.startedAt, finishedAt: step.finishedAt })),
+  });
 } catch (error) {
   report.error = error.message;
   console.error(error.message);

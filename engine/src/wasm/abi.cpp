@@ -54,16 +54,6 @@ extern "C" void sp_server_flush(void) {
   for (auto& packet : api().flush()) g_flushed.push_back(std::move(packet.payload));
 }
 
-extern "C" void sp_server_flush_original(void) {
-  g_flushed.clear();
-  (void)api().flush(); // drain the domain queue; this mode emits original framing
-  // Per-think records must be published exactly once. Rebuilding a record at
-  // flush time would consume the dirty cache after enqueue already consumed
-  // it, silently dropping movement, deaths and control-reference updates.
-  for (auto& packet : api().flush_original_client())
-    g_flushed.push_back(std::move(packet.payload));
-}
-
 extern "C" std::uint32_t sp_server_entity_count(void) {
   return static_cast<std::uint32_t>(api().world().entities().active_count());
 }
@@ -213,7 +203,7 @@ extern "C" float sp_server_player_health(void) {
   return entity != nullptr ? entity->health.value : 0.0F;
 }
 
-/** Diagnostics used by tools/parity/server-state-trace.mjs to explain AI and
+/** Diagnostics used by native tests to explain AI and
  * contact divergence. They are read-only observers and do not alter the tick. */
 extern "C" std::uint32_t sp_server_debug_ai_targets(void) {  std::uint32_t count = 0;
   for (const engine::EntityHandle handle : api().world().ai_entities()) {
@@ -438,7 +428,7 @@ extern "C" float sp_server_debug_petal_angle(std::uint32_t index) {
 }
 
 /** Numeric view of one active entity, keyed by the raw handle. This exists so
- * tools/parity/server-state-trace.mjs can explain a per-entity difference
+ * native tests can explain a per-entity difference
  * without exposing component offsets. Unsupported handles/fields return 0. */
 extern "C" float sp_server_debug_entity_field(std::uint32_t handle, std::uint32_t field) {
   const engine::Entity* entity = api().world().entities().get(engine::EntityHandle{handle});

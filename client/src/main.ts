@@ -7,7 +7,7 @@ import { interpolateCameraTarget } from './state/interpolation.js';
 import { getPointerMovement, updatePanState } from './state/pan.js';
 import { PlayerWorldTransformCache } from './state/world-transform.js';
 import { loadoutSlots, playerLoadoutSlots, playerSlotProgress } from './state/loadout.js';
-import { CompositeSnapshotDecoder, OriginalBareSnapshotDecoder, SkeletonSnapshotDecoder, type DenseGroupPlan, type EntitySnapshot, type SnapshotEvent } from './state/snapshot.js';
+import { BareSnapshotDecoder, type DenseGroupPlan, type EntitySnapshot, type SnapshotEvent } from './state/snapshot.js';
 import { DENSE_GROUPS, DENSE_GROUP_SPECS } from './state/field-types.js';
 import { PointerInput } from './input/pointer.js';
 import { KeyboardInput } from './input/keyboard.js';
@@ -129,12 +129,8 @@ const densePlans: readonly DenseGroupPlan[] = DENSE_GROUPS.map(group => ({
   offset: group.offset,
   specs: DENSE_GROUP_SPECS[group.offset] ?? [],
 }));
-// The live C++ server writes the original mask/field form. Keep the skeleton
-// decoder as a fallback for older packets; index 0 is the original path.
-const decoder = new CompositeSnapshotDecoder([
-  new OriginalBareSnapshotDecoder(densePlans),
-  new SkeletonSnapshotDecoder(),
-]);
+// The live C++ server writes the mask/field domain snapshot framing.
+const decoder = new BareSnapshotDecoder(densePlans);
 function applyPacket(packet: Uint8Array, at: number): boolean {
   const snapshot = decoder.decode(packet);
   if (snapshot === null) return false;
@@ -143,14 +139,13 @@ function applyPacket(packet: Uint8Array, at: number): boolean {
     width: camera.viewportWidth, height: camera.viewportHeight,
     level: player.entity.level ?? 1, mobile: mobileUi, pixelRatio: camera.pixelRatio,
   });
-  if (decoder.lastIndex === 1) world.apply(snapshot, at);
-  else world.applyPartial(snapshot, at);
+  world.applyPartial(snapshot, at);
   deathLifecycle.observe(world);
   return true;
 }
 const pointer = new PointerInput(canvas);
 canvas.addEventListener('wheel', event => {
-  // Original cp6_mouse_wheel: deltaY/175, multiplied by three for the
+  // Mouse wheel: deltaY/175, multiplied by three for the
   // Chrome wheelDeltaY convention, then adjusted for line/page delta modes.
   const legacyWheel = event as WheelEvent & { wheelDeltaY?: number };
   let delta = event.deltaY / 175;
@@ -253,7 +248,7 @@ async function startGame(): Promise<void> {
 }
 
 /** Diagnostic local restart shares the pending spawn/cooldown path. Opcode4
- * is the engine's compatibility entry point for the original restart request. */
+ * is the engine's compatibility entry point for the restart request. */
 async function restartGame(): Promise<void> {
   menuInputAnimation.requestSpawn();
   started = true;
@@ -271,7 +266,7 @@ function continueToMenu(): void {
   exitCanvas.getContext('2d')?.drawImage(canvas, 0, 0);
   exitAt = performance.now();
   exitFrame = 0;
-  // The original menu always carries the respawn line after a death, even
+  // The menu always carries the respawn line after a death, even
   // when no petal survived ("with:" is part of the native format string).
   menuRespawn = { level: lastDeathMetadata.respawnLevel || lastLevel,
     items: [...lastDeathMetadata.keptItems] };
@@ -302,7 +297,7 @@ async function tickServer(): Promise<void> {
     } else if (started && enteredWorld && player === null && enter) {
       continueToMenu();
     }
-    // Original spawn has two gates: the one-second corpse and a 2500ms
+    // Spawn has two gates: the one-second corpse and a 2500ms
     // cooldown measured from the last successful spawn. This manual worker
     // advances exactly 50ms per completed think(), so even a stalled tab sends
     // one request at the engine's deadline. Retain it until a healthy body arrives.
@@ -561,7 +556,7 @@ function captureEntryCanvas(): void {
   entryCanvas.getContext('2d')?.drawImage(canvas, 0, 0);
 }
 
-/** Original spawn transition: the menu crossfades into an expanding iris
+/** Spawn transition: the menu crossfades into an expanding iris
  * while a black ring sweeps over the garden. */
 function drawEntryTransition(now: number): void {
   const progress = Math.max(0, Math.min(1, (now - (entryAt ?? now)) / 420));
@@ -589,11 +584,11 @@ function drawEntryTransition(now: number): void {
 }
 
 
-/** Original death→menu transition: the captured death frame remains inside a
+/** Death→menu transition: the captured death frame remains inside a
  * circular iris while the menu is revealed outside it. The radius decays with
  * the source's pow(.95, delta*0.06) curve; the ring is five UI units wide. */
 function drawExitTransition(): void {
-  // Original clientFrame's iris: a cubic ease over 62.5 rendered frames in the
+  // The menu iris: a cubic ease over 62.5 rendered frames in the
   // menu's logical space, never wall-clock time. The black band shrinks with
   // the same progress after the first 41 frames.
   const width = canvas.clientWidth, height = canvas.clientHeight;
@@ -616,7 +611,7 @@ function drawExitTransition(): void {
   context2d.setTransform(ui * logicalWidth, 0, 0, ui * logicalHeight, 0, 0);
   if (exitCanvas) context2d.drawImage(exitCanvas, 0, 0, 1, 1);
   context2d.restore();
-  // The original paints the menu clipped *outside* the iris and then fills a
+  // The menu is painted clipped *outside* the iris and then fills a
   // black band around the circle. Its width is 5 for the first 41 frames and
   // then shrinks to 0.12 as the iris closes; our menu is already on screen, so
   // paint the equivalent band as an annulus. Filling the outer circle while
@@ -761,7 +756,7 @@ function frame(now: number): void {
     playerTransform.get(player.entity, now, pan);
     const hitAt = world.hitTime(player.entity.handle);
     if (hitAt !== undefined) camera.markHit(hitAt);
-    // Original updateCamera scans the equipped petal slots: Antennae widens
+    // Camera update scans the equipped petal slots: Antennae widens
     // the view from a 0.9 to a 0.63 scene scale.
     const equipped = Math.min(16, equippedSlotCount(player.entity.level ?? 1));
     const antennae = (playerLoadoutSlots(player.entity) ?? []).slice(0, equipped).includes(25);

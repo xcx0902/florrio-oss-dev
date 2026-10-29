@@ -1384,23 +1384,8 @@
     "schema": 1,
     "name": "worker-protocol",
     "confidence": "medium",
-    "source": {
-      "artifact": "web/sp_server.wasm",
-      "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
-      "clientArtifact": "web/client.wasm",
-      "clientSha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
-      "evidence": [
-        "source/javascript/sp_server.js",
-        "source/javascript/client.js",
-        "reports/server-behavior.md",
-        "reports/server-input.md",
-        "reports/client-snapshots.md",
-        "reports/client-entity-snapshot.md",
-        "reports/client-snapshot-decoder.md"
-      ]
-    },
     "notes": [
-      "This is a byte-level contract assembled from the original worker glue, the recovered input entry point and the recovered snapshot decoder.",
+      "This is the product's byte-level worker contract; generated C++/TypeScript views are the runtime source.",
       "Fields whose exact wire type has not been proven are marked confidence medium and described by role, not invented names."
     ],
     "worker": {
@@ -1450,7 +1435,6 @@
       "functions": [
         {
           "name": "sp_server_init",
-          "wasmIndex": 656,
           "args": [
             0,
             0
@@ -1460,7 +1444,6 @@
         },
         {
           "name": "sp_server_send",
-          "wasmIndex": 655,
           "args": [
             "pointer",
             "length"
@@ -1470,14 +1453,12 @@
         },
         {
           "name": "sp_server_think",
-          "wasmIndex": 654,
           "args": [],
           "confidence": "high",
           "behavior": "one 20 Hz simulation tick"
         },
         {
           "name": "sp_server_flush",
-          "wasmIndex": 657,
           "args": [
             0,
             0
@@ -1490,7 +1471,6 @@
     "input": {
       "maxPacketBytes": 65536,
       "xor": {
-        "keyAddress": 4576,
         "keyLength": 256,
         "algorithm": "rolling-xor",
         "confidence": "high"
@@ -1595,14 +1575,12 @@
         }
       ],
       "fieldNotes": [
-        "Opcode 12 angle uses the original binary64 constants and is normalized as the original bit test does.",
-        "Name strings are trimmed and UTF-8 truncated on the original spawn path."
+        "Opcode 12 angle uses fixed binary64 constants and a bit-level normalization test.",
+        "Name strings are trimmed and UTF-8 truncated on the spawn path."
       ]
     },
     "output": {
       "queue": {
-        "countAddress": 8545512,
-        "pointersAddress": 8545516,
         "capacity": 16,
         "confidence": "high"
       },
@@ -1641,7 +1619,6 @@
       },
       "snapshot": {
         "sequence": "varint",
-        "xorKeyAddress": 32272,
         "xorKeyLength": 256,
         "reliableAck": "varint",
         "framing": {
@@ -1649,24 +1626,6 @@
           "componentDeltaXor": 1
         },
         "sparseModes": {
-          "nativeSparse": {
-            "packetFormat": "archived-client",
-            "fieldDeltaXor": 1,
-            "indexDeltaXor": 1,
-            "indexedFields": [
-              3,
-              4,
-              10,
-              16,
-              25,
-              33,
-              35,
-              39,
-              60,
-              61
-            ],
-            "field26Role": "player-model"
-          },
           "domainSparse": {
             "packetFormat": "domain-counted",
             "fieldDeltaXor": 0,
@@ -1681,7 +1640,7 @@
               61
             ],
             "field26Role": "entity-kind",
-            "note": "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md. Shared value widths do not assert native semantic equivalence."
+            "note": "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md."
           }
         },
         "domainExtensions": [
@@ -1690,8 +1649,7 @@
             "name": "entity-kind",
             "type": "byte",
             "permanent": true,
-            "originalRole": "player-model",
-            "note": "Domain packets retain the permanent kind byte; the archived-client adapter writes the original model byte separately."
+            "note": "Domain packets retain the permanent kind byte; field 2 carries the catalog species."
           }
         ],
         "entityHandle": {
@@ -2127,7 +2085,7 @@
             61
           ],
           "confidence": "high",
-          "note": "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing; domainSparse is not the native wire contract."
+          "note": "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing."
         },
         "denseGroups": [
           {
@@ -3505,331 +3463,6 @@
       }
     ],
     "sparseModes": {
-      "nativeSparse": {
-        "packetFormat": "archived-client",
-        "fieldDeltaXor": 1,
-        "indexDeltaXor": 1,
-        "fieldTerminator": 1,
-        "indexTerminator": 1,
-        "field26Role": "player-model",
-        "fields": [
-          {
-            "field": 1,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 2,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 3,
-            "encoding": "indexed-update",
-            "valueType": "reference"
-          },
-          {
-            "field": 4,
-            "encoding": "indexed-update",
-            "valueType": "string"
-          },
-          {
-            "field": 5,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 6,
-            "encoding": "scalar",
-            "valueType": "string"
-          },
-          {
-            "field": 7,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 8,
-            "encoding": "scalar",
-            "valueType": "angle"
-          },
-          {
-            "field": 9,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 10,
-            "encoding": "indexed-update",
-            "valueType": "string"
-          },
-          {
-            "field": 11,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 12,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 13,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 14,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 15,
-            "encoding": "scalar",
-            "valueType": "varint"
-          },
-          {
-            "field": 16,
-            "encoding": "indexed-update",
-            "valueType": "byte"
-          },
-          {
-            "field": 17,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 18,
-            "encoding": "scalar",
-            "valueType": "f64"
-          },
-          {
-            "field": 19,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 20,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 21,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 22,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 23,
-            "encoding": "scalar",
-            "valueType": "reference"
-          },
-          {
-            "field": 24,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 25,
-            "encoding": "indexed-update",
-            "valueType": "string"
-          },
-          {
-            "field": 26,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 27,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 28,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 29,
-            "encoding": "scalar",
-            "valueType": "bit"
-          },
-          {
-            "field": 30,
-            "encoding": "scalar",
-            "valueType": "varint"
-          },
-          {
-            "field": 31,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 32,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 33,
-            "encoding": "indexed-update",
-            "valueType": "bit"
-          },
-          {
-            "field": 34,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 35,
-            "encoding": "indexed-update",
-            "valueType": "f64"
-          },
-          {
-            "field": 36,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 37,
-            "encoding": "scalar",
-            "valueType": "bit"
-          },
-          {
-            "field": 38,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 39,
-            "encoding": "indexed-update",
-            "valueType": "varint"
-          },
-          {
-            "field": 40,
-            "encoding": "scalar",
-            "valueType": "bit"
-          },
-          {
-            "field": 41,
-            "encoding": "scalar",
-            "valueType": "varint"
-          },
-          {
-            "field": 42,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 43,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 44,
-            "encoding": "scalar",
-            "valueType": "varint"
-          },
-          {
-            "field": 45,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 46,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 47,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 48,
-            "encoding": "scalar",
-            "valueType": "string"
-          },
-          {
-            "field": 49,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 50,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 51,
-            "encoding": "scalar",
-            "valueType": "varint"
-          },
-          {
-            "field": 52,
-            "encoding": "scalar",
-            "valueType": "varint"
-          },
-          {
-            "field": 53,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 54,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 55,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 56,
-            "encoding": "scalar",
-            "valueType": "reference"
-          },
-          {
-            "field": 57,
-            "encoding": "scalar",
-            "valueType": "reference"
-          },
-          {
-            "field": 58,
-            "encoding": "scalar",
-            "valueType": "varint"
-          },
-          {
-            "field": 59,
-            "encoding": "scalar",
-            "valueType": "f32"
-          },
-          {
-            "field": 60,
-            "encoding": "indexed-update",
-            "valueType": "byte"
-          },
-          {
-            "field": 61,
-            "encoding": "indexed-update",
-            "valueType": "short"
-          },
-          {
-            "field": 62,
-            "encoding": "scalar",
-            "valueType": "byte"
-          },
-          {
-            "field": 63,
-            "encoding": "scalar",
-            "valueType": "byte"
-          }
-        ]
-      },
       "domainSparse": {
         "packetFormat": "domain-counted",
         "fieldDeltaXor": 0,

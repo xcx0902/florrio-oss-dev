@@ -30,7 +30,7 @@ const expectedFiles = artifacts.map(entry => entry.path).sort();
 if (JSON.stringify(actualFiles) !== JSON.stringify(expectedFiles)) issues.push('delivery inventory differs from manifest (missing/extra files)');
 for (const entry of artifacts) {
   if (typeof entry.path !== 'string' || path.isAbsolute(entry.path) || entry.path.split('/').includes('..') || entry.path.includes('\\')) { issues.push('unsafe manifest path'); continue; }
-  if (/^(source|reports?|tests?|upstream|web)\//.test(entry.path)) { issues.push(`forbidden ${entry.path}`); continue; }
+  if (/^(archive|source|reports?|tests?|upstream|web)\//.test(entry.path)) { issues.push(`forbidden ${entry.path}`); continue; }
   try {
     const [actual] = await fileEntries(output, [entry.path]);
     if (actual.sha256 !== entry.sha256 || actual.bytes !== entry.bytes) issues.push(`delivery hash mismatch ${entry.path}`);

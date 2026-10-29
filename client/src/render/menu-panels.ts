@@ -89,7 +89,7 @@ function drawPetalGallery(context: Canvas2DContext, state: MenuRenderState, heig
   }
   context.restore(); drawScrollbar(context, content, scroll, max);
 }
-/** Portrait callbacks in the original use a fixed resting shape and a 225° pose. */
+/** Portrait callbacks use a fixed resting shape and a 225° pose. */
 function portrait(context: Canvas2DContext, type: number, x: number, y: number): void {
   context.save(); roundedRect(context, x, y, 60, 60, 5);
   context.setFillRgb(90, 159, 219); context.fill(); context.clip();
@@ -120,7 +120,7 @@ function drawMobGallery(context: Canvas2DContext, state: MenuRenderState, height
     if (y + rect.height < content.y || y > content.y + content.height) continue;
     roundedRect(context, rect.x, y, rect.width, rect.height, 5); context.setFillRgb(73, 129, 177); context.fill();
     if (!state.mobs.includes(type)) {
-      // Original gallery uses its 16-unit default label font; 36 made the
+      // The gallery uses its 16-unit default label font; 36 made the
       // placeholder more than three times too tall.
       const size = 16;
       label(context, '?', size, f(rect.x + f((rect.width - measureLabel('?', size)) / 2)),
@@ -169,7 +169,7 @@ function drawChangelog(context: Canvas2DContext, state: MenuRenderState, height:
     }
     y = f(y + entry.height);
   }
-  const footer = 'Older changelog entries not available';
+  const footer = 'End of changelog';
   label(context, footer, 14, f(content.x + f((content.width - 16 - f(measureLabel(footer, 14) + 6)) * .5)), y, raster);
   context.restore(); drawScrollbar(context, content, scroll, max);
 }

@@ -95,14 +95,14 @@ struct RockBody {
 [[nodiscard]] EntityHandle spawn_rock(World& world, Vec2 position, bool massive, ServerRng& rng);
 
 /** Function 144's Rock path: three pre-configure draws, then configureRock. */
-[[nodiscard]] EntityHandle spawn_rock_function144(World& world, Vec2 position, bool massive, ServerRng& rng);
+[[nodiscard]] EntityHandle spawn_rock_with_component_draws(World& world, Vec2 position, bool massive, ServerRng& rng);
 
 /** Cactus initializer: one RNG draw, radius 40..60, max health radius * 0.7,
  * contact damage 30, physics flag 48 = 0. */
 struct CactusBody { f32 radius; f32 health; };
 [[nodiscard]] CactusBody configure_cactus(ServerRng& rng);
 [[nodiscard]] EntityHandle spawn_cactus(World& world, Vec2 position, ServerRng& rng);
-[[nodiscard]] EntityHandle spawn_cactus_function144(World& world, Vec2 position, ServerRng& rng);
+[[nodiscard]] EntityHandle spawn_cactus_with_component_draws(World& world, Vec2 position, ServerRng& rng);
 
 /** Spawn the explicit per-band counts using the live world as the occupied
  * predicate. Counts are caller-supplied; the original initializer's counts are

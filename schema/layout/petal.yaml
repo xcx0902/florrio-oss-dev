@@ -4,13 +4,6 @@ kind: struct
 confidence: high
 size: 52
 alignment: 4
-source:
-  artifact: web/sp_server.wasm
-  sha256: 75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d
-  evidence:
-    - source/semantic/server-catalogs.json
-    - reports/server-behavior.md
-    - reports/server-petal-factories.md
 notes:
   - 39 records of 52 bytes begin at absolute address 8545792.
   - Field names at offsets 40/41/44/48 are kept as offsets unless evidence exists.

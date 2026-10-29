@@ -1,5 +1,5 @@
 /** Native clientFrame menu: preview world/HUD, then floating petals and UI.
- * Layout and pass ownership follow original func1095; traces only verify it.
+ * Layout and pass ownership follow the menu animation; tests verify it.
  */
 import type { Canvas2DContext } from './canvas2d/context.js';
 import { createRasterCanvas, getRasterContext, drawLabel } from './canvas2d/text-cache.js';
@@ -56,7 +56,7 @@ function previewContext(): Canvas2DContext | undefined {
   preview = { context: wrapContext(native) };
   return preview.context;
 }
-/** Original clientFrame's menu branch. The world callback owns the native
+/** The menu branch. The world callback owns the native
  * world pass, including its composite and balanced saves. It receives the
  * cleared 1x1 renderer; viewport dimensions remain those of the main canvas.
  * Main canvas identity/clear belongs to the frame owner, as for gameplay.

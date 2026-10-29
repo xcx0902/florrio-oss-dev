@@ -306,7 +306,7 @@ export class WorldState {
   }
   deathMetadata(): DeathMetadata {
     const controller = this.controller();
-    // The archive's standalone controller record carries these values as
+    // The profile record carries these values as
     // sparse fields. The live domain transport scopes the same values onto the
     // controlled body's dense group 72, so accept either representation.
     const dense = controller?.denseFields;

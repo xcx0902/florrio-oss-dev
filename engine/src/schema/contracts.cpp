@@ -1,6 +1,5 @@
-// Compile the archived byte-layout contracts in every engine_core build.
-// These are schema consistency checks, not claims that every schema field
-// has been confirmed against the original binary. See docs/schema-coverage.md.
+// Compile the schema layout contracts in every engine_core build.
+// These are schema consistency checks, not runtime claims about omitted fields.
 #include "engine/schema/generated.hpp"
 #include "engine/core/f32.hpp"
 #include "engine/model/entity.hpp"

@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "purpose": "XOR key applied to every Worker input packet before decoding and to every published snapshot packet",
+  "protocolVersion": 1,
+  "packetXor": {
+    "algorithm": "xor",
+    "encoding": "hex",
+    "bytes": 256,
+    "keyHex": "370d2d2ef765f413c5ceb2967bd8724294369599bf3bac3d90946fe9ecaf4d91985e3017f61bf0234b1d51c6befb127c5375a946767e6acf3044e02bd3c35cc96d68427d1a3c7b3f4acd7968be41b965ccf881d4e3555b576f53b906b0ae65d3b2b8db60d07ae9a3802cb84e5c2af8dd31351005d6025992be39e26840e82566549e2194b07f978f3dfb45303db823d1eddc595da2cd408cea62e2064d495dec6124ffe3866e7604d7f180ac5f3290ff5e383ac89d394276cf23fa8047bc9aeab055e3419a100bcd3288fa29af779ac168e9ea062caf0f9f5061b0747973ec2b87d1ae87d8c130df304702ed0e43ca658e15951ab52beef49e8cb8b43c248ef0"
+  }
+}

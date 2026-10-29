@@ -5,10 +5,10 @@
  * Successful compilation never upgrades a schema's evidence/confidence.
  */
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
 import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises';
+import { realpathSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import YAML from 'yaml';
 
@@ -81,67 +81,6 @@ export function checkCompiledLayouts(layouts, entries) {
   return { types: compiledTypes, fields, alignments };
 }
 
-export async function checkSavedOracleEvidence(layouts, compiled, base = root) {
-  const probe = JSON.parse(await readFile(path.join(base, 'schema/generated/layout-probe.json'), 'utf8'));
-  const binary = await readFile(path.join(base, probe.artifact));
-  assert.equal(createHash('sha256').update(binary).digest('hex'), probe.sha256, 'saved layout probe must identify the current frozen oracle');
-  for (const type of layouts.types.values()) if (type.source?.artifact === probe.artifact)
-    assert.equal(type.source.sha256, probe.sha256, `${type.name} evidence artifact differs from saved probe`);
-  for (const mismatches of Object.values(probe.mismatches)) assert.deepEqual(mismatches, [], 'saved probe recorded mismatches');
-  const field = (type, name) => compiled.types.get(type).fields.get(name);
-  const scalar = (bytes, type, name, scalarType) => {
-    const offset = field(type, name).offset;
-    if (scalarType === 'f32') return bytes.readFloatLE(offset);
-    if (scalarType === 'u8') return bytes.readUInt8(offset);
-    return bytes.readUInt32LE(offset);
-  };
-  const tables = [
-    { type: 'PetalDefinition', table: 'petals', decoded: 'petals', global: 'petalTable',
-      scalars: { descriptionCount: 'descriptionCount', rarityIndex: 'rarityIndex', rechargeMilliseconds: 'rechargeMilliseconds',
-        instancesPerSlot: 'instancesPerSlot', radius: 'radius', flag40: 'flag40', flag41: 'flag41', field44: 'field44', factoryTableIndex: 'factoryTableIndex' } },
-    { type: 'EntityDefinition', table: 'entityDefinitions', decoded: 'entities', global: 'entityDefinitionTable',
-      scalars: { descriptionCount: 'descriptionCount', rarity: 'rarity', scale: 'scale', componentPairCount: 'componentPairCount',
-        typeId: 'field100', zero104: 'field104', field108: 'field108', field109: 'field109', field110: 'field110', secondaryScale: 'secondaryScale' } },
-    { type: 'SpawnRule', table: 'spawnRules', decoded: 'spawnRules', global: 'spawnRuleTable',
-      scalars: { weight: 'weight', regionCount: 'regionCount', entityTypeId: 'entityTypeId' } },
-  ];
-  let records = 0;
-  for (const table of tables) {
-    const metadata = probe.tables[table.table], global = layouts.globals.get(table.global);
-    const type = layouts.types.get(table.type), size = compiled.types.get(table.type).size;
-    assert.equal(size, metadata.stride, `${table.type} compiler stride matches saved original records`);
-    assert.equal(global.address, metadata.base, `${table.global} matches saved original table base`);
-    assert.equal(global.count, metadata.count, `${table.global} matches saved original record count`);
-    assert.equal(probe.decoded[table.decoded].length, global.count);
-    for (const [index, record] of probe.decoded[table.decoded].entries()) {
-      assert.match(record.bytesHex, /^[0-9a-f]+$/i, 'complete original record bytes');
-      const bytes = Buffer.from(record.bytesHex, 'hex');
-      assert.equal(bytes.length, size, `${table.type} original byte count`);
-      assert.equal(record.address, global.address + index * size, `${table.type} original record address`);
-      for (const [name, property] of Object.entries(table.scalars)) {
-        const expected = name === 'descriptionCount' ? record.descriptions.length : record[property];
-        const scalarType = type.fields.find(member => member.name === name).type;
-        assert.equal(scalar(bytes, table.type, name, scalarType), expected, `${table.type}[${index}].${name} saved oracle bytes`);
-      }
-      if (table.type === 'EntityDefinition') for (const [pairIndex, pair] of record.componentPairs.entries()) {
-        const offset = field(table.type, 'componentPairs').offset + pairIndex * compiled.types.get('ComponentPair').size;
-        assert.equal(bytes.readUInt8(offset + field('ComponentPair', 'slot').offset), pair[0]);
-        assert.equal(bytes.readUInt8(offset + field('ComponentPair', 'flags').offset), pair[1]);
-      }
-      if (table.type === 'SpawnRule') for (const [regionIndex, region] of record.regionIds.entries())
-        assert.equal(bytes.readUInt8(field(table.type, 'regionIds').offset + regionIndex), region);
-      records++;
-    }
-  }
-  const world = layouts.types.get('World'), live = probe.worldGlobals;
-  assert.equal(world.baseAddress, live.base, 'World base matches saved initialization probe');
-  assert.equal(world.fields.find(member => member.name === 'entities').count, live.entitySlotsWithWorldPointer);
-  assert.equal(world.baseAddress + field('World', 'entities').offset
-    + live.firstLiveEntity.index * compiled.types.get('EntitySlot').size,
-  live.firstLiveEntity.address, 'World entity array offset and EntitySlot stride match saved initialization probe');
-  return { records, artifact: probe.artifact, sha256: probe.sha256 };
-}
-
 async function main(args) {
   const layouts = await loadLayouts();
   if (args[0] === '--emit-probe' && args.length === 2) {
@@ -160,15 +99,13 @@ async function main(args) {
   assert.equal(result.status, 0, result.error?.message ?? result.stderr ?? 'native schema probe failed');
   const entries = result.stdout.trim().split('\n').map(line => JSON.parse(line));
   const compiled = checkCompiledLayouts(layouts, entries);
-  const evidence = await checkSavedOracleEvidence(layouts, compiled);
   console.log('TAP version 13');
   console.log(`ok 1 - compiler matches ${layouts.types.size} YAML sizes, ${compiled.fields} offsets/widths/types and ${layouts.globals.size} globals`);
-  console.log(`ok 2 - ${evidence.records} saved oracle catalog records and World entity-array geometry`);
-  console.log('# Layout consistency does not establish oracle truth for unprobed fields.');
-  console.log('# QuadTreeNode remains a low-confidence, unprobed layout hypothesis.');
-  console.log('# Declared original alignment and compiled byte-view alignment: ' + JSON.stringify(compiled.alignments));
-  console.log('1..2');
+  console.log('# Layout consistency does not establish runtime truth for unprobed fields.');
+  console.log('# Declared and compiled byte-view alignment: ' + JSON.stringify(compiled.alignments));
+  console.log('1..1');
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href)
+const invoked = process.argv[1] ? realpathSync(path.resolve(process.argv[1])) : null;
+if (invoked && invoked === realpathSync(fileURLToPath(import.meta.url)))
   await main(process.argv.slice(2));

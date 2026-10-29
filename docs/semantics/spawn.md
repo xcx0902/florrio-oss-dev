@@ -1,23 +1,21 @@
 # Spawn selection
 
 Status: catalog grouping, weighted choice, position trials, collision retries,
-population targets, the recovered family initializers, the per-species RNG draw
-budget and the Ant Hole/Centipede child links are reconstructed. Exact
-per-species animation and the byte-level `call(144)` scratch layout remain open.
+population targets, family initializers, the per-species RNG draw budget and the
+Ant Hole/Centipede child links are implemented. Exact per-species animation and
+the spawn scratch layout remain open.
 
 ## Inputs
 
 - 20 spawn rules from `schema/catalogs/spawn-rules.json`.
 - Each rule has a binary32 weight, one or more region ids (0..7) and an entity
   type id.
-- Server RNG state at `8573024` (original). `sp_server_init` starts from the
-  post-constructor state `285456437`, consumes two draws through original `102`
-  (the 32-bit init value) and then fills the bands; the population ends at
-  `787621659`. The engine mirrors this: `World::random()` starts at
-  `285456437`, `WorkerApi::init(true)` consumes the two init draws, then
-  `populate_world` runs. A native `populate_world` probe seeded directly with
-  `2065629805` (the state after those two draws) reproduces the original
-  species sequence and the final `787621659`.
+- Server RNG. `sp_server_init` starts from `285456437`, consumes two init draws
+  and then fills the bands; the population ends at `787621659`.
+  `World::random()` starts at `285456437`; `WorkerApi::init(true)` consumes the
+  two init draws, then `populate_world` runs. A native `populate_world` fixture
+  seeded with `2065629805` (the state after those two draws) pins the species
+  sequence and the final `787621659`.
 
 ## Band construction
 
@@ -28,11 +26,7 @@ Entries stay in catalog order. The band total is accumulated in binary32:
 total = f32(total + weight)
 ```
 
-The original table is at `8548144 + band * 16`: total at `+0`, count at `+4`,
-descriptor pointer at `+12`. Descriptors are 16 bytes, weight at `+0`, species
-at `+13`.
-
-Probed totals and counts:
+The per-band totals and counts:
 
 | Band | Total (f32) | Entries |
 | ---: | ---: | ---: |
@@ -49,7 +43,7 @@ Band 0 order: `1, 2, 4, 5, 6, 7, 15, 19`.
 
 ## Weighted choice
 
-Original function `113`:
+Weighted choice:
 
 ```
 choice = serverRng.next()                  // Park-Miller variant, multiplier 48271
@@ -61,7 +55,7 @@ for entry in band.entries:
 return none
 ```
 
-`ServerRng` uses the original quotient/correction form:
+`ServerRng` uses the Park-Miller quotient/correction form:
 
 ```
 quotient   = state / 44488
@@ -75,26 +69,25 @@ All arithmetic is uint32 wrapping. The sequence from seed `1` starts
 
 ## Per-species RNG draw budget
 
-The original consumes RNG while constructing each default entity:
+Entity construction consumes RNG in this order:
 
 1. one draw per catalog component (`componentDrawCount` in
    `schema/catalogs/entities.json`) before the species initializer;
 2. the initializer's own draws (for example the queen's extra draws, the
    centipede's segment chain and the ant hole's baby-ant loop);
-3. `configureBehavior` (original `114`): one orientation draw, one
-   `uniform_int(0, 1)` draw stored at `AI+48`, and a second orientation draw
-   when the species settings byte at `+4` is clear (hornet and square).
+3. behavior configuration: one orientation draw, one `uniform_int(0, 1)`
+   draw, and a second orientation draw when the species settings byte is clear
+   (hornet and square).
 
 `consume_component_draws` and `configure_behavior_draws` implement steps 1 and
-3. Runtime probes of all 22 default species match the original per-type draw
-counts exactly (for example type 11 = 57, type 15 = 82, type 16 = 8, type 17 =
-62, type 18 = 6). `schema/catalogs/entities.json` records the counts and the
-probe evidence; variants 16/18 are runtime copies of 15/17 and do not re-run the
-parent initializer.
+3. Native fixtures pin the per-type draw counts (for example type 11 = 57,
+type 15 = 82, type 16 = 8, type 17 = 62, type 18 = 6).
+`schema/catalogs/entities.json` records the counts; variants 16/18 are runtime
+copies of 15/17 and do not re-run the parent initializer.
 
 ## Position trial
 
-Original `113` uses two RNG draws per trial without an intermediate state store:
+A position trial uses two RNG draws without an intermediate state store:
 
 ```
 first  = successor(state)
@@ -107,7 +100,7 @@ x = f32(50000 * f32(f32(lower + f32(f32(upper - lower) * fx)) + -0.5))
 y = f32(4000  * f32(fy + -0.5))
 ```
 
-Band bounds (binary32, original `6984 + (band-1)*4` and `7012 + (band-1)*4`):
+Band bounds (binary32):
 
 | Band | Lower | Upper |
 | ---: | ---: | ---: |
@@ -125,41 +118,33 @@ default to `50000`/`4000`; the sampler uses the current `World` dimensions.
 
 Bands are **vertical x strips spanning the full arena height**: the band
 bounds above select `x`, while `y` uses the unclamped `fy` over the whole
-height. This was confirmed by the original `6984`/`7012` table probe; an earlier
-domain version incorrectly restricted `y` to the same fraction and is now
-fixed.
+height.
 
 `SpawnTable::sample_position` implements one trial. For seed `787621659`,
 band 0 returns `(-24180.6171875, 652.9090576171875)` and advances the state to
 `1424269740`. Tests also cover bands 3 and 7.
 
-`SpawnTable::find_clear_position` implements the original up-to-100-trial loop.
-It takes an `occupied(position)` predicate (the `SpatialQuery` port of function
-161); the trial is accepted on the first false result. The original query
-rectangle is 1200 x 1200 around the candidate (`half_extent = 600`), which is
-the default of `SpatialQuery::occupied`. Tests reject two trials and verify the
-third position and RNG state, and reject all trials with `max_trials=2`.
+`SpawnTable::find_clear_position` implements the up-to-100-trial loop. It takes
+an `occupied(position)` predicate backed by `SpatialQuery`; the trial is
+accepted on the first false result. The query rectangle is 1200 x 1200 around
+the candidate (`half_extent = 600`), which is the default of
+`SpatialQuery::occupied`. Tests reject two trials and verify the third
+position and RNG state, and reject all trials with `max_trials=2`.
 
-`SpawnTable::spawn_from_band` composes the original order: choose a species
-(`nextRandom`), sample/reject positions, then call a factory to construct the
-entity. Tests verify the selected type, the factory's accepted position and the
-fully consumed RNG state.
+`SpawnTable::spawn_from_band` chooses a species (`nextRandom`), samples/rejects
+positions, then calls a factory to construct the entity. Tests verify the
+selected type, the factory's accepted position and the fully consumed RNG
+state.
 
-## Evidence
+## Tests
 
-- `source/game/server/components.mjs` `spawnPopulationBand` (original 113).
-- `schema/catalogs/spawn-rules.json` and `schema/generated/layout-probe.json`.
-- Probe of original `8548144` after `sp_server_init` (band totals/counts/order).
-- Engine tests: `test_spawn_table` in
-  `engine/tests/unit/test_main.cpp` compares all 8 totals/counts, band-0 order,
-  RNG sequence, selections for seeds `1`, `2147483646`, `787621659`, and three
-  position trials.
+`test_spawn_table` in `engine/tests/unit/test_main.cpp` compares all 8
+totals/counts, band-0 order, the RNG sequence, selections for seeds `1`,
+`2147483646` and `787621659`, and three position trials.
 
 ## Entity spawn defaults
 
-`tools/probe-entity-defaults.mjs` calls original function `144` for the 19
-catalog species and records the resulting radius, contact damage and entity
-flags. The generated table lives in
+The 19 catalog species' radius, contact damage and entity flags live in
 `engine/include/engine/catalog/entity_spawn_defaults.hpp`.
 
 - Cactus: randomized radius 40..60, health `radius * 0.7`, contact `30`,
@@ -171,7 +156,7 @@ flags. The generated table lives in
   `spawn_entity_from_defaults`; use `configure_rock` / `spawn_rock` when the
   caller owns the RNG state.
 
-`configure_rock` implements original 417's single draw:
+`configure_rock` uses one draw:
 
 ```
 random = nextRandom()
@@ -181,18 +166,16 @@ health = f32((massive ? 2 : 1) * radius * 0.4)
 ```
 
 With RNG state `1677421613`, the next draw is `2095254635`, radius
-`39.513580322265625`, health `15.805432319641113`; this matches a direct
-function-144 Rock probe. `spawn_rock` writes contact `10`, flags `(75,96)` and
-component flag `4`. `spawn_rock_function144` performs the three pre-configure draws followed by
-`configure_rock`; `spawn_from_band_function144` routes type 1/2 through it,
-type 3 through `spawn_cactus_function144`, and other species through the
-catalog defaults. With the recorded seed
-`787621659`, band 0 selects Rock, accepts the first position trial and ends at
-RNG state `2095254635` with radius `39.513580322265625`, matching the original
-spawn probe. The generic `spawn_from_band` still leaves the factory choice to
-the caller.
+`39.513580322265625`, health `15.805432319641113`. `spawn_rock` writes contact
+`10`, flags `(75,96)` and component flag `4`. `spawn_rock_with_component_draws` performs
+the three pre-configure draws followed by `configure_rock`;
+`spawn_from_band_with_component_draws` routes type 1/2 through it, type 3 through
+`spawn_cactus_with_component_draws`, and other species through the catalog defaults.
+With seed `787621659`, band 0 selects Rock, accepts the first position trial and
+ends at RNG state `2095254635` with radius `39.513580322265625`. The generic
+`spawn_from_band` leaves the factory choice to the caller.
 
-`configure_cactus` implements original 716's single draw:
+`configure_cactus` uses one draw:
 
 ```
 random = nextRandom()
@@ -201,12 +184,12 @@ health = f32(radius * 0.7)
 ```
 
 `spawn_cactus` writes contact `30`, flags `(75,96)` and component flag `0`;
-`spawn_cactus_function144` consumes the same three pre-draws. The factory
+`spawn_cactus_with_component_draws` consumes the same three pre-draws. The factory
 rejects Cactus because its radius is dynamic.
 
-`spawn_entity_from_defaults` creates the entity with the probed radius/flags and
-sets `contact_damage`, `health`/`max_health` and `component_flags92`. It then
-dispatches the recovered family initializers:
+`spawn_entity_from_defaults` creates the entity with the catalog radius/flags
+and sets `contact_damage`, `health`/`max_health` and `component_flags92`. It
+then dispatches the family initializers:
 
 - Ladybug 4/5/20/21 → `configure_ladybug` (normal/massive/dark/shiny);
 - Ant 7/8/9/10 → `configure_ant` (baby/worker/soldier/queen, random turn
@@ -215,35 +198,32 @@ dispatches the recovered family initializers:
 - Centipede 15/16/17/18 → `configure_centipede` (normal/evil, head/segment,
   1% rare);
 - Spider 22 → `configure_spider` (aggressive, chase, territory 0.45);
-- Bee 6 / Hornet 14 / Square 19 → their recovered constructors;
+- Bee 6 / Hornet 14 / Square 19 → their family constructors;
 - Ant Hole 11 → six children in the 7,7,7,8,8,9 caste order. Each child is
-  spawned at the hole position, then original 143 draws one RNG value and adds
-  a 0.25-unit velocity scatter `(cos, sin)(f32((random-1)*2π/2^31)) * 0.25`.
+  spawned at the hole position, then one RNG draw adds a 0.25-unit velocity
+  scatter `(cos, sin)(f32((random-1)*2π/2^31)) * 0.25`.
   The child is linked to the hole with `owner` + `attach_child`; its
   `spawn_band` is 255 so it never counts as an ordinary population parent.
 
-Queen Ant (10) and segment records 16/18 are absent from the 19-row
-spawn-default probe; explicit fallbacks supply radius 40/35 and then run the
-same family initializer. A normal/evil Centipede head consumes one rare roll
+Queen Ant (10) and segment records 16/18 are not in the 19-row defaults table;
+explicit fallbacks supply radius 40/35 and then run the same family
+initializer. A normal/evil Centipede head consumes one rare roll
 and then one initial-angle draw
 `f32(f32((random-1)>>>0) * f32(2π/2^31))`; it spawns a 9-segment chain (49 when
 rare) at 70-unit spacing with `angle += f32(2π/20)` (`f32(2π/100)` rare). Each
 segment is owned by the previous one, records `ai.predecessor`, and carries
 `spawn_band = 255`. Bounds and `spawnAreaBlocked` are checked before every
-segment; the first rejection stops the chain (the original returns).
+segment; the first rejection stops the chain.
 
 ## Ant Hole release table
 
-`initializeAntHoleEntity11` creates a 12-byte companion at `species+136` and
-appends it to the world's dense vector at `world+468` (count `+0`, storage
-`+8` in the original; the engine stores `AntHoleRelease` records in
-`World::ant_hole_releases()`). The companion's `+8` field is the next release
-index, initially zero. The six children spawned by the initializer are **not**
-table entries; they are created before the first tick observes the hole.
+`initializeAntHoleEntity11` creates an `AntHoleRelease` record in
+`World::ant_hole_releases()`. Its `release_index` starts at zero. The six
+children spawned by the initializer are **not** table entries; they are created
+before the first tick observes the hole.
 
-Every tick, after the movement-integration loop and before contact damage
-(original `654`, immediately after the active-entity movement loop), the
-server walks the dense vector in creation order. For each hole with
+Every tick, after movement integration and before contact damage, the server
+walks the release records in creation order. For each hole with
 `release_index <= 32` it computes `health / max_health` as binary32 and loops:
 
 ```
@@ -254,9 +234,8 @@ draw one RNG value; add 0.25*(cos,sin)(angle) to the child's velocity;
 link the child to the hole; ++release_index;
 ```
 
-The comparison is exactly `ratio > threshold`: equality releases. The table at
-`4848` (f32 threshold) and `4852` (species offset) is 33 entries, stride 8. A
-byte-exact probe gives the species sequence
+The comparison is exactly `ratio > threshold`: equality releases. The table has
+33 entries. The species sequence is
 
 ```
 7,8,7,8,8,8,9,9,9,9,8,9,9,9,9,8,9,9,10,9,9,9,9,9,9,9,9,9,9,9,9,9,9
@@ -265,21 +244,19 @@ byte-exact probe gives the species sequence
 and thresholds `0.97, 0.95, 0.93, 0.90, 0.87, 0.83, 0.80, 0.77, 0.73, 0.67,
 0.63, 0.60, 0.57, 0.53, 0.47, 0.44, 0.41, 0.38, 0.36, 0.32, 0.30, 0.27, 0.24,
 0.20, 0.26, 0.16, 0.10, 0.07, 0.04, 0.02, 0, 0, 0` (binary32 values; the
-0.26/0.20 pair is intentionally out of order in the original table and is
-preserved). Entry 18 is the Queen Ant (type 10). At zero health all 33 entries
+0.26/0.20 pair is intentionally out of order and is preserved). Entry 18 is the
+Queen Ant (type 10). At zero health all 33 entries
 release: 2 baby, 6 worker, 24 soldier and 1 queen, in addition to the six
 starting children.
 
 The engine attaches each released child to the hole with `set_owner`, so the
-child carries the original `entity_flags` bit 64, `owner`/`ai.owner`, and is in
-`hole.children`; it keeps `spawn_band = 255`, so it never counts as a
-population parent. `World::destroy(hole)` removes the companion record, and a
+child carries entity flag 64, `owner`/`ai.owner`, and is in `hole.children`; it
+keeps `spawn_band = 255`, so it never counts as a population parent. `World::destroy(hole)` removes the companion record, and a
 reused slot cannot release from the old state.
 
 ## Rare rows and the fixed seed
 
-The three species called out in the bug report are present in the catalogue and
-in every band where the original table puts them:
+The three rare species are present in the catalogue and in these bands:
 
 | species | bands | weight | expected initial count at 797 parents |
 | --- | --- | ---: | ---: |
@@ -287,20 +264,17 @@ in every band where the original table puts them:
 | Ant Hole (11) | 3, 4, 5, 6, 7 | 0.00200000009 | 1.70 |
 | Evil Centipede (17) | 3, 4, 5, 6, 7 | 0.00100000005 | 0.85 |
 
-These weights match original descriptors at `8547824 + n*16` byte-for-byte and
-`SpawnTable::from_catalog` keeps them. The default parity seed `285456437`
-(the original test fixture's post-`randomGet` state) produces an initial world
-with zero of all three. That is a valid outcome: the probability of all three
-being absent from one 797-parent world is about 7%. Because this project uses a
-fixed seed for deterministic replay, every new session repeats that one
-outcome; the original browser uses host entropy. Do not raise these weights or
-drop the rows to make the fixed fixture more interesting; that would diverge
-from the original table. Any entropy change must be an explicit production
-mode and must not alter the parity fixture.
+`SpawnTable::from_catalog` keeps these weights. The deterministic seed
+`285456437` produces an initial world with zero of all three. That is a valid
+outcome: the probability of all three being absent from one 797-parent world is
+about 7%. Because the product uses a fixed seed for deterministic replay, every
+new session repeats that outcome. Do not raise these weights or drop the rows
+to make the fixture more interesting. Any entropy mode must be explicit and
+must not change the deterministic fixture.
 
 Population is **deficit-only**, so waiting does not create new parents: a rare
-row can only be selected when a parent in its band dies and `function 400`
-refills that slot. Killing a child (Ant Hole ant, Centipede segment, band 255)
+row can only be selected when a parent in its band dies and the population
+targets refill that slot. Killing a child (Ant Hole ant, Centipede segment, band 255)
 never creates a parent deficit. Averaged over random parent kills, the chance
 per replacement is `1/13391` for Massive Ladybug, `1/468` for Ant Hole and
 `1/936` for Evil Centipede. At one parent kill per second those are about 3.7
@@ -313,20 +287,17 @@ draws, so a long gap is possible even when the long-run rate is correct.
 
 ## Open
 
-- Exact per-species `configure_*` RNG draw counts. The domain matches the
-  recovered draws for Rock/Boulder/Cactus, Ladybug, Ant, Centipede, Beetle,
-  Bee, Hornet and Spider, but the population sequence diverges when a species
-  consumes a different number of draws than the original; this is the main
-  reason a full initial-world species histogram is not yet byte-identical.
-- Spawn call `144` scratch/behavior components beyond the recovered family
-  fields.
+- Exact per-species `configure_*` RNG draw counts. Rock/Boulder/Cactus,
+  Ladybug, Ant, Centipede, Beetle, Bee, Hornet and Spider are pinned; a species
+  that consumes a different number of draws changes the downstream population.
+- Spawn scratch/behavior components beyond the family fields.
 - Rock/Boulder/Cactus dynamic radius is implemented; the remaining gap is the
   exact three pre-draw order for every band factory path.
 
 ## Population targets
 
-`population_targets(width, height)` reproduces original function 400's area
-scales. At the default 50000 x 4000 arena the eight targets are
+`population_targets(width, height)` computes area-scaled targets. At the default
+50000 x 4000 arena the eight targets are
 `120, 120, 119, 120, 119, 119, 40, 40` (797 mobs).
 
 `populate_world(world, table)` is the initial fill: for each band it spawns
@@ -338,5 +309,5 @@ calls `replenish_population` when `World::auto_populate()` is set. Native tests
 keep auto-population off by default.
 
 At the default arena the parent target is 797. Ant Hole and Centipede children
-are additional entities, matching the original manager-active vector count of
-870 (797 parents + 73 children in the shipped run).
+are additional entities; the shipped world has 870 active records (797 parents
++ 73 children).

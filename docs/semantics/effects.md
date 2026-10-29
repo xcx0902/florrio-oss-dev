@@ -1,21 +1,21 @@
 # Timed effects and special petal callbacks
 
-Status: the recovered poison / healing-suppression / slow families, the Peas
-split/egg hatch/Web slow callbacks, the shared effect payload (original 271),
-the area-target spatial pass, and the deferred Peas launch are implemented as
-domain effects. The original byte-level vtable table is represented by typed
-`EffectPayload` objects rather than executable native vtables.
+Status: the poison / healing-suppression / slow families, the Peas split/egg
+hatch/Web slow callbacks, the shared effect payload, the area-target spatial
+pass and the deferred Peas launch are implemented as domain effects. Behavior
+families are represented by typed `EffectPayload` objects rather than
+executable vtables.
 
 ## Effect record
 
 `Effect` carries `{type, source, remaining_ms, intensity, active, payload}`; an
 entity has eight slots. `payload` is a reference-counted `EffectPayload`; area
-effects install the same payload pointer in every tracked target, matching the
-unique-owner transfer in original 271. `World::destroy` walks the dead entity's
+effects install the same payload pointer in every tracked target, with
+unique-owner transfer. `World::destroy` walks the dead entity's
 eight slots and decrements every live payload before releasing the slot, so a
 shared area effect is not kept alive by a corpse waiting for slot reuse;
 `test_effect_payload_released_on_destroy` asserts the refcount drop. The tick
-publishes three flags, matching the original `applyActiveDamageEffects` bits:
+publishes three effect flags:
 
 | Bit | Meaning | Source family |
 | --- | --- | --- |
@@ -29,14 +29,11 @@ publishes three flags, matching the original `applyActiveDamageEffects` bits:
 amount = intensity * min(dt, remaining_before) * 0.001
 ```
 
-This is the recovered `storedF32 * duration * 0.001` path in
-`source/game/server/simulation-tick.mjs`. `slow_multiplier` starts at `1.0` and
-multiplies every active slow effect's intensity, matching original608's
-`vtable+20` loop; it does not take the minimum. Behaviors that produce velocity
-(original608 player controls and the AI behavior path) apply that multiplier.
-`integrate_movement` (original654) does **not** scale acceleration or velocity
-by it. `heal_entity(world, target, amount)` refuses to heal while a heal-block
-effect is active.
+`slow_multiplier` starts at `1.0` and multiplies every active slow effect's
+intensity; it does not take the minimum. Behaviors that produce velocity (player
+controls and the AI behavior path) apply that multiplier. `integrate_movement`
+does **not** scale acceleration or velocity by it. `heal_entity(world, target,
+amount)` refuses to heal while a heal-block effect is active.
 
 ## Petal callbacks
 
@@ -51,9 +48,9 @@ effect is active.
 | 31 Honey | slot 4 | slow 0.5 for 4000 ms |
 | 34 Peas R4 | slot 4 | poison `16000/9` ms |
 
-Poison intensity is the petal's recovered contact damage, so the duration is
-the distinguishing parameter. The `500 ms` `behavior_cooldown_ms` gate replaces
-the original `behavior+4` hit flag.
+Poison intensity is the petal's contact damage, so the duration is the
+distinguishing parameter. The `500 ms` `behavior_cooldown_ms` gate prevents
+multiple hits from the same behavior in one window.
 
 Special behaviors:
 
@@ -61,8 +58,7 @@ Special behaviors:
   `sqrt(72)` units around the parent, consume the parent, give children a
   1000 ms lifetime, and queue a deferred radial launch one millisecond later.
   The launch advances the phase by `2π/count` per child and adds `1.4` to the
-  child position plus `0.6` to its velocity along the current angle (original
-  callback 272).
+  child position plus `0.6` to its velocity along the current angle.
 - Egg 22/23: hatch after 1000 / 2500 ms into a Soldier Ant (9) / Beetle (12);
   the petal is consumed.
 - Web 29/30: apply the slow payload, spawn the tag entity at the hit position,
@@ -73,19 +69,15 @@ Special behaviors:
   (`has_effect_area`, `world_flags |= 128`), packet epochs `tick+1`, and a
   12000 ms lifetime. It owns a shared slow payload with radius 50, intensity
   0.25 and infinite duration, so contact with the tag applies the same slow as
-  the original `spawnWeb` area. The area link removes the effect when the
-  target leaves; the effect itself has no timer expiry.
-
-Evidence: `source/game/server/petals.mjs` (666/680/688/692/738),
-`source/game/server/petals-special.mjs` (431/676/681/691/693/719/732/747),
-`reports/server-petals.md`, `reports/server-petals-special.md`.
+  the Web area. The area link removes the effect when the target leaves; the
+  effect itself has no timer expiry.
 
 ## Area effects
 
-`World::replace_area_effect(owner, scale, payload)` is original 271. It stores
-the float32 scale, replaces the payload pointer in every current target's
-effect vector, transfers ownership, and unlinks all targets when the payload is
-cleared. `World::update_area_effects()` is the domain `updateAreaEffectTargets`:
+`World::replace_area_effect(owner, scale, payload)` stores the float32 scale,
+replaces the payload pointer in every current target's effect vector, transfers
+ownership, and unlinks all targets when the payload is cleared.
+`World::update_area_effects()` performs the area-target pass:
 
 1. expired payloads are cleared and their target links removed;
 2. dead targets are pruned and detached;
@@ -100,14 +92,13 @@ once per target) and mirrors the remaining lifetime into every target slot.
 
 ## Deferred callbacks
 
-`World::schedule_deferred_launch(due_ms, phase, children)` stores the original
-world+1916-style deferred vector entry. `World::run_deferred_launches(now)`
+`World::schedule_deferred_launch(due_ms, phase, children)` stores a deferred
+launch entry. `World::run_deferred_launches(now)`
 executes due entries, applies the radial impulse, and removes them. The tick
 runs it in the timed-entity/AI phase, before active damage effects.
 
 ## Open
 
-- exact poison intensity from the original effect virtual slot 8;
-- byte-level native vtable identity and allocator addresses (domain payloads
-  carry the same ownership/lifetime semantics, not the same pointers);
-- arbitrary deferred-callback payloads beyond the recovered Peas closure.
+- dispatch for future effect families beyond the typed payload kinds;
+- exact poison intensity for effect sources that do not use contact damage;
+- arbitrary deferred-callback payloads beyond the Peas closure.

@@ -607,7 +607,7 @@ std::size_t resolve_contacts(World& world) {
                                         + normal_y * overlap * weight_b));
       }
       ++contacts;
-      // Original162 returns 1 at WAT34799..34811 when its querying body dies,
+      // The contact query returns 1 when its querying body dies,
       // aborting the remaining node/child traversal after this complete pair.
       if (a.health.value <= 0.0F) break;
     }

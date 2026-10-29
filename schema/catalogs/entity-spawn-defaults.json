@@ -1,6 +1,5 @@
 {
   "schema": 1,
-  "source": "web/sp_server.wasm function 144 probe",
   "artifactSha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
   "notes": "Direct spawn defaults read from the original entity record after function 144. Rock/Boulder/Cactus radius and health are randomized by their initializers and are marked dynamic.",
   "defaults": [

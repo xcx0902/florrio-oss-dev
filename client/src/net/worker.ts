@@ -2,7 +2,7 @@ import { asBytes, type ServerFunction, type WorkerRequest, type WorkerResponse }
 
 export type PacketHandler = (data: Uint8Array | null, final: boolean) => void;
 
-/** Promise/callback wrapper around the original worker message envelope. */
+/** Promise/callback wrapper around the worker message envelope. */
 export class ServerWorkerClient {
   private readonly worker: Worker;
   private nextCallbackId = 0;

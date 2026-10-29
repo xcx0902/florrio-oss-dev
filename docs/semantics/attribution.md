@@ -14,11 +14,11 @@ damage to the same target within one tick:
 - later hits to the same target/epoch in the same tick add `amount`, replace
   `health_after`/attacker, and increment both `count` and `refcount`.
 
-`damage_entity` sets `Entity::hit_epoch = tick + 1`, so the message epoch is the
-original health-component epoch analogue. If the target is not in
-`World::known_entities()` (the sorted handle list used by the original message
-cache), the message is stored in `pending_hit_events_` and moved to the outgoing
-list by `flush_pending_hits()` once the target becomes known.
+`damage_entity` sets `Entity::hit_epoch = tick + 1`, so the message epoch mirrors
+the health-component epoch. If the target is not in
+`World::known_entities()` (the sorted handle list used by the message cache),
+the message is stored in `pending_hit_events_` and moved to the outgoing list by
+`flush_pending_hits()` once the target becomes known.
 
 `domain_snapshot_bytes` drains the list into event opcode 11 (`entity-time`) and
 event opcode 14 (visual hit index) so the client observes one hit per target per
@@ -34,8 +34,8 @@ attacker's player owner through the owner chain and records:
   otherwise the catalog species name;
 - `Entity::killer_name` — the same string on the dying record before removal.
 
-This corresponds to the recovered `assignLastAttacker` / `updateKillerName`
-path in `source/game/server/damage.mjs`.
+The attacker chain is resolved once at death; the dying record keeps the same
+name until it is removed.
 
 ## Death score, level and child recursion
 
@@ -44,7 +44,7 @@ On a player death, `kill_entity`:
 1. sets `Entity::death_flag` and `death_time_ms = now + 1000`;
 2. runs the retained-loot pass and spawns the retained drops;
 3. stores `World::last_death_score` from `PlayerLoadout::score()` and
-   `World::last_death_level` from the profile level (original player +84/+97);
+   `World::last_death_level` from the profile level;
 4. walks all 24 owned loadout handles (`slot*3 + instance`), recursively damages
    live children to zero, and clears stale handles;
 5. clears the loadout and destroys any remaining player petals.
@@ -63,14 +63,14 @@ true. The check covers:
 `World::register_pickup` / `unregister_pickup` maintain the intrusive list
 (`Entity::pickup_prev/next`, `pickup_listed`) and are called by
 `spawn_loot_drop` and `World::destroy`. `spawn_loot_drops` applies the legendary
-check before each drop. This is the recovered `legendaryExists` scan over
-loadout lists and the pickup intrusive list.
+check before each drop, scanning the loadout lists and the pickup intrusive
+list.
 
 ## Open
 
-- the exact 4124-byte message object layout and virtual destructor addresses
-  (the domain object carries the same epoch/refcount/known semantics);
+- the exact message-object byte layout (the domain object carries the same
+  epoch/refcount/known semantics);
 - killer-name short-string/heap growth beyond the domain `std::string`;
 - packet-cache invalidation epochs for every changed loadout slot;
-- the original allocator's exact pickup free-heap/chunk addresses (the domain
-  list preserves order and intrusive links).
+- the exact pickup free-list layout (the domain list preserves order and
+  intrusive links).

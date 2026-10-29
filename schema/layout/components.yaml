@@ -4,13 +4,6 @@ kind: struct
 confidence: medium
 size: 56
 alignment: 8
-source:
-  artifact: web/sp_server.wasm
-  sha256: 75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d
-  evidence:
-    - reports/server-spawn-manager-192.md
-    - reports/server-components.md
-    - source/game/client/entity-snapshot-map.json
 notes:
   - Component pools use maximum-pointer free heaps and 128-record chunks.
   - Known strides are 52, 56, 120, 16, 24 and 16 bytes; the id-to-stride mapping is not fully confirmed.

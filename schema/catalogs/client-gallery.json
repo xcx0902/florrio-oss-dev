@@ -1,10 +1,5 @@
 {
   "schema": 1,
-  "source": {
-    "artifact": "web/client.wasm",
-    "sha256": "c1e574288f05e4387c888e375952f0b61a1a5f185cef25ad74d0c1088759a4b1",
-    "evidence": "Fully initialized original client runtime catalogue, offline synthetic gallery fixture; includes probabilities and segment aliases populated after func391."
-  },
   "entities": [
     {
       "typeId": 0,

@@ -1,6 +1,6 @@
 /** Snapshot event 14: a collected petal becomes its HUD slot visual.
  * Decoder defaults/payload: snapshot-decoder.mjs 288–320, 465–505.
- * Flight/retirement: original func803, slot attachment func1101, and the
+ * Flight/retirement, slot attachment and the
  * clientFrame retired-list cleanup. render-frame's similarly named pass
  * draws the world pickup marker, not this screen-space transfer.
  */

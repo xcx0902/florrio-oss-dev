@@ -1,5 +1,5 @@
 /** Mouse camera pan from original763 queuePlayerInput, recovered in
- * source/game/client/render-frame.mjs:1944–2220 (WAT 132794–133972).
+ * The camera pan follows the render-frame transform.
  * These are world offsets at game +2056/+2060 == state +2048/+2052. */
 export interface PanState {
   readonly x: number;
@@ -46,7 +46,7 @@ function floatBits(value: number): number {
 const atanHigh = [0.46364760398864746, 0.7853981256484985, 0.9827936887741089, 1.570796251296997];
 const atanLow = [5.01215824399992e-9, 3.774894707930798e-8, 3.447321716976148e-8, 7.549789415861596e-8];
 
-/** Original932, recovered in source/game/client/atanf.mjs. Native atan2
+/** Native atan2 approximation. The polynomial keeps the browser and wasm
  * divides in f32 before this polynomial; rounding Math.atan2 differs by ULPs. */
 function atanFloat(value: number): number {
   const absolute = floatBits(value) & 0x7fffffff;

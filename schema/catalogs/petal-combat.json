@@ -1,12 +1,5 @@
 {
   "schema": 1,
-  "source": {
-    "artifact": "web/sp_server.wasm",
-    "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
-    "petalCatalog": "source/semantic/server-catalogs.json",
-    "initializerEvidence": "source/game/server/petals.mjs INITIALIZERS + catalog virtual slot 2",
-    "note": "collisionRadius is the physics +8 value written by the slot-2 initializer; damage is physics +44; health is the health maximum."
-  },
   "count": 39,
   "petals": [
     {

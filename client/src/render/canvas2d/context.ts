@@ -1,5 +1,4 @@
-/** Canvas2D surface used by the renderer. Mirrors the original bridge surface
- * in goal.md §3.4; style setters use explicit RGB where the original did. */
+/** Canvas2D surface used by the renderer. Style setters use explicit RGB. */
 export interface Canvas2DContext {
   save(): void;
   restore(): void;

@@ -48,7 +48,7 @@ test('tooltip preserves source name, rarity, blank separation and full descripti
   assert.equal(result.texts[0], 'Rose');
   assert.equal(result.texts[1], 'Unusual');
   assert.equal(result.texts.slice(2).join(' '), PETAL_INFO[6].description);
-  // source/game/client/petal-tooltip.mjs func623 has no synthetic reload line.
+  // The tooltip contract has no synthetic reload line; only real state changes rebuild it.
   assert.ok(!result.texts.some(text => /reload/i.test(text)));
   const ys = result.tooltip.filter(([op]) => op === 'fillText').map(([, args]) => args[2]);
     assert.ok(ys[2] - ys[1] >= 21, 'description retains the source blank separator');

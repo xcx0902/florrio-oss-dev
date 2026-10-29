@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CompositeSnapshotDecoder, DenseGroupDecoder, DensePlanDecoder, OriginalBareSnapshotDecoder, SkeletonSnapshotDecoder } from '../public/state/snapshot.js';
+import { DenseGroupDecoder, DensePlanDecoder, BareSnapshotDecoder } from '../public/state/snapshot.js';
 import { DENSE_GROUP_SPECS } from '../public/state/field-types.js';
 import { WorldState } from '../public/state/world.js';
 import { interpolateCameraTarget, interpolateEntity } from '../public/state/interpolation.js';
@@ -70,7 +70,7 @@ function domainPacket(handle = 0x12345678) {
 
 test('original mask entry projects species, kind, health and maximum', () => {
   const { bytes, handle } = domainPacket();
-  const snapshot = new OriginalBareSnapshotDecoder().decode(bytes);
+  const snapshot = new BareSnapshotDecoder().decode(bytes);
   assert.ok(snapshot);
   assert.equal(snapshot.sequence, 42);
   assert.equal(snapshot.entities.length, 1);
@@ -96,7 +96,7 @@ test('schema component locations project progression, variant, radius and known 
   const fields = values.flatMap(([field, encoded]) => {
     const result = [...varint(field - previous), ...encoded]; previous = field; return result;
   });
-  const snapshot = new OriginalBareSnapshotDecoder().decode(Uint8Array.from([
+  const snapshot = new BareSnapshotDecoder().decode(Uint8Array.from([
     1, 1, 0, 0, 1, 0, ...u32(handle), 55, ...u32(0), ...fields, 0,
   ]));
   assert.ok(snapshot);
@@ -120,7 +120,7 @@ test('visual position, camera follow and collider radius use distinct original f
   });
   const bytes = Uint8Array.from([1, 1, 0, 0, 1, 0, ...u32(handle), 55,
     ...u32((1 << 5) | (1 << 20) | (1 << 25)), ...payload, 0]);
-  const decoder = new OriginalBareSnapshotDecoder();
+  const decoder = new BareSnapshotDecoder();
   const snapshot = decoder.decode(bytes);
   assert.ok(snapshot);
   const entity = snapshot.entities[0];
@@ -153,7 +153,7 @@ test('dense convenience decoders preserve coordinate semantics, removals and ful
 
 test('authoritative deletion removes artwork immediately (no flash-back)', () => {
   const world = new WorldState(), { bytes, handle } = domainPacket();
-  world.applyPartial(new OriginalBareSnapshotDecoder().decode(bytes), 0);
+  world.applyPartial(new BareSnapshotDecoder().decode(bytes), 0);
   world.applyPartial({ sequence: 43, serverTime: 0, entities: [], events: [], deletedHandles: [handle] }, 100);
   assert.equal(world.get(handle), undefined);
   assert.equal(world.count, 0);
@@ -161,7 +161,7 @@ test('authoritative deletion removes artwork immediately (no flash-back)', () =>
   assert.equal([...world.renderable(100)].length, 0);
   assert.equal([...world.renderable(249)].length, 0);
   assert.equal([...world.renderable(250)].length, 0);
-  world.applyPartial(new OriginalBareSnapshotDecoder().decode(bytes), 300);
+  world.applyPartial(new BareSnapshotDecoder().decode(bytes), 300);
   assert.equal([...world.renderable(300)].length, 1);
   world.reset();
   assert.equal([...world.renderable(300)].length, 0);
@@ -185,7 +185,7 @@ test('indexed visual effects do not reset the independent hit and camera-shake c
 test('applyPartial merges health without dropping prior position', () => {
   const world = new WorldState();
   const { bytes, handle } = domainPacket();
-  world.applyPartial(new OriginalBareSnapshotDecoder().decode(bytes), 0);
+  world.applyPartial(new BareSnapshotDecoder().decode(bytes), 0);
   const first = world.get(handle);
   assert.ok(first);
   assert.equal(first.health, 17);
@@ -206,7 +206,7 @@ test('applyPartial merges health without dropping prior position', () => {
     ...varint(53), ...f32(9),
     0,
   ]);
-  const snapshot = new OriginalBareSnapshotDecoder().decode(healthOnly);
+  const snapshot = new BareSnapshotDecoder().decode(healthOnly);
   assert.ok(snapshot);
   world.applyPartial(snapshot, 16);
   const merged = world.get(handle);
@@ -231,7 +231,7 @@ test('event block decodes chat, entity time and visual opcodes', () => {
     11, ...u32(handle),
     14, ...u32(handle), 3,
   ]);
-  const snapshot = new OriginalBareSnapshotDecoder().decode(bytes);
+  const snapshot = new BareSnapshotDecoder().decode(bytes);
   assert.ok(snapshot);
   assert.deepEqual(snapshot.events, [
     { opcode: 9, text: 'hello' },
@@ -252,7 +252,7 @@ test('world stores chat lines and visual hit indices', () => {
     9, ...Array.from(new TextEncoder().encode('garden')), 0,
     14, ...u32(handle), 3,
   ]);
-  const snapshot = new OriginalBareSnapshotDecoder().decode(bytes);
+  const snapshot = new BareSnapshotDecoder().decode(bytes);
   assert.ok(snapshot);
   const world = new WorldState();
   world.apply(snapshot, 100);
@@ -290,7 +290,7 @@ test('dense groups use native component-pointer presence from the mask entry', (
     47, // field 47
     ...u32(0), // field 56 reference
   ];
-  const decoder = new OriginalBareSnapshotDecoder([{ offset: 72, specs: dense }]);
+  const decoder = new BareSnapshotDecoder([{ offset: 72, specs: dense }]);
   const snapshot = decoder.decode(Uint8Array.from(bytes));
   assert.ok(snapshot);
   // The mask entry and the dense entry are two update records for one handle;
@@ -313,7 +313,7 @@ test('live profile fields project and merge XP, score and displayed level', () =
     ...varint(1), ...f32(43),
     ...varint(3), 20, 0,
   ]);
-  const decoder = new OriginalBareSnapshotDecoder();
+  const decoder = new BareSnapshotDecoder();
   const snapshot = decoder.decode(bytes);
   assert.ok(snapshot);
   const player = snapshot.entities[0];
@@ -357,30 +357,20 @@ test('delta snapshots retain omitted entities and apply explicit removals', () =
   assert.equal(world.get(2), undefined);
 });
 
-test('decoders reject trailing bytes, non-finite values and malformed fallback records', () => {
+test('decoders reject trailing bytes and non-finite values', () => {
   const { bytes } = domainPacket();
-  const composite = new CompositeSnapshotDecoder([
-    new OriginalBareSnapshotDecoder(), new SkeletonSnapshotDecoder(),
-  ]);
-  assert.equal(composite.decode(Uint8Array.from([...bytes, 0])), null);
-  assert.equal(composite.lastIndex, -1);
+  const decoder = new BareSnapshotDecoder();
+  assert.equal(decoder.decode(Uint8Array.from([...bytes, 0])), null);
   const bad = bytes.slice();
   const position = bad.findIndex((_, i) => bad[i] === 3 && bad[i + 1] === 0 && bad[i + 2] === 0 && bad[i + 3] === 246 && bad[i + 4] === 66);
   assert.ok(position > 0);
   bad.set(f32(NaN), position + 1);
-  assert.equal(composite.decode(bad), null);
-  const skeleton = Uint8Array.from([1, 1, 0, 0, 1, 0, ...u32(123), 1,
-    ...f32(10), ...f32(20), ...f32(0), ...f32(50), ...f32(100), 1]);
-  assert.ok(new SkeletonSnapshotDecoder().decode(skeleton));
-  assert.equal(new SkeletonSnapshotDecoder().decode(Uint8Array.from([...skeleton, 0])), null);
-  const wrongKind = skeleton.slice();
-  wrongKind[10] = 55;
-  assert.equal(new SkeletonSnapshotDecoder().decode(wrongKind), null);
+  assert.equal(decoder.decode(bad), null);
 });
 
 test('failed packets roll back component masks before the next dense update', () => {
   const handle = 0x12345678;
-  const decoder = new OriginalBareSnapshotDecoder([{ offset: 52, specs: [{ field: 22, type: 'byte' }, { field: 54, type: 'byte' }] }]);
+  const decoder = new BareSnapshotDecoder([{ offset: 52, specs: [{ field: 22, type: 'byte' }, { field: 54, type: 'byte' }] }]);
   const mask = Uint8Array.from([1, 1, 0, 0, 1, 0, ...u32(handle), 55, ...u32(1 << 0), 0]);
   assert.ok(decoder.decode(mask));
   // A truncated replacement mask must not erase the previous component.
@@ -392,7 +382,7 @@ test('failed packets roll back component masks before the next dense update', ()
 });
 
 test('a sparse record without angle leaves its interpolation clock unchanged', () => {
-  const decoder = new OriginalBareSnapshotDecoder();
+  const decoder = new BareSnapshotDecoder();
   const world = new WorldState();
   const { bytes, handle } = domainPacket();
   world.applyPartial(decoder.decode(bytes), 0);
