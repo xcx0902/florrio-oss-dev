@@ -8,8 +8,6 @@
 #include "engine/model/component_store.hpp"
 #include "engine/model/entity.hpp"
 #include "engine/model/world.hpp"
-#include "engine/model/hit_message.hpp"
-#include "engine/model/simulation_frame.hpp"
 #include "engine/net/input.hpp"
 #include "engine/net/angle.hpp"
 #include "engine/net/protocol.hpp"
@@ -160,9 +158,7 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_ant_hole_exact_children", test_ant_hole_exact_children);
   engine::test::runTest("test_ant_hole_release", test_ant_hole_release);
   engine::test::runTest("test_web_tag_domain_side_effects", test_web_tag_domain_side_effects);
-  engine::test::runTest("test_world_frame_tracks_tick", test_world_frame_tracks_tick);
-  engine::test::runTest("test_simulation_frame_layout", test_simulation_frame_layout);
-  engine::test::runTest("test_hit_message_layout", test_hit_message_layout);
+  engine::test::runTest("test_world_clock_tracks_tick", test_world_clock_tracks_tick);
   engine::test::runTest("test_loadout_reserve_cycle_and_packet_cache", test_loadout_reserve_cycle_and_packet_cache);
   engine::test::runTest("test_quadtree", test_quadtree);
   engine::test::runTest("test_quadtree_compaction_order", test_quadtree_compaction_order);

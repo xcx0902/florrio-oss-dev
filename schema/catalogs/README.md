@@ -21,7 +21,9 @@ the collision radius for world collision; a legitimate zero is preserved.
 
 Validation (all performed before writing):
 
-- petal ids are dense 0–38, entity ids dense 0–22;
+- petal and entity type ids are unique `0..255` publishable keys (stored as
+  uint16, serialized as one byte in snapshots/loadout); sparse ids are legal;
+  ids above 255 are rejected until a protocol-width change;
 - every petal/entity/drop/spawn/children reference exists;
 - drop aliases are acyclic and do not name themselves;
 - floats are finite and numeric thresholds are in range;

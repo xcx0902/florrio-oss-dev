@@ -280,6 +280,30 @@
       "origin": "moved",
       "reason": "\u7531\u539f\u7248 layout \u751f\u6210\u7684\u5b57\u6bb5/\u5730\u5740\u6587\u6863\u3002",
       "productReplacement": "docs/schema.md (product protocol rewrite)"
+    },
+    {
+      "originalPath": "engine/include/engine/model/simulation_frame.hpp",
+      "archivePath": "engine/include/engine/model/simulation_frame.hpp",
+      "type": "file",
+      "bytes": 2009,
+      "sha256": "9a9976b362ca0e411e10b98e80002f2426e01cf9b972a19c93b41bdc5abf302d",
+      "linkTarget": null,
+      "tracked": true,
+      "origin": "moved",
+      "reason": "\u5f52\u6863\u7684 1152 \u5b57\u8282\u539f\u7248 simulation scratch frame\uff1b\u9886\u57df\u65f6\u949f\u76f4\u63a5\u4fdd\u5b58\u5728 World\u3002",
+      "productReplacement": "World::tick()/World::time_ms()"
+    },
+    {
+      "originalPath": "engine/include/engine/model/hit_message.hpp",
+      "archivePath": "engine/include/engine/model/hit_message.hpp",
+      "type": "file",
+      "bytes": 2089,
+      "sha256": "01c97c0c68ec93fb925d1df350cbe1ef33fd3592c12c17900d2c4599a7e33409",
+      "linkTarget": null,
+      "tracked": true,
+      "origin": "moved",
+      "reason": "\u5f52\u6863\u7684 4124 \u5b57\u8282\u539f\u7248 attribution \u5bf9\u8c61\uff1b\u4e8b\u4ef6\u53d1\u5e03\u53ea\u4f7f\u7528 HitEvent \u7684\u9886\u57df\u5b57\u6bb5\u3002",
+      "productReplacement": "World::hit_events() + HitEvent"
     }
   ]
 }

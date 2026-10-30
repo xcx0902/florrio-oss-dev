@@ -1,6 +1,5 @@
 #include "engine/net/worker_api.hpp"
 #include "engine/net/angle.hpp"
-#include "engine/model/hit_message.hpp"
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/petals.hpp"
 #include "engine/net/input.hpp"
@@ -459,15 +458,9 @@ std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequenc
   for (const HitEvent& hit : world_.hit_events()) {
     if (domain_visibility_enabled_ && !visible.contains(hit.target.raw)
         && !domain_known_.contains(hit.target.raw)) continue;
-    // The archived attribution object is 4124 bytes; the domain fills the
-    // epoch/refcount/endpoint fields and uses it as the event key.
-    HitMessage message;
-    message.set_epoch(hit.epoch);
-    message.set_refcount(hit.refcount);
-    message.set_target(hit.target.raw);
-    message.set_attacker(hit.attacker.raw);
-    const EntityHandle target{message.target()};
-    writer.write_entity_time_event(target);
+    // Attribution events use the current domain record directly; the retired
+    // fixed-size attribution object is not part of the product layout.
+    writer.write_entity_time_event(hit.target);
   }
   world_.clear_hit_events();
   for (const auto& transfer : world_.loadout().pickup_transfers())

@@ -3,6 +3,7 @@ import { compileProtocol } from './protocol.mjs';
 import { validateTransport } from './transport.mjs';
 import { parseChangelog } from './menu.mjs';
 import { validateDropInputs } from './drop-chances.mjs';
+import { PUBLISHABLE_TYPE_ID_MAX } from './wire-ids.mjs';
 
 const fail = (location, message) => { throw new Error(`${location}: ${message}`); };
 const object = (value, location) => {
@@ -39,18 +40,15 @@ const boolean = (value, location) => {
 const unique = (values, location) => {
   if (new Set(values).size !== values.length) fail(location, 'contains duplicate values');
 };
-const denseIds = (rows, location) => {
-  const ids = rows.map(row => row.typeId);
-  unique(ids, `${location}.typeId`);
-  const sorted = [...ids].sort((left, right) => left - right);
-  for (let index = 0; index < sorted.length; ++index)
-    if (sorted[index] !== index) fail(location, `type ids must be dense 0..${rows.length - 1}`);
+const uniqueIds = (rows, location) => {
+  unique(rows.map(row => row.typeId), `${location}.typeId`);
 };
+const typeId = (value, location) => integer(value, location, 0, PUBLISHABLE_TYPE_ID_MAX);
 
 function validatePetal(petal, index, combat) {
   const at = `petals[${index}]`;
   object(petal, at);
-  integer(petal.typeId, `${at}.typeId`);
+  typeId(petal.typeId, `${at}.typeId`);
   nonempty(petal.name, `${at}.name`);
   array(petal.descriptions, `${at}.descriptions`).forEach((description, descriptionIndex) =>
     string(description, `${at}.descriptions[${descriptionIndex}]`));
@@ -74,17 +72,17 @@ function validatePetal(petal, index, combat) {
 function validateEntity(entity, index) {
   const at = `entities[${index}]`;
   object(entity, at);
-  integer(entity.typeId, `${at}.typeId`);
+  typeId(entity.typeId, `${at}.typeId`);
   nonempty(entity.name, `${at}.name`);
   array(entity.descriptions, `${at}.descriptions`).forEach((description, descriptionIndex) =>
     string(description, `${at}.descriptions[${descriptionIndex}]`));
   integer(entity.rarity, `${at}.rarity`, 0, 7);
   finite(entity.scale, `${at}.scale`, 0);
   array(entity.petalTypeIds, `${at}.petalTypeIds`).forEach((id, petalIndex) =>
-    integer(id, `${at}.petalTypeIds[${petalIndex}]`));
+    typeId(id, `${at}.petalTypeIds[${petalIndex}]`));
   unique(entity.petalTypeIds, `${at}.petalTypeIds`);
   integer(entity.componentDrawCount, `${at}.componentDrawCount`, 0, 0xff);
-  integer(entity.dropAliasOf, `${at}.dropAliasOf`);
+  typeId(entity.dropAliasOf, `${at}.dropAliasOf`);
   finite(entity.dropWeight, `${at}.dropWeight`, 0);
   for (const field of ['opaque100', 'opaque104', 'opaque108', 'opaque110'])
     integer(entity[field], `${at}.${field}`, 0, 0xff);
@@ -99,13 +97,13 @@ export function validateInputs(inputs) {
 
   object(inputs.petals, 'petals');
   integer(inputs.petals.count, 'petals.count', 1);
-  denseIds(array(inputs.petals.petals, 'petals.petals'), 'petals');
+  uniqueIds(array(inputs.petals.petals, 'petals.petals'), 'petals');
   if (inputs.petals.count !== inputs.petals.petals.length)
     fail('petals.count', `declares ${inputs.petals.count} rows but has ${inputs.petals.petals.length}`);
 
   object(inputs.entities, 'entities');
   integer(inputs.entities.count, 'entities.count', 1);
-  denseIds(array(inputs.entities.entities, 'entities.entities'), 'entities');
+  uniqueIds(array(inputs.entities.entities, 'entities.entities'), 'entities');
   if (inputs.entities.count !== inputs.entities.entities.length)
     fail('entities.count', `declares ${inputs.entities.count} rows but has ${inputs.entities.entities.length}`);
 
@@ -120,7 +118,7 @@ export function validateInputs(inputs) {
     array(rule.regionIds, `${ruleAt}.regionIds`).forEach((band, bandIndex) =>
       integer(band, `${ruleAt}.regionIds[${bandIndex}]`, 0, 7));
     unique(rule.regionIds, `${ruleAt}.regionIds`);
-    integer(rule.entityTypeId, `${ruleAt}.entityTypeId`);
+    typeId(rule.entityTypeId, `${ruleAt}.entityTypeId`);
   });
   if (inputs.spawnRules.count !== inputs.spawnRules.rules.length)
     fail('spawnRules.count', `declares ${inputs.spawnRules.count} rows but has ${inputs.spawnRules.rules.length}`);
@@ -142,7 +140,7 @@ export function validateInputs(inputs) {
   array(inputs.spawnDefaults.defaults, 'spawnDefaults.defaults').forEach((entry, index) => {
     const entryAt = `spawnDefaults.defaults[${index}]`;
     object(entry, entryAt);
-    integer(entry.typeId, `${entryAt}.typeId`);
+    typeId(entry.typeId, `${entryAt}.typeId`);
     nonempty(entry.name, `${entryAt}.name`);
     finite(entry.radius, `${entryAt}.radius`, 0);
     finite(entry.contactDamage, `${entryAt}.contactDamage`, 0);
@@ -164,7 +162,7 @@ export function validateInputs(inputs) {
   for (const [index, entry] of array(inputs.petalCombat.petals, 'petalCombat.petals').entries()) {
     const entryAt = `petalCombat.petals[${index}]`;
     object(entry, entryAt);
-    integer(entry.typeId, `${entryAt}.typeId`);
+    typeId(entry.typeId, `${entryAt}.typeId`);
     if (combatById.has(entry.typeId)) fail(entryAt, `duplicate combat typeId ${entry.typeId}`);
     combatById.set(entry.typeId, entry);
   }
@@ -204,6 +202,7 @@ export function validateInputs(inputs) {
   array(inputs.galleryOverrides.overrides, 'galleryOverrides.overrides').forEach((entry, index) => {
     const entryAt = `galleryOverrides.overrides[${index}]`;
     object(entry, entryAt);
+    typeId(entry.typeId, `${entryAt}.typeId`);
     if (!entityIds.has(entry.typeId)) fail(`${entryAt}.typeId`, `unknown entity ${entry.typeId}`);
     nonempty(entry.reason, `${entryAt}.reason`);
     if (entry.rarity !== undefined) integer(entry.rarity, `${entryAt}.rarity`, 0, 7);
@@ -211,9 +210,9 @@ export function validateInputs(inputs) {
       if (entry[field] === undefined) continue;
       if (!Array.isArray(entry[field])) fail(`${entryAt}.${field}`, 'expected array');
       for (const [dropIndex, drop] of entry[field].entries()) {
-        if (field === 'removeDrops') { integer(drop, `${entryAt}.${field}[${dropIndex}]`); continue; }
+        if (field === 'removeDrops') { typeId(drop, `${entryAt}.${field}[${dropIndex}]`); continue; }
         object(drop, `${entryAt}.${field}[${dropIndex}]`);
-        integer(drop.petalTypeId, `${entryAt}.${field}[${dropIndex}].petalTypeId`);
+        typeId(drop.petalTypeId, `${entryAt}.${field}[${dropIndex}].petalTypeId`);
         finite(drop.chance, `${entryAt}.${field}[${dropIndex}].chance`, 0, 1);
         if (!petalIds.has(drop.petalTypeId))
           fail(`${entryAt}.${field}[${dropIndex}].petalTypeId`, `unknown petal ${drop.petalTypeId}`);

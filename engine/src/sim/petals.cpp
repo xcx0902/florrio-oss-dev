@@ -44,9 +44,8 @@ std::uint8_t petal_orbit_index(const World& world, std::uint8_t slot,
   const auto& slots = world.loadout().slots();
   for (std::uint8_t index = 0; index < 8U; ++index) {
     const std::uint16_t type = slots[index].type_id;
-    if (type == 0U || type > 38U) continue;
     const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-    if (definition == nullptr) continue;
+    if (type == 0U || definition == nullptr) continue;
     // definition+40 disables the orbit slot entirely.
     if (definition->orbitHidden) continue;
     const std::uint8_t count = slots[index].count == 0U ? 1U : slots[index].count;
@@ -78,11 +77,11 @@ void assign_petal_orbit_indices(World& world) {
   };
   for (std::uint8_t slot = 0; slot < 8U; ++slot) {
     const std::uint16_t type = slots[slot].type_id;
-    if (type == 0U || type > 38U) {
+    const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
+    if (type == 0U || definition == nullptr) {
       // Still write the boundary counter for empty slots.
     } else {
-      const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-      if (definition != nullptr && !definition->orbitHidden) {
+      if (!definition->orbitHidden) {
         if (definition->sharedOrbit) {
           bool position_used = false;
           for (std::uint8_t instance = 0; instance < 3U; ++instance) {
@@ -137,9 +136,8 @@ double petal_orbit_angle(const World& world, std::uint8_t orbit_index) {
     const auto& loadout_slots = world.loadout().slots();
     for (std::uint8_t slot = 0; slot < active && slot < loadout_slots.size(); ++slot) {
       const std::uint16_t type = loadout_slots[slot].type_id;
-      if (type == 0U || type > 38U) continue;
       const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-      if (definition == nullptr || definition->orbitHidden) continue;
+      if (type == 0U || definition == nullptr || definition->orbitHidden) continue;
       if (definition->sharedOrbit) ++orbit_positions;
       else orbit_positions = static_cast<std::uint8_t>(orbit_positions + definition->instancesPerSlot);
     }

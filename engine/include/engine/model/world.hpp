@@ -3,7 +3,6 @@
 #include "engine/model/component_store.hpp"
 #include "engine/model/effect_payload.hpp"
 #include "engine/model/entity.hpp"
-#include "engine/model/simulation_frame.hpp"
 #include "engine/model/petal_state.hpp"
 #include "engine/model/player_profile.hpp"
 #include "engine/sim/player_loadout.hpp"
@@ -583,12 +582,8 @@ class World {
   void advance_tick(double delta_milliseconds = 50.0) {
     ++tick_;
     time_ms_ += delta_milliseconds;
-    frame_.set_tick(tick_);
-    frame_.set_time_ms(time_ms_);
   }
   [[nodiscard]] std::uint64_t identity() const { return identity_; }
-  [[nodiscard]] SimulationFrame& frame() { return frame_; }
-  [[nodiscard]] const SimulationFrame& frame() const { return frame_; }
   [[nodiscard]] bool initialized() const { return initialized_; }
   void set_initialized(bool value) { initialized_ = value; }
 
@@ -639,7 +634,6 @@ class World {
   std::uint64_t tick_ = 0;
   std::uint64_t bounds_rebuilds_ = 0;
   std::uint64_t quadtree_updates_ = 0;
-  SimulationFrame frame_{};
   std::uint64_t identity_ = next_identity();
   bool initialized_ = false;
 };

@@ -3,6 +3,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { parseTap } from './verification/tap.mjs';
 import { chromiumExecutable } from './lib/chromium.mjs';
 import { expandSuite, loadManifest, suiteDefinition, validateManifest } from './test-manifest.mjs';
 
@@ -47,9 +48,20 @@ if (names.length === 1 && names[0] === 'engine') {
     if (!Array.isArray(suite)) throw new Error(`suite ${suiteName} is not a file list`);
     const args = ['--test'];
     if (suiteName.startsWith('client') || suiteName === 'delivery') args.push('--test-concurrency=1');
-    args.push(...extra, ...suite);
+    // Always request TAP so the runner can prove that at least one test was
+    // discovered. An empty `describe` exits 0 from node:test but has `tests 0`.
+    const passthrough = extra.filter(arg => !arg.startsWith('--test-reporter'));
+    args.push('--test-reporter=tap', ...passthrough, ...suite);
     console.error(`[test:${suiteName}] ${suite.length} files`);
-    const run = spawnSync(process.execPath, args, { cwd: root, stdio: 'inherit', env: process.env });
+    const run = spawnSync(process.execPath, args, {
+      cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, env: process.env,
+    });
+    process.stdout.write(run.stdout ?? '');
+    process.stderr.write(run.stderr ?? '');
+    if (run.error) throw run.error;
+    const tap = parseTap(run.stdout ?? '');
+    if (tap.status !== 'pass' || !(tap.total > 0) || !(tap.passed > 0))
+      throw new Error(`test suite ${suiteName} did not establish a nonempty pass: ${tap.issues.join('; ') || 'no tests discovered'}`);
     if (run.status !== 0) {
       process.exitCode = run.status ?? 1;
       break;

@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, writeFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { validateManifest } from '../../tools/test-manifest.mjs';
+
+const repo = fileURLToPath(new URL('../..', import.meta.url));
 
 async function fixture(t, suites, extra = {}) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'florr-test-manifest-'));
@@ -41,4 +45,18 @@ test('manifest rejects an unknown suite and an engine inventory without expected
   const root = await fixture(t, { unit: [] });
   await assert.rejects(validateManifest(root, { schema: 1, suites: { mystery: [] } }), /unknown suite/);
   await assert.rejects(validateManifest(root, { schema: 1, suites: { engine: { runner: 'ctest', expected: [] } } }), /nonempty ctest/);
+});
+
+test('runner rejects a suite whose files discover zero tests despite exit code 0', async t => {
+  const root = await fixture(t, { unit: ['tests/unit/empty.test.mjs'] }, {
+    'tests/unit/empty.test.mjs': "import { describe } from 'node:test';\ndescribe('empty', () => {});\n",
+  });
+  const env = { ...process.env };
+  delete env.NODE_TEST_CONTEXT;
+  const run = spawnSync(process.execPath, [path.join(repo, 'tools/run-tests.mjs'), 'unit'], {
+    cwd: root, encoding: 'utf8', timeout: 30000, env,
+  });
+  assert.notEqual(run.status, 0);
+  assert.match(run.stderr, /did not establish a nonempty pass|no tests discovered/);
+  assert.match(run.stdout, /# tests 0/);
 });

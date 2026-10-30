@@ -76,7 +76,7 @@ storage before calling `init(true)`.
 
 ## Tests
 
-- `engine_tests` (`tests/unit/test_main.cpp`) is a thin runner; its 115 cases
+- `engine_tests` (`tests/unit/test_main.cpp`) is a thin runner; its 113 cases
   live in `tests/unit/cases/` grouped by core, entity pool, spawn/loadout,
   snapshot codec, WorkerApi, catalog, AI, domain snapshot, combat, dense
   framing and tail invariants.

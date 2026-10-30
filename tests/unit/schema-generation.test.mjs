@@ -177,6 +177,24 @@ test('drop derivation is deterministic and keeps the product reference mass and 
     derived.entities.find(entity => entity.typeId === 15).drops);
 });
 
+test('drop aliases resolve through a chain regardless of input order', async () => {
+  const inputs = await loadSchemaInputs(root);
+  const entities = structuredClone(inputs.entities.entities);
+  const byId = id => entities.find(entity => entity.typeId === id);
+  byId(16).dropAliasOf = 18;
+  byId(18).dropAliasOf = 17;
+  const derived = deriveDropChances({
+    entities,
+    spawnRules: inputs.spawnRules.rules,
+    petals: inputs.petals.petals,
+    rules: inputs.dropRules,
+  });
+  const drops = id => derived.entities.find(entity => entity.typeId === id).drops;
+  assert.ok(drops(17).length > 0);
+  assert.deepEqual(drops(16), drops(17));
+  assert.deepEqual(drops(18), drops(17));
+});
+
 test('drop rules reject missing ids, alias cycles, illegal floats and zero denominators', async () => {
   const inputs = await loadSchemaInputs(root);
   const base = {
@@ -206,7 +224,7 @@ test('catalog validation rejects duplicate ids and unknown references', async ()
   duplicate.petals[1].typeId = 0;
   assert.throws(() => validateInputs({ ...inputs, petals: duplicate }), /duplicate|dense/);
   const unknown = structuredClone(inputs.entities);
-  unknown.entities[1].petalTypeIds.push(999);
+  unknown.entities[1].petalTypeIds.push(255);
   assert.throws(() => validateInputs({ ...inputs, entities: unknown }), /unknown petal/);
   const badFloat = structuredClone(inputs.petalCombat);
   badFloat.petals[1].collisionRadius = Number.POSITIVE_INFINITY;
@@ -274,4 +292,106 @@ test('adding an existing-behavior petal needs schema owner inputs, not generator
   assert.match(cpp, /kPetalCount = 40/);
   assert.match(cpp, /\{39, "Basic Plus",/);
   assert.match(ts, /39: \{ name: "Basic Plus",/);
+});
+
+test('sparse uint16 type ids remain valid inputs and generated keys', async () => {
+  const fixture = await inputFixture('sparse-ids');
+  const petalsFile = path.join(fixture, 'schema/catalogs/petals.json');
+  const petals = JSON.parse(await readFile(petalsFile, 'utf8'));
+  petals.petals[1].typeId = 100;
+  await writeFile(petalsFile, JSON.stringify(petals));
+  const combatFile = path.join(fixture, 'schema/catalogs/petal-combat.json');
+  const combat = JSON.parse(await readFile(combatFile, 'utf8'));
+  combat.petals[1].typeId = 100;
+  await writeFile(combatFile, JSON.stringify(combat));
+  const entitiesFile = path.join(fixture, 'schema/catalogs/entities.json');
+  const entities = JSON.parse(await readFile(entitiesFile, 'utf8'));
+  for (const entity of entities.entities)
+    entity.petalTypeIds = entity.petalTypeIds.map(id => id === 1 ? 100 : id);
+  await writeFile(entitiesFile, JSON.stringify(entities));
+  const result = run(fixture);
+  assert.equal(result.status, 0, result.stderr);
+  const cpp = await readFile(path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'), 'utf8');
+  const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
+  assert.match(cpp, /\{100, "Basic",/);
+  assert.match(ts, /100: \{ name: "Basic",/);
+});
+
+test('publishable ids accept 255 and reject 256 at the uint8 wire boundary', async () => {
+  const fixture = await inputFixture('id-boundary');
+  const petalsFile = path.join(fixture, 'schema/catalogs/petals.json');
+  const combatFile = path.join(fixture, 'schema/catalogs/petal-combat.json');
+  const entitiesFile = path.join(fixture, 'schema/catalogs/entities.json');
+  const galleryFile = path.join(fixture, 'schema/catalogs/gallery-overrides.json');
+  const replacePetal = async (from, to) => {
+    const petals = JSON.parse(await readFile(petalsFile, 'utf8'));
+    petals.petals.find(petal => petal.typeId === from).typeId = to;
+    await writeFile(petalsFile, JSON.stringify(petals));
+    const combat = JSON.parse(await readFile(combatFile, 'utf8'));
+    combat.petals.find(petal => petal.typeId === from).typeId = to;
+    await writeFile(combatFile, JSON.stringify(combat));
+    const entities = JSON.parse(await readFile(entitiesFile, 'utf8'));
+    for (const entity of entities.entities)
+      entity.petalTypeIds = entity.petalTypeIds.map(id => id === from ? to : id);
+    await writeFile(entitiesFile, JSON.stringify(entities));
+    const gallery = JSON.parse(await readFile(galleryFile, 'utf8'));
+    for (const override of gallery.overrides) {
+      for (const field of ['addDrops', 'removeDrops', 'replaceDrops']) {
+        if (!Array.isArray(override[field])) continue;
+        override[field] = override[field].map(drop =>
+          typeof drop === 'number' ? (drop === from ? to : drop)
+            : { ...drop, petalTypeId: drop.petalTypeId === from ? to : drop.petalTypeId });
+      }
+    }
+    await writeFile(galleryFile, JSON.stringify(gallery));
+  };
+
+  await replacePetal(1, 255);
+  const boundary = run(fixture);
+  assert.equal(boundary.status, 0, boundary.stderr);
+  const cpp = await readFile(path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'), 'utf8');
+  const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
+  assert.match(cpp, /\{255, "Basic",/);
+  assert.match(ts, /255: \{ name: "Basic",/);
+
+  await replacePetal(255, 256);
+  const rejected = run(fixture);
+  assert.notEqual(rejected.status, 0);
+  assert.match(rejected.stderr, /0\.\.255/);
+
+  await replacePetal(256, 300);
+  const rejected300 = run(fixture);
+  assert.notEqual(rejected300.status, 0);
+  assert.match(rejected300.stderr, /0\.\.255/);
+});
+
+test('every publishable entity and reference id is capped at 255', async () => {
+  const inputs = await loadSchemaInputs(root);
+  const withEntity = id => {
+    const copy = structuredClone(inputs);
+    const row = structuredClone(copy.entities.entities[1]);
+    row.typeId = id;
+    row.name = `Boundary entity ${id}`;
+    row.petalTypeIds = [];
+    row.dropAliasOf = 0;
+    copy.entities.entities.push(row);
+    copy.entities.count = copy.entities.entities.length;
+    return copy;
+  };
+  assert.doesNotThrow(() => validateInputs(withEntity(255)));
+  assert.throws(() => validateInputs(withEntity(256)), /0\.\.255/);
+  assert.throws(() => validateInputs(withEntity(300)), /0\.\.255/);
+
+  const mutations = [
+    value => { value.entities.entities[1].petalTypeIds[0] = 256; },
+    value => { value.entities.entities[1].dropAliasOf = 256; },
+    value => { value.spawnRules.rules[0].entityTypeId = 256; },
+    value => { value.spawnDefaults.defaults[0].typeId = 256; },
+    value => { value.petalCombat.petals[0].typeId = 256; },
+  ];
+  for (const mutate of mutations) {
+    const copy = structuredClone(inputs);
+    mutate(copy);
+    assert.throws(() => validateInputs(copy), /0\.\.255/);
+  }
 });

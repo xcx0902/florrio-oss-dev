@@ -13,6 +13,7 @@ hand-written catalog tables therefore stayed active. This addendum retires them
 only after their product replacements and tests exist:
 
 - original memory layouts and their generated C++/TS views;
+- the archived 1152-byte `SimulationFrame` and 4124-byte `HitMessage` wrappers;
 - the CMake schema probe and its checker test;
 - the monolithic generator that emitted both layouts and product catalogs;
 - the hand-written `petal_defaults.hpp` and `drop_table.hpp` duplicates;
@@ -37,6 +38,8 @@ nothing here is a build, test, generation, runtime or delivery input.
 | `engine/include/engine/catalog/drop_table.hpp` | `Catalog::drop_table()` from derived `drop-chances.json` |
 | `schema/catalogs/client-gallery.json` | derived drop chances plus `schema/catalogs/gallery-overrides.json` |
 | `tools/gen-client-petals.mjs`, `tools/gen-mob-gallery.mjs`, `tools/gen-menu-content.mjs` | `tools/generate.mjs` and `tools/schema/*` |
+| `engine/include/engine/model/simulation_frame.hpp` | `World::tick()` / `World::time_ms()` |
+| `engine/include/engine/model/hit_message.hpp` | `World::hit_events()` + `HitEvent` publication |
 
 ## Known migration-map correction
 

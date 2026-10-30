@@ -10,6 +10,8 @@
  * runtime. Callers pass already-loaded product catalog arrays.
  */
 
+import { PUBLISHABLE_TYPE_ID_MAX } from './wire-ids.mjs';
+
 const f32 = Math.fround;
 const fail = message => { throw new Error(`drop rules: ${message}`); };
 
@@ -51,6 +53,8 @@ export function validateDropInputs({ entities, spawnRules, petals, rules }) {
   for (const entity of entities) {
     if (!isObject(entity)) fail('entity must be an object');
     integer(entity.typeId, 'entity.typeId');
+    if (entity.typeId < 0 || entity.typeId > PUBLISHABLE_TYPE_ID_MAX)
+      fail(`entity.typeId ${entity.typeId} is outside uint8`);
     if (entityIds.has(entity.typeId)) fail(`duplicate entity typeId ${entity.typeId}`);
     entityIds.add(entity.typeId);
     byId.set(entity.typeId, entity);
@@ -59,10 +63,14 @@ export function validateDropInputs({ entities, spawnRules, petals, rules }) {
       fail(`entity ${entity.typeId} has duplicate petalTypeIds`);
     for (const petalId of entity.petalTypeIds) {
       integer(petalId, `entity ${entity.typeId} petalTypeId`);
+      if (petalId < 0 || petalId > PUBLISHABLE_TYPE_ID_MAX)
+        fail(`entity ${entity.typeId} petalTypeId ${petalId} is outside uint8`);
       if (!petals.some(petal => petal.typeId === petalId))
         fail(`entity ${entity.typeId} references unknown petal ${petalId}`);
     }
     integer(entity.dropAliasOf ?? 0, `entity ${entity.typeId} dropAliasOf`);
+    if ((entity.dropAliasOf ?? 0) > PUBLISHABLE_TYPE_ID_MAX)
+      fail(`entity ${entity.typeId} dropAliasOf is outside uint8`);
     if ((entity.dropAliasOf ?? 0) !== 0 && entity.dropAliasOf === entity.typeId)
       fail(`entity ${entity.typeId} cannot alias itself`);
     positive(entity.dropWeight, `entity ${entity.typeId} dropWeight`);
@@ -111,12 +119,16 @@ export function validateDropInputs({ entities, spawnRules, petals, rules }) {
       if (band < 0 || band >= bands)
         fail(`spawn rule ${rule.index} band ${band} is outside 0..${bands - 1}`);
     }
+    if (rule.entityTypeId < 0 || rule.entityTypeId > PUBLISHABLE_TYPE_ID_MAX)
+      fail(`spawn rule ${rule.index} entityTypeId is outside uint8`);
     if (!byId.has(rule.entityTypeId))
       fail(`spawn rule ${rule.index} references unknown entity ${rule.entityTypeId}`);
   }
 
   for (const petal of petals) {
     integer(petal.typeId, 'petal.typeId');
+    if (petal.typeId < 0 || petal.typeId > PUBLISHABLE_TYPE_ID_MAX)
+      fail(`petal.typeId ${petal.typeId} is outside uint8`);
     integer(petal.rarityIndex, `petal ${petal.typeId} rarityIndex`);
     if (petal.rarityIndex < 0 || petal.rarityIndex >= rules.petalDropMass.length)
       fail(`petal ${petal.typeId} rarity ${petal.rarityIndex} has no drop mass`);
@@ -130,7 +142,20 @@ export function deriveDropChances({ entities, spawnRules, petals, rules }) {
   const bands = rules.areaMix.length;
   const alias = new Map();
   for (const entity of entities) if ((entity.dropAliasOf ?? 0) !== 0) alias.set(entity.typeId, entity.dropAliasOf);
-  const canonical = species => alias.get(species) ?? species;
+  const canonicalMemo = new Map();
+  const canonical = species => {
+    if (canonicalMemo.has(species)) return canonicalMemo.get(species);
+    const path = new Set();
+    let root = species;
+    while (alias.has(root)) {
+      if (path.has(root)) fail(`alias cycle at entity ${species}`);
+      path.add(root);
+      root = alias.get(root);
+    }
+    for (const node of path) canonicalMemo.set(node, root);
+    canonicalMemo.set(species, root);
+    return root;
+  };
 
   const bandRows = Array.from({ length: bands }, () => ({ entries: [], total: 0 }));
   for (const rule of spawnRules) {
@@ -223,7 +248,10 @@ export function deriveDropChances({ entities, spawnRules, petals, rules }) {
     }
   }
 
-  for (const [species, source] of alias) chances.set(species, new Map(chances.get(source)));
+  // Resolve the whole alias chain, not just one hop. Copying in map order made
+  // a result depend on whether the parent alias happened to be processed first.
+  for (const species of alias.keys())
+    chances.set(species, new Map(chances.get(canonical(species)) ?? []));
 
   const finalized = entities.map(entity => ({
     typeId: entity.typeId,

@@ -32,12 +32,8 @@ void PlayerLoadout::refresh_pending_cache() {
   for (std::uint8_t slot = 0; slot < 8U; ++slot) {
     pending_cache_[slot].fill(0U);
     const std::uint16_t type = slots_[slot].type_id;
-    if (type == 0U || type > 38U) {
-      if (slot + 1U == active_slots_) pending_cache_count_ = order;
-      continue;
-    }
     const auto* petal = Catalog::instance().petal(type);
-    if (petal == nullptr || petal->orbitHidden) {
+    if (type == 0U || petal == nullptr || petal->orbitHidden) {
       if (slot + 1U == active_slots_) pending_cache_count_ = order;
       continue;
     }

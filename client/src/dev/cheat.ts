@@ -43,6 +43,7 @@ export function installCheatPanel(api: CheatApi): void {
     body.textContent = rows.join('\n');
     column.append(label, body); tables.append(column);
   };
+  const maxPetalId = Math.max(...Object.keys(PETAL_INFO).map(Number));
   const petalRows = Object.entries(PETAL_INFO)
     .map(([id, info]) => `${id.padStart(2, ' ')}  ${info.name}`).join('\n');
   const mobRows = Object.entries(MOB_INFO)
@@ -59,7 +60,7 @@ export function installCheatPanel(api: CheatApi): void {
     label.style.cssText = 'display:flex;flex-direction:column;gap:2px';
     label.append(`Slot ${slot}`);
     const input = document.createElement('input');
-    input.type = 'number'; input.min = '0'; input.max = '38'; input.step = '1';
+    input.type = 'number'; input.min = '0'; input.max = String(maxPetalId); input.step = '1';
     input.style.cssText = 'width:100%;box-sizing:border-box;background:#222;color:#fff;border:1px solid #555';
     input.dataset.dirty = 'false';
     input.addEventListener('input', () => { input.dataset.dirty = 'true'; });
@@ -125,7 +126,7 @@ export function installCheatPanel(api: CheatApi): void {
       status.textContent = 'Applying…';
       try {
         for (let slot = 0; slot < inputs.length; slot++) {
-          const value = Math.max(0, Math.min(38, Math.trunc(Number(inputs[slot].value) || 0)));
+          const value = Math.max(0, Math.min(maxPetalId, Math.trunc(Number(inputs[slot].value) || 0)));
           if (value !== (api.loadout()[slot] ?? 0)) await api.setPetal(slot, value);
         }
         for (const input of inputs) input.dataset.dirty = 'false';

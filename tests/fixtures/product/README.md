@@ -21,18 +21,29 @@ same generator during the assertion.
 ## Native snapshot fixture
 
 `protocol/native_fixture.cpp` is compiled by `engine/CMakeLists.txt` as
-`engine_native_snapshot_fixture`. It uses the shipping `WorkerApi` and
-`domain_snapshot_bytes()` path to emit a two-packet `FLRR` stream:
+`engine_native_snapshot_fixture`. It drives the shipping path end to end:
 
-1. a player at `(100, 50)` with health 100 and five Basic loadout slots, a mob
-   of species 1 at `(140, 90)`, and chat event 9 `fixture`;
-2. a despawn of that mob and a second empty-event snapshot.
+- opcode 6 input creates the player through `WorkerApi::send()` and
+  `spawn_player_default()`; `think()` advances the real fixed-step world;
+- opcode 12 input (buttons + binary32 angle/strength) is consumed by twenty
+  real ticks and moves the player;
+- a mob of species 1 is spawned through `WorkerApi` ahead of the player;
+- opcode 5 chat input publishes event 9 `fixture`;
+- `domain_snapshot_bytes()` emits the post-spawn baseline (sequence 6), the
+  input+mob+event snapshot (sequence 7), and after `despawn()` the deletion
+  snapshot (sequence 8);
+- the final packet (sequence 9) is a direct `SnapshotWriter` probe that writes
+  species field 2 as `255`, the largest id the current one-byte wire can carry;
+  it is a wire-boundary fixture, not a catalog row.
 
-The native executable takes an output path and exits nonzero on any setup
-failure. `tests/integration/native-snapshot.test.mjs` decodes both packets with
-the product TypeScript decoder, applies them to `WorldState`, and asserts
-player/inventory/mob/event/deletion plus a failed truncated decode that does not
-poison the next packet.
+The `FLRR` v1 stream therefore has four length-prefixed packets. The executable
+takes an output path and exits nonzero on any setup failure.
+`tests/integration/native-snapshot.test.mjs` decodes the first three packets with
+the product TypeScript decoder, asserts that player input movement is visible,
+applies them to `WorldState`, and checks player default inventory, mob, chat
+event and deletion plus a failed truncated decode that does not poison the next
+packet. A separate assertion decodes the fourth packet and requires species
+`255`; `256` is rejected by schema validation before generation.
 
 ## Update policy
 
@@ -40,7 +51,9 @@ poison the next packet.
   old bytes are wrong; do not update an expectation merely to make a test green.
 - Manual vectors are updated by editing the JSON and the prose above together.
 - Native fixture changes must keep the real `WorkerApi` path and deterministic
-  seeds; do not add an original replay or a test-only encoder.
+  seeds; do not add an original replay. A direct `SnapshotWriter` packet is
+  allowed only as the documented width-boundary probe, never as a replacement
+  for the `WorkerApi` flow.
 - Visual fixtures, if added later, must be reviewed product screenshots under
   this directory. Archived original screenshots are never used as a new
   baseline.

@@ -19,8 +19,10 @@ all owners and emits the C++/TypeScript views. Runtime code does not read JSON.
 
 ## Petals
 
-39 records. Type id is the identity; display names are not unique (`Rose` at
-6/15/24, `Cactus` at 13/21/33, `Basic` at 1/35). `rarityIndex` indexes the petal
+39 records. Type id is the unique catalog identity stored as uint16; the
+publishable range is `0..255` because snapshots and loadout packets still carry
+one byte. Ids may be sparse inside that range and array position is not an id. Display names are not unique (`Rose` at 6/15/24, `Cactus`
+at 13/21/33, `Basic` at 1/35). `rarityIndex` indexes the petal
 drop-mass list. `labelFontSize` is the UI label unit, `drawRadius` is the
 rendered card/art radius, and `collisionRadius` is the world collision radius.
 They are separate fields; a zero collision radius is legal and is not replaced
@@ -28,8 +30,9 @@ with a silent default.
 
 ## Entity definitions
 
-23 records. `petalTypeIds` is the ordered drop pool; `dropAliasOf` inherits
-another entity's pool (0 means none); `dropWeight` is the species mass multiplier.
+23 records. Entity ids use the same `0..255` publishable range. `petalTypeIds` is the ordered drop pool; `dropAliasOf` inherits
+the canonical root of another entity's pool (0 means none; alias chains are
+resolved to the root and cycles are rejected); `dropWeight` is the species mass multiplier.
 The low-confidence offsets were renamed only where the domain use is known;
 unknown values remain documented opaque fields (`opaque100/104/108/110`).
 

@@ -1,35 +1,11 @@
-void test_world_frame_tracks_tick() {
+void test_world_clock_tracks_tick() {
   engine::World world;
   world.initialize();
-  CHECK(world.frame().tick() == 0U);
+  CHECK(world.tick() == 0U);
+  CHECK(world.time_ms() == 0.0);
   engine::tick(world, 50.0);
-  CHECK(world.frame().tick() == world.tick());
-  CHECK(world.frame().time_ms() == 50.0);
-}
-
-void test_simulation_frame_layout() {
-  engine::SimulationFrame frame;
-  CHECK(sizeof(frame) == 1152U);
-  frame.set_tick(42U);
-  frame.set_time_ms(2100.0);
-  frame.set_scratch(1151U, 0xA5U);
-  CHECK(frame.tick() == 42U);
-  CHECK(frame.time_ms() == 2100.0);
-  CHECK(frame.scratch(1151U) == 0xA5U);
-  CHECK(frame.scratch(1152U) == 0U);
-}
-
-void test_hit_message_layout() {
-  engine::HitMessage message;
-  message.set_epoch(0x11223344U);
-  message.set_refcount(3U);
-  message.set_target(0x55667788U);
-  message.set_attacker(0x99AABBCCU);
-  CHECK(message.epoch() == 0x11223344U);
-  CHECK(message.refcount() == 3U);
-  CHECK(message.target() == 0x55667788U);
-  CHECK(message.attacker() == 0x99AABBCCU);
-  CHECK(sizeof(engine::HitMessage) == 4124U);
+  CHECK(world.tick() == 1U);
+  CHECK(world.time_ms() == 50.0);
 }
 
 void test_loadout_reserve_cycle_and_packet_cache() {
