@@ -103,9 +103,7 @@ export function drawPetalCard(context: Canvas2DContext, type: number, size = 60,
   local.stroke();
   inLocal(local, artwork => drawPetalIcon(artwork, type), f(size / 70), 0, 0, f(-size / 14));
   const matrix = local.getTransform?.() ?? [1, 0, 0, 1, 0, 0];
-  // func391's +36 label font is smaller for the four long names.
-  const nameFont = type === 20 ? 11 : [25, 26, 28].includes(type) ? 12 : 14;
-  drawLabel(local, { text: info.name, font: f(f(nameFont * size) / 70),
+  drawLabel(local, { text: info.name, font: f(f(info.labelSize * size) / 70),
     rasterScale: Math.fround(Math.max(Math.abs(matrix[0]), Math.abs(matrix[1]), Math.abs(matrix[2]), Math.abs(matrix[3])) * 2.4),
     cacheKey: owner }, 0, f(f(size * .5) + size * (-18 / 70)));
 }

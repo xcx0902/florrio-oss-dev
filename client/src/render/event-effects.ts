@@ -207,12 +207,14 @@ export function drawEvent14Effect(context: Canvas2DContext, effect: Readonly<Eve
     -image.width / raster / 2, -image.height / raster / 2, image.width / raster, image.height / raster);
   else drawPetalIcon(context, effect.type);
   context.restore();
-  const spec = { text: PETAL_INFO[effect.type].name, font: 14, rasterScale: raster, cacheKey: labelOwner(effect) };
+  // Collected petals keep this renderer after settling; match static card labels.
+  const spec = { text: PETAL_INFO[effect.type].name, font: PETAL_INFO[effect.type].labelSize,
+    rasterScale: raster, cacheKey: labelOwner(effect) };
   const label = getLabel(spec);
   if (label) {
     // The shared lazy context intentionally has no native getTransform;
     // compose the cached label through this pass's known logical matrix.
-    const width = f(label.boxWidth), height = f(14 * 1.4);
+    const width = f(label.boxWidth), height = f(spec.font * 1.4);
     context.setTransform(f(projected * width), 0, 0, f(projected * height),
       f(f(scale * effect.x) + f(projected * f(-width * 0.5))),
       f(y + f(projected * f(17 - f(height * 0.5)))));

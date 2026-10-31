@@ -6,6 +6,7 @@ import ts from 'typescript';
 import { createEvent14Effect, updateEvent14Effect, drawEvent14Effect } from '../../../build/client/render/event-effects.js';
 import { createHudState, drawHud, getHudLayout } from '../../../build/client/render/ui.js';
 import { PetalMotionState } from '../../../build/client/render/petal-motion.js';
+import { PETAL_INFO } from '../../../build/client/schema/petals.js';
 import { RenderingCanvas } from '../helpers/recording-canvas.mjs';
 
 const payload = { index: 2, type: 6, startScreenX: 150.125, startScreenY: 280.25, recharge: 32767 / 65535 };
@@ -187,6 +188,25 @@ test('drawing emits a petal rarity card, recharge sector and name, preserves con
   assert.deepEqual(repeat.ops, context.ops);
 });
 
+test('pickup slot names use catalogue font sizes during arrival, settlement and retirement', () => {
+  for (const type of [6, 20, 25, 26, 28]) for (const index of [0, getHudLayout().equippedCount]) {
+    const effect = createEvent14Effect({ ...payload, type, index });
+    for (const frame of [
+      { nowMilliseconds: 16, deltaMilliseconds: 16 },
+      { nowMilliseconds: 10000, deltaMilliseconds: 9984 },
+      { nowMilliseconds: 10016, deltaMilliseconds: 16 },
+      { nowMilliseconds: 10032, deltaMilliseconds: 16, active: false },
+    ]) {
+      updateEvent14Effect(effect, frame);
+      const context = new Context();
+      drawEvent14Effect(context, effect);
+      assert.deepEqual(context.ops.filter(([op]) => op === 'font'),
+        [['font', `${PETAL_INFO[type].labelSize}px Ubuntu`]],
+        `${PETAL_INFO[type].name}, slot ${index}, ${effect.phase}`);
+    }
+  }
+});
+
 test('HUD slot pass replaces static contents, preserves backgrounds, draws retirement and applies DPR once', () => {
   const state = { health: 100, maxHealth: 100, level: 1, slots: [1, 5, 0, 0, 0], storageSlots: [] };
   const labels = context => context.ops.filter(([op]) => op === 'fillText').map(([, text]) => text);
@@ -270,6 +290,51 @@ test('native browser reuses petal artwork and label bitmaps while preserving res
     const replacement = result.replacement.filter(([id, op]) => id === 0 && op === 'drawImage').map(([, , args]) => args[0]);
     assert.equal(replacement[0].id, bitmaps[0].id, 'identical species share immutable artwork');
     assert.notEqual(replacement[1].id, bitmaps[1].id, 'replacement and retired effects own separate name canvases');
+    const names = await page.evaluate(async () => {
+      const { createEvent14Effect, updateEvent14Effect, drawEvent14Effect } = await import('/render/event-effects.js');
+      const { wrapContext } = await import('/render/canvas2d/context.js');
+      const { getHudLayout } = await import('/render/hud.js');
+      const { PETAL_INFO } = await import('/schema/petals.js');
+      const results = [], f = Math.fround;
+      for (const type of [6, 20, 25, 26, 28]) for (const index of [0, getHudLayout().equippedCount]) {
+        for (const pixelRatio of [1, 2]) {
+          const context = wrapContext(document.createElement('canvas').getContext('2d'));
+          const drawImage = context.drawImage;
+          let bitmap, matrix;
+          context.drawImage = (image, ...args) => {
+            bitmap = image; matrix = context.getTransform(); drawImage(image, ...args);
+          };
+          const effect = createEvent14Effect({ index, type, startScreenX: 100, startScreenY: 200 });
+          for (const frame of [
+            { nowMilliseconds: 16, deltaMilliseconds: 16 },
+            { nowMilliseconds: 10000, deltaMilliseconds: 9984 },
+            { nowMilliseconds: 10016, deltaMilliseconds: 16 },
+            { nowMilliseconds: 10032, deltaMilliseconds: 16, active: false },
+          ]) {
+            updateEvent14Effect(effect, frame);
+            drawEvent14Effect(context, effect, { pixelRatio });
+            const first = bitmap, firstMatrix = matrix;
+            window.__canvasTrace.reset();
+            drawEvent14Effect(context, effect, { pixelRatio });
+            const font = PETAL_INFO[type].labelSize, scale = f(getHudLayout().scale * pixelRatio);
+            const raster = f(scale * 2.4), projected = f(scale * f(effect.size / 70));
+            results.push({ name: PETAL_INFO[type].name, index, pixelRatio, phase: effect.phase,
+              height: matrix[3], expectedHeight: f(projected * f(font * 1.4)),
+              bitmapHeight: bitmap.height, expectedBitmapHeight: Math.trunc(f(f(font) * raster) * 1.4),
+              reused: first === bitmap && firstMatrix.every((value, i) => value === matrix[i]),
+              repainted: window.__canvasTrace.state.ops.some(([, op]) => ['fillText', 'strokeText', 'measureText'].includes(op)) });
+          }
+        }
+      }
+      return results;
+    });
+    for (const name of names) {
+      const message = `${name.name}, slot ${name.index}, DPR ${name.pixelRatio}, ${name.phase}`;
+      assert.equal(name.height, name.expectedHeight, `${message}: displayed font height`);
+      assert.equal(name.bitmapHeight, name.expectedBitmapHeight, `${message}: raster font height`);
+      assert.equal(name.reused, true, `${message}: cached bitmap and transform`);
+      assert.equal(name.repainted, false, `${message}: warm draw`);
+    }
     const fallbackPage = await page.context().newPage();
     await fallbackPage.goto('http://event.test/');
     const fallback = await fallbackPage.evaluate(async () => {
