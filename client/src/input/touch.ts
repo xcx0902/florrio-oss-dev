@@ -2,16 +2,17 @@ export interface JoystickVector { readonly x: number; readonly y: number; readon
 
 /** Single-stick touch input. Coordinates are normalized to [-1, 1]. */
 export class TouchJoystick {
+  private readonly listeners = new AbortController();
   readonly vector: JoystickVector = { x: 0, y: 0, active: false };
   private readonly element: HTMLElement;
   private center: { x: number; y: number } | null = null;
 
   constructor(element: HTMLElement) {
     this.element = element;
-    element.addEventListener('touchstart', this.onStart, { passive: false });
-    element.addEventListener('touchmove', this.onMove, { passive: false });
-    element.addEventListener('touchend', this.onEnd);
-    element.addEventListener('touchcancel', this.onEnd);
+    element.addEventListener('touchstart', this.onStart, { passive: false, signal: this.listeners.signal });
+    element.addEventListener('touchmove', this.onMove, { passive: false, signal: this.listeners.signal });
+    element.addEventListener('touchend', this.onEnd, { signal: this.listeners.signal });
+    element.addEventListener('touchcancel', this.onEnd, { signal: this.listeners.signal });
   }
 
   private readonly onStart = (event: TouchEvent): void => {
@@ -41,4 +42,5 @@ export class TouchJoystick {
     (this.vector as { x: number; y: number }).x = 0;
     (this.vector as { x: number; y: number }).y = 0;
   };
+  dispose(): void { this.listeners.abort(); this.onEnd(); }
 }

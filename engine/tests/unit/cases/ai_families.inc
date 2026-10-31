@@ -373,8 +373,8 @@ void test_ai_activity_branch_and_wire() {
   CHECK(entity->ai.activity_flags == 0x81U);
   CHECK(world.destroy(player));
   CHECK(entity->ai.activity_flags == 0x81U); // target destruction is not the AI branch
-  for (const bool full : {false, true}) {
-    api.set_full_field_framing(full);
+  {
+    constexpr bool full = false;
     api.set_default_dense_groups(false);
     const auto packet = api.domain_snapshot_bytes(1U);
     engine::ByteWriter expected;
@@ -398,7 +398,7 @@ void test_ai_activity_branch_and_wire() {
       CHECK(saw_activity && sparse.eof());
     }
   }
-  engine::SnapshotWriter dense;
+  engine::SnapshotEncoder dense;
   dense.begin(1U); dense.write_dense_default_groups(*entity);
   const auto packet = dense.finish(); engine::ByteReader reader(packet);
   (void)reader.read_u8(); for (unsigned i = 0; i < 5; ++i) (void)reader.read_varint32();

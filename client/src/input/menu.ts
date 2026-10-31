@@ -1,14 +1,21 @@
 /** Canvas-native menu state and hit testing. The only remaining DOM control is
  * the flower-name input, which needs real text editing and IME support. */
-import { MOB_INFO, PETAL_INFO } from '../schema/petals.js';
-import { MOB_GALLERY } from '../schema/mob-gallery.js';
 import type { MenuInputPresentation } from '../render/menu-animation.js';
 import {
-  MENU_TABS, PETAL_GALLERY_TYPES, MOB_GALLERY_TYPES, menuCloseRect, menuContentRect, menuPanelRect, menuScrollMax, menuTabAt,
-  menuRespawnCardRect,
-  petalCellAt, mobRowAt, mobDropRect, settingsRowAt,
-  type MenuPanel, type MenuRenderState,
+MENU_TABS,
+MOB_GALLERY_TYPES,
+PETAL_GALLERY_TYPES,
+menuCloseRect,menuContentRect,menuPanelRect,
+menuRespawnCardRect,
+menuScrollMax,menuTabAt,
+mobDropRect,
+mobRowAt,
+petalCellAt,
+settingsRowAt,
+type MenuPanel,type MenuRenderState,
 } from '../render/menu-layout.js';
+import { MOB_GALLERY } from '../schema/mob-gallery.js';
+import { MOB_INFO,PETAL_INFO } from '../schema/petals.js';
 
 const f = Math.fround;
 
@@ -20,6 +27,7 @@ function store(key: string, value: string): void {
 }
 
 export class MenuControls {
+  private readonly listeners = new AbortController();
   readonly root = document.createElement('div');
   readonly name = document.createElement('input');
   panel: MenuPanel | undefined;
@@ -71,13 +79,13 @@ export class MenuControls {
       if (Array.isArray(saved.mobs)) for (const id of saved.mobs)
         if (Number.isInteger(id) && id > 0 && MOB_INFO[id]) this.mobs.add(id);
     } catch { /* Storage may be unavailable; controls still work. */ }
-    this.name.addEventListener('input', () => this.save());
+    this.name.addEventListener('input', () => this.save(), { signal: this.listeners.signal });
     document.body.append(this.root);
     this.name.addEventListener('keydown', event => {
       if (event.isComposing || event.keyCode === 229) { event.stopPropagation(); return; }
       if (event.key === 'Escape' && this.panel) { this.open(undefined); event.preventDefault(); }
       if (event.key !== 'Enter') event.stopPropagation();
-    });
+    }, { signal: this.listeners.signal });
   }
 
   save(): void {
@@ -330,4 +338,5 @@ export class MenuControls {
     };
   }
   get tabs(): readonly MenuPanel[] { return MENU_TABS; }
+  dispose(): void { this.listeners.abort(); this.root.remove(); this.tooltipAlphas.clear(); this.mobDropAlphas.clear(); }
 }

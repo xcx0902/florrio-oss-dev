@@ -9,7 +9,8 @@
     "tools": [
       "tests/tools/delivery.test.mjs",
       "tests/tools/verification.test.mjs",
-      "tests/tools/test-runner.test.mjs"
+      "tests/tools/test-runner.test.mjs",
+      "tests/tools/structure.test.mjs"
     ],
     "client-unit": [
       "client/tests/unit/canvas-context.test.mjs",
@@ -20,9 +21,11 @@
       "client/tests/unit/petal-transfers.test.mjs",
       "client/tests/unit/snapshot-domain.test.mjs",
       "client/tests/unit/text-cache.test.mjs",
-      "client/tests/unit/ui-tooltip.test.mjs"
+      "client/tests/unit/ui-tooltip.test.mjs",
+      "client/tests/unit/structure.test.mjs"
     ],
     "client-integration": [
+      "client/tests/integration/app-lifecycle.test.mjs",
       "client/tests/integration/death-pickup-regression.test.mjs",
       "client/tests/integration/event-effects.test.mjs",
       "client/tests/integration/menu-controls.test.mjs",
@@ -56,7 +59,8 @@
         "engine_rose_tests",
         "engine_passives_pets_tests",
         "engine_peer_visibility_tests",
-        "engine_pickup_arrival_tests"
+        "engine_pickup_arrival_tests",
+        "engine_structure_tests"
       ]
     }
   }

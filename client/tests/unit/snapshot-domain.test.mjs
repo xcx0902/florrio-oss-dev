@@ -1,14 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DenseGroupDecoder, DensePlanDecoder, BareSnapshotDecoder } from '../../public/state/snapshot.js';
-import { DENSE_GROUP_SPECS } from '../../public/state/field-types.js';
-import { WorldState } from '../../public/state/world.js';
-import { interpolateCameraTarget, interpolateEntity } from '../../public/state/interpolation.js';
+import { SnapshotDecoder } from '../../../build/client/state/snapshot.js';
+import { DenseGroupDecoder, DensePlanDecoder } from '../support/dense-codec.mjs';
+import { DENSE_GROUP_SPECS } from '../../../build/client/state/field-types.js';
+import { WorldState } from '../../../build/client/state/world.js';
+import { interpolateCameraTarget, interpolateEntity } from '../../../build/client/state/interpolation.js';
 
 test('pickup constructor marker survives position deltas before the first render and resets on deletion', () => {
   const world = new WorldState();
   const drop = { handle: 91, typeId: 7, kind: 4, x: 0, y: 0, angle: 0, health: 0, maxHealth: 0, flags: 129 };
-  const apply = (entities, deletedHandles = []) => world.applyPartial({ sequence: 1, serverTime: 0, entities, events: [], deletedHandles }, 100);
+  const apply = (entities, deletedHandles = []) => world.applyDeltaSnapshot({ sequence: 1, serverTime: 0, entities, events: [], deletedHandles }, 100);
   apply([drop]); apply([{ ...drop, flags: 2, x: 1 }]);
   assert.equal(world.get(91).flags, 2);
   assert.equal(world.get(91).arrivalMarked, true);
@@ -70,7 +71,7 @@ function domainPacket(handle = 0x12345678) {
 
 test('original mask entry projects species, kind, health and maximum', () => {
   const { bytes, handle } = domainPacket();
-  const snapshot = new BareSnapshotDecoder().decode(bytes);
+  const snapshot = new SnapshotDecoder().decode(bytes);
   assert.ok(snapshot);
   assert.equal(snapshot.sequence, 42);
   assert.equal(snapshot.entities.length, 1);
@@ -96,7 +97,7 @@ test('schema component locations project progression, variant, radius and known 
   const fields = values.flatMap(([field, encoded]) => {
     const result = [...varint(field - previous), ...encoded]; previous = field; return result;
   });
-  const snapshot = new BareSnapshotDecoder().decode(Uint8Array.from([
+  const snapshot = new SnapshotDecoder().decode(Uint8Array.from([
     1, 1, 0, 0, 1, 0, ...u32(handle), 55, ...u32(0), ...fields, 0,
   ]));
   assert.ok(snapshot);
@@ -120,18 +121,18 @@ test('visual position, camera follow and collider radius use distinct original f
   });
   const bytes = Uint8Array.from([1, 1, 0, 0, 1, 0, ...u32(handle), 55,
     ...u32((1 << 5) | (1 << 20) | (1 << 25)), ...payload, 0]);
-  const decoder = new BareSnapshotDecoder();
+  const decoder = new SnapshotDecoder();
   const snapshot = decoder.decode(bytes);
   assert.ok(snapshot);
   const entity = snapshot.entities[0];
   assert.deepEqual([entity.x, entity.y, entity.cameraX, entity.cameraY, entity.radius], [-90, -40, 100, 200, 25]);
   const world = new WorldState();
-  world.applyPartial(snapshot, 0);
+  world.applyDeltaSnapshot(snapshot, 0);
   // A camera-only update must not move artwork or restart its clocks.
   const camera = decoder.decode(Uint8Array.from([1, 2, 0, 0, 1, 0,
     ...u32(handle), 52, 5, ...f32(300), 19, ...f32(400), 0]));
   assert.ok(camera);
-  world.applyPartial(camera, 60);
+  world.applyDeltaSnapshot(camera, 60);
   assert.deepEqual(interpolateEntity(world.get(handle), 120), { x: -90, y: -40, angle: 0, radius: 25 });
   assert.deepEqual(interpolateCameraTarget(world.get(handle), 120), { x: 200, y: 300 });
   assert.equal(world.get(handle).radius, 25);
@@ -153,15 +154,15 @@ test('dense convenience decoders preserve coordinate semantics, removals and ful
 
 test('authoritative deletion removes artwork immediately (no flash-back)', () => {
   const world = new WorldState(), { bytes, handle } = domainPacket();
-  world.applyPartial(new BareSnapshotDecoder().decode(bytes), 0);
-  world.applyPartial({ sequence: 43, serverTime: 0, entities: [], events: [], deletedHandles: [handle] }, 100);
+  world.applyDeltaSnapshot(new SnapshotDecoder().decode(bytes), 0);
+  world.applyDeltaSnapshot({ sequence: 43, serverTime: 0, entities: [], events: [], deletedHandles: [handle] }, 100);
   assert.equal(world.get(handle), undefined);
   assert.equal(world.count, 0);
   assert.equal([...world.all()].length, 0);
   assert.equal([...world.renderable(100)].length, 0);
   assert.equal([...world.renderable(249)].length, 0);
   assert.equal([...world.renderable(250)].length, 0);
-  world.applyPartial(new BareSnapshotDecoder().decode(bytes), 300);
+  world.applyDeltaSnapshot(new SnapshotDecoder().decode(bytes), 300);
   assert.equal([...world.renderable(300)].length, 1);
   world.reset();
   assert.equal([...world.renderable(300)].length, 0);
@@ -169,7 +170,7 @@ test('authoritative deletion removes artwork immediately (no flash-back)', () =>
 
 test('indexed visual effects do not reset the independent hit and camera-shake clock', () => {
   const world = new WorldState();
-  const update = (events, at) => world.applyPartial({ sequence: at, serverTime: 0, entities: [], events }, at);
+  const update = (events, at) => world.applyDeltaSnapshot({ sequence: at, serverTime: 0, entities: [], events }, at);
   update([{ opcode: 14, handle: 7, index: 3 }], 100);
   assert.equal(world.hitTime(7), undefined);
   assert.equal(world.hitFlash(7, 100), 0);
@@ -185,7 +186,7 @@ test('indexed visual effects do not reset the independent hit and camera-shake c
 test('applyPartial merges health without dropping prior position', () => {
   const world = new WorldState();
   const { bytes, handle } = domainPacket();
-  world.applyPartial(new BareSnapshotDecoder().decode(bytes), 0);
+  world.applyDeltaSnapshot(new SnapshotDecoder().decode(bytes), 0);
   const first = world.get(handle);
   assert.ok(first);
   assert.equal(first.health, 17);
@@ -206,9 +207,9 @@ test('applyPartial merges health without dropping prior position', () => {
     ...varint(53), ...f32(9),
     0,
   ]);
-  const snapshot = new BareSnapshotDecoder().decode(healthOnly);
+  const snapshot = new SnapshotDecoder().decode(healthOnly);
   assert.ok(snapshot);
-  world.applyPartial(snapshot, 16);
+  world.applyDeltaSnapshot(snapshot, 16);
   const merged = world.get(handle);
   assert.ok(merged);
   assert.equal(merged.health, 9);
@@ -231,7 +232,7 @@ test('event block decodes chat, entity time and visual opcodes', () => {
     11, ...u32(handle),
     14, ...u32(handle), 3,
   ]);
-  const snapshot = new BareSnapshotDecoder().decode(bytes);
+  const snapshot = new SnapshotDecoder().decode(bytes);
   assert.ok(snapshot);
   assert.deepEqual(snapshot.events, [
     { opcode: 9, text: 'hello' },
@@ -252,10 +253,10 @@ test('world stores chat lines and visual hit indices', () => {
     9, ...Array.from(new TextEncoder().encode('garden')), 0,
     14, ...u32(handle), 3,
   ]);
-  const snapshot = new BareSnapshotDecoder().decode(bytes);
+  const snapshot = new SnapshotDecoder().decode(bytes);
   assert.ok(snapshot);
   const world = new WorldState();
-  world.apply(snapshot, 100);
+  world.applyFullSnapshot(snapshot, 100);
   assert.deepEqual(world.chat, ['garden']);
   assert.equal(world.visualIndex(handle, 100), 3);
   assert.equal(world.visualIndex(handle, 400), 0);
@@ -290,7 +291,7 @@ test('dense groups use native component-pointer presence from the mask entry', (
     47, // field 47
     ...u32(0), // field 56 reference
   ];
-  const decoder = new BareSnapshotDecoder([{ offset: 72, specs: dense }]);
+  const decoder = new SnapshotDecoder([{ offset: 72, specs: dense }]);
   const snapshot = decoder.decode(Uint8Array.from(bytes));
   assert.ok(snapshot);
   // The mask entry and the dense entry are two update records for one handle;
@@ -313,7 +314,7 @@ test('live profile fields project and merge XP, score and displayed level', () =
     ...varint(1), ...f32(43),
     ...varint(3), 20, 0,
   ]);
-  const decoder = new BareSnapshotDecoder();
+  const decoder = new SnapshotDecoder();
   const snapshot = decoder.decode(bytes);
   assert.ok(snapshot);
   const player = snapshot.entities[0];
@@ -321,18 +322,18 @@ test('live profile fields project and merge XP, score and displayed level', () =
   assert.equal(player.score, 43);
   assert.equal(player.levelProgress, 49151 / 65535);
   const world = new WorldState();
-  world.applyPartial(snapshot, 0);
+  world.applyDeltaSnapshot(snapshot, 0);
   const { bytes: update } = domainPacket(handle);
-  world.applyPartial(decoder.decode(update), 50);
+  world.applyDeltaSnapshot(decoder.decode(update), 50);
   assert.equal(world.get(handle).level, 20);
   assert.equal(world.get(handle).score, 43);
   assert.equal(world.get(handle).levelProgress, 49151 / 65535);
 });
 
 test('delta interpolation starts at the displayed value and keeps independent clocks', async () => {
-  const { interpolateEntity } = await import('../../public/state/interpolation.js');
+  const { interpolateEntity } = await import('../../../build/client/state/interpolation.js');
   const world = new WorldState();
-  const put = (x, at, fields = { 5: x, 24: 0 }) => world.applyPartial({ sequence: at + 1,
+  const put = (x, at, fields = { 5: x, 24: 0 }) => world.applyDeltaSnapshot({ sequence: at + 1,
     serverTime: at, entities: [{ handle: 1, typeId: 2, kind: 2, x, y: 0,
       angle: 0, health: 10, maxHealth: 10, flags: 0, floatFields: fields }], events: [] }, at);
   put(0, 0);
@@ -349,17 +350,17 @@ test('delta snapshots retain omitted entities and apply explicit removals', () =
   const world = new WorldState();
   const entity = handle => ({ handle, typeId: 2, kind: 2, x: 0, y: 0,
     angle: 0, health: 10, maxHealth: 10, flags: 0, floatFields: { 5: 0, 24: 0 } });
-  world.applyPartial({ sequence: 1, serverTime: 0, entities: [entity(1), entity(2)], events: [] }, 0);
-  world.applyPartial({ sequence: 2, serverTime: 50, entities: [entity(1)], events: [] }, 50);
+  world.applyDeltaSnapshot({ sequence: 1, serverTime: 0, entities: [entity(1), entity(2)], events: [] }, 0);
+  world.applyDeltaSnapshot({ sequence: 2, serverTime: 50, entities: [entity(1)], events: [] }, 50);
   assert.equal(world.count, 2);
-  world.applyPartial({ sequence: 3, serverTime: 100, entities: [], deletedHandles: [2], events: [] }, 100);
+  world.applyDeltaSnapshot({ sequence: 3, serverTime: 100, entities: [], deletedHandles: [2], events: [] }, 100);
   assert.equal(world.count, 1);
   assert.equal(world.get(2), undefined);
 });
 
 test('decoders reject trailing bytes and non-finite values', () => {
   const { bytes } = domainPacket();
-  const decoder = new BareSnapshotDecoder();
+  const decoder = new SnapshotDecoder();
   assert.equal(decoder.decode(Uint8Array.from([...bytes, 0])), null);
   const bad = bytes.slice();
   const position = bad.findIndex((_, i) => bad[i] === 3 && bad[i + 1] === 0 && bad[i + 2] === 0 && bad[i + 3] === 246 && bad[i + 4] === 66);
@@ -370,7 +371,7 @@ test('decoders reject trailing bytes and non-finite values', () => {
 
 test('failed packets roll back component masks before the next dense update', () => {
   const handle = 0x12345678;
-  const decoder = new BareSnapshotDecoder([{ offset: 52, specs: [{ field: 22, type: 'byte' }, { field: 54, type: 'byte' }] }]);
+  const decoder = new SnapshotDecoder([{ offset: 52, specs: [{ field: 22, type: 'byte' }, { field: 54, type: 'byte' }] }]);
   const mask = Uint8Array.from([1, 1, 0, 0, 1, 0, ...u32(handle), 55, ...u32(1 << 0), 0]);
   assert.ok(decoder.decode(mask));
   // A truncated replacement mask must not erase the previous component.
@@ -381,17 +382,61 @@ test('failed packets roll back component masks before the next dense update', ()
   assert.deepEqual(snapshot.entities[0].denseFields, { 22: 7, 54: 9 });
 });
 
+test('sparse field boundaries accept 1 and 63 and reject direct or accumulated overflow', () => {
+  const packet = fields => Uint8Array.from([1, 1, 0, 0, 1, 0,
+    ...u32(0x12345678), 55, ...u32(1), ...fields, 0]);
+  const decoder = new SnapshotDecoder();
+  assert.deepEqual(decoder.decode(packet([1, 7, 62, 9])).entities[0].byteFields, { 1: 7, 63: 9 });
+  for (const fields of [[64, 7], [63, 9, 1, 7], [...varint(0xffffffff), 7]]) {
+    assert.equal(decoder.decode(packet(fields)), null, `invalid field bytes: ${fields}`);
+  }
+});
+
+test('out-of-range fields cannot install masks or enable dense groups on a fresh decoder', () => {
+  const handle = 0x12345678;
+  const decoder = new SnapshotDecoder([{ offset: 52, specs: DENSE_GROUP_SPECS[52] }]);
+  const dense = values => Uint8Array.from([1, 2, 0, 0, 1, 0, ...u32(handle), 62, ...values]);
+  const before = decoder.decode(dense([]));
+  assert.equal(decoder.decode(dense([2, 0])), null);
+  // Exact audit vector: the old decoder rewrote field 64 to 1 and committed mask 1.
+  assert.equal(decoder.decode(Uint8Array.from(Buffer.from('010100000100785634123701000000400700', 'hex'))), null);
+  assert.deepEqual(decoder.decode(dense([])), before);
+  assert.equal(decoder.decode(dense([2, 0])), null);
+});
+
+test('invalid sparse fields roll back deletions, earlier records and ordinal presence together', () => {
+  const first = 7, second = 8, added = 9;
+  const decoder = new SnapshotDecoder([{ offset: 52, specs: DENSE_GROUP_SPECS[52] }]);
+  assert.ok(decoder.decode(Uint8Array.from([1, 1, 0, 0, 2, 0,
+    ...u32(first), 55, ...u32(1), 0,
+    ...u32(second), 55, ...u32(0), 0])));
+  const dense = (handle, values) => Uint8Array.from([1, 3, 0, 0, 1, 0, ...u32(handle), 62, ...values]);
+  const firstBefore = decoder.decode(dense(first, [7, 9]));
+  const secondBefore = decoder.decode(dense(second, []));
+  const addedBefore = decoder.decode(dense(added, []));
+  assert.ok(firstBefore); assert.ok(secondBefore); assert.ok(addedBefore);
+  assert.equal(decoder.decode(Uint8Array.from([1, 2, 0, 1, 3, 0, ...u32(first),
+    ...u32(first), 55, ...u32(0), 0, // Valid replacement after deletion.
+    ...u32(second), 54, 0, 1, 0, // Valid ordinal 1 addition, then terminators.
+    ...u32(added), 55, ...u32(1), 64, 7, 0])), null);
+  assert.deepEqual(decoder.decode(dense(first, [7, 9])), firstBefore);
+  assert.deepEqual(decoder.decode(dense(second, [])), secondBefore);
+  assert.deepEqual(decoder.decode(dense(added, [])), addedBefore);
+  assert.equal(decoder.decode(dense(second, [7, 9])), null);
+  assert.equal(decoder.decode(dense(added, [7, 9])), null);
+});
+
 test('a sparse record without angle leaves its interpolation clock unchanged', () => {
-  const decoder = new BareSnapshotDecoder();
+  const decoder = new SnapshotDecoder();
   const world = new WorldState();
   const { bytes, handle } = domainPacket();
-  world.applyPartial(decoder.decode(bytes), 0);
+  world.applyDeltaSnapshot(decoder.decode(bytes), 0);
   const update = Uint8Array.from([1, 43, 0, 0, 1, 0, ...u32(handle), 52,
     ...varint(53), ...f32(9), 0]);
   const snapshot = decoder.decode(update);
   assert.ok(snapshot);
   assert.equal(snapshot.entities[0].angleField8, undefined);
-  world.applyPartial(snapshot, 50);
+  world.applyDeltaSnapshot(snapshot, 50);
   assert.equal(world.get(handle).receivedAngleAt, 0);
   assert.equal(world.get(handle).angle, Math.PI * 2 * 0x4000 / 65535);
 });
@@ -400,7 +445,7 @@ test('sparse angle updates replace a previously dense angle', () => {
   const world = new WorldState();
   const base = { handle: 21, typeId: 2, kind: 2, x: 0, y: 0,
     health: 10, maxHealth: 10, flags: 0 };
-  const put = (at, record) => world.applyPartial({ sequence: at, serverTime: at,
+  const put = (at, record) => world.applyDeltaSnapshot({ sequence: at, serverTime: at,
     entities: [{ ...base, ...record }], events: [] }, at);
   const initial = 8192 * (2 * Math.PI / 65535);
   const next = 16384 * (2 * Math.PI / 65535);
@@ -419,7 +464,7 @@ test('dense fields replace older sparse flags in the current component view', ()
   const world = new WorldState();
   const base = { handle: 22, typeId: 2, kind: 2, x: 0, y: 0, angle: 0,
     health: 10, maxHealth: 10, flags: 0 };
-  const put = (at, record) => world.applyPartial({ sequence: at, serverTime: at,
+  const put = (at, record) => world.applyDeltaSnapshot({ sequence: at, serverTime: at,
     entities: [{ ...base, ...record }], events: [] }, at);
   put(0, { byteFields: { 14: 1, 36: 1 }, floatFields: { 49: 0, 28: 0 } });
   put(50, { x: 10, y: 20, denseFields: { 14: 0, 36: 0, 49: 10, 28: 20 } });
@@ -432,7 +477,7 @@ test('dense fields replace older sparse flags in the current component view', ()
 
 test('the first controlled player follows the existing menu camera from zero', () => {
   const world = new WorldState();
-  world.applyPartial({ sequence: 1, serverTime: 1504, events: [], entities: [{
+  world.applyDeltaSnapshot({ sequence: 1, serverTime: 1504, events: [], entities: [{
     handle: 23, typeId: 1, kind: 1, x: -24870.875, y: -918.9522094726562,
     cameraX: -24870.875, cameraY: -918.9522094726562, angle: 0,
     health: 100, maxHealth: 100, flags: 128,
@@ -444,8 +489,8 @@ test('the first controlled player follows the existing menu camera from zero', (
   assert.deepEqual(interpolateCameraTarget(player, 1640), { x: player.x, y: player.y });
   assert.equal(interpolateEntity(player, 1520).x, player.x);
   assert.equal(interpolateEntity(player, 1520).y, player.y);
-  world.applyPartial({ sequence: 2, serverTime: 1700, events: [], entities: [], deletedHandles: [23] }, 1700);
-  world.applyPartial({ sequence: 3, serverTime: 1800, events: [], entities: [{
+  world.applyDeltaSnapshot({ sequence: 2, serverTime: 1700, events: [], entities: [], deletedHandles: [23] }, 1700);
+  world.applyDeltaSnapshot({ sequence: 3, serverTime: 1800, events: [], entities: [{
     ...player, handle: 24, x: -24000, y: -1000, cameraX: -24000, cameraY: -1000,
     floatFields: { 5: -24000, 24: -1000, 49: -24000, 28: -1000 },
     denseFields: undefined,
@@ -454,9 +499,9 @@ test('the first controlled player follows the existing menu camera from zero', (
 });
 
 test('radius retargets from its displayed value with an independent field-seven clock', async () => {
-  const { interpolateEntity } = await import('../../public/state/interpolation.js');
+  const { interpolateEntity } = await import('../../../build/client/state/interpolation.js');
   const world = new WorldState();
-  const put = (radius, at, fields) => world.applyPartial({ sequence: at + 1, serverTime: at,
+  const put = (radius, at, fields) => world.applyDeltaSnapshot({ sequence: at + 1, serverTime: at,
     entities: [{ handle: 9, typeId: 2, kind: 2, x: 0, y: 0, angle: 0,
       radius, health: 10, maxHealth: 10, flags: 0, floatFields: fields }], events: [] }, at);
   put(30, 0, { 7: 30 });
@@ -471,7 +516,7 @@ test('radius retargets from its displayed value with an independent field-seven 
 
 test('visual fade follows field38 rather than a zero-health heuristic', () => {
   const world = new WorldState();
-  const put = (at, extra) => world.applyPartial({ sequence: at + 1, serverTime: at,
+  const put = (at, extra) => world.applyDeltaSnapshot({ sequence: at + 1, serverTime: at,
     entities: [{ handle: 12, typeId: 2, kind: 2, x: 0, y: 0, angle: 0,
       health: 0, maxHealth: 10, flags: 0, ...extra }], events: [] }, at);
   put(0, {});
@@ -485,7 +530,7 @@ test('visual fade follows field38 rather than a zero-health heuristic', () => {
 
 test('score field retargets continuously and health updates retain its clock', () => {
   const world = new WorldState();
-  const put = (score, at, fields) => world.applyPartial({ sequence: at + 1, serverTime: at,
+  const put = (score, at, fields) => world.applyDeltaSnapshot({ sequence: at + 1, serverTime: at,
     entities: [{ handle: 13, typeId: 1, kind: 1, x: 0, y: 0, angle: 0,
       health: 10, maxHealth: 10, flags: 0, score, floatFields: fields }], events: [] }, at);
   put(0, 0, { 59: 0 }); put(120, 50, { 59: 120 }); put(240, 110, { 59: 240 });
@@ -497,7 +542,7 @@ test('score field retargets continuously and health updates retain its clock', (
 
 test('indexed inventory and recharge deltas merge without losing omitted elements', () => {
   const world = new WorldState();
-  const put = (at, extra) => world.applyPartial({ sequence: at + 1, serverTime: at,
+  const put = (at, extra) => world.applyDeltaSnapshot({ sequence: at + 1, serverTime: at,
     entities: [{ handle: 14, typeId: 1, kind: 1, x: 0, y: 0, angle: 0,
       health: 10, maxHealth: 10, flags: 0, ...extra }], events: [] }, at);
   put(0, { byteArrayFields: { 60: [{ index: 0, value: 1 }, { index: 6, value: 11 }] },
@@ -513,7 +558,7 @@ test('indexed inventory and recharge deltas merge without losing omitted element
 test('profile-only records preserve known health after a health record in the same packet', () => {
   const world = new WorldState();
   const base = { handle: 15, typeId: 1, kind: 1, x: 0, y: 0, angle: 0, flags: 0 };
-  world.applyPartial({ sequence: 1, serverTime: 0, events: [], entities: [
+  world.applyDeltaSnapshot({ sequence: 1, serverTime: 0, events: [], entities: [
     { ...base, health: 50, maxHealth: 100, healthKnown: true, maxHealthKnown: true,
       floatFields: { 53: 50, 55: 100 } },
     { ...base, health: 0, maxHealth: 0, healthKnown: false, maxHealthKnown: false,

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PetalTransfers } from '../../public/render/petal-transfers.js';
-import { WorldState } from '../../public/state/world.js';
-import { CameraState } from '../../public/state/camera.js';
+import { PetalTransfers } from '../../../build/client/render/petal-transfers.js';
+import { WorldState } from '../../../build/client/state/world.js';
+import { CameraState } from '../../../build/client/state/camera.js';
 
 const viewport = { width: 1280, height: 720, level: 1 };
 const drop = { handle: 91, typeId: 4, kind: 4, speciesId: 1, byteFields: { 22: 6 },
@@ -11,7 +11,7 @@ const receive = [{ opcode: 14, handle: drop.handle, index: 2 }];
 function fixture() {
   const world = new WorldState(), camera = new CameraState(), transfers = new PetalTransfers();
   camera.resize(1280, 720, 1); camera.setCamera(0, 0, 0.6);
-  world.apply({ sequence: 1, serverTime: 0, entities: [drop], events: [] }, 0);
+  world.applyFullSnapshot({ sequence: 1, serverTime: 0, entities: [drop], events: [] }, 0);
   return { world, camera, transfers };
 }
 
@@ -20,7 +20,7 @@ test('event14 captures the previous pickup before deletion and suppresses its wo
   transfers.receive(receive, world, camera, 0, viewport);
   assert.equal(world.count, 1, 'receipt changes presentation ownership, not authoritative state');
   assert.equal([...world.renderable(0)].length, 0);
-  world.applyPartial({ sequence: 2, serverTime: 16, entities: [], events: [], deletedHandles: [91] }, 16);
+  world.applyDeltaSnapshot({ sequence: 2, serverTime: 16, entities: [], events: [], deletedHandles: [91] }, 16);
   const inventory = [1, 1, 6, 1, 1];
   const [effect] = transfers.update(16, 16, inventory, undefined, viewport);
   assert.equal(effect.type, 6); assert.equal(effect.index, 2);

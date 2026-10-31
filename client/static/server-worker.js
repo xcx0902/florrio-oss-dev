@@ -1,16 +1,4 @@
-/**
- * Production worker shim for the C++ engine.
- *
- * The engine is compiled to `server.wasm` with the C ABI in
- * engine/include/engine/abi.h. This shim mirrors the original sp_server.js
- * message envelope so the archived client and the new TypeScript client can
- * both talk to it.
- *
- * The original worker owns its simulation clock: its host import 22600 runs
- * sp_server_think every 50 ms. The shim mirrors that with a worker-local timer
- * unless it was loaded with ?manual=1, which lets parity drivers advance the
- * engine on the virtual clock instead.
- */
+/** Product worker: current C ABI, automatic 50ms clock or explicit manual ticks. */
 let modulePromise = null;
 let wasmMemory = null;
 let tickTimer = null;
@@ -78,10 +66,12 @@ self.onmessage = async event => {
   const exports = await instantiate();
   let pointer = 0;
   let length = 0;
+  try {
   if (data) {
     const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
     length = bytes.length;
     pointer = exports.malloc(length);
+    if (length && !pointer) throw new Error('Worker input allocation failed');
     new Uint8Array(exports.memory.buffer).set(bytes, pointer);
   }
   switch (funcName) {
@@ -118,7 +108,7 @@ self.onmessage = async event => {
     }
     default: throw new Error(`invalid worker function to call: ${funcName}`);
   }
-  if (pointer) exports.free(pointer);
+  } finally { if (pointer) exports.free(pointer); }
   if (funcName === 'sp_server_flush') postOutput(exports, callbackId);
   self.postMessage({ callbackId, finalResponse: true, data: 0 });
   } catch (error) {

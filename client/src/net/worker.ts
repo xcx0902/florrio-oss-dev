@@ -1,4 +1,4 @@
-import { asBytes, type ServerFunction, type WorkerRequest, type WorkerResponse } from './protocol.js';
+import { asBytes,type ServerFunction,type WorkerRequest,type WorkerResponse } from './protocol.js';
 
 export type PacketHandler = (data: Uint8Array | null, final: boolean) => void;
 
@@ -6,6 +6,8 @@ export type PacketHandler = (data: Uint8Array | null, final: boolean) => void;
 export class ServerWorkerClient {
   private readonly worker: Worker;
   private nextCallbackId = 0;
+  private closed = false;
+  private fail(error: Error): void { for (const reject of this.rejecters.values()) reject(error); this.pending.clear(); this.rejecters.clear(); }
   private readonly pending = new Map<number, PacketHandler>();
   private readonly rejecters = new Map<number, (error: Error) => void>();
 
@@ -21,9 +23,14 @@ export class ServerWorkerClient {
         this.rejecters.delete(response.callbackId);
         return;
       }
-      handler(asBytes(response.data), response.finalResponse);
+      try { handler(asBytes(response.data), response.finalResponse); } catch (error) {
+        this.rejecters.get(response.callbackId)?.(error instanceof Error ? error : new Error(String(error)));
+        this.pending.delete(response.callbackId); this.rejecters.delete(response.callbackId);
+      }
       if (response.finalResponse) this.pending.delete(response.callbackId);
     };
+    this.worker.onerror = event => { this.closed = true; this.fail(new Error(event.message || 'Worker crashed')); };
+    this.worker.onmessageerror = () => { this.closed = true; this.fail(new Error('Invalid worker message')); };
   }
 
   request(funcName: ServerFunction, data?: Uint8Array): Promise<Uint8Array | null> {
@@ -37,6 +44,7 @@ export class ServerWorkerClient {
     data: Uint8Array | undefined,
     onPacket: (payload: Uint8Array, final: boolean) => void,
   ): Promise<Uint8Array | null> {
+    if (this.closed) return Promise.reject(new Error('Worker terminated'));
     const callbackId = this.nextCallbackId++;
     return new Promise((resolve, reject) => {
       this.rejecters.set(callbackId, reject);
@@ -66,5 +74,5 @@ export class ServerWorkerClient {
   think(): Promise<Uint8Array | null> { return this.request('sp_server_think'); }
   flush(): Promise<Uint8Array | null> { return this.request('sp_server_flush'); }
 
-  terminate(): void { this.worker.terminate(); }
+  terminate(): void { this.closed = true; this.fail(new Error('Worker terminated')); this.worker.onmessage = this.worker.onerror = this.worker.onmessageerror = null; this.worker.terminate(); }
 }

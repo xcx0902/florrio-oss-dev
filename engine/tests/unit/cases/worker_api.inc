@@ -20,7 +20,6 @@ void test_world_initialize() {
   CHECK(world.rng().state() == expected.state());
   CHECK(world.rng().state() == 11065635568950165505ULL); // frozen initial RNG state
   CHECK(world.random().state() == 285456437U); // post-constructor RNG state
-  CHECK(!world.components().has(0));
   world.apply_input(3, engine::f32(7000.0F), engine::f32(-2.0F));
   CHECK(world.input().buttons == 3);
   CHECK(std::fabs(world.input().normalized_angle.value - 0.5315678F) < 1e-6F);
@@ -62,37 +61,17 @@ void test_player_input_appearance() {
   CHECK(entity->player_expression == 0U);
 }
 
-void test_state_dump() {
+void test_entity_domain_state() {
   engine::WorkerApi api;
   api.init();
-  CHECK(api.dump_state(nullptr, 0) == 0U);
-  const auto spawned = api.spawn(engine::EntityKind::kMob, 4,
+  const auto handle = api.spawn(engine::EntityKind::kMob, 4,
     engine::Vec2(engine::f32(12.5F), engine::f32(-3.25F)));
-  CHECK(spawned.valid());
-  CHECK(api.dump_state(nullptr, 0) == 1U);
-  std::array<std::uint8_t, 48> record{};
-  CHECK(api.dump_state(record.data(), 1) == 1U);
-  std::uint32_t handle = 0;
-  std::uint16_t type = 0;
-  std::uint8_t kind = 0;
-  float x = 0.0F, y = 0.0F;
-  std::memcpy(&handle, record.data(), 4);
-  std::memcpy(&type, record.data() + 4, 2);
-  std::memcpy(&kind, record.data() + 6, 1);
-  std::memcpy(&x, record.data() + 8, 4);
-  std::memcpy(&y, record.data() + 12, 4);
-  CHECK(handle == spawned.raw);
-  CHECK(type == 4U);
-  CHECK(kind == static_cast<std::uint8_t>(engine::EntityKind::kMob));
-  CHECK(x == 12.5F);
-  CHECK(y == -3.25F);
-  // R01 diagnostic tail: velocity/acceleration are exposed for the state trace.
-  float vx = 0.0F, vy = 0.0F, ax = 0.0F, ay = 0.0F;
-  std::memcpy(&vx, record.data() + 32, 4);
-  std::memcpy(&vy, record.data() + 36, 4);
-  std::memcpy(&ax, record.data() + 40, 4);
-  std::memcpy(&ay, record.data() + 44, 4);
-  CHECK(vx == 0.0F && vy == 0.0F && ax == 0.0F && ay == 0.0F);
+  const auto* entity = api.world().entities().get(handle);
+  CHECK(entity != nullptr);
+  CHECK(entity->handle == handle && entity->type_id == 4U);
+  CHECK(entity->kind == engine::EntityKind::kMob);
+  CHECK(entity->position.x.value == 12.5F && entity->position.y.value == -3.25F);
+  CHECK(entity->velocity.x == 0.0F && entity->velocity.y == 0.0F);
 }
 
 void test_worker_api() {
@@ -279,23 +258,7 @@ void test_spatial_query() {
   CHECK(blocked_calls == 0);
 }
 
-void test_component_store() {
-  engine::ComponentStore store;
-  CHECK(!store.has(4));
-  auto& positions = store.pool<engine::Vec2>(4);
-  CHECK(store.has(4));
-  const auto first = positions.attach(engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)));
-  CHECK(first.has_value());
-  CHECK(store.has(4));
-  CHECK(positions.capacity() == 1);
-  CHECK(positions.get(*first)->x.value == 1.0F);
-  positions.release(*first);
-  CHECK(positions.free_count() == 1);
-  const auto reused = positions.attach(engine::Vec2(engine::f32(3.0F), engine::f32(4.0F)));
-  CHECK(reused.has_value());
-  CHECK(*reused == *first);
-  CHECK(positions.get(*reused)->y.value == 4.0F);
-}
+
 
 void test_catalog() {
   const engine::Catalog& catalog = engine::Catalog::instance();

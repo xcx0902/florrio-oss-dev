@@ -17,6 +17,25 @@ target_compile_options(engine_core PRIVATE
   -fno-rtti
 )
 
+if(EMSCRIPTEN)
+  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/abi-exports.json" ABI_JSON)
+  set(ABI_NAMES "")
+  foreach(GROUP core diagnostics runtime)
+    string(JSON GROUP_SIZE LENGTH "${ABI_JSON}" ${GROUP})
+    math(EXPR GROUP_LAST "${GROUP_SIZE} - 1")
+    foreach(INDEX RANGE 0 ${GROUP_LAST})
+      string(JSON ABI_NAME GET "${ABI_JSON}" ${GROUP} ${INDEX})
+      list(APPEND ABI_NAMES "_${ABI_NAME}")
+    endforeach()
+  endforeach()
+  list(JOIN ABI_NAMES "," ABI_NAMES_CSV)
+  add_executable(engine_wasm src/wasm/entry.cpp)
+  target_link_libraries(engine_wasm PRIVATE engine_core)
+  set_target_properties(engine_wasm PROPERTIES OUTPUT_NAME server SUFFIX ".wasm")
+  target_link_options(engine_wasm PRIVATE -O2 -Wl,--no-entry
+    "-sEXPORTED_FUNCTIONS=${ABI_NAMES_CSV}" -sSTANDALONE_WASM=1
+    -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=67108864 -sERROR_ON_UNDEFINED_SYMBOLS=1)
+else()
 add_executable(engine_tests tests/unit/test_main.cpp)
 target_link_libraries(engine_tests PRIVATE engine_core)
 target_compile_options(engine_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math -fno-inline)
@@ -75,3 +94,14 @@ add_executable(engine_native_snapshot_fixture
   ${CMAKE_CURRENT_SOURCE_DIR}/../tests/fixtures/product/protocol/native_fixture.cpp)
 target_link_libraries(engine_native_snapshot_fixture PRIVATE engine_core)
 target_compile_options(engine_native_snapshot_fixture PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+
+add_executable(engine_product_workload tests/perf/workload.cpp)
+target_link_libraries(engine_product_workload PRIVATE engine_core)
+target_compile_options(engine_product_workload PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+
+add_executable(engine_structure_tests tests/unit/test_structure.cpp)
+target_link_libraries(engine_structure_tests PRIVATE engine_core)
+target_compile_options(engine_structure_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+add_test(NAME engine_structure_tests COMMAND engine_structure_tests)
+
+endif()

@@ -6,7 +6,7 @@
 | --- | --- |
 | Node.js | 24+ (`node:test`, ESM, `WebAssembly`) |
 | npm | 11+ |
-| CMake | 3.24+ (`--fresh`) |
+| CMake | 3.24+ |
 | C++ compiler | C++20, tested with Apple Clang |
 | Emscripten | version from [`.emscripten-version`](../.emscripten-version) (6.0.10) |
 | Chromium | version from [`.chromium-version`](../.chromium-version) (156.0.8078.47) for acceptance |
@@ -31,7 +31,7 @@ emcc --version
 ```
 
 Chromium selection is shared by every browser runner
-(`tools/lib/chromium.mjs`):
+(`tools/lib/browser-harness.mjs` and `chromium.mjs`):
 
 1. `CHROME_PATH` explicitly selects an executable and fails if missing.
 2. On macOS an installed Google Chrome is used.
@@ -47,9 +47,9 @@ node tools/check-browser-version.mjs
 
 ```sh
 npm run build:engine        # native Release build in build/engine
-npm run build:engine:wasm   # emcc -> client/public/server.wasm
-npm run build:client        # tsc -> client/public
-npm run build:dist-next     # package dist-next/
+npm run build:engine:wasm   # Emscripten CMake -> build/wasm/server.wasm
+npm run build:client        # tsc -> fresh build/client
+npm run build               # schema + wasm + TS + dist-next/
 ```
 
 `build:dist-next` runs the engine wasm, client build and packaging steps unless
@@ -61,15 +61,15 @@ npm run build:dist-next     # package dist-next/
 ```sh
 npm run test:unit           # protocol/wire unit tests
 npm run test:tools          # delivery and verification tool tests
-npm run test:engine         # native build + 10 CTest targets
+npm run test:engine         # native build + 11 CTest targets
 npm run test:client         # typecheck + client unit/integration suites
 npm run test:integration    # native WorkerApi fixture -> TS decoder
 npm run build:dist-next     # packaged delivery tree
-npm run verify:dist-next    # delivery manifest, hashes and source identity
+npm run verify:delivery    # delivery manifest, hashes and source identity
 npm run test:delivery       # dist-next worker/menu smoke
 ```
 
-The client tests launch a real Chromium and load `client/public` or `dist-next`
+The client tests launch a real Chromium and load the packaged `dist-next`
 via `CLIENT_ROOT`. They do not read `archive/`.
 
 ## Full acceptance
@@ -78,21 +78,11 @@ via `CLIENT_ROOT`. They do not read `archive/`.
 npm run test:all
 ```
 
-The runner performs, in order:
-
-1. native engine build;
-2. engine wasm build;
-3. client build;
-4. protocol unit tests;
-5. tool tests;
-6. CTest;
-7. client unit and integration suites;
-8. native WorkerApi -> TS integration fixture;
-9. `dist-next` packaging;
-10. delivery identity and integrity checks;
-11. delivery smoke tests against the packaged tree;
-12. entrypoint smoke with a real Worker, keyboard and mouse;
-13. Chromium browser matrix.
+The sole definition is `tools/verification/gates.mjs`: schema check, native
+build/complete CTest, wasm, TS, package once, unit/tools/client unit, cross-end
+integration, ABI, delivery integrity, browser scenarios/entrypoint smoke/render
+performance in one pinned Chromium process, engine performance and integration
+performance (15 gates). Each gate binds the same run and delivery identity.
 
 It writes `reports/current-verification.json`. A failed or interrupted run does
 not produce a passing record. `reports/` is gitignored; attach the JSON and the
@@ -105,7 +95,7 @@ The archive is not an input. To prove it, copy the source tree without
 
 ```sh
 rsync -a --exclude archive --exclude build --exclude 'dist*' \
-  --exclude node_modules --exclude reports --exclude .git --exclude .emcache \
+  --exclude node_modules --exclude reports --exclude .git --exclude .emcache --exclude release --exclude public \
   ./ /tmp/florrio-product/
 cd /tmp/florrio-product
 npm ci
@@ -125,5 +115,7 @@ absolute paths. If a command needs `archive/`, the migration is incomplete.
   it; the acceptance step rejects other versions.
 - **Port already in use** — `serve.mjs` increments the port; pass `--port` to
   choose one explicitly.
-- **Stale `client/public` output** — `npm run build:client` rewrites the compiled
-  JS and declarations; do not edit them by hand.
+- **Stale compiled output** — `npm run build:client` atomically replaces `build/client`
+  from fresh staging; do not edit generated JS. `client/public` is obsolete.
+- **Preparing a release** — see [release.md](release.md); a completed current ledger
+  is required, and old reports cannot be inherited.

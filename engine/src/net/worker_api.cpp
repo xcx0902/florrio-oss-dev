@@ -3,8 +3,7 @@
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/petals.hpp"
 #include "engine/net/input.hpp"
-#include "engine/net/snapshot_writer.hpp"
-#include "engine/net/snapshot_writer.hpp"
+#include "engine/net/snapshot_codec.hpp"
 
 #include "engine/net/dense_fields.hpp"
 #include "engine/sim/tick.hpp"
@@ -15,123 +14,12 @@
 #include <cstring>
 
 namespace engine {
-
 namespace {
-
-// Original1015 ordinals: 5 -> entity+68, 7 -> +76, 12 -> +92,
-// 18 -> +108. Split Peas retain component7/type50 and add component5/flags9.
-std::uint32_t projectile_render_component(const Entity& entity) {
-  if (entity.kind == EntityKind::kPetal) {
-    const bool peas = entity.type_id == 11U || entity.type_id == 12U || entity.type_id == 34U;
-    return peas && entity.petal_launched ? 5U : 7U;
-  }
-  if (entity.kind == EntityKind::kProjectile)
-    return entity.has_tag_component && (entity.type_id == 29U || entity.type_id == 30U) ? 12U : 18U;
-  return 0U;
-}
-
-/** Original167: circle bounds include attached children. Keep the original
- * f32 min+diameter construction, rather than replacing it with center+radius.
- * Publication uses its own index and does not mutate the contact quadtree or
- * the simulation's geometry-cache epochs. */
-Aabb peer_body_bounds(const World& world, const Entity& entity, std::uint32_t depth = 0U) {
-  const f32 radius = entity.collision_radius;
-  const f32 left = entity.position.x - radius;
-  const f32 top = entity.position.y - radius;
-  const f32 diameter = radius + radius;
-  Aabb result{left, top, left + diameter, top + diameter};
-  if (depth >= kEntitySlotCount) return result;
-  for (const EntityHandle handle : entity.children) {
-    const Entity* child = world.entities().get(handle);
-    if (child == nullptr || child == &entity) continue;
-    const Aabb bounds = peer_body_bounds(world, *child, depth + 1U);
-    const f32 min_x = std::min(result.min_x, bounds.min_x);
-    const f32 min_y = std::min(result.min_y, bounds.min_y);
-    // Original167 stores min/size, not min/max. Preserve the subtraction
-    // and subsequent query-side addition at each attached-body union.
-    const f32 width = std::max(result.max_x, bounds.max_x) - min_x;
-    const f32 height = std::max(result.max_y, bounds.max_y) - min_y;
-    result = {min_x, min_y, min_x + width, min_y + height};
-  }
-  return result;
-}
-
-bool peer_handle_less(EntityHandle first, EntityHandle second) {
-  return first.index() == second.index() ? first.generation() < second.generation()
-                                        : first.index() < second.index();
-}
-
-/** The original player-spawn path consumes one entity slot and releases it
- * before creating the avatar (the handle trace shows the player at slot 870
- * after the 866-entity population ends at slot 868). Releasing with the FIFO
- * free list leaves that slot at the tail, so the avatar and its petals take the
- * original handle sequence. */
 void reserve_spawn_placeholder(World& world) {
   const EntityHandle placeholder = world.entities().allocate().value_or(EntityHandle{});
   if (placeholder.valid()) (void)world.entities().release(placeholder);
 }
-
-/** Emit every sparse field id (1..63) using the recovered wire types. Dense
- * groups remain available through their dedicated writers; this covers the
- * complete 1015 field table for live domain records. */
-void write_full_fields(SnapshotWriter& writer, const Entity& entity,
-                       std::uint32_t mask) {
-  const EntityHandle handle = entity.handle;
-  writer.write_mask_byte_field(handle, mask, 1U, entity.world_flags);
-  writer.write_mask_byte_field(handle, mask, 9U, entity.entity_flags);
-  writer.write_mask_byte_field(handle, mask, 11U, entity.loadout_slot);
-  writer.write_mask_byte_field(handle, mask, 12U, entity.loadout_instance);
-  // Original entity+192 effect component +8; population band is unrelated.
-  writer.write_mask_byte_field(handle, mask, 14U, entity.effect_flags);
-  writer.write_mask_byte_field(handle, mask, 17U, entity.component_flags92);
-  writer.write_mask_byte_field(handle, mask, 20U, 0U);
-  writer.write_mask_byte_field(handle, mask, 22U,
-    entity.kind == EntityKind::kDrop ? static_cast<std::uint8_t>(entity.type_id) : 0U);
-  writer.write_mask_byte_field(handle, mask, 34U, 0U);
-  writer.write_mask_byte_field(handle, mask, 36U, entity.ai.activity_flags);
-  writer.write_mask_byte_field(handle, mask, 38U, entity.death_processed ? 1U : 0U);
-  writer.write_mask_byte_field(handle, mask, 43U, 0U);
-  writer.write_mask_byte_field(handle, mask, 46U, 0U);
-  writer.write_mask_byte_field(handle, mask, 47U, 0U);
-  writer.write_mask_byte_field(handle, mask, 50U, 0U);
-  writer.write_mask_byte_field(handle, mask, 54U, entity.pickup_collected ? 1U : 0U);
-  writer.write_mask_byte_field(handle, mask, 62U, 0U);
-  writer.write_mask_byte_field(handle, mask, 63U, 0U);
-  writer.write_mask_float_field(handle, mask, 7U, entity.collision_radius.value);
-  writer.write_mask_float_field(handle, mask, 13U, 0.0F);
-  writer.write_mask_float_field(handle, mask, 19U, 0.0F);
-  writer.write_mask_float_field(handle, mask, 21U, 0.0F);
-  writer.write_mask_float_field(handle, mask, 27U, 0.0F);
-  writer.write_mask_float_field(handle, mask, 32U, 0.0F);
-  writer.write_mask_float_field(handle, mask, 42U, 0.0F);
-  writer.write_mask_float_field(handle, mask, 45U, 0.0F);
-  if (entity.kind != EntityKind::kPlayer)
-    writer.write_mask_float_field(handle, mask, 59U, 0.0F);
-  writer.write_mask_double_field18(handle, mask, 0.0);
-  writer.write_mask_double_field35(handle, mask, 0.0);
-  for (const std::uint32_t field : {15U, 30U, 41U, 44U, 51U, 52U, 58U})
-    writer.write_mask_varint_field(handle, mask, field, 0U);
-  for (const std::uint32_t field : {29U, 33U, 37U, 40U})
-    writer.write_mask_bit_field(handle, mask, field, false);
-  writer.write_mask_string_field(handle, mask, 4U, "");
-  writer.write_mask_string_field(handle, mask, 6U, "");
-  writer.write_mask_string_field(handle, mask, 48U, "");
-  writer.write_mask_reference_field(handle, mask, 23U, entity.owner);
-  writer.write_mask_reference_field(handle, mask, 56U, 0U);
-  writer.write_mask_reference_field(handle, mask, 57U, 0U);
-  for (std::uint32_t index = 0; index < 10U; ++index) {
-    writer.write_mask_handle_array_field3(handle, mask, index, 0U);
-    writer.write_mask_string_array_field(handle, mask, 10U, index, "");
-    writer.write_mask_byte_array_field(handle, mask, 16U, index, 0U);
-    writer.write_mask_string_array_field(handle, mask, 25U, index, "");
-    writer.write_mask_varint_array_field(handle, mask, 39U, index, 0U);
-  }
-  // Fields 60/61 belong to the player loadout and are emitted from actual
-  // carried types/recharge below, never zero-filled for unrelated entities.
 }
-
-} // namespace
-
 void WorkerApi::init(bool populate) {
   world_.initialize();
   world_.set_auto_populate(populate);
@@ -144,37 +32,17 @@ void WorkerApi::init(bool populate) {
     (void)world_.random().next();
     (void)populate_world(world_, SpawnTable::from_catalog());
   }
-  clock_ = FixedStepClock{};
   output_.clear();
   last_sequence_ = 0;
   next_spawn_time_ms_ = 0.0;
-  domain_score_bits_.clear();
-  domain_camera_bits_.clear();
-  domain_position_revisions_.clear();
-  domain_angle_values_.clear();
-  domain_loadout_values_.clear();
-  domain_viewer_started_ = !populate;
-  domain_visibility_enabled_ = populate;
-  domain_viewer_position_ = Vec2{};
-  domain_viewer_scale_ = f32(1.0F);
-  domain_known_.clear();
-  full_field_framing_ = false;
-  pending_deletes_.clear();
-  pending_events_.clear();
-  snapshot_byte_values_.clear();
-  snapshot_values_.clear();
+  publisher_.reset(populate);
 }
 
 bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::uint8_t> key) {
   if (!world_.initialized() || packet.empty() || packet.size() > kMaxInputPacketBytes) return false;
   std::vector<InputMessage> messages;
   if (decode_input_packet(packet, key, messages) != Status::kOk) return false;
-  // Input commands can destroy equipped entities before think() captures its
-  // own before-list. Keep those removals in the same snapshot deletion queue.
-  std::vector<EntityHandle> before;
-  before.reserve(world_.entities().active_count());
-  for (const auto& entity : world_.entities().entities())
-    if (entity.active) before.push_back(entity.handle);
+  // All input-driven destruction reaches World::destroy and its notification queue.
   for (const auto& message : messages) {
     // The original applies the sequence gate per message, not per buffer.
     if (!accept_input_sequence(last_sequence_, message.sequence)) continue;
@@ -182,13 +50,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
     const bool has_player = world_.player().valid()
       && world_.entities().get(world_.player()) != nullptr;
     if (command.opcode == 5U) {
-      // Original opcode 5 is a chat/string command. Emit event opcode 9 with a
-      // NUL-terminated payload so the client can render the chat line.
-      std::vector<std::uint8_t> payload;
-      payload.reserve(command.text.size() + 1U);
-      for (const char byte : command.text) payload.push_back(static_cast<std::uint8_t>(byte));
-      payload.push_back(0U);
-      emit_event(9U, payload);
+      publisher_.emit_chat(command.text);
       continue;
     }
     if (command.opcode == 4U && !has_player && world_.time_ms() >= next_spawn_time_ms_) {
@@ -206,9 +68,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
     }
     if (command.opcode == 6U && !has_player && world_.time_ms() >= next_spawn_time_ms_) {
       reserve_spawn_placeholder(world_);
-      if (player_spawn_configured_) {
-        (void)spawn_player(world_, command.text, player_position_, player_config_);
-      } else {
+      {
         const bool fresh = world_.profile().level() == 0
           && world_.profile().inventory_count() == 0;
         const PlayerProfile profile = fresh ? make_default_profile() : make_respawn_profile(world_);
@@ -245,373 +105,19 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
     // next applyPlayerControls tick consumes the latest values.
     world_.apply_input(command.buttons, f32(command.angle), f32(command.strength));
   }
-  for (const EntityHandle handle : before)
-    if (world_.entities().get(handle) == nullptr) pending_deletes_.push_back(handle);
   return true;
 }
 
 void WorkerApi::think() {
   if (!world_.initialized()) return;
-  std::vector<EntityHandle> before;
-  before.reserve(world_.entities().active_count());
-  for (const auto& entity : world_.entities().entities())
-    if (entity.active) before.push_back(entity.handle);
   tick(world_, static_cast<double>(kTickMilliseconds));
   // Original 654 appends six random bytes (six original-102 calls) while
   // building the per-tick snapshot seed. They do not affect simulation state,
   // but they advance the shared RNG and therefore every later spawn roll.
   for (int index = 0; index < 6; ++index) (void)world_.random().next();
-  for (const EntityHandle handle : before)
-    if (world_.entities().get(handle) == nullptr) pending_deletes_.push_back(handle);
 }
 
 std::deque<OutputPacket> WorkerApi::flush() { return output_.drain(); }
-
-bool WorkerApi::write_dense_values(SnapshotWriter& writer, const Entity& entity) {
-    const auto values_it = snapshot_values_.find(entity.handle.to_wire());
-    if (entity.snapshot_dense_group != 0 && values_it != snapshot_values_.end()) {
-      const SnapshotValues& values = values_it->second;
-      switch (entity.snapshot_dense_group) {
-        case 116: {
-          const std::array<float, 2> floats{{values.floats[53], values.floats[55]}};
-          writer.write_dense_float_group(entity.handle, floats);
-          return true;
-        }
-        case 120:
-          writer.write_dense_angle_float_group(entity.handle,
-            static_cast<std::uint16_t>(values.varints[8]), values.floats[28], values.floats[49]);
-          return true;
-        case 124: {
-          const std::array<bool, 2> bits{{values.bits[29], values.bits[40]}};
-          writer.write_dense_bit_group(entity.handle, bits);
-          return true;
-        }
-        case 112:
-          writer.write_dense_string_group(entity.handle, values.strings[48]);
-          return true;
-        case -8:
-          writer.write_dense_float_bit_group(entity.handle, values.floats[13], values.bits[37]);
-          return true;
-        case -15:
-          writer.write_dense_reference_group(entity.handle, values.references[23],
-                                             values.references[57]);
-          return true;
-        case -27:
-          writer.write_dense_group_minus27(entity.handle, values.strings[4], values.varints[15],
-                                           values.doubles[18], values.strings[25],
-                                           values.floats[27], values.bits[33],
-                                           values.doubles[35], values.varints[41],
-                                           values.varints[44], values.varints[51]);
-          return true;
-        case 72: {
-          std::array<std::uint8_t, 10> bytes16{};
-          for (std::size_t index = 0; index < bytes16.size(); ++index)
-            bytes16[index] = values.byte_arrays10[16][index];
-          const float position_x = values.auto_position ? entity.position.x.value : values.floats[5];
-          const float position_y = values.auto_position ? entity.position.y.value : values.floats[24];
-          writer.write_dense_group72(entity.handle, values.bytes[1], position_x,
-                                     values.strings[6], bytes16, values.bytes[20],
-                                     values.floats[21], position_y, values.floats[32],
-                                     values.bytes[34], values.bytes[47], values.references[56]);
-          return true;
-        }
-        case -16: {
-          std::array<std::string_view, 10> strings10{};
-          for (std::size_t index = 0; index < strings10.size(); ++index)
-            strings10[index] = values.string_arrays[10][index];
-          writer.write_dense_group_minus16(entity.handle, values.handle_arrays[3], strings10,
-                                           values.bytes[11], values.bytes[12], values.floats[19],
-                                           values.varints[30], values.varint_arrays[39],
-                                           values.floats[42], values.floats[45], values.bytes[46],
-                                           values.varints[52]);
-          return true;
-        }
-        case 152:
-          writer.write_dense_group152_extended(entity.handle, values.bytes[2], values.bytes[26],
-            values.bytes[31], values.varints[58], values.floats[59], values.byte_arrays[60],
-            values.short_arrays[61], values.bytes[62], values.bytes[63]);
-          return true;
-        default: break;
-      }
-    }
-    constexpr std::array<int, 8> kByteGroupOffsets{{52, 56, 68, 76, 84, 100, 136, 144}};
-    const auto stored = snapshot_byte_values_.find(entity.handle.to_wire());
-    std::array<std::vector<std::uint8_t>, 8> byte_groups;
-    bool any_byte_groups = false;
-    if (stored != snapshot_byte_values_.end()) {
-      for (std::size_t index = 1; index < kByteGroupOffsets.size(); ++index) {
-        if ((entity.snapshot_present_groups & (1U << index)) == 0U) continue;
-        const auto* group = dense_group_by_offset(kByteGroupOffsets[index]);
-        if (group == nullptr) continue;
-        for (const std::uint32_t field : group->fields)
-          byte_groups[index].push_back(stored->second[field]);
-        any_byte_groups = true;
-      }
-    }
-    if (any_byte_groups) {
-      std::array<std::span<const std::uint8_t>, 8> spans{};
-      std::size_t count = 0;
-      for (const auto& values : byte_groups)
-        if (!values.empty()) spans[count++] = values;
-      writer.write_dense_byte_groups(entity.handle,
-        std::span<const std::span<const std::uint8_t>>(spans.data(), count));
-      return true;
-    } else if (entity.snapshot_dense52 || (entity.snapshot_present_groups & 1U) != 0U) {
-
-      writer.write_dense_byte_group52(entity.handle, entity.snapshot_dense52_field22,
-                                      entity.snapshot_dense52_field54);
-      return true;
-    } else if (entity.snapshot_component_mask != 0U || entity.component_presence != 0U) {
-      const auto raw = pack_snapshot_angle(entity.angle.value);
-      writer.write_mask_float_angle8(entity.handle,
-                                     entity.snapshot_component_mask | entity.component_presence,
-                                     entity.snapshot_field5.value, raw);
-      return true;
-    }
-    return false;}
-
-void WorkerApi::write_default_dense_values(SnapshotWriter& writer, const Entity& entity) {
-  if (entity.snapshot_dense_group != 0) return;
-  if (snapshot_values_.find(entity.handle.to_wire()) != snapshot_values_.end()) return;
-  if (snapshot_byte_values_.find(entity.handle.to_wire()) != snapshot_byte_values_.end()) return;
-  writer.write_dense_default_groups(entity);
-}
-
-std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequence,
-                                                           std::uint32_t reliable_ack) {
-  SnapshotWriter writer;
-  writer.begin(sequence, reliable_ack);
-  // Original 654 beginSnapshot only queries spatial entities after the local
-  // viewer component (+120) has a controlled body (+100). At boot the world
-  // still simulates its population, but sends only control/world metadata.
-  // The domain transport has no standalone metadata entities to introduce.
-  if (!domain_viewer_started_) {
-    const Entity* player = world_.entities().get(world_.player());
-    domain_viewer_started_ = player != nullptr && player->active;
-    if (!domain_viewer_started_) {
-      pending_deletes_.clear();
-      pending_events_.clear();
-      world_.clear_hit_events();
-      world_.loadout().clear_pickup_transfers();
-      return writer.finish();
-    }
-  }
-  std::unordered_set<std::uint32_t> visible;
-  const Entity* controlled = world_.entities().get(world_.player());
-  if (domain_visibility_enabled_) {
-    if (controlled != nullptr && controlled->health.value > 0.0F) {
-      domain_viewer_position_ = controlled->position;
-      // Original145: an equipped type25 widens the player's view. The
-      // ordinary live scale is 0.9; death keeps the last peer view instead
-      // of querying the world origin or switching back to a menu camera.
-      bool wide_view = false;
-      const auto& slots = world_.loadout().slots();
-      for (std::size_t index = 0; index < world_.profile().active_slots(); ++index)
-        wide_view = wide_view || slots[index].type_id == 25U;
-      domain_viewer_scale_ = f32(wide_view ? 0.63F : 0.9F);
-    }
-    // Both divisions, additions and origin offsets store f32; the rectangle
-    // query uses inclusive overlap.
-    const f32 width = f32(1920.0F) / domain_viewer_scale_ + f32(200.0F);
-    const f32 height = f32(1080.0F) / domain_viewer_scale_ + f32(200.0F);
-    const f32 left = width * f32(-0.5F) + domain_viewer_position_.x;
-    const f32 top = height * f32(-0.5F) + domain_viewer_position_.y;
-    const Aabb view{left, top, left + width, top + height};
-    const f32 half_width = world_.width() * f32(0.5F);
-    const f32 half_height = world_.height() * f32(0.5F);
-    QuadTree tree({f32(0.0F) - half_width, f32(0.0F) - half_height, half_width, half_height}, 4U, 6U);
-    for (const auto& entity : world_.entities().entities())
-      if (entity.active) tree.insert(entity.handle.index(), peer_body_bounds(world_, entity));
-    std::vector<std::size_t> candidates;
-    tree.query(view, candidates);
-    for (const auto index : candidates) {
-      const auto& entity = world_.entities().entities()[index];
-      if (entity.active && peer_body_bounds(world_, entity).intersects(view))
-        visible.insert(entity.handle.raw);
-    }
-    // Original5897–5936 introduces the controlled body independently of the
-    // rectangle (important when the eye and a newly spawned body differ).
-    if (controlled != nullptr) visible.insert(controlled->handle.raw);
-  } else {
-    for (const auto& entity : world_.entities().entities())
-      if (entity.active) visible.insert(entity.handle.raw);
-  }
-  std::vector<EntityHandle> removed;
-  for (const EntityHandle handle : pending_deletes_)
-    if (!domain_visibility_enabled_ || domain_known_.contains(handle.raw)) removed.push_back(handle);
-  if (domain_visibility_enabled_)
-    for (const auto raw : domain_known_)
-      if (!visible.contains(raw)) removed.push_back(EntityHandle{raw});
-  std::sort(removed.begin(), removed.end(), peer_handle_less);
-  removed.erase(std::unique(removed.begin(), removed.end()), removed.end());
-  for (const EntityHandle handle : removed) {
-    writer.write_delete(handle);
-    domain_camera_bits_.erase(handle.to_wire());
-    domain_position_revisions_.erase(handle.to_wire());
-    domain_angle_values_.erase(handle.to_wire());
-    domain_score_bits_.erase(handle.to_wire());
-    domain_loadout_values_.erase(handle.to_wire());
-  }
-  pending_deletes_.clear();
-  for (const auto& event : pending_events_) writer.write_event(event.first, event.second);
-  pending_events_.clear();
-  for (const HitEvent& hit : world_.hit_events()) {
-    if (domain_visibility_enabled_ && !visible.contains(hit.target.raw)
-        && !domain_known_.contains(hit.target.raw)) continue;
-    // Attribution events use the current domain record directly; the retired
-    // fixed-size attribution object is not part of the product layout.
-    writer.write_entity_time_event(hit.target);
-  }
-  world_.clear_hit_events();
-  for (const auto& transfer : world_.loadout().pickup_transfers())
-    if (!domain_visibility_enabled_ || visible.contains(transfer.drop.raw)
-        || domain_known_.contains(transfer.drop.raw))
-      writer.write_visual_event(transfer.drop, transfer.slot);
-  world_.loadout().clear_pickup_transfers();
-  // Component ordinals are not the sparse field ids: transform is 6 (72),
-  // identity is 30 (152), health is 20 (116), visual transform is 21 (120),
-  // collider radius is 26 (140).
-  constexpr std::uint32_t kDomainMask =
-    (1U << 5) | (1U << 19) | (1U << 20) | (1U << 25) | (1U << 29);
-  for (const auto& entity : world_.entities().entities()) {
-    if (!entity.active || !visible.contains(entity.handle.raw)) continue;
-    const std::uint32_t mask = default_dense_groups_
-      ? SnapshotWriter::kDefaultDenseComponentMask : kDomainMask;
-    const std::array<std::uint32_t, 2> camera_bits{{entity.position.x.bits(), entity.position.y.bits()}};
-    const auto previous_camera = domain_camera_bits_.find(entity.handle.to_wire());
-    const bool camera_x_changed = previous_camera == domain_camera_bits_.end()
-      || previous_camera->second[0] != camera_bits[0];
-    const bool camera_y_changed = previous_camera == domain_camera_bits_.end()
-      || previous_camera->second[1] != camera_bits[1];
-    const std::array<std::uint64_t, 2> position_revisions{{entity.position_x_revision, entity.position_y_revision}};
-    const auto previous_position = domain_position_revisions_.find(entity.handle.to_wire());
-    const bool visual_x_changed = camera_x_changed || previous_position == domain_position_revisions_.end()
-      || previous_position->second[0] != position_revisions[0];
-    const bool visual_y_changed = camera_y_changed || previous_position == domain_position_revisions_.end()
-      || previous_position->second[1] != position_revisions[1];
-    const auto angle_value = pack_snapshot_angle(entity.angle.value);
-    const auto previous_angle = domain_angle_values_.find(entity.handle.to_wire());
-    const bool angle_changed = previous_angle == domain_angle_values_.end()
-      || previous_angle->second != angle_value;
-    // A newly spawned pickup is introduced with the arrival bit so
-    // the client replays its birth animation. Pickups that were already in
-    // view keep full scale, matching the original first-snapshot behaviour.
-    const bool arriving = (entity.kind == EntityKind::kDrop || projectile_render_component(entity) == 12U)
-      && !domain_known_.contains(entity.handle.raw)
-      && world_.tick() <= entity.spawn_tick + 1U;
-    writer.write_mask_domain_fields(entity.handle, mask,
-      entity.kind == EntityKind::kPlayer ? entity.player_look : static_cast<std::uint8_t>(entity.type_id),
-      static_cast<std::uint8_t>(entity.kind),
-      entity.kind == EntityKind::kPlayer ? entity.player_expression : entity.loadout_instance,
-      entity.position.x.value, entity.position.y.value,
-      entity.angle.value, entity.health.value, entity.max_health.value, entity.collision_radius.value,
-      entity.death_processed ? 1U : 0U, camera_x_changed, camera_y_changed, angle_changed,
-      entity.ai.enabled ? std::optional<std::uint8_t>(entity.ai.activity_flags) : std::nullopt,
-      visual_x_changed, visual_y_changed, arriving);
-    domain_camera_bits_[entity.handle.to_wire()] = camera_bits;
-    domain_position_revisions_[entity.handle.to_wire()] = position_revisions;
-    domain_angle_values_[entity.handle.to_wire()] = angle_value;
-    if (full_field_framing_) {
-      write_full_fields(writer, entity, mask);
-      if (entity.kind == EntityKind::kPlayer && world_.zone_progress() != 0U)
-        writer.write_mask_byte_field(entity.handle, mask, 63U, world_.zone_progress());
-    }
-    if (entity.kind == EntityKind::kDrop && !full_field_framing_) {
-      writer.write_mask_byte_field(entity.handle, mask, 22U, static_cast<std::uint8_t>(entity.type_id));
-      writer.write_mask_byte_field(entity.handle, mask, 54U, entity.pickup_collected ? 1U : 0U);
-    }
-    if (entity.kind == EntityKind::kPetal && !full_field_framing_) {
-      // Domain fields 11/12 identify the actual equipped slot/instance.
-      // These are not the original world component's capacity bytes.
-      writer.write_mask_byte_field(entity.handle, mask, 11U, entity.loadout_slot);
-      writer.write_mask_byte_field(entity.handle, mask, 12U, entity.loadout_instance);
-    }
-    if (entity.kind == EntityKind::kPlayer) {
-      // Original player component fields: 58 is a normalized u16 XP fraction,
-      // 59 is the scoreboard score, and 62 is the displayed level. Keep these
-      // authoritative; the client must never substitute a recorded HUD sample.
-      const float threshold = experience_threshold(world_.profile().level()).value;
-      const float progress = threshold > 0.0F
-        ? std::clamp(world_.profile().experience().value * 65535.0F / threshold, 0.0F, 65535.0F) : 0.0F;
-      writer.write_mask_varint_field(entity.handle, mask, 58U,
-        static_cast<std::uint32_t>(progress));
-      const auto score_bits = world_.loadout().score().bits();
-      const auto previous_score = domain_score_bits_.find(entity.handle.to_wire());
-      if (previous_score == domain_score_bits_.end() || previous_score->second != score_bits) {
-        writer.write_mask_float_field(entity.handle, mask, 59U, world_.loadout().score().value);
-        domain_score_bits_[entity.handle.to_wire()] = score_bits;
-      }
-      writer.write_mask_byte_field(entity.handle, mask, 62U,
-        world_.profile().level());
-      if (!full_field_framing_) {
-        const std::uint8_t zone = world_.zone_progress();
-        if (zone != 0U || domain_zone_progress_ != 0U)
-          writer.write_mask_byte_field(entity.handle, mask, 63U, zone);
-        domain_zone_progress_ = zone;
-      }
-      DomainLoadoutValues loadout;
-      for (std::size_t slot = 0; slot < loadout.inventory.size(); ++slot)
-        loadout.inventory[slot] = static_cast<std::uint8_t>(world_.loadout().slots()[slot].type_id);
-      loadout.recharge = world_.loadout().recharge_progress();
-      const auto previous = domain_loadout_values_.find(entity.handle.to_wire());
-      writer.write_mask_loadout_fields(entity.handle, mask, loadout.inventory, loadout.recharge,
-        previous == domain_loadout_values_.end() || previous->second.inventory != loadout.inventory,
-        previous == domain_loadout_values_.end() || previous->second.recharge != loadout.recharge);
-      domain_loadout_values_[entity.handle.to_wire()] = loadout;
-    }
-    // Dense live value tables (set_snapshot_* / set_snapshot_groups) are
-    // appended after the compact domain record; absent tables fall back to the
-    // derived default groups when enabled.
-    // Dense group 72 necessarily contains both camera axes. Omit this
-    // redundant default record unless both axes changed, otherwise it would
-    // reintroduce unchanged camera/visual targets and reset their clocks.
-    if (!write_dense_values(writer, entity) && default_dense_groups_
-        && camera_x_changed && camera_y_changed && angle_changed)
-      write_default_dense_values(writer, entity);
-    if (entity.kind == EntityKind::kPlayer && entity.death_processed) {
-      // The archived client reads death statistics from control component 478,
-      // a standalone record that the domain transport does not carry. Emit the
-      // same fields on the controlled body so the death screen and the respawn
-      // menu retain the original killer/lost-item/score data. These records
-      // intentionally follow the dense defaults, whose group 72 writes zeros.
-      writer.write_mask_string_field(entity.handle, mask, 6U, entity.killer_name);
-      // Controller survivors: up to ten, after the first three ground drops.
-      const auto& kept_items = world_.last_death_kept();
-      for (std::uint32_t index = 0; index < 10U; ++index)
-        writer.write_mask_byte_array_field(entity.handle, mask, 16U, index,
-          static_cast<std::uint8_t>(kept_items[index]));
-      writer.write_mask_float_field(entity.handle, mask, 21U,
-        world_.last_death_score().value);
-      writer.write_mask_byte_field(entity.handle, mask, 34U,
-        static_cast<std::uint8_t>(world_.last_death_kept_count()));
-      writer.write_mask_byte_field(entity.handle, mask, 47U,
-        static_cast<std::uint8_t>(world_.last_death_level()));
-      writer.write_mask_byte_field(entity.handle, mask, 1U,
-        static_cast<std::uint8_t>((entity.health.value > 0.0F
-          ? world_.profile().level() : world_.last_death_level()) * 3U / 4U));
-      writer.write_mask_reference_field(entity.handle, mask, 56U,
-        entity.handle.to_wire());
-    }
-    // Keep the fixed dense payload's plan unchanged. Publish the native art
-    // declaration after it: adding group 68/76 before the dense record would
-    // make its decoder consume bytes that payload does not contain.
-    const auto render_component = projectile_render_component(entity);
-    if (render_component != 0U) {
-      const auto render_mask = mask | (1U << (render_component - 1U))
-        | (render_component == 5U ? 1U << 6U : 0U);
-      if (render_component == 5U) {
-        writer.write_mask_byte_field(entity.handle, render_mask, 9U, entity.petal_render_flags);
-        writer.write_mask_byte_field(entity.handle, render_mask, 50U,
-          static_cast<std::uint8_t>(entity.type_id));
-      } else if (render_component == 7U)
-        writer.write_mask_byte_field(entity.handle, render_mask, 50U,
-          static_cast<std::uint8_t>(entity.type_id));
-      else writer.write_mask_entity(entity.handle, render_mask);
-    }
-  }
-  domain_known_ = std::move(visible);
-  return writer.finish();
-}
 
 void WorkerApi::enqueue_domain_snapshot(std::uint32_t sequence) {
   (void)output_.enqueue(OutputPacket{domain_snapshot_bytes(sequence)});
@@ -621,190 +127,13 @@ EntityHandle WorkerApi::spawn(EntityKind kind, std::uint16_t type_id, Vec2 posit
   return spawn_entity_from_defaults(world_, kind, type_id, position);
 }
 
-bool WorkerApi::set_snapshot_byte(EntityHandle handle, std::uint32_t field, std::uint8_t value) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  snapshot_byte_values_[handle.to_wire()][field] = value;
-  snapshot_values_[handle.to_wire()].bytes[field] = value;
-  return true;
-}
-
-bool WorkerApi::set_snapshot_groups(EntityHandle handle, std::uint32_t groups) {
-  Entity* entity = world_.entities().get(handle);
-  if (entity == nullptr) return false;
-  entity->snapshot_present_groups = groups;
-  return true;
-}
-
-bool WorkerApi::set_snapshot_float(EntityHandle handle, std::uint32_t field, float value) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  snapshot_values_[handle.to_wire()].floats[field] = value;
-  return true;
-}
-
-bool WorkerApi::set_snapshot_varint(EntityHandle handle, std::uint32_t field, std::uint32_t value) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  snapshot_values_[handle.to_wire()].varints[field] = value;
-  return true;
-}
-
-bool WorkerApi::set_snapshot_bit(EntityHandle handle, std::uint32_t field, bool value) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  snapshot_values_[handle.to_wire()].bits[field] = value;
-  return true;
-}
-
-bool WorkerApi::set_snapshot_string(EntityHandle handle, std::uint32_t field, std::string value) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  snapshot_values_[handle.to_wire()].strings[field] = std::move(value);
-  return true;
-}
-
-bool WorkerApi::set_snapshot_double(EntityHandle handle, std::uint32_t field, double value) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  snapshot_values_[handle.to_wire()].doubles[field] = value;
-  return true;
-}
-
-bool WorkerApi::set_snapshot_reference(EntityHandle handle, std::uint32_t field, std::uint32_t value) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  snapshot_values_[handle.to_wire()].references[field] = value;
-  return true;
-}
-
-bool WorkerApi::set_snapshot_byte_array(EntityHandle handle, std::uint32_t field,
-                                        std::span<const std::uint8_t, 16> values) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  for (std::size_t index = 0; index < values.size(); ++index)
-    snapshot_values_[handle.to_wire()].byte_arrays[field][index] = values[index];
-  return true;
-}
-
-bool WorkerApi::set_snapshot_byte_array10(EntityHandle handle, std::uint32_t field,
-                                          std::span<const std::uint8_t, 10> values) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  for (std::size_t index = 0; index < values.size(); ++index)
-    snapshot_values_[handle.to_wire()].byte_arrays10[field][index] = values[index];
-  return true;
-}
-
-bool WorkerApi::set_snapshot_short_array(EntityHandle handle, std::uint32_t field,
-                                         std::span<const std::uint16_t, 8> values) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  for (std::size_t index = 0; index < values.size(); ++index)
-    snapshot_values_[handle.to_wire()].short_arrays[field][index] = values[index];
-  return true;
-}
-
-bool WorkerApi::set_snapshot_string_array(EntityHandle handle, std::uint32_t field,
-                                          std::span<const std::string, 10> values) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  for (std::size_t index = 0; index < values.size(); ++index)
-    snapshot_values_[handle.to_wire()].string_arrays[field][index] = values[index];
-  return true;
-}
-
-bool WorkerApi::set_snapshot_handle_array(EntityHandle handle, std::uint32_t field,
-                                          std::span<const std::uint32_t, 10> values) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  for (std::size_t index = 0; index < values.size(); ++index)
-    snapshot_values_[handle.to_wire()].handle_arrays[field][index] = values[index];
-  return true;
-}
-
-bool WorkerApi::set_snapshot_varint_array(EntityHandle handle, std::uint32_t field,
-                                          std::span<const std::uint32_t, 10> values) {
-  if (world_.entities().get(handle) == nullptr || field >= 64U) return false;
-  for (std::size_t index = 0; index < values.size(); ++index)
-    snapshot_values_[handle.to_wire()].varint_arrays[field][index] = values[index];
-  return true;
-}
-
-bool WorkerApi::set_snapshot_group(EntityHandle handle, int group) {
-  Entity* entity = world_.entities().get(handle);
-  if (entity == nullptr) return false;
-  entity->snapshot_dense_group = group;
-  return true;
-}
-
-void WorkerApi::configure_player_spawn(const PlayerConfig& config, Vec2 position) {
-  player_spawn_configured_ = true;
-  player_config_ = config;
-  player_position_ = position;
-}
-
-bool WorkerApi::set_component_presence(EntityHandle handle, std::uint32_t index, bool present) {
-  Entity* entity = world_.entities().get(handle);
-  if (entity == nullptr || index < 1U || index > 30U) return false;
-  const std::uint32_t bit = 1U << (index - 1U);
-  if (present) {
-    entity->component_presence |= bit;
-    entity->component_presence_bits.set(index - 1U);
-  } else {
-    entity->component_presence &= ~bit;
-    entity->component_presence_bits.reset(index - 1U);
-  }
-  return true;
-}
-
-bool WorkerApi::set_snapshot_auto_position(EntityHandle handle, bool enabled) {
-  if (world_.entities().get(handle) == nullptr) return false;
-  snapshot_values_[handle.to_wire()].auto_position = enabled;
-  return true;
-}
-
-std::uint32_t WorkerApi::dump_state(std::uint8_t* output, std::uint32_t capacity) const {
-  std::uint32_t written = 0;
-  std::uint32_t count = 0;
-  for (const auto& entity : world_.entities().entities()) {
-    if (!entity.active) continue;
-    if (output != nullptr && written < capacity) {
-      std::uint8_t* record = output + static_cast<std::size_t>(written) * 48U;
-      const std::uint32_t handle = entity.handle.raw;
-      const std::uint16_t type = entity.type_id;
-      const std::uint8_t kind = static_cast<std::uint8_t>(entity.kind);
-      const std::uint8_t reserved = 0;
-      const float values[6] = {
-        entity.position.x.value, entity.position.y.value, entity.angle.value,
-        // Original physics +8 is the collision radius (petals draw at 14 but
-        // collide at 10), so the diagnostic record must publish the collision
-        // radius, not the render radius.
-        entity.collision_radius.value, entity.health.value, entity.max_health.value,
-      };
-      std::memcpy(record, &handle, 4);
-      std::memcpy(record + 4, &type, 2);
-      std::memcpy(record + 6, &kind, 1);
-      std::memcpy(record + 7, &reserved, 1);
-      for (std::size_t index = 0; index < 6; ++index)
-        std::memcpy(record + 8 + index * 4, &values[index], 4);
-      // Diagnostic tail (R01): velocity and acceleration let the trace tool
-      // separate AI steering differences from integration differences.
-      const float motion[4] = {
-        static_cast<float>(entity.velocity.x), static_cast<float>(entity.velocity.y),
-        static_cast<float>(entity.acceleration.x), static_cast<float>(entity.acceleration.y),
-      };
-      for (std::size_t index = 0; index < 4; ++index)
-        std::memcpy(record + 32 + index * 4, &motion[index], 4);
-      ++written;
-    }
-    ++count;
-  }
-  return count;
-}
-
 bool WorkerApi::occupied(Vec2 position) const {
   return SpatialQuery::from_world(world_).occupied({position.x, position.y});
 }
 
-void WorkerApi::emit_event(std::uint8_t opcode, std::span<const std::uint8_t> payload) {
-  pending_events_.emplace_back(opcode, std::vector<std::uint8_t>(payload.begin(), payload.end()));
-}
 
-bool WorkerApi::despawn(EntityHandle handle) {
-  if (!world_.destroy(handle)) return false;
-  snapshot_byte_values_.erase(handle.to_wire());
-  snapshot_values_.erase(handle.to_wire());
-  pending_deletes_.push_back(handle);
-  return true;
-}
+bool WorkerApi::despawn(EntityHandle handle) { return world_.destroy(handle); }
+
+std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequence, std::uint32_t ack) { return publisher_.publish(world_, sequence, ack); }
 
 } // namespace engine

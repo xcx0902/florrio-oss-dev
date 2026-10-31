@@ -1,3 +1,4 @@
+import { hotbarAnchor } from '../ui/layout/hud.js';
 /** Retained hotbar visuals for event-effect flight and slot attachment. All motion
  * is in logical HUD units, with the same order of binary32 stores as WASM. */
 import type { HudLayout } from './hud.js';
@@ -22,10 +23,7 @@ export interface PetalMotion {
 }
 
 export function petalSlotAnchor(layout: HudLayout, slot: number): { x: number; y: number; size: number } {
-  const equipped = slot < layout.equippedCount;
-  const index = slot === 16 ? 8 : slot - layout.equippedCount;
-  return { x: f(equipped ? layout.equippedX + slot * 90 : layout.storageX + index * 65),
-    y: f(equipped ? layout.equippedY : layout.storageY), size: equipped ? 70 : 50 };
+  return hotbarAnchor(layout, slot);
 }
 
 /** Native snap searches circular regions with radius equal to the slot size.

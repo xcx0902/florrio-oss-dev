@@ -1,14 +1,11 @@
+import { startTestServer } from '../../../tools/lib/test-server.mjs';
+import { launchBrowser } from '../../../tools/lib/browser-harness.mjs';
 /** Shared HTTP + Playwright fixture for the split worker/browser tests. */
-import { existsSync } from 'node:fs';
-import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { pathToFileURL } from 'node:url';
-import { chromiumExecutable } from '../../../tools/lib/chromium.mjs';
 
-const root = path.resolve(process.env.CLIENT_ROOT || 'client/public');
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.map': 'application/json' };
+const root = path.resolve(process.env.CLIENT_ROOT || 'dist-next');
 let server;
 export let browser;
 export let origin;
@@ -85,39 +82,21 @@ export function assertPeerVisibleSet(result, phase) {
 }
 
 export async function start() {
-  const local = ['node_modules/playwright-core/index.mjs', 'node_modules/playwright/node_modules/playwright-core/index.mjs'].find(candidate => existsSync(candidate));
-  const playwrightPath = process.env.PLAYWRIGHT_CORE || local;
-  if (!playwrightPath) throw new Error('playwright-core is required for client tests');
-  const playwright = await import(pathToFileURL(path.resolve(playwrightPath)).href);
-  const engineName = process.env.BROWSER || 'chromium';
-  const engine = playwright[engineName];
-  if (!engine) throw new Error(`unknown Playwright engine ${engineName}`);
-  server = http.createServer(async (request, response) => {
-    try {
-      const pathname = decodeURIComponent(new URL(request.url, 'http://local.test').pathname);
-      if (pathname === '/stream-test-worker.js') {
-        response.writeHead(200, { 'Content-Type': 'text/javascript', 'Cache-Control': 'no-store' }).end(`
-          self.onmessage = event => {
-            const { callbackId } = event.data;
-            self.postMessage({ callbackId, finalResponse: false, data: new Uint8Array([1, 2]) });
-            self.postMessage({ callbackId, finalResponse: true, data: new Uint8Array([3]) });
-          };
-        `);
-        return;
-      }
-      const filename = path.resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
-      const body = await readFile(filename);
-      response.writeHead(200, { 'Content-Type': mime[path.extname(filename)] || 'application/octet-stream', 'Cache-Control': 'no-store' }).end(body);
-    } catch { response.writeHead(404).end('Not found'); }
-  });
-  await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
-  origin = `http://127.0.0.1:${server.address().port}`;
-  const chromePath = chromiumExecutable();
-  browser = await engine.launch({
-    executablePath: engineName === 'chromium' ? chromePath : undefined,
-    headless: true,
-    args: ['--no-first-run', '--disable-background-networking'],
-  });
+  const fixture = await startTestServer(root, { diagnostics: true, routes: {
+    '/test-support/dense-codec.js': async (request, response) => {
+      const source = (await readFile(new URL('./dense-codec.mjs', import.meta.url), 'utf8'))
+        .replaceAll('../../../build/client/', '/');
+      response.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8' })
+        .end(request.method === 'HEAD' ? undefined : source);
+    },
+    '/stream-test-worker.js': (_request, response) => response.writeHead(200, { 'Content-Type': 'text/javascript' }).end(`
+      self.onmessage = event => { const { callbackId } = event.data;
+        self.postMessage({ callbackId, finalResponse: false, data: new Uint8Array([1, 2]) });
+        self.postMessage({ callbackId, finalResponse: true, data: new Uint8Array([3]) }); };
+    `),
+  } });
+  server = fixture.server; origin = fixture.origin;
+  browser = await launchBrowser();
 }
 
 export async function stop() {

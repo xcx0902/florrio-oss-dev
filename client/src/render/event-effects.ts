@@ -4,13 +4,13 @@
  * clientFrame retired-list cleanup. render-frame's similarly named pass
  * draws the world pickup marker, not this screen-space transfer.
  */
+import { PETAL_INFO } from '../schema/petals.js';
 import type { Canvas2DContext } from './canvas2d/context.js';
 import { wrapContext } from './canvas2d/context.js';
-import { createRasterCanvas, getRasterContext, drawLabel, getLabel } from './canvas2d/text-cache.js';
 import type { RasterCanvas } from './canvas2d/text-cache.js';
+import { createRasterCanvas,drawLabel,getLabel,getRasterContext } from './canvas2d/text-cache.js';
 import { drawPetalIcon } from './entity-art.js';
 import { getHudLayout } from './hud.js';
-import { PETAL_INFO } from '../schema/petals.js';
 
 export interface Event14Payload {
   readonly index: number;

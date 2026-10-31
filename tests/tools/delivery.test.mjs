@@ -13,24 +13,25 @@ const repo = fileURLToPath(new URL('../..', import.meta.url));
 async function fixture(t) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'florr-delivery-test-'));
   t.after(() => rm(root, { recursive: true, force: true }));
-  for (const folder of ['client/src', 'client/public', 'engine/src', 'engine/include', 'tools/lib', 'tools/verification'])
+  for (const folder of ['client/src', 'client/static', 'build/client', 'build/wasm', 'engine/src', 'engine/include', 'tools/lib', 'tools/verification'])
     await mkdir(path.join(root, folder), { recursive: true });
-  for (const file of ['.emscripten-version', 'engine/sources.cmake', 'tools/build-engine-wasm.mjs', 'tools/lib/build-inputs.mjs', 'tools/verification/io.mjs'])
+  for (const file of ['.emscripten-version', 'engine/sources.cmake', 'tools/build-engine-wasm.mjs', 'tools/lib/build-inputs.mjs', 'tools/lib/identity.mjs', 'engine/CMakeLists.txt', 'engine/abi-exports.json', 'tools/verification/io.mjs'])
     await cp(path.join(repo, file), path.join(root, file));
   const config = { compilerOptions: { target: 'ES2022', module: 'ES2022', lib: ['ES2022'],
-    rootDir: 'src', outDir: 'public', declaration: true, sourceMap: true, types: [] }, include: ['src/**/*.ts'] };
+    rootDir: 'src', outDir: '../build/client', declaration: false, sourceMap: false, types: [] }, include: ['src/**/*.ts'] };
   await writeFile(path.join(root, 'client/tsconfig.json'), JSON.stringify(config));
   await writeFile(path.join(root, 'client/src/main.ts'), "export const label = 'current';\n");
   const parsed = ts.parseJsonConfigFileContent(config, ts.sys, path.join(root, 'client'));
   const program = ts.createProgram(parsed.fileNames, parsed.options);
   assert.equal(program.emit().emitSkipped, false);
-  await writeFile(path.join(root, 'client/public/index.html'), '<html>fixture</html>');
-  await writeFile(path.join(root, 'client/public/server-worker.js'), '// fixture worker\n');
+  await writeFile(path.join(root, 'client/static/index.html'), '<html>fixture</html>');
+  await writeFile(path.join(root, 'client/static/server-worker.js'), '// fixture worker\n');
+  await writeFile(path.join(root, 'client/static/assets.json'), JSON.stringify(['index.html', 'server-worker.js']));
   // No game/compiler execution: a minimal valid wasm plus an explicit mock
   // compiler record isolates the packaging/verification contract under test.
   const wasm = Buffer.from([0, 97, 115, 109, 1, 0, 0, 0]);
-  await writeFile(path.join(root, 'client/public/server.wasm'), wasm);
-  await writeFile(path.join(root, 'client/public/server.wasm.build.json'), JSON.stringify({
+  await writeFile(path.join(root, 'build/wasm/server.wasm'), wasm);
+  await writeFile(path.join(root, 'build/wasm/server.wasm.build.json'), JSON.stringify({
     sha256: sha256(wasm), inputs: await engineInputs(root), compilerVersion: 'mock fixture compiler',
   }));
   return root;
@@ -87,7 +88,7 @@ test('delivery refuses wasm whose compiler input record is stale', async t => {
 
 test('failed wasm compiler retains the last valid module and compiler record', async t => {
   const root = await fixture(t);
-  const output = path.join(root, 'client/public/server.wasm');
+  const output = path.join(root, 'build/wasm/server.wasm');
   const before = await readFile(output), record = await readFile(output + '.build.json');
   const version = (await readFile(path.join(root, '.emscripten-version'), 'utf8')).trim();
   const compiler = path.join(root, 'failing-emxx.mjs');
@@ -107,7 +108,7 @@ test('incomplete delivery retains the previous tree and cleans staging and locks
   const root = await fixture(t);
   assert.equal(run(root, 'build-dist-next.mjs', ['--skip-build']).status, 0);
   const before = await readFile(path.join(root, 'dist-next/build-manifest.json'));
-  await rm(path.join(root, 'client/public/index.html'));
+  await rm(path.join(root, 'client/static/index.html'));
   const result = run(root, 'build-dist-next.mjs', ['--skip-build']);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Missing required compiled file index.html/);

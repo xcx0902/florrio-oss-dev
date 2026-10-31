@@ -3,7 +3,7 @@
 // WASM export, generated expectation or golden.
 #include "engine/core/byte_reader.hpp"
 #include "engine/net/protocol.hpp"
-#include "engine/net/snapshot_writer.hpp"
+#include "engine/net/snapshot_codec.hpp"
 #include "engine/net/worker_api.hpp"
 
 #include <array>
@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
   // Direct wire-boundary probe: the schema allows only uint8-publishable ids;
   // snapshot field 2 is the species byte. This packet is not a catalog row.
   const engine::EntityHandle boundary_handle = engine::EntityHandle::from_parts(0U, 1U);
-  engine::SnapshotWriter boundary_writer;
+  engine::SnapshotEncoder boundary_writer;
   boundary_writer.begin(9U, 0U);
   boundary_writer.write_mask_byte_field(boundary_handle, 1U, 2U, 255U);
   std::array<std::uint8_t, 16> inventory{};

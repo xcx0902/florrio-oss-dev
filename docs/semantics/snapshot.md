@@ -47,6 +47,12 @@ dense existing-component fields, flag 64 extends group 152 with fields 58–63,
 and flag 128 marks entity byte 44 bit 0. A declared component pointer gates the
 corresponding dense group; an undeclared group consumes no bytes.
 
+Sparse field deltas accumulate to field ids 1 through 63; zero terminates the
+field list. An out-of-range accumulated id rejects the whole packet, without
+rewriting it to another field. Masks, component presence and deletions commit
+only after every record and event validates and no trailing bytes remain.
+A rejected packet leaves the next sparse or dense decode in the prior state.
+
 ## Live sparse fields
 
 `domain_snapshot_bytes` writes these ascending field ids:
@@ -146,13 +152,13 @@ receiver preserves that rule.
 
 ## Events
 
-The header's event count covers events written by `SnapshotWriter`:
+The header's event count covers events written by `SnapshotEncoder`:
 
 - opcode 9 — chat: NUL-terminated string;
 - opcode 11 — entity time: handle;
 - opcode 14 — petal transfer: handle + slot index.
 
-`WorkerApi` synthesizes one opcode-11 event per coalesced hit in a tick.
+`SnapshotPublisher` emits one opcode-11 event per coalesced domain hit in a tick.
 Pickup/slot assignment queues the actual drop handle and selected slot in
 `PlayerLoadout`; the live writer drains the queue once. A collected pickup
 remains for 2000 ms so the receiver can process the event, and cannot be
@@ -161,12 +167,14 @@ publishes its real petal type and the collected bit.
 
 ## Client decoding
 
-- `client/src/state/snapshot.ts` — `BareSnapshotDecoder` with
-  `DensePlanDecoder`; events 9/11/14; rejects truncated packets, non-canonical
-  varints, unknown opcodes, trailing bytes and non-finite f32 values.
+- `client/src/net/snapshot-decoder.ts` — one `SnapshotDecoder` with explicit
+  schema-derived dense plans and events 9/11/14; validates the entire packet
+  before committing masks/pointers, rejecting malformed or truncated input.
+- `client/src/state/snapshot-projection.ts` — named domain/death/loadout views;
+  `state/snapshot.ts` is only a public compatibility re-export.
 - `client/src/state/field-types.ts` — field-type sets, 19 dense groups and
   `FIELD_COMPONENTS`.
-- `client/src/state/world.ts` — `WorldState.applyPartial` merges health, maximum,
+- `client/src/state/world.ts` — `WorldState.applyDeltaSnapshot` merges health, maximum,
   kind, species, position, angle, dense fields and component offsets; keeps
   interpolation anchors, chat lines and visual hit indices.
 
@@ -187,4 +195,7 @@ decoded against the live mask/dense contract.
 
 - exact revision publication for fields not listed above;
 - full per-instance recharge timer behavior behind field 61;
-- peer visibility subset for entities outside the local interest set.
+- additional protocol fields beyond current product publishers remain codec capabilities;
+  changing wire support requires a separate versioned decision.
+
+Peer interest exit/reentry and death-view retention have dedicated product tests.

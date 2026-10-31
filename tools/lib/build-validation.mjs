@@ -2,7 +2,7 @@
 import ts from 'typescript';
 import path from 'node:path';
 import { readFile, lstat } from 'node:fs/promises';
-import { engineInputs, sha256 } from './build-inputs.mjs';
+import { engineInputs, sha256, listFiles } from './build-inputs.mjs';
 
 export async function validateBuild(root = '.') {
   root = path.resolve(root);
@@ -13,7 +13,9 @@ export async function validateBuild(root = '.') {
   const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, path.dirname(configPath));
   const program = ts.createProgram(parsed.fileNames, parsed.options);
   const pending = [];
+  const expectedOutputs = [];
   const emit = program.emit(undefined, (file, text) => {
+    expectedOutputs.push(path.relative(path.join(root, 'build/client'), file));
     pending.push((async () => {
       try {
         const actual = await readFile(file, 'utf8');
@@ -26,9 +28,10 @@ export async function validateBuild(root = '.') {
     getCanonicalFileName: file => file, getCurrentDirectory: () => root, getNewLine: () => '\n',
   }) || 'TypeScript emit skipped');
   await Promise.all(pending);
+  try { if (JSON.stringify((await listFiles(path.join(root, 'build/client'))).sort()) !== JSON.stringify(expectedOutputs.sort())) issues.push('compiled TypeScript inventory differs (missing/orphan modules)'); } catch { issues.push('missing compiled client'); }
   let engineBuild = null;
   try {
-    const output = path.join(root, 'client/public/server.wasm');
+    const output = path.join(root, 'build/wasm/server.wasm');
     if (await lstat(output + '.lock').then(() => true, error => { if (error.code === 'ENOENT') return false; throw error; }))
       issues.push('engine wasm build is still in progress');
     engineBuild = JSON.parse(await readFile(output + '.build.json', 'utf8'));

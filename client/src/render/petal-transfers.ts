@@ -1,10 +1,10 @@
-import { createEvent14Effect, updateEvent14Effect, type Event14Effect, type Event14Viewport } from './event-effects.js';
-import { getHudLayout } from './hud.js';
 import { PETAL_INFO } from '../schema/petals.js';
+import type { CameraState } from '../state/camera.js';
 import { interpolateEntity } from '../state/interpolation.js';
 import type { SnapshotEvent } from '../state/snapshot.js';
 import type { WorldState } from '../state/world.js';
-import type { CameraState } from '../state/camera.js';
+import { createEvent14Effect,updateEvent14Effect,type Event14Effect,type Event14Viewport } from './event-effects.js';
+import { getHudLayout } from './hud.js';
 
 /** One native event14 object per occupied slot; retired objects retain their
  * own fade instead of being overwritten by the next transfer into that slot. */

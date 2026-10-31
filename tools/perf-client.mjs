@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { startTestServer } from './lib/test-server.mjs';
+import { launchBrowser } from './lib/browser-harness.mjs';
 /**
  * R31: measure the reconstructed client's frame budget.
  *
@@ -9,14 +11,11 @@
  *
  * Usage: node tools/perf-client.mjs [--frames 600] [--root dist-next] [--out reports/perf.json]
  */
-import { chromiumExecutable } from './lib/chromium.mjs';
-import http from 'node:http';
 import path from 'node:path';
 import { evidence, newRunId, sameEvidence, sha256, treeIdentity } from './verification-evidence.mjs';
 import { atomicJson, assertVerificationOwner } from './verification/io.mjs';
 import { readFile, mkdir, open, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -40,33 +39,12 @@ const rootManifestSha256 = existsSync(manifestPath) ? sha256(await readFile(mani
 const sourceMatchesDelivery = !rootManifestSha256 || JSON.parse(await readFile(manifestPath, 'utf8')).inputs?.sha256 === before.source.sha256;
 const lock = await open(output + '.lock', 'wx');
 
-const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8', '.wasm': 'application/wasm', '.json': 'application/json; charset=utf-8' };
-const server = http.createServer(async (request, response) => {
-  try {
-    const pathname = decodeURIComponent(new URL(request.url, 'http://local.test').pathname);
-    const filename = path.resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
-    if (!filename.startsWith(root + path.sep)) { response.writeHead(403).end(); return; }
-    const body = await readFile(filename);
-    response.writeHead(200, { 'Content-Type': mime[path.extname(filename)] || 'application/octet-stream',
-      'Cache-Control': 'no-store' }).end(body);
-  } catch { response.writeHead(404).end('Not found'); }
-});
+const fixture = await startTestServer(root, { diagnostics: true });
+const server = fixture.server;
 try {
 await atomicJson(output, { runId, evidence: before, generatedAt: new Date().toISOString(), passed: false, status: 'running' });
-await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
-const origin = `http://127.0.0.1:${server.address().port}`;
-
-async function playwrightPath() {
-  if (process.env.PLAYWRIGHT_CORE) return process.env.PLAYWRIGHT_CORE;
-  for (const candidate of ['node_modules/playwright-core/index.mjs', 'node_modules/playwright/node_modules/playwright-core/index.mjs'])
-    if (existsSync(candidate)) return path.resolve(candidate);
-  throw new Error('playwright-core is required');
-}
-const { chromium } = await import(pathToFileURL(await playwrightPath()).href);
-const chromePath = chromiumExecutable();
-browser = await chromium.launch({ executablePath: chromePath, headless: true,
-  args: ['--no-first-run', '--disable-background-networking', '--enable-precise-memory-info'] });
+const origin = fixture.origin;
+browser = await launchBrowser({ args: ['--no-first-run', '--disable-background-networking', '--enable-precise-memory-info'] });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
 const errors = [];
 page.on('pageerror', error => errors.push(error.message));
@@ -78,7 +56,7 @@ await page.addInitScript(() => {
     return clear.apply(this, args);
   };
 });
-await page.goto(origin + '/index.html', { waitUntil: 'load', timeout: 60000 });
+await page.goto(origin + '/index.html?test=1', { waitUntil: 'load', timeout: 60000 });
 await page.waitForFunction(() => window.__florr && document.getElementById('canvas'), null, { timeout: 30000 });
 await page.evaluate(() => document.fonts.ready);
 

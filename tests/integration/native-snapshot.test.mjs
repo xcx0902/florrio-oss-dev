@@ -7,10 +7,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { BareSnapshotDecoder } from '../../client/public/state/snapshot.js';
-import { DENSE_GROUPS, DENSE_GROUP_SPECS } from '../../client/public/state/field-types.js';
-import { WorldState } from '../../client/public/state/world.js';
-import { playerLoadoutSlots } from '../../client/public/state/loadout.js';
+import { SnapshotDecoder } from '../../build/client/state/snapshot.js';
+import { DENSE_GROUPS, DENSE_GROUP_SPECS } from '../../build/client/state/field-types.js';
+import { WorldState } from '../../build/client/state/world.js';
+import { playerLoadoutSlots } from '../../build/client/state/loadout.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const temporary = await mkdtemp(path.join(os.tmpdir(), 'florr-native-integration-'));
@@ -33,7 +33,7 @@ function parseFixture(bytes) {
 test('hand-authored protocol vectors decode without a generator-derived expectation', async () => {
   const document = JSON.parse(await readFile(
     path.join(root, 'tests/fixtures/product/protocol/manual_vectors.json'), 'utf8'));
-  const decoder = new BareSnapshotDecoder();
+  const decoder = new SnapshotDecoder();
   for (const vector of document.vectors) {
     const packet = Uint8Array.from(Buffer.from(vector.hex, 'hex'));
     const snapshot = decoder.decode(packet);
@@ -59,7 +59,7 @@ test('native WorkerApi fixture drives input, think and publish through player, m
   assert.equal(run.status, 0, run.stderr);
   const packets = parseFixture(await readFile(output));
   assert.equal(packets.length, 4);
-  const decoder = new BareSnapshotDecoder(plans);
+  const decoder = new SnapshotDecoder(plans);
 
   const baseline = decoder.decode(packets[0]);
   assert.ok(baseline, 'post-spawn baseline decodes');
@@ -68,7 +68,7 @@ test('native WorkerApi fixture drives input, think and publish through player, m
   assert.ok(baselinePlayer, 'opcode 6 created a player through WorkerApi input');
   assert.equal(baselinePlayer.health, 100);
   const loadoutWorld = new WorldState();
-  loadoutWorld.applyPartial(baseline, 0);
+  loadoutWorld.applyDeltaSnapshot(baseline, 0);
   const spawnedPlayer = loadoutWorld.get(baselinePlayer.handle);
   assert.deepEqual(playerLoadoutSlots(spawnedPlayer)?.slice(0, 5), [1, 1, 1, 1, 1],
     'spawn_loadout_petals created the real default inventory');
@@ -89,8 +89,8 @@ test('native WorkerApi fixture drives input, think and publish through player, m
   assert.ok(mobRecord.health > 0 && mobRecord.maxHealth >= mobRecord.health);
 
   const world = new WorldState();
-  world.applyPartial(baseline, 0);
-  world.applyPartial(moved, 50);
+  world.applyDeltaSnapshot(baseline, 0);
+  world.applyDeltaSnapshot(moved, 50);
   const player = world.get(baselinePlayer.handle);
   assert.ok(player);
   assert.deepEqual(playerLoadoutSlots(player)?.slice(0, 5), [1, 1, 1, 1, 1]);
@@ -106,7 +106,7 @@ test('native WorkerApi fixture drives input, think and publish through player, m
   assert.equal(deleted.sequence, 8);
   assert.deepEqual(deleted.deletedHandles, [mobHandle]);
   assert.equal(deleted.events.length, 0);
-  world.applyPartial(deleted, 100);
+  world.applyDeltaSnapshot(deleted, 100);
   assert.equal(world.get(mobHandle), undefined, 'deletion removes the mob');
   assert.ok(world.get(baselinePlayer.handle), 'player survives the mob deletion');
 });
@@ -119,7 +119,7 @@ test('native snapshot preserves the uint8 publishable id boundary', async () => 
   assert.equal(run.status, 0, run.stderr);
   const packets = parseFixture(await readFile(output));
   assert.equal(packets.length, 4);
-  const decoder = new BareSnapshotDecoder();
+  const decoder = new SnapshotDecoder();
   const boundary = decoder.decode(packets[3]);
   assert.ok(boundary, 'boundary packet decodes');
   assert.equal(boundary.sequence, 9);

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadoutSlots, playerLoadoutSlots, playerSlotProgress } from '../../public/state/loadout.js';
+import { loadoutSlots, playerLoadoutSlots, playerSlotProgress } from '../../../build/client/state/loadout.js';
 
 test('loadout slots come from petal byte fields 11/12', () => {
   const entities = [

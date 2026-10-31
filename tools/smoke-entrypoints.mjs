@@ -4,8 +4,7 @@ import { spawn } from 'node:child_process';
 import net from 'node:net';
 import path from 'node:path';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { chromium } from 'playwright-core';
-import { chromiumExecutable } from './lib/chromium.mjs';
+import { launchBrowser } from './lib/browser-harness.mjs';
 import { evidence, sameEvidence, sha256, treeIdentity } from './verification-evidence.mjs';
 import { atomicJson, assertVerificationOwner } from './verification/io.mjs';
 
@@ -14,8 +13,7 @@ const initial = await evidence();
 const delivery = await treeIdentity('.', ['dist-next']);
 const report = { generatedAt: new Date().toISOString(), evidence: initial,
   target: { root: 'dist-next', sha256: delivery.sha256 }, entries: [], passed: false };
-const browser = await chromium.launch({ executablePath: chromiumExecutable(), headless: true,
-  args: ['--no-first-run', '--disable-background-networking'] });
+const browser = await launchBrowser();
 try {
   for (const entry of [
     { name: 'default', root: 'dist-next', args: [], worker: 'server-worker.js', wasm: 'server.wasm' },

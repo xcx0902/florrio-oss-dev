@@ -1,13 +1,15 @@
 /** Native menu panels (func1095), sharing geometry with pointer hit tests. */
-import type { Canvas2DContext } from './canvas2d/context.js';
-import { drawLabel, drawLabelBox, measureLabel } from './canvas2d/text-cache.js';
-import { drawPetalCard, drawSpecies } from './entity-art.js';
-import { MOB_INFO, RARITY_NAMES } from '../schema/petals.js';
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
+import { MOB_INFO,RARITY_NAMES } from '../schema/petals.js';
+import type { Canvas2DContext } from './canvas2d/context.js';
+import { drawLabel,drawLabelBox,measureLabel } from './canvas2d/text-cache.js';
+import { drawPetalCard,drawSpecies } from './entity-art.js';
 import {
-  MENU_TABS, MOB_GALLERY_TYPES, PETAL_GALLERY_TYPES, changelogEntries, mobDescriptionLines, mobDropRect,
-  menuCloseRect, menuContentRect, menuPanelRect, menuScrollMax, mobRowRect, petalCellRect, settingsCheckboxRect,
-  type MenuPanel, type MenuRenderState, type Rect,
+MENU_TABS,MOB_GALLERY_TYPES,PETAL_GALLERY_TYPES,changelogEntries,
+menuCloseRect,menuContentRect,menuPanelRect,menuScrollMax,
+mobDescriptionLines,mobDropRect,
+mobRowRect,petalCellRect,settingsCheckboxRect,
+type MenuPanel,type MenuRenderState,type Rect,
 } from './menu-layout.js';
 
 const f = Math.fround;

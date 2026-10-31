@@ -5,14 +5,12 @@
 #include "engine/core/rng.hpp"
 #include "engine/core/vec2.hpp"
 #include "engine/model/catalog.hpp"
-#include "engine/model/component_store.hpp"
 #include "engine/model/entity.hpp"
 #include "engine/model/world.hpp"
 #include "engine/net/input.hpp"
 #include "engine/net/angle.hpp"
 #include "engine/net/protocol.hpp"
-#include "engine/net/snapshot_writer.hpp"
-#include "engine/net/snapshot_writer.hpp"
+#include "engine/net/snapshot_codec.hpp"
 
 #include "engine/net/dense_fields.hpp"
 #include "engine/sim/quadtree.hpp"
@@ -27,7 +25,6 @@
 #include "engine/sim/progression.hpp"
 #include "engine/sim/damage.hpp"
 #include "engine/sim/effects.hpp"
-#include "engine/sim/movement.hpp"
 #include "engine/sim/petal_effects.hpp"
 #include "engine/sim/petal_orbit.hpp"
 #include "engine/sim/petals.hpp"
@@ -166,9 +163,8 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_entity_spawn_defaults", test_entity_spawn_defaults);
   engine::test::runTest("test_rock_construction", test_rock_construction);
   engine::test::runTest("test_spatial_query", test_spatial_query);
-  engine::test::runTest("test_component_store", test_component_store);
 
-  engine::test::runTest("test_state_dump", test_state_dump);
+  engine::test::runTest("test_entity_domain_state", test_entity_domain_state);
   engine::test::runTest("test_contact_nearest_candidate_first", test_contact_nearest_candidate_first);
   engine::test::runTest("test_chain_constraint_clamps_segments", test_chain_constraint_clamps_segments);
   engine::test::runTest("test_worker_api", test_worker_api);

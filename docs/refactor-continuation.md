@@ -173,3 +173,109 @@ A product command that requires any excluded path is an unfinished migration.
 not as a source input. The result of the current run is recorded in
 `reports/current-verification.json`; that report is the authority for this tree,
 not historical pass counts.
+
+## M3 — structure convergence (2026-10-31, Asia/Shanghai)
+
+This is a new implementation record for goals 04, 05 and 06. The 02/03 counts
+and run IDs above remain historical results; they are not rewritten to describe
+the M3 tree. Work began at clean HEAD `7200f631eef7bda996c0a6648812b1f14227ad9c`.
+
+- Engine: one `SnapshotPublisher` / `ReplicationSession` and schema-checked
+  `SnapshotEncoder`; separate EntityPool, World lifecycle, per-World collision,
+  health/death and AI responsibilities; core ABI plus actual product diagnostics.
+- Client: GameApp owns frame scheduling/input dispatch; GameSession owns phase
+  changes and exposes a readonly frame view; one atomic decoder, typed projection,
+  indexed WorldState, shared layout, scoped renderer resources and complete dispose.
+- Build/release: one CMake source list, separate static/compiled/delivery trees,
+  common HTTP/browser/process helpers, 15 ordered gates and schema-5 evidence,
+  plus local verified tar/manifest/checksum preparation.
+
+| Environment | Initial M3 run (historical; superseded below) | Result |
+| --- | --- | --- |
+| source tree | `2026-10-30T15-58-17.497Z-c7651172` | PASS, 15/15, stable=true; release prepared |
+| clean copy without archive or Git | `2026-10-30T16-00-56.159Z-29a79711` | PASS, 15/15, stable=true; release prepared |
+
+Both runs execute 11 native CTest targets (112 cases in the topic runner), 39
+product unit tests, 16 tool tests, 90 client unit tests, 76 browser integration
+tests, 3 native-to-TS tests, ABI/delivery checks, real entrypoint smoke and the
+three separate performance workloads. No required test is skipped. The clean
+copy uses fresh build/output/report/cache directories and lockfile dependencies
+installed with `npm ci --offline --no-audit` from the existing npm cache.
+
+The matching product source SHA-256 is
+`21212a12209ef649fafc8165e330b4bbae66b0626af01c80c53e7d5170fe3e37`;
+verification inputs are
+`906e72c72d5f9c84dd226a934c796b3187682ba31af24505f5ef873b228465f4`.
+Wasm and the ordered delivery file identity also match in both environments.
+
+The new source-tree package is under
+`release/florrio-2.0.0-21212a12209e-2026-10-30T15-58-17.497Z-c7651172/`.
+Its tar.gz SHA-256 is
+`6abb3a80450c9744f512662e0d49c603d4519e0a0d7e8564e8b62c3d17436493`.
+Both environments pass checksum validation. The source-tree archive was also
+unpacked, all 81 product files checked, and the unpacked page exercised through
+HTTP, a real Worker and trusted Enter input; no page/Worker errors, no installed
+test API, and `/dev/test-api.js` returns 404.
+
+Full mapping, exact identities, evidence paths and scope are in
+[M3 structure](m3-structure.md). Ten retired source copies are preserved in the
+append-only `archive/addenda/m3-structure/` inventory. Original archive/tree and
+inventory remain unchanged; no historical archive script was rerun. Performance
+results are baselines, not an M4 improvement claim. No Git commit or remote
+publication was performed by this task.
+
+
+## M3 audit follow-up — decoder boundary and delivery binding (2026-10-31, Asia/Shanghai)
+
+The initial M3 runs above are historical. A later audit found that sparse field
+64 was rewritten to field 1 and committed a new component mask, and that an
+independent build had replaced the source-tree delivery with `runId: null`.
+Neither the old package nor the old clean-copy pass substitutes for current
+source-tree delivery evidence.
+
+The decoder now rejects accumulated field ids outside 1–63. Three new unit
+regressions failed before the fix and pass after it: legal boundary fields,
+direct/accumulated overflow including the exact audit vector, and transaction
+rollback across deletes, masks, earlier records and ordinal component presence.
+The browser test that expected clamping now requires rejection and unchanged
+dense decoding. The engine implementation and Wasm hash are unchanged.
+
+The pinned Chromium `156.0.8078.47` was selected with `CHROME_PATH`, retaining
+`.chromium-version`; the auto-updated system browser was not used for acceptance.
+A new clean copy at `/tmp/florrio-m3-audit-clean-47ia00oq` excludes archive, Git,
+node_modules, build/dist/reports/release and emcache, installs lockfile dependencies
+with `npm ci --offline --no-audit`, and rebuilds every output.
+
+| Environment | Audit follow-up run | Result |
+| --- | --- | --- |
+| source tree | `2026-10-31T00-48-36.371Z-b9ac5b38` | PASS, 15/15, stable=true; release prepared |
+| new clean copy | `2026-10-31T00-51-22.376Z-7cabf9df` | PASS, 15/15, stable=true; release prepared |
+
+Each run passes schema 15 outputs, 11 CTest targets (112 topic cases), unit 39,
+tools 16, client unit 93, browser integration 76 and cross-end integration 3,
+plus ABI, delivery, real Worker/input smoke and all three performance workloads.
+There are no required test failures or skips. Product source, verification inputs,
+Wasm and the ordered product artifact identity match across both environments:
+
+- Source: `e1dcb9c9469cab60760bb3979dffbecb78947ee6436277f22dfaed57f2cf7021`.
+- Verification: `1e969b35cc084a6a3d09e73ff954f2da399bf4b9e70a6e1065f90b56d3c94fc0`.
+- Wasm: `1c5a96253c8c4670162cd4577742f21007ade419c5be89fd7b013de63b12876e`.
+- Artifacts: `190f18560a38085ef2d273302fd4c8b6a774398cbfb8a5c76b86d75f17a52baf`.
+
+The current source-tree build manifest is bound to the new source-tree run.
+`releaseEvidence()` independently verifies both current deliveries and their
+immutable ledgers, logs and reports. Both new packages pass SHA256SUMS and
+unpacked path/size/hash validation (81 product files, 668885 bytes). The main
+package is under
+`release/florrio-2.0.0-e1dcb9c9469c-2026-10-31T00-48-36.371Z-b9ac5b38/`, with tar SHA-256
+`c754d79a06a18981c81f5555eb4e55fd7808b83b6b3b3ac6c35b579560f226ab`.
+Its unpacked page also passes real HTTP/Worker/trusted Enter smoke: 3 input sends,
+31 packets, 2 large packets, no page/Worker errors, no installed test API and
+`/dev/test-api.js` returns 404. Extra smoke output is
+`/tmp/florr-m3-audit-release-smoke.json` and does not overwrite verified reports.
+
+[Release instructions](release.md) now explain that an independent rebuild
+invalidates prior run binding even if product hashes match; rerun `test:all`
+before `release:prepare`, without editing evidence manually. See
+[M3 structure](m3-structure.md) for the current evidence. No Git commit, external
+publication, M4 optimization or archived runtime execution was performed.

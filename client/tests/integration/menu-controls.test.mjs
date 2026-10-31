@@ -1,16 +1,15 @@
+import { launchBrowser } from '../../../tools/lib/browser-harness.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { chromium } from 'playwright-core';
 import ts from 'typescript';
-import { chromiumExecutable } from '../../../tools/lib/chromium.mjs';
 
 const root = new URL('../../../', import.meta.url);
 let browser;
 test.after(async () => { await browser?.close(); });
 
 async function menuPage(t, { width = 1280, height = 720, deviceScaleFactor = 1, stored } = {}) {
-  browser ??= await chromium.launch({ executablePath: chromiumExecutable(), headless: true });
+  browser ??= await launchBrowser();
   const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor });
   t.after(() => context.close());
   const page = await context.newPage(), errors = [];
@@ -30,7 +29,7 @@ async function menuPage(t, { width = 1280, height = 720, deviceScaleFactor = 1, 
       return;
     }
     if (pathname === '/ubuntu.woff2') {
-      await route.fulfill({ contentType: 'font/woff2', body: await readFile(new URL('client/public/fonts/ubuntu-bold-latin.woff2', root)) });
+      await route.fulfill({ contentType: 'font/woff2', body: await readFile(new URL('client/static/fonts/ubuntu-bold-latin.woff2', root)) });
       return;
     }
     await route.abort();

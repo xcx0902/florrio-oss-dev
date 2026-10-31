@@ -1,3 +1,5 @@
+import { startTestServer } from '../../../tools/lib/test-server.mjs';
+import { launchBrowser } from '../../../tools/lib/browser-harness.mjs';
 /** Real menu/HUD regressions against the HTTP-served client and C++ worker.
  * Build first with: node node_modules/typescript/bin/tsc -p client/tsconfig.json
  * Run with: node --test client/tests/integration/menu-interactions.test.mjs
@@ -7,17 +9,11 @@
  */
 import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import http from 'node:http';
 import path from 'node:path';
-import { existsSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
-import { chromiumExecutable } from '../../../tools/lib/chromium.mjs';
 
-const root = path.resolve(process.env.CLIENT_ROOT || 'client/public');
+const root = path.resolve(process.env.CLIENT_ROOT || 'dist-next');
 const viewport = { width: 1280, height: 720 };
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.wasm': 'application/wasm',
-  '.css': 'text/css', '.map': 'application/json' };
 let server;
 let browser;
 let origin;
@@ -26,34 +22,10 @@ let packetKey;
 before(async () => {
   // Same HTTP + Playwright/Chromium setup as the worker fixture, but with its
   // own ephemeral listener. Existing development servers are never touched.
-  const local = ['node_modules/playwright-core/index.mjs',
-    'node_modules/playwright/node_modules/playwright-core/index.mjs'].find(file => existsSync(file));
-  const playwrightPath = process.env.PLAYWRIGHT_CORE || local;
-  if (!playwrightPath) throw new Error('playwright-core is required for client tests');
-  const playwright = await import(pathToFileURL(path.resolve(playwrightPath)).href);
-  const engineName = process.env.BROWSER || 'chromium';
-  const engine = playwright[engineName];
-  if (!engine) throw new Error(`unknown Playwright engine ${engineName}`);
   ({ PACKET_XOR_KEY: packetKey } = await import(pathToFileURL(path.join(root, 'schema/packet-key.js')).href));
-  server = http.createServer(async (request, response) => {
-    try {
-      const pathname = decodeURIComponent(new URL(request.url, 'http://local.test').pathname);
-      const filename = path.resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
-      if (!filename.startsWith(root + path.sep)) { response.writeHead(403).end(); return; }
-      const body = await readFile(filename);
-      response.writeHead(200, { 'Content-Type': mime[path.extname(filename)] || 'application/octet-stream',
-        'Cache-Control': 'no-store' }).end(body);
-    } catch { response.writeHead(404).end('Not found'); }
-  });
-  await new Promise((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', resolve);
-  });
-  origin = `http://127.0.0.1:${server.address().port}`;
-  browser = await engine.launch({
-    executablePath: engineName === 'chromium' ? chromiumExecutable() : undefined,
-    headless: true, args: ['--no-first-run', '--disable-background-networking'],
-  });
+  const fixture = await startTestServer(root, { diagnostics: true });
+  server = fixture.server; origin = fixture.origin;
+  browser = await launchBrowser();
 }, { timeout: 30000 });
 
 after(async t => {
@@ -107,7 +79,7 @@ async function openClient(t, dimensions = viewport, deviceScaleFactor = 1, menuS
       return Reflect.apply(post, this, args);
     };
   }, menuStorage);
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr?.world && !document.getElementById('status'));
   await page.locator('#player-name').waitFor({ state: 'visible' });
   return page;

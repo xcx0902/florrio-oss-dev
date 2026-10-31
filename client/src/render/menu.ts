@@ -1,18 +1,25 @@
-/** Native clientFrame menu: preview world/HUD, then floating petals and UI.
- * Layout and pass ownership follow the menu animation; tests verify it.
+import { renderResources } from './resources.js';
+/** Native clientFrame menu: resources.preview world/HUD, then floating petals and UI.
+ * Layout and pass ownership follow the menu resources.animation; tests verify it.
  */
-import type { Canvas2DContext } from './canvas2d/context.js';
-import { createRasterCanvas, getRasterContext, drawLabel } from './canvas2d/text-cache.js';
-import { wrapContext } from './canvas2d/context.js';
-import { hudRenderer, drawMenuPreviewHud } from './hud.js';
-import type { HudState } from './hud.js';
-import { MenuAnimation, menuSeed, caretAlpha, type MenuInputPresentation } from './menu-animation.js';
-import { PETAL_INFO } from '../schema/petals.js';
-import { drawPetalCard, drawPetalInstance } from './entity-art.js';
-import { drawMenuPanels } from './menu-panels.js';
-import { PETAL_GALLERY_TYPES, petalCellRect, mobDropRect, menuPanelRect,
-  menuRespawnCardAnchor, MENU_RESPAWN_CARD_SIZE, MENU_RESPAWN_TOOLTIP_Y, type MenuRenderState } from './menu-layout.js';
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
+import { PETAL_INFO } from '../schema/petals.js';
+import type { Canvas2DContext } from './canvas2d/context.js';
+import { wrapContext } from './canvas2d/context.js';
+import { createRasterCanvas,drawLabel,getRasterContext } from './canvas2d/text-cache.js';
+import { drawPetalCard,drawPetalInstance } from './entity-art.js';
+import type { HudState } from './hud.js';
+import { drawMenuPreviewHud,hudRenderer } from './hud.js';
+import { caretAlpha,MenuAnimation,menuSeed,type MenuInputPresentation } from './menu-animation.js';
+import {
+MENU_RESPAWN_CARD_SIZE,MENU_RESPAWN_TOOLTIP_Y,
+menuPanelRect,
+menuRespawnCardAnchor,
+mobDropRect,
+PETAL_GALLERY_TYPES,petalCellRect,
+type MenuRenderState
+} from './menu-layout.js';
+import { drawMenuPanels } from './menu-panels.js';
 import { drawPetalTooltipAt } from './tooltip.js';
 
 const f = Math.fround;
@@ -29,7 +36,6 @@ export interface MenuPreviewFrame {
 }
 export type MenuPreviewPass = (context: Canvas2DContext, frame: MenuPreviewFrame) => void | boolean;
 
-let animation: MenuAnimation | undefined;
 
 /** Rounded UI tab with a 5-unit corner radius. */
 function tabPath(context: Canvas2DContext, left: number, right: number, top: number, bottom: number): void {
@@ -46,15 +52,14 @@ function tabPath(context: Canvas2DContext, left: number, right: number, top: num
   context.closePath();
 }
 
-let preview: { context: Canvas2DContext } | undefined;
-const previewStates = new WeakMap<Canvas2DContext, { at: number; amount: number }>();
 function previewContext(): Canvas2DContext | undefined {
-  if (preview) return preview.context;
+  const resources = renderResources();
+  if (resources.preview) return resources.preview.context;
   const canvas = createRasterCanvas(1, 1);
   const native = canvas && getRasterContext(canvas);
   if (!native) return undefined;
-  preview = { context: wrapContext(native) };
-  return preview.context;
+  resources.preview = { context: wrapContext(native) };
+  return resources.preview.context;
 }
 /** The menu branch. The world callback owns the native
  * world pass, including its composite and balanced saves. It receives the
@@ -68,6 +73,7 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
                          petalTypes?: readonly number[],
                          respawn?: { readonly level: number; readonly items: readonly number[] },
                          input?: MenuInputPresentation | false): void {
+  const resources = renderResources();
   const scale = f(Math.max(0.7, f(Math.max(width * 0.000521, height * 0.000926))));
   const ui = f(scale * pixelRatio), raster = f(ui * 2.4);
   const w = Math.ceil(f(width / scale)), h = Math.ceil(f(height / scale));
@@ -85,7 +91,7 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
     ready = worldPass?.(offscreen, frame) !== false && worldPass !== undefined;
   }
   context.save();
-  let presentation = previewStates.get(native);
+  let presentation = resources.previewStates.get(native);
   if (!presentation || now < presentation.at) presentation = { at: 0, amount: 0 };
   const delta = f(Math.max(0, now - presentation.at));
   presentation.at = now;
@@ -93,16 +99,16 @@ export function drawMenu(native: Canvas2DContext, width: number, height: number,
     presentation.amount = f(presentation.amount + (1 - presentation.amount) * Math.max(0, Math.min(1, 1 - Math.pow(0.95, delta * 0.06))));
     drawMenuPreviewHud(offscreen, frame, presentation.amount, previewState);
   }
-  previewStates.set(native, presentation);
+  resources.previewStates.set(native, presentation);
   context.save(); context.save();
   context.setFillRgb(30, 167, 97);
   context.setTransform(f(ui * w), 0, 0, f(ui * h), 0, 0);
   context.fillRect(0, 0, 1, 1);
 
-  if (animation === undefined || (seed !== undefined && animation.seed !== seed))
-    animation = new MenuAnimation(seed ?? menuSeed());
-  animation.setPetals(petalTypes ?? [1]);
-  for (const { scale: flowerScale, x, y, type } of animation.sample(now, width, height)) {
+  if (resources.animation === undefined || (seed !== undefined && resources.animation.seed !== seed))
+    resources.animation = new MenuAnimation(seed ?? menuSeed());
+  resources.animation.setPetals(petalTypes ?? [1]);
+  for (const { scale: flowerScale, x, y, type } of resources.animation.sample(now, width, height)) {
     if (type === 1) {
       context.save(); context.beginPath();
       context.setTransform(f(flowerScale * pixelRatio), 0, 0, f(flowerScale * pixelRatio), f(x * pixelRatio), f(y * pixelRatio));

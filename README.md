@@ -1,4 +1,4 @@
-# Legacy Florr.io — C++20 + TypeScript 重建
+# Florr.io — C++20 + TypeScript 重建
 
 以 2020–2022 年的 Legacy Florr.io 为行为基线，用 **C++20 → WebAssembly** 重建服务端与共享规则，
 用 **TypeScript + Canvas2D** 重建 Web 客户端。游戏完全在浏览器本地运行：Web Worker 启动引擎 wasm，
@@ -37,9 +37,9 @@
 
 ```bash
 npm ci
-npm run build:dist-next     # emcc + tsc + 打包 dist-next
-npm run verify:dist-next    # 校验交付清单、源码身份与产物
-node serve.mjs              # 默认服务 dist-next，并打开浏览器
+npm run build               # schema check + CMake wasm + tsc + 打包 dist-next
+npm run verify:delivery     # 校验交付清单、源码身份与产物
+npm start                   # 默认服务 dist-next，并打开浏览器
 ```
 
 默认地址 <http://127.0.0.1:8477/>；端口被占用时自动顺延。
@@ -83,21 +83,24 @@ C ABI：
 | `sp_server_think` | 推进一个固定 tick |
 | `sp_server_flush` | 取走输出包 |
 | `sp_server_output_count/data/size` | Worker shim 读取输出队列 |
-| `sp_server_entity_count` | 诊断用实体数 |
+| `sp_server_entity_count` | 当前实体数 |
+| `sp_server_player_handle/valid`、`sp_server_debug_set_entity_field/spawn_mob/set_loadout_slot` | 5 个真实 cheat/产品诊断导出 |
 
 细节见 [`engine/README.md`](engine/README.md)。
 
 ### `client/` — TypeScript + Canvas2D
 
-`client/public/index.html` 是入口；`client/public/server-worker.js` 加载
+`client/static/index.html` 是入口；`client/static/server-worker.js` 加载
 `server.wasm` 并转发 `init/send/think/flush`。客户端解码稀疏快照，合并到
 `WorldState`，再驱动插值、相机、世界与 HUD 渲染。
 
 ```
-src/net/        Worker 客户端与线格式
-src/state/      快照解码、实体表、插值
-src/input/      指针、键盘、触控摇杆
-src/render/     Canvas2D 封装、精灵、世界、HUD、菜单
+src/app/        GameApp、GameSession、50ms SimulationLoop
+src/net/        Worker 客户端与唯一当前 decoder、字节读取
+src/state/      协议投影、实体表/索引、插值
+src/input/      输入合成、装备控制、指针/键盘/触控
+src/ui/layout/  绘制与命中共用几何
+src/render/     FrameRenderer、RenderResources、HUD/art 子模块、菜单
 src/schema/     生成的协议/目录类型（勿手改）
 ```
 
@@ -129,20 +132,24 @@ serve.mjs     静态服务器
 ```bash
 npm run build:engine        # 原生 Release 构建
 npm run test:engine         # 构建 + ctest
-npm run build:engine:wasm   # emcc -> client/public/server.wasm
-npm run build:client        # tsc -> client/public
+npm run build:engine:wasm   # Emscripten CMake -> build/wasm/server.wasm
+npm run build:client        # tsc -> fresh build/client
 npm run test:unit           # 协议/线格式单元测试
 npm run test:tools          # 构建/校验工具测试
 npm run test:client         # 客户端单元 + 集成测试
 npm run test:integration    # 原生 WorkerApi -> TS 解码器
-npm run build:dist-next     # 完整交付树
-npm run verify:dist-next    # 交付完整性
+npm run build               # 完整交付树
+npm run verify:delivery     # 交付完整性
 npm run test:delivery       # dist-next 交付冒烟
 npm run test:all            # 全流程验收，写 reports/current-verification.json
 ```
 
-`test:all` 依次执行引擎/客户端构建、单元与工具测试、CTest、客户端测试、打包、
-交付身份与完整性校验、入口冒烟和浏览器矩阵。任何一步失败都不会写出通过报告。
+`test:all` 由唯一 gate 表执行 15 步验收，wasm/TS/交付各构建一次，所有后续检查绑定同一份
+交付；包含完整 CTest、跨端、ABI、共享固定 Chrome 的浏览器/真实入口/绘制性能、
+原生与跨端工作负载。失败、中断或输入变化不会写出通过报告。
+`npm run release:prepare` 只为本次通过的 ledger 生成本地 tar.gz、manifest 与 SHA256SUMS。
+发布、校验与回退见 [`docs/release.md`](docs/release.md)，M3 映射见
+[`docs/m3-structure.md`](docs/m3-structure.md)。
 
 开发约束：
 
@@ -154,7 +161,9 @@ npm run test:all            # 全流程验收，写 reports/current-verification
 ## 交付树
 
 `dist-next/` 是独立目录：`index.html`、`server-worker.js`、`server.wasm`、客户端
-JS/CSS、字体与图标。`tools/verify-dist-next.mjs` 校验清单、哈希和源码身份；
+JS、字体与清单。手写资产只在 `client/static/`，编译输出只在 `build/client/` 与
+`build/wasm/`；打包器按白名单及本次编译清单合成，排除测试 API、声明与 source map。
+`tools/verify-dist-next.mjs` 校验清单、哈希、imports、ABI 配置和源码身份；
 `tools/smoke-entrypoints.mjs` 用真实 Worker、键盘和鼠标启动它。
 
 `dist/`、`dist-readable/`、`dist-reference/` 是历史产物，已移入归档，不再由本仓库构建。
@@ -163,7 +172,7 @@ JS/CSS、字体与图标。`tools/verify-dist-next.mjs` 校验清单、哈希和
 
 - Legacy 原始资源来自官方静态快照 <https://static.florr.io/old/>。
 - 归档中的原站代码、图像、文案版权归原权利人所有，仅作为兼容性研究与存档使用。
-- `client/public/fonts/` 中的 Ubuntu 字体按 Ubuntu Font License 分发。
+- `client/static/fonts/` 中的 Ubuntu 字体按 Ubuntu Font License 分发。
 - 本仓库未附统一开源许可证；再分发或商用前请自行确认各部分授权。
 
 历史材料索引见 [`archive/README.md`](archive/README.md)，文档索引见 [`docs/`](docs/)。

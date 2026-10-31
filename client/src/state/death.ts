@@ -1,5 +1,5 @@
-import type { DeathMetadata, WorldState } from './world.js';
-import { playerLoadoutSlots, loadoutSlots } from './loadout.js';
+import { loadoutSlots,playerLoadoutSlots } from './loadout.js';
+import type { DeathMetadata,WorldState } from './world.js';
 
 export interface DeathSnapshot {
   readonly slots: readonly number[];

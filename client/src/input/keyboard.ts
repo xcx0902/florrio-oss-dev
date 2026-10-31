@@ -1,5 +1,6 @@
 /** Keyboard state with normalized single-character keys and physical codes. */
 export class KeyboardInput {
+  private readonly listeners = new AbortController();
   private readonly down = new Set<string>();
   private readonly pressed = new Set<string>();
 
@@ -9,9 +10,9 @@ export class KeyboardInput {
           && (event.target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName))) return;
       if (!this.down.has(event.code)) this.pressed.add(event.code);
       this.down.add(event.code);
-    });
-    target.addEventListener('keyup', event => { this.down.delete(event.code); });
-    target.addEventListener('blur', () => { this.down.clear(); this.pressed.clear(); });
+    }, { signal: this.listeners.signal });
+    target.addEventListener('keyup', event => { this.down.delete(event.code); }, { signal: this.listeners.signal });
+    target.addEventListener('blur', () => { this.down.clear(); this.pressed.clear(); }, { signal: this.listeners.signal });
   }
 
   isDown(code: string): boolean { return this.down.has(code); }
@@ -23,4 +24,5 @@ export class KeyboardInput {
   }
   /** Test/browser helper: clear edge-triggered state without releasing keys. */
   clearPressed(): void { this.pressed.clear(); }
+  dispose(): void { this.listeners.abort(); this.down.clear(); this.pressed.clear(); }
 }

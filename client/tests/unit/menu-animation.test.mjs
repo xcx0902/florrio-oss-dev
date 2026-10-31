@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MenuAnimation } from '../../public/render/menu-animation.js';
+import { MenuAnimation } from '../../../build/client/render/menu-animation.js';
 
 test('home petals are drawn only from discovered petal types', () => {
   const animation = new MenuAnimation(1234567);

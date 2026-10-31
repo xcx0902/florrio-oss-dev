@@ -1,43 +1,13 @@
-import type { EntitySnapshot, Snapshot, SnapshotEvent } from './snapshot.js';
-import { interpolateEntity, interpolateCameraTarget } from './interpolation.js';
-import { BYTE_FIELDS, FLOAT_FIELDS } from './field-types.js';
+import { mergeScalar } from './scalar.js';
+import type { DeathMetadata } from './snapshot-types.js';
+import { projectDeathMetadata, isController, hasDeathMetadata } from './snapshot-projection.js';
+import { BYTE_FIELDS,FLOAT_FIELDS } from './field-types.js';
+import { interpolateCameraTarget,interpolateEntity } from './interpolation.js';
+import type { Snapshot,SnapshotEvent } from './snapshot.js';
 
-export interface EntityState extends EntitySnapshot {
-  readonly previousX: number;
-  readonly previousY: number;
-  readonly previousAngle: number;
-  readonly previousRadius?: number;
-  readonly receivedAt: number;
-  readonly receivedXAt?: number;
-  readonly receivedYAt?: number;
-  readonly receivedAngleAt?: number;
-  readonly receivedRadiusAt?: number;
-  readonly previousScore?: number;
-  readonly receivedScoreAt?: number;
-  readonly visualFlags?: number;
-  readonly fadingAt?: number;
-  readonly previousCameraX?: number;
-  readonly previousCameraY?: number;
-  readonly receivedCameraXAt?: number;
-  readonly receivedCameraYAt?: number;
-  /** First snapshot clock at which this handle was rendered. */
-  readonly firstSeenAt?: number;
-  /** Retain the constructor marker across deltas received before a render. */
-  readonly arrivalMarked?: boolean;
-}
-
-/** Fields of the native controller record (component 478) that survive the
- * player's death and drive the death/menu HUD. */
-export interface DeathMetadata {
-  readonly killerName: string;
-  readonly keptCount: number;
-  readonly keptItems: readonly number[];
-  readonly score: number;
-  readonly deathLevel: number;
-  readonly respawnLevel: number;
-  readonly viewerHandle?: number;
-}
-
+import type { EntityState } from './entity-state.js';
+export type { EntityState } from './entity-state.js';
+export type { DeathMetadata } from './snapshot-types.js';
 export interface VisualEventState {
   readonly handle: number;
   readonly index: number;
@@ -48,6 +18,32 @@ export interface VisualEventState {
 export class WorldState {
   private readonly entities = new Map<number, EntityState>();
   private sequence = 0;
+  private playerHandle: number | undefined;
+  private readonly byKind = new Map<number, Set<number>>();
+  membershipRevision = 0;
+  private remove(handle: number): void {
+    const entity = this.entities.get(handle);
+    if (!entity) return;
+    this.entities.delete(handle); this.byKind.get(entity.kind ?? entity.typeId)?.delete(handle);
+    if (this.playerHandle === handle) this.playerHandle = undefined;
+    this.hitTimes.delete(handle); this.visualEvents.delete(handle); this.collected.delete(handle);
+    this.membershipRevision++;
+  }
+  private indexMembership(): void {
+    const current = new Map<number, Set<number>>();
+    let player: number | undefined;
+    for (const entity of this.entities.values()) {
+      const kind = entity.kind ?? entity.typeId;
+      let set = current.get(kind); if (!set) current.set(kind, set = new Set()); set.add(entity.handle);
+      if (kind === 1 && player === undefined) player = entity.handle;
+    }
+    if ([...current].some(([kind, handles]) => handles.size !== this.byKind.get(kind)?.size || [...handles].some(h => !this.byKind.get(kind)?.has(h))) || [...this.byKind.keys()].some(k => !current.has(k))) this.membershipRevision++;
+    this.byKind.clear(); for (const [kind, handles] of current) this.byKind.set(kind, handles);
+    this.playerHandle = player;
+  }
+  *entitiesOfKind(kind: number): IterableIterator<EntityState> { for (const handle of this.byKind.get(kind) ?? []) { const entity = this.entities.get(handle); if (entity) yield entity; } }
+  healthyPlayer(): EntityState | undefined { const player = this.playerEntity(); return player && player.health > 0 ? player : undefined; }
+
   private serverTime = 0;
   private events: readonly SnapshotEvent[] = [];
   private readonly chatLines: string[] = [];
@@ -57,7 +53,7 @@ export class WorldState {
   /** The native control component survives player death and respawn. */
   private controlledCamera: EntityState | undefined;
 
-  apply(snapshot: Snapshot, now: number): void {
+  applyFullSnapshot(snapshot: Snapshot, now: number): void {
     this.sequence = snapshot.sequence;
     this.serverTime = snapshot.serverTime;
     this.applyEvents(snapshot.events, now);
@@ -78,17 +74,18 @@ export class WorldState {
         receivedAt: now,
       });
     }
-    for (const handle of this.entities.keys()) if (!seen.has(handle)) this.entities.delete(handle);
+    for (const handle of this.entities.keys()) if (!seen.has(handle)) this.remove(handle);
+    this.indexMembership();
   }
 
   /** Merge an original-style snapshot that may contain only a subset of the
    * gameplay fields. Missing position/health/flags keep the prior state. */
-  applyPartial(snapshot: Snapshot, now: number): void {
+  applyDeltaSnapshot(snapshot: Snapshot, now: number): void {
     this.sequence = snapshot.sequence;
     this.serverTime = snapshot.serverTime;
     this.applyEvents(snapshot.events, now);
     for (const handle of snapshot.deletedHandles ?? []) {
-      this.entities.delete(handle);
+      this.remove(handle);
       this.collected.delete(handle);
     }
     for (const entity of snapshot.entities) {
@@ -115,6 +112,8 @@ export class WorldState {
       const hasCameraY = hasFloat(24) || hasDense(24);
       const hasX = hasVisualX || hasCameraX && previous?.floatFields?.[49] === undefined && previous?.denseFields?.[49] === undefined;
       const hasY = hasVisualY || hasCameraY && previous?.floatFields?.[28] === undefined && previous?.denseFields?.[28] === undefined;
+      const x = mergeScalar(previous ? { value: previous.x, from: previous.previousX, receivedAt: previous.receivedXAt ?? previous.receivedAt, known: true } : undefined, hasX ? entity.x : undefined, displayed.x, now);
+      const y = mergeScalar(previous ? { value: previous.y, from: previous.previousY, receivedAt: previous.receivedYAt ?? previous.receivedAt, known: true } : undefined, hasY ? entity.y : undefined, displayed.y, now);
       const hasAngle = entity.angleField8 !== undefined || hasDense(8);
       const hasRadius = hasFloat(7) || hasDense(7);
       const hasScore = hasFloat(59) || hasDense(59);
@@ -203,8 +202,8 @@ export class WorldState {
         // does not remove a health component already decoded on this entity.
         healthKnown: entity.healthKnown === true || previous?.healthKnown === true,
         maxHealthKnown: entity.maxHealthKnown === true || previous?.maxHealthKnown === true,
-        x: hasX ? entity.x : (previous?.x ?? entity.x),
-        y: hasY ? entity.y : (previous?.y ?? entity.y),
+        x: x.value,
+        y: y.value,
         cameraX: hasCameraX ? entity.cameraX ?? entity.x : previous?.cameraX,
         cameraY: hasCameraY ? entity.cameraY ?? entity.y : previous?.cameraY,
         angle,
@@ -236,22 +235,23 @@ export class WorldState {
         handleArrayFields: mergeIndexed(previous?.handleArrayFields, entity.handleArrayFields),
         stringArrayFields: mergeIndexed(previous?.stringArrayFields, entity.stringArrayFields),
         components: mergedComponents,
-        previousX: hasX ? displayed.x : (previous?.previousX ?? entity.x),
-        previousY: hasY ? displayed.y : (previous?.previousY ?? entity.y),
+        previousX: x.from,
+        previousY: y.from,
         previousAngle: hasAngle ? displayed.angle : (previous?.previousAngle ?? entity.angle),
         previousRadius: hasRadius ? displayed.radius : (previous?.previousRadius ?? entity.radius),
         previousCameraX: hasCameraX ? displayedCamera.x : previous?.previousCameraX,
         previousCameraY: hasCameraY ? displayedCamera.y : previous?.previousCameraY,
         receivedCameraXAt: hasCameraX ? now : previous?.receivedCameraXAt,
         receivedCameraYAt: hasCameraY ? now : previous?.receivedCameraYAt,
-        receivedXAt: hasX ? now : (previous?.receivedXAt ?? previous?.receivedAt ?? now),
-        receivedYAt: hasY ? now : (previous?.receivedYAt ?? previous?.receivedAt ?? now),
+        receivedXAt: x.receivedAt,
+        receivedYAt: y.receivedAt,
         receivedAngleAt: hasAngle ? now : (previous?.receivedAngleAt ?? previous?.receivedAt ?? now),
         receivedRadiusAt: hasRadius ? now : (previous?.receivedRadiusAt ?? previous?.receivedAt ?? now),
         receivedAt: now,
       });
       if (kind === 1) this.controlledCamera = this.entities.get(entity.handle);
     }
+    this.indexMembership();
   }
 
   private applyEvents(events: readonly SnapshotEvent[] | undefined, now: number): void {
@@ -274,9 +274,10 @@ export class WorldState {
       if (now - at > 1000) this.hitTimes.delete(handle);
   }
 
-  /** Clear all client-side state (used by deterministic parity scenes). */
+  /** Clear all client-side state (used when replacing a product fixture or session). */
   reset(): void {
     this.entities.clear();
+    this.byKind.clear(); this.playerHandle = undefined; this.membershipRevision++;
     this.chatLines.length = 0;
     this.visualEvents.clear();
     this.hitTimes.clear();
@@ -293,62 +294,21 @@ export class WorldState {
    * handle); its death fields remain after the controlled body is removed. */
   controller(): EntityState | undefined {
     for (const entity of this.entities.values())
-      if ((entity.referenceFields?.[56] ?? entity.varintFields?.[56]) !== undefined && entity.byteFields?.[20] !== undefined)
+      if (isController(entity))
         return entity;
     // The original controller storage record is not a gameplay entity. A
     // few snapshots merge its profile fields onto the controlled body when
     // both records use the same wire slot; keep that body usable as the
     // death metadata source instead of showing the menu fallbacks.
     const body = this.playerEntity();
-    return body && (body.byteFields?.[34] !== undefined || body.byteFields?.[47] !== undefined
-      || body.floatFields?.[21] !== undefined || body.stringFields?.[6] !== undefined
-      || body.byteArrayFields?.[16] !== undefined) ? body : undefined;
+    return body && hasDeathMetadata(body) ? body : undefined;
   }
   deathMetadata(): DeathMetadata {
-    const controller = this.controller();
-    // The profile record carries these values as
-    // sparse fields. The live domain transport scopes the same values onto the
-    // controlled body's dense group 72, so accept either representation.
-    const dense = controller?.denseFields;
-    const denseString = (field: number): string | undefined => {
-      const value = dense?.[field];
-      return typeof value === 'string' ? value : undefined;
-    };
-    const denseNumber = (field: number): number | undefined => {
-      const value = dense?.[field];
-      return typeof value === 'number' ? value : undefined;
-    };
-    const items = Array.from({ length: 10 }, () => 0);
-    for (const entry of controller?.byteArrayFields?.[16] ?? [])
-      if (entry.index >= 0 && entry.index < items.length) items[entry.index] = entry.value;
-    if (!controller?.byteArrayFields?.[16]) {
-      const packed = dense?.[16];
-      if (Array.isArray(packed)) for (let index = 0; index < items.length; ++index)
-        if (typeof packed[index] === 'number') items[index] = packed[index] & 255;
-    }
-    // The first three eligible petals become ground drops. Controller field
-    // 16 contains up to ten remaining survivors for the next spawn.
-    const keptCount = Math.max(0, Math.min(10,
-      controller?.byteFields?.[34] ?? denseNumber(34) ?? 0));
-    return {
-      killerName: controller?.stringFields?.[6] ?? denseString(6) ?? '',
-      keptCount,
-      keptItems: items.slice(0, keptCount),
-      score: controller?.floatFields?.[21] ?? denseNumber(21) ?? 0,
-      deathLevel: controller?.byteFields?.[47] ?? denseNumber(47) ?? 0,
-      // Field 47 is the level at death; field 1 is the remembered spawn
-      // level. The original menu clamps the latter to a minimum of one.
-      respawnLevel: Math.max(1, controller?.byteFields?.[1] ?? denseNumber(1)
-        ?? Math.floor((controller?.byteFields?.[47] ?? denseNumber(47) ?? 0) * 3 / 4)),
-      viewerHandle: controller?.referenceFields?.[56] ?? controller?.varintFields?.[56]
-        ?? denseNumber(56),
-    };
+    return projectDeathMetadata(this.controller());
   }
   /** First controlled body, including a health-0 corpse. */
   playerEntity(): EntityState | undefined {
-    for (const entity of this.entities.values())
-      if ((entity.kind ?? entity.typeId) === 1) return entity;
-    return undefined;
+    return this.playerHandle === undefined ? undefined : this.entities.get(this.playerHandle);
   }
   /** Authoritative deletion is immediate: the old 150 ms retiring window made
    * killed mobs/petals flash back into view before disappearing. */

@@ -1,3 +1,4 @@
+import { renderResources } from '../resources.js';
 /** Reimplementation of the archived client's outlined-text cache.
  *
  * The renderer rasterizes every label once into an offscreen canvas at a
@@ -70,39 +71,28 @@ export function getRasterContext(canvas: RasterCanvas): RasterContext2D | null {
   return canvas.getContext('2d');
 }
 
-const labels = new Map<string, CachedLabel>();
-const ownedLabels = new Map<string | number, {
-  readonly signature: string;
-  readonly rasterScale: number;
-  readonly canvas: RasterCanvas;
-  readonly label: CachedLabel;
-}>();
-const measurements = new Map<string, number>();
-let measureContext: RasterContext2D | null | undefined;
-let canvasSupport: boolean | undefined;
-
 /** Release one owner's retained bitmap, returning whether it existed. */
 export function releaseLabel(cacheKey: string | number): boolean {
-  return ownedLabels.delete(cacheKey);
+  return renderResources().ownedLabels.delete(cacheKey);
 }
 
 export function canvasAvailable(): boolean {
-  if (canvasSupport !== undefined) return canvasSupport;
+  if (renderResources().canvasSupport !== undefined) return renderResources().canvasSupport ?? false;
   try {
     const canvas = createRasterCanvas(1, 1);
-    canvasSupport = !!canvas && !!getRasterContext(canvas);
+    renderResources().canvasSupport = !!canvas && !!getRasterContext(canvas);
   }
-  catch { canvasSupport = false; }
-  return canvasSupport;
+  catch { renderResources().canvasSupport = false; }
+  return renderResources().canvasSupport ?? false;
 }
 
 function measuringContext(): RasterContext2D | null {
-  if (measureContext !== undefined) return measureContext;
-  measureContext = null;
+  if (renderResources().measureContext !== undefined) return renderResources().measureContext ?? null;
+  renderResources().measureContext = null;
   if (!canvasAvailable()) return null;
   const canvas = createRasterCanvas(8, 8);
-  measureContext = canvas ? getRasterContext(canvas) : null;
-  return measureContext;
+  renderResources().measureContext = canvas ? getRasterContext(canvas) : null;
+  return renderResources().measureContext ?? null;
 }
 
 /** Quantize like the archived host: `(2048 * size | 0) / 2048`. */
@@ -114,13 +104,13 @@ function quantizeFont(size: number): number {
  * that same measurement to f32 only when exposing a logical label width. */
 function measureNative(text: string, font: number): number {
   const key = `${text}\u0000${quantizeFont(font)}`;
-  const cached = measurements.get(key);
+  const cached = renderResources().measurements.get(key);
   if (cached !== undefined) return cached;
   const context = measuringContext();
   if (!context) return 0;
   context.font = `${quantizeFont(font)}px Ubuntu`;
   const width = context.measureText(text).width;
-  measurements.set(key, width);
+  renderResources().measurements.set(key, width);
   return width;
 }
 
@@ -138,7 +128,7 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
   const signature = `${spec.text}\u0000${spec.font}\u0000${outline}\u0000`
     + `${fill}\u0000${stroke}\u0000${spec.cacheWidth ?? ''}`;
   const key = `${signature}\u0000${spec.rasterScale}`;
-  const owned = spec.cacheKey === undefined ? undefined : ownedLabels.get(spec.cacheKey);
+  const owned = spec.cacheKey === undefined ? undefined : renderResources().ownedLabels.get(spec.cacheKey);
   if (spec.cacheKey !== undefined) {
     // func444 compares the projected (2 * transform) scale with the stored
     // raster scale (projected * 1.2), before adding the oversampling margin.
@@ -148,7 +138,7 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
     const ratio = owned && Math.fround(projected / owned.rasterScale);
     if (owned?.signature === signature && ratio !== undefined && ratio <= 1.0001 && ratio >= 0.4) return owned.label;
   } else {
-    const cached = labels.get(key);
+    const cached = renderResources().labels.get(key);
     if (cached) return cached;
   }
 
@@ -190,8 +180,8 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
     margin,
   };
   if (spec.cacheKey !== undefined) {
-    ownedLabels.set(spec.cacheKey, { signature, rasterScale: Math.fround(spec.rasterScale), canvas, label });
-  } else labels.set(key, label);
+    renderResources().ownedLabels.set(spec.cacheKey, { signature, rasterScale: Math.fround(spec.rasterScale), canvas, label });
+  } else renderResources().labels.set(key, label);
   return label;
 }
 
@@ -281,7 +271,7 @@ export function drawLabelBox(context: Canvas2DContext, spec: LabelSpec,
 
 /** Clear all cached bitmaps (tests / font reloads). */
 export function clearLabelCache(): void {
-  labels.clear();
-  ownedLabels.clear();
-  measurements.clear();
+  renderResources().labels.clear();
+  renderResources().ownedLabels.clear();
+  renderResources().measurements.clear();
 }

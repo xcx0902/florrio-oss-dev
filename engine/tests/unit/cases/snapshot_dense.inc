@@ -1,30 +1,17 @@
 void test_domain_dense_live_values() {
-  engine::WorkerApi api;
-  api.init();
-  api.set_default_dense_groups(false);
-  const engine::EntityHandle mob = api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)));
-  CHECK(mob.valid());
-  const auto compact = api.domain_snapshot_bytes(60, 0);
-  engine::ByteReader compact_reader(compact);
-  CHECK(compact_reader.read_u8().value() == 1);
-  (void)compact_reader.read_varint32();
-  (void)compact_reader.read_varint32();
-  CHECK(compact_reader.read_varint32().value() == 0);
-  CHECK(compact_reader.read_varint32().value() == 1);
-
-  // A configured byte group is appended after the compact domain record.
-  CHECK(api.set_snapshot_groups(mob, 1U << 1)); // group 56
-  CHECK(api.set_snapshot_byte(mob, 1U, 7U));
-  const auto dense = api.domain_snapshot_bytes(61, 0);
-  CHECK(!dense.empty()); // unchanged camera targets are now omitted
-  engine::ByteReader reader(dense);
-  CHECK(reader.read_u8().value() == 1);
-  CHECK(reader.read_varint32().value() == 61);
-  (void)reader.read_varint32();
-  CHECK(reader.read_varint32().value() == 0);
-  CHECK(reader.read_varint32().value() == 2);
+  engine::SnapshotEncoder writer;
+  writer.begin(61U);
+  const std::array<std::uint8_t, 1> values{7U};
+  writer.write_dense_byte_group(engine::EntityHandle::from_parts(3U, 1U), values);
+  const auto bytes = writer.finish();
+  engine::ByteReader reader(bytes);
+  CHECK(reader.read_u8().value() == 1U);
+  CHECK(reader.read_varint32().value() == 61U);
+  CHECK(reader.read_varint32().value() == 0U);
+  CHECK(reader.read_varint32().value() == 0U);
+  CHECK(reader.read_varint32().value() == 1U);
 }
+
 void test_default_dense_groups() {
   engine::WorkerApi api;
   api.init();
@@ -127,9 +114,9 @@ void test_domain_dense_player_wire_boundaries() {
         // All profile records preserve the entire dense declaration, not just
         // bit 29. The last declaration determines the following dense length.
         const auto component_mask = reader.read_u32_le().value();
-        CHECK(component_mask == engine::SnapshotWriter::kDefaultDenseComponentMask
+        CHECK(component_mask == engine::SnapshotEncoder::kDefaultDenseComponentMask
           || (handle == petal && component_mask ==
-              (engine::SnapshotWriter::kDefaultDenseComponentMask | (1U << 6U))));
+              (engine::SnapshotEncoder::kDefaultDenseComponentMask | (1U << 6U))));
         std::uint32_t field = 0;
         for (auto delta = reader.read_varint32().value(); delta != 0U;
              delta = reader.read_varint32().value()) {
@@ -195,43 +182,26 @@ void test_domain_dense_player_wire_boundaries() {
 }
 
 void test_full_field_framing() {
-  engine::WorkerApi api;
-  api.init();
-  const engine::EntityHandle mob = api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(5.0F), engine::f32(6.0F)));
-  CHECK(mob.valid());
-  const auto compact = api.domain_snapshot_bytes(70, 0);
-  api.set_full_field_framing(true);
-  const auto full = api.domain_snapshot_bytes(71, 0);
-  CHECK(full.size() > compact.size());
-  engine::ByteReader reader(full);
-  CHECK(reader.read_u8().value() == 1);
-  CHECK(reader.read_varint32().value() == 71);
-  CHECK(reader.read_varint32().value() == 0);
-  CHECK(reader.read_varint32().value() == 0); // deletes
-  const auto updates = reader.read_varint32();
-  CHECK(updates.has_value());
-  CHECK(updates.value() > 75); // full nonplayer fields; player arrays are not fabricated
-  CHECK(reader.read_varint32().value() == 0); // events
+  engine::SnapshotEncoder writer;
+  writer.begin(71U);
+  const auto handle = engine::EntityHandle::from_parts(3U, 1U);
+  writer.write_mask_double_field(handle, 0U, 18U, 2.0);
+  writer.write_mask_double_field(handle, 0U, 35U, 3.0);
+  writer.write_mask_string_field(handle, 0U, 4U, "codec");
+  const auto bytes = writer.finish();
+  CHECK(bytes.size() > 40U);
 }
-
 void test_full_field_effect_flags() {
-  engine::WorkerApi api;
-  api.init(false);
-  api.set_full_field_framing(true);
-  api.set_default_dense_groups(false);
-  const auto mob = api.spawn(engine::EntityKind::kMob, 4U, {});
-  auto* entity = api.world().entities().get(mob);
-  entity->spawn_band = 7U;
   for (const std::uint8_t flags : {0U, 1U, 4U}) {
-    entity->effect_flags = flags;
-    const auto packet = api.domain_snapshot_bytes(1U);
-    // Every full sparse field is a self-contained mask record. Match the exact
-    // field14 record including handle/mask, rather than an unrelated byte.
+    engine::SnapshotEncoder writer;
+    writer.begin(1U);
+    const auto mob = engine::EntityHandle::from_parts(3U, 1U);
+    writer.write_mask_byte_field(mob, 0U, 14U, flags);
+    const auto packet = writer.finish();
     engine::ByteWriter expected;
     expected.write_u32_le(mob.to_wire()); expected.write_u8(55U);
-    expected.write_u32_le((1U << 5) | (1U << 19) | (1U << 20) | (1U << 25) | (1U << 29));
-    expected.write_varint32(14U); expected.write_u8(flags); expected.write_u8(0U);
+    expected.write_u32_le(0U); expected.write_varint32(14U);
+    expected.write_u8(flags); expected.write_u8(0U);
     CHECK(std::search(packet.begin(), packet.end(), expected.bytes().begin(), expected.bytes().end()) != packet.end());
   }
 }

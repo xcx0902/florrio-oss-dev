@@ -1,27 +1,27 @@
-import type { Canvas2DContext } from './canvas2d/context.js';
-import type { EntityState, WorldState } from '../state/world.js';
-import { interpolateEntity } from '../state/interpolation.js';
-import { isOutsideWorldViewport, playerWorldPosition } from '../state/world-transform.js';
 import type { CameraState } from '../state/camera.js';
-import { advanceSpeciesAnimation, createSpeciesAnimationState, type SpeciesAnimationState } from './species-animation.js';
-import { createArtRandom, createUniqueTrail, drawUniqueTrail, type UniqueTrail } from './petal-effects.js';
+import { interpolateEntity } from '../state/interpolation.js';
+import { isOutsideWorldViewport,playerWorldPosition } from '../state/world-transform.js';
+import type { EntityState,WorldState } from '../state/world.js';
+import type { Canvas2DContext } from './canvas2d/context.js';
 import {
-  drawDrop,
-  createDropVisualState,
-  advanceDropVisualState,
-  drawPetalInstance,
-  drawHornetMissile,
-  drawLaunchedPea,
-  drawGroundWeb,
-  drawPlayerFace,
-  drawPlayerHealthBar,
-  drawSpecies,
-  createPlayerFaceState,
-  createPlayerHealthBarState,
-  type PlayerFaceState,
-  type PlayerHealthBarState,
-  type DropVisualState,
+advanceDropVisualState,
+createDropVisualState,
+createPlayerFaceState,
+createPlayerHealthBarState,
+drawDrop,
+drawGroundWeb,
+drawHornetMissile,
+drawLaunchedPea,
+drawPetalInstance,
+drawPlayerFace,
+drawPlayerHealthBar,
+drawSpecies,
+type DropVisualState,
+type PlayerFaceState,
+type PlayerHealthBarState,
 } from './entity-art.js';
+import { createArtRandom,createUniqueTrail,drawUniqueTrail,type UniqueTrail } from './petal-effects.js';
+import { advanceSpeciesAnimation,createSpeciesAnimationState,type SpeciesAnimationState } from './species-animation.js';
 
 const ARENA_WIDTH = 50000;
 const ARENA_HEIGHT = 4000;

@@ -1,6 +1,6 @@
 # Broadcast and event semantics
 
-Status: the C++ `WorkerApi` owns the authoritative broadcast order. The
+Status: the C++ `SnapshotPublisher` owns the authoritative broadcast order. The
 TypeScript client consumes the same type-1 snapshot envelope and event opcodes.
 
 ## Authority boundary
@@ -15,16 +15,16 @@ WorkerApi::send  ──► decode_input_packet ──► World::apply_input / lo
 tick(World, 50 ms)  (fixed 20 Hz)
         │
         ▼
-WorkerApi::think ──► pending deletes / events / world state
+WorkerApi::think ──► World state / typed events / destruction notices
         │
         ▼
-domain_snapshot_bytes(sequence)
+SnapshotPublisher::publish(world, sequence) → SnapshotEncoder
         │
         ▼
 sp_server_flush ──► worker envelope (callbackId, finalResponse, transferable)
         │
         ▼
-BareSnapshotDecoder ──► WorldState.applyPartial ──► Canvas2D
+SnapshotDecoder ──► WorldState.applyDeltaSnapshot ──► Canvas2D
 ```
 
 The server is the sole authority for positions, health, spawns, deaths, petal
@@ -71,14 +71,14 @@ Event order inside one packet:
 
 ## Known-entity and packet-cache gates
 
-The server tracks `domain_known_` so visibility exits become deletes and a
+The server tracks `ReplicationSession::known` so visibility exits become deletes and a
 newly visible handle receives full declarations. Later ticks use the component
-mask plus sparse deltas. The client's `BareSnapshotDecoder` mirrors this
+mask plus sparse deltas. The client's `SnapshotDecoder` mirrors this
 with a `masks` map keyed by handle; a delete drops the cached mask.
 
-`WorkerApi::despawn` and `World::destroy` both remove the handle from the cache
-and queue a delete. Tests cover that a deleted handle is not resurrected by a
-stale update in the same packet.
+`WorkerApi::despawn` delegates to `World::destroy`. Its single destruction
+notification invalidates publication history; a delete is sent only if that
+session knew the handle. Reentry receives complete initial values.
 
 When visibility is enabled, the server only emits entities intersecting the
 viewer rectangle plus the controlled body. Death keeps the last peer view
@@ -86,14 +86,15 @@ instead of switching to the world origin or a menu camera.
 
 ## Chat queue
 
-`WorkerApi::emit_event(9, text)` appends a NUL-terminated chat payload. The
+Input chat submits text through `SnapshotPublisher::emit_chat`; the encoder
+writes its opcode and NUL-terminated wire payload at publication. The
 client trims at 8 visible lines and preserves receive order. Chat is not
 deduplicated: repeated identical strings remain separate events.
 
 ## Extension points
 
-- New event opcode: add a writer in `SnapshotWriter`, a decoder branch in
-  `client/src/state/snapshot.ts`, and a consumer in `WorldState`.
+- New event opcode: add a writer in `SnapshotEncoder`, a decoder branch in
+  `client/src/net/snapshot-decoder.ts`, and a consumer in `WorldState`.
 - New sparse field: add the field ordinal to `schema/protocol.yaml`, regenerate
   `DENSE_GROUP_SPECS`/`FIELD_COMPONENTS`, and extend `projectDomain`.
 - New dense group: add the group offset and specs to `schema/protocol.yaml`;

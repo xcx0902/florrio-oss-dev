@@ -1,11 +1,11 @@
 /** Browser contracts: real worker publications, page boot, menu/HUD input, DPR and touch. */
 import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { DENSE_GROUPS, DENSE_GROUP_SPECS } from '../../public/state/field-types.js';
+import { DENSE_GROUPS, DENSE_GROUP_SPECS } from '../../../build/client/state/field-types.js';
 import { RenderingCanvas } from '../helpers/recording-canvas.mjs';
-import { drawWorld } from '../../public/render/world.js';
-import { WorldState } from '../../public/state/world.js';
-import { CameraState } from '../../public/state/camera.js';
+import { drawWorld } from '../../../build/client/render/world.js';
+import { WorldState } from '../../../build/client/state/world.js';
+import { CameraState } from '../../../build/client/state/camera.js';
 import { browser, origin, start, stop, readPeerVisibleSet, assertPeerVisibleSet } from '../support/worker-fixture.mjs';
 
 before(start);
@@ -14,11 +14,11 @@ after(stop);
 test('real worker publishes special petal launch, recharge and artwork components', { timeout: 120000 }, async () => {
   const page = await browser.newPage();
   try {
-    await page.goto(origin + '/index.html', { waitUntil: 'load' });
+    await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
     const results = await page.evaluate(async () => {
       const { ServerWorkerClient } = await import('/net/worker.js');
       const { InputPacketEncoder } = await import('/net/input.js');
-      const { BareSnapshotDecoder } = await import('/state/snapshot.js');
+      const { SnapshotDecoder } = await import('/state/snapshot.js');
       const { WorldState } = await import('/state/world.js');
       const { playerSlotProgress } = await import('/state/loadout.js');
       const { DENSE_GROUPS, DENSE_GROUP_SPECS } = await import('/state/field-types.js');
@@ -27,7 +27,7 @@ test('real worker publishes special petal launch, recharge and artwork component
         const worker = new ServerWorkerClient('server-worker.js?manual=1');
         try {
           const input = new InputPacketEncoder(), world = new WorldState();
-          const decoder = new BareSnapshotDecoder(DENSE_GROUPS.map(group => ({
+          const decoder = new SnapshotDecoder(DENSE_GROUPS.map(group => ({
             offset: group.offset, specs: DENSE_GROUP_SPECS[group.offset] ?? [],
           })));
           await worker.init();
@@ -42,7 +42,7 @@ test('real worker publishes special petal launch, recharge and artwork component
             await worker.requestStream('sp_server_flush', undefined, bytes => {
               const snapshot = decoder.decode(bytes);
               if (!snapshot) throw new Error(`undecodable special petal snapshot: ${type}/${tick}`);
-              world.applyPartial(snapshot, tick * 50);
+              world.applyDeltaSnapshot(snapshot, tick * 50);
             });
             const entities = [...world.all()].filter(entity => entity.speciesId === type && entity.health > 0);
             if (!originalHandles) originalHandles = new Set(entities.map(entity => entity.handle));
@@ -74,7 +74,7 @@ test('real worker publishes special petal launch, recharge and artwork component
         assert.equal(result.launch.byteFields[9], result.type === 11 ? 0 : result.type === 12 ? 1 : 3);
         const world = new WorldState(), camera = new CameraState(), context = new RenderingCanvas();
         camera.setCamera(0, 0, 1);
-        world.apply({ sequence: 1, serverTime: 0, events: [], entities: [{ ...result.launch, x: 0, y: 0 }] }, 0);
+        world.applyFullSnapshot({ sequence: 1, serverTime: 0, events: [], entities: [{ ...result.launch, x: 0, y: 0 }] }, 0);
         drawWorld(context, world, camera, 0);
         assert.equal(context.paints.filter(paint => paint.op === 'fill' && paint.path[0]?.[0] === 'arc').length, 1,
           `${result.type}: production drawWorld renders each launched child as one Pea`);
@@ -84,7 +84,7 @@ test('real worker publishes special petal launch, recharge and artwork component
         assert.ok(result.ground.componentMask & (1 << 11), `${result.type}: native ground-Web component`);
         const world = new WorldState(), camera = new CameraState(), context = new RenderingCanvas();
         camera.setCamera(0, 0, 1);
-        world.apply({ sequence: 1, serverTime: 0, events: [], entities: [{ ...result.ground, x: 0, y: 0 }] }, 0);
+        world.applyFullSnapshot({ sequence: 1, serverTime: 0, events: [], entities: [{ ...result.ground, x: 0, y: 0 }] }, 0);
         drawWorld(context, world, camera, 0);
         assert.ok(context.paints.some(paint => paint.path.filter(op => op[0] === 'quadraticCurveTo').length === 65),
           `${result.type}: production drawWorld renders five scalloped rings`);
@@ -95,7 +95,7 @@ test('real worker publishes special petal launch, recharge and artwork component
 
 test('client joins the native peer-visible set with a healthy player and nearby mobs', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
     if (!window.__florr || window.__florr.world.count === 0) return false;
@@ -111,7 +111,7 @@ test('client joins the native peer-visible set with a healthy player and nearby 
 
 test('single match: spawn, suicide, death overlay and restart', async () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
     for (const entity of window.__florr.world.all()) if (entity.typeId === 1) return true;
@@ -148,7 +148,7 @@ test('single match: spawn, suicide, death overlay and restart', async () => {
 
 test('keyboard drives menu, inventory and hotbar selection', async () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr !== undefined, null, { timeout: 8000 });
   const initial = await page.evaluate(() => window.__florr.ui);
   await page.keyboard.press('Enter');
@@ -177,7 +177,7 @@ test('keyboard drives menu, inventory and hotbar selection', async () => {
 
 test('client canvas follows devicePixelRatio and camera resize', async () => {
   const page = await browser.newPage({ viewport: { width: 800, height: 600 }, deviceScaleFactor: 2 });
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr !== undefined, null, { timeout: 8000 });
   const before = await page.evaluate(() => ({
     width: document.querySelector('#canvas').width,
@@ -210,7 +210,7 @@ test('client page boots without console or page errors', async () => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.waitForTimeout(1000);
   const state = await page.evaluate(() => ({
     canvas: [document.getElementById('canvas').width, document.getElementById('canvas').height],
@@ -227,7 +227,7 @@ test('single-player loop: menu -> garden -> move -> attack', async () => {
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr && window.__florr.world, null, { timeout: 20000 });
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => [...window.__florr.world.all()].some(entity => (entity.kind ?? entity.typeId) === 1),
@@ -276,7 +276,7 @@ test('match interactions drive equip, attack, defend, no-discard, swap, chat and
   });
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
     for (const entity of window.__florr.world.all()) if (entity.typeId === 1) return true;
@@ -429,7 +429,7 @@ test('mobile viewport: DPR canvas, touch start and joystick movement',
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr !== undefined, null, { timeout: 8000 });
   const layout = await page.evaluate(() => ({
     width: document.querySelector('#canvas').width,

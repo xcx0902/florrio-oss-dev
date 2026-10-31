@@ -1,4 +1,4 @@
-import { MOB_INFO, PETAL_INFO } from '../schema/petals.js';
+import { MOB_INFO,PETAL_INFO } from '../schema/petals.js';
 
 /** Development-only cheat panel. main.ts loads this module only when the page
  * is opened with ?cheat=1, so normal players never see or touch it. */
@@ -10,8 +10,8 @@ export interface CheatApi {
   teleport(x: number, y: number): Promise<void>;
 }
 
-export function installCheatPanel(api: CheatApi): void {
-  if (document.getElementById('florr-cheat-panel')) return;
+export function installCheatPanel(api: CheatApi): () => void {
+  if (document.getElementById('florr-cheat-panel')) return () => {};
   const panel = document.createElement('div');
   panel.id = 'florr-cheat-panel';
   Object.assign(panel.style, {
@@ -115,7 +115,7 @@ export function installCheatPanel(api: CheatApi): void {
       : 'No controlled flower';
   };
   refresh();
-  window.setInterval(refresh, 100);
+  const refreshTimer = window.setInterval(refresh, 100);
 
   read.addEventListener('click', () => {
     for (const input of inputs) input.dataset.dirty = 'false';
@@ -158,4 +158,5 @@ export function installCheatPanel(api: CheatApi): void {
       } catch (error) { status.textContent = String(error); }
     })();
   });
+  return () => { window.clearInterval(refreshTimer); panel.remove(); };
 }

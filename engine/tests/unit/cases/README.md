@@ -3,7 +3,7 @@
 `test_main.cpp` is only the runner/support include. Every case below lives in one
 `cases/*.inc` translation-unit fragment included in original order, so helper
 visibility and test order are unchanged from the pre-split file. The total is
-113 tests, matching the pre-split runner count after the archived fixed-layout wrappers were retired.
+112 tests. M3 retired the unused ComponentStore case and replaced StateDump coverage with direct domain-state assertions; the separate structure CTest covers new ownership boundaries.
 
 | Case file | Tests | Count |
 | --- | --- | ---: |
@@ -18,9 +18,9 @@ visibility and test order are unchanged from the pre-split file. The total is
 | `snapshot_dense.inc` | `test_domain_dense_live_values`, `test_default_dense_groups`, `test_domain_dense_player_wire_boundaries`, `test_full_field_framing`, `test_full_field_effect_flags`, `test_input_discard_deletion_then_swap` | 6 |
 | `snapshot_domain.inc` | `test_domain_profile_snapshot`, `test_player_loadout_replication`, `test_snapshot_angle_quantization`, `test_camera_snapshot_deltas`, `test_pickup_transfer_snapshot`, `test_domain_boot_visibility`, `test_domain_snapshot` | 7 |
 | `spawn_loadout.inc` | `test_petals`, `test_populate_world`, `test_player_loadout`, `test_profile_discard_and_swap`, `test_discard_removes_petals`, `test_cactus_construction`, `test_player_spawn`, `test_drop_pickup`, `test_spawn_table`, `test_spawn_and_movement`, `test_collision`, `test_damage_and_effects`, `test_petal_orbit_profiles` | 13 |
-| `worker_api.inc` | `test_world_initialize`, `test_player_input_appearance`, `test_state_dump`, `test_worker_api`, `test_rock_construction`, `test_entity_spawn_defaults`, `test_spatial_query`, `test_component_store`, `test_catalog`, `test_protocol_constants`, `test_quadtree` | 11 |
+| `worker_api.inc` | `test_world_initialize`, `test_player_input_appearance`, `test_entity_domain_state`, `test_worker_api`, `test_rock_construction`, `test_entity_spawn_defaults`, `test_spatial_query`, `test_catalog`, `test_protocol_constants`, `test_quadtree` | 10 |
 
-**Total: 113**
+**Total: 112**
 
 
 ## Required category coverage

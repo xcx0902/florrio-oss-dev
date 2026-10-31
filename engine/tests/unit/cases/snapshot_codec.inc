@@ -181,12 +181,12 @@ void test_snapshot_header() {
   CHECK(reader.read_varint32().value() == 0);
   CHECK(reader.eof());
 
-  engine::SnapshotPacketBuilder builder;
+  engine::SnapshotEncoder builder;
   builder.begin(12, 4);
   const engine::EntityHandle handle = engine::EntityHandle::from_parts(7, 3);
-  builder.add_delete(handle);
+  builder.write_delete(handle);
   const std::array<std::uint8_t, 2> event_payload{0xAA, 0xBB};
-  builder.add_event(14, event_payload);
+  builder.write_event(14, event_payload);
   const auto built = builder.finish();
   engine::ByteReader built_reader(built);
   CHECK(built_reader.read_u8().value() == 1);
@@ -203,7 +203,7 @@ void test_snapshot_header() {
 }
 
 void test_snapshot_writer_fields() {
-  engine::SnapshotWriter writer;
+  engine::SnapshotEncoder writer;
   writer.begin(12, 4);
   const engine::EntityHandle handle = engine::EntityHandle::from_parts(3, 5);
   writer.write_bare_entity(handle);
@@ -220,7 +220,7 @@ void test_snapshot_writer_fields() {
   CHECK(reader.read_u8().value() == 0); // sparse field terminator
   CHECK(reader.eof());
 
-  engine::SnapshotWriter mask_writer;
+  engine::SnapshotEncoder mask_writer;
   mask_writer.begin(13, 4);
   mask_writer.write_mask_entity(handle, 5);
   const auto mask_bytes = mask_writer.finish();
@@ -237,7 +237,7 @@ void test_snapshot_writer_fields() {
   CHECK(mask_reader.read_u8().value() == 0);
   CHECK(mask_reader.eof());
 
-  engine::SnapshotWriter field_writer;
+  engine::SnapshotEncoder field_writer;
   field_writer.begin(14, 4);
   field_writer.write_mask_byte_field(handle, 5, 1, 0x7A);
   const auto field_bytes = field_writer.finish();
@@ -256,9 +256,9 @@ void test_snapshot_writer_fields() {
   CHECK(field_reader.read_u8().value() == 0);
   CHECK(field_reader.eof());
 
-  engine::SnapshotWriter float_writer;
+  engine::SnapshotEncoder float_writer;
   float_writer.begin(15, 4);
-  float_writer.write_mask_float_field5(handle, 5, 1.5F);
+  float_writer.write_mask_float_field(handle, 5, 5U, 1.5F);
   const auto float_bytes = float_writer.finish();
   engine::ByteReader float_reader(float_bytes);
   CHECK(float_reader.read_u8().value() == 1);
@@ -275,7 +275,7 @@ void test_snapshot_writer_fields() {
   CHECK(float_reader.read_u8().value() == 0);
   CHECK(float_reader.eof());
 
-  engine::SnapshotWriter generic_writer;
+  engine::SnapshotEncoder generic_writer;
   generic_writer.begin(16, 4);
   generic_writer.write_mask_float_field(handle, 5, 7, 2.5F);
   const auto generic_bytes = generic_writer.finish();
@@ -294,9 +294,9 @@ void test_snapshot_writer_fields() {
   CHECK(generic_reader.read_u8().value() == 0);
   CHECK(generic_reader.eof());
 
-  engine::SnapshotWriter double_writer;
+  engine::SnapshotEncoder double_writer;
   double_writer.begin(17, 4);
-  double_writer.write_mask_double_field35(handle, 5, 2.25);
+  double_writer.write_mask_double_field(handle, 5, 35U, 2.25);
   const auto double_bytes = double_writer.finish();
   engine::ByteReader double_reader(double_bytes);
   CHECK(double_reader.read_u8().value() == 1);
@@ -313,9 +313,9 @@ void test_snapshot_writer_fields() {
   CHECK(double_reader.read_u8().value() == 0);
   CHECK(double_reader.eof());
 
-  engine::SnapshotWriter field18_writer;
+  engine::SnapshotEncoder field18_writer;
   field18_writer.begin(18, 4);
-  field18_writer.write_mask_double_field18(handle, 5, 3.25);
+  field18_writer.write_mask_double_field(handle, 5, 18U, 3.25);
   const auto field18_bytes = field18_writer.finish();
   engine::ByteReader field18_reader(field18_bytes);
   CHECK(field18_reader.read_u8().value() == 1);
@@ -332,9 +332,9 @@ void test_snapshot_writer_fields() {
   CHECK(field18_reader.read_u8().value() == 0);
   CHECK(field18_reader.eof());
 
-  engine::SnapshotWriter field27_writer;
+  engine::SnapshotEncoder field27_writer;
   field27_writer.begin(19, 4);
-  field27_writer.write_mask_float_field27(handle, 5, 5.5F);
+  field27_writer.write_mask_float_field(handle, 5, 27U, 5.5F);
   const auto field27_bytes = field27_writer.finish();
   engine::ByteReader field27_reader(field27_bytes);
   CHECK(field27_reader.read_u8().value() == 1);
@@ -351,9 +351,9 @@ void test_snapshot_writer_fields() {
   CHECK(field27_reader.read_u8().value() == 0);
   CHECK(field27_reader.eof());
 
-  engine::SnapshotWriter string_writer;
+  engine::SnapshotEncoder string_writer;
   string_writer.begin(20, 4);
-  string_writer.write_mask_string_field4(handle, 5, "hi");
+  string_writer.write_mask_string_field(handle, 5, 4U, "hi");
   const auto string_bytes = string_writer.finish();
   engine::ByteReader string_reader(string_bytes);
   CHECK(string_reader.read_u8().value() == 1);
@@ -372,7 +372,7 @@ void test_snapshot_writer_fields() {
   CHECK(string_reader.read_u8().value() == 0);
   CHECK(string_reader.eof());
 
-  engine::SnapshotWriter byte2_writer;
+  engine::SnapshotEncoder byte2_writer;
   byte2_writer.begin(21, 4);
   byte2_writer.write_mask_byte_field(handle, 5, 2, 0xAB);
   const auto byte2_bytes = byte2_writer.finish();
@@ -391,9 +391,9 @@ void test_snapshot_writer_fields() {
   CHECK(byte2_reader.read_u8().value() == 0);
   CHECK(byte2_reader.eof());
 
-  engine::SnapshotWriter array_writer;
+  engine::SnapshotEncoder array_writer;
   array_writer.begin(22, 4);
-  array_writer.write_mask_byte_array_field60(handle, 5, 2, 0xCD);
+  array_writer.write_mask_byte_array_field(handle, 5, 60U, 2, 0xCD);
   const auto array_bytes = array_writer.finish();
   engine::ByteReader array_reader(array_bytes);
   CHECK(array_reader.read_u8().value() == 1);
@@ -412,7 +412,7 @@ void test_snapshot_writer_fields() {
   CHECK(array_reader.read_u8().value() == 0); // field terminator
   CHECK(array_reader.eof());
 
-  engine::SnapshotWriter varint_array_writer;
+  engine::SnapshotEncoder varint_array_writer;
   varint_array_writer.begin(23, 4);
   varint_array_writer.write_mask_varint_array_field(handle, 5, 39, 1, 200);
   const auto varint_array_bytes = varint_array_writer.finish();
@@ -433,7 +433,7 @@ void test_snapshot_writer_fields() {
   CHECK(varint_array_reader.read_u8().value() == 0);
   CHECK(varint_array_reader.eof());
 
-  engine::SnapshotWriter short_array_writer;
+  engine::SnapshotEncoder short_array_writer;
   short_array_writer.begin(24, 4);
   short_array_writer.write_mask_short_array_field(handle, 5, 61, 0, 0xBEEF);
   const auto short_array_bytes = short_array_writer.finish();
@@ -454,9 +454,9 @@ void test_snapshot_writer_fields() {
   CHECK(short_array_reader.read_u8().value() == 0);
   CHECK(short_array_reader.eof());
 
-  engine::SnapshotWriter multi_writer;
+  engine::SnapshotEncoder multi_writer;
   multi_writer.begin(26, 4);
-  const std::array<engine::SnapshotWriter::FloatField, 2> multi_fields{{
+  const std::array<engine::SnapshotEncoder::FloatField, 2> multi_fields{{
     {5, 1.5F}, {7, 2.5F},
   }};
   multi_writer.write_mask_float_fields(handle, 5, multi_fields);
@@ -478,7 +478,7 @@ void test_snapshot_writer_fields() {
   CHECK(multi_reader.read_u8().value() == 0);
   CHECK(multi_reader.eof());
 
-  engine::SnapshotWriter varint_writer;
+  engine::SnapshotEncoder varint_writer;
   varint_writer.begin(27, 4);
   varint_writer.write_mask_varint_field(handle, 5, 30, 300);
   const auto varint_bytes = varint_writer.finish();
@@ -497,7 +497,7 @@ void test_snapshot_writer_fields() {
   CHECK(varint_reader.read_u8().value() == 0);
   CHECK(varint_reader.eof());
 
-  engine::SnapshotWriter reference_writer;
+  engine::SnapshotEncoder reference_writer;
   reference_writer.begin(28, 4);
   reference_writer.write_mask_reference_field(handle, 5, 23, 0x11223344);
   const auto reference_bytes = reference_writer.finish();
@@ -516,7 +516,7 @@ void test_snapshot_writer_fields() {
   CHECK(reference_reader.read_u8().value() == 0);
   CHECK(reference_reader.eof());
 
-  engine::SnapshotWriter string48_writer;
+  engine::SnapshotEncoder string48_writer;
   string48_writer.begin(29, 4);
   string48_writer.write_mask_string_field(handle, 5, 48, "abc");
   const auto string48_bytes = string48_writer.finish();
@@ -538,7 +538,7 @@ void test_snapshot_writer_fields() {
   CHECK(string48_reader.read_u8().value() == 0);
   CHECK(string48_reader.eof());
 
-  engine::SnapshotWriter string_array_writer;
+  engine::SnapshotEncoder string_array_writer;
   string_array_writer.begin(30, 4);
   string_array_writer.write_mask_string_array_field(handle, 5, 25, 1, "xy");
   const auto string_array_bytes = string_array_writer.finish();
@@ -561,9 +561,9 @@ void test_snapshot_writer_fields() {
   CHECK(string_array_reader.read_u8().value() == 0);
   CHECK(string_array_reader.eof());
 
-  engine::SnapshotWriter float45_writer;
+  engine::SnapshotEncoder float45_writer;
   float45_writer.begin(31, 4);
-  float45_writer.write_mask_float_field45(handle, 5, 6.5F);
+  float45_writer.write_mask_float_field(handle, 5, 45U, 6.5F);
   const auto float45_bytes = float45_writer.finish();
   engine::ByteReader float45_reader(float45_bytes);
   CHECK(float45_reader.read_u8().value() == 1);
@@ -580,7 +580,7 @@ void test_snapshot_writer_fields() {
   CHECK(float45_reader.read_u8().value() == 0);
   CHECK(float45_reader.eof());
 
-  engine::SnapshotWriter sparse_writer;
+  engine::SnapshotEncoder sparse_writer;
   sparse_writer.begin(32, 4);
   const std::array<std::uint32_t, 2> ordinals{{1, 3}};
   sparse_writer.write_sparse_entity(handle, ordinals);
@@ -600,7 +600,7 @@ void test_snapshot_writer_fields() {
   CHECK(sparse_reader.read_u8().value() == 0);
   CHECK(sparse_reader.eof());
 
-  engine::SnapshotWriter bit_writer;
+  engine::SnapshotEncoder bit_writer;
   bit_writer.begin(33, 4);
   bit_writer.write_mask_bit_field(handle, 5, 33, true);
   const auto bit_bytes = bit_writer.finish();
@@ -619,9 +619,9 @@ void test_snapshot_writer_fields() {
   CHECK(bit_reader.read_u8().value() == 0);
   CHECK(bit_reader.eof());
 
-  engine::SnapshotWriter bits_writer;
+  engine::SnapshotEncoder bits_writer;
   bits_writer.begin(38, 4);
-  const std::array<engine::SnapshotWriter::BitField, 2> bit_fields{{
+  const std::array<engine::SnapshotEncoder::BitField, 2> bit_fields{{
     {33, true}, {40, false},
   }};
   bits_writer.write_mask_bit_fields(handle, 5, bit_fields);
@@ -643,7 +643,7 @@ void test_snapshot_writer_fields() {
   CHECK(bits_reader.read_u8().value() == 0);
   CHECK(bits_reader.eof());
 
-  engine::SnapshotWriter angle_writer;
+  engine::SnapshotEncoder angle_writer;
   angle_writer.begin(34, 4);
   angle_writer.write_mask_angle_field8(handle, 5, 0x8000);
   const auto angle_bytes = angle_writer.finish();
@@ -662,7 +662,7 @@ void test_snapshot_writer_fields() {
   CHECK(angle_reader.read_u8().value() == 0);
   CHECK(angle_reader.eof());
 
-  engine::SnapshotWriter handle_array_writer;
+  engine::SnapshotEncoder handle_array_writer;
   handle_array_writer.begin(35, 4);
   handle_array_writer.write_mask_handle_array_field3(handle, 5, 0, 0xCAFEBABE);
   const auto handle_array_bytes = handle_array_writer.finish();
@@ -683,7 +683,7 @@ void test_snapshot_writer_fields() {
   CHECK(handle_array_reader.read_u8().value() == 0);
   CHECK(handle_array_reader.eof());
 
-  engine::SnapshotWriter event_writer;
+  engine::SnapshotEncoder event_writer;
   event_writer.begin(37, 4);
   event_writer.write_chat_event("hi");
   event_writer.write_entity_time_event(handle);
@@ -707,7 +707,7 @@ void test_snapshot_writer_fields() {
   CHECK(event_reader.read_u8().value() == 2);
   CHECK(event_reader.eof());
 
-  engine::SnapshotWriter dense_writer;
+  engine::SnapshotEncoder dense_writer;
   dense_writer.begin(41, 4);
   dense_writer.write_dense_byte_group52(handle, 0x11, 0x22);
   const auto dense_bytes = dense_writer.finish();
@@ -724,7 +724,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense_reader.read_u8().value() == 0x22);
   CHECK(dense_reader.eof());
 
-  engine::SnapshotWriter dense56_writer;
+  engine::SnapshotEncoder dense56_writer;
   dense56_writer.begin(42, 4);
   const std::array<std::uint8_t, 1> dense56_values{{0x33}};
   dense56_writer.write_dense_byte_group(handle, dense56_values);
@@ -741,7 +741,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense56_reader.read_u8().value() == 0x33);
   CHECK(dense56_reader.eof());
 
-  engine::SnapshotWriter dense116_writer;
+  engine::SnapshotEncoder dense116_writer;
   dense116_writer.begin(43, 4);
   const std::array<float, 2> dense116_values{{1.25F, 2.5F}};
   dense116_writer.write_dense_float_group(handle, dense116_values);
@@ -759,7 +759,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense116_reader.read_f32_le().value() == 2.5F);
   CHECK(dense116_reader.eof());
 
-  engine::SnapshotWriter dense_string_writer;
+  engine::SnapshotEncoder dense_string_writer;
   dense_string_writer.begin(44, 4);
   dense_string_writer.write_dense_string_group(handle, "abc");
   const auto dense_string_bytes = dense_string_writer.finish();
@@ -778,7 +778,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense_string_reader.read_u8().value() == 0);
   CHECK(dense_string_reader.eof());
 
-  engine::SnapshotWriter dense_mixed_writer;
+  engine::SnapshotEncoder dense_mixed_writer;
   dense_mixed_writer.begin(45, 4);
   dense_mixed_writer.write_dense_angle_float_group(handle, 0x4000, 1.5F, 2.5F);
   const auto dense_mixed_bytes = dense_mixed_writer.finish();
@@ -796,7 +796,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense_mixed_reader.read_f32_le().value() == 2.5F);
   CHECK(dense_mixed_reader.eof());
 
-  engine::SnapshotWriter dense152_writer;
+  engine::SnapshotEncoder dense152_writer;
   dense152_writer.begin(46, 4);
   dense152_writer.write_dense_group152_base(handle, 1, 2, 3, 300);
   const auto dense152_bytes = dense152_writer.finish();
@@ -815,7 +815,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense152_reader.read_varint32().value() == 300);
   CHECK(dense152_reader.eof());
 
-  engine::SnapshotWriter dense152x_writer;
+  engine::SnapshotEncoder dense152x_writer;
   dense152x_writer.begin(47, 4);
   std::array<std::uint8_t, 16> bytes60{};
   for (std::uint8_t index = 0; index < 16; ++index) bytes60[index] = index;
@@ -846,7 +846,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense152x_reader.read_u8().value() == 8);
   CHECK(dense152x_reader.eof());
 
-  engine::SnapshotWriter dense124_writer;
+  engine::SnapshotEncoder dense124_writer;
   dense124_writer.begin(48, 4);
   const std::array<bool, 2> dense124_values{{true, false}};
   dense124_writer.write_dense_bit_group(handle, dense124_values);
@@ -863,7 +863,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense124_reader.read_u8().value() == 1);
   CHECK(dense124_reader.eof());
 
-  engine::SnapshotWriter dense8_writer;
+  engine::SnapshotEncoder dense8_writer;
   dense8_writer.begin(49, 4);
   dense8_writer.write_dense_float_bit_group(handle, 3.5F, true);
   const auto dense8_bytes = dense8_writer.finish();
@@ -880,7 +880,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense8_reader.read_u8().value() == 1);
   CHECK(dense8_reader.eof());
 
-  engine::SnapshotWriter dense_ref_writer;
+  engine::SnapshotEncoder dense_ref_writer;
   dense_ref_writer.begin(50, 4);
   dense_ref_writer.write_dense_reference_group(handle, 0x11111111, 0x22222222);
   const auto dense_ref_bytes = dense_ref_writer.finish();
@@ -897,7 +897,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense_ref_reader.read_u32_le().value() == 0x22222222);
   CHECK(dense_ref_reader.eof());
 
-  engine::SnapshotWriter dense72_writer;
+  engine::SnapshotEncoder dense72_writer;
   dense72_writer.begin(51, 4);
   std::array<std::uint8_t, 10> bytes16{};
   for (std::uint8_t index = 0; index < 10; ++index) bytes16[index] = index;
@@ -927,7 +927,7 @@ void test_snapshot_writer_fields() {
   CHECK(dense72_reader.read_u32_le().value() == 0xABCD);
   CHECK(dense72_reader.eof());
 
-  engine::SnapshotWriter denseM27_writer;
+  engine::SnapshotEncoder denseM27_writer;
   denseM27_writer.begin(52, 4);
   denseM27_writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
   const auto denseM27_bytes = denseM27_writer.finish();
@@ -954,7 +954,7 @@ void test_snapshot_writer_fields() {
   CHECK(denseM27_reader.read_varint32().value() == 268435457);
   CHECK(denseM27_reader.eof());
 
-  engine::SnapshotWriter denseM16_writer;
+  engine::SnapshotEncoder denseM16_writer;
   denseM16_writer.begin(53, 4);
   std::array<std::uint32_t, 10> handles3{};
   for (std::uint32_t index = 0; index < 10; ++index) handles3[index] = 0x100 + index;

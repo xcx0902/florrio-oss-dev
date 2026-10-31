@@ -1,7 +1,7 @@
-import type { EntityState } from './world.js';
+import type { CameraState } from './camera.js';
 import { interpolateEntity } from './interpolation.js';
 import type { PanState } from './pan.js';
-import type { CameraState } from './camera.js';
+import type { EntityState } from './world.js';
 
 /** Original760 tests interpolated collider bounds against a viewport expanded
  * by 100 world units on each side, independently of artwork dimensions. */

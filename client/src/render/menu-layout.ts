@@ -1,8 +1,8 @@
 /** Shared native menu geometry. All rectangles are logical client units; the
  * caller converts pointer coordinates with the same HUD scale. */
-import { MOB_INFO, PETAL_INFO } from '../schema/petals.js';
-import { MOB_GALLERY } from '../schema/mob-gallery.js';
 import { CHANGELOG } from '../schema/menu-content.js';
+import { MOB_GALLERY } from '../schema/mob-gallery.js';
+import { MOB_INFO,PETAL_INFO } from '../schema/petals.js';
 import { measureLabel } from './canvas2d/text-cache.js';
 
 const f = Math.fround;

@@ -1,6 +1,8 @@
 #pragma once
 #include "engine/core/rng.hpp"
-#include "engine/model/component_store.hpp"
+#include "engine/model/entity_pool.hpp"
+#include "engine/model/world_records.hpp"
+#include "engine/sim/collision_context.hpp"
 #include "engine/model/effect_payload.hpp"
 #include "engine/model/entity.hpp"
 #include "engine/model/petal_state.hpp"
@@ -23,240 +25,21 @@ namespace engine {
 
 inline constexpr std::uint32_t kInvalidEntity = std::numeric_limits<std::uint32_t>::max();
 
-/** Fixed-capacity entity pool with generation handles and a free list. */
-class EntityPool {
- public:
-  EntityPool() { reset(); }
-
-  void reset() {
-    entities_->fill(Entity{});
-    generations_.fill(1);
-    free_.clear();
-    reserved_ = 0;
-    for (std::uint32_t index = 0; index < kEntitySlotCount; ++index) free_.push_back(index);
-  }
-
-  [[nodiscard]] std::optional<EntityHandle> allocate() {
-    if (free_.empty()) return std::nullopt;
-    const std::uint32_t index = free_.front();
-    free_.pop_front();
-    const std::uint32_t generation = generations_[index];
-    EntityHandle handle = EntityHandle::from_parts(index, generation);
-    (*entities_)[index] = Entity{};
-    (*entities_)[index].handle = handle;
-    (*entities_)[index].active = true;
-    return handle;
-  }
-
-  [[nodiscard]] bool release(EntityHandle handle) {
-    if (!owns(handle)) return false;
-    const std::uint32_t index = handle.index();
-    (*entities_)[index].active = false;
-    generations_[index] = (generations_[index] + 1U) & 0x3FFFFU;
-    if (generations_[index] == 0U) generations_[index] = 1U;
-    free_.push_back(index);
-    return true;
-  }
-
-  [[nodiscard]] bool owns(EntityHandle handle) const {
-    if (handle.index() >= kEntitySlotCount) return false;
-    const Entity& entity = (*entities_)[handle.index()];
-    return entity.active && entity.handle == handle;
-  }
-
-  [[nodiscard]] Entity* get(EntityHandle handle) {
-    return owns(handle) ? &(*entities_)[handle.index()] : nullptr;
-  }
-  [[nodiscard]] const Entity* get(EntityHandle handle) const {
-    return owns(handle) ? &(*entities_)[handle.index()] : nullptr;
-  }
-  /** Reserve slots at the front of the free list without activating them.
-   * The original world keeps three storage records in slots 0..2, so the first
-   * gameplay entity is allocated from slot 3. */
-  void reserve_front(std::uint32_t count) {
-    while (count-- > 0U && !free_.empty()) { free_.pop_front(); ++reserved_; }
-  }
-  [[nodiscard]] std::size_t active_count() const {
-    return kEntitySlotCount - free_.size() - reserved_;
-  }
-  void set_generation(std::uint32_t index, std::uint32_t generation) {
-    if (index < kEntitySlotCount) generations_[index] = generation & 0x3FFFFU;
-  }
-  [[nodiscard]] std::array<Entity, kEntitySlotCount>& entities() { return *entities_; }
-  [[nodiscard]] const std::array<Entity, kEntitySlotCount>& entities() const { return *entities_; }
-
- private:
-  std::unique_ptr<std::array<Entity, kEntitySlotCount>> entities_ = std::make_unique<std::array<Entity, kEntitySlotCount>>();
-  std::array<std::uint32_t, kEntitySlotCount> generations_{};
-  std::deque<std::uint32_t> free_;
-  std::uint32_t reserved_ = 0;
-};
-
-// The original host call fmod(angle, 2*pi); 6924 is the signature pointer,
-// not a modulus.
-inline constexpr double kInputTau = 0x1921fb54442d18ULL * 0x1p-50;
-inline constexpr double kInputAngleModulus = kInputTau;
-inline constexpr double kDirectionScale = 0x144ad13d5bfebaULL * 0x1p-47;
-
-/** Original inputButtons direction packing. */
-[[nodiscard]] inline std::uint32_t pack_direction(f32 angle) {
-  const f32 normalized(static_cast<float>(std::fmod(static_cast<double>(angle.value), kInputAngleModulus)));
-  const double wrapped = std::fmod(static_cast<double>(normalized.value), kInputTau);
-  const double scaled = std::floor(std::fmod(wrapped + kInputTau, kInputTau) * kDirectionScale);
-  if (scaled >= 0.0 && scaled < 4294967296.0) return static_cast<std::uint32_t>(scaled);
-  return 0U;
-}
-
-/** One coalesced hit notification. The original merges repeated damage to the
- * same entity epoch into a single outgoing message, so the client sees one hit
- * per target per tick. */
-struct HitEvent {
-  EntityHandle target{};
-  EntityHandle attacker{};
-  f32 amount = f32(0.0F);
-  f32 health_after = f32(0.0F);
-  std::uint64_t tick = 0;
-  std::uint32_t count = 0;
-  /** Entity epoch carried by the original 4124-byte message object. */
-  std::uint32_t epoch = 0;
-  /** Shared-message reference count (original message+4). */
-  std::uint32_t refcount = 1;
-  /** False while the target is not yet in the sorted known-entity list. */
-  bool known = true;
-};
-
-/** One area-effect owner. Targets share `payload`; the vector is rebuilt from
- * the spatial query each tick, matching original 271/updateAreaEffectTargets. */
-struct AreaEffect {
-  EntityHandle owner{};
-  f32 scale = f32(0.0F);
-  std::shared_ptr<EffectPayload> payload;
-  std::vector<EntityHandle> targets;
-};
-
-/** Deferred Peas radial launch (original scheduler entry +1 ms). */
-struct DeferredLaunch {
-  double due_ms = 0.0;
-  f32 phase = f32(0.0F);
-  std::vector<EntityHandle> children;
-  /** Insertion order, used as the stable tie-breaker for equal due times. */
-  std::uint64_t sequence = 0;
-};
-
-/** Original ant-hole species component (species+136, 12-byte pool record).
- * The world keeps the same append/swap-remove order as the original dense
- * component vector; `release_index` is the next entry in the 4848/4852 table. */
-struct AntHoleRelease {
-  EntityHandle entity{};
-  std::uint32_t release_index = 0;
-};
-
-/** Last decoded player input. */
-struct PlayerInput {
-  std::uint32_t buttons = 0;
-  f32 angle;
-  f32 strength;
-  f32 normalized_angle;
-  std::uint32_t direction = 0;
-};
-
 /** Server-side world skeleton. Simulation domains are filled in by
  * engine/src/sim/; this header intentionally has no magic offsets. */
 class World {
  public:
   World() = default;
 
-  void reset() {
-    entities_.reset();
-    rng_ = MinstdRng{};
-    random_.seed(285456437U);
-    tick_ = 0;
-    petals_.clear();
-    hit_events_.clear();
-    last_killer_ = EntityHandle{};
-    last_killer_name_.clear();
-    player_ = EntityHandle{};
-    player_name_.clear();
-    player_speed_ = f32(0.0F);
-    loadout_.clear();
-    profile_.clear();
-    area_effects_.clear();
-    deferred_launches_.clear();
-    deferred_sequence_ = 0;
-    last_launch_order_.clear();
-    phase_trace_.clear();
-    pickups_.clear();
-    ai_order_.clear();
-    ant_hole_releases_.clear();
-    known_entities_.clear();
-    pending_hit_events_.clear();
-    deaths_.clear();
-    time_ms_ = 0.0;
-    last_death_score_ = f32(0.0F);
-    last_death_level_ = 0;
-    last_death_kept_.fill(0);
-    last_death_kept_count_ = 0;
-    zone_timer_ms_ = f32(0.0F);
-    zone_progress_ = 0;
-    zone_disabled_ = false;
-    width_ = f32(50000.0F);
-    height_ = f32(4000.0F);
-    auto_populate_ = false;
-    initialized_ = false;
-  }
+  void reset();
 
   /** Match sp_server_init's 16,384 entity-slot handle pass: every index gets a
    * nonzero generation from the 64-bit LCG, rejecting generation & 262143 == 0. */
-  void initialize() {
-    entities_.reset();
-    MinstdRng rng(0);
-    for (std::uint32_t index = 0; index < kEntitySlotCount; ++index) {
-      std::uint32_t generation = 0;
-      do { generation = rng.next_generation(); } while ((generation & 262143U) == 0U);
-      entities_.set_generation(index, generation);
-      entities_.entities()[index].handle = EntityHandle::from_parts(index, generation);
-      entities_.entities()[index].active = false;
-    }
-    // Slots 0..2 are the original world's three storage records. They keep
-    // their generated handles but are never handed out to gameplay entities.
-    entities_.reserve_front(3);
-    rng_.seed(rng.state());
-    random_.seed(285456437U);
-    tick_ = 0;
-    petals_.clear();
-    hit_events_.clear();
-    last_killer_ = EntityHandle{};
-    last_killer_name_.clear();
-    player_ = EntityHandle{};
-    player_name_.clear();
-    player_speed_ = f32(0.0F);
-    loadout_.clear();
-    profile_.clear();
-    area_effects_.clear();
-    deferred_launches_.clear();
-    deferred_sequence_ = 0;
-    last_launch_order_.clear();
-    phase_trace_.clear();
-    pickups_.clear();
-    ai_order_.clear();
-    ant_hole_releases_.clear();
-    known_entities_.clear();
-    pending_hit_events_.clear();
-    deaths_.clear();
-    time_ms_ = 0.0;
-    last_death_score_ = f32(0.0F);
-    last_death_level_ = 0;
-    last_death_kept_.fill(0);
-    last_death_kept_count_ = 0;
-    zone_timer_ms_ = f32(0.0F);
-    zone_progress_ = 0;
-    zone_disabled_ = false;
-    width_ = f32(50000.0F);
-    height_ = f32(4000.0F);
-    auto_populate_ = false;
-    initialized_ = true;
-  }
+  void initialize();
 
+  [[nodiscard]] CollisionContext& collision() { return collision_; }
+  [[nodiscard]] const std::vector<EntityHandle>& destroyed() const { return destroyed_; }
+  void clear_destroyed() { destroyed_.clear(); }
   [[nodiscard]] EntityPool& entities() { return entities_; }
   [[nodiscard]] const EntityPool& entities() const { return entities_; }
   [[nodiscard]] MinstdRng& rng() { return rng_; }
@@ -271,8 +54,6 @@ class World {
     death_shuffle_.seed(entropy % 2147483647U);
   }
   [[nodiscard]] ServerRng& death_shuffle_random() { return death_shuffle_; }
-  [[nodiscard]] ComponentStore& components() { return components_; }
-  [[nodiscard]] const ComponentStore& components() const { return components_; }
   [[nodiscard]] const PlayerInput& input() const { return input_; }
   [[nodiscard]] std::vector<PetalOrbitState>& petals() { return petals_; }
   [[nodiscard]] const std::vector<PetalOrbitState>& petals() const { return petals_; }
@@ -327,62 +108,9 @@ class World {
   /** Original424 detaches the entity+212 constraint links at health death,
    * independently of ordinary ownership. Centipede links have +76 clear,
    * so a surviving next segment becomes a root even after a middle death. */
-  void detach_linked_entities(EntityHandle handle) {
-    for (const EntityHandle linked : ai_entities()) {
-      if (Entity* segment = entities_.get(linked)) {
-        if (linked == handle || segment->ai.predecessor == handle)
-          segment->ai.predecessor = EntityHandle{};
-      }
-    }
-  }
+  void detach_linked_entities(EntityHandle handle);
 
-  [[nodiscard]] bool destroy(EntityHandle handle) {
-    Entity* entity = entities_.get(handle);
-    if (entity == nullptr) return false;
-    detach_linked_entities(handle);
-    // Original404 reparents ordinary ownership only. It must not reconnect
-    // constraint links that original43/424 already detached at health death.
-    const bool owned = (entity->entity_flags & 64U) != 0U;
-    const std::uint32_t inherited_owner = owned ? entity->owner : kInvalidEntity;
-    const EntityHandle inherited_owner_handle{
-      inherited_owner == kInvalidEntity ? 0U : inherited_owner};
-    for (const EntityHandle child : entity->children) {
-      if (Entity* child_entity = entities_.get(child)) {
-        child_entity->ai.owner = inherited_owner_handle;
-        child_entity->owner = inherited_owner;
-        if (Entity* parent = entities_.get(inherited_owner_handle)) {
-          if (std::find(parent->children.begin(), parent->children.end(), child) == parent->children.end())
-            parent->children.push_back(child);
-        }
-      }
-    }
-    entity->children.clear();
-    if (entity->owner != kInvalidEntity) {
-      if (Entity* parent = entities_.get(EntityHandle{entity->owner})) {
-        parent->children.erase(
-          std::remove(parent->children.begin(), parent->children.end(), handle),
-          parent->children.end());
-      }
-    }
-    // Release shared effect payloads immediately. The original effect slots
-    // own a reference to the payload; a dead entity must not keep an area
-    // effect alive until its slot is reused.
-    for (auto& effect : entity->effects) {
-      if (effect.payload && effect.payload->refcount > 0U) --effect.payload->refcount;
-      effect = Effect{};
-    }
-    entity->effect_count = 0;
-    entity->effect_flags = 0;
-    unregister_pickup(handle);
-    unregister_ai(handle);
-    unregister_ant_hole(handle);
-    known_entities_.erase(handle.raw);
-    pending_hit_events_.erase(
-      std::remove_if(pending_hit_events_.begin(), pending_hit_events_.end(),
-                     [handle](const HitEvent& event) { return event.target == handle; }),
-      pending_hit_events_.end());
-    return entities_.release(handle);
-  }
+  [[nodiscard]] bool destroy(EntityHandle handle);
 
   /** Sorted known-entity list used by the original hit-message cache. */
   void mark_known(EntityHandle handle) {
@@ -396,31 +124,7 @@ class World {
   /** Coalesce a hit notification for the current tick. The original keeps one
    * message per target epoch and merges repeated damage into it. Targets that
    * are not in the sorted known list stay in a pending vector. */
-  void record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f32 health_after) {
-    if (!target.valid()) return;
-    Entity* entity = entities_.get(target);
-    const std::uint32_t epoch = entity != nullptr && entity->hit_epoch != 0U
-      ? entity->hit_epoch : static_cast<std::uint32_t>(tick_ + 1U);
-    auto merge = [&](std::vector<HitEvent>& events) {
-      for (auto& event : events) {
-        if (event.target != target || event.tick != tick_ || event.epoch != epoch) continue;
-        event.amount = event.amount + amount;
-        event.health_after = health_after;
-        if (attacker.valid()) event.attacker = attacker;
-        ++event.count;
-        ++event.refcount;
-        return true;
-      }
-      return false;
-    };
-    if (merge(hit_events_)) return;
-    HitEvent event{target, attacker, amount, health_after, tick_, 1U, epoch, 1U, is_known(target)};
-    if (event.known) {
-      hit_events_.push_back(event);
-    } else {
-      pending_hit_events_.push_back(event);
-    }
-  }
+  void record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f32 health_after);
   /** Move pending notifications into the outgoing list once their target is
    * visible in the known-entity list. */
   std::size_t flush_pending_hits() {
@@ -593,10 +297,11 @@ class World {
     return next++;
   }
   EntityPool entities_;
+  CollisionContext collision_;
+  std::vector<EntityHandle> destroyed_;
   MinstdRng rng_;
   ServerRng random_{285456437U};
   ServerRng death_shuffle_{1U};
-  ComponentStore components_;
   PlayerInput input_;
   std::vector<PetalOrbitState> petals_;
   std::vector<HitEvent> hit_events_;

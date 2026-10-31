@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "core": [
+    "sp_server_init",
+    "sp_server_send",
+    "sp_server_think",
+    "sp_server_flush",
+    "sp_server_entity_count",
+    "sp_server_output_count",
+    "sp_server_output_data",
+    "sp_server_output_size"
+  ],
+  "diagnostics": [
+    "sp_server_player_handle",
+    "sp_server_player_valid",
+    "sp_server_debug_set_entity_field",
+    "sp_server_debug_spawn_mob",
+    "sp_server_debug_set_loadout_slot"
+  ],
+  "runtime": [
+    "malloc",
+    "free"
+  ],
+  "toolchain": [
+    "setThrew",
+    "_emscripten_stack_restore",
+    "emscripten_stack_get_current"
+  ]
+}

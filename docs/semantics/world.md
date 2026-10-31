@@ -3,8 +3,8 @@
 ## World
 
 `World` is a current C++ domain type, not a byte-for-byte copy of the retired
-native layout. It owns the entity table, component store, loadout/profile,
-clock, RNG and snapshot bookkeeping. Wire offsets are defined only by
+native layout. It owns the EntityPool, loadout/profile, domain records,
+clock, RNG, destruction notices and its CollisionContext. Wire offsets are defined only by
 `schema/protocol.yaml` and the generated protocol views.
 
 The old absolute-offset World/EntitySlot/PetalDefinition layouts and their
@@ -22,7 +22,7 @@ reintroduced as product struct members.
 
 ## Player input state
 
-`World::PlayerInput` stores the latest decoded buttons, angle, non-negative
+`PlayerInput` in `model/world_records.hpp` stores the latest decoded buttons, angle, non-negative
 strength, `normalized_angle = fmod(angle, TAU)` and the packed direction. The
 ABI applies every accepted opcode-12 message to this state; the movement
 impulse is applied once per tick by `apply_player_controls`. Avatar
@@ -30,19 +30,21 @@ look/expression publication is described in [input.md](input.md).
 
 ## Snapshot writer
 
-`SnapshotWriter::write_world` serializes active entities in slot order using the
+`SnapshotPublisher::publish` serializes active entities in slot order through the
 live mask/dense format generated from `schema/protocol.yaml`. The native
 `test_worker_api` and `test_snapshot_writer_fields` cover spawn, update, delete
 and event blocks. Full framing is in [snapshot.md](snapshot.md); the cross-end
 fixture in `tests/integration/native-snapshot.test.mjs` drives real
 `WorkerApi` bytes into the TypeScript decoder.
 
-## Component store
+## Storage and lifecycle
 
-`engine::ComponentStore` provides 30 type-erased dense pools keyed by the schema
-component id. `ComponentPool<T>::attach` returns a stable index and reuses
-released indices FIFO; `get`/`release` are bounds-checked. Concrete component
-fields remain domain-owned; only their protocol projection is generated.
+EntityPool owns current domain Entities, generation validation and FIFO slot
+reuse. The former ComponentStore had no live product consumer and is retired.
+`World::initialize` resets domain data and collision cache before the handle
+pass; `World::destroy` invalidates relationships, AI/pickup registration and
+spatial state once. SnapshotPublisher consumes its destruction notifications.
+ReplicationSession owns per-peer known handles and optional publication history.
 
 ## Initialization anchors
 
@@ -52,7 +54,7 @@ fields remain domain-owned; only their protocol projection is generated.
 - reject `generation & 262143 == 0`;
 - `handle = index | generation << 14`;
 - first handle `1048936448` (`0x3e858000`);
-- free list is FIFO (index 0 first).
+- free list is FIFO; World reserves slots 0–2, then gameplay starts at slot 3.
 
 The unit test checks 16,384 unique handles and the final LCG state
 `11065635568950165505`.

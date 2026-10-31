@@ -1,47 +1,14 @@
-/** Content identities shared by build artifacts and verification reports. */
-import { createHash, randomUUID } from 'node:crypto';
-import { readdir, readFile, lstat, realpath } from 'node:fs/promises';
-import path from 'node:path';
-
-export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-export async function treeIdentity(root, entries, { exclude = () => false } = {}) {
-  root = await realpath(root);
-  const files = {};
-  async function visit(relative, entry = false) {
-    if (exclude(relative)) return;
-    const absolute = path.join(root, relative);
-    let info;
-    try { info = await lstat(absolute); } catch (error) {
-      if (error.code === 'ENOENT') { files[relative] = null; return; }
-      throw error;
-    }
-    if (info.isSymbolicLink()) throw new Error(`Unsupported evidence symlink: ${relative}`);
-    if (info.isDirectory()) {
-      for (const name of (await readdir(absolute)).sort()) {
-        if (name === '.DS_Store') continue;
-        await visit(path.posix.join(relative, name));
-      }
-    } else if (info.isFile()) files[relative] = sha256(await readFile(absolute));
-    else throw new Error(`Unsupported evidence file: ${relative}`);
-  }
-  for (const entry of [...entries].sort()) await visit(entry, true);
-  return { sha256: sha256(JSON.stringify(files)), files };
-}
-export async function sourceIdentity(root = process.cwd()) {
-  return treeIdentity(root, ['engine/src', 'engine/include', 'engine/tests', 'engine/CMakeLists.txt', 'client/src',
-    'client/tsconfig.json', 'client/tests', 'tests', 'schema', 'tools', 'serve.mjs',
-    'CHANGELOG.md', '.emscripten-version', '.chromium-version', 'package.json', 'package-lock.json']);
-}
+/** Run-scoped product verification identities; no historical inputs. */
+import { randomUUID } from 'node:crypto';
+import { buildInputs, verificationInputs, treeIdentity } from './lib/identity.mjs';
+export { sha256, treeIdentity } from './lib/identity.mjs';
+export const sourceIdentity = buildInputs;
 export async function evidence(root = process.cwd()) {
-  const compact = identity => ({ sha256: identity.sha256, fileCount: Object.keys(identity.files).length });
-  return { runId: process.env.VERIFY_RUN_ID ?? null, source: compact(await sourceIdentity(root)),
-    // Compiler record timestamps/run IDs are provenance, not runtime bytes.
-    // Exclude them so two rebuilds of one version have the same client hash.
-    client: compact(await treeIdentity(root, ['client/public'], { exclude: file => file.endsWith('.build.json') })) };
+  const compact = identity => ({ schema: identity.schema, sha256: identity.sha256, fileCount: Object.keys(identity.files).length });
+  return { runId: process.env.VERIFY_RUN_ID ?? null, source: compact(await buildInputs(root)), verification: compact(await verificationInputs(root)),
+    client: compact(await treeIdentity(root, ['build/client', 'build/wasm/server.wasm', 'client/static'])) };
 }
 export function newRunId() { return `${new Date().toISOString().replaceAll(':', '-')}-${randomUUID().slice(0, 8)}`; }
 export function sameEvidence(left, right) {
-  return ['source', 'client'].every(key =>
-    typeof left?.[key]?.sha256 === 'string' && /^[a-f0-9]{64}$/.test(left[key].sha256)
-    && left[key].sha256 === right?.[key]?.sha256);
+  return ['source', 'verification', 'client'].every(key => typeof left?.[key]?.sha256 === 'string' && /^[a-f0-9]{64}$/.test(left[key].sha256) && left[key].schema === right?.[key]?.schema && left[key].sha256 === right?.[key]?.sha256);
 }

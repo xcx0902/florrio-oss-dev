@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { WorldState } from '../../public/state/world.js';
-import { DeathLifecycle } from '../../public/state/death.js';
-import { drawHud, getHudLayout } from '../../public/render/ui.js';
+import { WorldState } from '../../../build/client/state/world.js';
+import { DeathLifecycle } from '../../../build/client/state/death.js';
+import { drawHud, getHudLayout } from '../../../build/client/render/ui.js';
 
 const carried = [6, 7, 8, 9, 10, 12, 15, 18, 19, 22, 25, 29, 34, 36, 2, 3];
 const body = (health = 100, slots = carried, handle = 7) => ({ handle, typeId: 1, kind: 1,
@@ -12,7 +12,7 @@ const controller = { handle: 2, typeId: 0, kind: 0, flags: 0, x: 0, y: 0, angle:
   health: 0, maxHealth: 0, referenceFields: { 56: 7 },
   byteFields: { 1: 33, 20: 0, 34: 10, 47: 45 }, floatFields: { 21: 1234.5 },
   stringFields: { 6: 'Hornet' }, byteArrayFields: { 16: carried.slice(5, 15).map((value, index) => ({ value, index })) } };
-const apply = (world, entities, sequence) => world.apply({ sequence, serverTime: sequence * 50, entities, events: [] }, sequence * 50);
+const apply = (world, entities, sequence) => world.applyFullSnapshot({ sequence, serverTime: sequence * 50, entities, events: [] }, sequence * 50);
 
 test('capture the corpse inventory and controller statistics before a batched removal, then reset on a new body', () => {
   const world = new WorldState(), death = new DeathLifecycle();

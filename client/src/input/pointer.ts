@@ -2,6 +2,7 @@ export interface PointerPosition { readonly x: number; readonly y: number; }
 
 /** Pointer state in CSS pixels relative to the canvas. */
 export class PointerInput {
+  private readonly listeners = new AbortController();
   readonly position: PointerPosition = { x: 0, y: 0 };
   readonly buttons = { left: false, right: false };
   private rightClickPending = false;
@@ -15,11 +16,11 @@ export class PointerInput {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    canvas.addEventListener('pointermove', this.onMove);
-    canvas.addEventListener('pointerdown', this.onDown);
-    window.addEventListener('pointerup', this.onUp);
-    window.addEventListener('blur', () => this.reset());
-    canvas.addEventListener('contextmenu', event => event.preventDefault());
+    canvas.addEventListener('pointermove', this.onMove, { signal: this.listeners.signal });
+    canvas.addEventListener('pointerdown', this.onDown, { signal: this.listeners.signal });
+    window.addEventListener('pointerup', this.onUp, { signal: this.listeners.signal });
+    window.addEventListener('blur', () => this.reset(), { signal: this.listeners.signal });
+    canvas.addEventListener('contextmenu', event => event.preventDefault(), { signal: this.listeners.signal });
   }
 
   private readonly onMove = (event: PointerEvent): void => {
@@ -81,4 +82,5 @@ export class PointerInput {
     }
     if (event.button === 2) this.buttons.right = false;
   };
+  dispose(): void { this.listeners.abort(); this.reset(); }
 }

@@ -1,6 +1,6 @@
 # 05：客户端去除全局耦合与重复 UI 逻辑
 
-> 状态：待实施。保留当前 Canvas2D、单机 Worker 与交互体验；模块拆分和性能优化分开验证。
+> 状态：已完成（2026-10-31，Asia/Shanghai）。实现映射与双环境 15/15 验收见 [M3 实施记录](../docs/m3-structure.md)。下文保留实施前问题描述及目标；当前 Canvas2D、单机 Worker 与交互体验保留，模块拆分和性能优化分开验证。
 
 ## C01. 将 main.ts 改为组合入口
 
@@ -51,7 +51,7 @@ menu → joining → playing → dying → dead → returning → menu
 - 迁移必要的 codec 单元测试后，归档 `SkeletonSnapshotDecoder` 和只服务旧实验的 decoder 类；主入口移除 `CompositeSnapshotDecoder` 的“猜格式”回退。
 - `lastIndex === 1` 决定全量/部分状态的隐式约定退出；明确 `applyFullSnapshot` 与 `applyDeltaSnapshot`，实际网络只走一种已声明的当前格式。
 - 产品性能/渲染 fixture 使用 `WorldFixtureBuilder` 或明确的 `replaceWorld` 接口，不通过保留旧线上解码器来支持测试注入。
-- 解码先构造本包变更，全部验证通过后再提交 masks/component pointers；截断或非法包不能使 decoder 处于半更新状态。
+- 累计字段号必须在 `1…63` 内；越界时拒绝整包，不能重置为其他字段。解码先构造本包变更，全部验证通过后再提交 masks/component pointers；截断或非法包不能使 decoder 处于半更新状态。
 - 63 个字段与 dense group 类型来自 03 的协议生成物；特殊领域映射有命名访问器，不让业务代码散落 `floatFields[53]` / `byteFields[34]` 等数字。
 
 ## C04. WorldState 统一字段投影与索引
@@ -105,10 +105,10 @@ menu → joining → playing → dying → dead → returning → menu
 
 ## C08. 完成条件
 
-- [ ] main.ts 只组合依赖和启动；游戏阶段转换、server step、输入和绘制有明确所有者。
-- [ ] 启动→游戏→死亡→菜单→重生可连续重复，异步迟到不会污染新 session。
-- [ ] 线上入口只有当前 decoder，无 skeleton fallback；非法包不改变既有解码状态。
-- [ ] 同一套 layout 驱动点击与绘制，死亡行/背包/热栏不再各算一次几何。
-- [ ] HUD、art、资源缓存能独立定位和释放；无未使用的 PathCache/SpriteCache 空架构。
-- [ ] 产品测试/性能工具的注入入口独立，原版 parity hooks 全部归档。
-- [ ] 现有输入、昵称持久化、触控、cheat 功能和领域表现有产品回归保护。
+- [x] main.ts 只组合依赖和启动；游戏阶段转换、server step、输入和绘制有明确所有者。
+- [x] 启动→游戏→死亡→菜单→重生可连续重复，异步迟到不会污染新 session。
+- [x] 线上入口只有当前 decoder，无 skeleton fallback；非法包不改变既有解码状态。
+- [x] 同一套 layout 驱动点击与绘制，死亡行/背包/热栏不再各算一次几何。
+- [x] HUD、art、资源缓存能独立定位和释放；无未使用的 PathCache/SpriteCache 空架构。
+- [x] 产品测试/性能工具的注入入口独立，原版 parity hooks 全部归档。
+- [x] 现有输入、昵称持久化、触控、cheat 功能和领域表现有产品回归保护。

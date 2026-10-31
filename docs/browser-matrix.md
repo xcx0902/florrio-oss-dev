@@ -23,9 +23,9 @@ browser alone is not enough.
 
 ```sh
 node tools/check-browser-version.mjs
-npm run build:dist-next
+npm run build
 CLIENT_ROOT=dist-next node tools/run-tests.mjs client-integration
-node tools/browser-matrix.mjs
+node tools/browser-products.mjs  # one browser, isolated scenarios + smoke + render perf
 npm run test:all
 ```
 

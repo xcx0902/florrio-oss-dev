@@ -83,7 +83,7 @@ let fixturePromise;
 function wireFixture() {
   return fixturePromise ??= (async () => {
     const native = path.join(temporary, 'wire.cpp');
-    await writeFile(native, `#include "engine/net/snapshot_writer.hpp"
+    await writeFile(native, `#include "engine/net/snapshot_codec.hpp"
 #include "engine/net/dense_fields.hpp"
 #include <cstdio>
 #include <stdexcept>
@@ -97,7 +97,7 @@ int main() {
   for (unsigned field = 1; field <= 63; ++field) check(engine::dense_group_for_field(field) != nullptr);
   check(engine::dense_group_for_field(0) == nullptr);
   const auto handle = engine::EntityHandle::from_wire(0x12345678U);
-  engine::SnapshotWriter writer;
+  engine::SnapshotEncoder writer;
   writer.begin(128, 4);
   writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
   const auto bytes = writer.finish();
@@ -115,18 +115,18 @@ int main() {
   writer.begin(129, 4); writer.write_mask_entity(handle, 1U << 26);
   writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
   print(writer.finish());
-  writer.begin(130); writer.write_mask_string_field4(handle, 0, "domain");
+  writer.begin(130); writer.write_mask_string_field(handle, 0, 4, "domain");
   writer.write_mask_bit_field(handle, 0, 33, true);
-  writer.write_mask_double_field35(handle, 0, 3.5);
+  writer.write_mask_double_field(handle, 0, 35, 3.5);
   print(writer.finish());
 }
 `);
     const executable = path.join(temporary, 'wire');
-    const compile = spawnSync(process.env.CXX || 'c++', ['-std=c++20', '-O0', '-ffp-contract=off', '-I', path.join(root, 'engine/include'), native, path.join(root, 'engine/src/net/snapshot_writer.cpp'), '-o', executable], { encoding: 'utf8' });
+    const compile = spawnSync(process.env.CXX || 'c++', ['-std=c++20', '-O0', '-ffp-contract=off', '-I', path.join(root, 'engine/include'), native, path.join(root, 'engine/src/net/snapshot_codec.cpp'), '-o', executable], { encoding: 'utf8' });
     assert.equal(compile.status, 0, compile.stderr);
     const output = spawnSync(executable, [], { encoding: 'utf8' });
     assert.equal(output.status, 0, output.stderr);
-    for (const relative of ['state/snapshot.ts', 'state/field-types.ts', 'schema/protocol.ts']) {
+    for (const relative of ['state/snapshot.ts', 'state/field-types.ts', 'schema/protocol.ts', 'state/snapshot-projection.ts', 'net/snapshot-decoder.ts', 'net/binary-reader.ts']) {
       const target = path.join(temporary, relative.replace(/\.ts$/, '.mjs'));
       await mkdir(path.dirname(target), { recursive: true });
       const js = ts.transpileModule(await read(`client/src/${relative}`), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText;
@@ -145,7 +145,7 @@ test('native writer/byte-reader covers all ten -27 fields; actual bytes roundtri
   const expected = Buffer.from('01800104000100785634123e6100ac02000000000000f83f620000002040010000000000000c4090038180018180808001', 'hex');
   assert.deepEqual(Buffer.from(packets[0]), expected);
   const plan = [{ offset: -27, specs: fields.DENSE_GROUP_SPECS[-27] }];
-  const decoder = new decoded.BareSnapshotDecoder(plan);
+  const decoder = new decoded.SnapshotDecoder(plan);
   const snapshot = decoder.decode(packets[1]);
   assert.ok(snapshot);
   assert.equal(snapshot.sequence, 129);
@@ -158,7 +158,7 @@ test('native writer/byte-reader covers all ten -27 fields; actual bytes roundtri
 
 test('actual domain writers and TS decoder retain scalar4/33/35 and raw field terminators', async () => {
   const { packets, decoded, fields } = await wireFixture();
-  const snapshot = new decoded.BareSnapshotDecoder().decode(packets[2]);
+  const snapshot = new decoded.SnapshotDecoder().decode(packets[2]);
   assert.ok(snapshot);
   assert.equal(snapshot.entities[0].stringField4, 'domain');
   assert.equal(snapshot.entities[1].bitFields[33], 1);

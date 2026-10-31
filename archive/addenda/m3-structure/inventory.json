@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "sourceRevision": "7200f631eef7bda996c0a6648812b1f14227ad9c",
+  "purpose": "Read-only retired M3 implementations; never product inputs",
+  "files": [
+    {
+      "path": "client/src/main.ts",
+      "bytes": 43953,
+      "sha256": "efda5a0c55604051b54d01f475921c3f9d16871be0210fe1d4075a3918825efc"
+    },
+    {
+      "path": "client/src/render/canvas2d/path.ts",
+      "bytes": 388,
+      "sha256": "686168a1d0cef5b50231065a92c29348ae942ff03852da13f34ea550b573efcc"
+    },
+    {
+      "path": "client/src/render/canvas2d/sprites.ts",
+      "bytes": 634,
+      "sha256": "6371805d5a99e86345746e2d9635f1372d0597a6faa6f7e40e1cd98eb1f9a77f"
+    },
+    {
+      "path": "client/src/state/snapshot.ts",
+      "bytes": 30679,
+      "sha256": "25657217eb4e9d66736a56754049605db5661eb28d5ce1a369145b795f1a1e0a"
+    },
+    {
+      "path": "engine/include/engine/model/component_store.hpp",
+      "bytes": 2243,
+      "sha256": "4e5550cef7c0957a0b535a82418ef79d8af2b30b46de5f7a367cd4d9f33c9c6b"
+    },
+    {
+      "path": "engine/include/engine/net/snapshot_writer.hpp",
+      "bytes": 12455,
+      "sha256": "3d5a8369ab53b8c482f8d1eac7e12b2968f02ff720edc4d03984c65fde2df51d"
+    },
+    {
+      "path": "engine/src/net/snapshot_writer.cpp",
+      "bytes": 27136,
+      "sha256": "f7f1128b48125d73c9b1426c14b768294d009b2769fc2d471fa84e5ed141b94b"
+    },
+    {
+      "path": "engine/src/net/worker_api.cpp",
+      "bytes": 41710,
+      "sha256": "8be170bd783175e1aa9615775ed0976ad3bfd9cd8637b3497c7af96876b2696d"
+    },
+    {
+      "path": "engine/src/sim/combat.cpp",
+      "bytes": 33458,
+      "sha256": "c0bf15744ed79fb8143262490889abf4ca385f887b171522599a54e7f5d428e3"
+    },
+    {
+      "path": "engine/src/wasm/abi.cpp",
+      "bytes": 21870,
+      "sha256": "418ddec1adf974cd415b83f54d90274882ad071fa91e7c29952c9e4f4cd23415"
+    }
+  ]
+}

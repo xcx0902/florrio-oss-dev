@@ -15,14 +15,9 @@ dist-next.stage-*/
 build/
 engine/build-*/
 
-# Compiled client output (tsc outDir + emscripten wasm). The entry page,
-# worker shim and fonts are authored sources that live beside the output.
-client/public/**/*.js
-!client/public/server-worker.js
-client/public/**/*.js.map
-client/public/**/*.d.ts
-client/public/server.wasm
-client/public/server.wasm.build.json
+# Retired mixed compiler output and local release bundles
+client/public/
+release/
 
 # Product acceptance and performance records
 reports/*

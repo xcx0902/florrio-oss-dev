@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { wrapContext } from '../../public/render/canvas2d/context.js';
+import { wrapContext } from '../../../build/client/render/canvas2d/context.js';
 
 function surface() {
   let matrix = [1, 0, 0, 1, 0, 0];

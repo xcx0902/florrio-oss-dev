@@ -2,6 +2,8 @@
 # Both CMake and tools/build-engine-wasm.mjs read this file; add a source here
 # once and both native and wasm builds see it.
 set(ENGINE_CORE_SOURCES
+  src/model/world.cpp
+  src/sim/death.cpp
   src/core/contracts.cpp
   src/sim/tick.cpp
   src/sim/movement.cpp
@@ -11,6 +13,11 @@ set(ENGINE_CORE_SOURCES
   src/sim/collision_filter.cpp
   src/sim/combat.cpp
   src/sim/effects.cpp
+  src/sim/targeting.cpp
+  src/sim/ai_profiles.cpp
+  src/model/entity_relations.cpp
+  src/diagnostics/commands.cpp
+  src/sim/petal_lifecycle.cpp
   src/sim/ai.cpp
   src/sim/loot.cpp
   src/sim/progression.cpp
@@ -25,7 +32,8 @@ set(ENGINE_CORE_SOURCES
   src/sim/quadtree.cpp
   src/sim/species_attacks.cpp
   src/net/input.cpp
-  src/net/snapshot_writer.cpp
+  src/net/snapshot_codec.cpp
+  src/net/snapshot_publisher.cpp
   src/net/worker_api.cpp
   src/wasm/abi.cpp
 )

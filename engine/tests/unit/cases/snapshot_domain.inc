@@ -82,9 +82,13 @@ void test_player_loadout_replication() {
     const auto bytes = api.domain_snapshot_bytes(sequence, 0U);
     engine::ByteReader reader(bytes);
     (void)reader.read_u8(); (void)reader.read_varint32(); (void)reader.read_varint32();
-    CHECK(reader.read_varint32().value() == 0U);
+    const auto deleted = reader.read_varint32().value();
     const auto records = reader.read_varint32().value();
     CHECK(reader.read_varint32().value() == 0U);
+    for (unsigned index = 0; index < deleted; ++index) {
+      const auto handle = engine::EntityHandle::from_wire(reader.read_u32_le().value());
+      CHECK(api.world().entities().get(handle) == nullptr);
+    }
     for (unsigned record = 0; record < records; ++record) {
       const auto handle = engine::EntityHandle::from_wire(reader.read_u32_le().value());
       CHECK(reader.read_u8().value() == 55U);
@@ -347,9 +351,9 @@ void test_domain_boot_visibility() {
     if (flags != 1U) return;
     const auto component_mask = reader.read_u32_le().value();
     const auto* entity = api.world().entities().get(handle);
-    CHECK(component_mask == engine::SnapshotWriter::kDefaultDenseComponentMask
+    CHECK(component_mask == engine::SnapshotEncoder::kDefaultDenseComponentMask
       || (entity != nullptr && entity->kind == engine::EntityKind::kPetal
-          && component_mask == (engine::SnapshotWriter::kDefaultDenseComponentMask | (1U << 6U))));
+          && component_mask == (engine::SnapshotEncoder::kDefaultDenseComponentMask | (1U << 6U))));
     std::uint32_t field = 0U;
     for (auto delta = reader.read_varint32().value(); delta != 0U;
          delta = reader.read_varint32().value()) {

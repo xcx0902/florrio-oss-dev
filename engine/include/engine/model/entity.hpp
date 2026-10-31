@@ -234,16 +234,7 @@ struct Entity {
   std::uint8_t world_flags = 0;   // original entity +95
   std::uint8_t entity_flags = 0;  // original entity +93
   std::uint8_t component_flags92 = 0;
-  std::uint32_t snapshot_component_mask = 0;
-  std::uint32_t component_presence = 0;
-  /** Native 30-slot presence table; `component_presence` is its wire mask. */
-  std::bitset<30> component_presence_bits;
-  [[nodiscard]] bool component_present(std::uint32_t index) const {
-    return index >= 1U && index <= 30U && component_presence_bits.test(index - 1U);
-  }
-  f32 snapshot_field5;
-  std::uint32_t snapshot_present_groups = 0; // bit 0 = dense group 52
-  int snapshot_dense_group = 0;
+
   std::uint8_t loadout_slot = 0xFF;
   std::uint8_t loadout_instance = 0;
   std::uint8_t spawn_band = 0xFF;
@@ -275,9 +266,6 @@ struct Entity {
   double behavior_cooldown_ms = 0.0;
   /** Creation epoch used by the archived peer's one-tick arrival marker. */
   std::uint64_t spawn_tick = 0;
-  bool snapshot_dense52 = false;
-  std::uint8_t snapshot_dense52_field22 = 0;
-  std::uint8_t snapshot_dense52_field54 = 0;
   bool active = false;
   bool death_processed = false;
   bool death_flag = false;

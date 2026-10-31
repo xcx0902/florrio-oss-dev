@@ -3,8 +3,8 @@ import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parse as parseYaml } from 'yaml';
-import { DENSE_GROUPS, DENSE_GROUP_SPECS, DENSE_GROUP_COMPONENTS, densePresentForMask, FIELD_COMPONENTS } from '../../public/state/field-types.js';
-import { WorldState } from '../../public/state/world.js';
+import { DENSE_GROUPS, DENSE_GROUP_SPECS, DENSE_GROUP_COMPONENTS, densePresentForMask, FIELD_COMPONENTS } from '../../../build/client/state/field-types.js';
+import { WorldState } from '../../../build/client/state/world.js';
 import { browser, origin, start, stop } from '../support/worker-fixture.mjs';
 
 before(start);
@@ -12,7 +12,7 @@ after(stop);
 
 test('original snapshot header decoder reads type, sequence and ack', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { decodeSnapshotHeader } = await import('/state/snapshot.js');
     return decodeSnapshotHeader(new Uint8Array([1, 9, 3, 0, 0, 0]));
@@ -23,15 +23,15 @@ test('original snapshot header decoder reads type, sequence and ack', async () =
 
 test('original bare update decoder reads handle and flags', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
     const bytes = new Uint8Array([1, 12, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 52, 0]);
-    const snapshot = new BareSnapshotDecoder().decode(bytes);
+    const snapshot = new SnapshotDecoder().decode(bytes);
     const maskBytes = new Uint8Array([1, 13, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 0]);
-    const maskSnapshot = new BareSnapshotDecoder().decode(maskBytes);
+    const maskSnapshot = new SnapshotDecoder().decode(maskBytes);
     const fieldBytes = new Uint8Array([1, 14, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 1, 0x7A, 0]);
-    const fieldSnapshot = new BareSnapshotDecoder().decode(fieldBytes);
+    const fieldSnapshot = new SnapshotDecoder().decode(fieldBytes);
     const floatBytes = new Uint8Array([
       1, 15, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0,
       5, 0, 0, 0xC0, 0x3F,
@@ -39,54 +39,54 @@ test('original bare update decoder reads handle and flags', async () => {
       17, 0, 0, 0x60, 0x40,
       0,
     ]);
-    const floatSnapshot = new BareSnapshotDecoder().decode(floatBytes);
+    const floatSnapshot = new SnapshotDecoder().decode(floatBytes);
     const staticBytes = new Uint8Array([1, 16, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 19, 0, 0, 0x90, 0x40, 0]);
-    const staticSnapshot = new BareSnapshotDecoder().decode(staticBytes);
+    const staticSnapshot = new SnapshotDecoder().decode(staticBytes);
     const doubleBytes = new Uint8Array([1, 17, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0x02, 0x40, 0]);
-    const doubleSnapshot = new BareSnapshotDecoder().decode(doubleBytes);
+    const doubleSnapshot = new SnapshotDecoder().decode(doubleBytes);
     const field18Bytes = new Uint8Array([1, 18, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0x0A, 0x40, 0]);
-    const field18Snapshot = new BareSnapshotDecoder().decode(field18Bytes);
+    const field18Snapshot = new SnapshotDecoder().decode(field18Bytes);
     const field27Bytes = new Uint8Array([1, 19, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 27, 0, 0, 0xB0, 0x40, 0]);
-    const field27Snapshot = new BareSnapshotDecoder().decode(field27Bytes);
+    const field27Snapshot = new SnapshotDecoder().decode(field27Bytes);
     const stringBytes = new Uint8Array([1, 20, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 4, 0x68, 0x69, 0, 0]);
-    const stringSnapshot = new BareSnapshotDecoder().decode(stringBytes);
+    const stringSnapshot = new SnapshotDecoder().decode(stringBytes);
     const byte2Bytes = new Uint8Array([1, 21, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 2, 0xAB, 0]);
-    const byte2Snapshot = new BareSnapshotDecoder().decode(byte2Bytes);
+    const byte2Snapshot = new SnapshotDecoder().decode(byte2Bytes);
     const arrayBytes = new Uint8Array([1, 22, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 60, 3, 0xCD, 0, 0]);
-    const arraySnapshot = new BareSnapshotDecoder().decode(arrayBytes);
+    const arraySnapshot = new SnapshotDecoder().decode(arrayBytes);
     const varintArrayBytes = new Uint8Array([1, 23, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 39, 2, 200, 1, 0, 0]);
-    const varintArraySnapshot = new BareSnapshotDecoder().decode(varintArrayBytes);
+    const varintArraySnapshot = new SnapshotDecoder().decode(varintArrayBytes);
     const shortArrayBytes = new Uint8Array([1, 24, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 61, 1, 239, 253, 2, 0, 0]);
-    const shortArraySnapshot = new BareSnapshotDecoder().decode(shortArrayBytes);
+    const shortArraySnapshot = new SnapshotDecoder().decode(shortArrayBytes);
     const varint30Bytes = new Uint8Array([1, 27, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 30, 0xAC, 2, 0]);
-    const varint30Snapshot = new BareSnapshotDecoder().decode(varint30Bytes);
+    const varint30Snapshot = new SnapshotDecoder().decode(varint30Bytes);
     const reference23Bytes = new Uint8Array([1, 28, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 23, 0x44, 0x33, 0x22, 0x11, 0]);
-    const reference23Snapshot = new BareSnapshotDecoder().decode(reference23Bytes);
+    const reference23Snapshot = new SnapshotDecoder().decode(reference23Bytes);
     const string48Bytes = new Uint8Array([1, 29, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 48, 0x61, 0x62, 0x63, 0, 0]);
-    const string48Snapshot = new BareSnapshotDecoder().decode(string48Bytes);
+    const string48Snapshot = new SnapshotDecoder().decode(string48Bytes);
     const stringArray25Bytes = new Uint8Array([1, 30, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 25, 2, 0x78, 0x79, 0, 0, 0]);
-    const stringArray25Snapshot = new BareSnapshotDecoder().decode(stringArray25Bytes);
+    const stringArray25Snapshot = new SnapshotDecoder().decode(stringArray25Bytes);
     const float45Bytes = new Uint8Array([1, 31, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 45, 0, 0, 0xD0, 0x40, 0]);
-    const float45Snapshot = new BareSnapshotDecoder().decode(float45Bytes);
+    const float45Snapshot = new SnapshotDecoder().decode(float45Bytes);
     const sparseBytes = new Uint8Array([1, 32, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 54, 0, 3, 1, 0]);
-    const sparseSnapshot = new BareSnapshotDecoder().decode(sparseBytes);
+    const sparseSnapshot = new SnapshotDecoder().decode(sparseBytes);
     const bitBytes = new Uint8Array([1, 33, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 33, 1, 0]);
-    const bitSnapshot = new BareSnapshotDecoder().decode(bitBytes);
+    const bitSnapshot = new SnapshotDecoder().decode(bitBytes);
     const angleBytes = new Uint8Array([1, 34, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 8, 0, 0x80, 0]);
-    const angleSnapshot = new BareSnapshotDecoder().decode(angleBytes);
+    const angleSnapshot = new SnapshotDecoder().decode(angleBytes);
     const handleArrayBytes = new Uint8Array([1, 35, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 3, 1, 0xBE, 0xBA, 0xFE, 0xCA, 0, 0]);
-    const handleArraySnapshot = new BareSnapshotDecoder().decode(handleArrayBytes);
+    const handleArraySnapshot = new SnapshotDecoder().decode(handleArrayBytes);
     const mixedBytes = new Uint8Array([1, 36, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 5, 0, 0, 0xC0, 0x3F, 3, 0, 0x40, 0]);
-    const mixedSnapshot = new BareSnapshotDecoder().decode(mixedBytes);
+    const mixedSnapshot = new SnapshotDecoder().decode(mixedBytes);
     const field13Bytes = new Uint8Array([1, 39, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 13, 0, 0, 0xF0, 0x40, 0]);
-    const field13Snapshot = new BareSnapshotDecoder().decode(field13Bytes);
+    const field13Snapshot = new SnapshotDecoder().decode(field13Bytes);
     const eventsBytes = new Uint8Array([
       1, 40, 4, 0, 0, 3,
       9, 0x68, 0x69, 0,
       11, 0x78, 0x56, 0x34, 0x12,
       14, 0x78, 0x56, 0x34, 0x12, 2,
     ]);
-    const eventsSnapshot = new BareSnapshotDecoder().decode(eventsBytes);
+    const eventsSnapshot = new SnapshotDecoder().decode(eventsBytes);
     return {
       bare: snapshot?.entities.map(entity => ({ handle: entity.handle, typeId: entity.typeId })) ?? null,
       mask: maskSnapshot?.entities.map(entity => ({ handle: entity.handle, flags: entity.flags })) ?? null,
@@ -196,9 +196,9 @@ test('dense groups follow the component-presence mask', () => {
 
 test('dense group 52 decoder reads two byte fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroup52Decoder } = await import('/state/snapshot.js');
+    const { DenseGroup52Decoder } = await import('/test-support/dense-codec.js');
     const bytes = new Uint8Array([1, 41, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x22]);
     const snapshot = new DenseGroup52Decoder().decode(bytes);
     return snapshot?.entities.map(entity => ({ dense: entity.denseByteFields, components: entity.components })) ?? null;
@@ -209,9 +209,9 @@ test('dense group 52 decoder reads two byte fields', async () => {
 
 test('dense byte group decoder reads configured fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseByteGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseByteGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 42, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x33]);
     const snapshot = new DenseByteGroupDecoder([36]).decode(packet);
     return snapshot?.entities.map(entity => entity.denseByteFields) ?? null;
@@ -222,9 +222,9 @@ test('dense byte group decoder reads configured fields', async () => {
 
 test('dense float group decoder reads configured fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseFloatGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseFloatGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 43, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0, 0xA0, 0x3F, 0, 0, 0x20, 0x40]);
     const snapshot = new DenseFloatGroupDecoder([53, 55]).decode(packet);
     return snapshot?.entities.map(entity => entity.denseFields) ?? null;
@@ -235,9 +235,9 @@ test('dense float group decoder reads configured fields', async () => {
 
 test('dense string and mixed groups decode by spec', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseStringGroupDecoder, DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseStringGroupDecoder, DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const stringPacket = new Uint8Array([1, 44, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x61, 0x62, 0x63, 0]);
     const mixedPacket = new Uint8Array([1, 45, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0x40, 0, 0, 0xC0, 0x3F, 0, 0, 0x20, 0x40]);
     const stringSnapshot = new DenseStringGroupDecoder([48]).decode(stringPacket);
@@ -258,9 +258,9 @@ test('dense string and mixed groups decode by spec', async () => {
 
 test('dense group 152 base fields decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 46, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 1, 2, 3, 0xAC, 2]);
     const snapshot = new DenseGroupDecoder([
       { field: 2, type: 'byte' }, { field: 26, type: 'byte' },
@@ -274,9 +274,9 @@ test('dense group 152 base fields decode', async () => {
 
 test('dense group 152 extended fields decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
       1, 47, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 126,
       1, 2, 3, 0xAC, 2, 0, 0, 0xC0, 0x3F,
@@ -304,9 +304,9 @@ test('dense group 152 extended fields decode', async () => {
 
 test('dense bit group packs bits', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 48, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 1]);
     const snapshot = new DenseGroupDecoder([
       { field: 29, type: 'bit' }, { field: 40, type: 'bit' },
@@ -319,9 +319,9 @@ test('dense bit group packs bits', async () => {
 
 test('dense float+bit group decodes', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 49, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0, 0x60, 0x40, 1]);
     const snapshot = new DenseGroupDecoder([
       { field: 13, type: 'f32' }, { field: 37, type: 'bit' },
@@ -334,9 +334,9 @@ test('dense float+bit group decodes', async () => {
 
 test('dense reference group decodes', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 50, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x11, 0x11, 0x11, 0x22, 0x22, 0x22, 0x22]);
     const snapshot = new DenseGroupDecoder([
       { field: 23, type: 'reference' }, { field: 57, type: 'reference' },
@@ -349,9 +349,9 @@ test('dense reference group decodes', async () => {
 
 test('dense group 72 mixed fields decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
       1, 51, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62,
       9, 0, 0, 0xA0, 0x3F, 0x6E, 0,
@@ -378,9 +378,9 @@ test('dense group 72 mixed fields decode', async () => {
 
 test('dense group -27 mixed fields decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
       1, 52, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62,
       0x61, 0, 0xAC, 2, 0, 0, 0, 0, 0, 0, 0xF8, 0x3F,
@@ -401,9 +401,9 @@ test('dense group -27 mixed fields decode', async () => {
 
 test('dense group -16 mixed arrays decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroupDecoder } = await import('/state/snapshot.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const varint = (value) => {
       const out = [];
       do { let byte = value & 0x7f; value >>>= 7; if (value) byte |= 0x80; out.push(byte); } while (value);
@@ -437,9 +437,9 @@ test('dense group -16 mixed arrays decode', async () => {
 
 test('dense plan decoder respects present groups', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/state/snapshot.js');
+    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const plans = [
       { offset: 52, specs: [{ field: 22, type: 'byte' }, { field: 54, type: 'byte' }] },
       { offset: 56, specs: [{ field: 36, type: 'byte' }] },
@@ -460,9 +460,9 @@ test('dense plan decoder respects present groups', async () => {
 
 test('dense plan decoder handles angle and floats', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/state/snapshot.js');
+    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 62, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0x40, 0, 0, 0xC0, 0x3F, 0, 0, 0x20, 0x40]);
     const snapshot = new DensePlanDecoder([{
       offset: 120,
@@ -476,9 +476,9 @@ test('dense plan decoder handles angle and floats', async () => {
 
 test('dense plan decoder reads multiple byte groups in one entry', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/state/snapshot.js');
+    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const plans = [
       { offset: 52, specs: [{ field: 22, type: 'byte' }, { field: 54, type: 'byte' }] },
       { offset: 56, specs: [{ field: 36, type: 'byte' }] },
@@ -492,9 +492,9 @@ test('dense plan decoder reads multiple byte groups in one entry', async () => {
 
 test('dense plan decodes live byte values for groups 56/68', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/state/snapshot.js');
+    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const plans = [
       { offset: 56, specs: [{ field: 36, type: 'byte' }] },
       { offset: 68, specs: [{ field: 9, type: 'byte' }] },
@@ -508,9 +508,9 @@ test('dense plan decodes live byte values for groups 56/68', async () => {
 
 test('dense plan decodes live bit group 124', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/state/snapshot.js');
+    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 69, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 3]);
     return new DensePlanDecoder([{
       offset: 124, specs: [{ field: 29, type: 'bit' }, { field: 40, type: 'bit' }],
@@ -522,9 +522,9 @@ test('dense plan decodes live bit group 124', async () => {
 
 test('dense plan decodes live mixed group -27', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/state/snapshot.js');
+    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
       1, 70, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62,
       0x61, 0, 0xAC, 2, 0, 0, 0, 0, 0, 0, 0xF8, 0x3F,
@@ -547,9 +547,9 @@ test('dense plan decodes live mixed group -27', async () => {
 
 test('dense plan gates group 152 base fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/state/snapshot.js');
+    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const body = new Uint8Array([1, 76, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 2, 26, 31]);
     return new DensePlanDecoder([{
       offset: 152,
@@ -567,9 +567,9 @@ test('dense plan gates group 152 base fields', async () => {
 
 test('dense plan decodes live group 152 extended fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/state/snapshot.js');
+    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const varint = (value) => {
       const out = [];
       do { let byte = value & 0x7f; value >>>= 7; if (value) byte |= 0x80; out.push(byte); } while (value);
@@ -601,15 +601,15 @@ test('dense plan decodes live group 152 extended fields', async () => {
 
 test('original decoder mixes bare and dense updates', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
       1, 76, 4, 0, 2, 0,
       0x11, 0x11, 0x11, 0x11, 52, 0,
       0x22, 0x22, 0x22, 0x22, 62, 0x11, 0x22,
     ]);
-    const snapshot = new BareSnapshotDecoder([
+    const snapshot = new SnapshotDecoder([
       { offset: 52, specs: [{ field: 22, type: 'byte' }, { field: 54, type: 'byte' }] },
     ], new Set([52])).decode(packet);
     return snapshot?.entities.map(entity => ({ handle: entity.handle, dense: entity.denseFields ?? null })) ?? null;
@@ -623,41 +623,45 @@ test('original decoder mixes bare and dense updates', async () => {
 
 test('original decoder converts mask angle field 8 to radians', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
       1, 77, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 0, 0, 0, 0, 8, 0, 0x40, 0,
     ]);
-    const snapshot = new BareSnapshotDecoder().decode(packet);
+    const snapshot = new SnapshotDecoder().decode(packet);
     return snapshot?.entities[0]?.angle ?? null;
   });
   await page.close();
   assert.ok(result !== null && Math.abs(result - Math.PI / 2) < 1e-4, String(result));
 });
 
-test('original decoder clamps out-of-range sparse fields', async () => {
+test('snapshot decoder rejects out-of-range fields without changing dense presence', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
-    const bytes = new Uint8Array([1, 42, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 52, 64, 0x7A, 0]);
-    return new BareSnapshotDecoder().decode(bytes)?.entities[0]?.byteField1 ?? null;
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { DENSE_GROUP_SPECS } = await import('/state/field-types.js');
+    const decoder = new SnapshotDecoder([{ offset: 52, specs: DENSE_GROUP_SPECS[52] }]);
+    const dense = new Uint8Array([1, 2, 0, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 2, 0]);
+    const before = decoder.decode(dense);
+    const bytes = new Uint8Array([1, 1, 0, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 1, 0, 0, 0, 64, 7, 0]);
+    return { before, invalid: decoder.decode(bytes), after: decoder.decode(dense) };
   });
   await page.close();
-  assert.equal(result, 0x7A);
+  assert.deepEqual(result, { before: null, invalid: null, after: null });
 });
 
 test('original decoder maps fields 5/24 to world position', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { BareSnapshotDecoder } = await import('/state/snapshot.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
       1, 78, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 0, 0, 0, 0,
       5, 0, 0, 0x48, 0x41, 19, 0, 0, 0x0A, 0x42, 0,
     ]);
-    const entity = new BareSnapshotDecoder().decode(packet)?.entities[0] ?? null;
+    const entity = new SnapshotDecoder().decode(packet)?.entities[0] ?? null;
     return entity ? { x: entity.x, y: entity.y, components: entity.components } : null;
   });
   await page.close();
@@ -669,14 +673,14 @@ test('original decoder maps fields 5/24 to world position', async () => {
 
 test('WorldState.applyPartial preserves missing gameplay fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { WorldState } = await import('/state/world.js');
     const world = new WorldState();
-    world.apply({ sequence: 1, serverTime: 0, entities: [
+    world.applyFullSnapshot({ sequence: 1, serverTime: 0, entities: [
       { handle: 1, typeId: 3, x: 10, y: 20, angle: 0, health: 80, maxHealth: 100, flags: 5 },
     ] }, 0);
-    world.applyPartial({ sequence: 2, serverTime: 0, entities: [
+    world.applyDeltaSnapshot({ sequence: 2, serverTime: 0, entities: [
       { handle: 1, typeId: 0, x: 0, y: 0, angle: Math.PI / 2, health: 0, maxHealth: 0, flags: 0, angleField8: Math.PI / 2 },
     ] }, 100);
     const entity = world.get(1);
@@ -688,14 +692,14 @@ test('WorldState.applyPartial preserves missing gameplay fields', async () => {
 
 test('WorldState.applyPartial merges dense fields without dropping position', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { WorldState } = await import('/state/world.js');
     const world = new WorldState();
-    world.apply({ sequence: 1, serverTime: 0, entities: [
+    world.applyFullSnapshot({ sequence: 1, serverTime: 0, entities: [
       { handle: 2, typeId: 3, x: 1, y: 2, angle: 0, health: 50, maxHealth: 60, flags: 4, denseFields: { 5: 1, 24: 2, 8: 0 } },
     ] }, 0);
-    world.applyPartial({ sequence: 2, serverTime: 0, entities: [
+    world.applyDeltaSnapshot({ sequence: 2, serverTime: 0, entities: [
       { handle: 2, typeId: 0, x: 0, y: 0, angle: 0, health: 0, maxHealth: 0, flags: 0, denseFields: { 8: 0x4000 } },
     ] }, 100);
     const entity = world.get(2);
@@ -707,14 +711,14 @@ test('WorldState.applyPartial merges dense fields without dropping position', as
 
 test('WorldState.applyPartial merges scalar field records', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { WorldState } = await import('/state/world.js');
     const world = new WorldState();
-    world.apply({ sequence: 1, serverTime: 0, entities: [
+    world.applyFullSnapshot({ sequence: 1, serverTime: 0, entities: [
       { handle: 3, typeId: 3, x: 5, y: 6, angle: 0, health: 10, maxHealth: 10, flags: 1, floatFields: { 5: 5, 24: 6 }, byteFields: { 1: 7 } },
     ] }, 0);
-    world.applyPartial({ sequence: 2, serverTime: 0, entities: [
+    world.applyDeltaSnapshot({ sequence: 2, serverTime: 0, entities: [
       { handle: 3, typeId: 0, x: 0, y: 0, angle: 0, health: 0, maxHealth: 0, flags: 0, floatFields: { 7: 1.5 }, byteFields: { 2: 9 } },
     ] }, 100);
     const entity = world.get(3);
@@ -726,14 +730,14 @@ test('WorldState.applyPartial merges scalar field records', async () => {
 
 test('WorldState.applyPartial merges component offsets', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { WorldState } = await import('/state/world.js');
     const world = new WorldState();
-    world.apply({ sequence: 1, serverTime: 0, entities: [
+    world.applyFullSnapshot({ sequence: 1, serverTime: 0, entities: [
       { handle: 4, typeId: 3, x: 0, y: 0, angle: 0, health: 1, maxHealth: 1, flags: 1, components: { 478: { 16: 1 } } },
     ] }, 0);
-    world.applyPartial({ sequence: 2, serverTime: 0, entities: [
+    world.applyDeltaSnapshot({ sequence: 2, serverTime: 0, entities: [
       { handle: 4, typeId: 0, x: 0, y: 0, angle: 0, health: 0, maxHealth: 0, flags: 0, components: { 478: { 112: 2 }, 609: { 8: 0.5 } } },
     ] }, 100);
     return world.get(4)?.components ?? null;

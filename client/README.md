@@ -1,69 +1,51 @@
 # TypeScript + Canvas2D client
 
-The client owns input, interpolation, rendering and UI. It talks to the C++
-engine through a small worker envelope; it never loads the original client or
-the archived oracle.
-
-## Build and test
+The client owns input, interpolation, rendering and UI. It talks to the local
+C++ engine through the Worker envelope and never loads archived runtimes.
 
 ```sh
-npm run build:client   # tsc -> client/public
-npm run test:client    # typecheck + product client tests
+npm run build:client   # fresh staging -> build/client (JS only)
+npm run build         # schema + wasm + TS + packaged dist-next
+npm run test:client    # compiled client unit + real Chromium integration
 ```
 
-`client/public/index.html` is the entry point. `client/public/server-worker.js`
-loads `server.wasm`, forwards `sp_server_init/send/think/flush`, and posts each
-flushed packet as an intermediate response before the final response.
-`ServerWorkerClient.requestStream()` forwards every packet; `request()` resolves
-the final payload.
+Handwritten index/worker/fonts live in `client/static/`, compiler output in
+`build/client/`, and the served product in `dist-next/`. Build the delivery before
+running browser tests. Worker inputs are freed in finally; streaming RPC forwards
+each packet, and error/messageerror/terminate rejects every pending request.
 
-## Layout
+## Ownership
 
-```
-src/net/          worker client + wire types
-src/state/        snapshot decoders, world table, interpolation
-src/input/        pointer, keyboard, touch joystick
-src/render/       Canvas2D wrapper, paths, text, sprites, world, HUD, menu
-src/audio/        silent audio boundary
-src/schema/       generated protocol types, catalogs and the project changelog
-```
+- `main.ts`: find canvas, create/start GameApp, report boot failure, dispose on pagehide.
+- `app/game-app.ts`: dependency composition, resize, start/dispose and optional cheats.
+- `app/game-session.ts`: explicit menu/joining/playing/dying/dead/returning/error,
+  init/spawn single flight, generation, cooldown, death metadata and resets.
+- `app/simulation-loop.ts`: one in-flight 50ms server step and a disposable timer.
+- `input/`: composed intentions, typed loadout commands and disposable listeners.
+- `net/`: byte reader and the single transactional SnapshotDecoder; no fallback.
+- `state/`: schema projection, WorldState authoritative map/player/kind indices,
+  explicit full/delta application and independently timed scalar interpolation.
+- `ui/layout/`: common HUD, inventory and death rectangles for drawing and hits;
+  menu geometry remains in `render/menu-layout.ts`.
+- `render/frame-renderer.ts`: frame composition; no network commands.
+- `render/hud/`, `render/art/`: local drawing responsibilities.
+- `render/resources.ts`: renderer-owned paths, labels, measurements and surfaces,
+  selected only during synchronous drawing and released by dispose.
+- `render/transitions.ts`: disposable entry/exit canvases.
+- `audio/`: minimal SilentAudioBus boundary; sound is not implemented.
 
-## Runtime
+SnapshotDecoder validates a whole packet before committing component masks and
+pointers. Projection names the death/loadout/domain fields; business code does
+not decode numeric wire fields. WorldState distinguishes health 0 from absence,
+healthy player from corpse, and clears event indices on deletion/reset/TTL.
 
-- `main.ts` drives a 50 ms `send`/`think`/`flush` loop. The menu waits for
-  Enter/click, then sends opcode 4 (restart) to create the default player;
-  opcode 12 carries pointer/keyboard/touch direction and buttons each tick.
-- Every intermediate flush packet is decoded by `BareSnapshotDecoder`
-  with the dense plans from `schema/protocol.yaml`. There is no skeleton or
-  alternate framing fallback: malformed packets are rejected.
-- `WorldState.applyPartial` merges health, maximum, kind, species, position,
-  angle, dense fields and component offsets without dropping prior values.
-  `healthKnown`/`maxHealthKnown` distinguish an absent field from a real zero.
-- Dense groups use native component-pointer presence tracked from the mask or
-  ordinal declarations (`componentPointers`); groups without a declared
-  component stay absent.
-- Events 9/11/14 are decoded into `Snapshot.events`; `WorldState` keeps the last
-  eight chat lines, a 1000 ms hit clock and a 180 ms pickup-transfer index. The
-  HUD and world passes render them.
-- Input: pointer aim/buttons, WASD/arrows, `I`/`Tab` inventory, `1`–`5` hotbar
-  selection, `Esc` close. The encoder supports restart/discard/swap/spawn.
-- Camera: `CameraState` follows the player with an exponential lag, tracks
-  DPR/resize and converts screen to world. The renderer draws the player flower,
-  equipped petals, species-colored mobs, petals, drops, health bars, hit rings,
-  menu, death overlay, HUD/hotbar/inventory and chat.
-- The client projects field 2 to `speciesId`, field 26 to `kind`/`typeId`, and
-  fields 53/55 to `health`/`maxHealth`. Field 26 is a documented domain
-  extension; the catalog species id remains field 2.
+`?test=1` explicitly installs `dev/test-api.ts` for product fixtures/performance.
+The default delivery excludes its JS; shared test servers enable that one module
+explicitly from build/client. The real default entrypoint smoke uses trusted
+keyboard/pointer input and the shipped Worker without test API. `?cheat` retains
+the existing diagnostic UI and cleans up its DOM and polling on dispose.
 
-`window.__florr` exposes `freeze()`, `resume()` and `setSnapshot()` for
-deterministic product tests and browser diagnostics. It does not expose the
-archived original runtime.
-
-## Tests
-
-`client/tests/unit/` and `client/tests/integration/` cover the retained product
-surface: boot and worker RPC/streaming, snapshot decoding, movement, loadout,
-petal transfers, death lifecycle, event effects, menu animation/interactions,
-canvas context, text cache and tooltip UI.
-Original-WASM comparisons, golden screenshots and parity recordings live under
-[`../archive/`](../archive/README.md) and are not run by the product suite.
+See [M3 mapping](../docs/m3-structure.md) for phase transitions, protocol consumers
+and tests. Unit/integration tests cover movement, loadout, death/restart, IME/name
+persistence, touch, geometry, resource ownership and worker lifecycle. Original
+comparisons and old decoders are retired, never invoked by product tests.

@@ -1,7 +1,7 @@
 /** Petal tooltip drawn on the main canvas in CSS-pixel coordinates. */
+import { PETAL_INFO,RARITY_NAMES } from '../schema/petals.js';
 import type { Canvas2DContext } from './canvas2d/context.js';
-import { drawLabelBox, measureLabel } from './canvas2d/text-cache.js';
-import { PETAL_INFO, RARITY_NAMES } from '../schema/petals.js';
+import { drawLabelBox,measureLabel } from './canvas2d/text-cache.js';
 import { rarityRgb } from './menu-panels.js';
 
 function rounded(context: Canvas2DContext, x: number, y: number, width: number, height: number,

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /** One writer, completed TAP, immutable run copy, atomic publication. */
-import { spawn } from 'node:child_process';
+import { startProcess } from './lib/process.mjs';
 import { open, mkdir, readFile, rm } from 'node:fs/promises';
 import { globSync } from 'node:fs';
 import path from 'node:path';
@@ -20,17 +20,13 @@ export async function captureTap({ name, output, command, args = [], root = proc
   await mkdir(directory, { recursive: true });
   await mkdir(path.dirname(output), { recursive: true });
   const handle = await open(`${output}.lock`, 'wx');
-  let recordingHandle, child, interrupted = null;
+  let recordingHandle, active, interrupted = null;
   const recording = path.join(directory, `${name}.tap`);
   const metadata = { runId, startedAt: new Date().toISOString(), finishedAt: null, exitCode: null,
     command: [command, ...args], evidence: null, stable: false };
   const stop = signal => {
     interrupted = signal;
-    if (!child) return;
-    if (process.platform !== 'win32' && child.pid) {
-      try { process.kill(-child.pid, signal); return; } catch (error) { if (error.code !== 'ESRCH') throw error; }
-    }
-    child.kill(signal);
+    active?.stop(signal);
   };
   const onInterrupt = () => stop('SIGINT'), onTerminate = () => stop('SIGTERM');
   try {
@@ -50,12 +46,10 @@ export async function captureTap({ name, output, command, args = [], root = proc
       ...await treeIdentity(root, [env.CLIENT_ROOT]) };
     await atomicJson(`${output}.meta.json`, metadata);
     process.once('SIGINT', onInterrupt); process.once('SIGTERM', onTerminate);
-    const completion = await new Promise(resolve => {
-      child = spawn(command === 'node' ? process.execPath : command, commandArgs,
-        { cwd: root, env: { ...env, VERIFY_RUN_ID: runId }, stdio: ['ignore', recordingHandle.fd, 'inherit'], detached: process.platform !== 'win32' });
-      child.once('error', error => resolve({ exitCode: 1, error: error.message }));
-      child.once('close', (code, signal) => resolve({ exitCode: signal ? 1 : code ?? 1, signal }));
-    });
+    active = startProcess(command === 'node' ? process.execPath : command, commandArgs,
+      { cwd: root, env: { ...env, VERIFY_RUN_ID: runId }, stdio: ['ignore', recordingHandle.fd, 'inherit'] });
+    const completion = await active.done;
+    active = undefined;
     await recordingHandle.close(); recordingHandle = null;
     const tap = await readFile(recording);
     const parsed = parseTap(tap.toString('utf8'));

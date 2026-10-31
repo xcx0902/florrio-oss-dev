@@ -9,14 +9,15 @@
       "DOM.Iterable"
     ],
     "strict": true,
+    "isolatedModules": true,
     "noImplicitOverride": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "exactOptionalPropertyTypes": false,
     "skipLibCheck": true,
-    "declaration": true,
-    "sourceMap": true,
-    "outDir": "public",
+    "declaration": false,
+    "sourceMap": false,
+    "outDir": "../build/client",
     "rootDir": "src",
     "types": []
   },

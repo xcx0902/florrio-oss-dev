@@ -3,27 +3,16 @@
  * replacement renderer or a directly constructed Event14Effect. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import http from 'node:http';
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
-import { chromium } from 'playwright-core';
-import { chromiumExecutable } from '../../../tools/lib/chromium.mjs';
+import { launchBrowser } from '../../../tools/lib/browser-harness.mjs';
+import { startTestServer } from '../../../tools/lib/test-server.mjs';
 
 test('settled pickup cards leave their old loadout positions after death in the delivered client', { timeout: 30000 }, async () => {
-  const root = path.resolve(process.env.CLIENT_ROOT || 'client/public');
-  const mime = { '.html': 'text/html', '.js': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css' };
-  const server = http.createServer(async (request, response) => {
-    try {
-      const filename = path.resolve(root, '.' + new URL(request.url, 'http://local.test').pathname);
-      if (!filename.startsWith(root + path.sep)) { response.writeHead(403).end(); return; }
-      response.writeHead(200, { 'Content-Type': mime[path.extname(filename)] || 'application/octet-stream' })
-        .end(await readFile(filename));
-    } catch { response.writeHead(404).end(); }
-  });
+  const root = path.resolve(process.env.CLIENT_ROOT || 'dist-next');
+  const { server } = await startTestServer(root, { diagnostics: true });
   let browser;
   try {
-    await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
-    browser = await chromium.launch({ executablePath: chromiumExecutable(), headless: true });
+    browser = await launchBrowser();
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     await page.addInitScript(() => {
@@ -42,7 +31,7 @@ test('settled pickup cards leave their old loadout positions after death in the 
         };
       }
     });
-    await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
+    await page.goto(`http://127.0.0.1:${server.address().port}/index.html?test=1`);
     await page.waitForFunction(() => window.__florr?.world);
     await page.locator('#player-name').waitFor({ state: 'visible' });
     await page.keyboard.press('Enter');

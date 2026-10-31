@@ -145,11 +145,11 @@ void empty_populated(WorkerApi& api) {
 }
 
 EntityHandle join(WorkerApi& api, float x = -5000.0F, float y = 0.0F) {
-  api.configure_player_spawn(PlayerConfig{}, point(x, y));
   const std::array<std::uint8_t, 3> input{{1U, 6U, 0U}};
   require(api.send(input, {}), "join accepted");
   const auto handle = api.world().player();
   require(api.world().entities().get(handle) != nullptr, "controlled player spawned");
+  api.world().entities().get(handle)->set_position(point(x, y));
   return handle;
 }
 
@@ -199,11 +199,10 @@ void require_targets(const Record& record, Vec2 position, bool camera_x, bool ca
   }
 }
 
-template<bool FullFraming, bool DefaultDense>
+template<bool DefaultDense>
 void test_per_axis_dirty_targets() {
   WorkerApi api;
   empty_populated(api);
-  api.set_full_field_framing(FullFraming);
   api.set_default_dense_groups(DefaultDense);
   const auto player = join(api);
   const auto target = mob(api, -4900.0F, 17.0F);
@@ -214,10 +213,7 @@ void test_per_axis_dirty_targets() {
     require(packet.has(target), "dirty-target fixture remains visible");
     require_targets(packet.at(target), api.world().entities().get(target)->position,
                     x, y, x, y, angle, raw, dense);
-    if constexpr (FullFraming) {
-      for (const auto field : {3U, 4U, 10U, 16U, 18U, 23U, 25U, 29U, 35U, 39U, 63U})
-        require(packet.at(target).fields.contains(field), "full framing types are emitted and decoded");
-    }
+
   };
   check(true, true, true, 0U, DefaultDense); // introduction
   check(false, false, false, 0U, false); // unchanged
@@ -259,7 +255,7 @@ void test_per_axis_dirty_targets() {
   check(false, false, false, 0U, false);
 }
 
-template<bool FullFraming, bool DefaultDense>
+template<bool DefaultDense>
 void test_clamped_visual_dirty_targets() {
   // Native garden evidence: intermediate movement changes the visual scalar
   // revision even when arena clamping restores the last published value.
@@ -269,7 +265,6 @@ void test_clamped_visual_dirty_targets() {
   for (const float direction : {-1.0F, 1.0F}) {
     WorkerApi api;
     empty_populated(api);
-    api.set_full_field_framing(FullFraming);
     api.set_default_dense_groups(DefaultDense);
     const Vec2 limit = point(direction * (api.world().width().value * 0.5F - 10.0F),
                              direction * (api.world().height().value * 0.5F - 10.0F));
@@ -336,7 +331,7 @@ void test_boot_and_fixture_bypass() {
   const auto far = mob(api, 24000.0F, 4000.0F);
   require(snapshot(api).has(far), "explicit unpopulated fixtures remain unfiltered");
   require(api.world().destroy(far), "fixture may remove bodies directly");
-  require(snapshot(api, 2U).deleted.empty(), "unpopulated fixtures keep their explicit-delete contract");
+  require(snapshot(api, 2U).removes(far), "world destruction is published through the unified notification queue");
 }
 
 void test_joined_population() {
@@ -573,14 +568,10 @@ int main(int argc, char** argv) {
     std::pair{"joined population", test_joined_population},
     std::pair{"inclusive f32 rectangle edges", test_rectangle_edges},
     std::pair{"recursive attached bounds", test_attached_bounds},
-    std::pair{"per-axis dirty targets, sparse", test_per_axis_dirty_targets<false, false>},
-    std::pair{"per-axis dirty targets, default dense", test_per_axis_dirty_targets<false, true>},
-    std::pair{"per-axis dirty targets, full framing", test_per_axis_dirty_targets<true, false>},
-    std::pair{"per-axis dirty targets, full framing and dense", test_per_axis_dirty_targets<true, true>},
-    std::pair{"clamped visual dirty targets, sparse", test_clamped_visual_dirty_targets<false, false>},
-    std::pair{"clamped visual dirty targets, default dense", test_clamped_visual_dirty_targets<false, true>},
-    std::pair{"clamped visual dirty targets, full framing", test_clamped_visual_dirty_targets<true, false>},
-    std::pair{"clamped visual dirty targets, full framing and dense", test_clamped_visual_dirty_targets<true, true>},
+    std::pair{"per-axis dirty targets, sparse", test_per_axis_dirty_targets<false>},
+    std::pair{"per-axis dirty targets, default dense", test_per_axis_dirty_targets<true>},
+    std::pair{"clamped visual dirty targets, sparse", test_clamped_visual_dirty_targets<false>},
+    std::pair{"clamped visual dirty targets, default dense", test_clamped_visual_dirty_targets<true>},
     std::pair{"exit delete and sparse re-entry", test_exit_delete_and_sparse_reentry},
     std::pair{"dense and profile re-entry", test_dense_and_profile_reentry},
     std::pair{"known and unseen destruction", test_destroy_known_and_unseen},

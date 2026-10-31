@@ -1,6 +1,6 @@
 # 06：统一构建入口，精简工具并准备后续发布
 
-> 状态：待实施。保留 `dist-next/` 作为当前交付名，先收敛流程和边界。
+> 状态：已完成（2026-10-31，Asia/Shanghai）。保留 `dist-next/` 作为当前交付名；统一构建、验收、干净副本及本地发布包均已验证，见 [M3 实施记录](../docs/m3-structure.md)。下文保留实施前问题描述及目标。
 
 ## B01. 修正默认命令与项目身份
 
@@ -121,10 +121,10 @@ schema check → native build/CTest → wasm build → client build
 
 ## B08. 完成条件
 
-- [ ] `build/start/test/test:all` 全部默认指向当前产品。
-- [ ] CMake 与 wasm 共享一个核心源清单；编译/导出配置有一致性检查。
-- [ ] 手写源与生成树分离，删除 TS 源不会使旧输出混入新包。
-- [ ] 默认交付不含归档、原版、测试、声明文件、source map 或原版探针。
-- [ ] 旧 oracle/golden 改动不影响产品身份，当前产品源码/配置变更会使产物校验失效。
-- [ ] 每个产物只构建一次，报告绑定同一次源码与交付，没有旧 ledger 继承为通过。
-- [ ] 新发布流程不执行 archive move/restore、refreeze 或访问原版网络。
+- [x] `build/start/test/test:all` 全部默认指向当前产品。
+- [x] CMake 与 wasm 共享一个核心源清单；编译/导出配置有一致性检查。
+- [x] 手写源与生成树分离，删除 TS 源不会使旧输出混入新包。
+- [x] 默认交付不含归档、原版、测试、声明文件、source map 或原版探针。
+- [x] 旧 oracle/golden 改动不影响产品身份，当前产品源码/配置变更会使产物校验失效。
+- [x] 每个产物只构建一次，报告绑定同一次源码与交付，没有旧 ledger 继承为通过。
+- [x] 新发布流程不执行 archive move/restore、refreeze 或访问原版网络。

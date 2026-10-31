@@ -1,12 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { chromium } from 'playwright-core';
+import { launchBrowser } from '../../../tools/lib/browser-harness.mjs';
 import ts from 'typescript';
-import { chromiumExecutable } from '../../../tools/lib/chromium.mjs';
-import { createEvent14Effect, updateEvent14Effect, drawEvent14Effect } from '../../public/render/event-effects.js';
-import { createHudState, drawHud, getHudLayout } from '../../public/render/ui.js';
-import { PetalMotionState } from '../../public/render/petal-motion.js';
+import { createEvent14Effect, updateEvent14Effect, drawEvent14Effect } from '../../../build/client/render/event-effects.js';
+import { createHudState, drawHud, getHudLayout } from '../../../build/client/render/ui.js';
+import { PetalMotionState } from '../../../build/client/render/petal-motion.js';
 import { RenderingCanvas } from '../helpers/recording-canvas.mjs';
 
 const payload = { index: 2, type: 6, startScreenX: 150.125, startScreenY: 280.25, recharge: 32767 / 65535 };
@@ -224,7 +223,7 @@ test('HUD slot pass replaces static contents, preserves backgrounds, draws retir
 });
 
 test('native browser reuses petal artwork and label bitmaps while preserving resource dimensions', async () => {
-  const browser = await chromium.launch({ executablePath: chromiumExecutable(), headless: true });
+  const browser = await launchBrowser();
   try {
     const browserContext = await browser.newContext();
     const page = await browserContext.newPage();

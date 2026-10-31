@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { drawHud, hotbarSlotAt, inventorySlotAt, getHudLayout } from '../../public/render/ui.js';
-import { PETAL_INFO } from '../../public/schema/petals.js';
+import { drawHud, hotbarSlotAt, inventorySlotAt, getHudLayout } from '../../../build/client/render/ui.js';
+import { PETAL_INFO } from '../../../build/client/schema/petals.js';
 
 /** Record the DOM-free path. Scope tooltip checks to its own draw pass: Rose
  * may legitimately be drawn as a hotbar label even when no tooltip is open. */

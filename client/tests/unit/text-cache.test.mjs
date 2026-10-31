@@ -16,7 +16,7 @@ const compiled = ts.transpileModule(source, {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 },
 }).outputText;
 const moduleFile = path.join(temporary, 'text-cache.mjs');
-await writeFile(moduleFile, compiled.replaceAll("from './context.js'", "from './context.mjs'"));
+await writeFile(moduleFile, compiled.replaceAll("from '../resources.js'", `from '${new URL('../../../build/client/render/resources.js', import.meta.url).href}'`));
 
 let paints = 0;
 class FakeContext {

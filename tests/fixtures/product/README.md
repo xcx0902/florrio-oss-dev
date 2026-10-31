@@ -32,7 +32,7 @@ same generator during the assertion.
 - `domain_snapshot_bytes()` emits the post-spawn baseline (sequence 6), the
   input+mob+event snapshot (sequence 7), and after `despawn()` the deletion
   snapshot (sequence 8);
-- the final packet (sequence 9) is a direct `SnapshotWriter` probe that writes
+- the final packet (sequence 9) is a direct `SnapshotEncoder` probe that writes
   species field 2 as `255`, the largest id the current one-byte wire can carry;
   it is a wire-boundary fixture, not a catalog row.
 
@@ -51,7 +51,7 @@ packet. A separate assertion decodes the fourth packet and requires species
   old bytes are wrong; do not update an expectation merely to make a test green.
 - Manual vectors are updated by editing the JSON and the prose above together.
 - Native fixture changes must keep the real `WorkerApi` path and deterministic
-  seeds; do not add an original replay. A direct `SnapshotWriter` packet is
+  seeds; do not add an original replay. A direct `SnapshotEncoder` packet is
   allowed only as the documented width-boundary probe, never as a replacement
   for the `WorkerApi` flow.
 - Visual fixtures, if added later, must be reviewed product screenshots under
