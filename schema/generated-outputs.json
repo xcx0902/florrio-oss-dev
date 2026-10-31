@@ -17,8 +17,8 @@
   "outputs": [
     {
       "path": "client/src/schema/menu-content.ts",
-      "bytes": 1365,
-      "sha256": "4b7e72aa6351dafe9d6635a2d03ae8e8ced92ceb02645e0122b820dcb3000042"
+      "bytes": 2115,
+      "sha256": "d5199e713fbab1337823a5ead917932b1eefb008179ba75ae0229acd1e67f040"
     },
     {
       "path": "client/src/schema/mob-gallery.ts",

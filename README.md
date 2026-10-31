@@ -9,6 +9,10 @@
 
 ## 当前状态
 
+当前产品版本为 **v1.0.0**。本次功能、修复、使用方式与已知限制见
+[Release notes](docs/releases/v1.0.0.md)；发布包准备与校验见
+[发布流程](docs/release.md)。
+
 | 项目 | 状态 |
 | --- | --- |
 | 运行方式 | 纯静态 Web、单机；无匹配服务、无外部运行时依赖 |
@@ -173,7 +177,8 @@ JS、字体与清单。手写资产只在 `client/static/`，编译输出只在 
 
 - Legacy 原始资源来自官方静态快照 <https://static.florr.io/old/>。
 - 归档中的原站代码、图像、文案版权归原权利人所有，仅作为兼容性研究与存档使用。
-- `client/static/fonts/` 中的 Ubuntu 字体按 Ubuntu Font License 分发。
+- `client/static/fonts/` 中的 Ubuntu 字体按
+  [Ubuntu Font Licence](client/static/fonts/LICENCE.txt) 分发；版权声明与许可证随交付包附带。
 - 本仓库未附统一开源许可证；再分发或商用前请自行确认各部分授权。
 
 历史材料索引见 [`archive/README.md`](archive/README.md)，文档索引见 [`docs/`](docs/)。

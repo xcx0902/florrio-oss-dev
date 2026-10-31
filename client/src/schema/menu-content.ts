@@ -7,14 +7,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
-    "date": "Unreleased",
+    "date": "1.0.0 - 2026-10-31",
     "notes": [
       "Added: C++20 server engine compiled to WebAssembly, with a deterministic fixed-step simulation and a native test suite.",
       "Added: TypeScript Canvas2D client with the worker envelope, sparse snapshot decoding, interpolation, rendering, menu, HUD, inventory and chat.",
       "Added: Schema-driven protocol, layout and catalog generation under schema/.",
       "Added: A repeatable product acceptance flow that builds, packages and verifies the independent `dist-next/` delivery tree.",
+      "Added: Local release archives with a verification-bound manifest and SHA-256 checksums.",
+      "Added: The Ubuntu font copyright notice and licence are included in the static delivery and release archive.",
       "Changed: The product build, tests, runtime and delivery no longer read the original-client oracle or recovered source. Historical evidence is preserved under `archive/` for manual consultation only.",
       "Changed: The menu Changelog panel now describes this project instead of the upstream 2020 client.",
+      "Changed: Engine spatial queries, active-entity iteration and snapshot publication reuse bounded data structures to reduce repeated work.",
+      "Changed: Rendering reuses bounded text, geometry and layout caches; each simulation step sends one ordered worker request.",
+      "Fixed: Mob Gallery drop probabilities are displayed in descending order.",
+      "Fixed: Long petal names such as Dandelion use the catalog's label size consistently on static cards and throughout pickup arrival, settlement and retirement.",
       "Removed: Original-client snapshot writers, the skeleton snapshot fallback and the `original_client_*` worker ABI.",
       "Removed: Reference, recovery, parity and frozen-oracle tooling from the active tree."
     ]

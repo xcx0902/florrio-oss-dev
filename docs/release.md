@@ -3,6 +3,20 @@
 发布目录是 `dist-next/`，对外是纯静态页面。项目保持 private，不向 npm 或远端自动发布。
 依赖与固定版本工具链见 [environment.md](environment.md)。
 
+## v1.0.0 发布内容
+
+- 版本：根目录与客户端的 `package.json`、根目录 `package-lock.json` 均为 `1.0.0`。
+- 发布说明：[releases/v1.0.0.md](releases/v1.0.0.md)，可直接用于 GitHub Release 正文。
+- 本地验证摘要与包校验和：[releases/v1.0.0-verification.md](releases/v1.0.0-verification.md)。
+- 游戏内更新日志：编辑根目录 `CHANGELOG.md` 后运行 `npm run schema:generate`；
+  生成的菜单内容与交付一起验收，不手改生成文件。
+- 本地准备完成不代表已发布。提交本次源码后再创建 `v1.0.0` tag，并将已校验的
+  tar.gz、`release-manifest.json`、`SHA256SUMS` 附到对应 Release；发布前确认包中
+  `source.sha256` 与待发布源码一致。manifest 的 `revision` 是打包时的 HEAD，
+  若当时仍有未提交改动，它不是最终发布提交，不能仅据此认定包与 tag 一致。
+- 当前未附统一开源许可证；沿用 README 的来源与授权说明，字体按包内 Ubuntu
+  Font License 分发。发布记录不应宣称全仓库采用某一开源许可证。
+
 ## 验收并准备包
 
 ```sh

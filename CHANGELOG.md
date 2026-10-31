@@ -8,7 +8,7 @@ Changelog panel is generated from this file by
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Dates use `YYYY-MM-DD`.
 
-## [Unreleased]
+## [1.0.0] - 2026-10-31
 
 ### Added
 
@@ -19,6 +19,9 @@ Dates use `YYYY-MM-DD`.
 - Schema-driven protocol, layout and catalog generation under `schema/`.
 - A repeatable product acceptance flow that builds, packages and verifies the
   independent `dist-next/` delivery tree.
+- Local release archives with a verification-bound manifest and SHA-256 checksums.
+- The Ubuntu font copyright notice and licence are included in the static
+  delivery and release archive.
 
 ### Changed
 
@@ -27,6 +30,16 @@ Dates use `YYYY-MM-DD`.
   under `archive/` for manual consultation only.
 - The menu Changelog panel now describes this project instead of the upstream
   2020 client.
+- Engine spatial queries, active-entity iteration and snapshot publication reuse
+  bounded data structures to reduce repeated work.
+- Rendering reuses bounded text, geometry and layout caches; each simulation
+  step sends one ordered worker request.
+
+### Fixed
+
+- Mob Gallery drop probabilities are displayed in descending order.
+- Long petal names such as Dandelion use the catalog's label size consistently
+  on static cards and throughout pickup arrival, settlement and retirement.
 
 ### Removed
 
