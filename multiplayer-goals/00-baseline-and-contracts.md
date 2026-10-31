@@ -1,6 +1,6 @@
 # M00：冻结基线与架构契约
 
-状态：进行中。依赖：无。产出：可追溯基线、新架构 ADR、参数与规则决策、后续阶段可直接使用的测试约定。实际证据见 [基线记录](../docs/multiplayer/baseline.md)，契约见 [ADR 0002](../docs/adr/0002-native-authoritative-multiplayer.md)。
+状态：已完成。依赖：无。产出：可追溯基线、新架构 ADR、参数与规则决策、后续阶段可直接使用的测试约定。实际证据见 [基线记录](../docs/multiplayer/baseline.md)，契约见 [ADR 0002](../docs/adr/0002-native-authoritative-multiplayer.md)，实际提交与交接见 [执行清单](CHECKLIST.md#4-m00-完成交接)。
 
 ## 00.1 当前代码事实
 
@@ -46,7 +46,7 @@
 
 ## 00.4 完成条件
 
-- [ ] 当前基线重新运行，结果和失败项都有记录。
+- [x] 当前基线重新运行，结果和失败项都有记录；最终 `2026-10-31T15-09-18.267Z-4432f606` 的 15/15 gate 通过，12 个 CTest 目标与 249 项 Node/浏览器测试全部通过。
 - [x] ADR 0002 固定身份、时序、复制、PVP 规则和网络依赖。
 - [x] 计划中的新命令与现有命令明确区分，见 [测试与路径交接](../docs/multiplayer/testing.md)。
 - [x] 所有新路径有明确归属；后续实现不用再次猜测玩家生命周期或拾取规则，见 [配置契约](../docs/multiplayer/configuration.md)。

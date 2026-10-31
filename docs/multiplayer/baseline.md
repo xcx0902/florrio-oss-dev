@@ -16,9 +16,35 @@ CHROME_PATH=/private/tmp/florr-m3-chromium/chrome-headless-shell-mac-arm64/chrom
 
 原因是性能驱动在重生可见后继续运行 50ms 生产者，却在任意时刻采样 pending。M00 修复 `tools/performance/browser.mjs`：所有计时采样和生命周期操作完成后才 freeze，等待真实在途请求排空，且 UI 错误仍抛错；不写死 pending=0、不削减帧数/重复数/预算。`client/tests/integration/worker-rpc.test.mjs` 用延迟发送的真实 Worker step 与注入的错误 completion 验证成功排空和失败拒绝，两条新回归连同原有 3 项共 **5/5** 通过。
 
-`2026-10-31T15-03-14.015Z-7803cb3f` 是补齐错误完成保护前主动中断的重跑，保留 `guard-interrupted-run.json` 和 `test-all-before-error-guard.log`，不当成验收成功。最终源码将重新完整运行全部 15 gate；实际最终 runId/结果同步到执行清单和 `reports/multiplayer/baseline/summary.json`。
+`2026-10-31T15-03-14.015Z-7803cb3f` 是补齐错误完成保护前主动中断的重跑，保留 `guard-interrupted-run.json` 和 `test-all-before-error-guard.log`，不当成验收成功。修复后的最终源码已重新完整运行全部 15 gate，结果为 **PASS**，详见下一节。
 
 两次完整运行开始时的 source identity 为 `11acc5cc354b70dc5bb4c738337f52c8c4f4e4fdc101802758a027c3b72d5a30`；verification identity 为 `b15461bfcb68d26e8850b004c4cbb6c150999d76132c0551dacff95f83398dcc`。环境文件记录 Node 24.13.0、npm 11.6.2、CMake 4.2.1、Apple Clang 21.0.0、Emscripten 6.0.10-git（满足版本 pin）及两种浏览器的实际版本。
+
+## 最终验收与交付身份
+
+最终完整 runId 为 `2026-10-31T15-09-18.267Z-4432f606`，于 2026-10-31 23:24:53 +08:00 完成，**15/15 gate 通过，passed=true、stable=true**。该次从构建、打包到全部性能验收使用同一份源码、校验输入和交付物；完成后的文档收尾不改变这些输入身份。实现提交为 `2bb33bf`，架构契约提交为 `07b36d9`。
+
+| 测试集合 | 实际通过 / 总数 | 失败 / 跳过 |
+| --- | ---: | ---: |
+| native CTest 目标 | 12 / 12 | 0 / 0 |
+| schema / protocol 单元测试 | 40 / 40 | 0 / 0 |
+| 工具测试 | 22 / 22 | 0 / 0 |
+| 客户端单元测试 | 102 / 102 | 0 / 0 |
+| 跨端集成测试 | 4 / 4 | 0 / 0 |
+| 浏览器场景测试 | 81 / 81 | 0 / 0 |
+
+Node/浏览器测试合计 **249/249**；native 数量是 CTest 目标数，不与目标内部断言数混算。浏览器性能保留 12 个场景组合、600 帧 × 5 次重复；引擎性能与实战生命周期性能均通过。最终 5 次实战采样均完成装备、死亡和重生，实际排空后 `pending=0`，未放宽预算或完整性要求。
+
+| 身份 | SHA-256 |
+| --- | --- |
+| source | `e4cbf0db8ad7a772573f79f6b29b4a1e58a890b6fa02774aac34a05d16cc179b` |
+| verification | `13aa984b7907ba441a6e62836f7901e314b2eede33136c80e5343c497c36fc2a` |
+| client | `22991fe6843f62bec81145e6b2a2ef2ae9fe0b081fc336481549c04cc6992d99` |
+| 交付目录 | `852dce0b119d114d4897993b8983f1c4ded6b044c2c91e194a876340453b18d0` |
+| WASM | `39e22812dc79b79e1bf32ea91e65e64729b3e511c2b2979ff8070c93a3040cb4` |
+| native 场景可执行文件 | `6548015174b9a7a6c2fa86215ac6fc7456d9cb05daba417ac47f255b3d1e35bc` |
+
+最终 ledger 保存在 `reports/multiplayer/baseline/accepted-run.json`；它引用的 TAP、入口 smoke 和三类性能报告另存到 `accepted/2026-10-31T15-09-18.267Z-4432f606/`。该目录 `index.json` 保存原路径、SHA-256 与各 gate 的日志哈希，避免后续运行覆盖顶层性能报告而丢失证据。阶段 `summary.json` 已标记 complete/passed，并关联全部三次失败/中断记录，未用成功覆盖历史。
 
 ## 原生单玩家领域场景
 
@@ -50,7 +76,7 @@ npm run test:multiplayer:baseline
 
 最后一条是 **M00 新增已实现** 的单玩家证据入口：先 native build，再 `tools/multiplayer-baseline.mjs`；生成新 runId 的 environment/single-player 报告及顶层 `single-player.json` 索引。每份记录包含当前 source/verification identity、Release 配置、平台、种子、binary/library/fixture hash、两次重放及完整性结果；不能用它替代 `test:all` 或未来多人 gate。冻结夹具没有自动更新命令，修改必须说明领域行为/规则变化。
 
-M00 增加测试/CMake/npm 编排后 source/verification identity 会改变，单玩家证据使用新的实际身份；原完整验收仍按运行时的旧身份保留。新增内容不改 `engine/src`、`engine/include`、schema 或客户端产品源码，已逐文件核对这些产品实现与起点的 hash 不变；后续 native 回归明确验证与原单玩家观测等价。性能驱动修复与其浏览器回归属于验收工具，源码身份中保留。
+M00 增加测试/CMake/npm 编排后 source/verification identity 已改变；最终单玩家重放 runId 为 `m00-2026-10-31T15-08-52.986Z-cc65dce1`，使用与最终完整验收完全一致的 source/verification identity，两次独立进程输出均与原观测相同。原完整验收仍按运行时的旧身份保留。新增内容不改 `engine/src`、`engine/include`、schema 或客户端产品源码，已逐文件核对这些产品实现与起点的 hash 不变；native 回归明确验证与原单玩家观测等价。性能驱动修复与其浏览器回归属于验收工具，校验身份中保留。
 
 ## 证据文件归属
 
@@ -61,7 +87,7 @@ M00 增加测试/CMake/npm 编排后 source/verification identity 会改变，�
 | `reports/multiplayer/baseline/initial-failed-run.json` | 首次失败的完整 ledger；原始日志保留在 run 目录 |
 | `reports/multiplayer/baseline/pinned-failed-run.json`、`failed/<runId>/` | 固定浏览器下发现的原有采样收尾失败及完整原始性能数据 |
 | `reports/multiplayer/baseline/guard-interrupted-run.json` | 主动中断以补错误完成保护的运行，未宣称通过 |
-| `reports/multiplayer/baseline/accepted-run.json` | 本次完整验收成功后才保存的 ledger |
+| `reports/multiplayer/baseline/accepted-run.json`、`accepted/<runId>/index.json` | 本次完整验收成功的 ledger 与不可覆盖的报告副本/哈希索引 |
 | `reports/multiplayer/baseline/original-single-player.json` | 改测试清单前的原库两次确定性观测 |
 | `reports/multiplayer/baseline/<m00-runId>/{environment,single-player}.json` | 新回归接入后可重跑的完整证据 |
 | `reports/multiplayer/baseline/summary.json` | 本阶段结果、实际 runId、源码身份与报告 hash 索引 |
