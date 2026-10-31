@@ -1,78 +1,71 @@
 import { asBytes,type ServerFunction,type WorkerRequest,type WorkerResponse } from './protocol.js';
-
 export type PacketHandler = (data: Uint8Array | null, final: boolean) => void;
-
-/** Promise/callback wrapper around the worker message envelope. */
+interface PendingRequest {
+  resolve:(payload:Uint8Array|null)=>void;
+  reject:(error:Error)=>void;
+  onPacket:(payload:Uint8Array,final:boolean)=>void;
+  deadline:ReturnType<typeof setTimeout>;
+}
+/** One record per request, with a bounded deadline and one cleanup path. */
 export class ServerWorkerClient {
-  private readonly worker: Worker;
-  private nextCallbackId = 0;
-  private closed = false;
-  private fail(error: Error): void { for (const reject of this.rejecters.values()) reject(error); this.pending.clear(); this.rejecters.clear(); }
-  private readonly pending = new Map<number, PacketHandler>();
-  private readonly rejecters = new Map<number, (error: Error) => void>();
-
-  constructor(url = 'server-worker.js?manual=1') {
-    this.worker = new Worker(url);
-    this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      const response = event.data;
-      const handler = this.pending.get(response.callbackId);
-      if (!handler) return;
-      if (response.error) {
-        this.pending.delete(response.callbackId);
-        this.rejecters.get(response.callbackId)?.(new Error(response.error));
-        this.rejecters.delete(response.callbackId);
-        return;
-      }
-      try { handler(asBytes(response.data), response.finalResponse); } catch (error) {
-        this.rejecters.get(response.callbackId)?.(error instanceof Error ? error : new Error(String(error)));
-        this.pending.delete(response.callbackId); this.rejecters.delete(response.callbackId);
-      }
-      if (response.finalResponse) this.pending.delete(response.callbackId);
-    };
-    this.worker.onerror = event => { this.closed = true; this.fail(new Error(event.message || 'Worker crashed')); };
-    this.worker.onmessageerror = () => { this.closed = true; this.fail(new Error('Invalid worker message')); };
-  }
-
-  request(funcName: ServerFunction, data?: Uint8Array): Promise<Uint8Array | null> {
-    return this.requestStream(funcName, data, () => {});
-  }
-
-  /** Like request(), but forwards every intermediate packet. The promise
-   * resolves with the final payload (which may be null). */
-  requestStream(
-    funcName: ServerFunction,
-    data: Uint8Array | undefined,
-    onPacket: (payload: Uint8Array, final: boolean) => void,
-  ): Promise<Uint8Array | null> {
-    if (this.closed) return Promise.reject(new Error('Worker terminated'));
-    const callbackId = this.nextCallbackId++;
-    return new Promise((resolve, reject) => {
-      this.rejecters.set(callbackId, reject);
-      this.pending.set(callbackId, (payload, final) => {
-        if (payload) onPacket(payload, final);
-        if (final) {
-          this.rejecters.delete(callbackId);
-          resolve(payload);
-        }
-      });
+  private readonly worker:Worker;
+  private nextCallbackId=0;
+  private closed=false;
+  private stepping=false;
+  private readonly pending=new Map<number,PendingRequest>();
+  get pendingCount():number { return this.pending.size; }
+  constructor(url='server-worker.js?manual=1',readonly timeoutMs=10000) {
+    this.worker=new Worker(url);
+    this.worker.onmessage=(event:MessageEvent<WorkerResponse>)=>{
+      const response=event.data;
+      if(!response||!Number.isSafeInteger(response.callbackId)) {this.close(new Error('Invalid worker message'));return;}
+      const request=this.pending.get(response.callbackId);if(!request)return;
+      if(response.error) {this.finish(response.callbackId,new Error(response.error));return;}
       try {
-        const request: WorkerRequest = data
-          ? { funcName, callbackId, data }
-          : { funcName, callbackId };
-        if (data) this.worker.postMessage(request, [data.buffer]);
-        else this.worker.postMessage(request);
-      } catch (error) {
-        this.pending.delete(callbackId);
-        this.rejecters.delete(callbackId);
-        reject(error);
-      }
+        const payload=asBytes(response.data);
+        if(payload)request.onPacket(payload,response.finalResponse);
+        if(response.finalResponse)this.finish(response.callbackId,undefined,payload);
+      } catch(error) {this.finish(response.callbackId,error instanceof Error?error:new Error(String(error)));}
+    };
+    this.worker.onerror=event=>this.close(new Error(event.message||'Worker crashed'));
+    this.worker.onmessageerror=()=>this.close(new Error('Invalid worker message'));
+  }
+  private finish(id:number,error?:Error,payload:Uint8Array|null=null):void {
+    const request=this.pending.get(id);if(!request)return;
+    this.pending.delete(id);clearTimeout(request.deadline);
+    if(error)request.reject(error);else request.resolve(payload);
+  }
+  private close(error:Error):void {
+    this.closed=true;
+    for(const id of this.pending.keys())this.finish(id,error);
+    this.worker.onmessage=this.worker.onerror=this.worker.onmessageerror=null;
+    this.worker.terminate();
+  }
+  private dispatch(request:Omit<WorkerRequest,'callbackId'>,onPacket:(payload:Uint8Array,final:boolean)=>void):Promise<Uint8Array|null> {
+    if(this.closed)return Promise.reject(new Error('Worker terminated'));
+    const callbackId=this.nextCallbackId++;
+    return new Promise((resolve,reject)=>{
+      const deadline=setTimeout(()=>this.close(new Error(`Worker request timeout: ${request.funcName}`)),this.timeoutMs);
+      this.pending.set(callbackId,{resolve,reject,onPacket,deadline});
+      try {
+        const buffers=new Set<ArrayBuffer>();
+        for(const packet of request.inputs??(request.data?[request.data]:[]))if(packet.buffer instanceof ArrayBuffer)buffers.add(packet.buffer);
+        this.worker.postMessage({...request,callbackId},[...buffers]);
+      } catch(error) {this.finish(callbackId,error instanceof Error?error:new Error(String(error)));}
     });
   }
-
-  init(): Promise<Uint8Array | null> { return this.request('sp_server_init'); }
-  send(packet: Uint8Array): Promise<Uint8Array | null> { return this.request('sp_server_send', packet); }
-  think(): Promise<Uint8Array | null> { return this.request('sp_server_think'); }
-  flush(): Promise<Uint8Array | null> { return this.request('sp_server_flush'); }
-
-  terminate(): void { this.closed = true; this.fail(new Error('Worker terminated')); this.worker.onmessage = this.worker.onerror = this.worker.onmessageerror = null; this.worker.terminate(); }
+  request(funcName:ServerFunction,data?:Uint8Array):Promise<Uint8Array|null> {return this.requestStream(funcName,data,()=>{});}
+  requestStream(funcName:ServerFunction,data:Uint8Array|undefined,onPacket:(payload:Uint8Array,final:boolean)=>void):Promise<Uint8Array|null> {
+    return this.dispatch({funcName,data},onPacket);
+  }
+  async step(inputs:readonly Uint8Array[],onPacket:(payload:Uint8Array,final:boolean)=>void):Promise<void> {
+    if(this.stepping)throw new Error('Worker step already pending');
+    this.stepping=true;
+    try {await this.dispatch({funcName:'step',inputs},onPacket);}finally{this.stepping=false;}
+  }
+  init():Promise<Uint8Array|null> {return this.request('sp_server_init');}
+  send(packet:Uint8Array):Promise<Uint8Array|null> {return this.request('sp_server_send',packet);}
+  think():Promise<Uint8Array|null> {return this.request('sp_server_think');}
+  flush():Promise<Uint8Array|null> {return this.request('sp_server_flush');}
+  terminate():void {this.close(new Error('Worker terminated'));}
 }

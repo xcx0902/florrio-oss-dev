@@ -72,10 +72,12 @@ async function openClient(t, dimensions = viewport, deviceScaleFactor = 1, menuS
     Worker.prototype.postMessage = function (...args) {
       const message = args[0];
       if (message?.funcName === 'sp_server_think') window.__menuRegressionThinkCount += 1;
-      if (message?.funcName === 'sp_server_send' && message.data) {
-        window.__menuRegressionPackets.push(Array.from(message.data));
+      const inputs=message?.funcName==='step'?message.inputs:message?.funcName==='sp_server_send'&&message.data?[message.data]:[];
+      for(const packet of inputs??[]) {
+        window.__menuRegressionPackets.push(Array.from(packet));
         window.__menuRegressionPacketTicks.push(window.__menuRegressionThinkCount);
       }
+      if(message?.funcName==='step')window.__menuRegressionThinkCount+=1;
       return Reflect.apply(post, this, args);
     };
   }, menuStorage);

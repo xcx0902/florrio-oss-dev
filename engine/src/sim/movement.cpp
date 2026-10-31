@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/sim/movement.hpp"
 #include "engine/sim/bounds.hpp"
 #include <cmath>
@@ -20,69 +21,73 @@ double wrap_angle(double value) {
 } // namespace
 
 void integrate_positions(World& world, double seconds) {
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active) continue;
-    entity.set_position_x(f32::from_double(static_cast<double>(entity.position.x.value)
-                                         + entity.velocity.x * seconds));
-    entity.set_position_y(f32::from_double(static_cast<double>(entity.position.y.value)
-                                         + entity.velocity.y * seconds));
-  }
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      entity.set_position_x(f32::from_double(static_cast<double>(entity.position.x.value)
+                                           + entity.velocity.x * seconds));
+      entity.set_position_y(f32::from_double(static_cast<double>(entity.position.y.value)
+                                           + entity.velocity.y * seconds));
+    }
+  });
 }
 
 void integrate_movement(World& world, double delta_milliseconds) {
   if (!(delta_milliseconds > 0.0)) return;
   const double damping = std::pow(0.992, delta_milliseconds);
   const double drag = kDragScale - damping * kDragScale;
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active) continue;
-    // Original 654 integrates local angle first (transform +8 / +72).
-    const f32 angular_step = f32::from_double(delta_milliseconds * 0.001
-                                              * static_cast<double>(entity.angular_velocity.value));
-    if (std::fabs(static_cast<double>(angular_step.value)) >= 1.1920928955078125e-07) {
-      entity.angle = f32::from_double(wrap_angle(static_cast<double>(entity.angle.value)
-                                                 + static_cast<double>(angular_step.value)));
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      // Original 654 integrates local angle first (transform +8 / +72).
+      const f32 angular_step = f32::from_double(delta_milliseconds * 0.001
+                                                * static_cast<double>(entity.angular_velocity.value));
+      if (std::fabs(static_cast<double>(angular_step.value)) >= 1.1920928955078125e-07) {
+        entity.angle = f32::from_double(wrap_angle(static_cast<double>(entity.angle.value)
+                                                   + static_cast<double>(angular_step.value)));
+      }
+      const double vx = entity.velocity.x;
+      const double vy = entity.velocity.y;
+      // Acceleration is the original +56/+64 additive impulse: it enters the
+      // displacement once, unscaled by the drag factor, and is NOT added to
+      // velocity. Original 654 writes:
+      //   position += drag * velocity + dt * acceleration
+      //   velocity  = damping * velocity
+      // Slow effects act where a behavior produces velocity (player controls
+      // and AI), never inside integrateMovement.
+      const double ax = entity.acceleration.x;
+      const double ay = entity.acceleration.y;
+      // Original 654 evaluates (drag * velocity + dt * acceleration) first and
+      // adds the local position last; the grouping is observable at f32 ULP
+      // level for positions in the tens of thousands.
+      const double x = (drag * vx + delta_milliseconds * ax)
+                     + static_cast<double>(entity.position.x.value);
+      const double y = (drag * vy + delta_milliseconds * ay)
+                     + static_cast<double>(entity.position.y.value);
+      entity.set_position_x(f32::from_double(x));
+      entity.set_position_y(f32::from_double(y));
+      double next_vx = damping * vx;
+      double next_vy = damping * vy;
+      if (entity.kind == EntityKind::kPlayer || entity.kind == EntityKind::kMob) {
+        const double half_width = static_cast<double>(world.width().value) * 0.5;
+        const double half_height = static_cast<double>(world.height().value) * 0.5;
+        const double radius = static_cast<double>(entity.collision_radius.value);
+        const double limit_x = half_width - radius;
+        const double limit_y = half_height - radius;
+        if (entity.position.x.value > limit_x) { entity.set_position_x(f32::from_double(limit_x)); next_vx = 0.0; }
+        if (entity.position.x.value < -limit_x) { entity.set_position_x(f32::from_double(-limit_x)); next_vx = 0.0; }
+        if (entity.position.y.value > limit_y) { entity.set_position_y(f32::from_double(limit_y)); next_vy = 0.0; }
+        if (entity.position.y.value < -limit_y) { entity.set_position_y(f32::from_double(-limit_y)); next_vy = 0.0; }
+      }
+      if (std::fabs(next_vx) < 2.220446049250313e-16) next_vx = 0.0;
+      if (std::fabs(next_vy) < 2.220446049250313e-16) next_vy = 0.0;
+      entity.velocity.x = next_vx;
+      entity.velocity.y = next_vy;
+      // Original 167 caches a union including attached children; any transform
+      // change invalidates the entity and its owner chain.
+      invalidate_bounds(world, entity.handle);
     }
-    const double vx = entity.velocity.x;
-    const double vy = entity.velocity.y;
-    // Acceleration is the original +56/+64 additive impulse: it enters the
-    // displacement once, unscaled by the drag factor, and is NOT added to
-    // velocity. Original 654 writes:
-    //   position += drag * velocity + dt * acceleration
-    //   velocity  = damping * velocity
-    // Slow effects act where a behavior produces velocity (player controls
-    // and AI), never inside integrateMovement.
-    const double ax = entity.acceleration.x;
-    const double ay = entity.acceleration.y;
-    // Original 654 evaluates (drag * velocity + dt * acceleration) first and
-    // adds the local position last; the grouping is observable at f32 ULP
-    // level for positions in the tens of thousands.
-    const double x = (drag * vx + delta_milliseconds * ax)
-                   + static_cast<double>(entity.position.x.value);
-    const double y = (drag * vy + delta_milliseconds * ay)
-                   + static_cast<double>(entity.position.y.value);
-    entity.set_position_x(f32::from_double(x));
-    entity.set_position_y(f32::from_double(y));
-    double next_vx = damping * vx;
-    double next_vy = damping * vy;
-    if (entity.kind == EntityKind::kPlayer || entity.kind == EntityKind::kMob) {
-      const double half_width = static_cast<double>(world.width().value) * 0.5;
-      const double half_height = static_cast<double>(world.height().value) * 0.5;
-      const double radius = static_cast<double>(entity.collision_radius.value);
-      const double limit_x = half_width - radius;
-      const double limit_y = half_height - radius;
-      if (entity.position.x.value > limit_x) { entity.set_position_x(f32::from_double(limit_x)); next_vx = 0.0; }
-      if (entity.position.x.value < -limit_x) { entity.set_position_x(f32::from_double(-limit_x)); next_vx = 0.0; }
-      if (entity.position.y.value > limit_y) { entity.set_position_y(f32::from_double(limit_y)); next_vy = 0.0; }
-      if (entity.position.y.value < -limit_y) { entity.set_position_y(f32::from_double(-limit_y)); next_vy = 0.0; }
-    }
-    if (std::fabs(next_vx) < 2.220446049250313e-16) next_vx = 0.0;
-    if (std::fabs(next_vy) < 2.220446049250313e-16) next_vy = 0.0;
-    entity.velocity.x = next_vx;
-    entity.velocity.y = next_vy;
-    // Original 167 caches a union including attached children; any transform
-    // change invalidates the entity and its owner chain.
-    invalidate_bounds(world, entity.handle);
-  }
+  });
 }
 
 
@@ -142,30 +147,36 @@ void constrain_linked_entities(World& world) {
   // reached recursively from its head. Ant Hole children have no predecessor
   // link and are not affected by original 401.
   std::vector<EntityHandle> roots;
-  for (const auto& entity : world.entities().entities()) {
-    if (!entity.active) continue;
-    if (entity.children.empty()) continue;
-    if (entity.ai.predecessor.valid()) continue;
-    if (entity.type_id != 15U && entity.type_id != 16U && entity.type_id != 17U
-        && entity.type_id != 18U) continue;
-    roots.push_back(entity.handle);
-  }
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (const auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      if (entity.children.empty()) continue;
+      if (entity.ai.predecessor.valid()) continue;
+      if (entity.type_id != 15U && entity.type_id != 16U && entity.type_id != 17U
+          && entity.type_id != 18U) continue;
+      roots.push_back(entity.handle);
+    }
+  });
   for (const EntityHandle root : roots) constrain_entity(world, root);
 }
 
 std::uint32_t debug_linked_roots(const World& world) {
   std::uint32_t count = 0;
-  for (const auto& entity : world.entities().entities())
-    if (entity.active && !entity.children.empty() && !entity.ai.predecessor.valid()
-        && (entity.type_id == 15U || entity.type_id == 16U || entity.type_id == 17U
-            || entity.type_id == 18U)) ++count;
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (const auto& entity : slots)
+      if (entity.active && !entity.children.empty() && !entity.ai.predecessor.valid()
+          && (entity.type_id == 15U || entity.type_id == 16U || entity.type_id == 17U
+              || entity.type_id == 18U)) ++count;
+  });
   return count;
 }
 
 std::uint32_t debug_linked_segments(const World& world) {
   std::uint32_t count = 0;
-  for (const auto& entity : world.entities().entities())
-    if (entity.active && entity.ai.predecessor.valid()) ++count;
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (const auto& entity : slots)
+      if (entity.active && entity.ai.predecessor.valid()) ++count;
+  });
   return count;
 }
 

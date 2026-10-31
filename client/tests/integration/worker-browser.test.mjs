@@ -96,6 +96,7 @@ test('real worker publishes special petal launch, recharge and artwork component
 test('client joins the native peer-visible set with a healthy player and nearby mobs', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.waitForFunction(()=>window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
     if (!window.__florr || window.__florr.world.count === 0) return false;
@@ -112,6 +113,7 @@ test('client joins the native peer-visible set with a healthy player and nearby 
 test('single match: spawn, suicide, death overlay and restart', async () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.waitForFunction(()=>window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
     for (const entity of window.__florr.world.all()) if (entity.typeId === 1) return true;
@@ -268,8 +270,8 @@ test('match interactions drive equip, attack, defend, no-discard, swap, chat and
     const post = Worker.prototype.postMessage;
     Worker.prototype.postMessage = function postMessage(message, transfer) {
       try {
-        if (message && message.funcName === 'sp_server_send' && message.data)
-          window.__sent.push(Array.from(message.data));
+        const inputs=message?.funcName==='step'?message.inputs:message?.funcName==='sp_server_send'&&message.data?[message.data]:[];
+        for(const packet of inputs??[])window.__sent.push(Array.from(packet));
       } catch { /* ignore non-send messages */ }
       return post.call(this, message, transfer);
     };
@@ -277,6 +279,7 @@ test('match interactions drive equip, attack, defend, no-discard, swap, chat and
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
   await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.waitForFunction(()=>window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
     for (const entity of window.__florr.world.all()) if (entity.typeId === 1) return true;
@@ -441,6 +444,7 @@ test('mobile viewport: DPR canvas, touch start and joystick movement',
   // The menu is canvas-native (there is no DOM Play control), so start the
   // same way the keyboard spawn path does before exercising touch input.
   const cdp = await context.newCDPSession(page);
+  await page.waitForFunction(()=>window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
     for (const entity of window.__florr.world.all()) if (entity.typeId === 1) return true;

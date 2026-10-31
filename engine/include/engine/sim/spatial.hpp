@@ -49,6 +49,7 @@ class SpatialQuery {
   std::unordered_map<std::uint32_t, std::size_t> handle_index_;
   QuadTree index_;
   f32 max_radius_;
+  mutable std::vector<std::size_t> candidates_;
 };
 
 /** Spawn a band with component-drop defaults: Rock/Boulder use the dynamic

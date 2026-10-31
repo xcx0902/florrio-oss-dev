@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/sim/tick.hpp"
 #include "engine/sim/ai.hpp"
 #include "engine/sim/combat.hpp"
@@ -18,13 +19,15 @@ namespace {
  * contact/damage path, then drop dead petal orbit records. */
 void reap_dead(World& world) {
   auto& entities = world.entities();
-  for (auto& entity : entities.entities()) {
-    if (!entity.active) continue;
-    // Pickups have no original health component; their 0/0 state is not death.
-    if (entity.kind == EntityKind::kDrop) continue;
-    if (entity.health.value > 0.0F) continue;
-    kill_entity(world, entity.handle, EntityHandle{});
-  }
+  entities.with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      // Pickups have no original health component; their 0/0 state is not death.
+      if (entity.kind == EntityKind::kDrop) continue;
+      if (entity.health.value > 0.0F) continue;
+      kill_entity(world, entity.handle, EntityHandle{});
+    }
+  });
   auto& petals = world.petals();
   petals.erase(std::remove_if(petals.begin(), petals.end(),
     [&world](const PetalOrbitState& petal) {
@@ -35,25 +38,29 @@ void reap_dead(World& world) {
 /** Original pickup lifetime countdown (pickup +32, 32..62 s by rarity). */
 void expire_drops(World& world) {
   auto& entities = world.entities();
-  for (auto& entity : entities.entities()) {
-    if (!entity.active) continue;
-    if (entity.kind != EntityKind::kDrop) continue;
-    if (entity.pickup_transfer_deadline_ms > 0.0
-        && world.time_ms() >= entity.pickup_transfer_deadline_ms)
-      (void)world.destroy(entity.handle);
-  }
+  entities.with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      if (entity.kind != EntityKind::kDrop) continue;
+      if (entity.pickup_transfer_deadline_ms > 0.0
+          && world.time_ms() >= entity.pickup_transfer_deadline_ms)
+        (void)world.destroy(entity.handle);
+    }
+  });
 }
 
 /** Original health+24 timer: expiry deals the current health as damage;
  * the zero-health body then persists for the ordinary 1000 ms death window. */
 void expire_projectiles(World& world, double delta_milliseconds) {
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active || entity.kind != EntityKind::kProjectile
-        || entity.health.value <= 0.0F || entity.lifetime_remaining_ms <= 0.0) continue;
-    entity.lifetime_remaining_ms = std::max(0.0, entity.lifetime_remaining_ms - delta_milliseconds);
-    if (entity.lifetime_remaining_ms == 0.0)
-      (void)damage_entity(world, entity.handle, entity.health, EntityHandle{});
-  }
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active || entity.kind != EntityKind::kProjectile
+          || entity.health.value <= 0.0F || entity.lifetime_remaining_ms <= 0.0) continue;
+      entity.lifetime_remaining_ms = std::max(0.0, entity.lifetime_remaining_ms - delta_milliseconds);
+      if (entity.lifetime_remaining_ms == 0.0)
+        (void)damage_entity(world, entity.handle, entity.health, EntityHandle{});
+    }
+  });
 }
 
 } // namespace
@@ -133,17 +140,19 @@ void tick(World& world, double delta_milliseconds) {
   world.record_phase("reap-dead");
   expire_drops(world);
   world.record_phase("expire-drops");
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active || !entity.death_processed) continue;
-    if (entity.kind != EntityKind::kPlayer && entity.kind != EntityKind::kPetal && entity.kind != EntityKind::kMob
-        && entity.kind != EntityKind::kProjectile) continue;
-    if (entity.death_time_ms > world.time_ms()) continue;
-    if (entity.handle == world.player()) {
-      world.loadout().clear();
-      world.set_player(EntityHandle{});
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active || !entity.death_processed) continue;
+      if (entity.kind != EntityKind::kPlayer && entity.kind != EntityKind::kPetal && entity.kind != EntityKind::kMob
+          && entity.kind != EntityKind::kProjectile) continue;
+      if (entity.death_time_ms > world.time_ms()) continue;
+      if (entity.handle == world.player()) {
+        world.loadout().clear();
+        world.set_player(EntityHandle{});
+      }
+      (void)world.destroy(entity.handle);
     }
-    (void)world.destroy(entity.handle);
-  }
+  });
   {
     auto& petals = world.petals();
     petals.erase(std::remove_if(petals.begin(), petals.end(),

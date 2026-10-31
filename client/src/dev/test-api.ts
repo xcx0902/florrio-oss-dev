@@ -1,3 +1,4 @@
+import {worldVisualCounts,worldFrameStats} from '../render/world.js';
 import { CameraState } from '../state/camera.js';
 import { type EntitySnapshot, type SnapshotEvent } from '../state/snapshot.js';
 import { WorldState } from '../state/world.js';
@@ -5,6 +6,7 @@ import type { GameApp } from '../app/game-app.js';
 declare global {
   interface Window {
     __florr?: {
+      performanceState(): {visuals:ReturnType<typeof worldVisualCounts>;pending:number;resources:ReturnType<GameApp['renderer']['resources']['snapshot']>;frame:ReturnType<typeof worldFrameStats>};
       world: WorldState;
       camera: CameraState;
       freeze(): void;
@@ -45,6 +47,7 @@ declare global {
 }
 export function installTestApi(app: GameApp): () => void {
   window.__florr = {
+    performanceState:()=>({visuals:worldVisualCounts(app.world),pending:app.server.pendingCount,resources:app.renderer.resources.snapshot(),frame:{...worldFrameStats(app.world)}}),
     world: app.world,
     camera: app.camera,
     freeze: () => { app.frozen = true; },

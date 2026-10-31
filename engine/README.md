@@ -50,7 +50,8 @@ CTest includes the main topic-fragment suite, existing simulation/domain suites
 and `engine_structure_tests` (dual-world isolation, reset, ownership cycle/stale
 handle, one destruction notice and typed codec rejection). Hand byte vectors and
 `engine_native_snapshot_fixture` test real C++ input/think/publication into the
-current TS decoder. `engine_product_workload` is a separate 600-tick performance
-baseline, not an extra CTest or an M4 optimization claim.
+current TS decoder. `engine_benchmark` links a separate instrumented core and covers nine fixed
+workloads in native/WASM; it is not an extra CTest or a production dependency.
+Run `npm run perf:engine`; see [M4 measurements](../docs/m4-performance.md).
 
 See [M3 mapping](../docs/m3-structure.md) and [release](../docs/release.md).

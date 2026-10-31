@@ -12,7 +12,7 @@ export const gates = Object.freeze([
   { name: 'cross-end integration', script: 'tools/run-tests.mjs', args: ['integration'], suite: 'integration' },
   { name: 'ABI consistency', script: 'tools/verify-abi.mjs' },
   { name: 'delivery integrity', script: 'tools/verify-dist-next.mjs' },
-  { name: 'browser scenarios and performance', script: 'tools/browser-products.mjs', reports: ['reports/browser-tests.tap', 'reports/entrypoint-smoke.json', 'reports/perf.json'], suite: 'client-integration' },
+  { name: 'browser scenarios and performance', timeoutMs: 20 * 60 * 1000, script: 'tools/browser-products.mjs', reports: ['reports/browser-tests.tap', 'reports/entrypoint-smoke.json', 'reports/perf.json'], suite: 'client-integration' },
   { name: 'engine performance', script: 'tools/perf-engine.mjs', reports: ['reports/perf-engine.json'] },
   { name: 'integration performance', script: 'tools/perf-integration.mjs', reports: ['reports/perf-integration.json'] },
 ]);

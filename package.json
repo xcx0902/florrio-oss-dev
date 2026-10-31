@@ -23,6 +23,7 @@
     "test:client": "npm run build:client && node tools/run-tests.mjs client",
     "test:delivery": "CLIENT_ROOT=dist-next node tools/run-tests.mjs delivery",
     "test:all": "node tools/run-verification.mjs",
+    "test:m4": "node tools/performance/verify.mjs",
     "test:light": "npm run test:unit && npm run test:tools && npm run test:engine && npm run build:engine:wasm && npm run test:client && npm run build:dist-next -- --skip-build && npm run verify:dist-next",
     "perf:client": "node tools/perf-client.mjs --frames 600",
     "schema:check": "node tools/generate.mjs --check",

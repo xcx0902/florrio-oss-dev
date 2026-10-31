@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/sim/spatial.hpp"
 #include <algorithm>
 
@@ -41,18 +42,21 @@ void SpatialQuery::rebuild() {
 SpatialQuery SpatialQuery::from_world(const World& world) {
   const f32 half_width = f32::from_double(static_cast<double>(world.width().value) * 0.5);
   const f32 half_height = f32::from_double(static_cast<double>(world.height().value) * 0.5);
+  PERF_ADD(builds, 1);
   SpatialQuery query(Aabb{f32(0.0F) - half_width, f32(0.0F) - half_height, half_width, half_height});
-  for (const auto& entity : world.entities().entities()) {
-    if (!entity.active) continue;
-    query.add({entity.position, entity.radius, entity.world_flags, entity.entity_flags,
-               entity.handle});
-  }
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (const auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      query.add({entity.position, entity.radius, entity.world_flags, entity.entity_flags,
+                 entity.handle});
+    }
+  });
   return query;
 }
 
 void SpatialQuery::query_box(const Aabb& area, std::vector<EntityHandle>& out) const {
   out.clear();
-  std::vector<std::size_t> candidates;
+  auto& candidates = candidates_;
   index_.query(area, candidates);
   out.reserve(candidates.size());
   for (const std::size_t index : candidates) {
@@ -86,7 +90,7 @@ bool SpatialQuery::occupied(const SpawnPosition& candidate, f32 half_extent) con
   const f32 slack = half_extent + max_radius_;
   const Aabb area{candidate.x - slack, candidate.y - slack,
                   candidate.x + slack, candidate.y + slack};
-  std::vector<std::size_t> candidates;
+  auto& candidates = candidates_;
   index_.query(area, candidates);
   for (const std::size_t index : candidates) {
     const auto& body = bodies_[index];

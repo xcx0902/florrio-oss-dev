@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/model/world.hpp"
+#include "engine/net/snapshot_codec.hpp"
 #include <optional>
 #include <unordered_map>
 #include <unordered_set>
@@ -24,6 +25,17 @@ struct ReplicationSession {
   f32 viewer_scale = f32(1.0F);
   std::uint8_t zone_progress = 0;
 };
+struct PublicationBounds {
+  std::vector<Aabb> boxes;
+  std::vector<std::uint8_t> state;
+  std::vector<std::uint32_t> touched;
+  bool cyclic=false;
+  void begin() {
+    if(boxes.empty()){boxes.resize(kEntitySlotCount);state.resize(kEntitySlotCount);}
+    for(auto index:touched)state[index]=0;
+    touched.clear();cyclic=false;
+  }
+};
 class SnapshotPublisher {
  public:
   void reset(bool populated) { session_ = {}; session_.visibility_enabled = populated; session_.viewer_started = !populated; pending_chat_.clear(); default_dense_groups_ = true; }
@@ -33,6 +45,8 @@ class SnapshotPublisher {
   bool dense() const { return default_dense_groups_; }
  private:
   ReplicationSession session_;
+  SnapshotEncoder writer_;
+  PublicationBounds bounds_;
   bool default_dense_groups_ = true;
   std::vector<std::string> pending_chat_;
 };

@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/net/snapshot_codec.hpp"
 #include "engine/net/angle.hpp"
 #include <cmath>
@@ -35,9 +36,9 @@ std::optional<SnapshotHeader> read_snapshot_header(ByteReader& reader) {
 void SnapshotEncoder::begin(std::uint32_t sequence, std::uint32_t reliable_ack) {
   sequence_ = sequence;
   reliable_ack_ = reliable_ack;
-  deletes_ = ByteWriter{};
-  updates_ = ByteWriter{};
-  events_ = ByteWriter{};
+  deletes_.bytes().clear();
+  updates_.bytes().clear();
+  events_.bytes().clear();
   delete_count_ = 0;
   update_count_ = 0;
   event_count_ = 0;
@@ -52,6 +53,7 @@ void SnapshotEncoder::write_bare_entity(EntityHandle handle) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(52U); // flags=2 (skip declarations) XOR 54
   updates_.write_u8(0); // sparse field delta terminator
+  PERF_ADD(fields, (0U));
   ++update_count_;
 }
 
@@ -60,6 +62,7 @@ void SnapshotEncoder::write_mask_entity(EntityHandle handle, std::uint32_t compo
   updates_.write_u8(55U); // flags=1 (component mask) XOR 54
   updates_.write_u32_le(component_mask);
   updates_.write_u8(0); // sparse field delta terminator
+  PERF_ADD(fields, (0U));
   ++update_count_;
 }
 
@@ -72,6 +75,7 @@ void SnapshotEncoder::write_mask_byte_field(EntityHandle handle, std::uint32_t c
   updates_.write_varint32(field);
   updates_.write_u8(value);
   updates_.write_u8(0); // terminator
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -131,6 +135,7 @@ void SnapshotEncoder::write_mask_domain_fields(EntityHandle handle, std::uint32_
   updates_.write_varint32(2U); // 53 -> 55
   updates_.write_f32_le(max_health);
   updates_.write_u8(0); // field terminator
+  PERF_ADD(fields, (7U+include_camera_x+include_camera_y+include_angle+include_visual_x+include_visual_y+activity_flags.has_value()));
   ++update_count_;
 }
 
@@ -157,6 +162,7 @@ void SnapshotEncoder::write_mask_float_fields(EntityHandle handle, std::uint32_t
     previous = field.field;
   }
   updates_.write_u8(0); // terminator
+  PERF_ADD(fields, (fields.size()));
   ++update_count_;
 }
 
@@ -169,6 +175,7 @@ void SnapshotEncoder::write_mask_varint_field(EntityHandle handle, std::uint32_t
   updates_.write_varint32(field);
   updates_.write_varint32(value);
   updates_.write_u8(0);
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -181,6 +188,7 @@ void SnapshotEncoder::write_mask_reference_field(EntityHandle handle, std::uint3
   updates_.write_varint32(field);
   updates_.write_u32_le(target);
   updates_.write_u8(0);
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -194,6 +202,7 @@ void SnapshotEncoder::write_mask_string_field(EntityHandle handle, std::uint32_t
   for (const char byte : value) updates_.write_u8(static_cast<std::uint8_t>(byte));
   updates_.write_u8(0);
   updates_.write_u8(0);
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -211,6 +220,7 @@ void SnapshotEncoder::write_mask_string_array_field(EntityHandle handle, std::ui
   updates_.write_u8(0); // string terminator
   updates_.write_u8(0); // array terminator
   updates_.write_u8(0); // field terminator
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -226,6 +236,7 @@ void SnapshotEncoder::write_mask_byte_array_field(EntityHandle handle, std::uint
   updates_.write_u8(value);
   updates_.write_u8(0); // array terminator
   updates_.write_u8(0); // field terminator
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -241,6 +252,7 @@ void SnapshotEncoder::write_mask_varint_array_field(EntityHandle handle, std::ui
   updates_.write_varint32(value);
   updates_.write_u8(0); // array terminator
   updates_.write_u8(0); // field terminator
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -256,6 +268,7 @@ void SnapshotEncoder::write_mask_short_array_field(EntityHandle handle, std::uin
   updates_.write_varint32(value);
   updates_.write_u8(0); // array terminator
   updates_.write_u8(0); // field terminator
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -284,6 +297,7 @@ void SnapshotEncoder::write_mask_loadout_fields(EntityHandle handle, std::uint32
     updates_.write_u8(0);
   }
   updates_.write_u8(0);
+  PERF_ADD(fields, (static_cast<unsigned>(inventory_changed)+static_cast<unsigned>(recharge_changed)));
   ++update_count_;
 }
 
@@ -297,6 +311,7 @@ void SnapshotEncoder::write_sparse_entity(EntityHandle handle, std::span<const s
   }
   updates_.write_varint32(1U); // zero delta after XOR
   updates_.write_u8(0); // field terminator
+  PERF_ADD(fields, (0U));
   ++update_count_;
 }
 
@@ -323,6 +338,7 @@ void SnapshotEncoder::write_mask_bit_fields(EntityHandle handle, std::uint32_t c
     previous = field.field;
   }
   updates_.write_u8(0);
+  PERF_ADD(fields, (fields.size()));
   ++update_count_;
 }
 
@@ -334,6 +350,7 @@ void SnapshotEncoder::write_mask_angle_field8(EntityHandle handle, std::uint32_t
   updates_.write_varint32(8);
   updates_.write_u16_le(raw);
   updates_.write_u8(0);
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -347,6 +364,7 @@ void SnapshotEncoder::write_mask_handle_array_field3(EntityHandle handle, std::u
   updates_.write_u32_le(target);
   updates_.write_u8(0); // array terminator
   updates_.write_u8(0); // field terminator
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -360,6 +378,7 @@ void SnapshotEncoder::write_mask_float_angle8(EntityHandle handle, std::uint32_t
   updates_.write_varint32(3); // 8 - 5
   updates_.write_u16_le(angle_raw);
   updates_.write_u8(0);
+  PERF_ADD(fields, (2U));
   ++update_count_;
 }
 
@@ -387,6 +406,7 @@ void SnapshotEncoder::write_dense_byte_group(EntityHandle handle, std::span<cons
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U); // flags=8 XOR 54
   for (const std::uint8_t value : values) updates_.write_u8(value);
+  PERF_ADD(fields, (values.size()));
   ++update_count_;
 }
 
@@ -394,8 +414,10 @@ void SnapshotEncoder::write_dense_byte_groups(
     EntityHandle handle, std::span<const std::span<const std::uint8_t>> groups) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
-  for (const auto group : groups)
+  for (const auto group : groups) {
+    PERF_ADD(fields, group.size());
     for (const std::uint8_t value : group) updates_.write_u8(value);
+  }
   ++update_count_;
 }
 
@@ -403,6 +425,7 @@ void SnapshotEncoder::write_dense_float_group(EntityHandle handle, std::span<con
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U); // flags=8 XOR 54
   for (const float value : values) updates_.write_f32_le(value);
+  PERF_ADD(fields, (values.size()));
   ++update_count_;
 }
 
@@ -416,6 +439,7 @@ void SnapshotEncoder::write_dense_health_angle_groups(
   updates_.write_u16_le(angle_raw);
   updates_.write_f32_le(angle);
   updates_.write_f32_le(radius);
+  PERF_ADD(fields, (5U));
   ++update_count_;
 }
 
@@ -455,6 +479,7 @@ void SnapshotEncoder::write_dense_default_groups(const Entity& entity) {
   updates_.write_u8(static_cast<std::uint8_t>(entity.kind));
   updates_.write_u8(entity.kind == EntityKind::kPlayer
     ? entity.player_expression : entity.loadout_instance);
+  PERF_ADD(fields, (23U));
   ++update_count_;
 }
 
@@ -463,6 +488,7 @@ void SnapshotEncoder::write_dense_string_group(EntityHandle handle, std::string_
   updates_.write_u8(62U);
   for (const char byte : value) updates_.write_u8(static_cast<std::uint8_t>(byte));
   updates_.write_u8(0);
+  PERF_ADD(fields, (1U));
   ++update_count_;
 }
 
@@ -473,6 +499,7 @@ void SnapshotEncoder::write_dense_angle_float_group(EntityHandle handle, std::ui
   updates_.write_u16_le(angle_raw);
   updates_.write_f32_le(first);
   updates_.write_f32_le(second);
+  PERF_ADD(fields, (3U));
   ++update_count_;
 }
 
@@ -485,6 +512,7 @@ void SnapshotEncoder::write_dense_group152_base(EntityHandle handle, std::uint8_
   updates_.write_u8(field26);
   updates_.write_u8(field31);
   updates_.write_varint32(field58);
+  PERF_ADD(fields, (4U));
   ++update_count_;
 }
 
@@ -503,6 +531,7 @@ void SnapshotEncoder::write_dense_bit_group(EntityHandle handle, std::span<const
     }
   }
   if (bit != 0) updates_.write_u8(byte);
+  PERF_ADD(fields, (values.size()));
   ++update_count_;
 }
 
@@ -511,6 +540,7 @@ void SnapshotEncoder::write_dense_float_bit_group(EntityHandle handle, float val
   updates_.write_u8(62U);
   updates_.write_f32_le(value);
   updates_.write_u8(bit_value ? 1U : 0U);
+  PERF_ADD(fields, (2U));
   ++update_count_;
 }
 
@@ -520,6 +550,7 @@ void SnapshotEncoder::write_dense_reference_group(EntityHandle handle, std::uint
   updates_.write_u8(62U);
   updates_.write_u32_le(first);
   updates_.write_u32_le(second);
+  PERF_ADD(fields, (2U));
   ++update_count_;
 }
 
@@ -541,6 +572,7 @@ void SnapshotEncoder::write_dense_group_minus27(
   updates_.write_varint32(field41);
   updates_.write_varint32(field44);
   updates_.write_varint32(field51);
+  PERF_ADD(fields, (10U));
   ++update_count_;
 }
 
@@ -565,6 +597,7 @@ void SnapshotEncoder::write_dense_group_minus16(
   updates_.write_f32_le(field45);
   updates_.write_u8(field46);
   updates_.write_varint32(field52);
+  PERF_ADD(fields, (11U));
   ++update_count_;
 }
 
@@ -587,6 +620,7 @@ void SnapshotEncoder::write_dense_group72(
   updates_.write_u8(field34);
   updates_.write_u8(field47);
   updates_.write_u32_le(field56);
+  PERF_ADD(fields, (11U));
   ++update_count_;
 }
 
@@ -605,6 +639,7 @@ void SnapshotEncoder::write_dense_group152_extended(
   for (const std::uint16_t value : field61) updates_.write_varint32(value);
   updates_.write_u8(field62);
   updates_.write_u8(field63);
+  PERF_ADD(fields, (9U));
   ++update_count_;
 }
 
@@ -622,6 +657,7 @@ void SnapshotEncoder::write_event(std::uint8_t opcode, std::span<const std::uint
 
 std::vector<std::uint8_t> SnapshotEncoder::finish() const {
   ByteWriter writer;
+  writer.bytes().reserve(24+deletes_.bytes().size()+updates_.bytes().size()+events_.bytes().size());
   write_snapshot_header(writer, {sequence_, reliable_ack_});
   writer.write_varint32(delete_count_);
   writer.write_varint32(update_count_);
@@ -629,7 +665,7 @@ std::vector<std::uint8_t> SnapshotEncoder::finish() const {
   writer.write_bytes(deletes_.bytes());
   writer.write_bytes(updates_.bytes());
   writer.write_bytes(events_.bytes());
-  return writer.bytes();
+  return std::move(writer.bytes());
 }
 
 std::vector<std::uint8_t> empty_snapshot(std::uint32_t sequence, std::uint32_t reliable_ack) {
@@ -644,6 +680,7 @@ namespace engine {
 void SnapshotEncoder::write_mask_double_field(EntityHandle handle, std::uint32_t mask, std::uint32_t field, double value) {
   if (!field_is(field, protocol::FieldType::kDouble)) return;
   updates_.write_u32_le(handle.to_wire()); updates_.write_u8(55U); updates_.write_u32_le(mask);
-  updates_.write_varint32(field); updates_.write_f64_le(value); updates_.write_u8(0U); ++update_count_;
+  updates_.write_varint32(field); updates_.write_f64_le(value); updates_.write_u8(0U); PERF_ADD(fields, (1U));
+  ++update_count_;
 }
 }

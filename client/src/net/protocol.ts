@@ -5,6 +5,7 @@ export const PACKET_HEADER_BYTES = 16;
 export const INLINE_PAYLOAD_BYTES = 4096;
 
 export type ServerFunction =
+  | 'step'
   | 'sp_server_init'
   | 'sp_server_send'
   | 'sp_server_think'
@@ -17,6 +18,7 @@ export interface WorkerRequest {
   readonly funcName: ServerFunction;
   readonly callbackId: number;
   readonly data?: Uint8Array;
+  readonly inputs?: readonly Uint8Array[];
 }
 
 export interface WorkerResponse {

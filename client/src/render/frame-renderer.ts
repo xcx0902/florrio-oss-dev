@@ -1,3 +1,4 @@
+import { FrameContext } from './frame-context.js';
 import type { SessionFrameView } from '../app/game-session.js';
 import { getHudLayout, type HudLayout } from '../ui/layout/hud.js';
 import { hotbarAnchor } from '../ui/layout/hud.js';
@@ -10,16 +11,22 @@ import { MovementHelper } from '../render/movement-helper.js';
 import { PetalMotionState } from '../render/petal-motion.js';
 import { PetalTransfers } from '../render/petal-transfers.js';
 import { createHudState, drawHud, equippedSlotCount, type HudState } from '../render/ui.js';
-import { drawWorld } from '../render/world.js';
+import { drawWorld,releaseWorldVisuals } from '../render/world.js';
 import { MOB_INFO } from '../schema/petals.js';
 import { interpolateCameraTarget } from '../state/interpolation.js';
-import { loadoutSlots, playerLoadoutSlots, playerSlotProgress } from '../state/loadout.js';
+import { playerLoadoutSlots, playerSlotProgress } from '../state/loadout.js';
 import { getPointerMovement, updatePanState } from '../state/pan.js';
 import { PlayerWorldTransformCache } from '../state/world-transform.js';
 import type { GameApp } from '../app/game-app.js';
 export class FrameRenderer {
   readonly resources = new RenderResources();
-  dispose(): void { this.resources.dispose(); this.petalTransfers.reset(); this.petalMotion.reset(); this.movementHelper.reset(); }
+  readonly context = new FrameContext();
+  private loadoutKey:unknown;
+  private loadoutMembership=-1;
+  private displaySlots:number[]=[];
+  private discoveryRevision=-1;
+  private discoverySlots:readonly number[]|undefined;
+  dispose(): void { withRenderResources(this.resources,()=>releaseWorldVisuals(this.app.world));this.resources.dispose(); this.petalTransfers.reset(); this.petalMotion.reset(); this.movementHelper.reset(); }
   hudState: import('./hud.js').HudFrameState;
   playerTransform: PlayerWorldTransformCache;
   petalTransfers: PetalTransfers;
@@ -168,14 +175,25 @@ export class FrameRenderer {
       this.app.menuControls.presentInput(menuInput, !this.app.session.started);
     this.app.context2d.setTransform(1, 0, 0, 1, 0, 0);
     this.app.context2d.clearRect(0, 0, this.app.canvas.width, this.app.canvas.height);
+    this.app.renderContext.syncTransform?.();
     let playerHudState: HudState | undefined;
     if (player) {
-      const displaySlots = playerLoadoutSlots(player.entity) ?? loadoutSlots(this.app.world.all(), 16);
+      const key=player.entity.byteArrayFields?.[60]??player.entity.denseFields?.[60];
+      if(this.loadoutKey!==key||this.loadoutMembership!==this.app.world.membershipRevision) {
+        this.displaySlots=this.app.world.playerLoadout();
+        this.loadoutKey=key;this.loadoutMembership=this.app.world.membershipRevision;
+      }
+      const displaySlots=this.displaySlots;
       this.app.loadout.inventoryTypes = displaySlots;
       this.app.loadout.hotbarTypes.splice(0, this.app.loadout.hotbarTypes.length, ...displaySlots);
-      this.app.menuControls.discover(displaySlots, [...this.app.world.all()]
-        .filter(entity => entity.kind === 2 && MOB_INFO[entity.speciesId ?? 0])
-        .map(entity => [entity.speciesId!, MOB_INFO[entity.speciesId!].name] as const));
+      if(this.discoveryRevision!==this.app.world.discoveryRevision||this.discoverySlots!==displaySlots) {
+        const mobs:(readonly [number,string])[]=[];
+        for(const entity of this.app.world.entitiesOfKind(2)) {
+          const type=entity.speciesId??0;if(MOB_INFO[type])mobs.push([type,MOB_INFO[type].name]);
+        }
+        this.app.menuControls.discover(displaySlots,mobs);
+        this.discoveryRevision=this.app.world.discoveryRevision;this.discoverySlots=displaySlots;
+      }
       playerHudState = {
         health: player.entity.health, maxHealth: player.entity.maxHealth,
         level: player.entity.level ?? 1, levelProgress: player.entity.levelProgress,
@@ -253,7 +271,7 @@ export class FrameRenderer {
         this.app.transitions.captureEntryCanvas();
     }
     else if (player === null) {
-      drawWorld(this.app.renderContext, this.app.world, this.app.camera, now);
+      drawWorld(this.app.renderContext, this.app.world, this.app.camera, now, {frame:this.context,deltaMs:delta});
       drawMovementGuide();
       drawFrameHud({
         health: 0, maxHealth: 100, level: this.app.session.lastLevel, pixelRatio: this.app.dpr,
@@ -273,7 +291,7 @@ export class FrameRenderer {
       });
     }
     else {
-      drawWorld(this.app.renderContext, this.app.world, this.app.camera, now);
+      drawWorld(this.app.renderContext, this.app.world, this.app.camera, now, {frame:this.context,deltaMs:delta,playerPosition:player?this.playerTransform.get(player.entity,now,{x:this.app.camera.panX,y:this.app.camera.panY}):undefined});
       drawMovementGuide();
       drawFrameHud(playerHudState!);
     }

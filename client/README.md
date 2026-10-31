@@ -12,7 +12,13 @@ npm run test:client    # compiled client unit + real Chromium integration
 Handwritten index/worker/fonts live in `client/static/`, compiler output in
 `build/client/`, and the served product in `dist-next/`. Build the delivery before
 running browser tests. Worker inputs are freed in finally; streaming RPC forwards
-each packet, and error/messageerror/terminate rejects every pending request.
+each packet, and error/messageerror/timeout/terminate settles pending requests.
+The main thread owns one 50ms clock; each step transfers ordered inputs and
+executes send→think→flush once before its final response.
+
+`FrameContext` retains ordered membership and finished interpolation values;
+`RenderResources` owns bounded LRU caches and explicit bitmap release. See
+[M4 measurements and budgets](../docs/m4-performance.md).
 
 ## Ownership
 

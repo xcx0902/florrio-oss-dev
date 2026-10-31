@@ -102,14 +102,17 @@ export function drawFlowerPanel(context: HudContext, state: HudState, layout: Hu
   if (canvasAvailable()) {
     // The native panel cache compares displayed strings and score fractions,
     // rather than invalidating on each fractional step toward a score target.
-    const key = JSON.stringify([entries.map(entry => [entry.name, entry.local,
-        formatScore(entry.displayedScore ?? entry.score), scoreFraction(entry, entries[0])]), ratio, layout.scale]);
-    if (!resources.panelSurface || resources.panelSurface.key !== key) {
+    const rows = entries.map(entry => [entry.name, entry.local,
+      formatScore(entry.displayedScore ?? entry.score), scoreFraction(entry, entries[0])] as const);
+    const previous = resources.panelSurface;
+    if (!previous || previous.ratio !== ratio || previous.scale !== layout.scale
+        || rows.length !== previous.rows.length || rows.some((row,i) => row.some((value,j) => value !== previous.rows[i][j]))) {
+      if (previous) { previous.canvas.width=0; previous.canvas.height=0; }
       const canvas = createRasterCanvas(Math.ceil(242 * layout.scale * ratio), Math.ceil(325.6 * layout.scale * ratio));
       const native = canvas ? getRasterContext(canvas) : null;
       if (canvas && native) {
         drawPanelContent(wrapHudSurface(native), entries, f(layout.scale * 1.1 * ratio), f(layout.scale * 11 * ratio), f(layout.scale * 11 * ratio));
-        resources.panelSurface = { canvas, key };
+        resources.panelSurface = { canvas, rows, ratio, scale:layout.scale };
       }
     }
     if (resources.panelSurface) {

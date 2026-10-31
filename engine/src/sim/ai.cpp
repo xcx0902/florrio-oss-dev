@@ -70,6 +70,10 @@ std::size_t alert_to_attacker(World& world, EntityHandle target, EntityHandle at
 void update_ai(World& world, double delta_milliseconds) {
   if (!(delta_milliseconds > 0.0)) return;
   const double now_ms = world.time_ms();
+  // Steering changes velocity/angle only. Attack births run after this view
+  // has been discarded; movement/area/contact phases build independent views.
+  std::optional<SpatialQuery> phase_query;
+  std::vector<EntityHandle> phase_candidates;
   std::vector<EntityHandle> pending_attacks;
   for (const EntityHandle handle : world.ai_entities()) {
     Entity* entity = world.entities().get(handle);
@@ -98,7 +102,8 @@ void update_ai(World& world, double delta_milliseconds) {
       if (target == nullptr || !target_eligible(world, *entity, *target)) ai.target = EntityHandle{};
     }
     if (!ai.target.valid() && ai.aggressive) {
-      const EntityHandle found = find_target(world, handle);
+      if (!phase_query) phase_query.emplace(SpatialQuery::from_world(world));
+      const EntityHandle found = find_target(world, *phase_query, handle, phase_candidates);
       if (found.valid()) {
         ai.target = found;
         const f32 cooldown = std::min(ai.attack_cooldown_gain, f32(500.0F));

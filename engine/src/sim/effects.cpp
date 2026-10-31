@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/sim/effects.hpp"
 #include "engine/sim/projectile_math.hpp"
 #include "engine/sim/combat.hpp"
@@ -134,61 +135,65 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
 
   // Shared payloads (area effects) are advanced exactly once per tick.
   std::vector<EffectPayload*> payloads;
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active) continue;
-    for (const auto& effect : entity.effects) {
-      if (!effect.active || !effect.payload) continue;
-      if (std::find(payloads.begin(), payloads.end(), effect.payload.get()) == payloads.end())
-        payloads.push_back(effect.payload.get());
-    }
-  }
-
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active) continue;
-    // The tick applies only the strongest active damage effect; the original
-    // does not stack every poison instance in the same frame.
-    const Effect* strongest = nullptr;
-    for (const auto& effect : entity.effects) {
-      if (!effect.active || effect.type != EffectType::kPoison) continue;
-      if (strongest == nullptr || effect.intensity.value > strongest->intensity.value)
-        strongest = &effect;
-    }
-    if (strongest != nullptr && entity.health.value > 0.0F) {
-      const double duration = std::min(delta_milliseconds, strongest->remaining_ms);
-      const double amount = static_cast<double>(strongest->intensity.value) * duration * 0.001;
-      if (amount > 0.0) {
-        // Original654 effects+40/+48 gates feedback, not poison damage.
-        // A replacement/stronger poison shares this entity's same clock.
-        const bool quiet = world.time_ms() - entity.poison_hit_time_ms < 600.0;
-        if (!quiet) entity.poison_hit_time_ms = world.time_ms();
-        (void)damage_entity(world, entity.handle, f32::from_double(amount), strongest->source,
-          quiet ? 1U : 0U);
-        ++damaged;
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      for (const auto& effect : entity.effects) {
+        if (!effect.active || !effect.payload) continue;
+        if (std::find(payloads.begin(), payloads.end(), effect.payload.get()) == payloads.end())
+          payloads.push_back(effect.payload.get());
       }
     }
+  });
 
-    bool changed = false;
-    for (auto& effect : entity.effects) {
-      if (!effect.active) continue;
-      if (effect.payload) {
-        if (!effect.payload->active || effect.payload->remaining_ms < 0.0) {
-          if (effect.payload->refcount > 0U) --effect.payload->refcount;
-          effect = Effect{};
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      // The tick applies only the strongest active damage effect; the original
+      // does not stack every poison instance in the same frame.
+      const Effect* strongest = nullptr;
+      for (const auto& effect : entity.effects) {
+        if (!effect.active || effect.type != EffectType::kPoison) continue;
+        if (strongest == nullptr || effect.intensity.value > strongest->intensity.value)
+          strongest = &effect;
+      }
+      if (strongest != nullptr && entity.health.value > 0.0F) {
+        const double duration = std::min(delta_milliseconds, strongest->remaining_ms);
+        const double amount = static_cast<double>(strongest->intensity.value) * duration * 0.001;
+        if (amount > 0.0) {
+          // Original654 effects+40/+48 gates feedback, not poison damage.
+          // A replacement/stronger poison shares this entity's same clock.
+          const bool quiet = world.time_ms() - entity.poison_hit_time_ms < 600.0;
+          if (!quiet) entity.poison_hit_time_ms = world.time_ms();
+          (void)damage_entity(world, entity.handle, f32::from_double(amount), strongest->source,
+            quiet ? 1U : 0U);
+          ++damaged;
+        }
+      }
+
+      bool changed = false;
+      for (auto& effect : entity.effects) {
+        if (!effect.active) continue;
+        if (effect.payload) {
+          if (!effect.payload->active || effect.payload->remaining_ms < 0.0) {
+            if (effect.payload->refcount > 0U) --effect.payload->refcount;
+            effect = Effect{};
+            changed = true;
+          } else {
+            sync_effect(effect);
+          }
+          continue;
+        }
+        if (effect.remaining_ms <= delta_milliseconds) {
+          effect.active = false;
           changed = true;
         } else {
-          sync_effect(effect);
+          effect.remaining_ms -= delta_milliseconds;
         }
-        continue;
       }
-      if (effect.remaining_ms <= delta_milliseconds) {
-        effect.active = false;
-        changed = true;
-      } else {
-        effect.remaining_ms -= delta_milliseconds;
-      }
+      if (changed) refresh_count(entity);
     }
-    if (changed) refresh_count(entity);
-  }
+  });
 
   for (EffectPayload* payload : payloads) {
     if (!payload->active) continue;
@@ -199,12 +204,14 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
     }
   }
   // Mirror the once-per-tick payload advance into every target slot.
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active) continue;
-    for (auto& effect : entity.effects) {
-      if (effect.active && effect.payload) sync_effect(effect);
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active) continue;
+      for (auto& effect : entity.effects) {
+        if (effect.active && effect.payload) sync_effect(effect);
+      }
     }
-  }
+  });
   return damaged;
 }
 
@@ -287,6 +294,10 @@ std::shared_ptr<EffectPayload> World::replace_area_effect(EntityHandle owner, f3
 
 std::size_t World::update_area_effects() {
   std::size_t updated = 0;
+  std::optional<SpatialQuery> phase_query;
+  auto& alive = area_alive_; auto& candidates = area_candidates_;
+  auto& added = area_added_; auto& removed = area_removed_;
+  const auto less = [](EntityHandle a, EntityHandle b) { return a.raw < b.raw; };
   for (auto& area : area_effects_) {
     if (!area.payload) continue;
     if (area.payload->remaining_ms < 0.0 || !area.payload->active) {
@@ -299,10 +310,9 @@ std::size_t World::update_area_effects() {
       continue;
     }
     // Prune dead targets and detach the payload from them.
-    std::vector<EntityHandle> previous = area.targets;
-    std::vector<EntityHandle> alive;
-    alive.reserve(previous.size());
-    for (const EntityHandle target : previous) {
+    alive.clear();
+    alive.reserve(area.targets.size());
+    for (const EntityHandle target : area.targets) {
       Entity* entity = entities_.get(target);
       if (entity == nullptr || entity->health.value <= 0.0F) {
         if (entity != nullptr) (void)detach_effect_payload(*entity, area.payload);
@@ -311,8 +321,10 @@ std::size_t World::update_area_effects() {
       alive.push_back(target);
     }
     // The original query rectangle is owner centre +/- scale (a square).
-    SpatialQuery query = SpatialQuery::from_world(*this);
-    std::vector<EntityHandle> candidates;
+    // Payload attach/detach does not mutate geometry. This view ends before
+    // petal spawning, movement or destruction in later phases.
+    if (!phase_query) phase_query.emplace(SpatialQuery::from_world(*this));
+    const auto& query = *phase_query;
     const f32 half = area.scale;
     query.query_box(Aabb{f32::from_double(static_cast<double>(owner->position.x.value)
                                           - static_cast<double>(half.value)),
@@ -327,38 +339,21 @@ std::size_t World::update_area_effects() {
               [](EntityHandle left, EntityHandle right) { return left.raw < right.raw; });
     std::sort(alive.begin(), alive.end(),
               [](EntityHandle left, EntityHandle right) { return left.raw < right.raw; });
-    std::vector<EntityHandle> added;
-    std::vector<EntityHandle> removed;
-    for (const EntityHandle handle : candidates) {
-      if (!std::binary_search(alive.begin(), alive.end(), handle,
-                              [](EntityHandle left, EntityHandle right) {
-                                return left.raw < right.raw;
-                              })) {
-        added.push_back(handle);
-      }
-    }
-    for (const EntityHandle handle : alive) {
-      if (!std::binary_search(candidates.begin(), candidates.end(), handle,
-                              [](EntityHandle left, EntityHandle right) {
-                                return left.raw < right.raw;
-                              })) {
-        removed.push_back(handle);
-      }
-    }
+    added.clear(); removed.clear();
+    std::set_difference(candidates.begin(), candidates.end(), alive.begin(), alive.end(), std::back_inserter(added), less);
+    std::set_difference(alive.begin(), alive.end(), candidates.begin(), candidates.end(), std::back_inserter(removed), less);
     for (const EntityHandle handle : removed) {
       Entity* entity = entities_.get(handle);
       if (entity != nullptr) (void)detach_effect_payload(*entity, area.payload);
-      alive.erase(std::remove(alive.begin(), alive.end(), handle), alive.end());
+
     }
     for (const EntityHandle handle : added) {
       Entity* entity = entities_.get(handle);
       if (entity == nullptr) continue;
       (void)attach_effect_payload(*entity, area.payload);
-      alive.push_back(handle);
+
     }
-    std::sort(alive.begin(), alive.end(),
-              [](EntityHandle left, EntityHandle right) { return left.raw < right.raw; });
-    area.targets = std::move(alive);
+    area.targets.assign(candidates.begin(), candidates.end());
     ++updated;
   }
   return updated;

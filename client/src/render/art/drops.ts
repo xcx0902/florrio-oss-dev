@@ -5,6 +5,16 @@ import { drawLabel } from '../canvas2d/text-cache.js';
 import { fillArtRectangle, inLocal, localContext } from './geometry.js';
 import { rgb, setFill, setStroke, shade } from './palette.js';
 import { drawPetalIcon } from './petals.js';
+const cardColors = new Map<number, { fill:ReturnType<typeof rgb>; stroke:ReturnType<typeof rgb> }>();
+function cardColor(rarity:number):{ fill:ReturnType<typeof rgb>; stroke:ReturnType<typeof rgb> } {
+  let cached=cardColors.get(rarity);
+  if(!cached) {
+    const shift=BigInt(rarity*8);
+    const fill=rgb(Number(245047318478718n>>shift&255n),Number(34218529646319n>>shift&255n),Number(111187557834093n>>shift&255n));
+    cached={fill,stroke:shade(fill)};cardColors.set(rarity,cached);
+  }
+  return cached;
+}
 /** Native pickup visual owned by the world marker, separate from its HUD
 * transfer. A newly spawned pickup grows/spins in; a scene's existing pickups
 * start at full size. The protocol's flags&128 distinguishes those cases. */
@@ -81,21 +91,21 @@ export function drawPetalCard(context: Canvas2DContext, type: number, size = 60,
     return;
   const f = Math.fround, local = context;
   const rarity = info.rarity;
-  const color = rgb(Number(245047318478718n >> BigInt(rarity * 8) & 255n), Number(34218529646319n >> BigInt(rarity * 8) & 255n), Number(111187557834093n >> BigInt(rarity * 8) & 255n));
+  const color = cardColor(rarity);
   const line = f(size / 12), side = f(size - line);
   local.setLineJoin('round');
-  setFill(local, color);
+  setFill(local, color.fill);
   fillArtRectangle(local, -side / 2, -side / 2, side, side);
   local.beginPath();
   local.rect(-side / 2, -side / 2, side, side);
   local.setLineWidth(line);
-  setStroke(local, shade(color));
+  setStroke(local, color.stroke);
   local.stroke();
   inLocal(local, artwork => drawPetalIcon(artwork, type), f(size / 70), 0, 0, f(-size / 14));
   const matrix = local.getTransform?.() ?? [1, 0, 0, 1, 0, 0];
   // func391's +36 label font is smaller for the four long names.
   const nameFont = type === 20 ? 11 : [25, 26, 28].includes(type) ? 12 : 14;
   drawLabel(local, { text: info.name, font: f(f(nameFont * size) / 70),
-    rasterScale: Math.fround(Math.max(...matrix.slice(0, 4).map(Math.abs)) * 2.4),
+    rasterScale: Math.fround(Math.max(Math.abs(matrix[0]), Math.abs(matrix[1]), Math.abs(matrix[2]), Math.abs(matrix[3])) * 2.4),
     cacheKey: owner }, 0, f(f(size * .5) + size * (-18 / 70)));
 }

@@ -55,3 +55,25 @@ test('late initialization after returning to menu or disposing cannot schedule a
     assert.equal(result[0].pending, null); assert.equal(result[1].pending, null);
   } finally { await page.close(); }
 });
+
+test('offscreen visuals retain phases and authoritative deletion releases text owners across generation reuse',async()=>{
+  const page=await browser.newPage({viewport:{width:1280,height:720}});
+  try {
+    await page.goto(origin+'/?test=1');await page.waitForFunction(()=>window.__florr);
+    const result=await page.evaluate(async()=>{
+      const f=window.__florr;f.freeze();
+      const player={handle:1,typeId:1,kind:1,speciesId:0,x:0,y:0,angle:0,health:100,maxHealth:100,level:1,flags:1};
+      const drop={handle:2,typeId:1,kind:4,speciesId:1,x:0,y:0,angle:0,health:0,maxHealth:0,flags:128};
+      const frames=async()=>{for(let i=0;i<3;i++)await new Promise(requestAnimationFrame);};
+      f.setSnapshot([player,drop]);f.setCamera(0,0);await frames();const visible=f.performanceState();
+      f.setCamera(10000,0);await frames();const away=f.performanceState();
+      f.setCamera(0,0);await frames();const reentry=f.performanceState();
+      f.setSnapshotAt([player],performance.now());await frames();const deleted=f.performanceState();
+      f.setSnapshotAt([player,{...drop,handle:2+16384}],performance.now());await frames();const reused=f.performanceState();
+      return {visible,away,reentry,deleted,reused};
+    });
+    assert.equal(result.visible.visuals.drops,1);assert.equal(result.away.visuals.drops,1);assert.equal(result.reentry.visuals.drops,1);
+    assert.equal(result.deleted.visuals.drops,0);assert.ok(result.deleted.resources.owners<result.visible.resources.owners);
+    assert.equal(result.reused.visuals.drops,1);assert.equal(result.reused.resources.owners,result.visible.resources.owners);
+  } finally {await page.close();}
+});

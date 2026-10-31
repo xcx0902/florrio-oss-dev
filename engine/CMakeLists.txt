@@ -95,13 +95,22 @@ add_executable(engine_native_snapshot_fixture
 target_link_libraries(engine_native_snapshot_fixture PRIVATE engine_core)
 target_compile_options(engine_native_snapshot_fixture PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
 
-add_executable(engine_product_workload tests/perf/workload.cpp)
-target_link_libraries(engine_product_workload PRIVATE engine_core)
-target_compile_options(engine_product_workload PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
-
 add_executable(engine_structure_tests tests/unit/test_structure.cpp)
 target_link_libraries(engine_structure_tests PRIVATE engine_core)
 target_compile_options(engine_structure_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
 add_test(NAME engine_structure_tests COMMAND engine_structure_tests)
 
+endif()
+
+# A separate instrumented library never enters the delivery's hot path or ABI.
+add_library(engine_perf_core STATIC EXCLUDE_FROM_ALL ${ENGINE_CORE_SOURCES})
+target_include_directories(engine_perf_core PUBLIC include)
+target_compile_definitions(engine_perf_core PUBLIC ENGINE_PERF=1)
+target_compile_options(engine_perf_core PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math -fno-exceptions -fno-rtti)
+add_executable(engine_benchmark EXCLUDE_FROM_ALL tests/perf/benchmark.cpp)
+target_link_libraries(engine_benchmark PRIVATE engine_perf_core)
+target_compile_options(engine_benchmark PRIVATE -ffp-contract=off -fno-fast-math -fno-exceptions)
+if(EMSCRIPTEN)
+  set_target_properties(engine_benchmark PROPERTIES SUFFIX ".cjs")
+  target_link_options(engine_benchmark PRIVATE -sENVIRONMENT=node -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=67108864 -sEXIT_RUNTIME=1)
 endif()

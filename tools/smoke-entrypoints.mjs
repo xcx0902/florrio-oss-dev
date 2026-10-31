@@ -61,6 +61,7 @@ try {
           }
           postMessage(message, transfer) {
             if (message?.funcName === 'sp_server_send') probe.sends++;
+            if (message?.funcName === 'step') probe.sends += message.inputs.length;
             return super.postMessage(message, transfer);
           }
         };

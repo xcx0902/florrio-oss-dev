@@ -1,4 +1,3 @@
-import { playerLoadoutSlots, loadoutSlots } from '../state/snapshot-projection.js';
 import { DeathLifecycle } from '../state/death.js';
 import { DENSE_GROUPS, DENSE_GROUP_SPECS } from '../state/field-types.js';
 import { SnapshotDecoder, type DenseGroupPlan } from '../state/snapshot.js';
@@ -39,6 +38,7 @@ export class GameSession {
   }
   invalidate(): void {
     this.generation++;
+    this.app.simulation.clearCommands();
     this.pendingSpawn = undefined;
     this.spawnSentTick = undefined;
     this.pendingRestart = false;
@@ -190,10 +190,7 @@ export class GameSession {
     this.app.renderer.petalMotion.reset();
   }
   submit(packet: Uint8Array): void {
-    const generation = this.generation;
-    void this.app.server.send(packet).catch(error => {
-      if (!this.app.disposed && generation === this.generation) this.fail(error);
-    });
+    this.app.simulation.enqueue(packet);
   }
   confirmHealthy(): void {
     if (this.phase !== 'error' && this.localPlayer()) this.enterPlaying();
@@ -223,7 +220,7 @@ export class GameSession {
       this.lastDeathMetadata = this.app.world.deathMetadata();
     const player = this.app.world.healthyPlayer();
     if (player)
-      this.rememberLoadout(playerLoadoutSlots(player) ?? loadoutSlots(this.app.world.all(), 16), player.level ?? 1);
+      this.rememberLoadout(this.app.world.playerLoadout(), player.level ?? 1);
     const progress = this.deathLifecycle.advance(delta);
     if (this.phase === 'dying' && progress >= .999)
       this.phase = 'dead';

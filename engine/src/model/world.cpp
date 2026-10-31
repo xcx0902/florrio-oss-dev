@@ -20,6 +20,7 @@ void World::reset() {
   loadout_.clear();
   profile_.clear();
   area_effects_.clear();
+  area_alive_.clear();area_candidates_.clear();area_added_.clear();area_removed_.clear();
   deferred_launches_.clear();
   deferred_sequence_ = 0;
   last_launch_order_.clear();

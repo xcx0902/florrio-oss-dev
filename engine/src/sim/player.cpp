@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/sim/player.hpp"
 #include "engine/model/catalog.hpp"
 #include "engine/sim/loot.hpp"
@@ -126,24 +127,26 @@ void apply_player_controls(World& world, double delta_milliseconds) {
 
 void regenerate_players(World& world, double delta_milliseconds) {
   if (!(delta_milliseconds > 0.0)) return;
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active || entity.kind != EntityKind::kPlayer) continue;
-    if (entity.health.value <= 0.0F) continue;
-    const f32 maximum = player_level_max_health(world.profile().level())
-      + equipped_max_health_bonus(world, world.profile().level());
-    // Original tick calls 145 even with an unchanged maximum: the f32
-    // multiply/divide can change health by one ULP before regeneration.
-    entity.health = entity.max_health.value > 0.0F
-      ? (maximum * entity.health) / entity.max_health : maximum;
-    entity.max_health = maximum;
-    // Original 216 receives an f32 healing amount, then adds it in f32.
-    if (blocks_healing(entity)) continue;
-    const f32 amount = f32::from_double(delta_milliseconds
-      * static_cast<double>(maximum.value) * 4.166666666666667e-06
-      + equipped_leaf_healing(world, delta_milliseconds));
-    const f32 next = entity.health + amount;
-    entity.health = next < maximum ? next : maximum;
-  }
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active || entity.kind != EntityKind::kPlayer) continue;
+      if (entity.health.value <= 0.0F) continue;
+      const f32 maximum = player_level_max_health(world.profile().level())
+        + equipped_max_health_bonus(world, world.profile().level());
+      // Original tick calls 145 even with an unchanged maximum: the f32
+      // multiply/divide can change health by one ULP before regeneration.
+      entity.health = entity.max_health.value > 0.0F
+        ? (maximum * entity.health) / entity.max_health : maximum;
+      entity.max_health = maximum;
+      // Original 216 receives an f32 healing amount, then adds it in f32.
+      if (blocks_healing(entity)) continue;
+      const f32 amount = f32::from_double(delta_milliseconds
+        * static_cast<double>(maximum.value) * 4.166666666666667e-06
+        + equipped_leaf_healing(world, delta_milliseconds));
+      const f32 next = entity.health + amount;
+      entity.health = next < maximum ? next : maximum;
+    }
+  });
 }
 
 EntityHandle spawn_player_default(World& world, std::string_view name, PlayerProfile profile,

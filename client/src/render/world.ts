@@ -1,6 +1,8 @@
+import { FrameContext } from './frame-context.js';
+import { renderResources } from './resources.js';
+import { releaseLabel } from './canvas2d/text-cache.js';
 import type { CameraState } from '../state/camera.js';
-import { interpolateEntity } from '../state/interpolation.js';
-import { isOutsideWorldViewport,playerWorldPosition } from '../state/world-transform.js';
+import { isOutsideWorldBounds,worldViewportBounds,playerWorldPosition } from '../state/world-transform.js';
 import type { EntityState,WorldState } from '../state/world.js';
 import type { Canvas2DContext } from './canvas2d/context.js';
 import {
@@ -31,6 +33,7 @@ const arenaBoundaries = new WeakMap<WorldState, ArenaBoundary>();
 interface PlayerVisual { face: PlayerFaceState; health: PlayerHealthBarState; fresh: boolean }
 interface PetalVisual { phase: number; trail: UniqueTrail; webProgress: number }
 interface WorldVisuals {
+  epoch:number;
   at: number;
   players: Map<number, PlayerVisual>;
   species: Map<number, SpeciesAnimationState>;
@@ -40,6 +43,21 @@ interface WorldVisuals {
   randomAngle: () => number;
 }
 const worldVisuals = new WeakMap<WorldState, WorldVisuals>();
+const frameContexts = new WeakMap<WorldState,FrameContext>();
+const visibleBuffers = new WeakMap<WorldState,{items:VisibleEntity[];pool:VisibleEntity[]}>();
+
+export function releaseWorldVisuals(world:WorldState):void {
+  const visuals=worldVisuals.get(world),resources=renderResources();
+  if(visuals)for(const drop of visuals.drops.values()) {
+    const owner=resources.dropLabelOwners.get(drop);if(owner!==undefined)releaseLabel(owner);
+    resources.dropLabelOwners.delete(drop);
+  }
+  worldVisuals.delete(world);frameContexts.delete(world);visibleBuffers.delete(world);
+}
+export function worldFrameStats(world:WorldState) {return frameContexts.get(world)?.stats??{worldScans:0,sorts:0,visible:0,drawn:0,interpolations:0};}
+export function worldVisualCounts(world:WorldState) {
+  const v=worldVisuals.get(world);return {players:v?.players.size??0,species:v?.species.size??0,drops:v?.drops.size??0,petals:v?.petals.size??0};
+}
 
 /** Original fillRectangle emits a transformed unit rectangle and caches its
  * matrix. Keep zero-sized rectangles: they are part of the Canvas contract. */
@@ -124,13 +142,13 @@ function drawArena(context: Canvas2DContext, world: WorldState, camera: CameraSt
 /** One recovered entity block: a save/restore pair around a single
  * screen-space setTransform, followed by local-coordinate artwork. */
 interface VisibleEntity {
-  readonly entity: EntityState;
-  readonly x: number;
-  readonly y: number;
-  readonly angle: number;
-  readonly radius: number;
-  readonly screenX: number;
-  readonly screenY: number;
+  entity: EntityState;
+  x: number;
+  y: number;
+  angle: number;
+  radius: number;
+  screenX: number;
+  screenY: number;
 }
 
 const speciesOf = (entity: EntityState): number => entity.speciesId ?? entity.typeId;
@@ -209,13 +227,23 @@ function collectVisible(
   world: WorldState,
   camera: CameraState,
   now: number,
+  frame:FrameContext,
+  playerPosition?:{x:number;y:number},
 ): VisibleEntity[] {
+  frame.stats.worldScans++; // Culling visits the complete cached membership.
   const zoom = camera.zoom;
   const width = camera.viewportWidth;
   const height = camera.viewportHeight;
-  const visible: VisibleEntity[] = [];
-  for (const entity of world.renderable(now)) {
-    const transform = interpolateEntity(entity, now);
+  let buffers=visibleBuffers.get(world);
+  if(!buffers){buffers={items:[],pool:[]};visibleBuffers.set(world,buffers);}
+  const visible=buffers.items;visible.length=0;
+  const view=worldViewportBounds(camera),roundedZoom=f(zoom);
+  const rootX = f(width * 0.5 - f(f(camera.x) * f(zoom)));
+  const rootY = f(height * 0.5 - f(f(camera.y) * f(zoom)));
+  for (const handle of frame.orderedHandles) {
+    if(!world.isRenderable(handle))continue;
+    const entity=world.get(handle)!;
+    const transform = frame.transform(entity, now);
     // The archived local-player block is drawn with the mouse-pan/shake offset;
     // other entities use the unshifted world projection.
     const panX = entity.kind === 1 ? camera.entityOffsetX : 0;
@@ -224,28 +252,19 @@ function collectVisible(
     // The controlled flower is constrained after interpolation, before local
     // translation. The renderer composes rootTx + f32(localX * zoom), rather
     // than subtracting two large world coordinates before multiplication.
-    const controlled = entity.kind === 1 ? playerWorldPosition(entity, now, { x: camera.panX, y: camera.panY }) : transform;
+    const controlled = entity.kind === 1
+      ? (entity.handle === frame.player?.handle ? playerPosition : undefined) ?? playerWorldPosition(entity, now, { x: camera.panX, y: camera.panY })
+      : transform;
     const { x, y } = controlled;
-    const rootX = f(width * 0.5 - f(f(camera.x) * f(zoom)));
-    const rootY = f(height * 0.5 - f(f(camera.y) * f(zoom)));
-    const screenX = f(rootX + f(x * f(zoom))) + panX;
-    const screenY = f(rootY + f(y * f(zoom))) + panY;
-    if (isOutsideWorldViewport(x, y, radius, camera)) continue;
-    visible.push({
-      entity,
-      x,
-      y,
-      angle: transform.angle,
-      radius,
-      screenX,
-      screenY,
-    });
+    if (isOutsideWorldBounds(x, y, radius, view)) continue;
+    const screenX = f(rootX + f(x * roundedZoom)) + panX;
+    const screenY = f(rootY + f(y * roundedZoom)) + panY;
+    let item=buffers.pool[visible.length];
+    if(!item)buffers.pool.push(item={entity,x,y,angle:transform.angle,radius,screenX,screenY});
+    else {item.entity=entity;item.x=x;item.y=y;item.angle=transform.angle;item.radius=radius;item.screenX=screenX;item.screenY=screenY;}
+    visible.push(item);
   }
-  visible.sort((left, right) => {
-    const layer = drawLayer(left.entity) - drawLayer(right.entity);
-    if (layer !== 0) return layer;
-    return left.entity.handle - right.entity.handle;
-  });
+  frame.stats.visible=visible.length;
   return visible;
 }
 
@@ -357,21 +376,28 @@ function drawEntityBlock(
  * Each entity block is a save/restore pair around one screen-space transform,
  * matching the archived renderer's command structure. */
 export function drawWorld(context: Canvas2DContext, world: WorldState, camera: CameraState, now: number,
-                          options: { readonly menuPreview?: boolean } = {}): void {
-  const level = Array.from(world.all()).find(entity => entity.kind === 1)?.level ?? 1;
+                          options: { readonly menuPreview?: boolean;readonly frame?:FrameContext;readonly playerPosition?:{x:number;y:number};readonly deltaMs?:number } = {}): void {
+  let frame=options.frame??frameContexts.get(world);
+  if(!frame){frame=new FrameContext();frameContexts.set(world,frame);}
+  frameContexts.set(world,frame);
+  frame.begin(world,camera,now,options.deltaMs??16,drawLayer);
+  const level = frame.level;
   drawArena(context, world, camera, now, level, options.menuPreview === true);
   drawGrid(context, camera);
 
-  const visible = collectVisible(world, camera, now);
+  const visible = collectVisible(world, camera, now, frame,options.playerPosition);
   let visuals = worldVisuals.get(world);
-  if (!visuals || now < visuals.at) visuals = { at: now - 16, players: new Map(), species: new Map(),
+  if (!visuals || now < visuals.at || visuals.epoch!==world.lifetimeRevision) {
+    releaseWorldVisuals(world);
+    visuals = { epoch:world.lifetimeRevision, at: now - 16, players: new Map(), species: new Map(),
     drops: new Map(), dropRandom: 1, petals: new Map(), randomAngle: createArtRandom() };
+  }
   const deltaMs = Math.max(0, now - visuals.at);
   visuals.at = now;
   worldVisuals.set(world, visuals);
   // The archived pickup pass visits the whole component pool, including
   // offscreen drops. Retain its state while the camera moves away and back.
-  for (const entity of world.all()) if (entity.kind === 4) {
+  for (const entity of world.entitiesOfKind(4)) {
     const pickupFlags = entity.byteFields?.[54] ?? entity.denseByteFields?.[54] ?? entity.denseFields?.[54] ?? 0;
     const collected = typeof pickupFlags === 'number' && (pickupFlags & 1) !== 0;
     let drop = visuals.drops.get(entity.handle);
@@ -383,23 +409,27 @@ export function drawWorld(context: Canvas2DContext, world: WorldState, camera: C
     }
     advanceDropVisualState(drop, now, deltaMs, collected);
   }
-  for (const handle of visuals.drops.keys()) if (!world.get(handle)) visuals.drops.delete(handle);
+  for (const [handle,drop] of visuals.drops) if (!world.isRenderable(handle)) {
+    const resources=renderResources(),owner=resources.dropLabelOwners.get(drop);
+    if(owner!==undefined)releaseLabel(owner);
+    resources.dropLabelOwners.delete(drop);if(!world.get(handle))visuals.drops.delete(handle);
+  }
   const playerVisual = (handle: number): PlayerVisual => {
     let state = visuals!.players.get(handle);
     if (!state) { state = { face: createPlayerFaceState(), health: createPlayerHealthBarState(), fresh: true }; visuals!.players.set(handle, state); }
     return state;
   };
-  const renderedHandles = new Set(visible.map(item => item.entity.handle));
   for (const handle of visuals.players.keys())
-    if (!world.get(handle) && !renderedHandles.has(handle)) visuals.players.delete(handle);
+    if (!world.get(handle)) visuals.players.delete(handle);
   for (const handle of visuals.species.keys())
-    if (!world.get(handle) && !renderedHandles.has(handle)) visuals.species.delete(handle);
+    if (!world.get(handle)) visuals.species.delete(handle);
   for (const handle of visuals.petals.keys())
-    if (!world.get(handle) && !renderedHandles.has(handle)) visuals.petals.delete(handle);
+    if (!world.get(handle)) visuals.petals.delete(handle);
 
   // Health bars are the first entity layer in the archived frame.
   context.save();
-  for (const player of visible.filter(item => item.entity.kind === 1)) {
+  for (const player of visible) {
+    if(player.entity.kind!==1)continue;
     const maxHealth = player.entity.maxHealth;
     const ratioHealth = player.entity.maxHealthKnown && maxHealth > 0
       ? player.entity.health / maxHealth
@@ -423,6 +453,7 @@ export function drawWorld(context: Canvas2DContext, world: WorldState, camera: C
         trail: createUniqueTrail(), webProgress: item.entity.arrivalMarked ? 0 : 1 };
       visuals.petals.set(item.entity.handle,petal);
     }
+    frame.stats.drawn++;
     drawEntityBlock(context, camera, item, now, deltaMs,
       item.entity.kind === 1 ? playerVisual(item.entity.handle) : undefined, flash, animation,
       visuals.drops.get(item.entity.handle),petal,visuals.randomAngle);

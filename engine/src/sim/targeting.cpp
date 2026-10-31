@@ -78,6 +78,11 @@ EntityHandle find_target(const World& world, EntityHandle seeker_handle) {
 
 EntityHandle find_target(const World& world, const SpatialQuery& query,
                          EntityHandle seeker_handle) {
+  std::vector<EntityHandle> candidates;
+  return find_target(world,query,seeker_handle,candidates);
+}
+EntityHandle find_target(const World& world,const SpatialQuery& query,
+                         EntityHandle seeker_handle,std::vector<EntityHandle>& candidates) {
   const Entity* seeker = world.entities().get(seeker_handle);
   if (seeker == nullptr || !seeker->ai.enabled) return EntityHandle{};
   const f32 search_radius = seeker->ai.radius;
@@ -85,7 +90,6 @@ EntityHandle find_target(const World& world, const SpatialQuery& query,
   // Aabb is min/max (not origin+size): the query square is centre +/- radius.
   const Aabb area{seeker->position.x - search_radius, seeker->position.y - search_radius,
                   seeker->position.x + search_radius, seeker->position.y + search_radius};
-  std::vector<EntityHandle> candidates;
   query.query_box(area, candidates);
   EntityHandle best{};
   double best_distance = 0.0;

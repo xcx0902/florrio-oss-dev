@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/ai.hpp"
 #include "engine/sim/bounds.hpp"
@@ -18,7 +19,8 @@ constexpr float kRandomAngleScale = 2.925836239953128e-09F;
  * the candidate point reject the spawn. The original walks the quadtree with a
  * rectangle; a linear scan of the same bodies is equivalent for this predicate. */
 bool spawn_area_blocked(const World& world, double x, double y) {
-  for (const auto& entity : world.entities().entities()) {
+  return world.entities().with_ordered_slots([&](auto&& slots) {
+  for (const auto& entity : slots) { PERF_ADD(visits, 1);
     if (!entity.active) continue;
     if ((entity.world_flags & 32U) == 0U) continue;
     const double dx = static_cast<double>(entity.position.x.value) - x;
@@ -27,6 +29,7 @@ bool spawn_area_blocked(const World& world, double x, double y) {
     if (dx * dx + dy * dy < minimum * minimum) return true;
   }
   return false;
+  });
 }
 
 void set_owner(World& world, EntityHandle child, EntityHandle parent) {
@@ -424,12 +427,38 @@ EntityHandle spawn_entity(World& world, EntityKind kind, std::uint16_t type_id, 
   return *handle;
 }
 
+namespace {
+// Population factories create new bodies only; no existing body's geometry is
+// modified. Synchronize ALL births (including children) after each attempt.
+struct SpawnQueryContext {
+  World& world;
+  SpatialQuery query;
+  std::array<bool,kEntitySlotCount> present{};
+  explicit SpawnQueryContext(World& w) : world(w), query(SpatialQuery::from_world(w)) {
+    w.entities().with_ordered_slots([&](auto&& slots) {
+      for (const auto& e : slots) if(e.active) present[e.handle.index()] = true;
+    });
+  }
+  void synchronize_births() {
+    world.entities().with_ordered_slots([&](auto&& slots) {
+      for (const auto& e : slots) {
+        PERF_ADD(visits, 1);
+        if (!e.active || present[e.handle.index()]) continue;
+        present[e.handle.index()] = true;
+        query.add({e.position,e.radius,e.world_flags,e.entity_flags,e.handle});
+      }
+    });
+  }
+};
+}
+
 std::vector<EntityHandle> populate_world(
     World& world, const SpawnTable& table, const std::array<std::uint8_t, 8>& counts) {
+  SpawnQueryContext context(world);
   std::vector<EntityHandle> spawned;
   for (std::uint8_t band = 0; band < 8; ++band) {
     for (std::uint8_t index = 0; index < counts[band]; ++index) {
-      const SpatialQuery query = SpatialQuery::from_world(world);
+      const auto& query = context.query;
       const EntityHandle handle = table.spawn_from_band(world, band,
         [&query](const SpawnPosition& position) { return query.occupied(position); },
         [&world](const SpawnBandEntry& entry, const SpawnPosition& position) {
@@ -441,6 +470,7 @@ std::vector<EntityHandle> populate_world(
           return spawn_entity_from_defaults(world, EntityKind::kMob, entry.entity_type,
                                             Vec2(position.x, position.y));
         });
+      context.synchronize_births();
       if (handle.valid()) {
         if (Entity* entity = world.entities().get(handle)) entity->spawn_band = band;
         spawned.push_back(handle);
@@ -475,11 +505,11 @@ namespace {
 
 std::vector<EntityHandle> spawn_population_band(World& world, const SpawnTable& table,
                                                 std::uint8_t band, std::uint32_t target,
-                                                std::uint32_t already) {
+                                                std::uint32_t already, SpawnQueryContext& context) {
   std::vector<EntityHandle> spawned;
   std::uint32_t count = already;
   while (count < target) {
-    const SpatialQuery query = SpatialQuery::from_world(world);
+    const auto& query = context.query;
     const EntityHandle handle = table.spawn_from_band(world, band,
       [&query](const SpawnPosition& position) { return query.occupied(position); },
       [&world](const SpawnBandEntry& entry, const SpawnPosition& position) {
@@ -491,6 +521,7 @@ std::vector<EntityHandle> spawn_population_band(World& world, const SpawnTable& 
         return spawn_entity_from_defaults(world, EntityKind::kMob, entry.entity_type,
                                           Vec2(position.x, position.y));
       });
+    context.synchronize_births();
     if (!handle.valid()) break;
     if (Entity* entity = world.entities().get(handle)) entity->spawn_band = band;
     ++count;
@@ -502,10 +533,11 @@ std::vector<EntityHandle> spawn_population_band(World& world, const SpawnTable& 
 } // namespace
 
 std::vector<EntityHandle> populate_world(World& world, const SpawnTable& table) {
+  SpawnQueryContext context(world);
   const auto targets = population_targets(world.width(), world.height());
   std::vector<EntityHandle> spawned;
   for (std::uint8_t band = 0; band < 8; ++band) {
-    auto band_spawned = spawn_population_band(world, table, band, targets[band], 0U);
+    auto band_spawned = spawn_population_band(world, table, band, targets[band], 0U, context);
     spawned.insert(spawned.end(), band_spawned.begin(), band_spawned.end());
   }
   return spawned;
@@ -514,13 +546,18 @@ std::vector<EntityHandle> populate_world(World& world, const SpawnTable& table) 
 std::vector<EntityHandle> replenish_population(World& world, const SpawnTable& table) {
   const auto targets = population_targets(world.width(), world.height());
   std::array<std::uint32_t, 8> counts{};
-  for (const auto& entity : world.entities().entities()) {
-    if (!entity.active || entity.kind != EntityKind::kMob) continue;
-    if (entity.spawn_band < 8U) ++counts[entity.spawn_band];
-  }
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (const auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active || entity.kind != EntityKind::kMob) continue;
+      if (entity.spawn_band < 8U) ++counts[entity.spawn_band];
+    }
+  });
   std::vector<EntityHandle> spawned;
+  std::optional<SpawnQueryContext> context;
   for (std::uint8_t band = 0; band < 8; ++band) {
-    auto band_spawned = spawn_population_band(world, table, band, targets[band], counts[band]);
+    if (counts[band] >= targets[band]) continue;
+    if (!context) context.emplace(world);
+    auto band_spawned = spawn_population_band(world, table, band, targets[band], counts[band], *context);
     spawned.insert(spawned.end(), band_spawned.begin(), band_spawned.end());
   }
   return spawned;

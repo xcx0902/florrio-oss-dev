@@ -1,4 +1,4 @@
-import { loadoutSlots,playerLoadoutSlots } from './loadout.js';
+import { playerLoadoutSlots } from './loadout.js';
 import type { DeathMetadata,WorldState } from './world.js';
 
 export interface DeathSnapshot {
@@ -21,7 +21,7 @@ export class DeathLifecycle {
       if (body.handle !== this.bodyHandle) this.reset();
       this.bodyHandle = body.handle;
       this.latest = {
-        slots: playerLoadoutSlots(body) ?? loadoutSlots(world.all(), 16),
+        slots: world.playerLoadout(),
         level: body.level ?? 1,
         metadata: world.deathMetadata(),
       };

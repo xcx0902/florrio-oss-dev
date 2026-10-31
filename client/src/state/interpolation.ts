@@ -45,15 +45,20 @@ export function interpolateCameraTarget(entity: EntityState, now: number, durati
 
 /** Interpolate between the previous and current snapshot over `durationMs`. */
 export function interpolateEntity(entity: EntityState, now: number, durationMs = 120): InterpolatedTransform {
+  return interpolateEntityInto(entity, now, {x:0,y:0,angle:0}, durationMs);
+}
+export interface MutableTransform { x:number; y:number; angle:number; radius?:number; }
+/** Same scalar arithmetic, with caller-owned storage for the render hot path. */
+export function interpolateEntityInto(entity: EntityState, now: number, result: MutableTransform, durationMs = 120): MutableTransform {
   const tx = clamp01((now - (entity.receivedXAt ?? entity.receivedAt)) * (1 / durationMs));
   const ty = clamp01((now - (entity.receivedYAt ?? entity.receivedAt)) * (1 / durationMs));
   const ta = clamp01((now - (entity.receivedAngleAt ?? entity.receivedAt)) * (1 / durationMs));
   const tr = clamp01((now - (entity.receivedRadiusAt ?? entity.receivedAt)) * (1 / durationMs));
-  return {
-    x: Math.fround(entity.previousX + Math.fround(entity.x - entity.previousX) * tx),
-    y: Math.fround(entity.previousY + Math.fround(entity.y - entity.previousY) * ty),
-    angle: lerpAngle(entity.previousAngle, entity.angle, ta),
-    ...(entity.radius === undefined ? {} : { radius: Math.fround((entity.previousRadius ?? entity.radius)
-      + Math.fround(entity.radius - (entity.previousRadius ?? entity.radius)) * tr) }),
-  };
+  result.x = Math.fround(entity.previousX + Math.fround(entity.x - entity.previousX) * tx);
+  result.y = Math.fround(entity.previousY + Math.fround(entity.y - entity.previousY) * ty);
+  result.angle = lerpAngle(entity.previousAngle, entity.angle, ta);
+  if(entity.radius === undefined) delete result.radius;
+  else result.radius = Math.fround((entity.previousRadius ?? entity.radius)
+    + Math.fround(entity.radius - (entity.previousRadius ?? entity.radius)) * tr);
+  return result;
 }

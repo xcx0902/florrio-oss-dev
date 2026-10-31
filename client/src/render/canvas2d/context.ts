@@ -5,6 +5,8 @@ export interface Canvas2DContext {
   setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void;
   /** Snapshot of the logical matrix, including pending unflushed changes. */
   getTransform?(): readonly [number, number, number, number, number, number];
+  /** Resynchronize after a canvas resize or a direct native-context operation. */
+  syncTransform?(): void;
   transform?(a: number, b: number, c: number, d: number, e: number, f: number): void;
   createPath?(): Path2D;
   beginPath(): void;
@@ -40,25 +42,34 @@ export interface Canvas2DContext {
 
 export function wrapContext(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D): Canvas2DContext {
   const color = (r: number, g: number, b: number): string =>
-    '#' + [r, g, b].map(value => (value & 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+    '#' + HEX[r & 255] + HEX[g & 255] + HEX[b & 255];
   type Matrix = [number, number, number, number, number, number];
   const current = (): Matrix => {
     const m = context.getTransform();
     return [m.a, m.b, m.c, m.d, m.e, m.f];
   };
   let matrix = current();
-  const stack: Matrix[] = [];
+  let flushed = matrix;
+  const stack: { matrix: Matrix; flushed: Matrix }[] = [];
   // The recovered renderer keeps a logical f32 matrix and flushes its cache
   // at coordinate/path-resource operations, after intervening style setters.
   const flush = (): void => {
-    const native = current();
-    if (matrix.some((value, index) => value !== native[index])) context.setTransform(...matrix);
+    if (matrix[0] !== flushed[0] || matrix[1] !== flushed[1] || matrix[2] !== flushed[2]
+        || matrix[3] !== flushed[3] || matrix[4] !== flushed[4] || matrix[5] !== flushed[5]) {
+      context.setTransform(...matrix);
+      flushed = matrix;
+    }
   };
   return {
-    save: () => { stack.push([...matrix]); context.save(); },
-    restore: () => { context.restore(); matrix = stack.pop() ?? matrix; },
+    save: () => { stack.push({ matrix, flushed }); context.save(); },
+    restore: () => {
+      context.restore();
+      const state = stack.pop();
+      if (state) { matrix = state.matrix; flushed = state.flushed; }
+    },
     setTransform: (a, b, c, d, e, f) => { matrix = [a, b, c, d, e, f]; },
-    getTransform: () => [...matrix] as Matrix,
+    getTransform: () => matrix,
+    syncTransform: () => { flushed = current(); },
     transform: (a, b, c, d, e, offsetY) => {
       const [ma, mb, mc, md, me, mf] = matrix, f = Math.fround;
       matrix = [f(f(ma * a) + f(mc * b)), f(f(mb * a) + f(md * b)),
@@ -98,3 +109,5 @@ export function wrapContext(context: CanvasRenderingContext2D | OffscreenCanvasR
     drawImage: (image, ...args) => { flush(); (context.drawImage as unknown as (image: CanvasImageSource, ...values: number[]) => void)(image, ...args); },
   };
 }
+
+const HEX = Array.from({ length: 256 }, (_, value) => value.toString(16).padStart(2, '0').toUpperCase());

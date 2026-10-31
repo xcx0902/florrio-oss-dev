@@ -1,3 +1,4 @@
+import { ResourceCache } from '../resource-cache.js';
 import { renderResources } from '../resources.js';
 import type { Canvas2DContext } from '../canvas2d/context.js';
 import { SpeciesContext, SpeciesPath, artRandom, disc, f32, fillArtRectangle, finiteTime, inLocal, localContext, positiveRadius, style } from './geometry.js';
@@ -241,11 +242,9 @@ export function drawRock(context: Canvas2DContext, handle: number, radius: numbe
     path.closePath();
     let cache = resources.rockPathCache.get(context);
     if (!cache) {
-      cache = new Map();
+      cache = new ResourceCache(resources.budgets.paths,()=>1,resources.pathBudget);
       resources.rockPathCache.set(context, cache);
     }
-    if (cache.size >= 128)
-      cache.delete(cache.keys().next().value!);
     cache.set(key, path);
   }
   context.setLineWidth(7);
@@ -313,7 +312,7 @@ export function drawCactus(context: Canvas2DContext, radius: number, _now = 0, f
     geometry.inset(cached.inset);
     let cache = resources.cactusPathCache.get(context);
     if (!cache) {
-      cache = new Map();
+      cache = new ResourceCache(resources.budgets.paths,()=>1,resources.pathBudget);
       resources.cactusPathCache.set(context, cache);
     }
     if (cache.size >= 256)

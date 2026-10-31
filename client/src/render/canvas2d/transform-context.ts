@@ -18,7 +18,8 @@ export function hudRenderer(native: Canvas2DContext): HudContext {
   let flushed: Matrix = [NaN, NaN, NaN, NaN, NaN, NaN];
   const states: { matrix: Matrix; flushed: Matrix }[] = [];
   const flush = (): void => {
-    if (matrix.some((value, index) => value !== flushed[index])) {
+    if (matrix[0] !== flushed[0] || matrix[1] !== flushed[1] || matrix[2] !== flushed[2]
+        || matrix[3] !== flushed[3] || matrix[4] !== flushed[4] || matrix[5] !== flushed[5]) {
       native.setTransform(...matrix);
       flushed = matrix;
     }

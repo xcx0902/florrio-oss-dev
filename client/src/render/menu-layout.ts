@@ -1,3 +1,4 @@
+import { renderResources } from './resources.js';
 /** Shared native menu geometry. All rectangles are logical client units; the
  * caller converts pointer coordinates with the same HUD scale. */
 import { CHANGELOG } from '../schema/menu-content.js';
@@ -156,6 +157,10 @@ export const MOB_GALLERY_TYPES: readonly number[] = Object.keys(MOB_GALLERY).map
 
 /** Original multiline labels wrap the glyph advances before adding the outline. */
 export function wrapMenuText(value: string, font: number, maxWidth: number): readonly string[] {
+  const cache = renderResources().layouts;
+  const key = `wrap:${font}:${maxWidth}:${value}`;
+  const cached = cache.get(key) as readonly string[] | undefined;
+  if (cached) return cached;
   const result: string[] = [];
   for (const paragraph of value.split('\n')) {
     if (!paragraph) { result.push(''); continue; }
@@ -185,6 +190,7 @@ export function wrapMenuText(value: string, font: number, maxWidth: number): rea
       while (paragraph[start] === ' ') start++;
     }
   }
+  cache.set(key,result);
   return result;
 }
 
@@ -199,10 +205,19 @@ export function mobRowHeight(type: number, discovered: boolean): number {
 }
 
 export function mobRowRect(index: number, height: number, discovered: readonly number[] = []): Rect {
-  const content = menuContentRect('Mobs', height);
-  let y = f(content.y + 5);
-  for (let i = 0; i < index; i++) y = f(y + f(mobRowHeight(MOB_GALLERY_TYPES[i], discovered.includes(MOB_GALLERY_TYPES[i])) + 10));
-  return { x: content.x, y, width: 315, height: mobRowHeight(MOB_GALLERY_TYPES[index], discovered.includes(MOB_GALLERY_TYPES[index])) };
+  const cache = renderResources().layouts;
+  const key = `mob-rows:${height}:${discovered.join(',')}`;
+  let rows = cache.get(key) as readonly Rect[] | undefined;
+  if (!rows) {
+    const content = menuContentRect('Mobs',height), built:Rect[]=[];
+    let y=f(content.y+5);
+    for (const type of MOB_GALLERY_TYPES) {
+      const h=mobRowHeight(type,discovered.includes(type));
+      built.push({x:content.x,y,width:315,height:h}); y=f(y+f(h+10));
+    }
+    rows=built;cache.set(key,rows);
+  }
+  return rows[index];
 }
 
 export function mobRowAt(x: number, y: number, height: number, scroll: number, discovered: readonly number[] = []): number | undefined {
@@ -225,15 +240,22 @@ export function mobDropRect(type: number, index: number, height: number, discove
 }
 
 export function changelogEntries(): readonly { date: string; notes: readonly (readonly string[])[]; height: number }[] {
-  return CHANGELOG.map(entry => {
+  const cache=renderResources().layouts,key='changelog';
+  const cached=cache.get(key) as ReturnType<typeof changelogEntries> | undefined;
+  if(cached)return cached;
+  const result=CHANGELOG.map(entry => {
     // The native scroll area reserves 16 units, each entry 20, and the
     // bullet and multiline label each retain their six-unit outline margin.
     const notes = entry.notes.map(note => wrapMenuText(note, 14, 480 - 16 - 20 - measureLabel('-', 14) - 12));
     return { date: entry.date, notes, height: f(68 + notes.reduce((sum, lines) => f(sum + f(lines.length * f(19.6))), 0)) };
   });
+  cache.set(key,result);return result;
 }
 
 export function menuScrollMax(panel: MenuPanel, height: number, discoveredMobs: readonly number[] = []): number {
+  const cache=renderResources().layouts,key=`scroll:${panel}:${height}:${discoveredMobs.join(',')}`;
+  const cached=cache.get(key) as number|undefined;if(cached!==undefined)return cached;
+  const calculate=():number=>{
   if (panel === 'Petals') return Math.max(0, 10 * 70 + 10 - menuContentRect(panel, height).height);
   if (panel === 'Mobs') return Math.max(0, MOB_GALLERY_TYPES.reduce((sum, id) => f(sum + mobRowHeight(id, discoveredMobs.includes(id)) + 10), 0) - menuContentRect(panel, height).height);
   if (panel === 'Changelog') {
@@ -241,4 +263,6 @@ export function menuScrollMax(panel: MenuPanel, height: number, discoveredMobs: 
     return Math.max(0, f(changelogEntries().reduce((sum, entry) => f(sum + entry.height), 0) + f(14 * 1.4 + 10)) - content.height);
   }
   return 0;
+  };
+  const result=calculate();cache.set(key,result);return result;
 }

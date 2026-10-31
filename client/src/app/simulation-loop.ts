@@ -9,6 +9,12 @@ export class SimulationLoop {
     if (this.timer !== undefined) clearInterval(this.timer);
     this.timer = undefined;
   }
+  private commands:Uint8Array[]=[];
+  enqueue(packet:Uint8Array):void {
+    if(this.commands.length>=254) {this.app.session.fail(new Error('Too many pending commands'));return;}
+    this.commands.push(packet);
+  }
+  clearCommands():void {this.commands.length=0;}
   completedServerTicks: number;
   ticking: boolean;
   constructor(readonly app: GameApp) {
@@ -34,32 +40,28 @@ export class SimulationLoop {
       // advances exactly 50ms per completed think(), so even a stalled tab sends
       // one request at the engine's deadline. Retain it until a healthy body arrives.
       generation = this.app.session.generation;
+      const inputs=this.commands;this.commands=[];
+      let sentSpawn=false;
       if (this.app.session.started && this.app.session.pendingSpawn !== undefined && this.app.session.spawnSentTick === undefined
         && this.completedServerTicks >= this.app.session.nextSpawnTick
-        && ![...this.app.world.all()].some(entity => entity.kind === 1)) {
-        await this.app.server.send(this.app.session.pendingRestart ? this.app.inputEncoder.restart() : this.app.inputEncoder.spawn(this.app.session.pendingSpawn));
-        if (this.app.disposed || generation !== this.app.session.generation)
-          return;
-        this.app.session.spawnSentTick = this.completedServerTicks;
+        && !this.app.world.playerEntity()) {
+        inputs.push(this.app.session.pendingRestart ? this.app.inputEncoder.restart() : this.app.inputEncoder.spawn(this.app.session.pendingSpawn));
+        sentSpawn=true;
       }
       if (this.app.session.started && player !== null) {
         const { buttons, angle, strength } = this.app.input.intent();
-        await this.app.server.send(this.app.inputEncoder.input(buttons, angle, strength));
+        inputs.push(this.app.inputEncoder.input(buttons, angle, strength));
       }
       if (this.app.disposed || generation !== this.app.session.generation)
         return;
-      await this.app.server.think();
-      if (this.app.disposed)
-        return;
-      this.completedServerTicks += 1;
-      if (this.app.disposed || generation !== this.app.session.generation)
-        return;
-      await this.app.server.requestStream('sp_server_flush', undefined, packet => {
-        if (this.app.disposed || generation !== this.app.session.generation)
-          return;
-        if (!this.app.session.applyPacket(packet, performance.now()))
-          throw new Error('invalid server snapshot');
+      const tick=this.completedServerTicks;
+      await this.app.server.step(inputs, packet => {
+        if (this.app.disposed || generation !== this.app.session.generation) return;
+        if (!this.app.session.applyPacket(packet, performance.now())) throw new Error('invalid server snapshot');
       });
+      if (this.app.disposed) return;
+      this.completedServerTicks += 1;
+      if (sentSpawn && generation === this.app.session.generation) this.app.session.spawnSentTick=tick;
       if (this.app.disposed || generation !== this.app.session.generation)
         return;
       if (this.app.session.started && this.app.session.localPlayer() !== null) {

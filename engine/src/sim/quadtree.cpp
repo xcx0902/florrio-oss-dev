@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/sim/quadtree.hpp"
 #include <algorithm>
 
@@ -22,6 +23,7 @@ void QuadTree::set_location(std::size_t id, int node_index) {
 }
 
 void QuadTree::insert(std::size_t id, const Aabb& box) {
+  PERF_ADD(inserts, 1);
   if (id < location_.size() && location_[id] >= 0) remove(id);
   insert_at(0, id, box);
   ++size_;
@@ -115,6 +117,7 @@ void QuadTree::remove(std::size_t id) {
 }
 
 void QuadTree::update(std::size_t id, const Aabb& box) {
+  PERF_ADD(updates, 1);
   if (id < location_.size() && location_[id] >= 0) {
     Node& node = nodes_[static_cast<std::size_t>(location_[id])];
     if (path_for(box) == location_[id]) {
@@ -165,8 +168,10 @@ void QuadTree::compact_at(std::size_t node_index) {
 }
 
 void QuadTree::query(const Aabb& area, std::vector<std::size_t>& out) const {
+  PERF_ADD(queries, 1);
   out.clear();
   query_at(0, area, out);
+  PERF_ADD(candidates, out.size());
 }
 
 void QuadTree::query_at(std::size_t node_index, const Aabb& area,

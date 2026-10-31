@@ -26,6 +26,8 @@ std::size_t alert_nearby(World& world, EntityHandle attacker, f32 radius);
 /** Same selection with a caller-built spatial index (one rebuild per AI pass). */
 [[nodiscard]] EntityHandle find_target(const World& world, const SpatialQuery& query,
                                        EntityHandle seeker);
+[[nodiscard]] EntityHandle find_target(const World& world, const SpatialQuery& query,
+                                       EntityHandle seeker, std::vector<EntityHandle>& candidates);
 
 /** Original function 198: closest live player with an open carried-petal slot.
  * The current domain model has one player profile, so this selects the local

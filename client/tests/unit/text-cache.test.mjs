@@ -71,6 +71,20 @@ test('owner identity isolates identical labels; non-owner labels share by signat
   assert.equal(sharedA.canvas, sharedB.canvas);
 });
 
+test('LRU head/tail replacement and shared budgets retain exact costs and release the global oldest', async () => {
+  const {ResourceCache,CacheBudget}=await import('../../../build/client/render/resource-cache.js');
+  const budget=new CacheBudget(10),released=[];
+  const first=new ResourceCache(3,v=>v,budget,v=>released.push(v));
+  const second=new ResourceCache(3,v=>v,budget,v=>released.push(v));
+  first.set('a',3);first.set('b',3);second.set('c',3);
+  assert.equal(first.get('a'),3);second.set('d',3);
+  assert.equal(first.has('b'),false);assert.equal(budget.bytes,9);
+  first.set('a',1);assert.equal(budget.bytes,7);assert.deepEqual(released,[3]);
+  second.delete('c');first.delete('a');second.delete('d');
+  assert.equal(budget.bytes,0);assert.equal(first.oldest,Infinity);assert.equal(second.oldest,Infinity);
+  first.set('fresh',10);assert.equal(first.get('fresh'),10);first.clear();assert.equal(budget.bytes,0);
+});
+
 test('same owner and style reuses the bitmap without repainting; text/style changes dirty it', () => {
   cache.clearLabelCache();
   const owner = { ...base, cacheKey: 'leaderboard' };
@@ -152,4 +166,42 @@ test('without a canvas implementation getLabel is a clean null, not a crash', ()
   })`;
   const child = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8' });
   assert.equal(child.status, 0, child.stderr);
+});
+
+test('10000 dynamic owners release their bitmaps; shared raster and count budgets stay bounded', async () => {
+  const { RenderResources,withRenderResources }=await import('../../../build/client/render/resources.js');
+  const resources=new RenderResources({labels:32,owners:64,measurements:128,rasterBytes:128*1024});
+  withRenderResources(resources,()=>{
+    for(let i=0;i<10000;i++) {
+      const key=`dynamic:${i}`;
+      const label=cache.getLabel({text:`Drop ${i}`,font:13,rasterScale:2,cacheKey:key});
+      assert.ok(label);assert.equal(cache.releaseLabel(key),true);assert.equal(label.canvas.width,0);
+      cache.getLabel({text:`Shared ${i}`,font:13,rasterScale:2});
+      assert.ok(resources.rasterBudget.bytes<=128*1024);
+    }
+    assert.equal(resources.ownedLabels.size,0);assert.ok(resources.labels.size<=32);assert.ok(resources.measurements.size<=128);
+    assert.ok(resources.labels.evictions>0&&resources.measurements.evictions>0);
+    assert.equal(cache.getLabel({text:'x'.repeat(10000),font:100,rasterScale:10,cacheKey:'huge'}),null);
+    assert.equal(resources.ownedLabels.has('huge'),false);
+    resources.dispose();assert.equal(resources.rasterBudget.bytes,0);
+  });
+});
+
+test('LRU touches keep recent labels and menu wrap results survive scrolling until font reset', async () => {
+  const {RenderResources,withRenderResources}=await import('../../../build/client/render/resources.js');
+  const {wrapMenuText,mobRowRect,MOB_GALLERY_TYPES}=await import('../../../build/client/render/menu-layout.js');
+  const resources=new RenderResources({labels:2});
+  withRenderResources(resources,()=>{
+    const a=cache.getLabel({...base,text:'A'}),b=cache.getLabel({...base,text:'B'});
+    assert.equal(cache.getLabel({...base,text:'A'}),a);
+    cache.getLabel({...base,text:'C'});assert.equal(b.canvas.width,0);assert.ok(a.canvas.width>0);
+    const lines=wrapMenuText('This is a repeatable product menu paragraph.',14,150);
+    const measurements=resources.measurements.hits+resources.measurements.misses;
+    for(let i=0;i<100;i++)assert.equal(wrapMenuText('This is a repeatable product menu paragraph.',14,150),lines);
+    assert.equal(resources.measurements.hits+resources.measurements.misses,measurements);
+    const row=mobRowRect(4,720,MOB_GALLERY_TYPES);
+    assert.equal(mobRowRect(4,720,MOB_GALLERY_TYPES),row);
+    assert.notEqual(mobRowRect(4,800,MOB_GALLERY_TYPES),row);
+    cache.clearLabelCache();assert.equal(resources.layouts.size,0);
+  });
 });

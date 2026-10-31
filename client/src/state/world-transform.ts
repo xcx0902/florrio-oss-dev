@@ -5,15 +5,24 @@ import type { EntityState } from './world.js';
 
 /** Original760 tests interpolated collider bounds against a viewport expanded
  * by 100 world units on each side, independently of artwork dimensions. */
-export function isOutsideWorldViewport(x: number, y: number, radius: number,
-                                       camera: CameraState): boolean {
+export interface WorldViewportBounds { readonly left:number; readonly right:number; readonly top:number; readonly bottom:number; }
+/** Camera-only arithmetic is shared by every culling test in one frame. */
+export function worldViewportBounds(camera: CameraState): WorldViewportBounds {
   const f = Math.fround, zoom = f(camera.zoom);
   const width = f(camera.viewportWidth / zoom), height = f(camera.viewportHeight / zoom);
   const left = f(f(f(camera.x) + f(f(camera.viewportWidth * -0.5) / zoom)) - 100);
   const top = f(f(f(camera.y) + f(f(camera.viewportHeight * -0.5) / zoom)) - 100);
+  return {left,right:f(left + f(width + 200)),top,bottom:f(top + f(height + 200))};
+}
+export function isOutsideWorldBounds(x:number,y:number,radius:number,view:WorldViewportBounds):boolean {
+  const f = Math.fround;
   const bx = f(f(x) - radius), by = f(f(y) - radius), size = f(radius + radius);
-  return left > f(bx + size) || f(left + f(width + 200)) < bx
-    || top > f(by + size) || f(top + f(height + 200)) < by;
+  return view.left > f(bx + size) || view.right < bx
+    || view.top > f(by + size) || view.bottom < by;
+}
+export function isOutsideWorldViewport(x: number, y: number, radius: number,
+                                       camera: CameraState): boolean {
+  return isOutsideWorldBounds(x,y,radius,worldViewportBounds(camera));
 }
 
 /** Original409 constrains the controlled player's interpolated transform after

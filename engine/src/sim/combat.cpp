@@ -1,3 +1,4 @@
+#include "engine/core/perf.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/model/catalog.hpp"
 #include "engine/sim/ai.hpp"
@@ -28,14 +29,23 @@ f32 level_damage_scale(const World& world, EntityHandle first, EntityHandle seco
   return f32::from_double(std::min(1.0, std::max(0.0, value)));
 }
 }
+namespace {
+void collect_contact_bodies(World& world) {
+  auto& bodies = world.collision().bodies;
+  bodies.clear();
+  world.entities().with_ordered_slots([&](auto&& slots) {
+    for (auto& entity : slots) { PERF_ADD(visits, 1);
+      if (!entity.active || entity.health.value <= 0.0F || entity.kind == EntityKind::kDrop || entity.collision_radius.value <= 0.0F) continue;
+      bodies.push_back({entity.handle,&entity});
+    }
+  });
+}
+}
 void update_contact_tree(World& world) {
-  std::vector<Entity*> bodies;
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active || entity.health.value <= 0.0F) continue;
-    if (entity.kind == EntityKind::kDrop) continue;
-    if (entity.collision_radius.value <= 0.0F) continue;
-    bodies.push_back(&entity);
-  }
+  collect_contact_bodies(world);
+  auto& context = world.collision();
+  const auto& bodies = context.bodies;
+  context.prepared = true;
   auto box = [](const Entity& entity) {
     const float radius = entity.collision_radius.value;
     return Aabb{f32(entity.position.x.value - radius),
@@ -43,22 +53,26 @@ void update_contact_tree(World& world) {
                 f32(entity.position.x.value + radius),
                 f32(entity.position.y.value + radius)};
   };
-  std::vector<bool> present(kEntitySlotCount, false);
-  for (Entity* entity : bodies) {
-    const std::uint32_t slot = entity->handle.index();
-    if (slot < kEntitySlotCount) present[slot] = true;
+  auto& present = context.present;
+  for (auto slot : context.touched) present[slot] = false;
+  context.touched.clear();
+  for (const auto& body : bodies) {
+    const auto slot = body.handle.index();
+    present[slot] = true; context.touched.push_back(slot);
   }
   QuadTree& tree = world.collision().tree;
   const bool rebuild = world.collision().tick == std::numeric_limits<std::uint64_t>::max() || world.tick() != world.collision().tick + 1U;
   if (rebuild) {
     tree.clear();
-    for (Entity* entity : bodies) {
+    for (const auto& body : bodies) {
+      const Entity* entity = body.entity;
       const std::uint32_t slot = entity->handle.index();
       if (slot < kEntitySlotCount) tree.insert(slot, box(*entity));
     }
   } else {
     tree.remove_missing(present);
-    for (Entity* entity : bodies) {
+    for (const auto& body : bodies) {
+      const Entity* entity = body.entity;
       const std::uint32_t slot = entity->handle.index();
       if (slot < kEntitySlotCount) tree.update(slot, box(*entity));
     }
@@ -69,17 +83,11 @@ void update_contact_tree(World& world) {
 }
 
 std::size_t resolve_contacts(World& world) {
-  struct Body {
-    EntityHandle handle;
-    Entity* entity;
-  };
-  std::vector<Body> bodies;
-  for (auto& entity : world.entities().entities()) {
-    if (!entity.active || entity.health.value <= 0.0F) continue;
-    if (entity.kind == EntityKind::kDrop) continue;
-    if (entity.collision_radius.value <= 0.0F) continue;
-    bodies.push_back({entity.handle, &entity});
-  }
+  auto& context = world.collision();
+  if (context.tick != world.tick()) update_contact_tree(world);
+  else if (!context.prepared) collect_contact_bodies(world);
+  context.prepared = false;
+  const auto& bodies = context.bodies;
   std::size_t contacts = 0;
   // The original broad phase is a loose quadtree: a body descends into a
   // child only when its AABB is fully contained by that child, otherwise it
@@ -97,34 +105,36 @@ std::size_t resolve_contacts(World& world) {
     update_contact_tree(world);
   QuadTree& tree = world.collision().tree;
 
-  std::vector<int> body_by_slot(kEntitySlotCount, -1);
+  auto& body_by_slot = context.body_by_slot;
+  if (++context.stamp == 0) { context.stamps.fill(0); context.stamp = 1; }
   for (std::size_t index = 0; index < bodies.size(); ++index) {
     const std::uint32_t slot = bodies[index].handle.index();
     if (slot >= kEntitySlotCount) continue;
     body_by_slot[slot] = static_cast<int>(index);
+    context.stamps[slot] = context.stamp;
   }
-  std::vector<std::vector<std::size_t>> tree_order(bodies.size());
-  std::vector<std::size_t> candidates;
+  auto& candidates = context.candidates;
+  auto& pool = context.candidate_pool; pool.clear();
+  auto& offsets = context.offsets; offsets.clear(); offsets.push_back(0);
   for (std::size_t first = 0; first < bodies.size(); ++first) {
     tree.query(body_box(*bodies[first].entity), candidates);
 
     for (const std::size_t candidate : candidates) {
       if (candidate >= kEntitySlotCount) continue;
+      if (context.stamps[candidate] != context.stamp) continue;
       const int mapped = body_by_slot[candidate];
       if (mapped >= 0 && static_cast<std::size_t>(mapped) != first)
-        tree_order[first].push_back(static_cast<std::size_t>(mapped));
+        pool.push_back(static_cast<std::size_t>(mapped));
     }
+    offsets.push_back(pool.size());
   }
 
-  std::vector<std::size_t> order;
   for (std::size_t first = 0; first < bodies.size(); ++first) {
     // The original outer body loop checks health immediately before querying;
     // the body may have died after the initial broadphase snapshot.
     if (!bodies[first].entity->active || bodies[first].entity->health.value <= 0.0F) continue;
-    order.clear();
-    order = tree_order[first];
-
-    for (const std::size_t second : order) {
+    for (std::size_t cursor = offsets[first]; cursor < offsets[first + 1]; ++cursor) {
+      const std::size_t second = pool[cursor];
       if (second <= first) continue;
       Entity& a = *bodies[first].entity;
       Entity& b = *bodies[second].entity;
@@ -277,6 +287,7 @@ std::size_t resolve_contacts(World& world) {
                                         + normal_y * overlap * weight_b));
       }
       ++contacts;
+      PERF_ADD(contacts, 1);
       // The contact query returns 1 when its querying body dies,
       // aborting the remaining node/child traversal after this complete pair.
       if (a.health.value <= 0.0F) break;

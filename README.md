@@ -91,7 +91,7 @@ C ABI：
 ### `client/` — TypeScript + Canvas2D
 
 `client/static/index.html` 是入口；`client/static/server-worker.js` 加载
-`server.wasm` 并转发 `init/send/think/flush`。客户端解码稀疏快照，合并到
+`server.wasm`；主线程以一个 `step(inputs)` 完成有序 send→think→flush。客户端解码稀疏快照，合并到
 `WorldState`，再驱动插值、相机、世界与 HUD 渲染。
 
 ```
@@ -142,6 +142,7 @@ npm run build               # 完整交付树
 npm run verify:delivery     # 交付完整性
 npm run test:delivery       # dist-next 交付冒烟
 npm run test:all            # 全流程验收，写 reports/current-verification.json
+npm run test:m4             # 校验冻结基线 + 全流程 + 性能对比 + 30 分钟资源浸泡
 ```
 
 `test:all` 由唯一 gate 表执行 15 步验收，wasm/TS/交付各构建一次，所有后续检查绑定同一份

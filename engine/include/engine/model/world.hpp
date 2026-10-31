@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/core/perf.hpp"
 #include "engine/core/rng.hpp"
 #include "engine/model/entity_pool.hpp"
 #include "engine/model/world_records.hpp"
@@ -230,10 +231,11 @@ class World {
   /** R05 phase trace: the ordered system names executed by the last tick.
    * This is evidence for the phase-level comparison against spServerThink. */
   void record_phase(const char* phase) {
+    PERF_PHASE(phase);
     phase_trace_.push_back(phase);
     phase_draws_.push_back(random_.draws());
   }
-  void clear_phase_trace() { phase_trace_.clear(); phase_draws_.clear(); }
+  void clear_phase_trace() { PERF_START(); phase_trace_.clear(); phase_draws_.clear(); }
   [[nodiscard]] const std::vector<const char*>& phase_trace() const { return phase_trace_; }
   /** Cumulative server-RNG draw count at each recorded phase (diagnostics). */
   [[nodiscard]] const std::vector<std::uint32_t>& phase_draws() const { return phase_draws_; }
@@ -308,6 +310,7 @@ class World {
   std::vector<HitEvent> pending_hit_events_;
   std::set<std::uint32_t> known_entities_;
   std::vector<AreaEffect> area_effects_;
+  std::vector<EntityHandle> area_alive_, area_candidates_, area_added_, area_removed_;
   std::vector<DeferredLaunch> deferred_launches_;
   std::uint64_t deferred_sequence_ = 0;
   std::vector<std::uint64_t> last_launch_order_;

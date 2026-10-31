@@ -1,6 +1,6 @@
 import { mergeScalar } from './scalar.js';
 import type { DeathMetadata } from './snapshot-types.js';
-import { projectDeathMetadata, isController, hasDeathMetadata } from './snapshot-projection.js';
+import { playerLoadoutSlots,loadoutSlots, projectDeathMetadata, isController, hasDeathMetadata } from './snapshot-projection.js';
 import { BYTE_FIELDS,FLOAT_FIELDS } from './field-types.js';
 import { interpolateCameraTarget,interpolateEntity } from './interpolation.js';
 import type { Snapshot,SnapshotEvent } from './snapshot.js';
@@ -19,21 +19,45 @@ export class WorldState {
   private readonly entities = new Map<number, EntityState>();
   private sequence = 0;
   private playerHandle: number | undefined;
+  private controllerHandle:number|undefined;
+  private loadoutCache:{key:unknown;player:number;revision:number;slots:number[]}|undefined;
+  playerLoadout():number[] {
+    const player=this.playerEntity();if(!player)return [];
+    const key=player.byteArrayFields?.[60]??player.byteArrayField60??player.denseFields?.[60];
+    if(!this.loadoutCache||this.loadoutCache.player!==player.handle||this.loadoutCache.key!==key||this.loadoutCache.revision!==this.membershipRevision)
+      this.loadoutCache={key,player:player.handle,revision:this.membershipRevision,slots:playerLoadoutSlots(player)??loadoutSlots(this.all(),16)};
+    return this.loadoutCache.slots;
+  }
   private readonly byKind = new Map<number, Set<number>>();
   membershipRevision = 0;
+  lifetimeRevision=0;
+  renderOrderRevision=0;
+  discoveryRevision=0;
+  private membershipDirty=false;
+  private noteEntity(entity:import('./snapshot.js').EntitySnapshot,previous:EntityState|undefined):void {
+    if(!previous || entity.kind!==previous.kind || entity.typeId!==previous.typeId || isController(entity)!==isController(previous)) this.membershipDirty=true;
+    if(!previous || entity.kind!==previous.kind || entity.typeId!==previous.typeId || entity.speciesId!==previous.speciesId || entity.componentMask!==previous.componentMask) {
+      this.renderOrderRevision++;this.discoveryRevision++;
+    }
+  }
   private remove(handle: number): void {
     const entity = this.entities.get(handle);
     if (!entity) return;
     this.entities.delete(handle); this.byKind.get(entity.kind ?? entity.typeId)?.delete(handle);
     if (this.playerHandle === handle) this.playerHandle = undefined;
     this.hitTimes.delete(handle); this.visualEvents.delete(handle); this.collected.delete(handle);
-    this.membershipRevision++;
+    this.membershipRevision++;this.renderOrderRevision++;this.discoveryRevision++;
+    this.membershipDirty=true;
   }
   private indexMembership(): void {
+    if(!this.membershipDirty)return;
+    this.membershipDirty=false;
     const current = new Map<number, Set<number>>();
     let player: number | undefined;
+    this.controllerHandle=undefined;
     for (const entity of this.entities.values()) {
       const kind = entity.kind ?? entity.typeId;
+      if(this.controllerHandle===undefined&&isController(entity))this.controllerHandle=entity.handle;
       let set = current.get(kind); if (!set) current.set(kind, set = new Set()); set.add(entity.handle);
       if (kind === 1 && player === undefined) player = entity.handle;
     }
@@ -61,6 +85,7 @@ export class WorldState {
     for (const entity of snapshot.entities) {
       seen.add(entity.handle);
       const previous = this.entities.get(entity.handle);
+      this.noteEntity(entity,previous);
       this.entities.set(entity.handle, {
         ...entity,
         // Synthetic traces apply at clock 0; treat those as already settled so
@@ -191,7 +216,7 @@ export class WorldState {
       const radius = entity.radius ?? previous?.radius;
       const speciesId = entity.speciesId ?? previous?.speciesId;
       const typeId = kind ?? (entity.typeId !== 0 ? entity.typeId : (previous?.typeId ?? entity.typeId));
-      this.entities.set(entity.handle, {
+      const merged:EntityState = {
         ...entity,
         firstSeenAt: previous?.firstSeenAt ?? (now > 0 ? now : Number.NEGATIVE_INFINITY),
         arrivalMarked: previous?.arrivalMarked ?? ((entity.flags & 128) !== 0),
@@ -248,7 +273,9 @@ export class WorldState {
         receivedAngleAt: hasAngle ? now : (previous?.receivedAngleAt ?? previous?.receivedAt ?? now),
         receivedRadiusAt: hasRadius ? now : (previous?.receivedRadiusAt ?? previous?.receivedAt ?? now),
         receivedAt: now,
-      });
+      };
+      this.noteEntity(merged,previous);
+      this.entities.set(entity.handle,merged);
       if (kind === 1) this.controlledCamera = this.entities.get(entity.handle);
     }
     this.indexMembership();
@@ -276,8 +303,10 @@ export class WorldState {
 
   /** Clear all client-side state (used when replacing a product fixture or session). */
   reset(): void {
+    this.lifetimeRevision++;
     this.entities.clear();
     this.byKind.clear(); this.playerHandle = undefined; this.membershipRevision++;
+    this.membershipDirty=false;this.controllerHandle=undefined;this.loadoutCache=undefined;this.renderOrderRevision++;this.discoveryRevision++;
     this.chatLines.length = 0;
     this.visualEvents.clear();
     this.hitTimes.clear();
@@ -293,9 +322,9 @@ export class WorldState {
   /** The controller record is the only entity carrying field 56 (viewer
    * handle); its death fields remain after the controlled body is removed. */
   controller(): EntityState | undefined {
-    for (const entity of this.entities.values())
-      if (isController(entity))
-        return entity;
+    if(this.controllerHandle!==undefined) {
+      const controller=this.entities.get(this.controllerHandle);if(controller)return controller;
+    }
     // The original controller storage record is not a gameplay entity. A
     // few snapshots merge its profile fields onto the controlled body when
     // both records use the same wire slot; keep that body usable as the
@@ -316,6 +345,7 @@ export class WorldState {
     for (const entity of this.entities.values())
       if (!this.collected.has(entity.handle)) yield entity;
   }
+  isRenderable(handle:number):boolean {return this.entities.has(handle)&&!this.collected.has(handle);}
   get count(): number { return this.entities.size; }
   /** Original event14 marks the pickup visual as owned by its HUD transfer. */
   markCollected(handle: number): void { this.collected.add(handle); }

@@ -125,10 +125,8 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
   const outline = spec.outline ?? DEFAULT_OUTLINE;
   const fill = spec.fill ?? '#FFFFFF';
   const stroke = spec.stroke ?? '#000000';
-  const signature = `${spec.text}\u0000${spec.font}\u0000${outline}\u0000`
-    + `${fill}\u0000${stroke}\u0000${spec.cacheWidth ?? ''}`;
-  const key = `${signature}\u0000${spec.rasterScale}`;
   const owned = spec.cacheKey === undefined ? undefined : renderResources().ownedLabels.get(spec.cacheKey);
+  let key: string | undefined;
   if (spec.cacheKey !== undefined) {
     // func444 compares the projected (2 * transform) scale with the stored
     // raster scale (projected * 1.2), before adding the oversampling margin.
@@ -136,8 +134,12 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
     // the requested string happens to exist elsewhere in the cache.
     const projected = Math.fround(spec.projectedScale ?? spec.rasterScale / 1.2);
     const ratio = owned && Math.fround(projected / owned.rasterScale);
-    if (owned?.signature === signature && ratio !== undefined && ratio <= 1.0001 && ratio >= 0.4) return owned.label;
+    const style = owned?.style;
+    if (style?.text === spec.text && style.font === spec.font && style.outline === outline
+        && style.fill === fill && style.stroke === stroke && style.cacheWidth === spec.cacheWidth
+        && ratio !== undefined && ratio <= 1.0001 && ratio >= 0.4) return owned!.label;
   } else {
+    key = `${spec.text}\u0000${spec.font}\u0000${outline}\u0000${fill}\u0000${stroke}\u0000${spec.cacheWidth ?? ''}\u0000${spec.rasterScale}`;
     const cached = renderResources().labels.get(key);
     if (cached) return cached;
   }
@@ -152,6 +154,12 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
   const width = Math.max(1, spec.cacheWidth ?? Math.trunc(rasterWidth + Math.fround(pixelMargin + pixelMargin)));
   const height = Math.max(1, Math.trunc(fontPixels * 1.4));
 
+  const resources = renderResources();
+  if (width > resources.budgets.maxRasterDimension || height > resources.budgets.maxRasterDimension
+      || width * height * 4 > resources.budgets.rasterBytes) {
+    if (spec.cacheKey !== undefined) releaseLabel(spec.cacheKey);
+    return null; // direct text fallback retains font, outline and logical size
+  }
   const canvas = owned?.canvas ?? createRasterCanvas(width, height);
   if (!canvas) return null;
   if (owned) { canvas.width = width; canvas.height = height; }
@@ -180,8 +188,11 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
     margin,
   };
   if (spec.cacheKey !== undefined) {
-    renderResources().ownedLabels.set(spec.cacheKey, { signature, rasterScale: Math.fround(spec.rasterScale), canvas, label });
-  } else renderResources().labels.set(key, label);
+    renderResources().ownedLabels.set(spec.cacheKey, {
+      style: { text: spec.text, font: spec.font, outline, fill, stroke, cacheWidth: spec.cacheWidth },
+      rasterScale: Math.fround(spec.rasterScale), canvas, label,
+    });
+  } else renderResources().labels.set(key!, label);
   return label;
 }
 
@@ -274,4 +285,8 @@ export function clearLabelCache(): void {
   renderResources().labels.clear();
   renderResources().ownedLabels.clear();
   renderResources().measurements.clear();
+  renderResources().layouts.clear();
+  const panel=renderResources().panelSurface;
+  if(panel){panel.canvas.width=0;panel.canvas.height=0;}
+  renderResources().panelSurface = undefined;
 }

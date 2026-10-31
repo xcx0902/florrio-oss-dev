@@ -98,8 +98,10 @@ export class MenuControls {
     store('florrio_movement_helper', this.movementHelper ? '1' : '0');
   }
   get petalDiscoveryCount(): number { return this.discoveries.size; }
-  get discoveredPetals(): readonly number[] { return [...this.discoveries].sort((a, b) => a - b); }
-  get discoveredMobs(): readonly number[] { return [...this.mobs].sort((a, b) => a - b); }
+  private petalView:readonly number[]|undefined;
+  private mobView:readonly number[]|undefined;
+  get discoveredPetals(): readonly number[] { return this.petalView??=([...this.discoveries].sort((a, b) => a - b)); }
+  get discoveredMobs(): readonly number[] { return this.mobView??=([...this.mobs].sort((a, b) => a - b)); }
   discover(petals: readonly number[], mobs: readonly (readonly [number, string])[]): void {
     let changed = false;
     for (const type of petals) if (Number.isInteger(type) && type > 0 && PETAL_INFO[type] && !this.discoveries.has(type)) {
@@ -108,7 +110,7 @@ export class MenuControls {
     for (const [type] of mobs) if (Number.isInteger(type) && type > 0 && MOB_INFO[type] && !this.mobs.has(type)) {
       this.mobs.add(type); changed = true;
     }
-    if (changed) this.save();
+    if (changed) {this.petalView=undefined;this.mobView=undefined;this.save();}
   }
   show(visible: boolean): void {
     if (this.visible === visible) return;

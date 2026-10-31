@@ -51,3 +51,22 @@ test('worker client forwards intermediate packets', async () => {
   ]);
   assert.deepEqual(result.final, [3]);
 });
+
+test('one atomic step preserves send, think, flush packet order and enforces backpressure', async()=>{
+  const page=await browser.newPage();
+  try {
+    await page.goto(origin+'/index.html?test=1',{waitUntil:'load'});
+    const result=await page.evaluate(async()=>{
+      const {ServerWorkerClient}=await import('/net/worker.js');
+      const {InputPacketEncoder}=await import('/net/input.js');
+      const client=new ServerWorkerClient(),encoder=new InputPacketEncoder();
+      await client.init();const packets=[];
+      const first=client.step([encoder.spawn('Step')],p=>packets.push([...p]));
+      let refused=false;try{await client.step([],()=>{});}catch{refused=true;}
+      await first;const pending=client.pendingCount;
+      const second=[];await client.step([encoder.input(1,0,100)],p=>second.push([...p]));
+      client.terminate();return {packets:packets.length,second:second.length,pending,refused,after:client.pendingCount};
+    });
+    assert.deepEqual(result,{packets:1,second:1,pending:0,refused:true,after:0});
+  } finally {await page.close();}
+});

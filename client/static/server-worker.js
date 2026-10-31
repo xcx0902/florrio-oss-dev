@@ -1,9 +1,7 @@
-/** Product worker: current C ABI, automatic 50ms clock or explicit manual ticks. */
+/** Product worker: the main-thread loop owns the only 50ms clock. */
 let modulePromise = null;
 let wasmMemory = null;
-let tickTimer = null;
-const parameters = new URL(self.location.href).searchParams;
-const manualTick = parameters.has('manual');
+const diagnostics = new URL(self.location.href).searchParams.has('perf');
 
 
 const wasi = {
@@ -35,17 +33,6 @@ async function instantiate() {
   return modulePromise;
 }
 
-function startTicking(exports) {
-  if (manualTick || tickTimer !== null) return;
-  tickTimer = setInterval(() => {
-    try {
-      exports.sp_server_think();
-    } catch (error) {
-      self.postMessage({ callbackId: -1, finalResponse: true, data: 0, error: String(error) });
-    }
-  }, 50);
-}
-
 function postOutput(exports, callbackId) {
   const count = exports.sp_server_output_count();
   let posted = 0;
@@ -60,8 +47,9 @@ function postOutput(exports, callbackId) {
   return posted;
 }
 
-self.onmessage = async event => {
-  const { funcName, callbackId, data } = event.data ?? {};
+async function handle(event) {
+  const { funcName, callbackId, data, inputs } = event.data ?? {};
+  const timing = diagnostics ? {receivedAt:performance.timeOrigin+performance.now()} : undefined;
   try {
   const exports = await instantiate();
   let pointer = 0;
@@ -75,9 +63,27 @@ self.onmessage = async event => {
     new Uint8Array(exports.memory.buffer).set(bytes, pointer);
   }
   switch (funcName) {
+    case 'step': {
+      if (!Array.isArray(inputs) || inputs.length > 256 || inputs.some(packet => !(packet instanceof Uint8Array))) throw new Error('invalid step inputs');
+      for (const bytes of inputs) {
+        let inputPointer=0;
+        try {
+          inputPointer=exports.malloc(bytes.length);
+          if(bytes.length&&!inputPointer)throw new Error('Worker input allocation failed');
+          new Uint8Array(exports.memory.buffer,inputPointer,bytes.length).set(bytes);
+          exports.sp_server_send(inputPointer,bytes.length);
+        } finally {if(inputPointer)exports.free(inputPointer);}
+      }
+      const before=diagnostics?performance.now():0;
+      exports.sp_server_think();
+      if(timing)timing.thinkMs=performance.now()-before;
+      exports.sp_server_flush();
+      postOutput(exports,callbackId);
+      if(timing) {timing.entityCount=exports.sp_server_entity_count();timing.linearMemoryBytes=exports.memory.buffer.byteLength;}
+      break;
+    }
     case 'sp_server_init':
       exports.sp_server_init();
-      startTicking(exports);
       break;
     case 'sp_server_send': exports.sp_server_send(pointer, length); break;
     case 'sp_server_think': exports.sp_server_think(); break;
@@ -110,8 +116,11 @@ self.onmessage = async event => {
   }
   } finally { if (pointer) exports.free(pointer); }
   if (funcName === 'sp_server_flush') postOutput(exports, callbackId);
-  self.postMessage({ callbackId, finalResponse: true, data: 0 });
+  if(timing)timing.completedAt=performance.timeOrigin+performance.now();
+  self.postMessage({ callbackId, finalResponse: true, data: 0, ...(timing?{timing}:{}) });
   } catch (error) {
     self.postMessage({ callbackId, finalResponse: true, data: 0, error: String(error) });
   }
-};
+}
+let requests=Promise.resolve();
+self.onmessage=event=>{requests=requests.then(()=>handle(event));};

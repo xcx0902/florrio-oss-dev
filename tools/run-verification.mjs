@@ -29,7 +29,7 @@ async function execute(gate, index) {
   console.log(`[${runId}] ${gate.name}`);
   const logfile = path.join(folder, `${String(index).padStart(2, '0')}.log`), log = await open(logfile, 'wx');
   try {
-    active = startProcess(command, args, { env, stdio: ['ignore', 'pipe', 'pipe'] });
+    active = startProcess(command, args, { env, timeoutMs: gate.timeoutMs, stdio: ['ignore', 'pipe', 'pipe'] });
     active.child.stdout.pipe(process.stdout, { end: false }); active.child.stderr.pipe(process.stderr, { end: false });
     // A single file stream preserves stdout/stderr order as observed by the parent.
     const chunks = []; active.child.stdout.on('data', data => chunks.push(data)); active.child.stderr.on('data', data => chunks.push(data));
