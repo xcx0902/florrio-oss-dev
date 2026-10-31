@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "description": "M00 native dependency contract; root CMake consumes this lock starting in M01. No download occurs in M00.",
+  "dependencies": {
+    "boost": {
+      "version": "1.86.0",
+      "url": "https://archives.boost.io/release/1.86.0/source/boost_1_86_0.tar.bz2",
+      "sha256": "1bed88e40401b2cb7a1f76d4bab499e352fa4d0c5f31c0dbae64e24d34d7513b",
+      "checksumSource": "https://archives.boost.io/release/1.86.0/source/boost_1_86_0.tar.bz2.json",
+      "upstreamCommit": "65c1319bb92fe7a9a4abd588eff5818d9c2bccf9",
+      "license": "BSL-1.0",
+      "licenseFile": "LICENSE_1_0.txt",
+      "components": [
+        "asio",
+        "beast",
+        "system"
+      ],
+      "linkTargets": [
+        "florr_boost_headers",
+        "Threads::Threads"
+      ],
+      "acquisition": "CMake URL with URL_HASH SHA256; optionally preseed the identical archive for offline builds; never latest or system-version fallback",
+      "usage": "header-only Asio/Beast/System; project-owned INTERFACE headers target; official archive is not a Boost CMake source tree",
+      "expectedBoostVersion": 108600
+    }
+  }
+}

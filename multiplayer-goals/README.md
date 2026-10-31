@@ -1,6 +1,6 @@
 # 多人联机 PVP 执行计划
 
-> 创建日期：2026-10-31（Asia/Shanghai）。目标路线：原生 C++ 服务端链接 `engine_core`，浏览器通过 WebSocket 收发输入和快照。本文档集是实施计划，所有里程碑初始状态均为「未开始」；先前可行性实验不等于多人功能已完成。
+> 创建日期：2026-10-31（Asia/Shanghai）。目标路线：原生 C++ 服务端链接 `engine_core`，浏览器通过 WebSocket 收发输入和快照。本文档集是实施计划，阶段实际状态见 [执行清单](CHECKLIST.md)；先前可行性实验不等于多人功能已完成。
 
 ## 1. 最终交付
 
@@ -72,28 +72,9 @@ florr_server
 
 ## 5. 第一版参数基准
 
-这些是计划采用的初始值，M00 写入正式配置说明，M05 落到 `server/config/default.json`，M08 按实测复核。定义在同一处，其他代码引用，不散布常量。
+M00 已将唯一初始参数表固定到 [配置契约](../docs/multiplayer/configuration.md)。该契约保留本计划的 50ms 步长、2 人默认准入、2×8 容量验收目标、输入 TTL、grace、尸体/出生时序和队列上限，并补齐 M04/M05 消费前所需的有限传输参数。M05 才落地 `server/config/default.json`；M08 按实测复核，不把容量目标当成已实现能力。
 
-| 参数 | 初始目标 | 解释 |
-| --- | --- | --- |
-| `tickMs` | 50ms | 固定 20Hz 模拟；网络快慢不改变 dt |
-| `snapshotEveryTicks` | 1 | 首版每 tick 对每个已加入连接发布 |
-| `inputSendMs` | 50ms | 浏览器定时上报当前意图，不等快照回应 |
-| `initialMaxPlayersPerRoom` | 2 | 通过 8 人容量验收后配置提升 |
-| `certificationPlayersPerRoom` | 8 | 测试目标，不预先声称已支持 |
-| `certificationRooms` | 2 | 测试独立房间并存与互不影响 |
-| `inputTtlTicks` | 5 | 连续 250ms 无新移动输入后清零移动/攻击/防御 |
-| `reconnectGraceTicks` | 200 | 10 秒重连保留；身体仍可受伤，输入失效归零 |
-| `emptyRoomTtlTicks` | 1200 | 无活跃或保留玩家后 60 秒回收房间 |
-| `maxCatchupTicks` | 4 | 每轮调度最多补 4 tick；过载必须计数并触发准入限制 |
-| `spawnCooldownTicks` | 50 | 沿用成功出生后 2500ms 门槛 |
-| `corpseTicks` | 20 | 沿用 1000ms 尸体窗口 |
-| `nicknameMaxUtf8Bytes` | 128 | 同时限制 32 个 Unicode 码点；禁止控制字符 |
-| `maxClientFrameBytes` | 4096 | 新网络输入帧上限；不继承旧 Worker 的 64KiB 容限 |
-| `maxQueuedWriteBytes` | 1MiB/连接 | 初始内存上限；超限断开慢连接，不能盲丢增量 |
-| `maxQueuedCommands` | 128/连接 | 离散指令队列上限；移动只保留最新状态 |
-
-传输速率、握手超时、心跳、全量快照上限和命令突发桶在 M04/M05 定义为可测参数；必须在实现其消费者前完成，不留运行时无限默认值。
+参数调整必须注明玩法规则、容量实测或连接保护类别；其他文档引用配置契约，避免复制常量形成多处事实来源。架构决策见 [ADR 0002](../docs/adr/0002-native-authoritative-multiplayer.md)，已实现与计划入口见 [测试与路径交接](../docs/multiplayer/testing.md)。
 
 ## 6. 完成定义
 
@@ -107,4 +88,4 @@ florr_server
 
 ## 7. 实施时的状态声明
 
-本目录先于实现提交。文中的新文件、API、npm 命令、报告和部署包均为「计划新增」，不是当前仓库已具备的能力。变更时只更新真实完成的部分，不把计划命令复制进现有 README 当成可用指令。
+本目录先于实现提交。M00 已实现的证据与回归入口见基线记录；M01—M08 的新文件、API、npm 命令、报告和部署包仍为「计划新增」，不是当前仓库已具备的联机能力。变更时只更新真实完成的部分，不把计划命令复制进产品 README 当成可用指令。
