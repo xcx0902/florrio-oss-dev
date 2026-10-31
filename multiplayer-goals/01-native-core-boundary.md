@@ -24,7 +24,7 @@ server/tests/                     # 原生宿主测试
 1. 将当前 `sources.cmake` 拆成具有唯一来源的 `ENGINE_CORE_SOURCES` 与 `ENGINE_WORKER_ADAPTER_SOURCES`。从核心源表移出 `src/net/worker_api.cpp`、`src/wasm/abi.cpp`、`src/diagnostics/commands.cpp`；先检查所有消费者，再修改链接关系。
 2. 若 `SnapshotPublisher` 仍依赖单玩家 World，先保留其领域位置，不在此阶段重写；M04 再改接口。此阶段禁止引入服务器网络头到 engine。
 3. 把诊断中可复用的实体修改实现与 C ABI thunk 分开。测试若需要域内诊断，接收显式 World；只有离线适配层可调用 `current_worker_api()`。
-4. 为 CMake 新增适配器 target。将现有 11 个 CTest 和 native snapshot fixture 逐一链接到其真实依赖；不能让所有测试为省事继续从 engine_core 获得隐藏全局入口。
+4. 为 CMake 新增适配器 target。将现有 12 个 CTest（含 M00 单玩家基线） 和 native snapshot fixture 逐一链接到其真实依赖；不能让所有测试为省事继续从 engine_core 获得隐藏全局入口。
 5. 更新 Emscripten target，使其显式包含适配器并继续使用 `abi-exports.json`。静态库 dead-strip 下仍能导出所需 ABI；按实际构建验证，不靠头文件存在推断。
 6. 新增根 CMake，在根目录先启用 CTest/`enable_testing()`，`add_subdirectory(engine)` 后再加入 `server`，同时保证原有 `cmake -S engine -B build/engine` 不依赖根构建。两种入口的 CTest 注册不得遗漏或重复。
 7. 新增最小 `florr_server`：支持 `--help`、`--version`、配置解析失败退出码；使用显式 World 初始化并进行有限 tick 的 smoke 模式。尚未接网络时只提供 `--smoke-ticks N`，不要运行一个没有测试出口的无限主循环。

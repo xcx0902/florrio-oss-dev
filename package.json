@@ -32,7 +32,8 @@
     "verify:delivery": "node tools/verify-dist-next.mjs",
     "release:prepare": "node tools/prepare-release.mjs",
     "perf:engine": "node tools/perf-engine.mjs",
-    "perf:integration": "node tools/perf-integration.mjs"
+    "perf:integration": "node tools/perf-integration.mjs",
+    "test:multiplayer:baseline": "npm run build:engine && node tools/multiplayer-baseline.mjs"
   },
   "devDependencies": {
     "playwright-core": "^1.49.1",

@@ -35,7 +35,8 @@
       "client/tests/integration/worker-rpc.test.mjs"
     ],
     "integration": [
-      "tests/integration/native-snapshot.test.mjs"
+      "tests/integration/native-snapshot.test.mjs",
+      "tests/integration/single-player-baseline.test.mjs"
     ],
     "delivery": [
       "client/tests/integration/worker-browser.test.mjs",
@@ -60,7 +61,8 @@
         "engine_passives_pets_tests",
         "engine_peer_visibility_tests",
         "engine_pickup_arrival_tests",
-        "engine_structure_tests"
+        "engine_structure_tests",
+        "engine_single_player_baseline_tests"
       ]
     }
   }

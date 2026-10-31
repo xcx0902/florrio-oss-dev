@@ -61,7 +61,7 @@ npm run build               # schema + wasm + TS + dist-next/
 ```sh
 npm run test:unit           # protocol/wire unit tests
 npm run test:tools          # delivery and verification tool tests
-npm run test:engine         # native build + 11 CTest targets
+npm run test:engine         # native build + 12 CTest targets
 npm run test:client         # typecheck + client unit/integration suites
 npm run test:integration    # native WorkerApi fixture -> TS decoder
 npm run build:dist-next     # packaged delivery tree

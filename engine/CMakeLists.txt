@@ -100,6 +100,13 @@ target_link_libraries(engine_structure_tests PRIVATE engine_core)
 target_compile_options(engine_structure_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
 add_test(NAME engine_structure_tests COMMAND engine_structure_tests)
 
+# M00: explicit seeded domain evidence; no object-memory/padding comparison.
+add_executable(engine_single_player_baseline_tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/../tests/fixtures/product/multiplayer/single_player_baseline.cpp)
+target_link_libraries(engine_single_player_baseline_tests PRIVATE engine_core)
+target_compile_options(engine_single_player_baseline_tests PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
+add_test(NAME engine_single_player_baseline_tests COMMAND engine_single_player_baseline_tests)
+
 endif()
 
 # A separate instrumented library never enters the delivery's hot path or ABI.

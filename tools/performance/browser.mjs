@@ -54,6 +54,18 @@ async function prepare(page,origin) {
     const sort=Array.prototype.sort;Array.prototype.sort=function(...args){if(this.length>10)m.sorts++;return sort.apply(this,args);};
   });
 }
+// The live 50ms scheduler can start another step as soon as respawn is visible.
+// Stop new work after measurement/lifecycle, then observe the actual drain.
+// A stuck request still times out and fails acceptance; never substitute zero.
+export async function freezeAndDrain(page) {
+  await page.evaluate(()=>window.__florr.freeze());
+  await page.waitForFunction(()=>window.__florr.performanceState().pending===0,null,{timeout:10000});
+  return page.evaluate(()=>{
+    const app=window.__florr;
+    if(app.ui.status)throw new Error(`Worker drain failed: ${app.ui.status}`);
+    return app.performanceState().pending;
+  });
+}
 export async function browserWorkloads({root,frames=600,repeats=5,integration=false,profiles=['desktop','retina','touch'],scenarios=['moving-camera','visible-text-drops','gallery','death-transition']}) {
   const fixture=await startTestServer(root,{diagnostics:true}), browser=await launchBrowser({args:['--no-first-run','--disable-background-networking','--enable-precise-memory-info']});
   const results=[],errors=[];
@@ -120,7 +132,7 @@ export async function browserWorkloads({root,frames=600,repeats=5,integration=fa
             await page.waitForFunction(()=>!window.__florr.ui.started,null,{timeout:10000});
             await page.keyboard.press('Enter');
             await page.waitForFunction(()=>window.__florr.world.healthyPlayer(),null,{timeout:15000});
-            result.lifecycle={equipment:true,died:true,respawned:true,pending:await page.evaluate(()=>window.__florr.performanceState?.().pending??null)};
+            result.lifecycle={equipment:true,died:true,respawned:true,pending:await freezeAndDrain(page)};
           }
           runs.push({...result,frameMs:distribution(result.intervals),renderCpuMs:distribution(result.cpu),decodeMs:result.decode.length?distribution(result.decode):null,applyMs:result.apply.length?distribution(result.apply):null});
           console.log(`${integration?'integration':'renderer'}/${profile}/${scenario} ${repeat+1}/${repeats}: CPU p95 ${runs.at(-1).renderCpuMs.p95.toFixed(3)} ms`);

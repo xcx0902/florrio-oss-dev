@@ -1,7 +1,7 @@
 # Product fixtures
 
 These fixtures are committed product inputs, not archived evidence. No test
-reads `archive/`, old Git commits, an original WASM build or a historical golden
+reads `archive/`, old Git commits, an original WASM build or an archived oracle golden
 at runtime.
 
 ## Protocol vectors
@@ -44,6 +44,24 @@ applies them to `WorldState`, and checks player default inventory, mob, chat
 event and deletion plus a failed truncated decode that does not poison the next
 packet. A separate assertion decodes the fourth packet and requires species
 `255`; `256` is rejected by schema validation before generation.
+
+## M00 single-player domain baseline
+
+`multiplayer/single_player_baseline.cpp` is the registered native
+`engine_single_player_baseline_tests` target. It records seven seeded domain
+checkpoints through real Worker commands and the shared damage/death API:
+spawn, ten movement ticks, mob combat, death, corpse expiry, the blocked spawn
+at 2450ms and successful respawn at 2500ms. The game seeds are 285456437 and
+then 47 for death; the independent death shuffle uses seed 1.
+
+`multiplayer/single-player.expected.json` freezes values observed from the
+current native product in M00, not an archived/original-WASM replay. Entity
+rows declare their columns and contain explicit fields, with f32 bits and u64
+RNG state strings; no C++ object addresses or padding enter the fixture.
+`tests/integration/single-player-baseline.test.mjs` compares two fresh process
+runs to the full fixture. The recorder `npm run test:multiplayer:baseline`
+never rewrites this expectation. See `docs/multiplayer/baseline.md` for source
+identity, raw reports and the controlled profile injection before death.
 
 ## Update policy
 

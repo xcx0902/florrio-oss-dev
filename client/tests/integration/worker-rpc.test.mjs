@@ -2,9 +2,54 @@
 import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { browser, origin, start, stop } from '../support/worker-fixture.mjs';
+import { freezeAndDrain } from '../../../tools/performance/browser.mjs';
 
 before(start);
 after(stop);
+
+async function delayWorkerStep(page,error=null) {
+    await page.addInitScript(error=>{
+      const NativeWorker=window.Worker;
+      window.Worker=class extends NativeWorker {
+        postMessage(message,transfer) {
+          if(window.__delayNextStep&&message.funcName==='step') {
+            window.__delayNextStep=false;window.__stepDelayed=true;
+            setTimeout(()=>{
+              if(error)this.dispatchEvent(new MessageEvent('message',{data:{callbackId:message.callbackId,finalResponse:true,error}}));
+              else super.postMessage(message,transfer??[]);
+            },300);
+          } else super.postMessage(message,transfer??[]);
+        }
+      };
+    },error);
+    await page.goto(origin+'/index.html?test=1',{waitUntil:'load'});
+    await page.waitForFunction(()=>window.__florr);
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(()=>window.__florr.world.healthyPlayer()
+      &&window.__florr.ui.status===''&&window.__florr.performanceState().pending===0);
+    await page.evaluate(()=>{window.__delayNextStep=true;});
+    await page.waitForFunction(()=>window.__stepDelayed&&window.__florr.performanceState().pending===1);
+}
+
+test('performance teardown drains an outstanding real Worker step before sampling pending', async()=>{
+  const page=await browser.newPage();
+  try {
+    await delayWorkerStep(page);
+    assert.equal(await freezeAndDrain(page),0);
+    // More than one scheduling interval proves the producer remains frozen.
+    await page.waitForTimeout(100);
+    assert.equal(await page.evaluate(()=>window.__florr.performanceState().pending),0);
+  } finally {await page.close();}
+});
+
+test('performance teardown rejects a failed Worker completion instead of reporting a successful drain', async()=>{
+  const page=await browser.newPage();
+  try {
+    await delayWorkerStep(page,'injected step failure');
+    await assert.rejects(freezeAndDrain(page),/Worker drain failed: injected step failure/);
+    assert.equal(await page.evaluate(()=>window.__florr.performanceState().pending),0);
+  } finally {await page.close();}
+});
 
 test('engine worker responds to init/think/flush', async () => {
   const page = await browser.newPage();
