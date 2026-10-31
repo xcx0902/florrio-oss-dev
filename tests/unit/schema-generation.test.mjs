@@ -10,6 +10,7 @@ import { loadSchemaInputs, SCHEMA_INPUTS } from '../../tools/schema/load.mjs';
 import { validateInputs } from '../../tools/schema/validate.mjs';
 import { validateTransport, applyPacketXor } from '../../tools/schema/transport.mjs';
 import { deriveDropChances, validateDropInputs } from '../../tools/schema/drop-chances.mjs';
+import { applyGalleryOverrides } from '../../tools/schema/catalogs.mjs';
 import { parseChangelog, generateMenuContent } from '../../tools/schema/menu.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -175,6 +176,33 @@ test('drop derivation is deterministic and keeps the product reference mass and 
   assert.equal(derived.entities.reduce((sum, entity) => sum + entity.drops.length, 0), 102);
   assert.deepEqual(derived.entities.find(entity => entity.typeId === 16).drops,
     derived.entities.find(entity => entity.typeId === 15).drops);
+});
+
+test('mob gallery shows drops in descending chance order with or without overrides', async () => {
+  const inputs = await loadSchemaInputs(root);
+  const derived = deriveDropChances({
+    entities: inputs.entities.entities,
+    spawnRules: inputs.spawnRules.rules,
+    petals: inputs.petals.petals,
+    rules: inputs.dropRules,
+  });
+  const before = structuredClone(derived);
+  for (const overrides of [[], [{ typeId: 1, replaceDrops: [
+    { petalTypeId: 4, chance: .1 },
+    { petalTypeId: 2, chance: .8 },
+    { petalTypeId: 3, chance: .8 },
+  ] }]]) {
+    const gallery = applyGalleryOverrides(derived, overrides, inputs.entities.entities);
+    assert.deepEqual(gallery.find(entity => entity.typeId === 1).drops.map(drop => drop.petalTypeId),
+      overrides.length ? [2, 3, 4] : [3, 2, 4]);
+    for (const entity of gallery) {
+      for (let index = 1; index < entity.drops.length; index++) {
+        assert.ok(entity.drops[index - 1].chance >= entity.drops[index].chance,
+          `entity ${entity.typeId} gallery drops must be ordered from highest to lowest chance`);
+      }
+    }
+  }
+  assert.deepEqual(derived, before, 'gallery ordering must not change runtime drop tables');
 });
 
 test('drop aliases resolve through a chain regardless of input order', async () => {

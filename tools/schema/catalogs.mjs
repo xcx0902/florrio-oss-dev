@@ -315,6 +315,9 @@ export function applyGalleryOverrides(derived, overrides, entities) {
     }
     if (override.replaceDrops !== undefined) entry.drops = override.replaceDrops.map(drop => ({ ...drop }));
     if (override.addDrops !== undefined) entry.drops.push(...override.addDrops.map(drop => ({ ...drop })));
+  }
+  // Every gallery row uses display order, even when it has no overrides.
+  for (const entry of byType.values()) {
     entry.drops.sort((left, right) => right.chance - left.chance);
   }
   return [...byType.values()];

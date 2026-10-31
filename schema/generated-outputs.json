@@ -23,7 +23,7 @@
     {
       "path": "client/src/schema/mob-gallery.ts",
       "bytes": 5951,
-      "sha256": "bf9e2d845683f5a6e5bd886225ea9cb728f82aecdf6244d2989bddf5f6c7237f"
+      "sha256": "bcc8458d05e92986a770970314c797c2ebb02ee613ec5a620b202e455808758c"
     },
     {
       "path": "client/src/schema/packet-key.ts",
