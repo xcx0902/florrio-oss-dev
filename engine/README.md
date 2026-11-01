@@ -9,7 +9,7 @@ let native compilation run without invoking Node.
 ```sh
 npm run build:engine         # incremental native Release configure/build
 npm run build:engine:clean   # explicit fresh configure/build
-npm run test:engine          # build + all 14 manifest-listed CTest targets
+npm run test:engine          # build + all 18 manifest-listed CTest targets
 npm run build:engine:wasm    # pinned Emscripten CMake -> build/wasm/server.wasm
 node tools/verify-abi.mjs    # manifest/header/worker/actual wasm consistency
 ```
@@ -30,7 +30,7 @@ Strict options include `-Wall -Wextra -Werror -ffp-contract=off -fno-fast-math
 - `model/world_config.*`: explicit seeds/population and shared fixed-tick RNG
   compatibility; two population draws and six draws per world tick.
 - `net/worker_api.*`: offline adapter input dispatch and output coordination.
-- `net/snapshot_publisher.*`: one current publisher and ReplicationSession with
+- `net/snapshot_publisher.*`: read-only v1 publisher and WorkerReplicationSession with
   optional per-handle history, viewer retention and reentry invalidation.
 - `net/snapshot_codec.*`: one SnapshotEncoder, schema-checked typed writes,
   sparse/dense framing and event encoding.
@@ -53,8 +53,8 @@ probe exports, ComponentStore, skeleton writers and full-field injection state
 are retired. No original adapter is linked.
 
 World destruction invalidates ownership, AI, pickup, effect and spatial records
-once; publication consumes it rather than rescanning for destroyed entities in
-send/think. A peer gets no spatial entities before join, retains its last viewer
+once; read-only publication observes it and the room finishes tick changes after
+all observers have published. A peer gets no spatial entities before join, retains its last viewer
 after death and receives complete initial values on reentry. Flush drains once.
 
 CTest includes the main topic-fragment suite, existing simulation/domain suites
@@ -71,7 +71,10 @@ input expiry, body generations, death/respawn and room isolation. Hosts register
 players explicitly, adopt inputs before each tick, then advance the World once.
 The offline Worker owns a local PlayerId and preserves the v1 ABI and persistent
 input lease. See [player state and domain APIs](../docs/multiplayer/player-state.md).
-Network sessions, v2 replication and complete PVP ownership remain later stages.
+M03 supplies PVP ownership; M04 supplies strict v2 codecs, read-only per-connection
+replication, bounded input/command contracts and transactional TS state. See
+[replication](../docs/multiplayer/replication.md). Actual WebSocket hosting and
+browser connection remain M05/M06.
 
 See [M3 mapping](../docs/m3-structure.md) and [release](../docs/release.md).
 

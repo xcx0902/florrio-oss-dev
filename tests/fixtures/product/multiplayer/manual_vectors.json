@@ -1,0 +1,9 @@
+{
+  "description": "Hand-authored v2 bytes, independent of either encoder and schema generator.",
+  "vectors": [
+    { "name": "input LE numbers", "direction": "client", "hex": "464c523202000300070000001800000001000000010000000a000000030000000000c03f00004843", "type": 3, "sessionEpoch": 7, "value": { "inputSeq": 1, "lifeEpoch": 1, "targetTick": 10, "buttons": 3, "angle": 1.5, "strength": 200 } },
+    { "name": "ping f64", "direction": "server", "hex": "464c52320200080007000000100000002a0000006400000000000000004a9340", "type": 8, "sessionEpoch": 7, "value": { "nonce": 42, "serverTick": 100, "monotonicMs": 1234.5 } },
+    { "name": "pre-welcome error", "direction": "server", "hex": "464c523202000a0000000000050000000102686901", "type": 10, "sessionEpoch": 0, "value": { "code": 1, "message": "hi", "retryable": true } },
+    { "name": "command result with optional cooldown", "direction": "server", "hex": "464c523202000500070000000a00000001000000030132000000", "type": 5, "sessionEpoch": 7, "value": { "commandSeq": 1, "code": 3, "nextSpawnTick": 50 } }
+  ]
+}

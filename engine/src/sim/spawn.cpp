@@ -423,7 +423,6 @@ EntityHandle spawn_entity(World& world, EntityKind kind, std::uint16_t type_id, 
   if (type_id == 11U) entity->physics_flag48 = false;
   entity->active = true;
   entity->bounds_dirty = true;
-  world.mark_known(*handle);
   return *handle;
 }
 

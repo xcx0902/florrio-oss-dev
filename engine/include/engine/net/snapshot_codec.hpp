@@ -79,6 +79,8 @@ class SnapshotEncoder {
   static constexpr std::uint32_t kDefaultDenseComponentMask =
     (1U << 0) | (1U << 1) | (1U << 5) | (1U << 19) | (1U << 20) | (1U << 25) | (1U << 29);
   void write_dense_default_groups(const Entity& entity);
+  /** Network v2: groups 116/120/140/152 base; no control or inventory fields. */
+  void write_dense_public_groups(const Entity& entity);
   /** Complete indexed player arrays, including zero entries on clear/discard.
    * Each array can be omitted when unchanged on this stream. */
   void write_mask_loadout_fields(EntityHandle handle, std::uint32_t component_mask,

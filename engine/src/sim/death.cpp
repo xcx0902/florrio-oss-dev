@@ -69,6 +69,11 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
     if (owner == nullptr) return;
     auto& state = *owner;
     state.life = PlayerLife::kCorpse;
+    state.death.position = position;
+    bool wide_view = false;
+    for (std::size_t slot = 0; slot < state.profile().active_slots(); ++slot)
+      wide_view = wide_view || state.loadout().slots()[slot].type_id == 25;
+    state.death.view_scale = f32(wide_view ? 0.63F : 0.9F);
     // The frozen v1 Worker continues its orphan-petal orbit during the corpse
     // window using the last input. A new spawn always clears that lease.
     if (!state.has_offline_input_lease()) state.clear_input();

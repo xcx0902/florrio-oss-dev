@@ -21,7 +21,14 @@ std::uint32_t projectile_render_component(const Entity& entity) {
  * f32 min+diameter construction, rather than replacing it with center+radius.
  * Publication uses its own visibility pass and does not mutate the contact quadtree or
  * the simulation's geometry-cache epochs. */
-Aabb peer_body_bounds(const World& world, const Entity& entity, PublicationBounds& cache, std::uint32_t depth = 0U) {
+
+bool peer_handle_less(EntityHandle first, EntityHandle second) {
+  return first.index() == second.index() ? first.generation() < second.generation()
+                                        : first.index() < second.index();
+}
+
+}
+Aabb publication_body_bounds(const World& world, const Entity& entity, PublicationBounds& cache, std::uint32_t depth) {
   const auto index = entity.handle.index();
   if (!cache.cyclic && cache.state[index] == 2) return cache.boxes[index];
   PERF_ADD(bounds, 1);
@@ -39,7 +46,7 @@ Aabb peer_body_bounds(const World& world, const Entity& entity, PublicationBound
   for (const EntityHandle handle : entity.children) {
     const Entity* child = world.entities().get(handle);
     if (child == nullptr || child == &entity) continue;
-    const Aabb bounds = peer_body_bounds(world, *child, cache, depth + 1U);
+    const Aabb bounds = publication_body_bounds(world, *child, cache, depth + 1U);
     const f32 min_x = std::min(result.min_x, bounds.min_x);
     const f32 min_y = std::min(result.min_y, bounds.min_y);
     // Original167 stores min/size, not min/max. Preserve the subtraction
@@ -52,13 +59,7 @@ Aabb peer_body_bounds(const World& world, const Entity& entity, PublicationBound
   return result;
 }
 
-bool peer_handle_less(EntityHandle first, EntityHandle second) {
-  return first.index() == second.index() ? first.generation() < second.generation()
-                                        : first.index() < second.index();
-}
-
-}
-std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, PlayerId viewer_id, std::uint32_t sequence,
+std::vector<std::uint8_t> SnapshotPublisher::publish(const World& world, PlayerId viewer_id, std::uint32_t sequence,
                                                            std::uint32_t reliable_ack) {
   auto& writer = writer_;
   writer.begin(sequence, reliable_ack);
@@ -72,10 +73,7 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, PlayerId view
     const Entity* player = world.entities().get(viewer->player());
     session_.viewer_started = player != nullptr && player->active;
     if (!session_.viewer_started) {
-      world.clear_destroyed();
       pending_chat_.clear();
-      world.clear_hit_events();
-      viewer->loadout().clear_pickup_transfers();
       return writer.finish();
     }
   }
@@ -109,7 +107,7 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, PlayerId view
     const Aabb arena{f32(0.0F) - half_width, f32(0.0F) - half_height, half_width, half_height};
     if (arena.intersects(view)) world.entities().with_ordered_slots([&](auto&& slots) {
       for (const auto& entity : slots) { PERF_ADD(visits, 1);
-        if (entity.active && peer_body_bounds(world, entity, bounds).intersects(view))
+        if (entity.active && publication_body_bounds(world, entity, bounds).intersects(view))
           visible.insert(entity.handle.raw);
       }
     });
@@ -135,7 +133,6 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, PlayerId view
     session_.published.erase(handle.to_wire());
 
   }
-  world.clear_destroyed();
   for (const auto& text : pending_chat_) writer.write_chat_event(text);
   pending_chat_.clear();
   for (const HitEvent& hit : world.hit_events()) {
@@ -145,12 +142,10 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, PlayerId view
     // fixed-size attribution object is not part of the product layout.
     writer.write_entity_time_event(hit.target);
   }
-  world.clear_hit_events();
   for (const auto& transfer : viewer->loadout().pickup_transfers())
     if (!session_.visibility_enabled || visible.contains(transfer.drop.raw)
         || session_.known.contains(transfer.drop.raw))
       writer.write_visual_event(transfer.drop, transfer.slot);
-  viewer->loadout().clear_pickup_transfers();
   // Component ordinals are not the sparse field ids: transform is 6 (72),
   // identity is 30 (152), health is 20 (116), visual transform is 21 (120),
   // collider radius is 26 (140).

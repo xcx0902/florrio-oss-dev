@@ -88,4 +88,4 @@ M00 已将唯一初始参数表固定到 [配置契约](../docs/multiplayer/conf
 
 ## 7. 实施时的状态声明
 
-本目录先于实现提交。M00 已实现的证据与回归入口见基线记录；M01 已完成 core/adapter、原生有限 tick smoke、native identity 与回归入口。M02 已实现 PlayerId/PlayerState/Registry、显式领域命令、同 World 多玩家阶段和生命周期隔离，新增 15 个 core-only 场景，接口见 [玩家状态](../docs/multiplayer/player-state.md)。M03 已完成原生共享 World 的 FFA 战斗归属、花瓣/宠物/延迟伤害、唯一拾取与死亡重生闭环，新增 26 个 core-only 场景并通过完整 17 gate，接口与实际能力核查见 [玩法归属](../docs/multiplayer/gameplay-ownership.md)。完成状态与完整验收证据见 CHECKLIST；M04—M08 的协议、网络和发布仍为「计划新增」。变更时只更新真实完成的部分，不把计划命令复制进产品 README 当成可用指令。
+本目录先于实现提交。M00 已实现的证据与回归入口见基线记录；M01 已完成 core/adapter、原生有限 tick smoke、native identity 与回归入口。M02 已实现 PlayerId/PlayerState/Registry、显式领域命令、同 World 多玩家阶段和生命周期隔离，新增 15 个 core-only 场景，接口见 [玩家状态](../docs/multiplayer/player-state.md)。M03 已完成原生共享 World 的 FFA 战斗归属、花瓣/宠物/延迟伤害、唯一拾取与死亡重生闭环，新增 26 个 core-only 场景并通过完整 17 gate，接口与实际能力核查见 [玩法归属](../docs/multiplayer/gameplay-ownership.md)。M04 已完成可生成的 v2 协议、只读每连接复制、公开/私有投影、输入采用/生命与会话世代契约，新增 12 个原生场景并通过完整 17 gate，接口见 [协议与复制](../docs/multiplayer/replication.md)。完成状态与完整验收证据见 CHECKLIST；M05—M08 的网络服务、浏览器接入和发布仍为「计划新增」。变更时只更新真实完成的部分，不把计划命令复制进产品 README 当成可用指令。

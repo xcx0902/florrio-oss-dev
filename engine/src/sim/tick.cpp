@@ -166,7 +166,6 @@ void tick(World& world, double delta_milliseconds) {
       }), petals.end());
   });
   world.record_phase("corpse-sweep");
-  world.flush_pending_hits();
   world.record_phase("hit-flush");
   world.advance_tick(0.0);
   // Expire leases and expose respawnability at the completed tick boundary.

@@ -25,8 +25,6 @@ void World::reset() {
   pickups_.clear();
   ai_order_.clear();
   ant_hole_releases_.clear();
-  known_entities_.clear();
-  pending_hit_events_.clear();
   deaths_.clear();
   time_ms_ = 0.0;
   width_ = f32(50000.0F);
@@ -134,11 +132,6 @@ bool World::destroy(EntityHandle handle) {
   unregister_pickup(handle);
   unregister_ai(handle);
   unregister_ant_hole(handle);
-  known_entities_.erase(handle.raw);
-  pending_hit_events_.erase(
-    std::remove_if(pending_hit_events_.begin(), pending_hit_events_.end(),
-                   [handle](const HitEvent& event) { return event.target == handle; }),
-    pending_hit_events_.end());
   collision_.tree.remove(handle.index());
   destroyed_.push_back(handle);
   return entities_.release(handle);
@@ -175,13 +168,9 @@ void World::record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f
     return false;
   };
   if (merge(hit_events_)) return;
-  HitEvent event{target, attacker, amount, health_after, tick_, 1U, epoch, 1U, is_known(target),
+  HitEvent event{target, attacker, amount, health_after, tick_, 1U, epoch, 1U,
                  source == nullptr ? damage_source(*this, attacker) : *source};
-  if (event.known) {
-    hit_events_.push_back(event);
-  } else {
-    pending_hit_events_.push_back(event);
-  }
+  hit_events_.push_back(event);
 }
 
 } // namespace engine

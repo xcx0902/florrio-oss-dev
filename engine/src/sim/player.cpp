@@ -84,6 +84,7 @@ EntityHandle spawn_player(World& world, PlayerState& state, std::string_view nam
   state.clear_input();
   state.last_applied_input_tick = world.tick();
   state.last_control_tick = UINT64_MAX;
+  state.last_applied_input_sequence = 0;
   state.set_player_name(std::string(name));
   entity->attribution = damage_source(world, handle);
   state.set_player_speed(config.movement_speed);
@@ -118,6 +119,7 @@ void apply_player_controls(World& world, PlayerState& state, double delta_millis
   if (player == nullptr || player->health.value <= 0.0F) return;
   if (!(delta_milliseconds > 0.0) || state.last_control_tick == world.tick()) return;
   state.last_control_tick = world.tick();
+  if (state.input_sequence != 0) state.last_applied_input_sequence = state.input_sequence;
   const PlayerInput& input = state.input();
   const double strength = static_cast<double>(input.strength.value);
   // Original608 seeds its multiplier with 1.0, then multiplies the vtable+20

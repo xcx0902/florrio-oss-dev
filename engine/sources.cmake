@@ -33,6 +33,10 @@ set(ENGINE_CORE_SOURCES
   src/sim/quadtree.cpp
   src/sim/species_attacks.cpp
   src/net/input.cpp
+  src/net/multiplayer_wire.cpp
+  src/net/tick_changes.cpp
+  src/net/replication_session.cpp
+  src/net/peer_session.cpp
   src/net/snapshot_codec.cpp
   src/net/snapshot_publisher.cpp
 )

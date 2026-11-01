@@ -11,6 +11,7 @@ import {
   petalViews,
 } from './catalogs.mjs';
 import { generateMenuContent } from './menu.mjs';
+import { multiplayerOutputs } from './multiplayer.mjs';
 
 export const OUTPUT_MANIFEST = 'schema/generated-outputs.json';
 export const GENERATOR = 'tools/generate.mjs';
@@ -35,6 +36,8 @@ export async function buildOutputs(root = '.') {
     strings: inputs.strings.strings.length,
   };
   const outputs = new Map();
+  for (const [file, content] of multiplayerOutputs(inputs.multiplayerSource,
+    [inputs.petals, inputs.entities, inputs.spawnRules, inputs.strings, inputs.spawnDefaults, inputs.petalCombat, inputs.dropRules], contract)) outputs.set(file, content);
   outputs.set('schema/generated/protocol-contracts.json', json({
     schema: 2,
     generatedBy: GENERATOR,

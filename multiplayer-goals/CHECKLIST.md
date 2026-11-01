@@ -1,6 +1,6 @@
 # 多人联机执行跟踪
 
-> M00—M03 已完成；M04—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
+> M00—M04 已完成；M05—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
 
 ## 1. 阶段看板
 
@@ -10,7 +10,7 @@
 | M01 原生 core 边界 | 已完成 | 工作区实现，未创建提交 | `2026-10-31T23-43-46.442Z-f638c98a`；`reports/multiplayer/m01/2026-10-31T23-43-46.442Z-f638c98a/summary.json` | 17/17 gate；engine 13/13、根 CTest 18/18、Node/浏览器 251/251；20 tick smoke 与纯 core 双 World 通过 |
 | M02 多玩家状态 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T00-18-30.561Z-577c7708`；`reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/summary.json` | 17/17 gate；engine 14/14、根 CTest 19/19、15 个 M02 场景及 ASan/UBSan；冻结 M00 摘要一致 |
 | M03 PVP 与玩法归属 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T01-54-57.347Z-2c94ac23`；`reports/multiplayer/m03/2026-11-01T01-54-57.347Z-2c94ac23/summary.json` | 17/17 gate；engine 16/16、根 CTest 21/21；26 个新增场景、100 次生命周期及 ASan/UBSan 通过 |
-| M04 协议与复制 | 未开始 | — | — | — |
+| M04 协议与复制 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T02-58-18.343Z-05f8fff5`；`reports/multiplayer/m04/2026-11-01T02-58-18.343Z-05f8fff5/summary.json` | 17/17 gate；engine 18/18、根 CTest 23/23；12 个新增 native 场景、259 个 Node/浏览器测试与 ASan/UBSan |
 | M05 原生网络服务 | 未开始 | — | — | — |
 | M06 联机客户端 | 未开始 | — | — | — |
 | M07 延迟与预测 | 未开始 | — | — | — |
@@ -50,11 +50,11 @@
 
 ### M04：协议和复制
 
-- [ ] MP-040：v2 schema/生成/手工字节与 native→TS fixture。
-- [ ] MP-041：Room/Session/Life epoch、控制 handle、selfState、输入采用确认。
-- [ ] MP-042：冻结 TickChanges、只读发布、统一清理、发布顺序不影响世界。
-- [ ] MP-043：每连接 AOI/baseline/full/delta，公开/私有字段分离。
-- [ ] MP-044：重入、损坏包、resync、慢连接和回绕边界测试。
+- [x] MP-040：v2 schema/生成/手工字节与 native→TS fixture。
+- [x] MP-041：Room/Session/Life epoch、控制 handle、selfState、输入采用确认。
+- [x] MP-042：冻结 TickChanges、只读发布、统一清理、发布顺序不影响世界。
+- [x] MP-043：每连接 AOI/baseline/full/delta，公开/私有字段分离。
+- [x] MP-044：重入、损坏包、resync、慢连接和回绕边界测试。
 
 ### M05：服务端
 
@@ -179,3 +179,21 @@ runId / source identity / binary-client hash：
 - 规则或接口偏离及理由：双方实际等级的本体系数在 M02 已按玩家读取，本轮增加全部组合断言，保留公式和仅玩家本体适用范围。保留花瓣之间不接触、目录数值、地图、50ms 步长及接触顺序，不新增玩家击杀 XP。Salt/Rice/Corn 目前仅有目录数值、普通轨道和接触，全部当前行为已覆盖；不声称新增按名称推测的反伤、特殊回充或额外被动。
 - 未解决问题与受影响后续阶段：M03 无阻塞；尚未创建提交。本阶段仅完成原生同 World 玩法，v1 离线发布器仍消费事件；每连接只读复制、真实 WebSocket 与双浏览器在线入口分别留给 M04—M06，容量和 Linux 发布留给 M08。
 - 下一步：M04；v2 schema/协议、冻结 TickChanges、每连接可见集与全量/增量复制。本轮未开始 M04。
+
+## 8. M04 完成交接
+
+- 阶段 / 任务编号：M04；MP-040—MP-044 全部完成，2026-11-01（Asia/Shanghai）。
+- 实际提交：工作区实现，未创建提交；沿用前面阶段的工作区交接方式。
+- 实现范围：`schema/multiplayer.yaml`、统一生成器/manifest 与生成的 C++/TS/docs；`net/{multiplayer_wire,tick_changes,replication_session,peer_session}.*`、只读 v1 publisher/Worker 统一 finish；PlayerState 的输入采用世代/序号与持久死亡视点；TS `NetworkSnapshotDecoder`；真实 native fixture、手工向量及产品测试清单。接口见 [复制交接](../docs/multiplayer/replication.md)。
+- 执行命令：`npm run schema:generate`、`npm run schema:check`、`npm run build:engine`、`npm run build:client`、`node tools/run-tests.mjs engine`、`node tools/run-tests.mjs integration`、`node tools/run-tests.mjs client-unit`、`npm run test:unit`、`npm run test:tools`、`npm run test:multiplayer:baseline`。完整验收使用 `CHROME_PATH=/private/tmp/florr-m3-chromium/chrome-headless-shell-mac-arm64/chrome-headless-shell npm run test:all`，固定 Chromium `156.0.8078.47`，沙箱外运行。
+- sanitizer：`cmake -S engine -B build/m04-sanitize -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS='-fsanitize=address,undefined -fno-omit-frame-pointer'`；构建 `engine_replication_tests engine_multiplayer_protocol_tests`；`ASAN_OPTIONS=detect_leaks=0 ctest --test-dir build/m04-sanitize -R 'engine_(replication|multiplayer_protocol)_tests' --output-on-failure`。两项、12 场景全部通过。
+- 测试数量与结果：完整 17/17 gate；独立 engine 18/18、根构建 CTest 23/23；Node/浏览器 259/259（41 单元、24 工具、106 客户端单元、7 跨端、81 浏览器），无跳过。新增原生 6 个协议 + 6 个复制场景；4 个 TS codec、3 个 native→TS 和 1 个 schema 归属测试。原有渲染、引擎和游戏循环性能预算全部通过。
+- 覆盖：发布顺序交换/World 与 RNG 不变、共同删除/命中/拾取、远距离 AOI/移出重入/真实槽位换代、两种编码隐私、各自昵称/等级/owner、死亡与尸体删除后重连视点、控制 handle 重生、full/delta/resync/新连接全量、事件去重、输入接收与实际采用/TTL、未来窗口/非法前跳/回绕前拒绝、旧 session/跨 World/旧生命拒绝、命令有界幂等、超大全量与慢写队列不半提交。真实网络慢连接由 M05 继续验证。
+- runId：`2026-11-01T02-58-18.343Z-05f8fff5`，`passed=true`、`stable=true`；M00 冻结摘要双进程重放 `m00-2026-11-01T02-54-16.925Z-73be6f4e` 通过。
+- source identity：`a732fac5eb76efdf0e79d031ccb9ce81e575c41aeba82bbbc22946c7ef2627e3`；verification identity：`27ce40c1e97db2fa68d0389a12046a9dfaa2ae6926b850ad20e14567ada51361`；native source：`17d1e06bdbe1fca4b7dc0b6525611042da507996c4e96c013c58ec56d4f4cc41`。
+- catalog hash：`9d66e1aff774927d6bc7cdc709f16913bda06e56fb5cdd52f3172aeedbe7f287`；WASM：`e974c275724e7135037f16beb2cab0c9ea4dcc66c0d082d0becc879aa56b6264`；delivery tree：`a0873b69b6220ab345021d3eeb161dd92976260697e91a792a75646005b6dc89`。新原生 fixture、测试和宿主的字节数/哈希记录在 summary 中。
+- 报告路径：`reports/multiplayer/m04/2026-11-01T02-58-18.343Z-05f8fff5/summary.json`，同目录保存 sanitizer/基线日志及 SHA；完整账本 `reports/runs/2026-11-01T02-58-18.343Z-05f8fff5/run.json`。报告目录按仓库惯例不入 Git。
+- 失败与修复：首轮 `2026-11-01T02-54-23.380Z-9cc25ec9` 的前 14 项通过，Chromium 因沙箱 MachPort 权限启动失败；失败账本保留，改为沙箱外完整重跑。macOS 不支持 `detect_leaks=1`，保留原日志并用 `detect_leaks=0` 执行 ASan/UBSan；sanitizer 还发现换代测试夹具在复制旧 handle 后再次用新 handle 查找返回 null，已改为复制前保存实体引用，修复前后日志均保留。未放宽任何预算或实体数值。
+- 与计划的具体化：v2 增量粒度为变化实体的完整公开字段块，继续复用原字段 codec；每块固定内部 sequence=1/ack=0，并限制 2048 bytes/16 records。dense 仅公开 116/120/140/152 base。新增 counterDrainAt 预留 1024 个 u32 值用于排空；均为连接保护参数，见配置契约。网络调度前先落实了 PeerSession 的纯字节/领域命令契约；它不监听网络。
+- 未解决问题：M04 无未解决阻塞。M05 仍需实现真实 WebSocket、Room/Connection 生命周期、crypto token/grace、限流、排空与日志；M06 仍需将真实浏览器 GameSession 接入网络。当前宿主仍是有限 tick smoke，本阶段不宣称已完成真实双浏览器联机或容量验收。
+- 下一步：按主线进入 M05，消费既有 codec、PeerSession、TickChanges、ReplicationSession 和拥有缓冲写队列契约。

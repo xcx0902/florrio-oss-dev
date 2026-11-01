@@ -318,16 +318,12 @@ void test_attribution_death_and_pickups() {
   CHECK(world.hit_events().front().refcount == 2U);
   CHECK(world.hit_events().front().amount.value == 7.0F);
 
-  // A target allocated outside spawn_entity is not in the known list yet.
+  // A target allocated outside spawn_entity must also record domain hits.
   engine::EntityPool& pool = world.entities();
   const auto hidden = pool.allocate();
   CHECK(hidden.has_value());
   world.record_hit(*hidden, attacker, engine::f32(1.0F), engine::f32(1.0F));
-  CHECK(world.hit_events().size() == 1U);
-  CHECK(world.pending_hit_events().size() == 1U);
-  world.mark_known(*hidden);
-  CHECK(world.flush_pending_hits() == 1U);
-  CHECK(world.hit_events().size() == 2U);
+  CHECK(world.hit_events().size() == 2U); // Unseen targets also record domain events.
 
   // Pickup intrusive registry.
   const engine::EntityHandle drop = engine::spawn_loot_drop(

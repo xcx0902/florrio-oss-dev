@@ -483,6 +483,18 @@ void SnapshotEncoder::write_dense_default_groups(const Entity& entity) {
   ++update_count_;
 }
 
+void SnapshotEncoder::write_dense_public_groups(const Entity& entity) {
+  updates_.write_u32_le(entity.handle.to_wire()); updates_.write_u8(62U);
+  updates_.write_f32_le(entity.health.value); updates_.write_f32_le(entity.max_health.value);
+  updates_.write_u16_le(pack_snapshot_angle(entity.angle.value));
+  updates_.write_f32_le(entity.position.y.value); updates_.write_f32_le(entity.position.x.value);
+  updates_.write_f32_le(entity.collision_radius.value);
+  updates_.write_u8(entity.kind == EntityKind::kPlayer ? entity.player_look : static_cast<std::uint8_t>(entity.type_id));
+  updates_.write_u8(static_cast<std::uint8_t>(entity.kind));
+  updates_.write_u8(entity.kind == EntityKind::kPlayer ? entity.player_expression : entity.loadout_instance);
+  ++update_count_;
+}
+
 void SnapshotEncoder::write_dense_string_group(EntityHandle handle, std::string_view value) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);

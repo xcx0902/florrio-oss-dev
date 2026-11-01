@@ -6,6 +6,7 @@ only the committed generated views, never these JSON/YAML inputs.
 
 | Path | Purpose |
 | --- | --- |
+| `multiplayer.yaml` | network v2 envelope, messages, limits, visibility and identity contract |
 | `protocol.yaml` | sparse fields, dense groups, component projection, input/output framing |
 | `transport.json` | packet XOR algorithm, encoding, byte count and the 256-byte key |
 | `catalogs/*.json` | petals, combat, entities, spawns, strings, drop rules and display overrides |
@@ -16,6 +17,7 @@ Generated outputs:
 
 | Output | Contents |
 | --- | --- |
+| `engine/include/engine/net/generated_multiplayer.hpp`, `client/src/schema/multiplayer.ts`, `docs/multiplayer-protocol.md` | strict network v2 codecs and wire reference |
 | `engine/include/engine/net/generated_protocol.hpp` | C++ protocol constants, dense tables and field metadata |
 | `client/src/schema/protocol.ts` | TypeScript protocol constants and dense specs |
 | `engine/include/engine/net/packet_key.hpp` | 256-byte packet XOR key |

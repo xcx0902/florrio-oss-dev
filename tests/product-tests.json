@@ -22,7 +22,8 @@
       "client/tests/unit/snapshot-domain.test.mjs",
       "client/tests/unit/text-cache.test.mjs",
       "client/tests/unit/ui-tooltip.test.mjs",
-      "client/tests/unit/structure.test.mjs"
+      "client/tests/unit/structure.test.mjs",
+      "client/tests/unit/multiplayer-codec.test.mjs"
     ],
     "client-integration": [
       "client/tests/integration/app-lifecycle.test.mjs",
@@ -36,7 +37,8 @@
     ],
     "integration": [
       "tests/integration/native-snapshot.test.mjs",
-      "tests/integration/single-player-baseline.test.mjs"
+      "tests/integration/single-player-baseline.test.mjs",
+      "tests/integration/multiplayer-snapshot.test.mjs"
     ],
     "delivery": [
       "client/tests/integration/worker-browser.test.mjs",
@@ -64,6 +66,8 @@
         "engine_structure_tests",
         "engine_single_player_baseline_tests",
         "engine_multiplayer_state_tests",
+        "engine_replication_tests",
+        "engine_multiplayer_protocol_tests",
         "engine_multiplayer_combat_tests",
         "engine_multiplayer_lifecycle_tests",
         "engine_native_link_tests"
@@ -91,6 +95,8 @@
         "engine_structure_tests",
         "engine_single_player_baseline_tests",
         "engine_multiplayer_state_tests",
+        "engine_replication_tests",
+        "engine_multiplayer_protocol_tests",
         "engine_multiplayer_combat_tests",
         "engine_multiplayer_lifecycle_tests",
         "engine_native_link_tests",

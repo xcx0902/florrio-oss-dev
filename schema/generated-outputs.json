@@ -3,6 +3,7 @@
   "generatedBy": "tools/generate.mjs",
   "inputs": [
     "schema/protocol.yaml",
+    "schema/multiplayer.yaml",
     "schema/transport.json",
     "schema/catalogs/petals.json",
     "schema/catalogs/entities.json",
@@ -26,6 +27,11 @@
       "sha256": "bcc8458d05e92986a770970314c797c2ebb02ee613ec5a620b202e455808758c"
     },
     {
+      "path": "client/src/schema/multiplayer.ts",
+      "bytes": 20318,
+      "sha256": "5bf41ff5413ff4396dc45be5973a461dd980bc9384dec4524dadd800a6067b0e"
+    },
+    {
       "path": "client/src/schema/packet-key.ts",
       "bytes": 1708,
       "sha256": "fbc6994a99c40e6e880d7e8de9206cbe3a68fd6407fee75f859bdf4ca4e38050"
@@ -44,6 +50,11 @@
       "path": "docs/catalogs.md",
       "bytes": 4289,
       "sha256": "5c87fc93fdc4154b8b8240edf65fe431672d9785155b6adf3b615a8261360d9d"
+    },
+    {
+      "path": "docs/multiplayer-protocol.md",
+      "bytes": 8133,
+      "sha256": "039cd3939fc7f99f53e768df3e9af776a819b39b98336d03f097cb410c925588"
     },
     {
       "path": "engine/include/engine/catalog/catalog_types.hpp",
@@ -69,6 +80,11 @@
       "path": "engine/include/engine/catalog/petal_combat.hpp",
       "bytes": 3069,
       "sha256": "5e4cffedcc9a8afacc06cbf2da449f1b23ee644a7d75b532d884a7388f4c64e0"
+    },
+    {
+      "path": "engine/include/engine/net/generated_multiplayer.hpp",
+      "bytes": 22602,
+      "sha256": "e31c6aad88b4038bbe6a21869b31546022809765d51e40e77f2155d888cca90d"
     },
     {
       "path": "engine/include/engine/net/generated_protocol.hpp",

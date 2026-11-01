@@ -1,6 +1,6 @@
 # M04：网络协议与每连接复制
 
-状态：未开始。依赖：M02、M03。产出：可跨 C++/TypeScript 校验的 v2 协议，以及不会消费世界状态的多观察者快照发布器。
+状态：已完成（2026-11-01）。实现接口见 [协议与复制交接](../docs/multiplayer/replication.md)，验收 runId `2026-11-01T02-58-18.343Z-05f8fff5`，17/17 gate；证据见 CHECKLIST。依赖：M02、M03。产出：可跨 C++/TypeScript 校验的 v2 协议，以及不会消费世界状态的多观察者快照发布器。
 
 ## 04.1 schema 与文件边界
 
@@ -94,10 +94,10 @@ RoomEpoch 是房间实例随机 128-bit ID；出现在 Welcome 和快照元数�
 
 ## 04.8 完成条件
 
-- [ ] schema 可生成 C++/TS/docs，并通过 `schema:check`。
-- [ ] 发布器对 World 只读，所有观察者发布结束后才清理事件。
-- [ ] 每连接身份、AOI、baseline 和输入确认独立。
-- [ ] 真实 native→TS 快照测试、隐私测试和损坏包测试通过。
-- [ ] 先实现本阶段字节/状态契约，再实现网络传输，不让传输层重新发明协议。
+- [x] schema 可生成 C++/TS/docs，并通过 `schema:check`。
+- [x] 发布器对 World 只读，所有观察者发布结束后才清理事件。
+- [x] 每连接身份、AOI、baseline 和输入确认独立。
+- [x] 真实 native→TS 快照测试、隐私测试和损坏包测试通过。
+- [x] 先实现本阶段字节/状态契约，再实现网络传输，不让传输层重新发明协议。
 
 建议提交顺序：v2 schema → TickChanges → 只读发布与 viewer → public/self 拆分 → full/delta/epoch → 跨语言测试。

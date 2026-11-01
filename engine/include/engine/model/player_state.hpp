@@ -19,6 +19,8 @@ inline constexpr std::uint64_t kOfflineInputTtl = UINT64_MAX;
 enum class PlayerLife { kRegistered, kAlive, kCorpse, kRespawnable };
 
 struct DeathState {
+  Vec2 position;
+  f32 view_scale{0.9F};
   f32 score{};
   std::uint8_t level = 0;
   std::array<std::uint16_t, 10> kept{};
@@ -72,10 +74,13 @@ class PlayerState {
   std::uint64_t next_spawn_tick = 0;
   std::uint64_t last_applied_input_tick = 0;
   std::uint64_t input_valid_until_tick = 0;
+  std::uint32_t input_session_epoch = 0;
+  std::uint32_t input_sequence = 0;
+  std::uint32_t last_applied_input_sequence = 0;
   std::uint64_t last_control_tick = UINT64_MAX;
 
   void store_input(PlayerInput input) { input_ = input; }
-  void clear_input() { input_ = {}; input_valid_until_tick = 0; }
+  void clear_input() { input_ = {}; input_sequence = 0; input_valid_until_tick = 0; }
   [[nodiscard]] bool has_offline_input_lease() const {
     return input_valid_until_tick == kOfflineInputTtl;
   }

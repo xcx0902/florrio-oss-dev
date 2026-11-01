@@ -1,7 +1,7 @@
 # Damage attribution, hit events and legendary drops
 
 Status: the domain path records attacker identity, killer name, per-epoch hit
-messages with reference counts, the sorted known-entity gate, death score/level,
+messages with reference counts, observer-independent tick events, death score/level,
 recursive child-handle damage and an intrusive pickup list.
 
 ## Hit events
@@ -14,23 +14,21 @@ damage to the same target within one tick:
 - later hits to the same target/epoch in the same tick add `amount`, replace
   `health_after`/attacker, and increment both `count` and `refcount`.
 
-`damage_entity` sets `Entity::hit_epoch = tick + 1`, so the message epoch mirrors
-the health-component epoch. If the target is not in
-`World::known_entities()` (the sorted handle list used by the message cache),
-the message is stored in `pending_hit_events_` and moved to the outgoing list by
-`flush_pending_hits()` once the target becomes known.
-
-`domain_snapshot_bytes` drains the list into event opcode 11 (`entity-time`) and
-event opcode 14 (visual hit index) so the client observes one hit per target per
-tick.
+`damage_entity` sets `Entity::hit_epoch = tick + 1`. M04 removed the global
+known/pending visibility gate: every domain hit is recorded before any viewer
+is considered. `freeze_tick_changes` assigns room tick/ordinal event IDs, each
+read-only publisher filters with its own AOI/history, and the room calls
+`finish_tick_changes` after every observer has published. The offline Worker
+keeps its v1 event codec and performs the same cleanup after its sole publisher.
+See [replication](../multiplayer/replication.md).
 
 ## Killer identity
 
 `damage_entity` stores `last_attacker` on the target. `kill_entity` resolves the
 attacker's player owner through the owner chain and records:
 
-- `World::last_killer()` — the resolved attacker handle;
-- `World::last_killer_name()` — the player's name for a player-owned attacker,
+- `PlayerState::last_killer()` — the resolved attacker handle;
+- `PlayerState::last_killer_name()` — the player's name for a player-owned attacker,
   otherwise the catalog species name;
 - `Entity::killer_name` — the same string on the dying record before removal.
 
@@ -43,8 +41,8 @@ On a player death, `kill_entity`:
 
 1. sets `Entity::death_flag` and `death_time_ms = now + 1000`;
 2. runs the retained-loot pass and spawns the retained drops;
-3. stores `World::last_death_score` from `PlayerLoadout::score()` and
-   `World::last_death_level` from the profile level;
+3. stores `PlayerState::last_death_score()` from `PlayerLoadout::score()` and
+   `PlayerState::last_death_level()` from the profile level;
 4. walks all 24 owned loadout handles (`slot*3 + instance`), recursively damages
    live children to zero, and clears stale handles;
 5. clears the loadout and destroys any remaining player petals.

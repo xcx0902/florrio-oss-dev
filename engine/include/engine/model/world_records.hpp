@@ -35,8 +35,6 @@ struct HitEvent {
   std::uint32_t epoch = 0;
   /** Shared-message reference count (original message+4). */
   std::uint32_t refcount = 1;
-  /** False while the target is not yet in the sorted known-entity list. */
-  bool known = true;
   DamageSource source;
 };
 

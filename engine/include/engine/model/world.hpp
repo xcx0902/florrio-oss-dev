@@ -18,7 +18,6 @@
 #include <limits>
 #include <memory>
 #include <optional>
-#include <set>
 #include <span>
 #include <vector>
 
@@ -97,35 +96,10 @@ class World {
 
   [[nodiscard]] bool destroy(EntityHandle handle);
 
-  /** Sorted known-entity list used by the original hit-message cache. */
-  void mark_known(EntityHandle handle) {
-    if (handle.valid()) known_entities_.insert(handle.raw);
-  }
-  [[nodiscard]] bool is_known(EntityHandle handle) const {
-    return known_entities_.find(handle.raw) != known_entities_.end();
-  }
-  [[nodiscard]] const std::set<std::uint32_t>& known_entities() const { return known_entities_; }
-
-  /** Coalesce a hit notification for the current tick. The original keeps one
-   * message per target epoch and merges repeated damage into it. Targets that
-   * are not in the sorted known list stay in a pending vector. */
+  /** Simulation records hits independently of any observer's visibility. */
   void record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f32 health_after,
                   const DamageSource* source = nullptr);
-  /** Move pending notifications into the outgoing list once their target is
-   * visible in the known-entity list. */
-  std::size_t flush_pending_hits() {
-    std::size_t moved = 0;
-    for (auto it = pending_hit_events_.begin(); it != pending_hit_events_.end();) {
-      if (!is_known(it->target)) { ++it; continue; }
-      it->known = true;
-      hit_events_.push_back(*it);
-      it = pending_hit_events_.erase(it);
-      ++moved;
-    }
-    return moved;
-  }
   [[nodiscard]] const std::vector<HitEvent>& hit_events() const { return hit_events_; }
-  [[nodiscard]] const std::vector<HitEvent>& pending_hit_events() const { return pending_hit_events_; }
   void clear_hit_events() { hit_events_.clear(); }
 
   /** Pickup intrusive registry (world +36 count / +44 pointer vector). */
@@ -257,8 +231,6 @@ class World {
   ServerRng death_shuffle_{1U};
   PlayerRegistry players_;
   std::vector<HitEvent> hit_events_;
-  std::vector<HitEvent> pending_hit_events_;
-  std::set<std::uint32_t> known_entities_;
   std::vector<AreaEffect> area_effects_;
   std::uint32_t next_effect_id_ = 1;
   std::vector<EntityHandle> area_alive_, area_candidates_, area_added_, area_removed_;

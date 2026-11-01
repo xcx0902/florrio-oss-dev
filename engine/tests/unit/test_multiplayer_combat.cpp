@@ -41,7 +41,6 @@ void opposing_petals_damage_bodies_at_level_one() {
     const auto handle = petal(*world, attacker);
     world->entities().get(handle)->set_position(body(*world, target).position + at(10));
     body(*world, target).contact_damage = f32(0);
-    world->mark_known(state(*world, target).player());
     contacts(*world);
     CHECK(body(*world, target).health == f32(90));
     CHECK(body(*world, attacker).health == f32(100));
@@ -60,7 +59,6 @@ void petal_pairs_keep_existing_noncontact_rule() {
   contacts(*world);
   CHECK(world->entities().get(petal(*world, a))->health == f32(10));
   CHECK(world->entities().get(petal(*world, b))->health == f32(10));
-  CHECK(world->pending_hit_events().empty());
 }
 
 void self_petal_pet_projectile_and_wild_roots() {

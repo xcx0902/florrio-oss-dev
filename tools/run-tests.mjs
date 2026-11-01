@@ -26,6 +26,8 @@ if (names.some(item => browserSuites.has(item))) {
 if (names.includes('integration')) {
   for (const required of ['tests/fixtures/product/protocol/manual_vectors.json',
     'build/engine/engine_native_snapshot_fixture',
+    'tests/fixtures/product/multiplayer/manual_vectors.json',
+    'build/engine/engine_native_replication_fixture',
     'build/engine/engine_single_player_baseline_tests']) {
     if (!existsSync(path.join(root, required)))
       throw new Error(`integration fixture is missing: ${required} (run npm run build:engine)`);

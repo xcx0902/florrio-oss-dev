@@ -177,8 +177,6 @@ void controlling_root_full_tick_contacts() {
     const bool hostile = pair == Pair::kPetWild;
     require(engine::same_controlling_root(world, first, second) != hostile, "fixture controlling roots");
     world.clear_hit_events();
-    world.mark_known(first);
-    world.mark_known(second);
     engine::tick(world, 50);
     require(a->health.value == (hostile ? 89 : 100), "full tick hostile pet receives wild contact damage");
     require(b->health.value == (hostile ? 93 : 100), "full tick pet damages wild; owner/sibling/wild pairs protected");

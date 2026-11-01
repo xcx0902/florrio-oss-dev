@@ -6,6 +6,7 @@ import { parseProtocol } from './protocol.mjs';
 /** Every human-editable input the unified generator reads. */
 export const SCHEMA_INPUTS = Object.freeze({
   protocol: 'schema/protocol.yaml',
+  multiplayer: 'schema/multiplayer.yaml',
   transport: 'schema/transport.json',
   petals: 'schema/catalogs/petals.json',
   entities: 'schema/catalogs/entities.json',
@@ -24,9 +25,10 @@ async function json(root, relative) {
 
 /** Load and parse every input. Validation is a separate, side-effect-free step. */
 export async function loadSchemaInputs(root = '.') {
-  const [protocolSource, transport, petals, entities, spawnRules, strings,
+  const [protocolSource, multiplayerSource, transport, petals, entities, spawnRules, strings,
     spawnDefaults, petalCombat, dropRules, galleryOverrides, changelog] = await Promise.all([
     readFile(path.join(root, SCHEMA_INPUTS.protocol), 'utf8'),
+    readFile(path.join(root, SCHEMA_INPUTS.multiplayer), 'utf8'),
     json(root, SCHEMA_INPUTS.transport),
     json(root, SCHEMA_INPUTS.petals),
     json(root, SCHEMA_INPUTS.entities),
@@ -39,7 +41,7 @@ export async function loadSchemaInputs(root = '.') {
     readFile(path.join(root, SCHEMA_INPUTS.changelog), 'utf8'),
   ]);
   return {
-    protocolSource, protocolDocument: parseProtocol(protocolSource),
+    protocolSource, multiplayerSource, protocolDocument: parseProtocol(protocolSource),
     transport, petals, entities, spawnRules, strings, spawnDefaults,
     petalCombat, dropRules, galleryOverrides, changelog,
   };

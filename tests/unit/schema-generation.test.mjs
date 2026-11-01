@@ -12,6 +12,7 @@ import { validateTransport, applyPacketXor } from '../../tools/schema/transport.
 import { deriveDropChances, validateDropInputs } from '../../tools/schema/drop-chances.mjs';
 import { applyGalleryOverrides } from '../../tools/schema/catalogs.mjs';
 import { parseChangelog, generateMenuContent } from '../../tools/schema/menu.mjs';
+import { multiplayerOutputs } from '../../tools/schema/multiplayer.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const generator = path.join(root, 'tools/generate.mjs');
@@ -73,6 +74,19 @@ test('product generator check passes and is read-only', async () => {
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /"mode":"check"/);
   assert.equal(await treeHash(path.join(root, 'schema')), before);
+});
+
+test('multiplayer schema owns v2 fields, limits and visibility in all generated views', async () => {
+  const inputs=await loadSchemaInputs(root), {contract}=validateInputs(inputs);
+  const outputs=multiplayerOutputs(inputs.multiplayerSource,[],contract);
+  assert.equal(outputs.size,3);
+  const changed=multiplayerOutputs(inputs.multiplayerSource.replace('maxSequenceAdvance: 1024','maxSequenceAdvance: 512'),[],contract);
+  assert.notEqual(changed.get('engine/include/engine/net/generated_multiplayer.hpp'),outputs.get('engine/include/engine/net/generated_multiplayer.hpp'));
+  assert.notEqual(changed.get('client/src/schema/multiplayer.ts'),outputs.get('client/src/schema/multiplayer.ts'));
+  assert.notEqual(changed.get('docs/multiplayer-protocol.md'),outputs.get('docs/multiplayer-protocol.md'));
+  for(const source of [inputs.multiplayerSource.replace('maxClientFrameBytes: 4096','maxClientFrameBytes: 0'),
+    inputs.multiplayerSource.replace('publicFields: [2,','publicFields: [60,2,'),
+    inputs.multiplayerSource.replace('Suicide: 4','Suicide: 3')]) assert.throws(()=>multiplayerOutputs(source,[],contract),/multiplayer schema/);
 });
 
 test('generator produces identical bytes twice and check rejects stale, missing and unregistered outputs', async () => {

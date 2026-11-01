@@ -1,4 +1,5 @@
 #include "engine/net/worker_api.hpp"
+#include "engine/net/tick_changes.hpp"
 #include "engine/model/world_config.hpp"
 #include "engine/net/angle.hpp"
 #include "engine/sim/spawn.hpp"
@@ -106,6 +107,6 @@ bool WorkerApi::occupied(Vec2 position) const {
 
 bool WorkerApi::despawn(EntityHandle handle) { return world_.destroy(handle); }
 
-std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequence, std::uint32_t ack) { return publisher_.publish(world_, local_player_id_, sequence, ack); }
+std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequence, std::uint32_t ack) { auto bytes = publisher_.publish(world_, local_player_id_, sequence, ack); net::finish_tick_changes(world_); return bytes; }
 
 } // namespace engine

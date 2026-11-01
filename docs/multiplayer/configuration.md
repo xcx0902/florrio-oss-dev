@@ -39,6 +39,8 @@ tick 参数以**实际执行的模拟 tick**计时；墙钟超时一律使用单
 | maxServerFrameBytes | 1048576 | 一条全量/增量/事件 message 总 bytes，含 envelope；超限拒绝/关闭并记录，不能截断 | M04/M05 |
 | maxSnapshotEntities | 16384 | 不超过现有 entity slot 数；还必须满足总字节上限 | M04 |
 | maxSnapshotEvents | 4096 | 每条快照事件数上限；超限显式失败，不丢事件继续发 delta | M04 |
+| maxEntityFieldBytes / maxEntityFieldRecords | 2048 / 16 | 每个独立公开实体字段块的字节/记录上限；不改变实体数值 | M04 |
+| counterDrainAt | 4294966271 | u32 最大值前预留 1024；达到前排空并换 epoch，不能回绕 | M04/M05 |
 | maxQueuedWriteBytes | 1048576 | 每连接所有待发送及 active write 的拥有缓冲总 bytes；超限 `SLOW_CONSUMER` | M05 |
 | maxQueuedCommands | 128 | 每连接离散队列条数；移动输入独立 latest-state | M05 |
 | maxCommandsPerTick | 4 | 每连接每 tick；入队与执行前都校验 LifeEpoch | M05 |
@@ -79,3 +81,5 @@ nickname 修剪首尾空白后非空，随后检查完整 Unicode/字节上限�
 ## 修改与验收
 
 每次变更记录旧值、新值、类别（玩法规则 / 容量实测 / 连接保护）、理由、覆盖测试与报告 runId。接口重构不暗改数值。M05 的默认配置必须逐键对齐本表；M04 的 schema 字段上限必须引用此契约，增加消费者前先补有限默认值及边界测试。根 CMake/依赖锁、配置和选项在 M01/M08 纳入 native source identity；现有 WASM 身份校验继续保持。
+
+2026-11-01 M04 新增有限实体块上限 2048 bytes/16 records 和 counterDrainAt=4294966271，原值未定义；类别为连接保护。前者约束复用字段 codec 的独立块，后者给安全排空预留序号窗口。原生/TS 损坏块、数组和回绕前拒绝测试覆盖，runId 见 M04 CHECKLIST 交接。其余初值未变。
