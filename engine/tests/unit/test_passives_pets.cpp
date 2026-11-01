@@ -114,7 +114,7 @@ void passive_health() {
   World rewards;
   const auto reward_owner = setup(rewards,{13});
   rewards.entities().get(reward_owner)->health = f32(50.0F);
-  award_player_experience(rewards, engine::test::player(rewards),f32(4.0F));
+  award_player_experience(rewards, engine::test::player(rewards).id(),f32(4.0F));
   require(rewards.entities().get(reward_owner)->max_health
     == player_level_max_health(engine::test::player(rewards).profile().level())+f32(20.0F),
     "level reward keeps equipped Cactus maximum");

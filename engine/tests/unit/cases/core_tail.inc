@@ -202,13 +202,13 @@ void test_effect_payload_released_on_destroy() {
   CHECK(target.valid());
   engine::Entity* entity = world.entities().get(target);
   CHECK(entity != nullptr);
-  const auto payload = engine::make_effect_payload(engine::EffectType::kPoison,
+  const auto payload = engine::make_effect_payload(world, engine::EffectType::kPoison,
     engine::f32(2.0F), 1000.0, engine::EntityHandle{});
   CHECK(payload->refcount == 1U);
   CHECK(std::has_virtual_destructor_v<engine::EffectPayload>);
   CHECK(engine::attach_effect_payload(*entity, payload));
   CHECK(payload->refcount == 2U);
-  const auto second_payload = engine::make_effect_payload(
+  const auto second_payload = engine::make_effect_payload(world,
     engine::EffectType::kPoison, engine::f32(1.0F), 1000.0, engine::EntityHandle{});
   CHECK(second_payload->id == payload->id + 1U);
   CHECK(entity->effect_count == 1U);

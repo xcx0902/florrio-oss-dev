@@ -48,7 +48,7 @@ void test_reward_health_and_level_cap() {
   const unsigned levels[] = {1U, 2U, 4U, 11U};
   const float health[] = {100.0F, 101.13636016845703F, 103.40908813476562F, 111.3636245727539F};
   for (unsigned i = 0; i < 4; ++i) {
-    engine::award_player_experience(world, engine::test::player(world), engine::f32(rewards[i]));
+    engine::award_player_experience(world, engine::test::player(world).id(), engine::f32(rewards[i]));
     CHECK(engine::test::player(world).profile().level() == levels[i]);
     CHECK(player->health.value == health[i]);
     CHECK(player->max_health == engine::player_level_max_health(engine::test::player(world).profile().level()));
@@ -57,7 +57,7 @@ void test_reward_health_and_level_cap() {
   CHECK(engine::test::player(world).profile().experience().value == 11.0F);
   engine::test::player(world).profile().set_level(98U);
   engine::test::player(world).profile().set_experience(engine::f32(0.0F));
-  engine::award_player_experience(world, engine::test::player(world), engine::f32(1e8F));
+  engine::award_player_experience(world, engine::test::player(world).id(), engine::f32(1e8F));
   CHECK(engine::test::player(world).profile().level() == 99U);
   CHECK(player->max_health.value == 150.0F);
   engine::World restored;

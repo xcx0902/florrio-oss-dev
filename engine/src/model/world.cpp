@@ -1,6 +1,7 @@
 #include "engine/model/world.hpp"
 #include "engine/sim/petals.hpp"
 #include "engine/model/catalog.hpp"
+#include "engine/model/entity_relations.hpp"
 #include "engine/sim/combat.hpp"
 
 namespace engine {
@@ -15,6 +16,7 @@ void World::reset() {
   tick_ = 0;
   hit_events_.clear();
   area_effects_.clear();
+  next_effect_id_ = 1;
   area_alive_.clear();area_candidates_.clear();area_added_.clear();area_removed_.clear();
   deferred_launches_.clear();
   deferred_sequence_ = 0;
@@ -122,6 +124,13 @@ bool World::destroy(EntityHandle handle) {
   }
   entity->effect_count = 0;
   entity->effect_flags = 0;
+  for (auto& area : area_effects_)
+    if (area.owner == handle) (void)replace_area_effect(handle, area.scale, nullptr);
+  area_effects_.erase(std::remove_if(area_effects_.begin(), area_effects_.end(),
+    [](const AreaEffect& area) { return !area.payload; }), area_effects_.end());
+  for (auto& launch : deferred_launches_)
+    std::erase(launch.children, handle);
+  std::erase_if(deferred_launches_, [](const DeferredLaunch& launch) { return launch.children.empty(); });
   unregister_pickup(handle);
   unregister_ai(handle);
   unregister_ant_hole(handle);
@@ -144,7 +153,8 @@ void World::detach_linked_entities(EntityHandle handle) {
   }
 }
 
-void World::record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f32 health_after) {
+void World::record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f32 health_after,
+                       const DamageSource* source) {
   if (!target.valid()) return;
   Entity* entity = entities_.get(target);
   const std::uint32_t epoch = entity != nullptr && entity->hit_epoch != 0U
@@ -154,7 +164,10 @@ void World::record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f
       if (event.target != target || event.tick != tick_ || event.epoch != epoch) continue;
       event.amount = event.amount + amount;
       event.health_after = health_after;
-      if (attacker.valid()) event.attacker = attacker;
+      if (attacker.valid()) {
+        event.attacker = attacker;
+        event.source = source == nullptr ? damage_source(*this, attacker) : *source;
+      }
       ++event.count;
       ++event.refcount;
       return true;
@@ -162,7 +175,8 @@ void World::record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f
     return false;
   };
   if (merge(hit_events_)) return;
-  HitEvent event{target, attacker, amount, health_after, tick_, 1U, epoch, 1U, is_known(target)};
+  HitEvent event{target, attacker, amount, health_after, tick_, 1U, epoch, 1U, is_known(target),
+                 source == nullptr ? damage_source(*this, attacker) : *source};
   if (event.known) {
     hit_events_.push_back(event);
   } else {

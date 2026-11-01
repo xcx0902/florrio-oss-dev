@@ -25,6 +25,7 @@ struct DeathState {
   std::uint8_t kept_count = 0;
   EntityHandle killer{};
   std::string killer_name;
+  DamageSource source;
 };
 
 /** Authoritative state belonging to one identity, independent of its body. */

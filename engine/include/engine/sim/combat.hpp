@@ -14,6 +14,8 @@ struct DamageResult {
 DamageResult damage_entity(World& world, EntityHandle target, f32 amount,
                            EntityHandle attacker = EntityHandle{},
                            std::uint16_t options = 0U);
+DamageResult damage_entity_from_source(World&, EntityHandle target, f32 amount,
+                                      const DamageSource&, std::uint16_t options = 0U);
 
 /** Contact pass: overlapping non-allied bodies push apart and exchange their
  * physics +44 contact damage. The original collision resolver applies damage
@@ -23,6 +25,7 @@ std::size_t resolve_contacts(World& world);
 
 /** Run the death domain without applying damage (for direct tests). */
 void kill_entity(World& world, EntityHandle target, EntityHandle attacker = EntityHandle{});
+void kill_entity_from_source(World&, EntityHandle target, const DamageSource&);
 
 /** Original healing clamp: dead entities are not healed, live health is
  * clamped to [0, maximum]. Returns the new health. */

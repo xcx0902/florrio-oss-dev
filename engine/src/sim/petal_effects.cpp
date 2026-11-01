@@ -1,8 +1,10 @@
 #include "engine/sim/petal_effects.hpp"
 #include "engine/catalog/petal_combat.hpp"
 #include "engine/model/catalog.hpp"
+#include "engine/model/entity_relations.hpp"
 #include "engine/sim/effects.hpp"
 #include "engine/sim/combat.hpp"
+#include "engine/sim/ai.hpp"
 #include <limits>
 #include "engine/sim/petals.hpp"
 #include "engine/sim/projectile_math.hpp"
@@ -48,7 +50,7 @@ f32 poison_intensity(std::uint16_t type) {
   return f32(combat->damage);
 }
 
-void split_peas(World& world, EntityHandle petal_handle, EntityHandle owner) {
+void split_peas(World& world, EntityHandle petal_handle) {
   Entity* petal = world.entities().get(petal_handle);
   if (petal == nullptr) return;
   const std::uint16_t type = petal->type_id;
@@ -69,7 +71,9 @@ void split_peas(World& world, EntityHandle petal_handle, EntityHandle owner) {
     entity->contact_damage = f32(combat->damage);
     entity->health = f32(5.0F);
     entity->max_health = f32(5.0F);
-    entity->owner = owner.valid() ? owner.raw : std::numeric_limits<std::uint32_t>::max();
+    inherit_entity_owner(world, child, petal_handle);
+    // Physical owner remains the flower; attribution comes from the Peas.
+    entity->owner = petal->owner;
     entity->lifetime_remaining_ms = 1000.0;
     entity->petal_launched = true;
     entity->petal_render_flags = type == 34U ? 3U : type == 12U ? 1U : 0U;
@@ -110,6 +114,8 @@ void spawn_web_tag(World& world, EntityHandle petal_handle, Vec2 position) {
   Entity* entity = world.entities().get(tag);
   if (entity == nullptr) return;
   entity->owner = owner.valid() ? owner.raw : std::numeric_limits<std::uint32_t>::max();
+  inherit_entity_owner(world, tag, petal_handle);
+  entity->owner = owner.valid() ? owner.raw : kInvalidEntity;
   entity->collision_radius = f32(50.0F);
   entity->health = f32(5.0F);
   entity->max_health = f32(5.0F);
@@ -156,7 +162,7 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state,
   state.behavior_state = 1U;
   const EntityHandle handle = state.handle;
   if (peas) {
-    split_peas(world, handle, EntityHandle{petal->owner});
+    split_peas(world, handle);
     return true;
   }
   const double length = std::sqrt(dx * dx + dy * dy);
@@ -200,12 +206,13 @@ bool consume_peas_attack(World& world, EntityHandle petal_handle, EntityHandle o
   Entity* petal = world.entities().get(petal_handle);
   if (petal == nullptr) return false;
   if (petal->type_id != 11U && petal->type_id != 12U && petal->type_id != 34U) return false;
-  split_peas(world, petal_handle, owner);
+  if (EntityHandle{petal->owner} != owner) return false;
+  split_peas(world, petal_handle);
   return true;
 }
 
 void on_petal_hit(World& world, EntityHandle petal_handle, EntityHandle target_handle,
-                  EntityHandle attacker) {
+                  EntityHandle /*attacker*/) {
   Entity* petal = world.entities().get(petal_handle);
   Entity* target = world.entities().get(target_handle);
   if (petal == nullptr || target == nullptr) return;
@@ -216,7 +223,9 @@ void on_petal_hit(World& world, EntityHandle petal_handle, EntityHandle target_h
   if (effect_for_type(type, spec)) {
     const f32 intensity = spec.type == EffectType::kPoison ? poison_intensity(type)
       : spec.type == EffectType::kSlow ? f32(0.5F) : f32(1.0F);
-    (void)apply_effect(world, target_handle, spec.type, intensity, spec.duration_ms, attacker);
+    const auto source = damage_source(world, petal_handle);
+    const auto key = petal->owner == kInvalidEntity ? EntityHandle{} : EntityHandle{petal->owner};
+    (void)apply_effect(world, target_handle, spec.type, intensity, spec.duration_ms, key, &source);
     petal->behavior_cooldown_ms = 500.0;
   }
 
@@ -225,9 +234,10 @@ void on_petal_hit(World& world, EntityHandle petal_handle, EntityHandle target_h
 void on_petal_incoming_hit(World& world, EntityHandle petal_handle, EntityHandle attacker) {
   Entity* petal = world.entities().get(petal_handle);
   if (petal == nullptr || petal->type_id != 21U) return;
-  if (!attacker.valid() || attacker == EntityHandle{petal->owner}) return;
+  if (!attacker.valid() || same_controlling_root(world, petal_handle, attacker)) return;
+  const auto source = damage_source(world, petal_handle);
   (void)apply_effect(world, attacker, EffectType::kPoison, f32(10.0F), 4444.444444444444,
-                     EntityHandle{petal->owner});
+                     EntityHandle{petal->owner}, &source);
 }
 
 void update_petal_behaviors(World& world, double delta_milliseconds) {

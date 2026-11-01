@@ -1,5 +1,6 @@
 #include "engine/sim/species_attacks.hpp"
 #include "engine/sim/spawn.hpp"
+#include "engine/model/entity_relations.hpp"
 #include <cmath>
 #include <limits>
 
@@ -54,7 +55,7 @@ EntityHandle spawn_hornet_stinger(World& world, EntityHandle hornet_handle,
   entity->health = f32(10.0F);
   entity->max_health = f32(10.0F);
   entity->contact_damage = f32(kStingerDamage);
-  entity->owner = hornet_handle.raw;
+  inherit_entity_owner(world, stinger, hornet_handle);
   entity->lifetime_remaining_ms = kStingerLifetimeMs;
   entity->velocity = Vec2d{
     static_cast<double>(f32(direction_x.value * kLaunchVelocity).value),

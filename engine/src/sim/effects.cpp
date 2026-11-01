@@ -3,6 +3,7 @@
 #include "engine/sim/projectile_math.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/sim/spatial.hpp"
+#include "engine/model/entity_relations.hpp"
 #include <algorithm>
 #include <cmath>
 #include <unordered_set>
@@ -55,6 +56,7 @@ void sync_effect(Effect& effect) {
   if (!effect.payload) return;
   effect.type = effect.payload->type;
   effect.source = effect.payload->source;
+  effect.attribution = effect.payload->attribution;
   effect.intensity = effect.payload->intensity;
   effect.remaining_ms = effect.payload->remaining_ms;
   effect.active = effect.payload->active;
@@ -62,17 +64,11 @@ void sync_effect(Effect& effect) {
 
 } // namespace
 
-namespace {
-std::uint32_t next_payload_id() {
-  static std::uint32_t next = 1;
-  return next++;
-}
-} // namespace
-
-std::shared_ptr<EffectPayload> make_effect_payload(EffectType type, f32 intensity,
+std::shared_ptr<EffectPayload> make_effect_payload(World& world, EffectType type, f32 intensity,
                                                    double duration_ms, EntityHandle source) {
   auto payload = std::make_shared<EffectPayload>();
-  payload->id = next_payload_id();
+  payload->id = world.allocate_effect_id();
+  payload->attribution = damage_source(world, source);
   payload->type = type;
   payload->intensity = intensity;
   payload->remaining_ms = duration_ms;
@@ -85,9 +81,11 @@ bool attach_effect_payload(Entity& entity, const std::shared_ptr<EffectPayload>&
   if (!payload || !payload->active) return false;
   if (find_payload(entity, payload.get()) != nullptr) return true;
   Effect* effect = free_effect(entity);
+  if (effect->payload && effect->payload->refcount > 0U) --effect->payload->refcount;
   effect->payload = payload;
   effect->type = payload->type;
   effect->source = payload->source;
+  effect->attribution = payload->attribution;
   effect->intensity = payload->intensity;
   effect->remaining_ms = payload->remaining_ms;
   effect->active = true;
@@ -106,7 +104,7 @@ bool detach_effect_payload(Entity& entity, const std::shared_ptr<EffectPayload>&
 }
 
 bool apply_effect(World& world, EntityHandle target, EffectType type, f32 intensity,
-                  double duration_ms, EntityHandle source) {
+                  double duration_ms, EntityHandle source, const DamageSource* attribution) {
   Entity* entity = world.entities().get(target);
   if (entity == nullptr || entity->health.value <= 0.0F) return false;
   if (!(duration_ms > 0.0)) return false;
@@ -115,13 +113,15 @@ bool apply_effect(World& world, EntityHandle target, EffectType type, f32 intens
     if (!(intensity.value > 0.0F)) return false;
     if (intensity.value > 1.0F) intensity = f32(1.0F);
   }
-  const auto payload = make_effect_payload(type, intensity, duration_ms, source);
+  const auto payload = make_effect_payload(world, type, intensity, duration_ms, source);
+  if (attribution != nullptr) payload->attribution = *attribution;
   Effect* effect = find_effect(*entity, type, source);
   if (effect == nullptr) effect = free_effect(*entity);
   if (effect->payload && effect->payload->refcount > 0U) --effect->payload->refcount;
   effect->payload = payload;
   effect->type = type;
   effect->source = source;
+  effect->attribution = payload->attribution;
   effect->remaining_ms = duration_ms;
   effect->intensity = intensity;
   effect->active = true;
@@ -134,14 +134,16 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
   std::size_t damaged = 0;
 
   // Shared payloads (area effects) are advanced exactly once per tick.
-  std::vector<EffectPayload*> payloads;
+  // Death callbacks can destroy other targets/areas during this pass. Retain
+  // every payload until its one timer advance has finished.
+  std::vector<std::shared_ptr<EffectPayload>> payloads;
   world.entities().with_ordered_slots([&](auto&& slots) {
     for (auto& entity : slots) { PERF_ADD(visits, 1);
       if (!entity.active) continue;
       for (const auto& effect : entity.effects) {
         if (!effect.active || !effect.payload) continue;
-        if (std::find(payloads.begin(), payloads.end(), effect.payload.get()) == payloads.end())
-          payloads.push_back(effect.payload.get());
+        if (std::find(payloads.begin(), payloads.end(), effect.payload) == payloads.end())
+          payloads.push_back(effect.payload);
       }
     }
   });
@@ -165,7 +167,7 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
           // A replacement/stronger poison shares this entity's same clock.
           const bool quiet = world.time_ms() - entity.poison_hit_time_ms < 600.0;
           if (!quiet) entity.poison_hit_time_ms = world.time_ms();
-          (void)damage_entity(world, entity.handle, f32::from_double(amount), strongest->source,
+          (void)damage_entity_from_source(world, entity.handle, f32::from_double(amount), strongest->attribution,
             quiet ? 1U : 0U);
           ++damaged;
         }
@@ -195,7 +197,7 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
     }
   });
 
-  for (EffectPayload* payload : payloads) {
+  for (const auto& payload : payloads) {
     if (!payload->active) continue;
     payload->remaining_ms -= delta_milliseconds;
     if (payload->remaining_ms <= 0.0) {
@@ -248,7 +250,10 @@ std::uint8_t effect_flags(const Entity& entity) {
 }
 
 void clear_effects(Entity& entity) {
-  for (auto& effect : entity.effects) effect = Effect{};
+  for (auto& effect : entity.effects) {
+    if (effect.payload && effect.payload->refcount > 0U) --effect.payload->refcount;
+    effect = Effect{};
+  }
   entity.effect_count = 0;
   entity.effect_flags = 0;
 }
@@ -256,7 +261,7 @@ void clear_effects(Entity& entity) {
 std::shared_ptr<EffectPayload> add_area_effect(World& world, EntityHandle owner, f32 scale,
                                                EffectType type, f32 intensity,
                                                double duration_ms, EntityHandle source) {
-  const auto payload = make_effect_payload(type, intensity, duration_ms, source);
+  const auto payload = make_effect_payload(world, type, intensity, duration_ms, source);
   (void)world.replace_area_effect(owner, scale, payload);
   return payload;
 }
@@ -356,6 +361,7 @@ std::size_t World::update_area_effects() {
     area.targets.assign(candidates.begin(), candidates.end());
     ++updated;
   }
+  std::erase_if(area_effects_, [](const AreaEffect& area) { return !area.payload; });
   return updated;
 }
 

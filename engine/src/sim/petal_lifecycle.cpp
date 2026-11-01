@@ -1,6 +1,7 @@
 #include "engine/sim/petals.hpp"
 #include "engine/sim/petal_effects.hpp"
 #include "engine/model/catalog.hpp"
+#include "engine/model/entity_relations.hpp"
 #include "engine/sim/petal_orbit.hpp"
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/combat.hpp"
@@ -73,6 +74,7 @@ EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id
   if (type_id == 26U) entity->mass = f32(4.0F);
   entity->loadout_slot = slot;
   entity->loadout_instance = instance;
+  inherit_entity_owner(world, handle, state.player());
   PetalOrbitState orbit;
   orbit.handle = handle;
   orbit.type_id = type_id;

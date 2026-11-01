@@ -1,4 +1,4 @@
-# 多人测试与路径交接（M00—M02）
+# 多人测试与路径交接（M00—M03）
 
 本文区分已实现入口与后续计划；任何未来测试必须在对应阶段写出真实断言并同步清单，不能提前注册空 suite 或永久 skip。所有路径相对仓库根目录，不读取 `archive/`。
 
@@ -7,8 +7,8 @@
 | 入口 | 用途 | 清单/证据 |
 | --- | --- | --- |
 | `npm run test:all` | 重跑完整当前 WASM/Worker 产品验收（17 gate，含 M01 native 构建/CTest） | `tools/verification/gates.mjs`；`reports/runs/<runId>/run.json` |
-| `npm run test:engine` | native Release + 14 项 CTest 封闭清单，含 15 个 M02 场景 | `tests/product-tests.json` 的 engine.expected |
-| `npm run build:server`、`test:server:native` | 已实现：锁定 Boost 归档、根构建、core-only 链接、19 项封闭 CTest | `build/native/native-build.json`；构建工具仍输出到 `reports/multiplayer/m01/<runId>/{build,ctest}.json` |
+| `npm run test:engine` | native Release + 16 项 CTest 封闭清单，含 15 个 M02、26 个 M03 场景 | `tests/product-tests.json` 的 engine.expected |
+| `npm run build:server`、`test:server:native` | 已实现：锁定 Boost 归档、根构建、core-only 链接、21 项封闭 CTest | `build/native/native-build.json`；构建工具仍输出到 `reports/multiplayer/m01/<runId>/{build,ctest}.json` |
 | `npm run test:multiplayer:baseline` | M00 已实现：单玩家固定种子双进程重放、冻结领域摘要比较与新报告 | `tools/multiplayer-baseline.mjs`；不表示多人验收通过 |
 | `npm run test:unit`、`test:tools`、`test:integration` | 现有字节/工具/跨 C++→TS 测试 | `tools/test-manifest.mjs` 校验每个实际测试文件 |
 
@@ -24,13 +24,13 @@ M00 的单玩家场景入口及报告见 [baseline.md](baseline.md)。它只证�
 
 以上在 M00 是验收需求。M02 已加入真实领域测试和独立 received/applied 序号宿主夹具；夹具不是网络会话实现。MP-REG-003 仍待 M04；没有占位测试或永久 skip。原始失败与修复证据保留在阶段交接中。
 
-## 各阶段测试入口（M01—M02 已实现；M03—M08 计划新增）
+## 各阶段测试入口（M01—M03 已实现；M04—M08 计划新增）
 
 | 阶段 | CTest/Node 文件名或场景 | 计划入口与覆盖 |
 | --- | --- | --- |
 | M01 | `engine_native_link_tests`、`server_native_tests`、`server_help/version/smoke/invalid_config` | 已实现 `build:server`、`test:server:native`；core-only 双 World 交错推进、有限 tick smoke、无 Worker/cheat ABI、保留原有 native/wasm/ABI 回归 |
 | M02 | `engine_multiplayer_state_tests` | 已追加到 engine/server-native 清单；15 场景覆盖双出生、稳定迭代、独立输入/资料/zone、TTL/控制去重、死亡/重生 LifeEpoch、实际槽位换代、反向索引、离场和双 World；另保留冻结 M00 精确比较 |
-| M03 | `engine_multiplayer_combat_tests` | engine suite；真实等级系数、petal/pet/projectile/DOT/治疗归属、怪物 XP、无 PVP 额外 XP、唯一拾取、同时致死、死亡掉落一次性、两个 World 隔离 |
+| M03 | `engine_multiplayer_combat_tests`、`engine_multiplayer_lifecycle_tests` | 已加入 engine/server-native 清单；17+9 场景覆盖等级 1/5/6/10 全组合、38 个非空花瓣的现有行为、pet/petal/projectile/DOT/治疗/经验归属、真实槽位换代、唯一拾取、同时致死、完整闭环、100 次生命和双 World；审查范围与实际能力边界见 [玩法归属](gameplay-ownership.md) |
 | M04 | `engine_replication_tests`、`engine_multiplayer_protocol_tests`、`tests/integration/multiplayer-snapshot.test.mjs`、`client/tests/unit/multiplayer-codec.test.mjs` | engine/integration/client-unit；手工字节向量 + native→TS，公开/私有、双观察者、AOI、full/delta/epoch、序号回绕、损坏包事务性、无奖励重放 |
 | M05 | `server_config_tests`、`server_session_tests`、`server_room_tests`、`server_connection_tests`、`server_websocket_tests` | `test:server:native`、`test:server:network`；fake clock 20Hz/TTL/grace/补帧、双真实 WebSocket、限流、token 唯一胜者、慢写、超时/信号/重复 close 一次清理 |
 | M06 | `client/tests/unit/network-session.test.mjs`、`client/tests/integration/multiplayer-browser.test.mjs` | `test:multiplayer:browser`；独立 BrowserContext，显式控制对象/死亡相机、重连全量、后台标签、未知版本拒绝、真实入口无 wasm/worker 请求 |

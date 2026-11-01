@@ -1,6 +1,7 @@
 #include "engine/core/perf.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/model/catalog.hpp"
+#include "engine/model/entity_relations.hpp"
 #include "engine/sim/ai.hpp"
 #include "engine/sim/collision_filter.hpp"
 #include "engine/sim/effects.hpp"
@@ -270,12 +271,14 @@ std::size_t resolve_contacts(World& world) {
       const EntityHandle b_handle = b.handle;
       const EntityHandle a_owner = a_owned ? EntityHandle{a.owner} : EntityHandle{};
       const EntityHandle b_owner = b_owned ? EntityHandle{b.owner} : EntityHandle{};
+      const auto a_source = damage_source(world, a_handle);
+      const auto b_source = damage_source(world, b_handle);
       if (!suppress_damage && a.kind == EntityKind::kPetal) on_petal_hit(world, a_handle, b_handle, a_owner);
       if (!suppress_damage && b.kind == EntityKind::kPetal) on_petal_hit(world, b_handle, a_handle, b_owner);
-      if (damage_to_a.value > 0.0F) (void)damage_entity(world, a_handle, damage_to_a, b_handle);
-      if (damage_to_b.value > 0.0F) (void)damage_entity(world, b_handle, damage_to_b, a_handle);
-      if (a.kind == EntityKind::kPetal) on_petal_incoming_hit(world, a_handle, b_handle);
-      if (b.kind == EntityKind::kPetal) on_petal_incoming_hit(world, b_handle, a_handle);
+      if (damage_to_a.value > 0.0F) (void)damage_entity_from_source(world, a_handle, damage_to_a, b_source);
+      if (damage_to_b.value > 0.0F) (void)damage_entity_from_source(world, b_handle, damage_to_b, a_source);
+      if (!suppress_damage && a.kind == EntityKind::kPetal) on_petal_incoming_hit(world, a_handle, b_handle);
+      if (!suppress_damage && b.kind == EntityKind::kPetal) on_petal_incoming_hit(world, b_handle, a_handle);
       if (mass_path && overlap > 0.0) {
         // Original 390 applies damage/death (including spawning loot) before
         // returning to 162 for this split. A newly created drop must retain

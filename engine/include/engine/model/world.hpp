@@ -109,7 +109,8 @@ class World {
   /** Coalesce a hit notification for the current tick. The original keeps one
    * message per target epoch and merges repeated damage into it. Targets that
    * are not in the sorted known list stay in a pending vector. */
-  void record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f32 health_after);
+  void record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f32 health_after,
+                  const DamageSource* source = nullptr);
   /** Move pending notifications into the outgoing list once their target is
    * visible in the known-entity list. */
   std::size_t flush_pending_hits() {
@@ -197,6 +198,7 @@ class World {
   std::size_t update_area_effects();
   [[nodiscard]] std::vector<AreaEffect>& area_effects() { return area_effects_; }
   [[nodiscard]] const std::vector<AreaEffect>& area_effects() const { return area_effects_; }
+  [[nodiscard]] std::uint32_t allocate_effect_id() { return next_effect_id_++; }
 
   /** Deferred Peas launch queue (original world+1916 vector). */
   void schedule_deferred_launch(double due_ms, f32 phase, std::vector<EntityHandle> children) {
@@ -258,6 +260,7 @@ class World {
   std::vector<HitEvent> pending_hit_events_;
   std::set<std::uint32_t> known_entities_;
   std::vector<AreaEffect> area_effects_;
+  std::uint32_t next_effect_id_ = 1;
   std::vector<EntityHandle> area_alive_, area_candidates_, area_added_, area_removed_;
   std::vector<DeferredLaunch> deferred_launches_;
   std::uint64_t deferred_sequence_ = 0;

@@ -54,6 +54,6 @@ void regenerate_players(World& world, double delta_milliseconds);
 [[nodiscard]] f32 player_level_max_health(std::uint8_t level);
 /** Original 215 reward: score/experience, level cap 99, and original 145's
  * proportional health rescale after every level gained. */
-void award_player_experience(World& world, PlayerState& state, f32 amount);
+void award_player_experience(World& world, PlayerId player, f32 amount);
 
 } // namespace engine

@@ -13,6 +13,7 @@ struct EffectPayload {
 
   EffectType type = EffectType::kPoison;
   EntityHandle source{};
+  DamageSource attribution;
   double remaining_ms = 0.0;
   f32 intensity = f32(0.0F);
   bool active = true;

@@ -13,43 +13,15 @@
 
 namespace engine {
 
-namespace {
-
-std::string killer_name_for(const World& world, EntityHandle attacker) {
-  // Original 43 copies the *destroying entity's own name string* (entity+160).
-  // Petals and projectiles inherit their owner's name; mobs and flowers use
-  // their catalog/player name. An entity's killer_name is the name of whoever
-  // killed that entity, so it must never be reused here: a mob that the player
-  // had just killed would otherwise report the player's own flower name.
-  EntityHandle source = attacker;
-  bool rooted = false;
-  for (std::uint32_t guard = 0; guard < 16U; ++guard) {
-    const Entity* entity = world.entities().get(source);
-    if (entity == nullptr) return {};
-    if (entity->kind == EntityKind::kPlayer) {
-      const auto* state = world.players().by_body(source);
-      return state == nullptr ? std::string{} : state->player_name();
-    }
-    if (entity->kind == EntityKind::kMob) { rooted = true; break; }
-    if (entity->kind != EntityKind::kPetal && entity->kind != EntityKind::kProjectile) break;
-    if (entity->owner == std::numeric_limits<std::uint32_t>::max()) break;
-    source = EntityHandle{entity->owner};
-  }
-  // A petal/projectile with no owner chain is nameless in the original name
-  // component; do not invent a catalog name for it.
-  if (!rooted) return {};
-  const Entity* entity = world.entities().get(source);
-  if (entity == nullptr || entity->type_id == 0U) return {};
-  const auto* definition = Catalog::instance().entity(entity->type_id);
-  return definition == nullptr ? std::string{} : std::string(definition->name);
+void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
+  kill_entity_from_source(world, target, damage_source(world, attacker));
 }
 
-} // namespace
-
-void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
+void kill_entity_from_source(World& world, EntityHandle target, const DamageSource& incoming) {
   Entity* entity = world.entities().get(target);
   if (entity == nullptr || entity->death_processed) return;
-  if (!attacker.valid() && entity->last_attacker.valid()) attacker = entity->last_attacker;
+  const DamageSource source = incoming.entity.valid() ? incoming : entity->last_damage_source;
+  const EntityHandle attacker = source.entity;
   entity->death_processed = true;
   // Original43 calls424 immediately, a full second before corpse removal.
   // Leave the ordinary owner/children alive, but let the next segment steer
@@ -58,19 +30,19 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
   const EntityKind kind = entity->kind;
   const Vec2 position = entity->position;
   const std::uint16_t type_id = entity->type_id;
-  const Entity* attacker_entity = world.entities().get(attacker);
   world.record_death(kind, type_id, position,
-                     attacker_entity != nullptr ? attacker_entity->kind : EntityKind::kNone,
-                     attacker_entity != nullptr ? attacker_entity->type_id : 0U);
+                     source.kind, source.type_id);
   if (kind == EntityKind::kPlayer || kind == EntityKind::kMob) {
-    entity->killer_name = killer_name_for(world, attacker);
+    entity->killer_name = source.name;
     // Original updateKillerName writes the destroying entity's name into the
     // player's own replicated string field. Keep the per-player copy for the
     // local death payload only: mobs keep dying (and may die with no attacker)
     // after the player, and those later deaths must not erase or replace the
     // name the death screen is about to show.
-    if (auto* state = world.players().by_body(target))
+    if (auto* state = world.players().by_body(target)) {
       state->set_last_killer(attacker, entity->killer_name);
+      state->death.source = source;
+    }
   }
 
   if (kind == EntityKind::kPetal) {
@@ -132,7 +104,7 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
         continue;
       }
       if (child->health.value > 0.0F)
-        (void)damage_entity(world, child->handle, child->health, attacker);
+        (void)damage_entity_from_source(world, child->handle, child->health, source);
       else
         (void)world.destroy(child->handle);
     }
@@ -148,14 +120,13 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
     std::vector<std::uint16_t> petals(entity->loot_petals.begin(),
                                       entity->loot_petals.begin() + entity->loot_count);
     (void)spawn_loot_drops(world, petals, position, target);
-    const EntityHandle owner = owning_player(world, attacker);
-    if (auto* player = world.players().by_body(owner)) {
+    if (auto* player = world.players().get(source.player)) {
       const auto* definition = Catalog::instance().entity(type_id);
       if (definition != nullptr) {
         // spawnEntity writes the entity definition scale into loot +4; the
         // damage path awards that value to the attacker's player.
         const f32 reward(definition->scale);
-        award_player_experience(world, *player, reward);
+        award_player_experience(world, player->id(), reward);
       }
     }
     // Mobs also persist as health-0 corpses for one second before the world

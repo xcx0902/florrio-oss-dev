@@ -2,6 +2,7 @@
 #include "engine/sim/player.hpp"
 #include "engine/sim/player_commands.hpp"
 #include "engine/model/catalog.hpp"
+#include "engine/model/entity_relations.hpp"
 #include "engine/sim/loot.hpp"
 #include "engine/sim/progression.hpp"
 #include "engine/sim/passives.hpp"
@@ -41,7 +42,10 @@ f32 player_level_max_health(std::uint8_t level) {
   return f32(f32(growth.value * 50.0F).value + 100.0F);
 }
 
-void award_player_experience(World& world, PlayerState& state, f32 amount) {
+void award_player_experience(World& world, PlayerId id, f32 amount) {
+  auto* recipient = world.players().get(id);
+  if (recipient == nullptr) return;
+  auto& state = *recipient;
   const f32 reward(amount.value * (world.compact() ? 3.0F : 1.0F));
   const std::uint8_t previous_level = state.profile().level();
   state.profile().add_experience(reward);
@@ -81,6 +85,7 @@ EntityHandle spawn_player(World& world, PlayerState& state, std::string_view nam
   state.last_applied_input_tick = world.tick();
   state.last_control_tick = UINT64_MAX;
   state.set_player_name(std::string(name));
+  entity->attribution = damage_source(world, handle);
   state.set_player_speed(config.movement_speed);
   return handle;
 }
@@ -182,14 +187,17 @@ EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_
   }
   const f32 range = maximum - minimum;
   Vec2 position;
+  bool safe = false;
+  const auto query = SpatialQuery::from_world(world);
   for (std::uint32_t attempt = 0; attempt < 1000U; ++attempt) {
     const auto [uniform, vertical] = world.random().next_fraction_pair();
     const f32 biased = f32(std::min(uniform.value * uniform.value * 0.8F, 1.0F));
     position.x = f32(range.value * biased.value + minimum.value);
     position.y = f32(world.height().value * (vertical.value - 0.5F));
     const f32 clearance(world.compact() ? 100.0F : 800.0F);
-    if (!SpatialQuery::from_world(world).occupied({position.x, position.y}, clearance)) break;
+    if (!query.occupied({position.x, position.y}, clearance)) { safe = true; break; }
   }
+  if (!safe) return {};
   const bool rare = allow_rare_starter && world.random().next_fraction() < f32(0.00005F);
   if (rare) {
     // Original spawn restores survivors first, then fills the active row. The

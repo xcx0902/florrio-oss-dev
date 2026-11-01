@@ -1,7 +1,7 @@
 # M01 原生宿主骨架
 
 当前宿主只提供有限 tick smoke，不监听网络。M02 已在 engine_core 实现进程内
-多玩家状态和显式领域命令；完整 PVP 归属、协议和 WebSocket 按 M03—M06 继续。
+多玩家状态和显式领域命令，M03 补齐原生 PVP 与玩法归属；协议、WebSocket 和浏览器接入按 M04—M06 继续。
 浏览器产品入口仍使用离线 Worker。
 
 ## 构建与验证
@@ -54,7 +54,7 @@ engine 的严格浮点、禁异常/RTTI 参数为 PRIVATE，不传播到宿主�
 CMake 版本、编译选项、compile commands/CMake cache 哈希和二进制/静态库哈希；
 通过 `nm` 拒绝 core 和宿主中的 Worker/C ABI 符号，并检查构建前后输入稳定。
 `test:server:native` 对照 `tests/product-tests.json` 精确检查根构建 19 个 CTest，
-包含独立 engine 构建的全部 14 项及 5 项宿主 CLI/配置/smoke 回归。
+包含独立 engine 构建的全部 16 项及 5 项宿主 CLI/配置/smoke 回归。
 运行前拒绝过期源码或被修改的产物，不继承旧通过证据。
 
 每次构建/测试记录于 `reports/multiplayer/m01/<runId>/{build,ctest}.json`；当前

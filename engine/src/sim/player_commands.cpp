@@ -87,8 +87,9 @@ bool leave_player(World& world, PlayerId id) {
   // Retire room-owned entities before removing the identity record.
   std::vector<EntityHandle> owned;
   const auto body = state->player();
-  if (body.valid()) for (const auto& entity : world.entities().active_entities())
-    if (controlling_root(world, entity.handle) == body && entity.handle != body)
+  for (const auto& entity : world.entities().active_entities())
+    if ((entity.attribution.player == id || (body.valid() && controlling_root(world, entity.handle) == body))
+        && entity.handle != body)
       owned.push_back(entity.handle);
   for (auto handle : owned) (void)world.destroy(handle);
   if (body.valid()) (void)world.destroy(body);

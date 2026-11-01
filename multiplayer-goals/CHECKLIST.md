@@ -1,6 +1,6 @@
 # 多人联机执行跟踪
 
-> M00、M01、M02 已完成；M03—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
+> M00—M03 已完成；M04—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
 
 ## 1. 阶段看板
 
@@ -9,7 +9,7 @@
 | M00 基线与契约 | 已完成 | 回归/驱动修复 `2bb33bf`；架构契约 `07b36d9` | `2026-10-31T15-09-18.267Z-4432f606`；`reports/multiplayer/baseline/summary.json` | 15/15 gate；12 CTest + 249 Node/浏览器测试通过；失败记录保留 |
 | M01 原生 core 边界 | 已完成 | 工作区实现，未创建提交 | `2026-10-31T23-43-46.442Z-f638c98a`；`reports/multiplayer/m01/2026-10-31T23-43-46.442Z-f638c98a/summary.json` | 17/17 gate；engine 13/13、根 CTest 18/18、Node/浏览器 251/251；20 tick smoke 与纯 core 双 World 通过 |
 | M02 多玩家状态 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T00-18-30.561Z-577c7708`；`reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/summary.json` | 17/17 gate；engine 14/14、根 CTest 19/19、15 个 M02 场景及 ASan/UBSan；冻结 M00 摘要一致 |
-| M03 PVP 与玩法归属 | 未开始 | — | — | — |
+| M03 PVP 与玩法归属 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T01-54-57.347Z-2c94ac23`；`reports/multiplayer/m03/2026-11-01T01-54-57.347Z-2c94ac23/summary.json` | 17/17 gate；engine 16/16、根 CTest 21/21；26 个新增场景、100 次生命周期及 ASan/UBSan 通过 |
 | M04 协议与复制 | 未开始 | — | — | — |
 | M05 原生网络服务 | 未开始 | — | — | — |
 | M06 联机客户端 | 未开始 | — | — | — |
@@ -42,11 +42,11 @@
 
 ### M03：PVP
 
-- [ ] MP-030：控制根、物理 owner、击杀来源分别建模。
-- [ ] MP-031：装备、花瓣、宠物、投射物、DOT 与治疗归属隔离。
-- [ ] MP-032：双方实际等级伤害、真实击杀经验/昵称。
-- [ ] MP-033：唯一拾取、死亡掉落、尸体、重生事务与生命周期回归。
-- [ ] MP-034：原生双玩家完整对战闭环及两 World 隔离。
+- [x] MP-030：控制根、物理 owner、击杀来源分别建模。
+- [x] MP-031：装备、花瓣、宠物、投射物、DOT 与治疗归属隔离。
+- [x] MP-032：双方实际等级伤害、真实击杀经验/昵称。
+- [x] MP-033：唯一拾取、死亡掉落、尸体、重生事务与生命周期回归。
+- [x] MP-034：原生双玩家完整对战闭环及两 World 隔离。
 
 ### M04：协议和复制
 
@@ -160,3 +160,22 @@ runId / source identity / binary-client hash：
 - 规则或接口偏离及理由：保留旧离线 ABI 的无限输入租期，不将其用于原生多人默认入口；重生不新增区域计时重置。`same_input_sequence_is_independent` 是分别保存 received/applied 序号并调用真实领域输入的宿主夹具，不宣称 M05 网络会话已完成。v1 snapshot 仍消费 World 事件，只读多观察者复制留给 M04。
 - 未解决问题与受影响后续阶段：M02 无阻塞；尚未创建提交。特殊花瓣/宠物/投射物的完整 PVP 归属、每连接复制、真实 WebSocket、容量及 Linux 发布按 M03—M08 继续实现，不能把本次进程内双玩家结果当成联网发布验收。
 - 下一步：M03；控制根/物理 owner/伤害来源分离，完整多人战斗、拾取、掉落与生命周期回归。本轮未开始 M03。
+
+## 7. M03 完成交接
+
+- 阶段 / 任务编号：M03；MP-030—MP-034 全部完成，2026-11-01（Asia/Shanghai）。
+- 实际提交：本轮为工作区实现，未创建 Git 提交；基准 HEAD 为 `611e99b1bdc715ca33b41763b642d41b8cefbd35`。`reports/multiplayer/m03/2026-11-01T01-54-57.347Z-2c94ac23/source-changes.json` 保存本轮文件内容和哈希，可从基准重建修改；基准 HEAD 不是 M03 提交号。
+- 实现范围 / 文件：`model/entity*`、`world*`、`effect_payload.hpp` 与 `player_state.hpp`；`sim/{combat,damage,death,effects,petal_effects,petal_lifecycle,petals,pets,player,player_commands,species_attacks,targeting}.*`。物理 owner、控制根、DamageSource 值快照分离；PlayerId/LifeEpoch/昵称贯穿花瓣、宠物、投射物、DOT、子实体死亡和事件，源实体销毁或槽位换代不改写归属。经验显式接收 PlayerId；离场按持久身份清理孤立攻击和区域；效果 ID 属于各 World。
+- 事务与规则：拾取按距离、PlayerId 确定唯一胜者，提交后的转移动画不重复发物品；死亡只结算一次，保留原掉落、尸体和重生时序。出生最多尝试 1000 次，无安全位置明确失败，不创建新生命；其他玩家仍继续模拟。来源、刷新键与控制根各自保存，保留同 owner 的 Honey/毒刷新和 Web 多实例叠加；效果遍历持有 payload，避免死亡回调清理子实体时悬空。详细接口和 38 个实际支持花瓣的逐项核查见 [玩法归属](../docs/multiplayer/gameplay-ownership.md)。
+- 测试入口：新增 `engine/tests/unit/test_multiplayer_combat.cpp`（17 场景）、`test_multiplayer_lifecycle.cpp`（9 场景）及共享 `tests/support/gameplay.hpp`；两个目标仅链接 engine_core，接入 engine/server-native 封闭 CTest 清单、verification identity、原有 runner 与门禁，未创建替代验收入口。
+- 执行命令：`npm run build:engine`、`node tools/run-tests.mjs engine`；完整验收使用 `FLORR_BOOST_ARCHIVE=/private/tmp/florr-boost-1.86.0.tar.bz2 CHROME_PATH=/private/tmp/florr-m3-chromium/chrome-headless-shell-mac-arm64/chrome-headless-shell npm run test:all`；验收结束后执行 `CHROME_PATH=/private/tmp/florr-m3-chromium/chrome-headless-shell-mac-arm64/chrome-headless-shell node tools/multiplayer-baseline.mjs`，两个独立进程与原冻结 JSON 精确一致。浏览器固定 `156.0.8078.47`，Boost 沿用锁定归档及校验。
+- 内存安全：`cmake -S engine -B build/m03-sanitize -DCMAKE_BUILD_TYPE=Debug '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer' -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined`，构建并执行 `engine_multiplayer_combat_tests`、`engine_multiplayer_lifecycle_tests`，26/26 通过，无 ASan/UBSan 错误；配置、构建日志、TAP 与二进制哈希见 `sanitizer.json` 及配套文件。
+- 测试数量与结果：完整 **17/17 gate**，`passed=true`、`stable=true`；engine **16/16 CTest**，根构建 **21/21 CTest**；新增 **26/26** 场景，覆盖双方等级 1/5/6/10 的 16 组合、来源实际槽位复用、100 次死亡/重生（Egg/Peas/Web/effect）、双 World 的事件/分数/RNG/payload ID 隔离。Node/浏览器 **251/251**（40 单元、24 工具、102 客户端单元、4 跨端、81 浏览器），无失败或跳过；渲染 3 profile × 4 场景 × 5 次 × 600 帧、native/WASM 引擎及真实 Worker 跨端性能均通过，原预算未降低。
+- runId：`2026-11-01T01-54-57.347Z-2c94ac23`；UTC 完成时间 `2026-11-01T02:11:01.032Z`；冻结 M00 重放 `m00-2026-11-01T02-11-33.290Z-28e31ca4`。
+- source identity：产品 `27d71a09ea34fc71f3ca59e5c9474ea221335cf4a36dd1a333a4624e331fce48`；native `6eb1ce2ee48d87535bf53b96c4e80f98c3eb960855de5ea44d7d83539ecd73be`；verification `aab4f2a4b7b0b94a9e973de7a85df350ece1a08221f77407e23d7bb157b62646`。
+- binary/client hash：native host `3097c2ae3100ed4808104adeb7e30c368c5f7f2ac87b71750be7b69842cb36b2`；WASM `b56a2740d0728be46eecf38e340bb57b2285f931bcfd9fd2d1f933ba5759606c`；client/wasm/static 组合身份 `c86ae6102ded4fabeaa7d7c3b68cc1ab084f05c893b8cdc084c6da8ed0bf84b1`。
+- 报告路径：`reports/runs/2026-11-01T01-54-57.347Z-2c94ac23/run.json`、`reports/multiplayer/m03/2026-11-01T01-54-57.347Z-2c94ac23/{summary,build,ctest,baseline,sanitizer,source-changes}.json`、两份 `multiplayer-*.tap`；`accepted/index.json` 冻结全部 gate 日志/报告、交付 manifest 与 native toolchain 的副本及哈希。`releaseEvidence()` 校验真实通过；`reports/` 依现有策略不入 Git。
+- 失败与修复：`2026-11-01T01-35-48.887Z-07f7397c` 因 macOS 沙箱拒绝 Chromium MachPort 而失败；使用同一固定浏览器在沙箱外运行。`2026-11-01T01-38-29.217Z-285209b1` 与 `2026-11-01T01-48-33.854Z-91ee816a` 在渲染采样阶段主动中断，分别补齐物理父实体销毁后的控制根保存，以及已销毁 DOT 来源向死亡子实体继续传递；随后以最终源码完整重跑。三次原始 ledger/日志和早期编译/测试记录保留于 `prechecks/`，不覆盖失败。
+- 规则或接口偏离及理由：双方实际等级的本体系数在 M02 已按玩家读取，本轮增加全部组合断言，保留公式和仅玩家本体适用范围。保留花瓣之间不接触、目录数值、地图、50ms 步长及接触顺序，不新增玩家击杀 XP。Salt/Rice/Corn 目前仅有目录数值、普通轨道和接触，全部当前行为已覆盖；不声称新增按名称推测的反伤、特殊回充或额外被动。
+- 未解决问题与受影响后续阶段：M03 无阻塞；尚未创建提交。本阶段仅完成原生同 World 玩法，v1 离线发布器仍消费事件；每连接只读复制、真实 WebSocket 与双浏览器在线入口分别留给 M04—M06，容量和 Linux 发布留给 M08。
+- 下一步：M04；v2 schema/协议、冻结 TickChanges、每连接可见集与全量/增量复制。本轮未开始 M04。

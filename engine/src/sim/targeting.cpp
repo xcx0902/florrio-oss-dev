@@ -14,15 +14,19 @@ using namespace ai_detail;
 
 
 bool same_controlling_root(const World& world, EntityHandle first, EntityHandle second) {
+  const auto* source_a = world.entities().get(first);
+  const auto* source_b = world.entities().get(second);
+  if (source_a == nullptr || source_b == nullptr) return false;
   const EntityHandle a = controlling_root(world, first);
   const EntityHandle b = controlling_root(world, second);
   const Entity* root_a = world.entities().get(a);
   const Entity* root_b = world.entities().get(b);
-  if (root_a == nullptr || root_b == nullptr) return false;
   if (a == b) return true;
   // The domain has no manager entity. Uncontrolled mob roots all represent
   // that one original controller; pets instead end at their owning player.
-  return root_a->kind == EntityKind::kMob && root_b->kind == EntityKind::kMob;
+  const bool wild_a = root_a != nullptr ? root_a->kind == EntityKind::kMob : source_a->world_controlled;
+  const bool wild_b = root_b != nullptr ? root_b->kind == EntityKind::kMob : source_b->world_controlled;
+  return wild_a && wild_b;
 }
 
 bool target_eligible(const World& world, const Entity& seeker, const Entity& target) {
@@ -125,16 +129,20 @@ EntityHandle find_pickup_recipient(const World& world, EntityHandle source_handl
   const Entity* source = world.entities().get(source_handle);
   if (source == nullptr) return EntityHandle{};
   EntityHandle recipient{};
+  double best_distance = 4900.0;
   world.players().for_each([&](const PlayerState& state) {
-    if (recipient.valid()) return;
     const Entity* player = world.entities().get(state.player());
     if (player == nullptr || player->health.value <= 0.0F) return;
     const std::uint8_t capacity = state.profile().inventory_size();
     bool open = false;
     for (std::uint8_t slot = 0; slot < capacity; ++slot)
       if (state.loadout().slots()[slot].count == 0) { open = true; break; }
-    if (open && distance_squared_d(source->position, player->position) < 4900.0)
+    const double distance = distance_squared_d(source->position, player->position);
+    // Registry iteration is ascending PlayerId, so an exact tie keeps it.
+    if (open && distance < best_distance) {
       recipient = player->handle;
+      best_distance = distance;
+    }
   });
   return recipient;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/core/f32.hpp"
 #include "engine/core/vec2.hpp"
+#include "engine/model/player_id.hpp"
 #include <array>
 #include <bitset>
 #include <cstdint>
@@ -61,6 +62,18 @@ enum class EffectType : std::uint8_t {
   kSlow = 3,
 };
 
+/** Value snapshot of a server-created attack. Handles retain their generation;
+ * player identity and name survive the source body/entity and its slot reuse. */
+struct DamageSource {
+  EntityHandle entity{};
+  EntityHandle body{};
+  PlayerId player{};
+  LifeEpoch life = 0;
+  EntityKind kind = EntityKind::kNone;
+  std::uint16_t type_id = 0;
+  std::string name;
+};
+
 inline constexpr std::size_t kMaxEffects = 8;
 inline constexpr std::size_t kCollisionLayerCount = 30;
 
@@ -75,6 +88,7 @@ struct Effect {
   f32 intensity = f32(0.0F);
   bool active = false;
   std::shared_ptr<EffectPayload> payload;
+  DamageSource attribution;
 };
 
 /** Recovered AI family profiles. Family-specific parameters are written by
@@ -230,6 +244,10 @@ struct Entity {
   f32 contact_damage;      // physics +44
   double lifetime_remaining_ms = 0.0;  // pickup +32 countdown
   std::uint32_t owner = std::numeric_limits<std::uint32_t>::max();
+  /** Creation-time control identity for attacks whose physical parent can
+   * disappear. Ordinary live ownership chains retain their original rules. */
+  EntityHandle control_root{};
+  bool world_controlled = false;
   std::uint32_t flags = 0;
   std::uint8_t world_flags = 0;   // original entity +95
   std::uint8_t entity_flags = 0;  // original entity +93
@@ -242,6 +260,8 @@ struct Entity {
   std::array<std::uint16_t, 8> loot_petals{};
   std::uint8_t loot_count = 0;
   EntityHandle last_attacker{};
+  DamageSource attribution;
+  DamageSource last_damage_source;
   std::string killer_name;
   AiState ai;
   std::array<Effect, kMaxEffects> effects{};
@@ -282,6 +302,7 @@ struct Entity {
   bool pickup_listed = false;
   /** Original pickup+9 bit 0 and +32 absolute expiry after a slot transfer. */
   bool pickup_collected = false;
+  PlayerId pickup_recipient{};
   double pickup_transfer_deadline_ms = 0.0;
   /** Effect-vector epoch used by the shared area payload. */
   std::uint32_t effect_epoch = 0;

@@ -117,6 +117,12 @@ add_executable(engine_multiplayer_state_tests tests/unit/test_multiplayer_state.
 target_link_libraries(engine_multiplayer_state_tests PRIVATE engine_core)
 add_test(NAME engine_multiplayer_state_tests COMMAND engine_multiplayer_state_tests)
 
+foreach(suite combat lifecycle)
+  add_executable(engine_multiplayer_${suite}_tests tests/unit/test_multiplayer_${suite}.cpp)
+  target_link_libraries(engine_multiplayer_${suite}_tests PRIVATE engine_core)
+  add_test(NAME engine_multiplayer_${suite}_tests COMMAND engine_multiplayer_${suite}_tests)
+endforeach()
+
 add_executable(engine_native_link_tests tests/unit/test_native_link.cpp)
 target_link_libraries(engine_native_link_tests PRIVATE engine_core)
 add_test(NAME engine_native_link_tests COMMAND engine_native_link_tests)
@@ -144,7 +150,8 @@ if(NOT EMSCRIPTEN)
       engine_sim_tests engine_projectile_tests engine_poison_flash_tests engine_rose_tests
       engine_passives_pets_tests engine_peer_visibility_tests engine_pickup_arrival_tests
       engine_native_snapshot_fixture engine_structure_tests engine_single_player_baseline_tests
-      engine_native_link_tests engine_multiplayer_state_tests)
+      engine_native_link_tests engine_multiplayer_state_tests
+      engine_multiplayer_combat_tests engine_multiplayer_lifecycle_tests)
     set_target_properties(${target} PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
     target_compile_options(${target} PRIVATE -Wall -Wextra -Werror -ffp-contract=off -fno-fast-math)
   endforeach()

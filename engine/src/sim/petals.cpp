@@ -406,6 +406,7 @@ std::size_t advance_pickups(World& world, double delta_milliseconds) {
             state.profile().set_inventory_count(static_cast<std::uint8_t>(slot + 1U));
           state.loadout().record_pickup_transfer(handle, slot);
           drop.ai.target = recipient;
+          drop.pickup_recipient = state.id();
           drop.pickup_collected = true;
           drop.pickup_transfer_deadline_ms = world.time_ms() + 2000.0;
           ++collected;

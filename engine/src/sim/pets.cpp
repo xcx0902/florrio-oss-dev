@@ -1,6 +1,7 @@
 #include "engine/sim/pets.hpp"
 #include "engine/model/catalog.hpp"
 #include "engine/model/world.hpp"
+#include "engine/model/entity_relations.hpp"
 #include "engine/sim/bounds.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/sim/petals.hpp"
@@ -23,7 +24,7 @@ bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hat
                                                               hatchling_type, position);
   Entity* pet = world.entities().get(pet_handle);
   if (pet == nullptr) return false;
-  pet->owner = owner.valid() ? owner.raw : kInvalidEntity;
+  inherit_entity_owner(world, pet_handle, owner);
   pet->ai.owner = owner;
   pet->ai.home = position;
   pet->ai.radius = f32(1000.0F);
