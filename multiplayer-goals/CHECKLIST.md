@@ -1,6 +1,6 @@
 # 多人联机执行跟踪
 
-> M00—M04 已完成；M05—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
+> M00—M06 已完成；M07—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
 
 ## 1. 阶段看板
 
@@ -11,8 +11,8 @@
 | M02 多玩家状态 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T00-18-30.561Z-577c7708`；`reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/summary.json` | 17/17 gate；engine 14/14、根 CTest 19/19、15 个 M02 场景及 ASan/UBSan；冻结 M00 摘要一致 |
 | M03 PVP 与玩法归属 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T01-54-57.347Z-2c94ac23`；`reports/multiplayer/m03/2026-11-01T01-54-57.347Z-2c94ac23/summary.json` | 17/17 gate；engine 16/16、根 CTest 21/21；26 个新增场景、100 次生命周期及 ASan/UBSan 通过 |
 | M04 协议与复制 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T02-58-18.343Z-05f8fff5`；`reports/multiplayer/m04/2026-11-01T02-58-18.343Z-05f8fff5/summary.json` | 17/17 gate；engine 18/18、根 CTest 23/23；12 个新增 native 场景、259 个 Node/浏览器测试与 ASan/UBSan |
-| M05 原生网络服务 | 未开始 | — | — | — |
-| M06 联机客户端 | 未开始 | — | — | — |
+| M05 原生网络服务 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T09-57-01.230Z-e1098481`；`reports/multiplayer/m05/2026-11-01T09-57-01.230Z-e1098481/summary.json` | 17/17 gate；engine 18/18、根 CTest 28/28、259 个 Node/浏览器测试；29 个新增宿主场景及 ASan/UBSan |
+| M06 联机客户端 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T14-40-27.450Z-12bf3d91`；`reports/multiplayer/m06/2026-11-01T14-40-27.450Z-12bf3d91/summary.json` | 17/17 gate；engine 18/18、根 CTest 29/29、273 个 Node/浏览器测试；真实双浏览器 PVP 全程无 WASM/Worker |
 | M07 延迟与预测 | 未开始 | — | — | — |
 | M08 验收与发布 | 未开始 | — | — | — |
 
@@ -58,19 +58,19 @@
 
 ### M05：服务端
 
-- [ ] MP-050：配置、依赖、监听、health/readiness 与异步 Connection。
-- [ ] MP-051：握手/连接绑定、输入与离散命令分离、限流和幂等。
-- [ ] MP-052：固定 tick/补帧/TTL/过载，RoomManager 容量与隔离。
-- [ ] MP-053：grace/token 轮换/旧连接失效/房间回收/有界停服。
-- [ ] MP-054：真实双 WebSocket、错误清理、指标与正式包无 cheat。
+- [x] MP-050：配置、依赖、监听、health/readiness 与异步 Connection。
+- [x] MP-051：握手/连接绑定、输入与离散命令分离、限流和幂等。
+- [x] MP-052：固定 tick/补帧/TTL/过载，RoomManager 容量与隔离。
+- [x] MP-053：grace/token 轮换/旧连接失效/房间回收/有界停服。
+- [x] MP-054：真实双 WebSocket、错误清理、指标与正式包无 cheat。
 
 ### M06：客户端
 
-- [ ] MP-060：Transport 注入、公开连接配置、连接状态机。
-- [ ] MP-061：InputPump/CommandResult，移除在线 think/flush。
-- [ ] MP-062：显式控制身份、selfState HUD、远端 owner 与死亡相机。
-- [ ] MP-063：全量重置、重连、后台标签页与错误 UI。
-- [ ] MP-064：双 BrowserContext 完整 PVP，真实入口无 WASM/Worker 请求。
+- [x] MP-060：Transport 注入、公开连接配置、连接状态机。
+- [x] MP-061：InputPump/CommandResult，移除在线 think/flush。
+- [x] MP-062：显式控制身份、selfState HUD、远端 owner 与死亡相机。
+- [x] MP-063：全量重置、重连、后台标签页与错误 UI。
+- [x] MP-064：双 BrowserContext 完整 PVP，真实入口无 WASM/Worker 请求。
 
 ### M07：延迟
 
@@ -197,3 +197,42 @@ runId / source identity / binary-client hash：
 - 与计划的具体化：v2 增量粒度为变化实体的完整公开字段块，继续复用原字段 codec；每块固定内部 sequence=1/ack=0，并限制 2048 bytes/16 records。dense 仅公开 116/120/140/152 base。新增 counterDrainAt 预留 1024 个 u32 值用于排空；均为连接保护参数，见配置契约。网络调度前先落实了 PeerSession 的纯字节/领域命令契约；它不监听网络。
 - 未解决问题：M04 无未解决阻塞。M05 仍需实现真实 WebSocket、Room/Connection 生命周期、crypto token/grace、限流、排空与日志；M06 仍需将真实浏览器 GameSession 接入网络。当前宿主仍是有限 tick smoke，本阶段不宣称已完成真实双浏览器联机或容量验收。
 - 下一步：按主线进入 M05，消费既有 codec、PeerSession、TickChanges、ReplicationSession 和拥有缓冲写队列契约。
+
+## 9. M05 完成交接
+
+- 阶段 / 任务编号：M05；MP-050—MP-054 全部完成，2026-11-01（Asia/Shanghai）。
+- 实际提交：工作区实现，未创建提交；基准 HEAD 为 `b527a474113739bfea9a1e9c09c9dc92da904ab4`。归档 `source-changes.json` 保存修改文件内容及 SHA256，基准 HEAD 不是 M05 提交号。
+- 实现范围：`server/config/default.json`、严格配置解析、`net/{listener,connection}`、Session、Room/RoomManager、可注入时钟调度器、系统随机 token、固定标签 metrics 与信号停服。单 `io_context` 串行拥有网络和领域状态；只在 tick 边界准入/解绑与执行命令，全房一次模拟、冻结、分别发布和统一清理。根 CMake、显式源表、native identity、产物清单及既有 native gate 均已接入。运行及配置见 [宿主说明](../server/README.md)。
+- 身份与生命周期：Hello 前无玩家；房间容量包括 grace 身份；256-bit token 来自 `getentropy`，重连/在线接管保留 PlayerId、轮换 token 和 SessionEpoch，并创建全新复制基线。断线及 Leave 立即拒绝新输入，身体继续模拟，200 tick grace 到期统一清理；同名房间重建使用新 RoomEpoch。所有帧先完整校验再入队，输入/离散命令/聊天/控制消息独立限流。
+- I/O 与运维：每连接一个 active read、一个 FIFO active write，拥有缓冲直到 completion；active+pending 发送字节上限 1MiB。握手、Hello、心跳、write、close 和停服均有单调墙钟期限，错误/取消/迟到回调统一一次 teardown。排空期间 `/healthz` 保持 200、`/readyz` 与新 `/ws` 返回 503，期限到达关闭全部任务。启动日志包含构建/协议/目录身份；日志和指标不记录 token、昵称、路径；正式服务不链接 Worker/cheat ABI，故障注入仅存在于测试 target。
+- 执行命令：`npm run build:server`、`node tools/run-tests.mjs server-native`、`./build/native/server/florr_server --check-config`、`npm run test:multiplayer:baseline`。完整验收使用 `env 'CHROME_PATH=/private/tmp/florr-m05-chrome/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing' npm run test:all`，在沙箱外运行真实 socket/浏览器测试；Boost 继续使用锁定的官方 1.86.0 归档，Chromium 固定为 `156.0.8078.47`。
+- sanitizer：根构建 `build/native-m05-asan` 使用 Debug、`-fsanitize=address,undefined -fno-omit-frame-pointer`；以 `ASAN_OPTIONS=detect_leaks=0:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 ctest --test-dir build/native-m05-asan --output-on-failure -R '^server_(runtime_tests|network_tests|network_faults_tests|process_tests)$'` 执行四个目标，29/29 场景通过。macOS 不支持 LeakSanitizer，未宣称泄漏检测通过；实际编译选项、环境、可执行文件和日志哈希保存在 `sanitizer.json`。
+- 测试数量与结果：完整 **17/17 gate**，`passed=true`、`stable=true`；独立 engine **18/18 CTest**、根构建 **28/28 CTest**；Node/浏览器 **259/259**（41 单元、24 工具、106 客户端单元、7 跨端、81 浏览器），无跳过。新增 runtime 13、真实 network 8、network faults 6、process 2，共 **29** 场景；Release 和 ASan/UBSan 均通过。原有 60 轮渲染、native/WASM 引擎和 5 轮跨端性能均通过，未放宽预算。
+- 覆盖：fake clock 的 20Hz/4 tick 补帧上限/TTL/冷却/grace/空房回收；两房隔离；A/B 相同 inputSeq 分别生效与刷包不加速；真实双 WebSocket 各自控制身份/快照；重连死亡态/在线接管/token 竞争/旧世代拒绝；Origin、协议、损坏帧、超时、心跳、读写错误、慢连接、重复 close、晚到回调、计数耗尽；真实进程 SIGINT/SIGTERM 与有界排空。四个专用测试目标归并了计划中的运行时与网络测试，没有新增替代验收入口。
+- runId：`2026-11-01T09-57-01.230Z-e1098481`；UTC 完成时间 `2026-11-01T10:13:47.724Z`。M00 冻结单玩家摘要重放 `m00-2026-11-01T09-56-25.040Z-d305534e`，两个独立进程均与冻结值精确一致。
+- source identity：产品 `e182bf67184bb6a82b2a5627031c05088b122d61d42cfd250ca9a88ea6df2e99`；native `27f5e33115c709ecf4e6af2b29be2454f0f4f201910a08168ecf23036c380c88`；verification `ae8b6812da2ffcea0fb732462f0b83e4c24b952f649595762d6dc55aab4f7032`；依赖锁 `652d8b9eaa5ac6f86d7db807307c83d8fb6ebf2c82346b0072e5e36cac9b4037`。
+- binary/client hash：native host `36933c386440b9576d5fc0d024e7889d20584b653e0d64ce9a22523b8cb977ff`；WASM `e974c275724e7135037f16beb2cab0c9ea4dcc66c0d082d0becc879aa56b6264`；client `1ad232c1a7336108de931b118a16b79e094eda47483c4c26d7aa5fb7c8d997aa`；delivery tree `8815dc53a20e14a34a2c3cad367cdaba171cf4da4c6dc968862184555383a15d`。
+- 报告路径：`reports/multiplayer/m05/2026-11-01T09-57-01.230Z-e1098481/{summary,build,ctest,baseline,sanitizer,source-changes,browser-environment}.json` 及四份场景 TAP；`accepted/index.json` 冻结所有 gate 日志/报告、交付 manifest、native toolchain/编译命令及哈希。完整账本为 `reports/runs/2026-11-01T09-57-01.230Z-e1098481/run.json`；`releaseEvidence()` 校验有效。报告目录按仓库惯例不入 Git。
+- 失败与修复：`2026-11-01T09-24-34.325Z-f28d00cb` 因系统 Chrome 自动升级为 `.74` 而与 `.47` pin 不符，使用官方同版本 CfT 修复，未改版本约束。`2026-11-01T09-39-15.811Z-0399303a` 在渲染阶段主动中断，用于修复排空期间 HTTP 探针被提前拒绝，并补真实 socket 回归后完整重跑。ASan 下创建房间触发合法过载 503，测试客户端仅对显式 503 有界重试，服务端保护保持原样。另修复计数耗尽清理后重算条件导致房间残留，加入边界断言。失败 ledger 和原日志保留于 `reports/multiplayer/m05/failures/` 与对应 run 目录。
+- 规则或接口具体化：未改变玩法数值、地图、50ms 步长或接触顺序。M04 的 Leave 改为产生宿主生命周期请求，由 Room 执行 grace，避免立即移除身体造成退出免伤；输入接收层立即停止。调度器丢弃超额墙钟积压但不虚增模拟 tick。调度器采用 header-only 可注入实现；四套测试按职责归并，全部进入既有清单。默认 Origin allowlist 为空、`allowMissingOrigin=false`；开发/原生测试必须显式配置。
+- 未解决问题与后续阶段：M05 无未解决阻塞。当前浏览器产品仍走离线 Worker，真实在线 GameSession、双浏览器 PVP 属于 M06；网络延迟处理属于 M07；默认仍为每房两人、最多两房，2×8 容量、Linux 发行包、TLS 代理和生产交付属于 M08。本阶段没有宣称这些后续验收已完成。
+- 下一步：M06，按现有 v2 协议实现 NetworkTransport、连接状态机、InputPump、重连和真实双浏览器入口。
+
+## 10. M06 完成交接
+
+- 阶段 / 任务编号：M06；MP-060—MP-064 全部完成，2026-11-01（Asia/Shanghai）。
+- 实际提交：工作区实现，未创建提交；保留进入本轮时已有的 M05 改动。基准 HEAD 为 `b527a474113739bfea9a1e9c09c9dc92da904ab4`；归档 `source-changes.json` 保存完整工作区修改文件内容及 SHA256，基准 HEAD 不是 M06 提交号。
+- 实现范围：`net/{transport,websocket,multiplayer-codec,connection-config,local-worker}.ts`、`app/input-pump.ts` 与 GameApp/GameSession/SimulationLoop；WorldState/DeathLifecycle、HUD/相机/远端 owner/昵称和装备命令。默认 NetworkTransport，`connection.json` 承载公开配置，`?profile=offline` 显式使用离线适配器；在线失败不切换 profile。`serve.mjs --server` 只覆盖公开运行时端点，普通入口不构造 Worker，不请求 WASM，不安装 `?test`/`?cheat` 离线权限入口。运行与接口见 [网络客户端契约](../docs/multiplayer/network-client.md)。
+- 输入与连接：50ms 独立 InputPump，不调用在线 think/flush/step；Input/Command 分别编号，CommandResult/五秒超时/128 条队列和 1MiB 发送缓冲有界。首个合法 full 后 connect 完成；损坏包/缺口原子保留旧状态并请求一次有界 resync。socket generation、epoch、token 轮换、0.5/1/2/4 秒退避、终态错误和 leave/dispose 清理已实现；blur/hidden 中立输入、服务端 TTL、focus/visible resync 均实测。
+- 本地身份：PlayerId/controlledHandle 显式绑定，自己的身体暂缺时不选取远端玩家。等级/经验/分数/装备/recharge/相机/死亡/冷却来自 selfState；远端公开 owner/slot/instance、昵称和动作独立。full/新生命清理 decoder、实体/事件与视觉历史；旧生命命令取消，对手拾取/死亡不触发本地 HUD/死亡界面。
+- 真实闭环：专用 `server_browser_fixture` 链接同一 runtime/core，固定出生点和目录装备，不增加公开 debug RPC。两个独立 BrowserContext 从真实 main/index 启动，用正常键盘意图完成移动、攻击、防御、接触击杀、掉落、死亡、重生和恢复；另一个房间验证快照/聊天隔离。B 重生保留 PlayerId、更新 handle/LifeEpoch；恢复保留身体、轮换 SessionEpoch 并取新 full；A 持续推进且不跳到 B。停止输入泵不停止 server tick。普通 serve.mjs 入口另有真实 smoke。
+- 执行命令：`npm run build:client`、`npm run build:server`、`npm test`、`node tools/run-tests.mjs client-unit`、`node tools/run-tests.mjs client`、`node tools/smoke-entrypoints.mjs`、`npm run test:multiplayer:baseline`；完整验收为 `env 'CHROME_PATH=/private/tmp/florr-m05-chrome/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing' npm run test:all`。真实 socket/Chromium 在沙箱外运行，版本继续固定为 `156.0.8078.47`，未修改版本 pin。
+- 测试数量与结果：完整 **17/17 gate**，`passed=true`、`stable=true`；独立 engine **18/18 CTest**、根构建 **29/29 CTest**；Node/浏览器 **273/273**（41 单元、24 工具、118 客户端单元、7 跨端、83 浏览器），无跳过。新增 12 项客户端单元、2 项真实浏览器测试及 1 项原生 fixture 检查，全部进入既有清单和门禁；适用 Canvas/UI/触控/资源释放回归继续通过。原有 60 轮渲染、native/WASM 引擎及 5 轮真实 Worker 跨端性能全部通过，采样和预算不变；这些离线性能数据不冒充在线容量认证。
+- runId：`2026-11-01T14-40-27.450Z-12bf3d91`；UTC 完成时间 `2026-11-01T14:57:28.034Z`。M00 冻结摘要双进程重放 `m00-2026-11-01T14-29-45.987Z-e5626cff` 通过。
+- source identity：产品 `6dad2836f50b6b0071201dcdbbee8530b21fc5eb6adcf089b283b6bdb7205e6a`；native `d25a1c65b584440d09f92f4ed42d005e0bc1c3903cec8d3c79d89e6d37f98f66`；verification `fd490fd3684f8ba3c1b9c8e51e6fb9fb9980e74d94fda462fbafb3832bba5a5f`。
+- binary/client hash：native host `27d4f0409dd59515580788b92e936541b9c28b96ecb85ec2dd475c6b1270293a`；browser fixture `b879e8ddadd57975b99c1735f1ba9359479de282c2ca918d89018e8354a6ecbd`；WASM `e974c275724e7135037f16beb2cab0c9ea4dcc66c0d082d0becc879aa56b6264`；client `5734350f6fbb839a7cab0fff2f433731c0e521f1bb5994cdd2bf1bbd1ddd50cb`；delivery tree `5e26a563e0516b76d7f7f5b1d7346f78557e267bbeebf19bc854f559fddf9fc0`。
+- 报告路径：`reports/multiplayer/m06/2026-11-01T14-40-27.450Z-12bf3d91/{summary,build,ctest,baseline,browser-pvp,entrypoint-smoke,source-changes,browser-environment}.json`、截图与日志；`accepted/index.json` 冻结所有 gate 日志/报告、交付 manifest、native toolchain/编译命令及哈希。完整账本为 `reports/runs/2026-11-01T14-40-27.450Z-12bf3d91/run.json`；`releaseEvidence()` 校验有效，浏览器 PVP 报告的 runId/source/native 产物与本次账本绑定。报告目录按仓库惯例不入 Git。
+- 失败与修复：普通沙箱监听遇到 EPERM，改为沙箱外执行。实现期发现 Playwright 1.49 的 waitForFunction 不等待 async predicate，改为同步观察真实 app；固定接触时长会在正常击退后错过目标，测试改用公开位置和普通键盘追踪。首轮完整验收 `2026-11-01T14-34-15.391Z-17060a11` 为 82/83 浏览器通过，失败发生在重生首包早于 fixture 定位、相机尚未到达固定点；验收改为等待权威位置与实际画面一致，并显式等待重连新 full 基线。未改变玩法、超时预算或用 fake transport 代替 PVP；原 ledger/TAP/当时测试源码和观测保留在 `reports/multiplayer/m06/failures/`。
+- 规则或接口具体化：字段投影复用 M04 的生成 codec/NetworkSnapshotDecoder，私有 enrichment 集中在 WorldState，无需复制修改旧 v1 snapshot-projection/net/input。现有离线资产继续显式保留，默认在线路径不加载。Input targetTick 暂取最近收到的 serverTick + 1；自动恢复采用默认 grace 的十秒保守上限，更短期限由服务端拒绝，更长期限不延长客户端重试。
+- 未解决问题与后续阶段：M06 无未解决阻塞。网络时钟、采用反馈、快照缓冲与本地移动预测属于 M07；Linux/TLS 代理发布、2×8 容量、30 分钟浸泡和版本发布属于 M08，未宣称这些验收通过。
+- 下一步：M07，按服务端 tick 建立网络时钟、远端快照缓冲和纯移动预测/校正，保留当前权威生命、伤害、掉落与命令边界。

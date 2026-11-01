@@ -1,6 +1,6 @@
 import { FrameContext } from './frame-context.js';
 import { renderResources } from './resources.js';
-import { releaseLabel } from './canvas2d/text-cache.js';
+import { releaseLabel, drawLabel } from './canvas2d/text-cache.js';
 import type { CameraState } from '../state/camera.js';
 import { isOutsideWorldBounds,worldViewportBounds,playerWorldPosition } from '../state/world-transform.js';
 import type { EntityState,WorldState } from '../state/world.js';
@@ -246,13 +246,13 @@ function collectVisible(
     const transform = frame.transform(entity, now);
     // The archived local-player block is drawn with the mouse-pan/shake offset;
     // other entities use the unshifted world projection.
-    const panX = entity.kind === 1 ? camera.entityOffsetX : 0;
-    const panY = entity.kind === 1 ? camera.entityOffsetY : 0;
+    const panX = entity.handle === frame.player?.handle ? camera.entityOffsetX : 0;
+    const panY = entity.handle === frame.player?.handle ? camera.entityOffsetY : 0;
     const radius = transform.radius ?? 20;
     // The controlled flower is constrained after interpolation, before local
     // translation. The renderer composes rootTx + f32(localX * zoom), rather
     // than subtracting two large world coordinates before multiplication.
-    const controlled = entity.kind === 1
+    const controlled = entity.handle === frame.player?.handle
       ? (entity.handle === frame.player?.handle ? playerPosition : undefined) ?? playerWorldPosition(entity, now, { x: camera.panX, y: camera.panY })
       : transform;
     const { x, y } = controlled;
@@ -334,7 +334,7 @@ function drawEntityBlock(
       // Native player rendering reads ctor 756 (entity+144), protocol field
       // 14. These effect flags are independent of the field-31 expression
       // byte and field-22 pickup type.
-      const actions = field(14);
+      const actions = entity.ownerPlayerId === undefined ? field(14) : field(31) & 3;
       drawPlayerFace(context, {
         state: playerVisual?.face,
         deltaMs,
@@ -437,6 +437,8 @@ export function drawWorld(context: Canvas2DContext, world: WorldState, camera: C
     setEntityTransform(context, camera, player.screenX, player.screenY, 0, false);
     const visual = playerVisual(player.entity.handle);
     drawPlayerHealthBar(context, ratioHealth, { state: visual.health, deltaMs, immediate: visual.fresh });
+    if (player.entity.nickname) drawLabel(context, { text: player.entity.nickname, font: 14,
+      rasterScale: 2.4 * camera.zoom * camera.pixelRatio }, 0, -42);
   }
 
   for (const item of visible) {

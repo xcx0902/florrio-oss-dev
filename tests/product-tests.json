@@ -23,7 +23,10 @@
       "client/tests/unit/text-cache.test.mjs",
       "client/tests/unit/ui-tooltip.test.mjs",
       "client/tests/unit/structure.test.mjs",
-      "client/tests/unit/multiplayer-codec.test.mjs"
+      "client/tests/unit/multiplayer-codec.test.mjs",
+      "client/tests/unit/network-session.test.mjs",
+      "client/tests/unit/local-player-identity.test.mjs",
+      "client/tests/unit/input-pump.test.mjs"
     ],
     "client-integration": [
       "client/tests/integration/app-lifecycle.test.mjs",
@@ -33,7 +36,8 @@
       "client/tests/integration/menu-interactions.test.mjs",
       "client/tests/integration/snapshot-codec.test.mjs",
       "client/tests/integration/worker-browser.test.mjs",
-      "client/tests/integration/worker-rpc.test.mjs"
+      "client/tests/integration/worker-rpc.test.mjs",
+      "client/tests/integration/network-browser.test.mjs"
     ],
     "integration": [
       "tests/integration/native-snapshot.test.mjs",
@@ -42,7 +46,8 @@
     ],
     "delivery": [
       "client/tests/integration/worker-browser.test.mjs",
-      "client/tests/integration/menu-interactions.test.mjs"
+      "client/tests/integration/menu-interactions.test.mjs",
+      "client/tests/integration/network-browser.test.mjs"
     ],
     "engine": {
       "runner": "ctest",
@@ -104,7 +109,13 @@
         "server_help",
         "server_version",
         "server_smoke",
-        "server_invalid_config"
+        "server_invalid_config",
+        "server_default_config",
+        "server_runtime_tests",
+        "server_network_tests",
+        "server_network_faults_tests",
+        "server_process_tests",
+        "server_browser_fixture_check"
       ]
     }
   }

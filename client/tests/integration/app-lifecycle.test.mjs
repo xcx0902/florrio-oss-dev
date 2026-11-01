@@ -7,7 +7,7 @@ test('repeated app boot/dispose removes input, timers, worker requests, cheat pa
   try {
     await page.route('**/main.js', route => route.fulfill({ contentType: 'text/javascript', body: '' }));
     const errors = []; page.on('pageerror', error => errors.push(error.message));
-    await page.goto(origin + '/?cheat=1');
+    await page.goto(origin + '/?profile=offline&cheat=1');
     const results = await page.evaluate(async () => {
       const { GameApp } = await import('/app/game-app.js');
       const canvas = document.querySelector('canvas'), results = [];
@@ -35,7 +35,7 @@ test('late initialization after returning to menu or disposing cannot schedule a
   const page = await browser.newPage();
   try {
     await page.route('**/main.js', route => route.fulfill({ contentType: 'text/javascript', body: '' }));
-    await page.goto(origin);
+    await page.goto(origin + '/?profile=offline');
     const result = await page.evaluate(async () => {
       const { GameApp } = await import('/app/game-app.js');
       const results = [];
@@ -59,7 +59,7 @@ test('late initialization after returning to menu or disposing cannot schedule a
 test('offscreen visuals retain phases and authoritative deletion releases text owners across generation reuse',async()=>{
   const page=await browser.newPage({viewport:{width:1280,height:720}});
   try {
-    await page.goto(origin+'/?test=1');await page.waitForFunction(()=>window.__florr);
+    await page.goto(origin+'/?profile=offline&test=1');await page.waitForFunction(()=>window.__florr);
     const result=await page.evaluate(async()=>{
       const f=window.__florr;f.freeze();
       const player={handle:1,typeId:1,kind:1,speciesId:0,x:0,y:0,angle:0,health:100,maxHealth:100,level:1,flags:1};

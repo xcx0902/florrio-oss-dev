@@ -12,7 +12,7 @@ after(stop);
 
 test('original snapshot header decoder reads type, sequence and ack', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { decodeSnapshotHeader } = await import('/state/snapshot.js');
     return decodeSnapshotHeader(new Uint8Array([1, 9, 3, 0, 0, 0]));
@@ -23,7 +23,7 @@ test('original snapshot header decoder reads type, sequence and ack', async () =
 
 test('original bare update decoder reads handle and flags', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { SnapshotDecoder } = await import('/state/snapshot.js');
     const bytes = new Uint8Array([1, 12, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 52, 0]);
@@ -196,7 +196,7 @@ test('dense groups follow the component-presence mask', () => {
 
 test('dense group 52 decoder reads two byte fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroup52Decoder } = await import('/test-support/dense-codec.js');
     const bytes = new Uint8Array([1, 41, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x22]);
@@ -209,7 +209,7 @@ test('dense group 52 decoder reads two byte fields', async () => {
 
 test('dense byte group decoder reads configured fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseByteGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 42, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x33]);
@@ -222,7 +222,7 @@ test('dense byte group decoder reads configured fields', async () => {
 
 test('dense float group decoder reads configured fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseFloatGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 43, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0, 0xA0, 0x3F, 0, 0, 0x20, 0x40]);
@@ -235,7 +235,7 @@ test('dense float group decoder reads configured fields', async () => {
 
 test('dense string and mixed groups decode by spec', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseStringGroupDecoder, DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const stringPacket = new Uint8Array([1, 44, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x61, 0x62, 0x63, 0]);
@@ -258,7 +258,7 @@ test('dense string and mixed groups decode by spec', async () => {
 
 test('dense group 152 base fields decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 46, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 1, 2, 3, 0xAC, 2]);
@@ -274,7 +274,7 @@ test('dense group 152 base fields decode', async () => {
 
 test('dense group 152 extended fields decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
@@ -304,7 +304,7 @@ test('dense group 152 extended fields decode', async () => {
 
 test('dense bit group packs bits', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 48, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 1]);
@@ -319,7 +319,7 @@ test('dense bit group packs bits', async () => {
 
 test('dense float+bit group decodes', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 49, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0, 0x60, 0x40, 1]);
@@ -334,7 +334,7 @@ test('dense float+bit group decodes', async () => {
 
 test('dense reference group decodes', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 50, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x11, 0x11, 0x11, 0x22, 0x22, 0x22, 0x22]);
@@ -349,7 +349,7 @@ test('dense reference group decodes', async () => {
 
 test('dense group 72 mixed fields decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
@@ -378,7 +378,7 @@ test('dense group 72 mixed fields decode', async () => {
 
 test('dense group -27 mixed fields decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
@@ -401,7 +401,7 @@ test('dense group -27 mixed fields decode', async () => {
 
 test('dense group -16 mixed arrays decode', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const varint = (value) => {
@@ -437,7 +437,7 @@ test('dense group -16 mixed arrays decode', async () => {
 
 test('dense plan decoder respects present groups', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const plans = [
@@ -460,7 +460,7 @@ test('dense plan decoder respects present groups', async () => {
 
 test('dense plan decoder handles angle and floats', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 62, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0x40, 0, 0, 0xC0, 0x3F, 0, 0, 0x20, 0x40]);
@@ -476,7 +476,7 @@ test('dense plan decoder handles angle and floats', async () => {
 
 test('dense plan decoder reads multiple byte groups in one entry', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const plans = [
@@ -492,7 +492,7 @@ test('dense plan decoder reads multiple byte groups in one entry', async () => {
 
 test('dense plan decodes live byte values for groups 56/68', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const plans = [
@@ -508,7 +508,7 @@ test('dense plan decodes live byte values for groups 56/68', async () => {
 
 test('dense plan decodes live bit group 124', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 69, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 3]);
@@ -522,7 +522,7 @@ test('dense plan decodes live bit group 124', async () => {
 
 test('dense plan decodes live mixed group -27', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
@@ -547,7 +547,7 @@ test('dense plan decodes live mixed group -27', async () => {
 
 test('dense plan gates group 152 base fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const body = new Uint8Array([1, 76, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 2, 26, 31]);
@@ -567,7 +567,7 @@ test('dense plan gates group 152 base fields', async () => {
 
 test('dense plan decodes live group 152 extended fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
     const varint = (value) => {
@@ -601,7 +601,7 @@ test('dense plan decodes live group 152 extended fields', async () => {
 
 test('original decoder mixes bare and dense updates', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { SnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
@@ -623,7 +623,7 @@ test('original decoder mixes bare and dense updates', async () => {
 
 test('original decoder converts mask angle field 8 to radians', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { SnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
@@ -638,7 +638,7 @@ test('original decoder converts mask angle field 8 to radians', async () => {
 
 test('snapshot decoder rejects out-of-range fields without changing dense presence', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { SnapshotDecoder } = await import('/state/snapshot.js');
     const { DENSE_GROUP_SPECS } = await import('/state/field-types.js');
@@ -654,7 +654,7 @@ test('snapshot decoder rejects out-of-range fields without changing dense presen
 
 test('original decoder maps fields 5/24 to world position', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { SnapshotDecoder } = await import('/state/snapshot.js');
     const packet = new Uint8Array([
@@ -673,7 +673,7 @@ test('original decoder maps fields 5/24 to world position', async () => {
 
 test('WorldState.applyPartial preserves missing gameplay fields', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { WorldState } = await import('/state/world.js');
     const world = new WorldState();
@@ -692,7 +692,7 @@ test('WorldState.applyPartial preserves missing gameplay fields', async () => {
 
 test('WorldState.applyPartial merges dense fields without dropping position', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { WorldState } = await import('/state/world.js');
     const world = new WorldState();
@@ -711,7 +711,7 @@ test('WorldState.applyPartial merges dense fields without dropping position', as
 
 test('WorldState.applyPartial merges scalar field records', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { WorldState } = await import('/state/world.js');
     const world = new WorldState();
@@ -730,7 +730,7 @@ test('WorldState.applyPartial merges scalar field records', async () => {
 
 test('WorldState.applyPartial merges component offsets', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { WorldState } = await import('/state/world.js');
     const world = new WorldState();

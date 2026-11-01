@@ -31,9 +31,9 @@ test('undeclared symbolic links in product input fail without following them', a
 });
 test('native identity covers root build, server, dependency lock and schema; verification covers host tests', async t => {
   const root = await fixture(t);
-  for (const folder of ['cmake', 'server/src', 'server/tests', 'schema'])
+  for (const folder of ['cmake', 'server/src', 'server/config', 'server/tests', 'schema'])
     await mkdir(path.join(root, folder), { recursive: true });
-  for (const file of ['CMakeLists.txt', 'server/src/main.cpp', 'cmake/dependencies.lock.json', 'schema/protocol.yaml']) {
+  for (const file of ['CMakeLists.txt', 'server/src/main.cpp', 'server/sources.cmake', 'server/config/default.json', 'cmake/dependencies.lock.json', 'schema/protocol.yaml']) {
     const before = await nativeInputs(root);
     await writeFile(path.join(root, file), `changed ${file}`);
     assert.notEqual((await nativeInputs(root)).sha256, before.sha256, file);

@@ -14,7 +14,7 @@ after(stop);
 test('real worker publishes special petal launch, recharge and artwork components', { timeout: 120000 }, async () => {
   const page = await browser.newPage();
   try {
-    await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+    await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
     const results = await page.evaluate(async () => {
       const { ServerWorkerClient } = await import('/net/worker.js');
       const { InputPacketEncoder } = await import('/net/input.js');
@@ -95,7 +95,7 @@ test('real worker publishes special petal launch, recharge and artwork component
 
 test('client joins the native peer-visible set with a healthy player and nearby mobs', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForFunction(()=>window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
@@ -112,7 +112,7 @@ test('client joins the native peer-visible set with a healthy player and nearby 
 
 test('single match: spawn, suicide, death overlay and restart', async () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForFunction(()=>window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
@@ -150,7 +150,7 @@ test('single match: spawn, suicide, death overlay and restart', async () => {
 
 test('keyboard drives menu, inventory and hotbar selection', async () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr !== undefined, null, { timeout: 8000 });
   const initial = await page.evaluate(() => window.__florr.ui);
   await page.keyboard.press('Enter');
@@ -179,7 +179,7 @@ test('keyboard drives menu, inventory and hotbar selection', async () => {
 
 test('client canvas follows devicePixelRatio and camera resize', async () => {
   const page = await browser.newPage({ viewport: { width: 800, height: 600 }, deviceScaleFactor: 2 });
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr !== undefined, null, { timeout: 8000 });
   const before = await page.evaluate(() => ({
     width: document.querySelector('#canvas').width,
@@ -212,7 +212,7 @@ test('client page boots without console or page errors', async () => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForTimeout(1000);
   const state = await page.evaluate(() => ({
     canvas: [document.getElementById('canvas').width, document.getElementById('canvas').height],
@@ -229,7 +229,7 @@ test('single-player loop: menu -> garden -> move -> attack', async () => {
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr && window.__florr.world, null, { timeout: 20000 });
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => [...window.__florr.world.all()].some(entity => (entity.kind ?? entity.typeId) === 1),
@@ -278,7 +278,7 @@ test('match interactions drive equip, attack, defend, no-discard, swap, chat and
   });
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForFunction(()=>window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(() => {
@@ -432,7 +432,7 @@ test('mobile viewport: DPR canvas, touch start and joystick movement',
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr !== undefined, null, { timeout: 8000 });
   const layout = await page.evaluate(() => ({
     width: document.querySelector('#canvas').width,

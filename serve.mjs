@@ -8,6 +8,7 @@
  *   node serve.mjs --no-open        # 不自动打开浏览器
  *   node serve.mjs --host 0.0.0.0   # 开放到局域网（请注意安全）
  *   node serve.mjs --root dist-next # 指定其他构建输出目录
+ *   node serve.mjs --server ws://127.0.0.1:8787/ws # 显式开发服务地址
  *
  * archive/ 是只读历史资料，不允许作为静态站点根目录。
  */
@@ -32,6 +33,7 @@ function parseArgs(argv) {
     else if (a === '--host') opts.host = argv[++i];
     else if (a === '--no-open') opts.open = false;
     else if (a === '--root') opts.root = argv[++i];
+    else if (a === '--server') opts.server = argv[++i];
     else if (a === '--help' || a === '-h') opts.help = true;
     else if (/^\d+$/.test(a)) opts.port = Number(a);
   }
@@ -81,16 +83,24 @@ for (let i = 0; i < 20; i++) {
   port++;
 }
 
-const server = http.createServer(staticHandler(ROOT));
+const routes = {};
+if (opts.server) {
+  const url = new URL(opts.server);
+  if (!['ws:', 'wss:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) throw new Error('Invalid --server WebSocket URL');
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'connection.json'), 'utf8'));
+  routes['/connection.json'] = (_request, response) => response.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(JSON.stringify({ ...config, url: url.href }));
+}
+const server = http.createServer(staticHandler(ROOT, { routes }));
 server.listen(port, opts.host, () => {
   const target = opts.host === '0.0.0.0' || opts.host === '::' ? `http://localhost:${port}/` : `http://${opts.host}:${port}/`;
   console.log('');
-  console.log('  Florr.io 本地单机版已启动');
+  console.log('  Florr.io 浏览器客户端已启动');
   console.log('  ------------------------------------');
   console.log(`  地址:  ${target}`);
   console.log(`  目录:  ${ROOT}`);
   console.log('');
-  console.log('  提示: 必须用 http:// 访问，直接双击 index.html（file://）无法加载 Worker 与 wasm。');
+  console.log('  提示: 在线模式需要原生游戏服务；--server 可指定本地 WebSocket 地址。');
+  console.log('  离线诊断入口: ?profile=offline');
   console.log('  Ctrl+C 停止服务。');
   console.log('');
   if (opts.open) openBrowser(target);

@@ -103,13 +103,14 @@ std::vector<CommandResult> PeerSession::execute_commands(World& world, std::vect
           break;
         }
         case CommandKind::Chat: chats.push_back({identity_.player,command.text}); ok = true; break;
-        case CommandKind::Leave: ok = leave_player(world,identity_.player); break;
+        case CommandKind::Leave: leaveRequested_ = true; ok = true; break;
       }
       if (ok) result.code = ResultCode::Ok;
     }
     results_.emplace(result.commandSeq,result);
     while (results_.size() > kCommandResultWindow) results_.erase(results_.begin());
     output.push_back(result);
+    if (leaveRequested_) { commands_.clear(); future_.clear(); break; }
   }
   return output;
 }

@@ -2,10 +2,12 @@ import type { GameApp } from '../app/game-app.js';
 export class SimulationLoop {
   private timer: ReturnType<typeof setInterval> | undefined;
   start(): void {
+    if (this.app.online) { this.app.inputPump.start(); return; }
     if (this.app.disposed || this.timer !== undefined) return;
     this.timer = setInterval(() => { void this.tickServer(); }, 50);
   }
   stop(): void {
+    this.app.inputPump?.stop();
     if (this.timer !== undefined) clearInterval(this.timer);
     this.timer = undefined;
   }
@@ -22,6 +24,7 @@ export class SimulationLoop {
     this.ticking = false;
   }
   tickServer = async (): Promise<void> => {
+    if (this.app.online) { this.app.inputPump.sample(); return; }
     if (this.app.disposed || this.app.frozen || this.ticking)
       return;
     this.ticking = true;

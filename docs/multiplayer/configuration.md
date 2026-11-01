@@ -1,6 +1,6 @@
 # 多人配置契约（M00）
 
-状态：契约已固定，运行时消费者在 M04/M05 实现。唯一初始参数表在本文；`server/config/default.json` 在 M05 生成/实现，本阶段不创建假可用配置或改变当前单机入口。ADR 语义见 [0002](../adr/0002-native-authoritative-multiplayer.md)。
+状态：M04/M05 消费者已实现。唯一初始参数表在本文；M05 的 `server/config/default.json` 与下表逐键一致，完整配置使用严格类型/有限范围校验；网络宿主使用方式见 [server/README.md](../../server/README.md)。浏览器接入属于 M06。ADR 语义见 [0002](../adr/0002-native-authoritative-multiplayer.md)。
 
 ## 模拟与容量
 
@@ -76,10 +76,10 @@ nickname 修剪首尾空白后非空，随后检查完整 Unicode/字节上限�
 | allowMissingOrigin | false | 原生测试配置可打开，正式包不继承测试配置 | M05/M08 |
 | trustedProxies | `[]` | 默认不信任任何转发来源头 | M05 |
 
-仅声明心跳不足以实现可靠超时：M05 必须验证 Ping/Pong、active write/close 与 shutdown 的取消顺序。WebSocket 超时使用 Beast WebSocket 层，不能同时保留冲突的底层 tcp_stream 超时。Hello 尚未成功时绝不创建 PlayerState。
+M05 已验证 Ping/Pong、active write/close 与 shutdown 的取消顺序。WebSocket 握手超时使用 Beast WebSocket 层；写入、关闭和排空另有单调 deadline，不保留冲突的底层 tcp_stream 超时。Hello 尚未成功时绝不创建 PlayerState。
 
 ## 修改与验收
 
-每次变更记录旧值、新值、类别（玩法规则 / 容量实测 / 连接保护）、理由、覆盖测试与报告 runId。接口重构不暗改数值。M05 的默认配置必须逐键对齐本表；M04 的 schema 字段上限必须引用此契约，增加消费者前先补有限默认值及边界测试。根 CMake/依赖锁、配置和选项在 M01/M08 纳入 native source identity；现有 WASM 身份校验继续保持。
+每次变更记录旧值、新值、类别（玩法规则 / 容量实测 / 连接保护）、理由、覆盖测试与报告 runId。接口重构不暗改数值。M05 的默认配置逐键对齐本表；M04 的 schema 字段上限引用此契约，增加消费者前先补有限默认值及边界测试。根 CMake/依赖锁、配置和选项已纳入 native source identity；现有 WASM 身份校验继续保持。M08 继续验收发行包和部署配置。
 
 2026-11-01 M04 新增有限实体块上限 2048 bytes/16 records 和 counterDrainAt=4294966271，原值未定义；类别为连接保护。前者约束复用字段 codec 的独立块，后者给安全排空预留序号窗口。原生/TS 损坏块、数组和回绕前拒绝测试覆盖，runId 见 M04 CHECKLIST 交接。其余初值未变。

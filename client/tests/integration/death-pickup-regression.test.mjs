@@ -31,7 +31,7 @@ test('settled pickup cards leave their old loadout positions after death in the 
         };
       }
     });
-    await page.goto(`http://127.0.0.1:${server.address().port}/index.html?test=1`);
+    await page.goto(`http://127.0.0.1:${server.address().port}/index.html?profile=offline&test=1`);
     await page.waitForFunction(() => window.__florr?.world);
     await page.locator('#player-name').waitFor({ state: 'visible' });
     await page.keyboard.press('Enter');

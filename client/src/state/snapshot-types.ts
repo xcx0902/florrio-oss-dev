@@ -9,6 +9,11 @@ export type SnapshotEvent =
 
 export interface EntitySnapshot {
   readonly handle: number;
+  readonly ownerPlayerId?: number;
+  readonly nickname?: string;
+  readonly ownerHandle?: number;
+  readonly slot?: number;
+  readonly instance?: number;
   /** Domain kind for the accepted domain record (1 player, 2 mob, 3
    * petal, 4 drop). The catalog species id is `speciesId`. */
   readonly typeId: number;

@@ -18,12 +18,15 @@ class PeerSession {
   struct CommandReceipt { ResultCode code; std::optional<CommandResult> result; };
   [[nodiscard]] CommandReceipt queue_command(const World& world, const Command& command, std::uint32_t epoch);
   [[nodiscard]] std::vector<CommandResult> execute_commands(World& world, std::vector<ChatRecord>& chats);
+  /** Leave is a host lifecycle request; grace cleanup must not run as a command. */
+  [[nodiscard]] bool leave_requested() const { return leaveRequested_; }
   [[nodiscard]] bool accept_resync(const ResyncRequest& request, std::uint32_t epoch);
   ReplicationSession replication;
  private:
   bool bound(std::uint32_t epoch) const { return active_ && epoch == identity_.sessionEpoch && epoch > 0 && epoch < kCounterDrainAt; }
   bool owns(const World& world) const;
   bool active_ = false;
+  bool leaveRequested_ = false;
   const World* boundWorld_ = nullptr;
   ViewerContext identity_;
   std::uint32_t receivedInput_ = 0, receivedCommand_ = 0;

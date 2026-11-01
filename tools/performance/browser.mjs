@@ -41,7 +41,7 @@ export function instrumentation() {
 async function prepare(page,origin) {
   await page.addInitScript(instrumentation);
   await page.addInitScript(()=>{localStorage.setItem('florr-menu',JSON.stringify({mobs:Array.from({length:40},(_,i)=>i+1),petals:Array.from({length:40},(_,i)=>i+1)}));});
-  await page.goto(origin+'/index.html?test=1',{waitUntil:'load'});
+  await page.goto(origin+'/index.html?profile=offline&test=1',{waitUntil:'load'});
   await page.waitForFunction(()=>window.__florr&&document.fonts.status==='loaded');
   await page.evaluate(async()=>{
     const m=window.__metrics,w=window.__florr.world;

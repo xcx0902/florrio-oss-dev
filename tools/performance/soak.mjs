@@ -20,7 +20,7 @@ try {
     console.log(JSON.stringify({elapsedMs:sample.elapsedMs,created:sample.created,frames:sample.frames,resources:sample.resources,heap:sample.heap}));
   });
   const startedAt=new Date().toISOString();
-  await page.goto(fixture.origin+'/?test=1');await page.waitForFunction(()=>window.__florr&&document.fonts.status==='loaded');
+  await page.goto(fixture.origin+'/?profile=offline&test=1');await page.waitForFunction(()=>window.__florr&&document.fonts.status==='loaded');
   const result=await page.evaluate(async minutes=>{
     const f=window.__florr;f.freeze();
     const player={handle:1,typeId:1,kind:1,speciesId:0,x:0,y:0,angle:0,health:100,maxHealth:100,healthKnown:true,maxHealthKnown:true,level:1,flags:1};

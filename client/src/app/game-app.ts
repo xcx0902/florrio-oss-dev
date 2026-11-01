@@ -7,6 +7,11 @@ import { LoadoutController } from '../input/loadout-controller.js';
 import { MenuControls } from '../input/menu.js';
 import { InputPacketEncoder } from '../net/input.js';
 import { ServerWorkerClient } from '../net/worker.js';
+import { LocalWorkerTransport } from '../net/local-worker.js';
+import { NetworkTransport } from '../net/websocket.js';
+import { connectionConfig, type ConnectionConfig } from '../net/connection-config.js';
+import type { Transport } from '../net/transport.js';
+import { InputPump } from './input-pump.js';
 import { wrapContext } from '../render/canvas2d/context.js';
 import { FrameRenderer } from '../render/frame-renderer.js';
 import { Transitions } from '../render/transitions.js';
@@ -20,7 +25,15 @@ export class GameApp {
   frozen: boolean;
   injectedSequence: number;
   audio: SilentAudioBus;
-  server: ServerWorkerClient;
+  private worker?: ServerWorkerClient;
+  readonly transport: Transport;
+  readonly config: ConnectionConfig;
+  readonly inputPump: InputPump;
+  get online(): boolean { return this.transport.mode === 'network'; }
+  get network(): NetworkTransport | undefined { return this.transport instanceof NetworkTransport ? this.transport : undefined; }
+  get server(): ServerWorkerClient { if (!this.worker) throw new Error('Local simulation is unavailable online'); return this.worker; }
+  set server(value: ServerWorkerClient) { this.worker = value; }
+  readonly connectionStatus = document.createElement('div');
   inputEncoder: InputPacketEncoder;
   renderContext: import('../render/canvas2d/context.js').Canvas2DContext;
   menuControls: MenuControls;
@@ -41,7 +54,7 @@ export class GameApp {
   readonly loadout: LoadoutController;
   readonly renderer: FrameRenderer;
   readonly transitions: Transitions;
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, options: { transport?: Transport; config?: Partial<ConnectionConfig> } = {}) {
     this.canvas = canvas;
     const context = canvas.getContext('2d');
     if (!context)
@@ -54,7 +67,9 @@ export class GameApp {
     this.frozen = false;
     this.injectedSequence = 0;
     this.audio = new SilentAudioBus();
-    this.server = new ServerWorkerClient();
+    this.config = connectionConfig(options.config);
+    this.transport = options.transport ?? (this.config.profile === 'local' ? new LocalWorkerTransport() : new NetworkTransport(this.config));
+    if (this.transport instanceof ServerWorkerClient) this.worker = this.transport;
     this.inputEncoder = new InputPacketEncoder();
     this.renderContext = wrapContext(this.context2d);
     this.menuControls = new MenuControls();
@@ -67,6 +82,22 @@ export class GameApp {
     this.lastFrame = performance.now();
     this.session = new GameSession(this);
     this.simulation = new SimulationLoop(this);
+    this.inputPump = new InputPump(this);
+    if (this.online) {
+      this.connectionStatus.id = 'connection-status';
+      this.connectionStatus.setAttribute('role', 'status');
+      Object.assign(this.connectionStatus.style, { position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)',
+        color: 'white', background: '#173e2ddd', padding: '12px 18px', font: '16px sans-serif', borderRadius: '8px', display: 'none', zIndex: '10' });
+      document.body.append(this.connectionStatus);
+      this.transport.onClose(({ state, message }) => {
+        this.connectionStatus.replaceChildren(document.createTextNode(message));
+        this.connectionStatus.style.display = message ? 'block' : 'none';
+        if (state === 'error' || state === 'reconnecting') {
+          const button = document.createElement('button'); button.textContent = 'Return to menu';
+          button.onclick = () => this.session.returnToNetworkMenu(); this.connectionStatus.append(' ', button);
+        }
+      });
+    }
     this.camera.zoom = 2 / 3;
     this.canvas.addEventListener('wheel', event => {
       // Mouse wheel: deltaY/175, multiplied by three for the
@@ -104,6 +135,7 @@ export class GameApp {
     this.menuControls.resize(width, height);
   };
   installDevelopmentCheats = (): void => {
+    if (this.online) return;
     if (!new URLSearchParams(location.search).has('cheat'))
       return;
     void import('../dev/cheat.js').then(({ installCheatPanel }) => {
@@ -191,7 +223,7 @@ export class GameApp {
   }
   private async startOnce(): Promise<void> {
     if (this.disposed) throw new Error('Application disposed');
-    if (new URLSearchParams(location.search).has('test')) {
+    if (!this.online && new URLSearchParams(location.search).has('test')) {
       const { installTestApi } = await import('../dev/test-api.js');
       if (this.disposed) return;
       this.removeTestApi = installTestApi(this);
@@ -208,7 +240,10 @@ export class GameApp {
     this.listeners.abort();
     this.input.dispose();
     this.menuControls.dispose();
-    this.server.terminate();
+    this.worker?.terminate();
+    this.transport.dispose();
+    this.inputPump.dispose();
+    this.connectionStatus.remove();
     this.transitions.dispose();
     this.renderer.dispose();
     this.removeCheatPanel?.();

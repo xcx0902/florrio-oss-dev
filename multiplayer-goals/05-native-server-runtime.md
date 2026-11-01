@@ -1,19 +1,20 @@
 # M05：实现原生 WebSocket 游戏服务
 
-状态：未开始。依赖：M01；连接真实房间依赖 M03、M04。产出：原生 `florr_server`，具备独立时钟、多人房间、连接绑定、限额和重连。
+状态：已完成，2026-11-01。依赖：M01；连接真实房间依赖 M03、M04。产出：原生 `florr_server`，具备独立时钟、多人房间、连接绑定、限额和重连。当前使用方式见 [server/README.md](../server/README.md)，验收身份与报告见 [执行清单](CHECKLIST.md#9-m05-完成交接)。浏览器产品接入仍属于 M06。
 
 ## 05.1 目录、类与职责
 
-| 计划新增文件/组件 | 职责 |
+| 已实现文件/组件 | 职责 |
 | --- | --- |
-| `server/src/main.cpp` | 参数、配置、信号、启动与退出码 |
+| `server/src/main.cpp`、`server/src/runtime/service.cpp` | 参数、配置、信号、启动与退出码 |
 | `server/src/config.cpp` | 读取并校验 `server/config/default.json`，拒绝未知/无界参数 |
 | `server/src/net/listener.cpp` | TCP/HTTP accept、`/ws` upgrade、health/readiness |
 | `server/src/net/connection.cpp` | 异步读写、帧限额、发送队列、超时、关闭状态 |
 | `server/src/session.cpp` | Hello、连接绑定、epoch、输入序号、命令幂等、限流 |
 | `server/src/room.cpp` | World/players/peers、tick、事件冻结、快照发布 |
 | `server/src/room_manager.cpp` | 创建/查找房间、容量、空房回收、准入 |
-| `server/src/runtime/fixed_tick_scheduler.cpp` | 单调时钟、固定步长、补帧与过载统计 |
+| `server/include/florr/server/scheduler.hpp` | 可注入单调时钟、固定步长、补帧与过载统计 |
+| `server/src/runtime/secure_random.cpp` | 系统密码学随机数、token 生成与比较 |
 | `server/src/metrics.cpp` | 有界日志/指标、来源身份脱敏 |
 | `server/tests/` | 可注入时钟、会话、房间、网络生命周期回归 |
 
@@ -88,13 +89,15 @@ Origin 使用配置 allowlist；开发代理和无 Origin 的原生测试客户�
 
 ## 05.7 测试与完成条件
 
-- [ ] fake clock 验证 20Hz、补帧上限、TTL、冷却、grace 和空房回收，不靠长 sleep。
-- [ ] A/B inputSeq 相同仍分别生效；一人刷包不增加 tick、伤害次数或 B 的延迟队列。
-- [ ] 两房间实体/随机数/事件/连接完全隔离；离场只影响目标玩家。
-- [ ] 重连保持 PlayerId，替换 SessionEpoch，旧连接不能继续控制；恢复死亡态正确。
-- [ ] 超时、读错、写错、慢连接、重复 close、进程信号均完成一次清理。
-- [ ] 原生服务接两个真实 WebSocket 客户端，输出不同控制身份和正确的各自快照。
-- [ ] 正式服务没有可远程调用的 debug/cheat 命令；测试注入仅在专用测试 target。
-- [ ] 源码/依赖/配置进入 native identity，服务启动日志可识别构建和协议版本。
+- [x] fake clock 验证 20Hz、补帧上限、TTL、冷却、grace 和空房回收，不靠长 sleep。
+- [x] A/B inputSeq 相同仍分别生效；一人刷包不增加 tick、伤害次数或 B 的延迟队列。
+- [x] 两房间实体/随机数/事件/连接完全隔离；离场只影响目标玩家。
+- [x] 重连保持 PlayerId，替换 SessionEpoch，旧连接不能继续控制；恢复死亡态正确。
+- [x] 超时、读错、写错、慢连接、重复 close、进程信号均完成一次清理。
+- [x] 原生服务接两个真实 WebSocket 客户端，输出不同控制身份和正确的各自快照。
+- [x] 正式服务没有可远程调用的 debug/cheat 命令；测试注入仅在专用测试 target。
+- [x] 源码/依赖/配置进入 native identity，服务启动日志可识别构建和协议版本。
 
-建议提交顺序：配置/监听 → Connection → Session 输入 → Room 调度 → 重连清理 → 指标与宿主回归。
+验收 runId：`2026-11-01T09-57-01.230Z-e1098481`。完整 17/17 gate、独立 engine 18/18、根构建 CTest 28/28、Node/浏览器 259/259 全部通过；新增四个宿主测试目标共 29 个场景，Release 与 ASan/UBSan 均通过。M00 冻结单玩家摘要在两个独立进程重放一致，原性能预算保持不变。macOS 不支持 LeakSanitizer，本次未作泄漏检测通过声明。
+
+测试按 runtime（13）、真实 network（8）、network faults（6）、进程信号（2）归并，全部纳入既有 native gate 和构建身份。`reports/multiplayer/m05/2026-11-01T09-57-01.230Z-e1098481/` 保存完整报告、原始输出、构建与配置哈希，`releaseEvidence()` 校验有效。当前默认每房两人、最多两房；2×8 容量与 Linux/TLS 发布仍由 M08 验证。

@@ -61,13 +61,13 @@ npm run build               # schema + wasm + TS + dist-next/
 ```sh
 npm run test:unit           # protocol/wire unit tests
 npm run test:tools          # delivery and verification tool tests
-npm run test:engine         # native build + 13 CTest targets
-npm run test:server:native  # root native build + 18 CTest targets
+npm run test:engine         # native build + 18 CTest targets
+npm run test:server:native  # root native build + 29 CTest targets (M05 network included)
 npm run test:client         # typecheck + client unit/integration suites
 npm run test:integration    # native WorkerApi fixture -> TS decoder
 npm run build:dist-next     # packaged delivery tree
 npm run verify:delivery    # delivery manifest, hashes and source identity
-npm run test:delivery       # dist-next worker/menu smoke
+npm run test:delivery       # dist-next online PVP and offline menu smoke
 ```
 
 The client tests launch a real Chromium and load the packaged `dist-next`
@@ -121,7 +121,7 @@ absolute paths. If a command needs `archive/`, the migration is incomplete.
 - **Preparing a release** — see [release.md](release.md); a completed current ledger
   is required, and old reports cannot be inherited.
 
-## M01 native host dependencies
+## Native host dependencies (M01—M05)
 
 `npm run build:server` / `test:server:native` configure the root CMake project.
 The server consumes only the Boost 1.86.0 official archive headers locked by
@@ -129,5 +129,11 @@ The server consumes only the Boost 1.86.0 official archive headers locked by
 fallback. The first root build requires access to that archive, or an identical
 local copy passed as `FLORR_BOOST_ARCHIVE=/absolute/path/boost_1_86_0.tar.bz2`.
 Standalone `cmake -S engine` and offline WASM builds do not download Boost.
-See [server/README.md](../server/README.md) for the finite smoke command and
-native evidence. This is a build boundary milestone; network play comes later.
+See [server/README.md](../server/README.md) for the native WebSocket service,
+strict configuration, finite smoke command and native evidence. M05 provides
+the network host; the browser product transport follows in M06.
+
+The browser integration suite also starts `build/native/server/server_browser_fixture`.
+Run `npm run build:server` before invoking that suite directly. The ordinary online
+entry uses `connection.json`; `node serve.mjs --server ws://127.0.0.1:8787/ws` supplies
+an explicit local address. The native service must allow the exact frontend Origin.

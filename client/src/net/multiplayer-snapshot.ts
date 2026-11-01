@@ -14,7 +14,7 @@ export interface AppliedNetworkSnapshot {
   entities: ReadonlyMap<number,NetworkEntity>;
   events: readonly TickEvent[];
 }
-/** M04 byte/state contract. GameSession and real WebSocket integration arrive in M06. */
+/** Transactional network receiver shared by the real socket and contract tests. */
 export class NetworkSnapshotDecoder {
   private binding: Welcome | undefined;
   private baseline=0;

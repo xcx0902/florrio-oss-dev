@@ -22,7 +22,7 @@ async function delayWorkerStep(page,error=null) {
         }
       };
     },error);
-    await page.goto(origin+'/index.html?test=1',{waitUntil:'load'});
+    await page.goto(origin+'/index.html?profile=offline&test=1',{waitUntil:'load'});
     await page.waitForFunction(()=>window.__florr);
     await page.keyboard.press('Enter');
     await page.waitForFunction(()=>window.__florr.world.healthyPlayer()
@@ -53,7 +53,7 @@ test('performance teardown rejects a failed Worker completion instead of reporti
 
 test('engine worker responds to init/think/flush', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const worker = new Worker('server-worker.js?manual=1');
     const messages = [];
@@ -78,7 +78,7 @@ test('engine worker responds to init/think/flush', async () => {
 
 test('worker client forwards intermediate packets', async () => {
   const page = await browser.newPage();
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { ServerWorkerClient } = await import('/net/worker.js');
     const client = new ServerWorkerClient('stream-test-worker.js');
@@ -100,7 +100,7 @@ test('worker client forwards intermediate packets', async () => {
 test('one atomic step preserves send, think, flush packet order and enforces backpressure', async()=>{
   const page=await browser.newPage();
   try {
-    await page.goto(origin+'/index.html?test=1',{waitUntil:'load'});
+    await page.goto(origin+'/index.html?profile=offline&test=1',{waitUntil:'load'});
     const result=await page.evaluate(async()=>{
       const {ServerWorkerClient}=await import('/net/worker.js');
       const {InputPacketEncoder}=await import('/net/input.js');

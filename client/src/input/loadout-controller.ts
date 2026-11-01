@@ -1,3 +1,4 @@
+import { CommandKind } from '../schema/multiplayer.js';
 import { equippedSlotCount, getHudLayout, hotbarSlotAt, inventorySlotAt } from '../render/ui.js';
 import { deathCardRects } from '../ui/layout/death.js';
 import { contains } from '../ui/layout/rect.js';
@@ -17,6 +18,14 @@ export class LoadoutController {
     this.keyboardSlotAt = 0;
     this.hotbarTypes = [1, 1, 1, 1, 1];
     this.inventoryTypes = [];
+  }
+  private swap(slotA: number, typeA: number, slotB: number, typeB: number): void {
+    if (this.app.online) this.app.session.submitCommand({ kind: CommandKind.Swap, slotA, typeA, slotB, typeB });
+    else this.app.session.submit(this.app.inputEncoder.swap(slotA, typeA, slotB, typeB));
+  }
+  private discard(slotA: number, typeA: number): void {
+    if (this.app.online) this.app.session.submitCommand({ kind: CommandKind.Discard, slotA, typeA });
+    else this.app.session.submit(this.app.inputEncoder.discard(slotA, typeA));
   }
   handleUiKeys = (): void => {
     if (!this.app.session.started || this.app.session.dead) {
@@ -54,7 +63,7 @@ export class LoadoutController {
           for (const slot of [source, index])
             this.app.renderer.petalMotion.adopt(slot, this.app.renderer.petalTransfers.detachSlot(slot));
           this.app.renderer.petalMotion.request(source, index, layout);
-          this.app.session.submit(this.app.inputEncoder.swap(source, this.hotbarTypes[source], index, this.hotbarTypes[index] ?? 0));
+          this.swap(source, this.hotbarTypes[source], index, this.hotbarTypes[index] ?? 0);
           this.keyboardSlotAt = now;
         }
       }
@@ -67,7 +76,7 @@ export class LoadoutController {
         this.app.renderer.petalMotion.sync(this.hotbarTypes, layout);
         this.app.renderer.petalMotion.adopt(target, this.app.renderer.petalTransfers.detachSlot(target));
         this.app.renderer.petalMotion.request(target, 16, layout);
-        this.app.session.submit(this.app.inputEncoder.discard(target, this.hotbarTypes[target]));
+        this.discard(target, this.hotbarTypes[target]);
         if (this.keyboardSlot !== undefined) {
           this.keyboardSlot = reserves.find(slot => slot > target) ?? reserves.find(slot => slot !== target);
         }
@@ -125,19 +134,19 @@ export class LoadoutController {
       if (this.dragInventorySlot !== undefined) {
         const type = this.inventoryTypes[this.dragInventorySlot] ?? 0;
         if (typeof target === 'number') {
-          this.app.session.submit(this.app.inputEncoder.swap(this.dragInventorySlot, type, target, this.hotbarTypes[target] ?? 0));
+          this.swap(this.dragInventorySlot, type, target, this.hotbarTypes[target] ?? 0);
         }
         else if (target === 'discard') {
-          this.app.session.submit(this.app.inputEncoder.discard(this.dragInventorySlot, type));
+          this.discard(this.dragInventorySlot, type);
         }
       }
       else if (this.dragSlot !== undefined) {
         if (typeof target === 'number' && target !== this.dragSlot
           && target < this.hotbarTypes.length && this.dragSlot < this.hotbarTypes.length) {
-          this.app.session.submit(this.app.inputEncoder.swap(this.dragSlot, this.hotbarTypes[this.dragSlot] ?? 0, target, this.hotbarTypes[target]));
+          this.swap(this.dragSlot, this.hotbarTypes[this.dragSlot] ?? 0, target, this.hotbarTypes[target]);
         }
         else if (target === 'discard' && this.hotbarTypes[this.dragSlot]) {
-          this.app.session.submit(this.app.inputEncoder.discard(this.dragSlot, this.hotbarTypes[this.dragSlot]));
+          this.discard(this.dragSlot, this.hotbarTypes[this.dragSlot]);
         }
       }
       this.app.renderer.petalMotion.release(target === 'discard' ? 16 : target, getHudLayout(this.app.canvas.clientWidth, this.app.canvas.clientHeight, this.app.session.localPlayer()?.entity.level ?? 1, this.app.mobileUi));
@@ -148,7 +157,7 @@ export class LoadoutController {
     if (this.app.input.pointer.consumeDoubleClick()) {
       const slot = slotAtPointer();
       if (typeof slot === 'number' && slot < this.hotbarTypes.length && slot !== this.selectedSlot) {
-        this.app.session.submit(this.app.inputEncoder.swap(this.selectedSlot, this.hotbarTypes[this.selectedSlot] ?? 0, slot, this.hotbarTypes[slot]));
+        this.swap(this.selectedSlot, this.hotbarTypes[this.selectedSlot] ?? 0, slot, this.hotbarTypes[slot]);
       }
     }
   };

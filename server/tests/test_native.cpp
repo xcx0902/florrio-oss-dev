@@ -5,14 +5,15 @@
 int main() {
   using namespace std::literals;
   using florr::server::parse_options;
-  CHECK(!parse_options({}).ok());
+  CHECK(parse_options({}).ok());
+  CHECK(parse_options({}).options.action == florr::server::Action::serve);
   for (const auto value : {""sv, "0"sv, "-1"sv, "+1"sv, "1x"sv, "1.5"sv,
       "4294967296"sv, "1000001"sv, " 20"sv}) {
     const std::array args{"--smoke-ticks"sv, value};
     CHECK(!parse_options(args).ok());
   }
   const std::array missing{"--smoke-ticks"sv};
-  const std::array unknown{"--config"sv, "missing.json"sv};
+  const std::array unknown{"--unknown"sv, "missing.json"sv};
   const std::array duplicate{"--smoke-ticks"sv, "1"sv, "--smoke-ticks"sv, "2"sv};
   const std::array invalid_seed{"--smoke-ticks"sv, "1"sv, "--seed"sv, "2147483647"sv};
   const std::array duplicate_seed{"--seed"sv, "1"sv, "--seed"sv, "2"sv, "--smoke-ticks"sv, "1"sv};

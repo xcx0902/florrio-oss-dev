@@ -36,7 +36,10 @@ try {
   report.compileCommandsSha256 = sha256(await readFile(`${directory}/compile_commands.json`));
   report.cmakeCacheSha256 = sha256(await readFile(`${directory}/CMakeCache.txt`));
   report.artifacts = {};
-  for (const file of ['server/florr_server', 'engine/libengine_core.a', 'engine/libengine_worker_adapter.a']) {
+  const inventory = JSON.parse(await readFile('tests/product-tests.json', 'utf8')).suites;
+  const tests = [...inventory.engine.expected.map(name => `engine/${name}`),
+    ...['native', 'runtime', 'network', 'network_faults', 'process'].map(name => `server/server_${name}_tests`)];
+  for (const file of ['server/florr_server', 'server/server_browser_fixture', 'server/libserver_runtime.a', 'engine/libengine_core.a', 'engine/libengine_worker_adapter.a', ...tests]) {
     const bytes = await readFile(`${directory}/${file}`);
     report.artifacts[file] = { bytes: bytes.length, sha256: sha256(bytes) };
   }

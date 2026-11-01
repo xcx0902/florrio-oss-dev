@@ -17,6 +17,11 @@ export class DeathLifecycle {
 
   observe(world: WorldState): void {
     const body = world.playerEntity();
+    if (world.selfState?.life === 1 && !body) return;
+    if (world.selfState && world.selfState.life >= 2 && !this.latest) {
+      this.bodyHandle = body?.handle ?? 0;
+      this.latest = { slots: world.playerLoadout(), level: world.selfState.deathLevel || world.selfState.level || 1, metadata: world.deathMetadata() };
+    }
     if (body && body.health > 0) {
       if (body.handle !== this.bodyHandle) this.reset();
       this.bodyHandle = body.handle;
@@ -28,7 +33,8 @@ export class DeathLifecycle {
       return;
     }
     if (this.destroyed || this.bodyHandle === undefined || !this.latest) return;
-    const metadata = world.controller() ? world.deathMetadata() : this.latest.metadata;
+    if (world.selfState && world.selfState.life < 2) return;
+    const metadata = world.selfState || world.controller() ? world.deathMetadata() : this.latest.metadata;
     this.latest = {
       slots: body ? playerLoadoutSlots(body) ?? this.latest.slots : this.latest.slots,
       level: metadata.deathLevel || body?.level || this.latest.level,

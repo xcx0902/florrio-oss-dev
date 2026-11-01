@@ -81,7 +81,7 @@ async function openClient(t, dimensions = viewport, deviceScaleFactor = 1, menuS
       return Reflect.apply(post, this, args);
     };
   }, menuStorage);
-  await page.goto(origin + '/index.html?test=1', { waitUntil: 'load' });
+  await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__florr?.world && !document.getElementById('status'));
   await page.locator('#player-name').waitFor({ state: 'visible' });
   return page;

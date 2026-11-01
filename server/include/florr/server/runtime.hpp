@@ -1,12 +1,14 @@
 #pragma once
 #include "engine/model/world_config.hpp"
 #include <span>
+#include <string>
 #include <string_view>
 
 namespace florr::server {
-enum class Action { smoke, help, version };
+enum class Action { serve, smoke, check_config, help, version };
 struct Options {
-  Action action = Action::smoke;
+  Action action = Action::serve;
+  std::string config_path = "server/config/default.json";
   std::uint32_t smoke_ticks = 0;
   engine::WorldConfig world{.populate = true};
 };

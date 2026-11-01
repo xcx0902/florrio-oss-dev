@@ -1,6 +1,6 @@
 # M04 协议与每连接复制
 
-M04 实现字节与状态契约。原生 WebSocket、房间调度、密码学 token/grace 管理属于 M05，浏览器真实入口接入属于 M06。当前宿主仍只运行有限 tick smoke。线格式见生成的 [v2 协议](../multiplayer-protocol.md)，参数来源见 [配置契约](configuration.md)。
+M04 实现字节与状态契约。M05 已将其接入原生 WebSocket、房间调度和密码学 token/grace 管理，见 [原生宿主](../../server/README.md)；浏览器真实入口接入属于 M06。线格式见生成的 [v2 协议](../multiplayer-protocol.md)，参数来源见 [配置契约](configuration.md)。
 
 ## 生成与字节边界
 
@@ -29,7 +29,7 @@ auto packet = engine::net::publish(world, *changes, viewerContext, peer.replicat
 engine::net::finish_tick_changes(world);
 ```
 
-示意只显示一个会话，M05 必须先执行所有连接的命令/输入，再推进一次 World。`world.tick()` 在边界上表示下一个尚未执行的控制阶段编号；`advance_world()` 完成后递增。`Snapshot.serverTick` 为完成后的计数，`inputAppliedTick` 为实际控制阶段编号，因此首个输入在阶段 0 被采用、可出现在 serverTick=1 的快照中。0 在 inputAppliedTick 是合法值；是否已采用由非零 lastAppliedInputSeq 区分。
+示意只显示一个会话，M05 的 Room 先执行所有连接的命令/输入，再推进一次 World。`world.tick()` 在边界上表示下一个尚未执行的控制阶段编号；`advance_world()` 完成后递增。`Snapshot.serverTick` 为完成后的计数，`inputAppliedTick` 为实际控制阶段编号，因此首个输入在阶段 0 被采用、可出现在 serverTick=1 的快照中。0 在 inputAppliedTick 是合法值；是否已采用由非零 lastAppliedInputSeq 区分。
 
 `freeze_tick_changes()` 每个模拟 tick 只调用一次，并在之后禁止新的领域修改，直到统一 finish。它复制删除、命中、拾取和带发送者的聊天记录，给事件分配 `(serverTick, ordinal)`。发布顺序可交换。`publish(const World&, ...)` 只能修改传入的复制会话，构建失败不提交会话；返回的字节独立拥有内存。finish 不修改奖励或 RNG，也适用于没有观察者的 tick。
 
@@ -41,7 +41,7 @@ World 不再保留观察者 known/pending hit 缓存；未被任何观察者看�
 
 移动与离散命令使用独立非零序号和有限前跳。每个目标 tick 只保存采用前最后一条输入，立即阶段之外最多缓存两个未来阶段；过旧或过远输入拒绝。入队和执行均检查 LifeEpoch。`last_received_input_seq()` 只证明接收；实际控制阶段才更新 PlayerState 的 `last_applied_input_sequence`。相同意图持续执行不延长 lease，只有采用新序号才续期；TTL 到期反馈中立输入及最后实际采用序号。
 
-Command 有界排队、每 tick 有执行上限，执行结果保留有限幂等窗口；重复命令返回缓存结果，不重放出生、装备、拾取或伤害。生命变化后旧生命命令返回 StaleLife。新连接的 command 序列和缓存重新开始，宿主不能自动重放旧生命操作。M05 仍需接入限流、传输关闭和授权后的 token 轮换。
+Command 有界排队、每 tick 有执行上限，执行结果保留有限幂等窗口；重复命令返回缓存结果，不重放出生、装备、拾取或伤害。生命变化后旧生命命令返回 StaleLife。新连接的 command 序列和缓存重新开始，宿主不能自动重放旧生命操作。M05 Session 在此之前执行独立限流，并管理传输关闭和授权后的 token 轮换。Leave 产生 `leave_requested()` 生命周期请求，由 Room 解绑并保留 grace 身体；接收层立即停止输入，避免直接删除身体获得退出免伤。
 
 ## 公开实体与私有状态
 
@@ -55,9 +55,9 @@ ownerPlayerId/ownerHandle 与 slot/instance 一起传输，局部槽位不会混
 
 首个发布、resync 和新连接使用 full，生成新 baseline；普通 delta 发送变化实体和移除列表。当前增量粒度为完整公开实体块，与字段 codec 复用，不需要继承另一个块的 component 状态。selfState 每包完整发送。新连接使用新的 ReplicationSession，旧会话不能通过更换 ViewerContext 伪装成新 epoch。
 
-TS `NetworkSnapshotDecoder.bind(Welcome)` 建立显式身份；`decode()` 先校验全部 envelope、公开实体、基线、序列、房间、控制归属和事件，再原子提交 Map。full 清除实体/组件缓存；delta 要求同 baseline 且序号连续，失败返回 null 由 M06 请求 resync。resync 保留事件水位以去重，重新 bind 则清空旧会话事件状态。控制 handle=0 是合法状态，不选择第一个玩家实体。
+TS `NetworkSnapshotDecoder.bind(Welcome)` 建立显式身份；`decode()` 先校验全部 envelope、公开实体、基线、序列、房间、控制归属和事件，再原子提交 Map。full 清除实体/组件缓存；delta 要求同 baseline 且序号连续，失败返回 null 由已实现的 NetworkTransport 请求 resync。resync 保留事件水位以去重，重新 bind 则清空旧会话事件状态。控制 handle=0 是合法状态，不选择第一个玩家实体。
 
-`SnapshotWriteQueue` 计算 pending 和 active write 的拥有字节总量，写完成后才释放计数。超限返回 SlowConsumer 并锁住队列；已经编码/入队的 delta 不会被替换或丢弃。M05 将这个结果映射到实际关闭和日志。全量超过总帧/实体/事件上限显式失败，未实现隐式分片。所有相关 u32 计数在生成的 counterDrainAt 前排空并换房间/会话 epoch，不允许回绕继续比较。
+`SnapshotWriteQueue` 计算 pending 和 active write 的拥有字节总量，写完成后才释放计数。超限返回 SlowConsumer 并锁住队列；已经编码/入队的 delta 不会被替换或丢弃。M05 Connection 已将这个结果映射到实际关闭和指标。全量超过总帧/实体/事件上限显式失败，未实现隐式分片。所有相关 u32 计数在生成的 counterDrainAt 前排空并换房间/会话 epoch，不允许回绕继续比较。
 
 ## 验证入口
 
@@ -68,3 +68,5 @@ TS `NetworkSnapshotDecoder.bind(Welcome)` 建立显式身份；`decode()` 先校
 - `npm run test:all`：既有 17 gate，加上已注册的 M04 native/跨端/client-unit 测试；它仍不是 M08 真实联机发布验收。
 
 实现与测试均进入 engine source manifest、engine/server-native CTest 清单、产品测试清单和既有源码身份。实际 runId 与结果记录在 [执行清单](../../multiplayer-goals/CHECKLIST.md)。
+
+M06 的 GameSession/WorldState 已消费此接收器，在线运行、控制身份和测试边界见 [联机客户端](network-client.md)。

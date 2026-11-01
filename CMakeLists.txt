@@ -3,7 +3,7 @@ project(florr_native VERSION 0.1.0 LANGUAGES CXX)
 
 include(CTest)
 enable_testing()
-option(FLORR_BUILD_SERVER "Build the native authoritative host skeleton" ON)
+option(FLORR_BUILD_SERVER "Build the native authoritative WebSocket host" ON)
 add_subdirectory(engine)
 if(FLORR_BUILD_SERVER)
   if(EMSCRIPTEN)

@@ -1,8 +1,8 @@
 # Florr.io — C++20 + TypeScript 重建
 
-以 2020–2022 年的 Legacy Florr.io 为行为基线，用 **C++20 → WebAssembly** 重建服务端与共享规则，
-用 **TypeScript + Canvas2D** 重建 Web 客户端。游戏完全在浏览器本地运行：Web Worker 启动引擎 wasm，
-客户端通过固定 50 ms tick 收发快照。
+以 2020–2022 年的 Legacy Florr.io 为行为基线，用 **C++20** 重建原生服务端与共享规则，并保留 WebAssembly 离线适配器，
+用 **TypeScript + Canvas2D** 重建 Web 客户端。默认在线入口通过二进制 WebSocket 连接原生 C++ 服务，
+服务端独立推进固定 50 ms tick；显式离线诊断入口保留 Worker/WASM 适配器。
 
 原始客户端的逆向材料——WAT、还原 JS、逐函数语义表、parity 录制和冻结构建——已移入
 [`archive/`](archive/README.md)，只供人工查阅。产品构建、测试、运行时和交付树不再读取它们。
@@ -15,8 +15,8 @@
 
 | 项目 | 状态 |
 | --- | --- |
-| 运行方式 | 纯静态 Web、单机；无匹配服务、无外部运行时依赖 |
-| 服务端 | C++20 → WebAssembly，运行在 Web Worker |
+| 运行方式 | 默认原生 WebSocket 联机；每房默认两人；离线诊断显式选择 |
+| 服务端 | 原生 C++20 / engine_core；Worker/WASM 仅用于离线回归 |
 | 客户端 | TypeScript + Canvas2D |
 | 协议/布局/目录 | [`schema/`](schema/README.md) 为单一事实来源 |
 | 交付 | `dist-next/`，由源码重新构建并校验 |
@@ -43,10 +43,24 @@
 npm ci
 npm run build               # schema check + CMake wasm + tsc + 打包 dist-next
 npm run verify:delivery     # 校验交付清单、源码身份与产物
-npm start                   # 默认服务 dist-next，并打开浏览器
+npm run build:server        # 原生 WebSocket 服务与浏览器 fixture
 ```
 
-默认地址 <http://127.0.0.1:8477/>；端口被占用时自动顺延。
+本地服务需要允许网页 Origin。生成配置并启动原生服务：
+
+```bash
+node -e "const fs=require('node:fs'); const c=JSON.parse(fs.readFileSync('server/config/default.json')); c.allowedOrigins=['http://127.0.0.1:8477']; fs.writeFileSync('build/server-local.json',JSON.stringify(c,null,2));"
+./build/native/server/florr_server --config build/server-local.json
+```
+
+在另一个终端启动网页：
+
+```bash
+npm start -- --port 8477 --server ws://127.0.0.1:8787/ws
+```
+
+默认地址 <http://127.0.0.1:8477/>；端口顺延后需要同步 Origin 配置。
+部署时 `connection.json` 默认连接同源 `/ws`，HTTPS 自动使用 WSS。离线诊断访问 `?profile=offline`；在线服务不可用会明确报错。
 
 `dist-next/` 不提交。新克隆必须先构建；本地已有通过校验的交付树时可直接启动。
 
@@ -69,7 +83,7 @@ node serve.mjs --host 0.0.0.0   # 允许局域网访问（会开放该端口）
 node serve.mjs --root dist-next # 指定其他构建输出目录
 ```
 
-> 必须通过 HTTP 访问。`file://` 打开 `index.html` 时浏览器会拒绝加载 Worker 和 wasm。
+> 必须通过 HTTP/HTTPS 访问。`connection.json` 只承载公开连接参数，resume token 存放于当前标签页的 sessionStorage 或内存。
 
 ## 架构
 
@@ -94,13 +108,13 @@ C ABI：
 
 ### `client/` — TypeScript + Canvas2D
 
-`client/static/index.html` 是入口；`client/static/server-worker.js` 加载
-`server.wasm`；主线程以一个 `step(inputs)` 完成有序 send→think→flush。客户端解码稀疏快照，合并到
-`WorldState`，再驱动插值、相机、世界与 HUD 渲染。
+`client/static/index.html` 加载公开的 `connection.json`；GameApp 注入 NetworkTransport，InputPump 每 50 ms 上报意图，
+GameSession 验证 v2 快照并绑定 PlayerId/controlledHandle/selfState，再驱动相机、世界与 HUD。
+`?profile=offline` 显式使用 LocalWorkerTransport 和原有 `step(inputs)` 适配器。
 
 ```
-src/app/        GameApp、GameSession、50ms SimulationLoop
-src/net/        Worker 客户端与唯一当前 decoder、字节读取
+src/app/        GameApp、GameSession、50ms InputPump / 离线 SimulationLoop
+src/net/        Transport、WebSocket 状态机、v2 codec、离线适配器
 src/state/      协议投影、实体表/索引、插值
 src/input/      输入合成、装备控制、指针/键盘/触控
 src/ui/layout/  绘制与命中共用几何
@@ -117,20 +131,27 @@ src/schema/     生成的协议/目录类型（勿手改）
 `npm run schema:generate`；`npm run schema:check` 做只读一致性检查。
 原始布局探针、旧生成器和证据表已归档，不再是生成输入。
 
-### `server/` — M01 原生宿主骨架
+### `server/` — M05 原生 WebSocket 服务
 
 已实现 core/离线适配器分离及有限 tick smoke；原生宿主不加载 WASM、不初始化
 Worker/C ABI。`./build/native/server/florr_server --smoke-ticks 20` 输出实际 tick、
 实体数和种子摘要后退出。M02 已在 engine_core 实现同 World 多玩家状态和显式领域
-命令，M03 已补齐原生 PVP、特殊花瓣来源、唯一拾取和死亡重生闭环；M04 实现 v2 协议与只读每连接复制，见 [协议和复制](docs/multiplayer/replication.md)；宿主尚无网络监听，浏览器产品入口保持单机。接口见
+命令，M03 已补齐原生 PVP、特殊花瓣来源、唯一拾取和死亡重生闭环；M04 实现 v2 协议与只读每连接复制，见 [协议和复制](docs/multiplayer/replication.md)。M05 提供 `/ws`、health/readiness、独立 20Hz 房间时钟、限流和 token/grace 重连。M06 已接入真实浏览器在线 PVP、死亡重生、重连及房间隔离；网络预测和发布验收仍属于 M07/M08。接口见
 [玩家状态与领域命令](docs/multiplayer/player-state.md)、[玩法归属](docs/multiplayer/gameplay-ownership.md)。
 构建、离线依赖归档和证据路径见 [`server/README.md`](server/README.md)。
+
+```sh
+npm run build:server
+./build/native/server/florr_server --config server/config/default.json
+```
+
+默认本机端口 8787，房间默认两人；浏览器 Origin 需要在完整配置副本中显式允许。
 
 ## 仓库结构
 
 ```
 engine/       C++20 core、离线 Worker/C ABI 适配器、原生测试
-server/       M01 原生宿主骨架、有限 tick smoke 与宿主测试
+server/       原生 WebSocket 服务、房间/会话、配置与宿主测试
 cmake/        原生依赖锁和官方归档获取
 client/       TypeScript 客户端、入口页、Worker shim、字体与图标
 schema/       协议、布局、目录及生成器
@@ -147,8 +168,8 @@ serve.mjs     静态服务器
 ```bash
 npm run build:engine        # 原生 Release 构建
 npm run test:engine         # 构建 + 18 项 engine CTest（含 M02—M04）
-npm run build:server        # M01 原生宿主骨架 + 锁定依赖 + native identity
-npm run test:server:native  # 根构建 + 23 项封闭 CTest（含 engine）
+npm run build:server        # 原生 WebSocket 服务 + 锁定依赖 + native identity
+npm run test:server:native  # 根构建 + 29 项封闭 CTest（含 engine/真实网络/信号）
 npm run build:engine:wasm   # Emscripten CMake -> build/wasm/server.wasm
 npm run build:client        # tsc -> fresh build/client
 npm run test:unit           # 协议/线格式单元测试
@@ -182,7 +203,8 @@ npm run test:m4             # 校验冻结基线 + 全流程 + 性能对比 + 30
 JS、字体与清单。手写资产只在 `client/static/`，编译输出只在 `build/client/` 与
 `build/wasm/`；打包器按白名单及本次编译清单合成，排除测试 API、声明与 source map。
 `tools/verify-dist-next.mjs` 校验清单、哈希、imports、ABI 配置和源码身份；
-`tools/smoke-entrypoints.mjs` 用真实 Worker、键盘和鼠标启动它。
+`tools/smoke-entrypoints.mjs` 用原生 WebSocket fixture 与真实键盘启动普通在线入口，验证无 Worker/WASM 请求。
+当前交付仍包含显式离线所需的 WASM/Worker；M08 负责最终在线发布包和容量验收。
 
 `dist/`、`dist-readable/`、`dist-reference/` 是历史产物，已移入归档，不再由本仓库构建。
 

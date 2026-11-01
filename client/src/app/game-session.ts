@@ -3,6 +3,9 @@ import { DENSE_GROUPS, DENSE_GROUP_SPECS } from '../state/field-types.js';
 import { SnapshotDecoder, type DenseGroupPlan } from '../state/snapshot.js';
 import { type EntityState } from '../state/world.js';
 import type { GameApp } from '../app/game-app.js';
+import type { AppliedNetworkSnapshot } from '../net/multiplayer-snapshot.js';
+import { CommandKind, ResultCode, type Welcome } from '../schema/multiplayer.js';
+import type { CommandIntent } from '../net/transport.js';
 export type GamePhase = 'menu' | 'joining' | 'playing' | 'dying' | 'dead' | 'returning' | 'error';
 export interface SessionFrameView {
   readonly menuFrame: boolean;
@@ -21,6 +24,8 @@ export class GameSession {
   phase: GamePhase = 'menu';
   generation = 0;
   private ready: Promise<void> | undefined;
+  private spawning = false;
+  private networkIdentity?: Welcome;
   get started(): boolean { return this.phase !== 'menu' && this.phase !== 'returning'; }
   get enteredWorld(): boolean { return this.phase === 'playing' || this.phase === 'dying' || this.phase === 'dead'; }
   get dead(): boolean { return this.phase === 'dying' || this.phase === 'dead'; }
@@ -34,7 +39,7 @@ export class GameSession {
   fail(error: unknown): void {
     this.phase = 'error';
     this.status = error instanceof Error ? error.message : String(error);
-    this.app.simulation.stop();
+    if (!this.app.online) this.app.simulation.stop();
   }
   invalidate(): void {
     this.generation++;
@@ -73,6 +78,49 @@ export class GameSession {
     this.lastSlots = [1, 1, 1, 1, 1];
     this.lastLevel = 1;
     this.status = 'Connecting…';
+    if (app.online) {
+      this.status = '';
+      app.transport.onControl(message => { if (message.type === 2) this.networkIdentity = message.value; });
+      app.transport.onSnapshot(event => { if (event.kind === 'network' && !app.disposed) this.applyNetwork(event.value); });
+      app.transport.onClose(({ state, message }) => {
+        if (state !== 'connected') this.status = message;
+        if (state === 'reconnecting' || state === 'error') this.spawning = false;
+      });
+    }
+  }
+  private applyNetwork(value: AppliedNetworkSnapshot): void {
+    const welcome = this.networkIdentity;
+    if (!welcome) return;
+    const world = this.app.world;
+    const previousLife = world.selfState?.lifeEpoch;
+    const hadDeath = this.dead;
+    const now = performance.now();
+    // Pickup transfers need the old drop position before authoritative removal.
+    const pickups = value.events.filter(event => event.kind === 2 && event.actorPlayerId === welcome.playerId)
+      .map(event => ({ opcode: 14 as const, handle: event.target, index: event.slot }));
+    if (value.snapshot.full || previousLife !== value.snapshot.selfState.lifeEpoch) {
+      this.decoder = new SnapshotDecoder(this.densePlans);
+      this.app.renderer.petalMotion.reset(); this.app.renderer.petalTransfers.reset();
+      this.app.renderer.playerTransform.invalidate(); this.app.renderer.movementHelper.reset();
+      this.app.renderer.helperPlayer = undefined;
+      this.app.loadout.dragSlot = this.app.loadout.dragInventorySlot = undefined;
+      this.app.input.pointer.reset(); this.app.input.keyboard.clearPressed();
+      if (previousLife !== value.snapshot.selfState.lifeEpoch) { this.deathLifecycle.reset(); this.deathAt = undefined; }
+    } else {
+      this.app.renderer.petalTransfers.receive(pickups, world, this.app.camera, now, {
+        width: this.app.camera.viewportWidth, height: this.app.camera.viewportHeight, level: world.selfState?.level ?? 1,
+        mobile: this.app.mobileUi, pixelRatio: this.app.camera.pixelRatio });
+    }
+    world.applyNetworkSnapshot(value, welcome.playerId, now);
+    this.nextSpawnTick = value.snapshot.selfState.nextSpawnTick;
+    this.deathLifecycle.observe(world);
+    if (this.deathLifecycle.dead && (this.phase === 'joining' || this.enteredWorld)) {
+      if (!hadDeath) this.enterPlaying();
+      this.enterDead(now);
+    }
+    if (world.healthyPlayer() && this.phase !== 'menu' && this.phase !== 'returning') {
+      this.spawning = false; this.enterPlaying();
+    }
   }
   applyPacket = (packet: Uint8Array, at: number): boolean => {
     const snapshot = this.decoder.decode(packet);
@@ -108,6 +156,10 @@ export class GameSession {
       await this.ensureServer();
       if (this.app.disposed || generation !== this.generation)
         return;
+      if (this.app.online) {
+        if (this.app.world.selfState?.life === 1) { this.enterPlaying(); return; }
+        await this.spawnNetwork(); return;
+      }
       this.pendingSpawn = this.app.menuControls.name.value.trim();
       this.pendingRestart = false;
     }
@@ -125,6 +177,7 @@ export class GameSession {
     this.menuRespawn = undefined;
     this.app.menuControls.setRespawn(undefined);
     this.status = 'Respawning…';
+    if (this.app.online) { await this.spawnNetwork(); return; }
     this.pendingSpawn = this.app.menuControls.name.value.trim();
     this.pendingRestart = true;
   };
@@ -164,6 +217,43 @@ export class GameSession {
     this.app.menuControls.show(true);
     this.app.menuControls.name.focus({ preventScroll: true });
   };
+  returnToNetworkMenu(): void {
+    this.invalidate(); this.ready = undefined; this.spawning = false;
+    this.app.transport.leave(); this.networkIdentity = undefined; this.app.world.reset(); this.deathLifecycle.reset();
+    this.app.renderer.petalTransfers.reset(); this.app.renderer.petalMotion.reset();
+    this.app.menuControls.show(true); this.app.menuControls.name.focus({ preventScroll: true });
+    this.phase = 'menu'; this.status = ''; this.app.connectionStatus.style.display = 'none';
+  }
+  private async spawnNetwork(): Promise<void> {
+    if (this.spawning) return;
+    this.spawning = true;
+    const generation = this.generation;
+    try {
+      const result = await this.app.transport.sendCommand({ kind: CommandKind.Spawn, text: this.app.menuControls.name.value.trim() || 'Anonymous' });
+      if (this.app.disposed || generation !== this.generation) return;
+      if (result.code !== ResultCode.Ok) {
+        this.nextSpawnTick = result.nextSpawnTick ?? this.nextSpawnTick;
+        this.status = result.code === ResultCode.Cooldown
+          ? `Respawn available in ${Math.max(0, Math.ceil((this.nextSpawnTick - (this.app.network?.serverTick ?? 0)) / 20))}s`
+          : `Spawn rejected: ${ResultCode[result.code]}`;
+        this.phase = this.deathLifecycle.dead ? 'dead' : 'menu';
+        this.notice(this.status);
+      }
+    } catch (error) {
+      if (!this.app.disposed && this.app.transport.state === 'connected') { this.status = String(error instanceof Error ? error.message : error); this.notice(this.status); this.phase = this.deathLifecycle.dead ? 'dead' : 'menu'; }
+    } finally { this.spawning = false; }
+  }
+  private notice(message: string): void {
+    this.app.connectionStatus.textContent = message; this.app.connectionStatus.style.display = message ? 'block' : 'none';
+  }
+  submitCommand(command: CommandIntent): void {
+    if (!this.app.online) throw new Error('Network command used offline');
+    const generation = this.generation;
+    void this.app.transport.sendCommand(command).then(result => {
+      if (this.app.disposed || generation !== this.generation) return;
+      this.notice(result.code === ResultCode.Ok ? '' : `Command rejected: ${ResultCode[result.code]}`);
+    }).catch(error => { if (!this.app.disposed && this.app.transport.state === 'connected') this.notice(error instanceof Error ? error.message : String(error)); });
+  }
   private resetForJoin(): void {
     this.deathLifecycle.reset();
     this.app.loadout.inventoryOpen = false;
@@ -193,6 +283,7 @@ export class GameSession {
     this.app.simulation.enqueue(packet);
   }
   confirmHealthy(): void {
+    if (this.app.online && !this.enteredWorld && this.phase !== 'joining') return;
     if (this.phase !== 'error' && this.localPlayer()) this.enterPlaying();
   }
   prepareFrame(now: number, delta: number): SessionFrameView {
@@ -229,6 +320,10 @@ export class GameSession {
   ensureServer = async (): Promise<void> => {
     if (this.app.disposed)
       throw new Error('Application disposed');
+    if (this.app.online) {
+      await this.app.transport.connect(this.app.menuControls.name.value.trim() || 'Anonymous');
+      this.serverInitialized = true; return;
+    }
     this.ready ??= this.app.server.init().then(() => { if (!this.app.disposed)
       this.serverInitialized = true; }).catch(error => { this.ready = undefined; throw error; });
     await this.ready;

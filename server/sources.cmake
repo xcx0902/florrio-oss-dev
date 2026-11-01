@@ -1,0 +1,13 @@
+set(SERVER_RUNTIME_SOURCES
+  src/config.cpp
+  src/metrics.cpp
+  src/session.cpp
+  src/room.cpp
+  src/room_manager.cpp
+  src/net/listener.cpp
+  src/net/connection.cpp
+  src/runtime/options.cpp
+  src/runtime/smoke.cpp
+  src/runtime/service.cpp
+  src/runtime/secure_random.cpp
+)

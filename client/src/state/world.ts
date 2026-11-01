@@ -6,6 +6,8 @@ import { interpolateCameraTarget,interpolateEntity } from './interpolation.js';
 import type { Snapshot,SnapshotEvent } from './snapshot.js';
 
 import type { EntityState } from './entity-state.js';
+import type { SelfState } from '../schema/multiplayer.js';
+import type { AppliedNetworkSnapshot } from '../net/multiplayer-snapshot.js';
 export type { EntityState } from './entity-state.js';
 export type { DeathMetadata } from './snapshot-types.js';
 export interface VisualEventState {
@@ -19,9 +21,18 @@ export class WorldState {
   private readonly entities = new Map<number, EntityState>();
   private sequence = 0;
   private playerHandle: number | undefined;
+  private explicitControl = false;
+  controlledPlayerId = 0;
+  selfState: SelfState | undefined;
+  setControlledPlayer(playerId: number, handle: number): void {
+    this.explicitControl = true;
+    this.controlledPlayerId = playerId;
+    this.playerHandle = handle || undefined;
+  }
   private controllerHandle:number|undefined;
   private loadoutCache:{key:unknown;player:number;revision:number;slots:number[]}|undefined;
   playerLoadout():number[] {
+    if (this.explicitControl) return this.selfState?.inventory ?? [];
     const player=this.playerEntity();if(!player)return [];
     const key=player.byteArrayFields?.[60]??player.byteArrayField60??player.denseFields?.[60];
     if(!this.loadoutCache||this.loadoutCache.player!==player.handle||this.loadoutCache.key!==key||this.loadoutCache.revision!==this.membershipRevision)
@@ -63,7 +74,7 @@ export class WorldState {
     }
     if ([...current].some(([kind, handles]) => handles.size !== this.byKind.get(kind)?.size || [...handles].some(h => !this.byKind.get(kind)?.has(h))) || [...this.byKind.keys()].some(k => !current.has(k))) this.membershipRevision++;
     this.byKind.clear(); for (const [kind, handles] of current) this.byKind.set(kind, handles);
-    this.playerHandle = player;
+    if (!this.explicitControl) this.playerHandle = player;
   }
   *entitiesOfKind(kind: number): IterableIterator<EntityState> { for (const handle of this.byKind.get(kind) ?? []) { const entity = this.entities.get(handle); if (entity) yield entity; } }
   healthyPlayer(): EntityState | undefined { const player = this.playerEntity(); return player && player.health > 0 ? player : undefined; }
@@ -276,7 +287,7 @@ export class WorldState {
       };
       this.noteEntity(merged,previous);
       this.entities.set(entity.handle,merged);
-      if (kind === 1) this.controlledCamera = this.entities.get(entity.handle);
+      if (kind === 1 && (!this.explicitControl || entity.handle === this.playerHandle)) this.controlledCamera = this.entities.get(entity.handle);
     }
     this.indexMembership();
   }
@@ -315,6 +326,44 @@ export class WorldState {
     this.events = [];
     this.sequence = 0;
     this.serverTime = 0;
+    this.explicitControl = false; this.controlledPlayerId = 0; this.selfState = undefined;
+  }
+
+  /** All records have already been validated before this atomic receipt step. */
+  applyNetworkSnapshot(value: AppliedNetworkSnapshot, playerId: number, now: number): void {
+    const { snapshot: s } = value;
+    if (s.full) this.reset();
+    this.setControlledPlayer(playerId, s.controlledHandle);
+    this.selfState = s.selfState;
+    const handles = new Set(s.entities.map(entity => entity.handle));
+    // Private HUD/camera data can change while the public entity block is unchanged.
+    if (s.controlledHandle) handles.add(s.controlledHandle);
+    const entities = [...handles].flatMap(handle => {
+      const entry = value.entities.get(handle);
+      if (!entry) return [];
+      const nickname = entry.records.find(record => record.stringField4)?.stringField4;
+      return entry.records.map(record => {
+        const entity = { ...record, ...entry.ownership, nickname };
+        if (handle !== s.controlledHandle) return entity;
+        const self = s.selfState;
+        const threshold = Math.fround(Math.floor(self.level * 1.06 ** (self.level - 1)) + 3);
+        return { ...entity, level: self.level, score: self.score, levelProgress: Math.max(0, Math.min(1, self.experience / threshold)),
+          cameraX: self.cameraX, cameraY: self.cameraY,
+          floatFields: { ...entity.floatFields, 5: self.cameraX, 24: self.cameraY, 59: self.score },
+          byteFields: { ...entity.byteFields, 63: self.zoneProgress },
+          byteArrayFields: { 60: self.inventory.map((value, index) => ({ value, index })) },
+          shortArrayFields: { 61: self.recharge.map((value, index) => ({ value, index })) } };
+      });
+    });
+    const events: SnapshotEvent[] = value.events.flatMap((event): SnapshotEvent[] => {
+      if (event.kind === 1) return [{ opcode: 11, handle: event.target }];
+      if (event.kind === 2 && event.actorPlayerId === playerId) return [{ opcode: 14, handle: event.target, index: event.slot }];
+      if (event.kind === 3) return [{ opcode: 9, text: event.text }];
+      return [];
+    });
+    this.applyDeltaSnapshot({ sequence: s.snapshotSeq, serverTime: s.serverTick * 50, entities, deletedHandles: s.removed, events }, now);
+    // Removal never changes the explicit binding or selects another player.
+    this.setControlledPlayer(playerId, s.controlledHandle);
   }
 
   get(handle: number): EntityState | undefined { return this.entities.get(handle); }
@@ -333,6 +382,11 @@ export class WorldState {
     return body && hasDeathMetadata(body) ? body : undefined;
   }
   deathMetadata(): DeathMetadata {
+    if (this.selfState) {
+      const self = this.selfState;
+      return { killerName: self.killerName, keptCount: self.kept.length, keptItems: self.kept, score: self.deathScore,
+        deathLevel: self.deathLevel, respawnLevel: Math.max(1, Math.floor(self.deathLevel * 3 / 4)), viewerHandle: this.playerHandle };
+    }
     return projectDeathMetadata(this.controller());
   }
   /** First controlled body, including a health-0 corpse. */

@@ -14,7 +14,7 @@ import { createHudState, drawHud, equippedSlotCount, type HudState } from '../re
 import { drawWorld,releaseWorldVisuals } from '../render/world.js';
 import { MOB_INFO } from '../schema/petals.js';
 import { interpolateCameraTarget } from '../state/interpolation.js';
-import { playerLoadoutSlots, playerSlotProgress } from '../state/loadout.js';
+import { playerSlotProgress } from '../state/loadout.js';
 import { getPointerMovement, updatePanState } from '../state/pan.js';
 import { PlayerWorldTransformCache } from '../state/world-transform.js';
 import type { GameApp } from '../app/game-app.js';
@@ -165,10 +165,14 @@ export class FrameRenderer {
       // Camera update scans the equipped petal slots: Antennae widens
       // the view from a 0.9 to a 0.63 scene scale.
       const equipped = Math.min(16, equippedSlotCount(player.entity.level ?? 1));
-      const antennae = (playerLoadoutSlots(player.entity) ?? []).slice(0, equipped).includes(25);
-      this.app.camera.follow(target.x, target.y, delta, pan.x, pan.y, now, antennae ? 0.63 : 0.9);
+      const antennae = this.app.world.playerLoadout().slice(0, equipped).includes(25);
+      this.app.camera.follow(target.x, target.y, delta, pan.x, pan.y, now, this.app.world.selfState?.cameraScale ?? (antennae ? 0.63 : 0.9));
     }
-    const menuInput = this.menuInputAnimation.advance(now, delta, this.app.world.lastSequence > 0, menuFrame, getHudLayout(this.app.canvas.clientWidth, this.app.canvas.clientHeight).logicalHeight, this.app.mobileUi);
+    else if (this.app.world.selfState) {
+      const self = this.app.world.selfState;
+      this.app.camera.follow(self.cameraX, self.cameraY, delta, 0, 0, now, self.cameraScale);
+    }
+    const menuInput = this.menuInputAnimation.advance(now, delta, this.app.online || this.app.world.lastSequence > 0, menuFrame, getHudLayout(this.app.canvas.clientWidth, this.app.canvas.clientHeight).logicalHeight, this.app.mobileUi);
     if (this.app.frozen)
       this.app.menuControls.show(false);
     else
@@ -178,7 +182,7 @@ export class FrameRenderer {
     this.app.renderContext.syncTransform?.();
     let playerHudState: HudState | undefined;
     if (player) {
-      const key=player.entity.byteArrayFields?.[60]??player.entity.denseFields?.[60];
+      const key=this.app.world.selfState?.inventory??player.entity.byteArrayFields?.[60]??player.entity.denseFields?.[60];
       if(this.loadoutKey!==key||this.loadoutMembership!==this.app.world.membershipRevision) {
         this.displaySlots=this.app.world.playerLoadout();
         this.loadoutKey=key;this.loadoutMembership=this.app.world.membershipRevision;
@@ -220,7 +224,7 @@ export class FrameRenderer {
         keyboardHighlightAlpha: this.keyboardHighlightAlpha,
         slotMotions,
         petalDiscoveries: this.app.menuControls.petalDiscoveryCount,
-        slotProgress: playerSlotProgress(player.entity),
+        slotProgress: this.app.world.selfState?.recharge.map(value => value / 65535) ?? playerSlotProgress(player.entity),
         hoveredSlot: this.app.loadout.hoveredSlot(), pointerX: this.app.input.pointer.position.x, pointerY: this.app.input.pointer.position.y,
       };
     }
@@ -269,6 +273,11 @@ export class FrameRenderer {
       });
       if (menuFrame && player !== null)
         this.app.transitions.captureEntryCanvas();
+    }
+    else if (player === null && this.app.world.selfState?.life === 1) {
+      drawWorld(this.app.renderContext, this.app.world, this.app.camera, now, { frame: this.context, deltaMs: delta });
+      drawFrameHud({ health: 0, maxHealth: 100, level: this.app.world.selfState.level, pixelRatio: this.app.dpr,
+        slots: this.app.world.playerLoadout(), width: this.app.canvas.clientWidth, height: this.app.canvas.clientHeight, mobile: this.app.mobileUi });
     }
     else if (player === null) {
       drawWorld(this.app.renderContext, this.app.world, this.app.camera, now, {frame:this.context,deltaMs:delta});
