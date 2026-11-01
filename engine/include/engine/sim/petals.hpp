@@ -6,6 +6,7 @@
 #include <cstdint>
 
 namespace engine {
+class PlayerState;
 
 /** Position on a petal orbit. Angle is radians; the result stays binary32. */
 [[nodiscard]] Vec2 orbit_position(Vec2 center, f32 radius, f32 angle);
@@ -16,7 +17,7 @@ namespace engine {
 /** Spawn a petal entity at its orbit position using the catalog draw radius,
  * collision radius, damage and maximum health from the recovered initializer.
  * `orbit_index` is the ring slot assigned by original function 85 (petal +18). */
-[[nodiscard]] EntityHandle spawn_petal(World& world, std::uint16_t type_id,
+[[nodiscard]] EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id,
                                        Vec2 center, f32 orbit_radius, f32 angle,
                                        std::uint8_t slot = 0xFF, std::uint8_t instance = 0,
                                        std::uint8_t instance_count = 1,
@@ -25,14 +26,14 @@ namespace engine {
 /** Recompute all petal orbit indices after a loadout mutation, mirroring
  * original function 85 (including configured missing instances and flag41
  * shared positions). */
-void assign_petal_orbit_indices(World& world);
+void assign_petal_orbit_indices(World& world, PlayerState& state);
 
-[[nodiscard]] std::uint8_t petal_orbit_index(const World& world, std::uint8_t slot,
+[[nodiscard]] std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot,
                                              std::uint8_t instance);
 
 /** Orbit angle for one petal: index*(2*pi/unlockedSlots) + loadout phase.
  * The original keeps this in double and wraps it with fmod before sin/cos. */
-[[nodiscard]] double petal_orbit_angle(const World& world, std::uint8_t orbit_index);
+[[nodiscard]] double petal_orbit_angle(const PlayerState& state, std::uint8_t orbit_index);
 
 /** Accelerate a petal toward its orbit target using the recovered
  * updatePetalOrbits acceleration/damping constants. Position integration is
@@ -41,26 +42,26 @@ void update_petal_orbit(World& world, const PetalOrbitState& state, double step_
 
 /** Advance all petal orbits. Orbit radii follow the current input buttons and
  * each petal's recovered orbit profile; Wing uses its wave track. */
-void update_petal_orbits(World& world, double step_milliseconds);
+void update_petal_orbits(World& world, PlayerState& state, double step_milliseconds);
 
 /** Advance the shared loadout ring phase (loadout+284) with the original
  * YinYang direction table and Faster count contribution. */
-void advance_loadout_orbit_phase(World& world, double step_milliseconds);
+void advance_loadout_orbit_phase(World& world, PlayerState& state, double step_milliseconds);
 
 /** Update the overlevel zone countdown and progress. When the timer reaches
  * its limit equipped petals stop recharging/spawning and take the original
  * per-tick damage. */
-void update_zone_restriction(World& world, double step_milliseconds);
-void damage_zone_locked_petals(World& world, double step_milliseconds);
+void update_zone_restriction(World& world, PlayerState& state, double step_milliseconds);
+void damage_zone_locked_petals(World& world, PlayerState& state, double step_milliseconds);
 
 /** Consume an equipped Peas petal into four launched children. */
 bool consume_peas_attack(World& world, EntityHandle petal_handle, EntityHandle owner);
 
 /** Spawn all configured instances for every equipped loadout slot. */
-std::size_t spawn_loadout_petals(World& world);
+std::size_t spawn_loadout_petals(World& world, PlayerState& state);
 
 /** Advance slot recharge timers and respawn ready petals. */
-std::size_t refresh_loadout_petals(World& world, double step_milliseconds);
+std::size_t refresh_loadout_petals(World& world, PlayerState& state, double step_milliseconds);
 
 /** Remove a destroyed petal from its orbit list and start its slot recharge. */
 bool on_petal_destroyed(World& world, EntityHandle handle);
@@ -71,10 +72,10 @@ bool on_petal_destroyed(World& world, EntityHandle handle);
 bool detach_petal_from_slot(World& world, EntityHandle handle);
 
 /** Remove every spawned instance belonging to a loadout slot. */
-void remove_slot_petals(World& world, std::uint8_t slot);
+void remove_slot_petals(World& world, PlayerState& state, std::uint8_t slot);
 
 /** Move orbit/slot bookkeeping after a loadout slot swap. */
-void swap_slot_petals(World& world, std::uint8_t first, std::uint8_t second);
+void swap_slot_petals(World& world, PlayerState& state, std::uint8_t first, std::uint8_t second);
 
 /** Spawn a pickup/drop entity for a petal type using the catalog radius. */
 [[nodiscard]] EntityHandle spawn_drop(World& world, std::uint16_t type_id, Vec2 position);

@@ -8,6 +8,7 @@
 namespace engine {
 
 class World;
+class PlayerState;
 
 /** Sixteen-slot player loadout with the recovered original layout:
  *
@@ -32,13 +33,13 @@ class PlayerLoadout {
   bool discard(PlayerProfile& profile, std::uint8_t slot, std::uint16_t expected_type);
   /** Original opcode8 retires the equipped occupant before resetting its
    * slot, including a hatched Egg's mob handle. */
-  bool discard(World& world, PlayerProfile& profile, std::uint8_t slot,
+  bool discard(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t slot,
                std::uint16_t expected_type);
   bool swap(std::uint8_t first, std::uint16_t first_type,
             std::uint8_t second, std::uint16_t second_type);
   bool swap(PlayerProfile& profile, std::uint8_t first, std::uint16_t first_type,
             std::uint8_t second, std::uint16_t second_type);
-  bool swap(World& world, PlayerProfile& profile, std::uint8_t first,
+  bool swap(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t first,
             std::uint16_t first_type, std::uint8_t second, std::uint16_t second_type);
   /** Restore carried types, including reserve slots; only active slots spawn
    * equipped entities. Backpack contents stay in the profile. */
@@ -46,16 +47,16 @@ class PlayerLoadout {
   /** Domain form of original 125: change a slot type, clear its three equipped
    * handles (damaging live petals to zero), mark pending bytes and bump the
    * replication epoch. */
-  bool change_slot_type(World& world, PlayerProfile& profile, std::uint8_t slot,
+  bool change_slot_type(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t slot,
                         std::uint16_t type_id);
   /** Legacy domain helper kept for callers that only need the profile update. */
   bool set_slot_type(PlayerProfile& profile, std::uint8_t slot, std::uint16_t type_id);
   /** Original cycleInventory: fill the reserve slots (active..capacity-1) with
    * the rotating petal types used by the inventory-cycle input. */
-  bool cycle_reserve_slots(World& world, PlayerProfile& profile);
+  bool cycle_reserve_slots(World& world, PlayerState& state, PlayerProfile& profile);
   /** Original function 85: mark the loadout packet cache dirty after a type
    * change and rebuild the per-slot/instance cache order table. */
-  void invalidate_packet_cache(World& world);
+  void invalidate_packet_cache(World& world, PlayerState& state);
   /** Cache order assigned to one equipped instance (0 = not in the cache).
    * The original writes this byte into the handle record at +18. */
   [[nodiscard]] std::uint8_t pending_cache(std::uint8_t slot, std::uint8_t instance) const {
@@ -66,11 +67,11 @@ class PlayerLoadout {
   void set_active_slots(std::uint8_t value) { active_slots_ = value; }
   /** Domain form of original 397: create one equipped petal entity for a slot
    * instance when the slot is active and the catalog count allows it. */
-  bool create_equipped_petal(World& world, std::uint8_t slot, std::uint8_t instance);
+  bool create_equipped_petal(World& world, PlayerState& state, std::uint8_t slot, std::uint8_t instance);
   void advance(double delta_milliseconds);
   /** Original updateEquippedPetals loadout+100: minimum progress over missing
    * instances (65535 = ready), latched before this tick's collisions. */
-  void refresh_recharge_progress(const World& world);
+  void refresh_recharge_progress(const World& world, const PlayerState& state);
   [[nodiscard]] const std::array<std::uint16_t, 8>& recharge_progress() const {
     return recharge_progress_;
   }

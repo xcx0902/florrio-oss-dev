@@ -37,19 +37,19 @@ void test_domain_dense_player_wire_boundaries() {
   api.init(false);
   // Put another entity after the player: the old writer consumed the next
   // handle's first three bytes as the player's missing group-152 payload.
-  const auto player = engine::spawn_player_default(api.world(), "wire",
+  const auto player = engine::spawn_player_default(api.world(), engine::test::player(api.world()), "wire",
     engine::make_default_profile(), false);
   CHECK(player.valid());
   const auto mob = api.spawn(engine::EntityKind::kMob, 14,
     engine::Vec2(engine::f32(12345.0F), engine::f32(-321.0F)));
   CHECK(mob.valid());
-  CHECK(api.world().loadout().equip(2U, 3U));
-  CHECK(api.world().loadout().create_equipped_petal(api.world(), 2U, 0U));
-  const auto petal = api.world().loadout().handle(2U, 0U);
+  CHECK(engine::test::player(api.world()).loadout().equip(2U, 3U));
+  CHECK(engine::test::player(api.world()).loadout().create_equipped_petal(api.world(), engine::test::player(api.world()), 2U, 0U));
+  const auto petal = engine::test::player(api.world()).loadout().handle(2U, 0U);
   CHECK(petal.valid());
-  api.world().profile().set_experience(engine::f32(3.0F));
-  api.world().loadout().set_score(engine::f32(9.0F));
-  api.world().apply_input(3U, engine::f32(1.0F), engine::f32(0.0F));
+  engine::test::player(api.world()).profile().set_experience(engine::f32(3.0F));
+  engine::test::player(api.world()).loadout().set_score(engine::f32(9.0F));
+  engine::test::input(api.world(), 3U, engine::f32(1.0F), engine::f32(0.0F));
   for (std::uint32_t sequence : {127U, 128U, 256U}) {
     if (sequence == 127U) {
       // Health alone is not the visual lifecycle flag.
@@ -160,7 +160,7 @@ void test_domain_dense_player_wire_boundaries() {
               CHECK(index_delta == 1U);
               const auto value = field == 60U ? reader.read_u8().value() : reader.read_varint32().value();
               if (field == 60U) {
-                CHECK(value == api.world().loadout().slots()[slot].type_id);
+                CHECK(value == engine::test::player(api.world()).loadout().slots()[slot].type_id);
                 ++inventory_count;
               } else { CHECK(value == 0U); ++recharge_count; }
               ++slot;
@@ -219,7 +219,7 @@ void test_input_discard_deletion_then_swap() {
   for (const char byte : std::string("deletion")) spawn.write_u8(static_cast<std::uint8_t>(byte));
   spawn.write_u8(0U); send(spawn);
   (void)api.domain_snapshot_bytes(1U);
-  const auto discarded = api.world().loadout().handle(2U, 0U);
+  const auto discarded = engine::test::player(api.world()).loadout().handle(2U, 0U);
   CHECK(discarded.valid());
   engine::ByteWriter discard;
   discard.write_varint32(2U); discard.write_varint32(8U);
@@ -242,7 +242,7 @@ void test_input_discard_deletion_then_swap() {
   CHECK(reader.read_varint32().value() == 1U);
   (void)reader.read_varint32(); (void)reader.read_varint32(); // update/event counts precede delete payload
   CHECK(reader.read_u32_le().value() == discarded.to_wire());
-  const auto moved = api.world().loadout().handle(0U, 0U);
+  const auto moved = engine::test::player(api.world()).loadout().handle(0U, 0U);
   engine::ByteWriter swap;
   swap.write_varint32(3U); swap.write_varint32(10U);
   for (const unsigned value : {0U, 1U, 2U, 0U}) swap.write_varint32(value);
@@ -250,9 +250,9 @@ void test_input_discard_deletion_then_swap() {
   api.think();
   // Original swap is two changeSlotType calls: the old slot-0 petal is retired
   // and the incoming slot-2 petal waits out a full recharge before spawning.
-  CHECK(!api.world().loadout().handle(2U, 0U).valid());
-  CHECK(api.world().loadout().pending(2U, 0U));
-  CHECK(api.world().loadout().slots()[2].type_id == 1U);
+  CHECK(!engine::test::player(api.world()).loadout().handle(2U, 0U).valid());
+  CHECK(engine::test::player(api.world()).loadout().pending(2U, 0U));
+  CHECK(engine::test::player(api.world()).loadout().slots()[2].type_id == 1U);
   unsigned count = 0U, slot2 = 0U;
   for (const auto& entity : api.world().entities().entities()) {
     if (!entity.active || entity.health.value <= 0.0F || entity.kind != engine::EntityKind::kPetal) continue;
@@ -261,8 +261,8 @@ void test_input_discard_deletion_then_swap() {
     CHECK(entity.handle != moved);
   }
   CHECK(count == 3U && slot2 == 0U);
-  CHECK(engine::refresh_loadout_petals(api.world(), 3000.0) == 1U);
-  CHECK(api.world().loadout().handle(2U, 0U).valid());
+  CHECK(engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 3000.0) == 1U);
+  CHECK(engine::test::player(api.world()).loadout().handle(2U, 0U).valid());
   count = 0U; slot2 = 0U;
   for (const auto& entity : api.world().entities().entities()) {
     if (!entity.active || entity.health.value <= 0.0F || entity.kind != engine::EntityKind::kPetal) continue;

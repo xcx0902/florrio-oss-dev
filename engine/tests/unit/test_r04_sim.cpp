@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/sim/loot.hpp"
 #include "engine/sim/petals.hpp"
@@ -15,28 +16,28 @@ void require(bool condition, const char* message) {
 void idle_petal_hits_passive_ant() {
   engine::World world;
   world.initialize();
-  const auto player = engine::spawn_player(world, "sim", engine::Vec2(engine::f32(-1000.0F), engine::f32(0.0F)), {});
-  world.profile().set_level(1);
+  const auto player = engine::spawn_player(world, engine::test::player(world), "sim", engine::Vec2(engine::f32(-1000.0F), engine::f32(0.0F)), {});
+  engine::test::player(world).profile().set_level(1);
   const auto ant = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 7U, {});
-  const auto petal = engine::spawn_petal(world, 1U, engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)),
+  const auto petal = engine::spawn_petal(world, engine::test::player(world), 1U, engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)),
     engine::f32(0.0F), engine::f32(0.0F), 0U, 0U);
   require(player.valid() && ant.valid() && petal.valid(), "passive contact setup");
   world.entities().get(petal)->owner = player.raw;
   require(!world.entities().get(ant)->ai.aggressive, "worker Ant is passive");
-  require(world.input().buttons == 0U && world.input().strength.value == 0.0F, "no attack or movement input");
+  require(engine::test::player(world).input().buttons == 0U && engine::test::player(world).input().strength.value == 0.0F, "no attack or movement input");
   require(engine::resolve_contacts(world) == 1U, "one Ant/petal contact");
   require(world.entities().get(ant)->health.value == 0.0F, "idle petal kills worker Ant");
   require(world.entities().get(petal)->health.value == 0.0F, "worker Ant kills idle petal");
-  require(world.loadout().score().value > 0.0F, "contact kill awards player score");
+  require(engine::test::player(world).loadout().score().value > 0.0F, "contact kill awards player score");
 }
 
 void loot_precedes_mass_separation() {
   engine::World world;
   world.initialize();
-  const auto player = engine::spawn_player(world, "sim", engine::Vec2(engine::f32(-1000.0F), engine::f32(0.0F)), {});
+  const auto player = engine::spawn_player(world, engine::test::player(world), "sim", engine::Vec2(engine::f32(-1000.0F), engine::f32(0.0F)), {});
   const auto bee = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 6U,
     engine::Vec2(engine::f32(100.0F), engine::f32(50.0F)));
-  const auto petal = engine::spawn_petal(world, 1U, engine::Vec2(engine::f32(120.0F), engine::f32(50.0F)),
+  const auto petal = engine::spawn_petal(world, engine::test::player(world), 1U, engine::Vec2(engine::f32(120.0F), engine::f32(50.0F)),
     engine::f32(0.0F), engine::f32(0.0F), 0U, 0U);
   require(player.valid() && bee.valid() && petal.valid(), "loot contact setup");
   auto* victim = world.entities().get(bee);
@@ -73,18 +74,18 @@ void mob_manager_contacts_do_not_damage() {
 void pickup_grace_follow_and_expiry() {
   engine::World world;
   world.initialize();
-  const auto player = engine::spawn_player(world, "pickup", engine::Vec2(engine::f32(65.0F), engine::f32(0.0F)), {});
+  const auto player = engine::spawn_player(world, engine::test::player(world), "pickup", engine::Vec2(engine::f32(65.0F), engine::f32(0.0F)), {});
   const auto handle = engine::spawn_loot_drop(world, 2U, {});
   require(player.valid() && handle.valid(), "pickup follow setup");
   for (int tick = 0; tick < 9; ++tick) engine::tick(world, 50.0);
   require(!world.entities().get(handle)->pickup_collected, "pickup waits until spawn+500 ms");
-  require(world.loadout().pickup_transfers().empty(), "no early transfer event");
+  require(engine::test::player(world).loadout().pickup_transfers().empty(), "no early transfer event");
   engine::tick(world, 50.0);
   auto* drop = world.entities().get(handle);
   require(drop != nullptr && drop->pickup_collected, "70-unit query collects at 65-unit separation");
   require(drop->position.x.value == 31.719999313354492F, "original f64 follow rounds once to f32");
-  require(world.loadout().pickup_transfers().size() == 1U, "one real transfer event");
-  require(world.profile().inventory(0) == 2U, "actual carried slot receives type");
+  require(engine::test::player(world).loadout().pickup_transfers().size() == 1U, "one real transfer event");
+  require(engine::test::player(world).profile().inventory(0) == 2U, "actual carried slot receives type");
   world.entities().get(player)->position.x = engine::f32(100.0F);
   engine::tick(world, 50.0);
   require(world.entities().get(handle)->position.x.value == 65.04064178466797F,
@@ -98,26 +99,26 @@ void pickup_grace_follow_and_expiry() {
 void full_inventory_does_not_invent_backpack_pickup() {
   engine::World world;
   world.initialize();
-  require(engine::spawn_player(world, "full", {}, {}).valid(), "full inventory setup");
-  for (std::uint8_t slot = 0; slot < world.profile().inventory_size(); ++slot) {
-    require(world.loadout().equip(slot, 1U), "fill carried slots");
-    world.profile().set_inventory(slot, 1U);
+  require(engine::spawn_player(world, engine::test::player(world), "full", {}, {}).valid(), "full inventory setup");
+  for (std::uint8_t slot = 0; slot < engine::test::player(world).profile().inventory_size(); ++slot) {
+    require(engine::test::player(world).loadout().equip(slot, 1U), "fill carried slots");
+    engine::test::player(world).profile().set_inventory(slot, 1U);
   }
   const auto handle = engine::spawn_loot_drop(world, 2U, {});
   for (int tick = 0; tick < 11; ++tick) engine::tick(world, 50.0);
   require(!world.entities().get(handle)->pickup_collected, "original198 rejects a full inventory");
-  require(world.profile().backpack_count() == 0U && world.loadout().pickup_transfers().empty(),
+  require(engine::test::player(world).profile().backpack_count() == 0U && engine::test::player(world).loadout().pickup_transfers().empty(),
     "no synthetic backpack or sentinel event");
 }
 
 void dead_query_body_stops_contact_traversal() {
   engine::World world;
   world.initialize();
-  const auto owner = engine::spawn_player(world, "owner", engine::Vec2(engine::f32(-1000.0F), engine::f32(0.0F)), {});
+  const auto owner = engine::spawn_player(world, engine::test::player(world), "owner", engine::Vec2(engine::f32(-1000.0F), engine::f32(0.0F)), {});
   const auto ant = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 7U, {});
-  const auto first = engine::spawn_petal(world, 1U, engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)),
+  const auto first = engine::spawn_petal(world, engine::test::player(world), 1U, engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)),
     engine::f32(0.0F), engine::f32(0.0F));
-  const auto second = engine::spawn_petal(world, 1U, engine::Vec2(engine::f32(21.0F), engine::f32(0.0F)),
+  const auto second = engine::spawn_petal(world, engine::test::player(world), 1U, engine::Vec2(engine::f32(21.0F), engine::f32(0.0F)),
     engine::f32(0.0F), engine::f32(0.0F));
   require(owner.valid() && ant.valid() && first.valid() && second.valid(), "dead query setup");
   world.entities().get(first)->owner = owner.raw;
@@ -131,31 +132,31 @@ void dead_query_body_stops_contact_traversal() {
 void player_and_owned_corpses_keep_original_window() {
   engine::World world;
   world.initialize();
-  const auto player = engine::spawn_player(world, "corpse", {}, {});
-  require(world.loadout().equip(0U, 1U), "corpse loadout setup");
-  world.profile().set_inventory(0U, 1U);
-  require(engine::spawn_loadout_petals(world) == 1U, "one owned petal");
-  const auto petal = world.loadout().handle(0U, 0U);
+  const auto player = engine::spawn_player(world, engine::test::player(world), "corpse", {}, {});
+  require(engine::test::player(world).loadout().equip(0U, 1U), "corpse loadout setup");
+  engine::test::player(world).profile().set_inventory(0U, 1U);
+  require(engine::spawn_loadout_petals(world, engine::test::player(world)) == 1U, "one owned petal");
+  const auto petal = engine::test::player(world).loadout().handle(0U, 0U);
   require(petal.valid(), "owned petal handle");
   (void)engine::damage_entity(world, player, engine::f32(1000.0F));
-  require(world.player() == player && world.entities().get(player) != nullptr,
+  require(engine::test::player(world).player() == player && world.entities().get(player) != nullptr,
     "dead player retains controlled-body handle");
   require(world.entities().get(petal) != nullptr && world.entities().get(petal)->health.value == 0.0F,
     "owned petal is a corpse rather than immediate deletion");
-  require(world.profile().inventory(0U) == 1U, "corpse keeps carried inventory");
+  require(engine::test::player(world).profile().inventory(0U) == 1U, "corpse keeps carried inventory");
   for (int tick = 0; tick < 19; ++tick) engine::tick(world, 50.0);
   require(world.entities().get(player) != nullptr && world.entities().get(petal) != nullptr,
     "both corpses persist before 1000ms");
-  require(world.petals().empty(), "dead player does not respawn equipped petals");
+  require(engine::test::player(world).petals().empty(), "dead player does not respawn equipped petals");
   engine::tick(world, 50.0);
-  require(!world.player().valid() && world.entities().get(player) == nullptr
+  require(!engine::test::player(world).player().valid() && world.entities().get(player) == nullptr
     && world.entities().get(petal) == nullptr, "corpses and controlled handle release at 1000ms");
 }
 
 void player_health_refreshes_before_each_regeneration() {
   engine::World world;
   world.initialize();
-  const auto player = engine::spawn_player(world, "health", {}, {});
+  const auto player = engine::spawn_player(world, engine::test::player(world), "health", {}, {});
   require(player.valid(), "health refresh setup");
   auto* entity = world.entities().get(player);
   // Unmodified original wasm, death scenario at 6100ms: the unchanged 100

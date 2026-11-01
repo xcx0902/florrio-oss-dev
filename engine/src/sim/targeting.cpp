@@ -124,16 +124,19 @@ EntityHandle find_target(const World& world,const SpatialQuery& query,
 EntityHandle find_pickup_recipient(const World& world, EntityHandle source_handle) {
   const Entity* source = world.entities().get(source_handle);
   if (source == nullptr) return EntityHandle{};
-  const Entity* player = world.entities().get(world.player());
-  if (player == nullptr || player->health.value <= 0.0F) return EntityHandle{};
-  const std::uint8_t capacity = world.profile().inventory_size();
-  bool open = false;
-  for (std::uint8_t slot = 0; slot < capacity; ++slot)
-    if (world.loadout().slots()[slot].count == 0) { open = true; break; }
-  if (!open) return EntityHandle{};
-  // Original198 uses cached world coordinates and squared distance in f64.
-  if (distance_squared_d(source->position, player->position) >= 4900.0) return EntityHandle{};
-  return player->handle;
+  EntityHandle recipient{};
+  world.players().for_each([&](const PlayerState& state) {
+    if (recipient.valid()) return;
+    const Entity* player = world.entities().get(state.player());
+    if (player == nullptr || player->health.value <= 0.0F) return;
+    const std::uint8_t capacity = state.profile().inventory_size();
+    bool open = false;
+    for (std::uint8_t slot = 0; slot < capacity; ++slot)
+      if (state.loadout().slots()[slot].count == 0) { open = true; break; }
+    if (open && distance_squared_d(source->position, player->position) < 4900.0)
+      recipient = player->handle;
+  });
+  return recipient;
 }
 
 

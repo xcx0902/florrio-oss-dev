@@ -89,7 +89,7 @@ int main(int argc,char** argv) {
     const int count=name=="lifecycle-soak"?10000:2000;
     for(int i=0;i<count;++i) {
       if(combat) {
-        if(!api->world().entities().get(api->world().player())) { send(*api,seq++,6); ++cycles; }
+        if(!api->world().entities().get(api->world().players().get(api->local_player_id())->player())) { send(*api,seq++,6); ++cycles; }
         else { send(*api,seq++,12); if(name=="lifecycle-soak" && i%200==150) send(*api,seq++,3); }
       }
       const auto phase_before=metrics.phase_ms;

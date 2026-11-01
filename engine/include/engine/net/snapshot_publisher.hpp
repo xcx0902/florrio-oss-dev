@@ -39,7 +39,7 @@ struct PublicationBounds {
 class SnapshotPublisher {
  public:
   void reset(bool populated) { session_ = {}; session_.visibility_enabled = populated; session_.viewer_started = !populated; pending_chat_.clear(); default_dense_groups_ = true; }
-  std::vector<std::uint8_t> publish(World& world, std::uint32_t sequence, std::uint32_t reliable_ack = 0);
+  std::vector<std::uint8_t> publish(World& world, PlayerId viewer, std::uint32_t sequence, std::uint32_t reliable_ack = 0);
   void emit_chat(std::string text) { pending_chat_.push_back(std::move(text)); }
   void set_dense(bool enabled) { default_dense_groups_ = enabled; }
   bool dense() const { return default_dense_groups_; }

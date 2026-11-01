@@ -121,7 +121,9 @@ src/schema/     生成的协议/目录类型（勿手改）
 
 已实现 core/离线适配器分离及有限 tick smoke；原生宿主不加载 WASM、不初始化
 Worker/C ABI。`./build/native/server/florr_server --smoke-ticks 20` 输出实际 tick、
-实体数和种子摘要后退出。此阶段尚无网络监听或多人能力，浏览器产品入口保持单机。
+实体数和种子摘要后退出。M02 已在 engine_core 实现同 World 多玩家状态和显式领域
+命令，宿主尚无网络监听；浏览器产品入口保持单机。接口见
+[玩家状态与领域命令](docs/multiplayer/player-state.md)。
 构建、离线依赖归档和证据路径见 [`server/README.md`](server/README.md)。
 
 ## 仓库结构
@@ -144,9 +146,9 @@ serve.mjs     静态服务器
 
 ```bash
 npm run build:engine        # 原生 Release 构建
-npm run test:engine         # 构建 + 13 项 engine CTest
+npm run test:engine         # 构建 + 14 项 engine CTest（含 M02 多玩家状态）
 npm run build:server        # M01 原生宿主骨架 + 锁定依赖 + native identity
-npm run test:server:native  # 根构建 + 18 项封闭 CTest（含 engine）
+npm run test:server:native  # 根构建 + 19 项封闭 CTest（含 engine）
 npm run build:engine:wasm   # Emscripten CMake -> build/wasm/server.wasm
 npm run build:client        # tsc -> fresh build/client
 npm run test:unit           # 协议/线格式单元测试

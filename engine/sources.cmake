@@ -1,5 +1,7 @@
 # Single owner for domain and offline adapter translation units.
 set(ENGINE_CORE_SOURCES
+  src/model/player_registry.cpp
+  src/sim/player_commands.cpp
   src/model/world.cpp
   src/model/world_config.cpp
   src/sim/death.cpp

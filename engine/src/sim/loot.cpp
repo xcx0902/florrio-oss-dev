@@ -128,10 +128,13 @@ EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 positi
 
 bool legendary_exists(const World& world, EntityHandle dead, std::uint16_t petal_type) {
   if (rarity_of(petal_type) != 5U) return false;
-  if (world.player().valid() && world.player() != dead) {
-    for (const auto& slot : world.loadout().slots())
-      if (slot.count != 0 && slot.type_id == petal_type) return true;
-  }
+  bool equipped = false;
+  world.players().for_each([&](const PlayerState& player) {
+    if (!player.player().valid() || player.player() == dead) return;
+    for (const auto& slot : player.loadout().slots())
+      if (slot.count != 0 && slot.type_id == petal_type) equipped = true;
+  });
+  if (equipped) return true;
   // Original legendaryExists scans the world's pickup intrusive list.
   for (const EntityHandle handle : world.pickups()) {
     const Entity* entity = world.entities().get(handle);

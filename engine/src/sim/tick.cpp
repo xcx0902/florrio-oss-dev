@@ -6,6 +6,7 @@
 #include "engine/sim/movement.hpp"
 #include "engine/sim/petal_effects.hpp"
 #include "engine/sim/player.hpp"
+#include "engine/sim/player_commands.hpp"
 #include "engine/sim/petals.hpp"
 #include "engine/sim/spawn.hpp"
 #include "pickups.hpp"
@@ -28,11 +29,13 @@ void reap_dead(World& world) {
       kill_entity(world, entity.handle, EntityHandle{});
     }
   });
-  auto& petals = world.petals();
-  petals.erase(std::remove_if(petals.begin(), petals.end(),
-    [&world](const PetalOrbitState& petal) {
-      return world.entities().get(petal.handle) == nullptr;
-    }), petals.end());
+  world.players().for_each([&](PlayerState& state) {
+    auto& petals = state.petals();
+    petals.erase(std::remove_if(petals.begin(), petals.end(),
+      [&world](const PetalOrbitState& petal) {
+        return world.entities().get(petal.handle) == nullptr;
+      }), petals.end());
+  });
 }
 
 /** Original pickup lifetime countdown (pickup +32, 32..62 s by rarity). */
@@ -72,6 +75,7 @@ void tick(World& world, double delta_milliseconds) {
   // system runs; `advance_tick` at the end only bumps the tick counter.
   world.set_time_ms(world.time_ms() + delta_milliseconds);
   world.clear_phase_trace();
+  prepare_players(world);
   // Original tick order: timed entities/AI, active damage effects, area
   // targets, equipped petals, petal orbits, movement, collisions, snapshot.
   // The trace is the domain evidence for R05's phase-level comparison.
@@ -105,24 +109,29 @@ void tick(World& world, double delta_milliseconds) {
   // Original updateEquippedPetals computes the overlevel zone countdown first.
   // At the limit it skips the ring phase, slot recharge and all spawning, then
   // damages the petals that are still equipped.
-  update_zone_restriction(world, delta_milliseconds);
-  if (!world.zone_petals_disabled()) {
-    // Original updateEquippedPetals writes loadout+284 before updatePetalOrbits
-    // reads it, so the ring phase advances first.
-    advance_loadout_orbit_phase(world, delta_milliseconds);
-    world.record_phase("petal-phase");
-    // Original updateEquippedPetals both recharges/spawns petals and advances
-    // the ring phase before updatePetalOrbits; a petal recharged this tick
-    // therefore integrates in the same tick (death scenario, 8400 ms: spawn at
-    // the owner plus one movement step).
-    (void)refresh_loadout_petals(world, delta_milliseconds);
-  } else {
-    damage_zone_locked_petals(world, delta_milliseconds);
-  }
+  world.players().for_each([&](PlayerState& state) {
+    update_zone_restriction(world, state, delta_milliseconds);
+  });
+  bool has_enabled_player = false;
+  world.players().for_each([&](PlayerState& state) {
+    if (state.zone_petals_disabled()) return;
+    has_enabled_player = true;
+    advance_loadout_orbit_phase(world, state, delta_milliseconds);
+  });
+  // Preserve the legacy phase trace for empty/single-player worlds too.
+  if (has_enabled_player || world.players().size() == 0) world.record_phase("petal-phase");
+  world.players().for_each([&](PlayerState& state) {
+    if (!state.zone_petals_disabled())
+      (void)refresh_loadout_petals(world, state, delta_milliseconds);
+    else
+      damage_zone_locked_petals(world, state, delta_milliseconds);
+  });
   world.record_phase("loadout-petals");
-  update_petal_orbits(world, delta_milliseconds);
+  world.players().for_each([&](PlayerState& state) {
+    update_petal_orbits(world, state, delta_milliseconds);
+  });
   world.record_phase("petal-orbits");
-  apply_player_controls(world, delta_milliseconds);
+  apply_all_player_controls(world, delta_milliseconds);
   world.record_phase("player-controls");
   integrate_movement(world, delta_milliseconds);
   world.record_phase("movement");
@@ -146,24 +155,22 @@ void tick(World& world, double delta_milliseconds) {
       if (entity.kind != EntityKind::kPlayer && entity.kind != EntityKind::kPetal && entity.kind != EntityKind::kMob
           && entity.kind != EntityKind::kProjectile) continue;
       if (entity.death_time_ms > world.time_ms()) continue;
-      if (entity.handle == world.player()) {
-        world.loadout().clear();
-        world.set_player(EntityHandle{});
-      }
       (void)world.destroy(entity.handle);
     }
   });
-  {
-    auto& petals = world.petals();
+  world.players().for_each([&](PlayerState& state) {
+    auto& petals = state.petals();
     petals.erase(std::remove_if(petals.begin(), petals.end(),
       [&world](const PetalOrbitState& petal) {
         return world.entities().get(petal.handle) == nullptr;
       }), petals.end());
-  }
+  });
   world.record_phase("corpse-sweep");
   world.flush_pending_hits();
   world.record_phase("hit-flush");
   world.advance_tick(0.0);
+  // Expire leases and expose respawnability at the completed tick boundary.
+  prepare_players(world);
 }
 
 } // namespace engine

@@ -1,24 +1,19 @@
 #include "engine/model/world.hpp"
+#include "engine/sim/petals.hpp"
+#include "engine/model/catalog.hpp"
+#include "engine/sim/combat.hpp"
 
 namespace engine {
 
 void World::reset() {
   collision_.reset();
   destroyed_.clear();
-  input_ = PlayerInput{};
   entities_.reset();
+  players_.clear();
   rng_ = MinstdRng{};
   random_.seed(285456437U);
   tick_ = 0;
-  petals_.clear();
   hit_events_.clear();
-  last_killer_ = EntityHandle{};
-  last_killer_name_.clear();
-  player_ = EntityHandle{};
-  player_name_.clear();
-  player_speed_ = f32(0.0F);
-  loadout_.clear();
-  profile_.clear();
   area_effects_.clear();
   area_alive_.clear();area_candidates_.clear();area_added_.clear();area_removed_.clear();
   deferred_launches_.clear();
@@ -32,13 +27,6 @@ void World::reset() {
   pending_hit_events_.clear();
   deaths_.clear();
   time_ms_ = 0.0;
-  last_death_score_ = f32(0.0F);
-  last_death_level_ = 0;
-  last_death_kept_.fill(0);
-  last_death_kept_count_ = 0;
-  zone_timer_ms_ = f32(0.0F);
-  zone_progress_ = 0;
-  zone_disabled_ = false;
   width_ = f32(50000.0F);
   height_ = f32(4000.0F);
   auto_populate_ = false;
@@ -67,6 +55,39 @@ void World::initialize(std::uint64_t handle_seed) {
 bool World::destroy(EntityHandle handle) {
   Entity* entity = entities_.get(handle);
   if (entity == nullptr) return false;
+  if (entity->kind == EntityKind::kPetal) (void)on_petal_destroyed(*this, handle);
+  if (auto* equipped_owner = players_.by_body(EntityHandle{entity->owner})) {
+    auto& loadout = equipped_owner->loadout();
+    for (std::uint8_t slot = 0; slot < PlayerLoadout::kSlots; ++slot) {
+      for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
+        if (loadout.handle(slot, instance) != handle) continue;
+        loadout.clear_handle(slot, instance);
+        loadout.slots()[slot].instances[instance] = {};
+        if (const auto* combat = Catalog::instance().petal_combat(loadout.slots()[slot].type_id))
+          loadout.slots()[slot].recharge_remaining_ms = combat->rechargeMilliseconds;
+      }
+    }
+  }
+  if (auto* state = players_.by_body(handle)) {
+    // A direct body removal must retire its live equipped occupants too.
+    // Ordinary corpse sweeps keep their existing release order/timestamps.
+    std::array<EntityHandle, 24> equipped{};
+    for (std::uint8_t slot = 0; slot < 8; ++slot)
+      for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance)
+        equipped[slot * PlayerLoadout::kInstances + instance] = state->loadout().handle(slot, instance);
+    for (auto child : equipped) {
+      if (auto* occupant = entities_.get(child); occupant != nullptr && occupant->health.value > 0.0F)
+        (void)damage_entity(*this, child, occupant->health, {});
+    }
+    // Preserve the v1 Worker's orphan orbit records until respawn. Finite
+    // multiplayer leases retire their input and orbit bookkeeping here.
+    const bool offline_lease = state->has_offline_input_lease();
+    if (!offline_lease) state->clear_input();
+    state->loadout().clear();
+    if (!offline_lease) state->petals().clear();
+    state->life = tick_ >= state->next_spawn_tick ? PlayerLife::kRespawnable : PlayerLife::kCorpse;
+    players_.unbind_body(handle);
+  }
   detach_linked_entities(handle);
   // Original404 reparents ordinary ownership only. It must not reconnect
   // constraint links that original43/424 already detached at health death.

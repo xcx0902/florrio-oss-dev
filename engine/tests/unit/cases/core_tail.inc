@@ -16,30 +16,30 @@ void test_loadout_reserve_cycle_and_packet_cache() {
   profile.set_level(20);
   for (std::uint8_t slot = 0; slot < 6; ++slot) profile.set_inventory(slot, 1);
   profile.set_inventory_count(6);
-  const engine::EntityHandle player = engine::spawn_player(world, "p",
+  const engine::EntityHandle player = engine::spawn_player(world, engine::test::player(world), "p",
     engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
   CHECK(player.valid());
-  world.profile() = profile;
-  world.loadout().restore_from_profile(world.profile());
-  const std::uint32_t epoch_before = world.loadout().packet_cache_epoch();
-  CHECK(world.loadout().cycle_reserve_slots(world, world.profile()));
-  CHECK(world.loadout().packet_cache_epoch() > epoch_before);
-  CHECK(world.loadout().slots()[6].type_id == 1U);
-  CHECK(world.loadout().slots()[7].type_id == 1U);
-  CHECK(world.loadout().slots()[8].type_id == 2U);
-  CHECK(world.loadout().slots()[13].type_id == 7U);
+  engine::test::player(world).profile() = profile;
+  engine::test::player(world).loadout().restore_from_profile(engine::test::player(world).profile());
+  const std::uint32_t epoch_before = engine::test::player(world).loadout().packet_cache_epoch();
+  CHECK(engine::test::player(world).loadout().cycle_reserve_slots(world, engine::test::player(world), engine::test::player(world).profile()));
+  CHECK(engine::test::player(world).loadout().packet_cache_epoch() > epoch_before);
+  CHECK(engine::test::player(world).loadout().slots()[6].type_id == 1U);
+  CHECK(engine::test::player(world).loadout().slots()[7].type_id == 1U);
+  CHECK(engine::test::player(world).loadout().slots()[8].type_id == 2U);
+  CHECK(engine::test::player(world).loadout().slots()[13].type_id == 7U);
   const engine::Entity* player_entity = world.entities().get(player);
   CHECK(player_entity != nullptr);
-  CHECK(player_entity->packet_epoch_a == world.loadout().packet_cache_epoch());
-  CHECK(player_entity->packet_epoch_b == world.loadout().packet_cache_epoch());
+  CHECK(player_entity->packet_epoch_a == engine::test::player(world).loadout().packet_cache_epoch());
+  CHECK(player_entity->packet_epoch_b == engine::test::player(world).loadout().packet_cache_epoch());
   // A full backpack shifts its oldest entry before appending the discarded petal.
-  for (std::uint16_t item = 1; item <= 16; ++item) world.profile().push_backpack(item);
-  CHECK(world.profile().backpack_count() == 16U);
-  CHECK(world.profile().backpack()[0] == 1U);
-  world.profile().push_backpack(30U);
-  CHECK(world.profile().backpack_count() == 16U);
-  CHECK(world.profile().backpack()[0] == 2U);
-  CHECK(world.profile().backpack()[15] == 30U);
+  for (std::uint16_t item = 1; item <= 16; ++item) engine::test::player(world).profile().push_backpack(item);
+  CHECK(engine::test::player(world).profile().backpack_count() == 16U);
+  CHECK(engine::test::player(world).profile().backpack()[0] == 1U);
+  engine::test::player(world).profile().push_backpack(30U);
+  CHECK(engine::test::player(world).profile().backpack_count() == 16U);
+  CHECK(engine::test::player(world).profile().backpack()[0] == 2U);
+  CHECK(engine::test::player(world).profile().backpack()[15] == 30U);
 }
 
 void test_contact_nearest_candidate_first() {
@@ -237,7 +237,7 @@ void test_tick_phase_trace() {
     engine::World pickup_world;
     pickup_world.initialize();
     pickup_world.set_auto_populate(false);
-    const auto player = engine::spawn_player(pickup_world, "phase", engine::Vec2{}, {});
+    const auto player = engine::spawn_player(pickup_world, engine::test::player(pickup_world), "phase", engine::Vec2{}, {});
     const float drop_x = entering ? 74.0F : 69.0F;
     const auto drop = engine::spawn_drop(pickup_world, 2,
       engine::Vec2(engine::f32(drop_x), engine::f32(0.0F)));
@@ -253,8 +253,8 @@ void test_tick_phase_trace() {
     const float distance_after_movement = drop_x - moved_player->position.x.value;
     CHECK(entering ? distance_after_movement < 70.0F : distance_after_movement > 70.0F);
     CHECK(pickup->pickup_collected == !entering);
-    CHECK(pickup_world.loadout().pickup_transfers().size() == (entering ? 0U : 1U));
-    CHECK(pickup_world.profile().inventory(0) == (entering ? 0U : 2U));
+    CHECK(engine::test::player(pickup_world).loadout().pickup_transfers().size() == (entering ? 0U : 1U));
+    CHECK(engine::test::player(pickup_world).profile().inventory(0) == (entering ? 0U : 2U));
   }
 }
 

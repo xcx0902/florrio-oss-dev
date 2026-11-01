@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 #include "engine/core/byte_reader.hpp"
 #include "engine/net/worker_api.hpp"
 #include "engine/sim/loot.hpp"
@@ -16,7 +17,7 @@ int main() {
   WorkerApi api; api.init();
   const std::array<std::uint8_t, 4> join{1U, 6U, 'A', 0U};
   CHECK(api.send(join, {}));
-  const Vec2 position = api.world().entities().get(api.world().player())->position;
+  const Vec2 position = api.world().entities().get(engine::test::player(api.world()).player())->position;
   const auto old = spawn_loot_drop(api.world(), 7U, position + Vec2(f32(5000.0F), f32(0.0F)), Vec2{});
   for (int i = 0; i < 3; ++i) api.think();
   api.world().entities().get(old)->set_position(position);

@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 #include <iterator>
 #include "engine/model/catalog.hpp"
 #include "engine/sim/combat.hpp"
@@ -33,34 +34,34 @@ namespace {
 engine::EntityHandle setup(engine::World& world, std::uint16_t type) {
   world.initialize();
   world.set_auto_populate(false);
-  const auto owner = engine::spawn_player_default(world, "projectile", engine::make_default_profile(), false);
+  const auto owner = engine::spawn_player_default(world, engine::test::player(world), "projectile", engine::make_default_profile(), false);
   require(owner.valid(), "owner spawns");
   world.entities().get(owner)->set_position({engine::f32(0), engine::f32(0)});
-  world.profile().set_inventory(0, type);
-  world.profile().set_inventory_count(1);
-  world.loadout().clear();
-  require(world.loadout().equip(0, type), "projectile equips");
-  require(engine::spawn_loadout_petals(world) == world.loadout().slots()[0].count, "projectile spawns");
+  engine::test::player(world).profile().set_inventory(0, type);
+  engine::test::player(world).profile().set_inventory_count(1);
+  engine::test::player(world).loadout().clear();
+  require(engine::test::player(world).loadout().equip(0, type), "projectile equips");
+  require(engine::spawn_loadout_petals(world, engine::test::player(world)) == engine::test::player(world).loadout().slots()[0].count, "projectile spawns");
   return owner;
 }
 void release_and_recharge() {
   for (const auto type : {10U, 11U, 12U, 19U, 20U, 29U, 30U, 34U}) {
     engine::World world;
     setup(world, type);
-    const auto old = world.loadout().handle(0, 0);
-    world.apply_input(1, engine::f32(0), engine::f32(0));
+    const auto old = engine::test::player(world).loadout().handle(0, 0);
+    engine::test::input(world, 1, engine::f32(0), engine::f32(0));
     world.set_time_ms(500);
-    engine::update_petal_orbits(world, 0);
-    require(world.loadout().handle(0, 0) == old, "exact 500ms remains equipped");
+    engine::update_petal_orbits(world, engine::test::player(world), 0);
+    require(engine::test::player(world).loadout().handle(0, 0) == old, "exact 500ms remains equipped");
     world.set_time_ms(500.001);
-    engine::update_petal_orbits(world, 0);
-    require(!world.loadout().handle(0, 0).valid(), "strictly over 500ms releases");
+    engine::update_petal_orbits(world, engine::test::player(world), 0);
+    require(!engine::test::player(world).loadout().handle(0, 0).valid(), "strictly over 500ms releases");
     const auto* combat = engine::Catalog::instance().petal_combat(type);
-    require(world.loadout().slots()[0].recharge_remaining_ms == combat->rechargeMilliseconds,
+    require(engine::test::player(world).loadout().slots()[0].recharge_remaining_ms == combat->rechargeMilliseconds,
       "release arms exact catalog recharge");
-    require(engine::refresh_loadout_petals(world, combat->rechargeMilliseconds - 1) == 0,
+    require(engine::refresh_loadout_petals(world, engine::test::player(world), combat->rechargeMilliseconds - 1) == 0,
       "no replacement one ms before recharge");
-    require(engine::refresh_loadout_petals(world, 1) == world.loadout().slots()[0].count,
+    require(engine::refresh_loadout_petals(world, engine::test::player(world), 1) == engine::test::player(world).loadout().slots()[0].count,
       "replacement arrives on exact recharge boundary");
   }
 }
@@ -68,14 +69,14 @@ void peas_lifecycle() {
   for (const auto type : {11U, 12U, 34U}) {
     engine::World world;
     const auto owner = setup(world, type);
-    const auto parent = world.loadout().handle(0, 0);
+    const auto parent = engine::test::player(world).loadout().handle(0, 0);
     const auto target = engine::spawn_entity(world, engine::EntityKind::kMob, 1, {engine::f32(300), engine::f32(400)}, engine::f32(1));
     engine::on_petal_hit(world, parent, target, owner);
     require(world.entities().get(parent) != nullptr && world.deferred_launches().empty(),
       "contact does not split equipped Peas");
-    world.apply_input(1, engine::f32(0), engine::f32(0));
+    engine::test::input(world, 1, engine::f32(0), engine::f32(0));
     world.set_time_ms(550);
-    engine::update_petal_orbits(world, 0);
+    engine::update_petal_orbits(world, engine::test::player(world), 0);
     require(world.entities().get(parent) == nullptr, "split removes parent");
     require(world.deferred_launches().size() == 1, "one deferred launch");
     const auto children = world.deferred_launches()[0].children;
@@ -102,11 +103,11 @@ void web_death_and_area() {
   for (const auto type : {29U, 30U}) {
     engine::World world;
     const auto owner = setup(world, type);
-    const auto web = world.loadout().handle(0, 0);
+    const auto web = engine::test::player(world).loadout().handle(0, 0);
     // Isolate one callback for WebR4's three-instance slot.
-    while (world.petals().size() > 1) {
-      const auto extra = world.petals().back().handle;
-      world.petals().pop_back();
+    while (engine::test::player(world).petals().size() > 1) {
+      const auto extra = engine::test::player(world).petals().back().handle;
+      engine::test::player(world).petals().pop_back();
       (void)world.destroy(extra);
     }
 
@@ -114,9 +115,9 @@ void web_death_and_area() {
     const auto target = engine::spawn_entity(world, engine::EntityKind::kMob, 1, {engine::f32(500), engine::f32(400)}, engine::f32(1));
     engine::on_petal_hit(world, web, target, owner);
     require(world.area_effects().empty(), "orbiting Web contact creates no ground area");
-    world.apply_input(1, engine::f32(0), engine::f32(0));
+    engine::test::input(world, 1, engine::f32(0), engine::f32(0));
     world.set_time_ms(550);
-    engine::update_petal_orbits(world, 0);
+    engine::update_petal_orbits(world, engine::test::player(world), 0);
     engine::on_petal_hit(world, web, target, owner);
     require(world.area_effects().empty(), "nonlethal launched contact creates no area");
     engine::update_petal_behaviors(world, 650);
@@ -147,8 +148,8 @@ void controlling_root_full_tick_contacts() {
     engine::World world;
     const auto owner = setup(world, 22);
     world.set_time_ms(1001);
-    engine::update_petal_orbits(world, 1);
-    const auto pet = world.loadout().handle(0, 0);
+    engine::update_petal_orbits(world, engine::test::player(world), 1);
+    const auto pet = engine::test::player(world).loadout().handle(0, 0);
     require(pet.valid() && world.entities().get(pet)->kind == engine::EntityKind::kMob, "full tick uses actual Egg pet");
     world.entities().get(owner)->set_position({engine::f32(-500), engine::f32(0)});
     world.entities().get(pet)->set_position({engine::f32(300), engine::f32(0)});
@@ -196,14 +197,14 @@ void callback_trace() {
              engine::Vec2{engine::f32(1), engine::f32(7)}}) {
           engine::World world;
           setup(world, type);
-          const auto handle = world.loadout().handle(0, 0);
+          const auto handle = engine::test::player(world).loadout().handle(0, 0);
           auto* petal = world.entities().get(handle);
           petal->set_position(offset);
           petal->velocity = {0.25, -0.125};
           petal->acceleration = {0.125, -0.25};
           world.random().seed(123456789);
           world.set_time_ms(now);
-          const bool released = engine::update_projectile_petal_orbit(world, world.petals()[0], buttons);
+          const bool released = engine::update_projectile_petal_orbit(world, engine::test::player(world).petals()[0], buttons);
           std::printf("%s{\"type\":%u,\"buttons\":%u,\"now\":%.17g,\"x\":%.17g,\"y\":%.17g,"
             "\"released\":%s,\"vx\":%.17g,\"vy\":%.17g,\"ax\":%.17g,\"ay\":%.17g,\"angle\":%.17g,\"life\":%.17g}",
             first ? "" : ",", type, buttons, now, static_cast<double>(offset.x.value),
@@ -220,11 +221,11 @@ void split_trace() {
   for (const auto type : {11U, 12U, 34U}) for (const auto seed : {1U, 123456789U, 2147483646U}) {
     engine::World world;
     setup(world, type);
-    const auto parent = world.loadout().handle(0, 0);
+    const auto parent = engine::test::player(world).loadout().handle(0, 0);
     world.entities().get(parent)->set_position({engine::f32(300), engine::f32(400)});
     world.random().seed(seed);
     world.set_time_ms(550);
-    require(engine::update_projectile_petal_orbit(world, world.petals()[0], 1), "split trace releases");
+    require(engine::update_projectile_petal_orbit(world, engine::test::player(world).petals()[0], 1), "split trace releases");
     const auto children = world.deferred_launches()[0].children;
     require(world.run_deferred_launches(551) == 1, "split trace deferred launch");
     for (std::size_t index = 0; index < children.size(); ++index) {
@@ -246,12 +247,12 @@ void lifecycle_trace() {
   for (const auto type : {10U, 11U, 12U, 19U, 20U, 29U, 30U, 34U}) {
     engine::World world;
     setup(world, type);
-    world.apply_input(1, engine::f32(0), engine::f32(0));
+    engine::test::input(world, 1, engine::f32(0), engine::f32(0));
     std::printf("%s{\"type\":%u,\"frames\":[", first ? "" : ",", type);
     for (int frame = 1; frame <= 100; ++frame) {
       engine::tick(world, 50);
       std::printf("%s{\"now\":%d,\"equipped\":%s,\"progress\":%u}", frame == 1 ? "" : ",", frame * 50,
-        world.loadout().handle(0, 0).valid() ? "true" : "false", world.loadout().recharge_progress()[0]);
+        engine::test::player(world).loadout().handle(0, 0).valid() ? "true" : "false", engine::test::player(world).loadout().recharge_progress()[0]);
     }
     std::printf("]}");
     first = false;

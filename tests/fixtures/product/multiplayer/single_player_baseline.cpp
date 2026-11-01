@@ -1,3 +1,4 @@
+#include "../../../../engine/tests/support/single_player.hpp"
 #include "engine/net/worker_api.hpp"
 #include "engine/sim/combat.hpp"
 #include <array>
@@ -29,19 +30,19 @@ void checkpoint(engine::WorkerApi& api, const char* label) {
     << ",\"timeMs\":" << world.time_ms() << ",\"rng\":{\"game\":" << world.random().state()
     << ",\"gameDraws\":" << world.random().draws() << ",\"handles\":\"" << world.rng().state()
     << "\",\"deathShuffle\":" << world.death_shuffle_random().state()
-    << ",\"deathShuffleDraws\":" << world.death_shuffle_random().draws() << "},\"body\":" << world.player().raw
-    << ",\"level\":" << +world.profile().level() << ",\"experienceBits\":" << world.profile().experience().bits()
-    << ",\"scoreBits\":" << world.loadout().score().bits() << ",\"inventory\":";
-  array(world.profile().inventory());
+    << ",\"deathShuffleDraws\":" << world.death_shuffle_random().draws() << "},\"body\":" << engine::test::player(world).player().raw
+    << ",\"level\":" << +engine::test::player(world).profile().level() << ",\"experienceBits\":" << engine::test::player(world).profile().experience().bits()
+    << ",\"scoreBits\":" << engine::test::player(world).loadout().score().bits() << ",\"inventory\":";
+  array(engine::test::player(world).profile().inventory());
   std::cout << ",\"loadout\":[";
-  for (std::size_t i = 0; i < world.loadout().slots().size(); ++i) {
+  for (std::size_t i = 0; i < engine::test::player(world).loadout().slots().size(); ++i) {
     if (i != 0) std::cout << ',';
-    std::cout << world.loadout().slots()[i].type_id;
+    std::cout << engine::test::player(world).loadout().slots()[i].type_id;
   }
-  std::cout << "],\"lastDeathLevel\":" << +world.last_death_level() << ",\"retained\":[";
-  for (std::size_t i = 0; i < world.last_death_kept_count(); ++i) {
+  std::cout << "],\"lastDeathLevel\":" << +engine::test::player(world).last_death_level() << ",\"retained\":[";
+  for (std::size_t i = 0; i < engine::test::player(world).last_death_kept_count(); ++i) {
     if (i != 0) std::cout << ',';
-    std::cout << world.last_death_kept()[i];
+    std::cout << engine::test::player(world).last_death_kept()[i];
   }
   std::cout << "],\"drops\":[";
   bool first = true;
@@ -68,7 +69,7 @@ int main() {
   auto& world = api->world();
   require(world.random().state() == 285456437U, "initial game seed changed");
   command(*api, 1, 6);
-  const auto original = world.player();
+  const auto original = engine::test::player(world).player();
   require(original.valid(), "spawn did not create a body");
   const auto start_x = world.entities().get(original)->position.x;
   std::cout << "{\"schema\":\"single-player-domain-v1\",\"seeds\":{\"handleInitializer\":0,\"game\":285456437,\"deathGame\":47,\"deathShuffle\":1},\"tickMs\":50,\"autoPopulate\":false,\"entityColumns\":[\"handle\",\"kind\",\"type\",\"owner\",\"xBits\",\"yBits\",\"healthBits\",\"maxHealthBits\",\"deathProcessed\",\"deathTimeMs\"],\"checkpoints\":[";
@@ -86,14 +87,14 @@ int main() {
   require(!hit.died && hit.remaining.value < world.entities().get(original)->max_health.value, "nonlethal hit failed");
   const auto kill = engine::damage_entity(world, mob, world.entities().get(mob)->health, original);
   require(kill.died && world.entities().get(mob)->death_processed, "mob death failed");
-  require(world.loadout().score().value > 0, "actual player kill did not award mob XP");
+  require(engine::test::player(world).loadout().score().value > 0, "actual player kill did not award mob XP");
   std::cout << ','; checkpoint(*api, "combat");
   // Same carried items and streams as the existing level-30 death regression.
   const std::array<std::uint16_t, 16> carried{1,2,6,7,8,9,10,12,15,18,19,22,25,29,34,36};
-  world.profile().set_level(30); world.profile().set_experience(engine::f32(2.5F));
-  for (std::uint8_t i = 0; i < carried.size(); ++i) world.profile().set_inventory(i, carried[i]);
-  world.profile().set_inventory_count(16); world.loadout().restore_from_profile(world.profile());
-  world.loadout().set_score(engine::f32(1234.5F)); world.random().seed(47); world.seed_death_shuffle(1);
+  engine::test::player(world).profile().set_level(30); engine::test::player(world).profile().set_experience(engine::f32(2.5F));
+  for (std::uint8_t i = 0; i < carried.size(); ++i) engine::test::player(world).profile().set_inventory(i, carried[i]);
+  engine::test::player(world).profile().set_inventory_count(16); engine::test::player(world).loadout().restore_from_profile(engine::test::player(world).profile());
+  engine::test::player(world).loadout().set_score(engine::f32(1234.5F)); world.random().seed(47); world.seed_death_shuffle(1);
   // Remove the combat mob's loot before the independently seeded death case.
   const auto old_drops = world.pickups();
   for (auto drop : old_drops) require(world.destroy(drop), "combat drop cleanup failed");
@@ -108,17 +109,17 @@ int main() {
   for (int i = 0; i < 19; ++i) api->think();
   require(world.entities().get(original) != nullptr, "corpse vanished before 1000ms");
   api->think();
-  require(!world.player().valid() && world.entities().get(original) == nullptr, "corpse remains past deadline");
+  require(!engine::test::player(world).player().valid() && world.entities().get(original) == nullptr, "corpse remains past deadline");
   std::cout << ','; checkpoint(*api, "corpse-removed");
   for (int i = 0; i < 19; ++i) api->think();
   command(*api, 4, 6);
-  require(!world.player().valid(), "spawn accepted before 2500ms");
+  require(!engine::test::player(world).player().valid(), "spawn accepted before 2500ms");
   std::cout << ','; checkpoint(*api, "cooldown-blocked");
   api->think(); command(*api, 5, 6);
-  require(world.player().valid() && world.player() != original, "respawn needs a new body");
-  require(world.time_ms() == 2500 && world.profile().level() == 22, "respawn timing/level changed");
-  require(world.profile().experience().value == 0, "respawn kept partial XP");
-  require(world.entities().get(world.player())->health == world.entities().get(world.player())->max_health, "respawn health incomplete");
+  require(engine::test::player(world).player().valid() && engine::test::player(world).player() != original, "respawn needs a new body");
+  require(world.time_ms() == 2500 && engine::test::player(world).profile().level() == 22, "respawn timing/level changed");
+  require(engine::test::player(world).profile().experience().value == 0, "respawn kept partial XP");
+  require(world.entities().get(engine::test::player(world).player())->health == world.entities().get(engine::test::player(world).player())->max_health, "respawn health incomplete");
   std::cout << ','; checkpoint(*api, "respawn");
   std::cout << "],\"complete\":true}\n";
 }

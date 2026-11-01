@@ -20,15 +20,18 @@ bool set_entity_field(World& world, EntityHandle handle, std::uint32_t field, do
 EntityHandle spawn_mob(World& world, std::uint16_t type_id, Vec2 position) {
   return spawn_entity_from_defaults(world, EntityKind::kMob, type_id, position);
 }
-bool set_loadout_slot(World& world, std::uint32_t slot, std::uint32_t type_id) {
-  if (slot >= 8U || type_id > 65535U || !world.player().valid()) return false;
-  if (!world.loadout().change_slot_type(world, world.profile(),
+bool set_loadout_slot(World& world, PlayerId id, std::uint32_t slot, std::uint32_t type_id) {
+  auto* owner = world.players().get(id);
+  if (owner == nullptr) return false;
+  auto& state = *owner;
+  if (slot >= 8U || type_id > 65535U || !state.player().valid()) return false;
+  if (!state.loadout().change_slot_type(world, state, state.profile(),
       static_cast<std::uint8_t>(slot), static_cast<std::uint16_t>(type_id))) return false;
   for (std::uint8_t instance = 0; instance < 3U; ++instance) {
-    world.loadout().set_pending(static_cast<std::uint8_t>(slot), instance, false);
-    world.loadout().set_pending_timer(static_cast<std::uint8_t>(slot), instance, 0U);
+    state.loadout().set_pending(static_cast<std::uint8_t>(slot), instance, false);
+    state.loadout().set_pending_timer(static_cast<std::uint8_t>(slot), instance, 0U);
   }
-  (void)spawn_loadout_petals(world);
+  (void)spawn_loadout_petals(world, state);
   return true;
 }
 } // namespace engine::diagnostics

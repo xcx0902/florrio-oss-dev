@@ -28,7 +28,7 @@ void WorkerApi::init(bool populate) {
       .death_shuffle_seed = world_.death_shuffle_random().state()});
   output_.clear();
   last_sequence_ = 0;
-  next_spawn_time_ms_ = 0.0;
+  local_player_id_ = register_player(world_, {});
   publisher_.reset(populate);
 }
 
@@ -36,60 +36,43 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
   if (!world_.initialized() || packet.empty() || packet.size() > kMaxInputPacketBytes) return false;
   std::vector<InputMessage> messages;
   if (decode_input_packet(packet, key, messages) != Status::kOk) return false;
+  auto* state = world_.players().get(local_player_id_);
+  if (state == nullptr) return false;
   // All input-driven destruction reaches World::destroy and its notification queue.
   for (const auto& message : messages) {
     // The original applies the sequence gate per message, not per buffer.
     if (!accept_input_sequence(last_sequence_, message.sequence)) continue;
     const InputCommand& command = message.command;
-    const bool has_player = world_.player().valid()
-      && world_.entities().get(world_.player()) != nullptr;
+    const bool has_player = state->player().valid()
+      && world_.entities().get(state->player()) != nullptr;
     if (command.opcode == 5U) {
       publisher_.emit_chat(command.text);
       continue;
     }
-    if (command.opcode == 4U && !has_player && world_.time_ms() >= next_spawn_time_ms_) {
-      // Compatibility entry point for local restart. Original opcode4 itself
-      // schedules a transport/game restart; use the same spawn state and gate
-      // as opcode6 instead of preserving the previous life.
-      const bool fresh = world_.profile().level() == 0
-        && world_.profile().inventory_count() == 0;
-      const PlayerProfile profile = fresh ? make_default_profile() : make_respawn_profile(world_);
+    if ((command.opcode == 4U || command.opcode == 6U) && !has_player
+        && can_spawn_player(world_, *state)) {
       reserve_spawn_placeholder(world_);
-      (void)spawn_player_default(world_, command.text, profile);
-      (void)spawn_loadout_petals(world_);
-      if (world_.player().valid()) next_spawn_time_ms_ = world_.time_ms() + 2500.0;
+      (void)spawn_registered_player(world_, local_player_id_, state->life_epoch, command.text);
       continue;
     }
-    if (command.opcode == 6U && !has_player && world_.time_ms() >= next_spawn_time_ms_) {
-      reserve_spawn_placeholder(world_);
-      {
-        const bool fresh = world_.profile().level() == 0
-          && world_.profile().inventory_count() == 0;
-        const PlayerProfile profile = fresh ? make_default_profile() : make_respawn_profile(world_);
-        (void)spawn_player_default(world_, command.text, profile);
-      }
-      (void)spawn_loadout_petals(world_);
-      if (world_.player().valid()) next_spawn_time_ms_ = world_.time_ms() + 2500.0;
-      continue;
-    }
-    if (command.opcode == 3U && world_.player().valid()) {
+    if (command.opcode == 3U && state->player().valid()) {
       if (command.argument == 0U) {
-        if (Entity* player = world_.entities().get(world_.player()))
+        if (Entity* player = world_.entities().get(state->player()))
           (void)damage_entity(world_, player->handle, player->health, EntityHandle{});
       }
       continue;
     }
-    if (command.opcode == 8U && world_.player().valid()) {
+    if (command.opcode == 8U && state->player().valid()) {
       const std::uint8_t slot = static_cast<std::uint8_t>(command.slot_a);
-      if (world_.loadout().discard(world_, world_.profile(), slot,
+      if (state->loadout().discard(world_, *state, state->profile(), slot,
                                    static_cast<std::uint16_t>(command.value_a)))
-        remove_slot_petals(world_, slot);
+        remove_slot_petals(world_, *state, slot);
       continue;
     }
-    if (command.opcode == 10U && world_.player().valid()) {
+    if (command.opcode == 10U && state->player().valid()) {
       const std::uint8_t first = static_cast<std::uint8_t>(command.slot_a);
       const std::uint8_t second = static_cast<std::uint8_t>(command.slot_b);
-      (void)world_.loadout().swap(world_, world_.profile(), first,
+      (void)state->loadout().swap(world_, *state, state->profile(), first,
                                   static_cast<std::uint16_t>(command.value_a), second,
                                   static_cast<std::uint16_t>(command.value_b));
       continue;
@@ -97,7 +80,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
     if (command.opcode != 12U) continue;
     // Original 655 stores both angle and strength on the player record; the
     // next applyPlayerControls tick consumes the latest values.
-    world_.apply_input(command.buttons, f32(command.angle), f32(command.strength));
+    world_.apply_input(local_player_id_, state->life_epoch, command.buttons, f32(command.angle), f32(command.strength), kOfflineInputTtl);
   }
   return true;
 }
@@ -123,6 +106,6 @@ bool WorkerApi::occupied(Vec2 position) const {
 
 bool WorkerApi::despawn(EntityHandle handle) { return world_.destroy(handle); }
 
-std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequence, std::uint32_t ack) { return publisher_.publish(world_, sequence, ack); }
+std::vector<std::uint8_t> WorkerApi::domain_snapshot_bytes(std::uint32_t sequence, std::uint32_t ack) { return publisher_.publish(world_, local_player_id_, sequence, ack); }
 
 } // namespace engine

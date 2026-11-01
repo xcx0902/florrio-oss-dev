@@ -15,6 +15,9 @@ bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hat
       || (egg->type_id != 22U && egg->type_id != 23U)) return false;
   const Vec2 position = egg->position;
   const EntityHandle owner = egg->owner == kInvalidEntity ? EntityHandle{} : EntityHandle{egg->owner};
+  auto* player = world.players().by_body(owner);
+  if (player == nullptr) return false;
+  auto& state = *player;
   const std::uint8_t slot = egg->loadout_slot, instance = egg->loadout_instance;
   const EntityHandle pet_handle = spawn_entity_from_defaults(world, EntityKind::kMob,
                                                               hatchling_type, position);
@@ -30,7 +33,7 @@ bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hat
   // 693/719 disable the population-band record (+204), not the AI (+104).
   pet->spawn_band = 0xFFU;
   attach_child(world, owner, pet_handle);
-  auto& loadout = world.loadout();
+  auto& loadout = state.loadout();
   if (slot < 8U && instance < PlayerLoadout::kInstances
       && loadout.handle(slot, instance) == egg_handle) {
     loadout.set_handle(slot, instance, pet_handle);
@@ -41,17 +44,17 @@ bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hat
   }
   // The Egg's health is consumed after transferring its intrusive slot handle;
   // on_petal_destroyed must not clear that replacement or start its recharge.
-  auto& states = world.petals();
+  auto& states = state.petals();
   states.erase(std::remove_if(states.begin(), states.end(), [egg_handle](const auto& state) {
     return state.handle == egg_handle;
   }), states.end());
   (void)damage_entity(world, egg_handle, egg->health, EntityHandle{});
-  assign_petal_orbit_indices(world);
+  assign_petal_orbit_indices(world, state);
   return true;
 }
 
-void refresh_egg_pet_slots(World& world) {
-  auto& loadout = world.loadout();
+void refresh_egg_pet_slots(World& world, PlayerState& state) {
+  auto& loadout = state.loadout();
   auto& slots = loadout.slots();
   for (std::uint8_t slot = 0U; slot < 8U; ++slot) {
     if (slots[slot].type_id != 22U && slots[slot].type_id != 23U) continue;

@@ -20,11 +20,11 @@ void test_world_initialize() {
   CHECK(world.rng().state() == expected.state());
   CHECK(world.rng().state() == 11065635568950165505ULL); // frozen initial RNG state
   CHECK(world.random().state() == 285456437U); // post-constructor RNG state
-  world.apply_input(3, engine::f32(7000.0F), engine::f32(-2.0F));
-  CHECK(world.input().buttons == 3);
-  CHECK(std::fabs(world.input().normalized_angle.value - 0.5315678F) < 1e-6F);
-  CHECK(world.input().strength.value == 0.0F);
-  CHECK(world.input().direction == 21U);
+  engine::test::input(world, 3, engine::f32(7000.0F), engine::f32(-2.0F));
+  CHECK(engine::test::player(world).input().buttons == 3);
+  CHECK(std::fabs(engine::test::player(world).input().normalized_angle.value - 0.5315678F) < 1e-6F);
+  CHECK(engine::test::player(world).input().strength.value == 0.0F);
+  CHECK(engine::test::player(world).input().direction == 21U);
   CHECK(engine::pack_direction(engine::f32(0.0F)) == 0U);
   CHECK(engine::pack_direction(engine::f32(1.0F)) == 40U);
   CHECK(engine::pack_direction(engine::f32(-1.0F)) == 214U);
@@ -35,8 +35,8 @@ void test_player_input_appearance() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  world.apply_input(3U, engine::f32(1.0F), engine::f32(0.0F));
-  const auto player = engine::spawn_player_default(world, "appearance",
+  engine::test::input(world, 3U, engine::f32(1.0F), engine::f32(0.0F));
+  const auto player = engine::spawn_player_default(world, engine::test::player(world), "appearance",
     engine::make_default_profile(), false);
   auto* entity = world.entities().get(player);
   CHECK(entity != nullptr);
@@ -44,16 +44,17 @@ void test_player_input_appearance() {
   CHECK(entity->player_expression == 0U);
   entity->player_expression = 0xA0U;
   for (std::uint32_t buttons : {0U, 1U, 2U, 3U, 4U, 5U, 0U, 0x10000000U}) {
-    world.apply_input(buttons, engine::f32(1.0F), engine::f32(0.0F));
+    engine::test::input(world, buttons, engine::f32(1.0F), engine::f32(0.0F));
     CHECK(entity->player_look == 40U);
     CHECK(entity->player_expression == (0xA0U | (buttons & 3U)));
     CHECK(entity->type_id == 0U);
   }
-  world.apply_input(2U, engine::f32(-1.0F), engine::f32(0.0F));
+  engine::test::input(world, 2U, engine::f32(-1.0F), engine::f32(0.0F));
   CHECK(entity->player_look == 214U);
   CHECK(entity->player_expression == 0xA2U);
   CHECK(world.destroy(player));
-  const auto respawned = engine::spawn_player_default(world, "appearance",
+  for (unsigned step = 0; step < engine::kSpawnCooldownTicks; ++step) engine::tick(world, 50.0);
+  const auto respawned = engine::spawn_player_default(world, engine::test::player(world), "appearance",
     engine::make_default_profile(), false);
   entity = world.entities().get(respawned);
   CHECK(entity != nullptr);
@@ -97,9 +98,9 @@ void test_worker_api() {
   const std::array<std::uint8_t, 4> key{0x11, 0x22, 0x33, 0x44};
   engine::apply_packet_xor(packet, key);
   CHECK(api.send(packet, key));
-  CHECK(api.world().input().buttons == 5);
-  CHECK(api.world().input().strength.value == 1.0F);
-  CHECK(api.world().input().direction == 0U);
+  CHECK(engine::test::player(api.world()).input().buttons == 5);
+  CHECK(engine::test::player(api.world()).input().strength.value == 1.0F);
+  CHECK(engine::test::player(api.world()).input().direction == 0U);
   CHECK(api.last_sequence() == 1);
   CHECK(api.send(packet, key)); // duplicate sequence is ignored, not a decode failure
 

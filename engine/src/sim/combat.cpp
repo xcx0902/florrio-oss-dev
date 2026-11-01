@@ -22,8 +22,11 @@ f32 level_damage_scale(const World& world, EntityHandle first, EntityHandle seco
   const Entity* b = world.entities().get(second);
   if (a == nullptr || b == nullptr) return f32(1.0F);
   if (a->kind != EntityKind::kPlayer || b->kind != EntityKind::kPlayer) return f32(1.0F);
-  const std::uint8_t first_level = world.profile().level();
-  const std::uint8_t second_level = world.profile().level();
+  const auto* first_player = world.players().by_body(first);
+  const auto* second_player = world.players().by_body(second);
+  if (first_player == nullptr || second_player == nullptr) return f32(1.0F);
+  const std::uint8_t first_level = first_player->profile().level();
+  const std::uint8_t second_level = second_player->profile().level();
   const std::uint8_t highest = first_level > second_level ? first_level : second_level;
   const double value = static_cast<double>(static_cast<int>(highest) - 5) * 0.2;
   return f32::from_double(std::min(1.0, std::max(0.0, value)));

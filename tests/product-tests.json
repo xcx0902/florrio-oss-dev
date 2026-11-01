@@ -63,6 +63,7 @@
         "engine_pickup_arrival_tests",
         "engine_structure_tests",
         "engine_single_player_baseline_tests",
+        "engine_multiplayer_state_tests",
         "engine_native_link_tests"
       ]
     },
@@ -87,6 +88,7 @@
         "engine_pickup_arrival_tests",
         "engine_structure_tests",
         "engine_single_player_baseline_tests",
+        "engine_multiplayer_state_tests",
         "engine_native_link_tests",
         "server_native_tests",
         "server_help",

@@ -49,7 +49,7 @@ void test_ai_behavior_modifiers() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player_default(world, "p",
+  const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "p",
     engine::make_default_profile(), false);
   world.entities().get(player)->position = engine::Vec2(engine::f32(0.0F), engine::f32(0.0F));
   const engine::EntityHandle spider = engine::spawn_entity_from_defaults(
@@ -67,7 +67,7 @@ void test_ai_behavior_modifiers() {
   engine::World hornet_world;
   hornet_world.initialize();
   hornet_world.set_auto_populate(false);
-  const engine::EntityHandle hornet_player = engine::spawn_player_default(hornet_world, "p",
+  const engine::EntityHandle hornet_player = engine::spawn_player_default(hornet_world, engine::test::player(hornet_world), "p",
     engine::make_default_profile(), false);
   hornet_world.entities().get(hornet_player)->position = engine::Vec2(engine::f32(10000.0F), engine::f32(0.0F));
   const engine::EntityHandle hornet = engine::spawn_entity_from_defaults(
@@ -87,7 +87,7 @@ void test_hornet_stinger_callback() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player_default(world, "p",
+  const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "p",
     engine::make_default_profile(), false);
   // The hornet's territory gate (0.6 - 0.5) needs the player beyond x=5000.
   world.entities().get(player)->position = engine::Vec2(engine::f32(10000.0F), engine::f32(0.0F));
@@ -133,7 +133,7 @@ void test_hornet_stinger_callback() {
   engine::World far;
   far.initialize();
   far.set_auto_populate(false);
-  const engine::EntityHandle far_player = engine::spawn_player_default(far, "p",
+  const engine::EntityHandle far_player = engine::spawn_player_default(far, engine::test::player(far), "p",
     engine::make_default_profile(), false);
   far.entities().get(far_player)->position = engine::Vec2(engine::f32(10000.0F), engine::f32(0.0F));
   far.entities().get(far_player)->bounds_dirty = true;
@@ -165,7 +165,7 @@ void test_hornet_stinger_lifecycle() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const auto player = engine::spawn_player_default(world, "p", engine::make_default_profile(), false);
+  const auto player = engine::spawn_player_default(world, engine::test::player(world), "p", engine::make_default_profile(), false);
   const auto hornet = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 14,
     engine::Vec2(engine::f32(10000.0F), engine::f32(50000.0F)));
   auto* body = world.entities().get(hornet);
@@ -192,7 +192,7 @@ void test_ai_target_motion_and_guard() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player_default(world, "p",
+  const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "p",
     engine::make_default_profile(), false);
   engine::Entity* player_entity = world.entities().get(player);
   CHECK(player_entity != nullptr);
@@ -362,7 +362,7 @@ void test_ai_activity_branch_and_wire() {
   engine::WorkerApi api;
   api.init(false);
   auto& world = api.world();
-  const auto player = engine::spawn_player_default(world, "activity", engine::make_default_profile(), false);
+  const auto player = engine::spawn_player_default(world, engine::test::player(world), "activity", engine::make_default_profile(), false);
   world.entities().get(player)->position = {};
   const auto mob = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 22U,
     engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
@@ -574,7 +574,7 @@ void test_web_tag_domain_side_effects() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player_default(world, "p",
+  const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "p",
     engine::make_default_profile(), false);
   CHECK(player.valid());
   // spawn_player_default uses a random garden point; pin it next to the web tag

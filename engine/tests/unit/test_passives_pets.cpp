@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 #include <iterator>
 #include "engine/model/catalog.hpp"
 #include "engine/net/worker_api.hpp"
@@ -28,13 +29,13 @@ EntityHandle setup(World& world, std::initializer_list<std::uint16_t> types) {
   world.initialize();
   world.set_auto_populate(false);
   auto profile = make_default_profile();
-  const auto owner = spawn_player_default(world, "passive-pet", profile, false);
+  const auto owner = spawn_player_default(world, engine::test::player(world), "passive-pet", profile, false);
   require(owner.valid(), "player spawns");
   world.entities().get(owner)->set_position(Vec2{});
-  world.loadout().clear();
+  engine::test::player(world).loadout().clear();
   std::uint8_t slot = 0;
-  for (auto type : types) require(world.loadout().equip(slot++, type), "slot equips");
-  require(spawn_loadout_petals(world) >= types.size(), "configured petals spawn");
+  for (auto type : types) require(engine::test::player(world).loadout().equip(slot++, type), "slot equips");
+  require(spawn_loadout_petals(world, engine::test::player(world)) >= types.size(), "configured petals spawn");
   return owner;
 }
 void rotation_and_heaviest() {
@@ -44,25 +45,25 @@ void rotation_and_heaviest() {
     setup(world, types);
     std::uint32_t faster = 0, yin = 0;
     for (auto type : types) { faster += type == 14U; yin += type == 28U; }
-    advance_loadout_orbit_phase(world, 50.0);
+    advance_loadout_orbit_phase(world, engine::test::player(world), 50.0);
     const auto direction = yin == 0U ? 1.0 : yin == 1U ? -1.0 : 0.0;
-    require(world.loadout().orbit_phase() == f32::from_double((2.5 + 0.8*faster)*direction*0.05),
+    require(engine::test::player(world).loadout().orbit_phase() == f32::from_double((2.5 + 0.8*faster)*direction*0.05),
       "original shared phase including Faster and unchanged Heaviest");
     if (*types.begin() == 14U) {
-      world.loadout().set_pending(0, 0, true);
-      world.loadout().set_orbit_phase(f32(0.0F));
-      advance_loadout_orbit_phase(world, 50.0);
-      require(world.loadout().orbit_phase() == f32::from_double((2.5+0.8*(faster-1))*direction*0.05),
+      engine::test::player(world).loadout().set_pending(0, 0, true);
+      engine::test::player(world).loadout().set_orbit_phase(f32(0.0F));
+      advance_loadout_orbit_phase(world, engine::test::player(world), 50.0);
+      require(engine::test::player(world).loadout().orbit_phase() == f32::from_double((2.5+0.8*(faster-1))*direction*0.05),
         "pending Faster contributes no bonus");
     }
   }
   World world;
   setup(world, {26});
-  require(world.entities().get(world.loadout().handle(0,0))->mass == f32(4.0F),
+  require(world.entities().get(engine::test::player(world).loadout().handle(0,0))->mass == f32(4.0F),
     "original Heaviest mass is four");
-  world.apply_input(1U, f32(0.0F), f32(0.0F));
-  update_petal_orbits(world, 50.0);
-  require(world.petals()[0].orbit_radius == f32(100.0F), "Heaviest attack ring is 100");
+  engine::test::input(world, 1U, f32(0.0F), f32(0.0F));
+  update_petal_orbits(world, engine::test::player(world), 50.0);
+  require(engine::test::player(world).petals()[0].orbit_radius == f32(100.0F), "Heaviest attack ring is 100");
 }
 void passive_health() {
   struct Case { std::uint16_t type; float maximum; float health; };
@@ -77,7 +78,7 @@ void passive_health() {
     regenerate_players(world, 50.0);
     require(player->max_health == f32(fixture.maximum), "original Cactus max health per slot");
     require(player->health == f32(fixture.health), "original rounded rescale and passive healing");
-    world.loadout().set_pending(0,0,true);
+    engine::test::player(world).loadout().set_pending(0,0,true);
     const auto old_health = player->health, old_maximum = player->max_health;
     regenerate_players(world,50.0);
     const f32 expected = (f32(100.0F)*old_health)/old_maximum + f32::from_double(50.0*100.0/240000.0);
@@ -101,10 +102,10 @@ void passive_health() {
   regenerate_players(world,50.0);
   require(player->health == f32(0.0F), "Leaf never revives a dead player");
   // Reserve slots are not counted; type33 contributes once despite three petals.
-  world.profile().set_level(1);
-  require(world.loadout().equip(5,13), "reserve Cactus equips");
-  require(equipped_max_health_bonus(world,1) == f32(80.0F), "reserve Cactus adds nothing");
-  require(equipped_max_health_bonus(world,15) == f32(100.0F), "unlocking slot includes its Cactus");
+  engine::test::player(world).profile().set_level(1);
+  require(engine::test::player(world).loadout().equip(5,13), "reserve Cactus equips");
+  require(equipped_max_health_bonus(engine::test::player(world),1) == f32(80.0F), "reserve Cactus adds nothing");
+  require(equipped_max_health_bonus(engine::test::player(world),15) == f32(100.0F), "unlocking slot includes its Cactus");
   World capped;
   const auto capped_owner = setup(capped, {32});
   capped.entities().get(capped_owner)->health = f32(99.99F);
@@ -113,21 +114,21 @@ void passive_health() {
   World rewards;
   const auto reward_owner = setup(rewards,{13});
   rewards.entities().get(reward_owner)->health = f32(50.0F);
-  award_player_experience(rewards,f32(4.0F));
+  award_player_experience(rewards, engine::test::player(rewards),f32(4.0F));
   require(rewards.entities().get(reward_owner)->max_health
-    == player_level_max_health(rewards.profile().level())+f32(20.0F),
+    == player_level_max_health(engine::test::player(rewards).profile().level())+f32(20.0F),
     "level reward keeps equipped Cactus maximum");
 }
 void egg_slot_and_recharge(std::uint16_t type, double delay, std::uint16_t mob_type) {
   World world;
   const auto owner = setup(world, {type});
-  const auto egg = world.loadout().handle(0,0);
+  const auto egg = engine::test::player(world).loadout().handle(0,0);
   world.set_time_ms(delay);
-  update_petal_orbits(world,50.0);
-  require(world.loadout().handle(0,0) == egg, "no hatch at exact delay");
+  update_petal_orbits(world, engine::test::player(world),50.0);
+  require(engine::test::player(world).loadout().handle(0,0) == egg, "no hatch at exact delay");
   world.set_time_ms(delay+1.0);
-  update_petal_orbits(world,1.0);
-  const auto pet = world.loadout().handle(0,0);
+  update_petal_orbits(world, engine::test::player(world),1.0);
+  const auto pet = engine::test::player(world).loadout().handle(0,0);
   require(pet.valid() && pet != egg, "hatch replaces equipped handle");
   const auto* hatchling = world.entities().get(pet);
   require(hatchling != nullptr && hatchling->kind == EntityKind::kMob
@@ -137,31 +138,31 @@ void egg_slot_and_recharge(std::uint16_t type, double delay, std::uint16_t mob_t
   require(hatchling->ai.radius == f32(1000.0F) && hatchling->ai.guard_radius == f32(300.0F)
     && hatchling->ai.leash == f32(1000.0F), "original Egg AI overrides");
   require(world.entities().get(egg)->health == f32(0.0F), "Egg health is consumed");
-  require(world.petals().empty(), "pet does not orbit as an Egg");
-  require(refresh_loadout_petals(world,5000.0) == 0U && world.loadout().handle(0,0) == pet,
+  require(engine::test::player(world).petals().empty(), "pet does not orbit as an Egg");
+  require(refresh_loadout_petals(world, engine::test::player(world),5000.0) == 0U && engine::test::player(world).loadout().handle(0,0) == pet,
     "living pet blocks recharging and duplicate hatches");
-  require(world.loadout().slots()[0].recharge_remaining_ms == 0.0
-    && world.loadout().recharge_progress()[0] == 65535U, "living pet keeps its ready slot");
+  require(engine::test::player(world).loadout().slots()[0].recharge_remaining_ms == 0.0
+    && engine::test::player(world).loadout().recharge_progress()[0] == 65535U, "living pet keeps its ready slot");
   require(damage_entity(world,pet,world.entities().get(pet)->health).died,
     "pet dies through the actual damage and corpse path");
-  require(world.loadout().handle(0,0) == pet,
+  require(engine::test::player(world).loadout().handle(0,0) == pet,
     "pet death retains its slot until the next equipped-slot sweep");
-  require(refresh_loadout_petals(world,50.0) == 0U && !world.loadout().handle(0,0).valid(),
+  require(refresh_loadout_petals(world, engine::test::player(world),50.0) == 0U && !engine::test::player(world).loadout().handle(0,0).valid(),
     "pet death starts Egg recharge in the slot sweep");
-  require(world.loadout().slots()[0].recharge_remaining_ms == 950.0,
+  require(engine::test::player(world).loadout().slots()[0].recharge_remaining_ms == 950.0,
     "first recharge tick counts 50 ms after death");
-  require(refresh_loadout_petals(world,949.0) == 0U, "no Egg one ms before recharge completes");
+  require(refresh_loadout_petals(world, engine::test::player(world),949.0) == 0U, "no Egg one ms before recharge completes");
   world.set_time_ms(delay+6001.0);
-  require(refresh_loadout_petals(world,1.0) == 1U, "Egg returns after catalog recharge");
-  require(world.entities().get(world.loadout().handle(0,0))->type_id == type, "respawns an Egg");
-  require(world.petals()[0].behavior_started_at_ms == world.time_ms(), "fresh Egg hatch clock");
+  require(refresh_loadout_petals(world, engine::test::player(world),1.0) == 1U, "Egg returns after catalog recharge");
+  require(world.entities().get(engine::test::player(world).loadout().handle(0,0))->type_id == type, "respawns an Egg");
+  require(engine::test::player(world).petals()[0].behavior_started_at_ms == world.time_ms(), "fresh Egg hatch clock");
 }
 void pet_targeting_and_guard() {
   World world;
   const auto owner = setup(world, {22});
   world.set_time_ms(1001.0);
-  update_petal_orbits(world,1.0);
-  const auto pet = world.loadout().handle(0,0);
+  update_petal_orbits(world, engine::test::player(world),1.0);
+  const auto pet = engine::test::player(world).loadout().handle(0,0);
   auto* friendly = world.entities().get(pet);
   const auto wild = spawn_entity_from_defaults(world,EntityKind::kMob,9,Vec2(f32(100.0F),f32(0.0F)));
   const auto other_wild = spawn_entity_from_defaults(world,EntityKind::kMob,9,Vec2(f32(120.0F),f32(0.0F)));
@@ -191,16 +192,16 @@ void egg_full_ticks() {
   for (const auto type : {22U,23U}) {
     World world;
     setup(world,{static_cast<std::uint16_t>(type)});
-    const auto egg = world.loadout().handle(0,0);
+    const auto egg = engine::test::player(world).loadout().handle(0,0);
     const int ticks = type == 22U ? 20 : 50;
     for (int index=0; index<ticks; ++index) tick(world,50.0);
-    require(world.loadout().handle(0,0) == egg, "real tick keeps Egg at exact hatch time");
+    require(engine::test::player(world).loadout().handle(0,0) == egg, "real tick keeps Egg at exact hatch time");
     tick(world,50.0);
-    const auto pet = world.loadout().handle(0,0);
+    const auto pet = engine::test::player(world).loadout().handle(0,0);
     require(pet.valid() && pet != egg && world.entities().get(pet)->kind == EntityKind::kMob,
       "real tick replaces Egg with a pet in orbit phase");
     for (int index=0; index<30; ++index) tick(world,50.0);
-    require(world.loadout().handle(0,0) == pet && world.petals().empty(),
+    require(engine::test::player(world).loadout().handle(0,0) == pet && engine::test::player(world).petals().empty(),
       "real ticks never hatch duplicate pets while the pet lives");
   }
 }
@@ -211,8 +212,8 @@ void pet_contacts() {
     World world;
     const auto owner = setup(world,{22});
     world.set_time_ms(1001.0);
-    update_petal_orbits(world,1.0);
-    const auto pet = world.loadout().handle(0,0);
+    update_petal_orbits(world, engine::test::player(world),1.0);
+    const auto pet = engine::test::player(world).loadout().handle(0,0);
     world.entities().get(owner)->set_position(Vec2(f32(-500.0F),f32(0.0F)));
     world.entities().get(pet)->set_position(Vec2(f32(300.0F),f32(0.0F)));
     EntityHandle first = pet;
@@ -250,7 +251,7 @@ void pet_full_tick_damage() {
     const auto owner = setup(world,{static_cast<std::uint16_t>(type)});
     const int hatch_ticks = type == 22U ? 21 : 51;
     for (int index=0; index<hatch_ticks; ++index) tick(world,50.0);
-    const auto pet = world.loadout().handle(0,0);
+    const auto pet = engine::test::player(world).loadout().handle(0,0);
     auto* friendly = world.entities().get(pet);
     require(friendly != nullptr && friendly->kind == EntityKind::kMob,
       "full-tick damage fixture hatches a pet");
@@ -274,39 +275,39 @@ void zone_disables_equipped_pets() {
     const auto owner = setup(world,{static_cast<std::uint16_t>(type)});
     const int hatch_ticks = type == 22U ? 21 : 51;
     for (int index=0; index<hatch_ticks; ++index) tick(world,50.0);
-    const auto pet = world.loadout().handle(0,0);
-    require(world.entities().get(pet)->kind == EntityKind::kMob && world.petals().empty(),
+    const auto pet = engine::test::player(world).loadout().handle(0,0);
+    require(world.entities().get(pet)->kind == EntityKind::kMob && engine::test::player(world).petals().empty(),
       "zone fixture starts with a living equipped pet outside the orbit list");
-    world.profile().set_level(60U);
+    engine::test::player(world).profile().set_level(60U);
     world.entities().get(owner)->set_position_x(f32(-24000.0F));
-    world.set_zone_timer_ms(f32(44950.0F));
+    engine::test::player(world).set_zone_timer_ms(f32(44950.0F));
     tick(world,50.0);
     const auto* corpse = world.entities().get(pet);
-    require(world.zone_petals_disabled() && world.zone_timer_ms() == f32(45000.0F),
+    require(engine::test::player(world).zone_petals_disabled() && engine::test::player(world).zone_timer_ms() == f32(45000.0F),
       "zone timer reaches its unchanged 45-second cap");
     require(corpse != nullptr && corpse->health == f32(0.0F) && corpse->death_processed,
       "full-tick zone disable kills the pet through the ordinary corpse path");
-    require(!world.loadout().handle(0,0).valid() && !world.loadout().slots()[0].instances[0].valid(),
+    require(!engine::test::player(world).loadout().handle(0,0).valid() && !engine::test::player(world).loadout().slots()[0].instances[0].valid(),
       "zone sweep releases both equipped pet handle views");
-    require(world.loadout().slots()[0].recharge_remaining_ms == 950.0,
+    require(engine::test::player(world).loadout().slots()[0].recharge_remaining_ms == 950.0,
       "zone defeat starts the original 50-ms recharge tick");
-    require(world.loadout().recharge_progress()[0] == 0U,
+    require(engine::test::player(world).loadout().recharge_progress()[0] == 0U,
       "disabled-zone field61 cache publishes zero even as Egg recharge advances");
     for (int index=0; index<19; ++index) tick(world,50.0);
-    require(!world.loadout().handle(0,0).valid()
-      && world.loadout().slots()[0].recharge_remaining_ms == 0.0 && world.petals().empty(),
+    require(!engine::test::player(world).loadout().handle(0,0).valid()
+      && engine::test::player(world).loadout().slots()[0].recharge_remaining_ms == 0.0 && engine::test::player(world).petals().empty(),
       "disabled slots finish charging but never spawn another Egg or pet");
-    require(world.loadout().recharge_progress()[0] == 0U,
+    require(engine::test::player(world).loadout().recharge_progress()[0] == 0U,
       "a fully charged disabled slot still publishes zero");
     world.entities().get(owner)->set_position_x(f32(24000.0F));
     tick(world,50.0);
-    const auto replacement = world.loadout().handle(0,0);
-    require(!world.zone_petals_disabled() && world.zone_timer_ms() == f32(44995.0F),
+    const auto replacement = engine::test::player(world).loadout().handle(0,0);
+    require(!engine::test::player(world).zone_petals_disabled() && engine::test::player(world).zone_timer_ms() == f32(44995.0F),
       "safe-zone timer keeps its original 0.1 decay");
     require(replacement.valid() && world.entities().get(replacement)->kind == EntityKind::kPetal
       && world.entities().get(replacement)->type_id == type,
       "leaving zone restriction permits the recharged Egg to spawn");
-    require(world.loadout().recharge_progress()[0] == 65535U,
+    require(engine::test::player(world).loadout().recharge_progress()[0] == 65535U,
       "re-enabling a charged Egg restores the ready field61 cache");
   }
 }
@@ -317,10 +318,10 @@ void discard_hatched_pet_before_owner_death() {
     api.init(false);
     auto& world = api.world();
     const auto owner = setup(world,{static_cast<std::uint16_t>(type)});
-    world.profile().set_inventory(0U,static_cast<std::uint16_t>(type));
+    engine::test::player(world).profile().set_inventory(0U,static_cast<std::uint16_t>(type));
     const int hatch_ticks = type == 22U ? 21 : 51;
     for (int index=0; index<hatch_ticks; ++index) tick(world,50.0);
-    const auto pet = world.loadout().handle(0U,0U);
+    const auto pet = engine::test::player(world).loadout().handle(0U,0U);
     const auto* hatchling = world.entities().get(pet);
     require(hatchling != nullptr && hatchling->kind == EntityKind::kMob && hatchling->health.value > 0.0F,
       "opcode8 fixture starts with a living equipped pet");
@@ -334,15 +335,15 @@ void discard_hatched_pet_before_owner_death() {
       require(api.send(packet,key), "opcode8 packet parses");
     };
     discard(1U,1U);
-    require(world.loadout().handle(0U,0U) == pet && world.entities().get(pet)->health.value > 0.0F,
+    require(engine::test::player(world).loadout().handle(0U,0U) == pet && world.entities().get(pet)->health.value > 0.0F,
       "mismatched discard leaves the equipped pet alive");
     discard(2U,static_cast<std::uint8_t>(type));
     const auto* corpse = world.entities().get(pet);
     require(corpse != nullptr && corpse->health == f32(0.0F) && corpse->death_processed,
       "opcode8 damages the hatchling before clearing its equipped handle");
-    require(!world.loadout().handle(0U,0U).valid() && world.loadout().slots()[0].type_id == 0U
-      && world.profile().inventory(0U) == 0U, "discard clears the slot and profile");
-    require(world.profile().backpack_count() == 1U && world.profile().backpack()[0] == type,
+    require(!engine::test::player(world).loadout().handle(0U,0U).valid() && engine::test::player(world).loadout().slots()[0].type_id == 0U
+      && engine::test::player(world).profile().inventory(0U) == 0U, "discard clears the slot and profile");
+    require(engine::test::player(world).profile().backpack_count() == 1U && engine::test::player(world).profile().backpack()[0] == type,
       "discard retains the Egg type in the backpack");
     require(damage_entity(world,owner,world.entities().get(owner)->health).died,
       "owner subsequently dies through the ordinary damage path");
@@ -359,18 +360,18 @@ void zone_reenable_partial_recharge() {
   World world;
   const auto owner = setup(world,{22});
   for (int index=0; index<21; ++index) tick(world,50.0);
-  world.profile().set_level(60U);
+  engine::test::player(world).profile().set_level(60U);
   world.entities().get(owner)->set_position_x(f32(-24000.0F));
-  world.set_zone_timer_ms(f32(44950.0F));
+  engine::test::player(world).set_zone_timer_ms(f32(44950.0F));
   tick(world,50.0);
-  require(world.loadout().recharge_progress()[0] == 0U,
+  require(engine::test::player(world).loadout().recharge_progress()[0] == 0U,
     "partial-recharge fixture publishes zero while disabled");
   world.entities().get(owner)->set_position_x(f32(24000.0F));
   tick(world,50.0);
-  require(!world.zone_petals_disabled() && !world.loadout().handle(0U,0U).valid(),
+  require(!engine::test::player(world).zone_petals_disabled() && !engine::test::player(world).loadout().handle(0U,0U).valid(),
     "leaving restriction before recharge completes does not spawn early");
-  require(world.loadout().slots()[0].recharge_remaining_ms == 900.0
-    && world.loadout().recharge_progress()[0] == 6553U,
+  require(engine::test::player(world).loadout().slots()[0].recharge_remaining_ms == 900.0
+    && engine::test::player(world).loadout().recharge_progress()[0] == 6553U,
     "re-enabling restores actual 100/1000-ms progress instead of a stale zero or ready cache");
 }
 } // namespace

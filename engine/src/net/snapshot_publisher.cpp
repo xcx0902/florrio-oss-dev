@@ -58,27 +58,29 @@ bool peer_handle_less(EntityHandle first, EntityHandle second) {
 }
 
 }
-std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, std::uint32_t sequence,
+std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, PlayerId viewer_id, std::uint32_t sequence,
                                                            std::uint32_t reliable_ack) {
   auto& writer = writer_;
   writer.begin(sequence, reliable_ack);
+  auto* viewer = world.players().get(viewer_id);
+  if (viewer == nullptr) return writer.finish();
   // Original 654 beginSnapshot only queries spatial entities after the local
   // viewer component (+120) has a controlled body (+100). At boot the world
   // still simulates its population, but sends only control/world metadata.
   // The domain transport has no standalone metadata entities to introduce.
   if (!session_.viewer_started) {
-    const Entity* player = world.entities().get(world.player());
+    const Entity* player = world.entities().get(viewer->player());
     session_.viewer_started = player != nullptr && player->active;
     if (!session_.viewer_started) {
       world.clear_destroyed();
       pending_chat_.clear();
       world.clear_hit_events();
-      world.loadout().clear_pickup_transfers();
+      viewer->loadout().clear_pickup_transfers();
       return writer.finish();
     }
   }
   std::unordered_set<std::uint32_t> visible;
-  const Entity* controlled = world.entities().get(world.player());
+  const Entity* controlled = world.entities().get(viewer->player());
   if (session_.visibility_enabled) {
     if (controlled != nullptr && controlled->health.value > 0.0F) {
       session_.viewer_position = controlled->position;
@@ -86,8 +88,8 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, std::uint32_t
       // ordinary live scale is 0.9; death keeps the last peer view instead
       // of querying the world origin or switching back to a menu camera.
       bool wide_view = false;
-      const auto& slots = world.loadout().slots();
-      for (std::size_t index = 0; index < world.profile().active_slots(); ++index)
+      const auto& slots = viewer->loadout().slots();
+      for (std::size_t index = 0; index < viewer->profile().active_slots(); ++index)
         wide_view = wide_view || slots[index].type_id == 25U;
       session_.viewer_scale = f32(wide_view ? 0.63F : 0.9F);
     }
@@ -144,11 +146,11 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, std::uint32_t
     writer.write_entity_time_event(hit.target);
   }
   world.clear_hit_events();
-  for (const auto& transfer : world.loadout().pickup_transfers())
+  for (const auto& transfer : viewer->loadout().pickup_transfers())
     if (!session_.visibility_enabled || visible.contains(transfer.drop.raw)
         || session_.known.contains(transfer.drop.raw))
       writer.write_visual_event(transfer.drop, transfer.slot);
-  world.loadout().clear_pickup_transfers();
+  viewer->loadout().clear_pickup_transfers();
   // Component ordinals are not the sparse field ids: transform is 6 (72),
   // identity is 30 (152), health is 20 (116), visual transform is 21 (120),
   // collider radius is 26 (140).
@@ -196,32 +198,33 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, std::uint32_t
         writer.write_mask_byte_field(entity.handle, mask, 11U, entity.loadout_slot);
         writer.write_mask_byte_field(entity.handle, mask, 12U, entity.loadout_instance);
       }
-      if (entity.kind == EntityKind::kPlayer) {
+      const auto* owner = world.players().by_body(entity.handle);
+      if (entity.kind == EntityKind::kPlayer && owner != nullptr) {
         // Original player component fields: 58 is a normalized u16 XP fraction,
         // 59 is the scoreboard score, and 62 is the displayed level. Keep these
         // authoritative; the client must never substitute a recorded HUD sample.
-        const float threshold = experience_threshold(world.profile().level()).value;
+        const float threshold = experience_threshold(owner->profile().level()).value;
         const float progress = threshold > 0.0F
-          ? std::clamp(world.profile().experience().value * 65535.0F / threshold, 0.0F, 65535.0F) : 0.0F;
+          ? std::clamp(owner->profile().experience().value * 65535.0F / threshold, 0.0F, 65535.0F) : 0.0F;
         writer.write_mask_varint_field(entity.handle, mask, 58U,
           static_cast<std::uint32_t>(progress));
-        const auto score_bits = world.loadout().score().bits();
+        const auto score_bits = owner->loadout().score().bits();
         if (!published.score || *published.score != score_bits) {
-          writer.write_mask_float_field(entity.handle, mask, 59U, world.loadout().score().value);
+          writer.write_mask_float_field(entity.handle, mask, 59U, owner->loadout().score().value);
           published.score = score_bits;
         }
         writer.write_mask_byte_field(entity.handle, mask, 62U,
-          world.profile().level());
+          owner->profile().level());
         {
-          const std::uint8_t zone = world.zone_progress();
+          const std::uint8_t zone = owner->zone_progress();
           if (zone != 0U || session_.zone_progress != 0U)
             writer.write_mask_byte_field(entity.handle, mask, 63U, zone);
           session_.zone_progress = zone;
         }
         PublishedLoadout loadout;
         for (std::size_t slot = 0; slot < loadout.inventory.size(); ++slot)
-          loadout.inventory[slot] = static_cast<std::uint8_t>(world.loadout().slots()[slot].type_id);
-        loadout.recharge = world.loadout().recharge_progress();
+          loadout.inventory[slot] = static_cast<std::uint8_t>(owner->loadout().slots()[slot].type_id);
+        loadout.recharge = owner->loadout().recharge_progress();
         writer.write_mask_loadout_fields(entity.handle, mask, loadout.inventory, loadout.recharge,
           !published.loadout || published.loadout->inventory != loadout.inventory,
           !published.loadout || published.loadout->recharge != loadout.recharge);
@@ -229,7 +232,7 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, std::uint32_t
       }
       if (default_dense_groups_ && camera_x_changed && camera_y_changed && angle_changed)
         writer.write_dense_default_groups(entity);
-      if (entity.kind == EntityKind::kPlayer && entity.death_processed) {
+      if (entity.kind == EntityKind::kPlayer && entity.death_processed && owner != nullptr) {
         // The archived client reads death statistics from control component 478,
         // a standalone record that the domain transport does not carry. Emit the
         // same fields on the controlled body so the death screen and the respawn
@@ -237,19 +240,19 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(World& world, std::uint32_t
         // intentionally follow the dense defaults, whose group 72 writes zeros.
         writer.write_mask_string_field(entity.handle, mask, 6U, entity.killer_name);
         // Controller survivors: up to ten, after the first three ground drops.
-        const auto& kept_items = world.last_death_kept();
+        const auto& kept_items = owner->last_death_kept();
         for (std::uint32_t index = 0; index < 10U; ++index)
           writer.write_mask_byte_array_field(entity.handle, mask, 16U, index,
             static_cast<std::uint8_t>(kept_items[index]));
         writer.write_mask_float_field(entity.handle, mask, 21U,
-          world.last_death_score().value);
+          owner->last_death_score().value);
         writer.write_mask_byte_field(entity.handle, mask, 34U,
-          static_cast<std::uint8_t>(world.last_death_kept_count()));
+          static_cast<std::uint8_t>(owner->last_death_kept_count()));
         writer.write_mask_byte_field(entity.handle, mask, 47U,
-          static_cast<std::uint8_t>(world.last_death_level()));
+          static_cast<std::uint8_t>(owner->last_death_level()));
         writer.write_mask_byte_field(entity.handle, mask, 1U,
           static_cast<std::uint8_t>((entity.health.value > 0.0F
-            ? world.profile().level() : world.last_death_level()) * 3U / 4U));
+            ? owner->profile().level() : owner->last_death_level()) * 3U / 4U));
         writer.write_mask_reference_field(entity.handle, mask, 56U,
           entity.handle.to_wire());
       }

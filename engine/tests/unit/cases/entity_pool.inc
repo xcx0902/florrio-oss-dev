@@ -52,28 +52,27 @@ void test_zone_restriction() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player_default(
-    world, "zone", engine::make_default_profile(), false);
+  const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "zone", engine::make_default_profile(), false);
   CHECK(player.valid());
-  world.profile().set_level(60);
+  engine::test::player(world).profile().set_level(60);
   engine::Entity* entity = world.entities().get(player);
   CHECK(entity != nullptr);
   entity->set_position_x(engine::f32(-24000.0F));
   entity->set_position_y(engine::f32(0.0F));
-  (void)engine::spawn_loadout_petals(world);
-  CHECK(!world.petals().empty());
+  (void)engine::spawn_loadout_petals(world, engine::test::player(world));
+  CHECK(!engine::test::player(world).petals().empty());
   for (int index = 0; index < 60; ++index) {
-    engine::update_zone_restriction(world, 1000.0);
-    engine::damage_zone_locked_petals(world, 1000.0);
+    engine::update_zone_restriction(world, engine::test::player(world), 1000.0);
+    engine::damage_zone_locked_petals(world, engine::test::player(world), 1000.0);
   }
-  CHECK(world.zone_petals_disabled());
-  CHECK(world.zone_progress() == 255U);
-  CHECK(world.petals().empty());
+  CHECK(engine::test::player(world).zone_petals_disabled());
+  CHECK(engine::test::player(world).zone_progress() == 255U);
+  CHECK(engine::test::player(world).petals().empty());
   entity->set_position_x(engine::f32(30000.0F));
   for (int index = 0; index < 10; ++index)
-    engine::update_zone_restriction(world, 1000.0);
-  CHECK(!world.zone_petals_disabled());
-  CHECK(world.zone_progress() < 255U);
+    engine::update_zone_restriction(world, engine::test::player(world), 1000.0);
+  CHECK(!engine::test::player(world).zone_petals_disabled());
+  CHECK(engine::test::player(world).zone_progress() < 255U);
 }
 
 void test_petal_orbit() {

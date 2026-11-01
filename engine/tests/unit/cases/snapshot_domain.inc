@@ -2,10 +2,10 @@ void test_domain_profile_snapshot() {
   engine::WorkerApi api;
   api.init(false);
   api.set_default_dense_groups(false);
-  CHECK(engine::spawn_player_default(api.world(), "profile", engine::make_default_profile(), false).valid());
-  CHECK(api.world().profile().level() == 1U);
-  api.world().profile().set_experience(engine::f32(3.0F));
-  api.world().loadout().set_score(engine::f32(3.0F));
+  CHECK(engine::spawn_player_default(api.world(), engine::test::player(api.world()), "profile", engine::make_default_profile(), false).valid());
+  CHECK(engine::test::player(api.world()).profile().level() == 1U);
+  engine::test::player(api.world()).profile().set_experience(engine::f32(3.0F));
+  engine::test::player(api.world()).loadout().set_score(engine::f32(3.0F));
   const auto bytes = api.domain_snapshot_bytes(42, 0);
   engine::ByteReader reader(bytes);
   CHECK(reader.read_u8().value() == 1U);
@@ -63,11 +63,11 @@ void test_player_loadout_replication() {
   api.set_default_dense_groups(false);
   auto profile = engine::make_default_profile();
   profile.set_inventory(9U, 3U); // reserve type survives profile restoration
-  const auto player = engine::spawn_player_default(api.world(), "inventory", profile, false);
+  const auto player = engine::spawn_player_default(api.world(), engine::test::player(api.world()), "inventory", profile, false);
   CHECK(player.valid());
-  CHECK(api.world().loadout().slots()[9].type_id == 3U);
-  (void)engine::refresh_loadout_petals(api.world(), 0.0);
-  const auto basic = api.world().loadout().handle(0U, 0U);
+  CHECK(engine::test::player(api.world()).loadout().slots()[9].type_id == 3U);
+  (void)engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 0.0);
+  const auto basic = engine::test::player(api.world()).loadout().handle(0U, 0U);
   CHECK(basic.valid());
   CHECK(api.world().entities().get(basic)->radius.value == 14.0F);
   CHECK(api.world().entities().get(basic)->collision_radius.value == 10.0F);
@@ -133,38 +133,38 @@ void test_player_loadout_replication() {
   CHECK(values.score_count == 1U && values.score == 0.0F);
   values = decode(2U);
   CHECK(values.inventory_count == 0U && values.recharge_count == 0U && values.score_count == 0U);
-  api.world().loadout().set_score(engine::f32(3.0F));
+  engine::test::player(api.world()).loadout().set_score(engine::f32(3.0F));
   values = decode(3U);
   CHECK(values.score_count == 1U && values.score == 3.0F);
   for (unsigned i = 4U; i <= 10U; ++i) CHECK(decode(i).score_count == 0U);
   CHECK(engine::on_petal_destroyed(api.world(), basic));
   CHECK(api.world().destroy(basic));
-  (void)engine::refresh_loadout_petals(api.world(), 50.0);
+  (void)engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 50.0);
   values = decode(11U);
   CHECK(values.inventory_count == 0U); // inventory remains authoritative during cooldown
   CHECK(values.recharge_count == 8U && values.recharge[0] == 1310U);
-  CHECK(!api.world().loadout().handle(0U, 0U).valid());
-  (void)engine::refresh_loadout_petals(api.world(), 1200.0);
+  CHECK(!engine::test::player(api.world()).loadout().handle(0U, 0U).valid());
+  (void)engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 1200.0);
   CHECK(decode(12U).recharge[0] == 32767U);
-  (void)engine::refresh_loadout_petals(api.world(), 1250.0);
+  (void)engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 1250.0);
   CHECK(decode(13U).recharge[0] == 65535U);
-  CHECK(api.world().loadout().handle(0U, 0U).valid());
+  CHECK(engine::test::player(api.world()).loadout().handle(0U, 0U).valid());
   for (std::uint8_t slot = 0; slot < 16U; ++slot) {
-    const auto type = api.world().loadout().slots()[slot].type_id;
-    if (type != 0U) CHECK(api.world().loadout().discard(api.world().profile(), slot, type));
+    const auto type = engine::test::player(api.world()).loadout().slots()[slot].type_id;
+    if (type != 0U) CHECK(engine::test::player(api.world()).loadout().discard(engine::test::player(api.world()).profile(), slot, type));
   }
-  api.world().loadout().set_score(engine::f32(0.0F));
+  engine::test::player(api.world()).loadout().set_score(engine::f32(0.0F));
   values = decode(14U);
   CHECK(values.inventory_count == 16U);
   for (const auto type : values.inventory) CHECK(type == 0U);
   CHECK(values.score_count == 1U && values.score == 0.0F);
   // Original aggregation takes the least ready missing instance, rather than
   // hiding recharge behind any one surviving petal in a multi-instance slot.
-  CHECK(api.world().loadout().equip(0U, 17U));
-  api.world().loadout().slots()[0].recharge_remaining_ms = 250.0;
-  api.world().loadout().set_pending(0U, 1U, true);
-  api.world().loadout().set_pending_timer(0U, 1U, 2000U);
-  api.world().loadout().refresh_recharge_progress(api.world());
+  CHECK(engine::test::player(api.world()).loadout().equip(0U, 17U));
+  engine::test::player(api.world()).loadout().slots()[0].recharge_remaining_ms = 250.0;
+  engine::test::player(api.world()).loadout().set_pending(0U, 1U, true);
+  engine::test::player(api.world()).loadout().set_pending_timer(0U, 1U, 2000U);
+  engine::test::player(api.world()).loadout().refresh_recharge_progress(api.world(), engine::test::player(api.world()));
   values = decode(15U);
   CHECK(values.inventory[0] == 17U);
   CHECK(values.recharge[0] == 13107U);
@@ -241,7 +241,7 @@ void test_camera_snapshot_deltas() {
 void test_pickup_transfer_snapshot() {
   engine::WorkerApi api;
   api.init(false);
-  CHECK(engine::spawn_player(api.world(), "pickup", engine::Vec2{}, engine::PlayerConfig{}).valid());
+  CHECK(engine::spawn_player(api.world(), engine::test::player(api.world()), "pickup", engine::Vec2{}, engine::PlayerConfig{}).valid());
   const auto drop = engine::spawn_drop(api.world(), 2U, engine::Vec2{});
   CHECK(drop.valid());
   (void)api.domain_snapshot_bytes(1U, 0U);
@@ -271,8 +271,8 @@ void test_pickup_transfer_snapshot() {
   CHECK(event.read_u8().value() == 0U);
   CHECK(event.eof());
   CHECK(api.world().entities().get(drop)->pickup_collected);
-  CHECK(api.world().loadout().slots()[0].type_id == 2U);
-  CHECK(api.world().loadout().pickup_transfers().empty());
+  CHECK(engine::test::player(api.world()).loadout().slots()[0].type_id == 2U);
+  CHECK(engine::test::player(api.world()).loadout().pickup_transfers().empty());
   const auto next = api.domain_snapshot_bytes(12U, 0U);
   engine::ByteReader next_header(next);
   (void)next_header.read_u8(); (void)next_header.read_varint32(); (void)next_header.read_varint32();
@@ -300,7 +300,7 @@ void test_domain_boot_visibility() {
   const std::array<std::uint8_t, 3> spawn_packet{{1U, 6U, 0U}};
   CHECK(api.send(spawn_packet, {}));
   api.think();
-  const auto player = api.world().player();
+  const auto player = engine::test::player(api.world()).player();
   const auto* controlled = api.world().entities().get(player);
   CHECK(controlled != nullptr);
   if (controlled == nullptr) return;

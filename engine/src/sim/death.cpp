@@ -26,7 +26,10 @@ std::string killer_name_for(const World& world, EntityHandle attacker) {
   for (std::uint32_t guard = 0; guard < 16U; ++guard) {
     const Entity* entity = world.entities().get(source);
     if (entity == nullptr) return {};
-    if (entity->kind == EntityKind::kPlayer) return world.player_name();
+    if (entity->kind == EntityKind::kPlayer) {
+      const auto* state = world.players().by_body(source);
+      return state == nullptr ? std::string{} : state->player_name();
+    }
     if (entity->kind == EntityKind::kMob) { rooted = true; break; }
     if (entity->kind != EntityKind::kPetal && entity->kind != EntityKind::kProjectile) break;
     if (entity->owner == std::numeric_limits<std::uint32_t>::max()) break;
@@ -62,12 +65,12 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
   if (kind == EntityKind::kPlayer || kind == EntityKind::kMob) {
     entity->killer_name = killer_name_for(world, attacker);
     // Original updateKillerName writes the destroying entity's name into the
-    // player's own replicated string field. Keep the world-level copy for the
+    // player's own replicated string field. Keep the per-player copy for the
     // local death payload only: mobs keep dying (and may die with no attacker)
     // after the player, and those later deaths must not erase or replace the
     // name the death screen is about to show.
-    if (kind == EntityKind::kPlayer && target == world.player())
-      world.set_last_killer(attacker, entity->killer_name);
+    if (auto* state = world.players().by_body(target))
+      state->set_last_killer(attacker, entity->killer_name);
   }
 
   if (kind == EntityKind::kPetal) {
@@ -90,16 +93,23 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
     // Original43 retains the body's carried loadout throughout its corpse
     // window. retainPlayerLoot writes a separate loot component and the peer's
     // lost-item list; it does not replace the carried inventory in-place.
-    PlayerProfile retained_profile = world.profile();
+    auto* owner = world.players().by_body(target);
+    if (owner == nullptr) return;
+    auto& state = *owner;
+    state.life = PlayerLife::kCorpse;
+    // The frozen v1 Worker continues its orphan-petal orbit during the corpse
+    // window using the last input. A new spawn always clears that lease.
+    if (!state.has_offline_input_lease()) state.clear_input();
+    PlayerProfile retained_profile = state.profile();
     const LootResult loot = retain_player_loot(retained_profile, world.random(), world.death_shuffle_random());
-    world.profile().set_lost_items(loot.lost_count, loot.lost);
+    state.profile().set_lost_items(loot.lost_count, loot.lost);
     // The first three eligible petals are ground loot. The remainder (up to
     // ten, historically named `lost`) belongs to the controller and respawns.
-    world.set_last_death_kept(std::span<const std::uint16_t>(loot.lost.data(), loot.lost_count));
+    state.set_last_death_kept(std::span<const std::uint16_t>(loot.lost.data(), loot.lost_count));
     std::vector<std::uint16_t> retained(loot.retained.begin(),
                                         loot.retained.begin() + loot.retained_count);
     (void)spawn_loot_drops(world, retained, position, target);
-    world.set_last_death(world.loadout().score(), world.profile().level());
+    state.set_last_death(state.loadout().score(), state.profile().level());
     // Original 43 walks all 24 owned handles (8 slots x 3 instances), damages
     // live children to zero and queues handle-less children for removal.
     std::array<EntityHandle, 24> children{};
@@ -108,7 +118,7 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
     std::size_t child_count = 0;
     for (std::uint8_t slot = 0; slot < 8U; ++slot) {
       for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
-        const EntityHandle handle = world.loadout().handle(slot, instance);
+        const EntityHandle handle = state.loadout().handle(slot, instance);
         if (!handle.valid() || child_count >= children.size()) continue;
         child_slots[child_count] = slot;
         child_instances[child_count] = instance;
@@ -118,7 +128,7 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
     for (std::size_t index = 0; index < child_count; ++index) {
       Entity* child = world.entities().get(children[index]);
       if (child == nullptr) {
-        world.loadout().clear_handle(child_slots[index], child_instances[index]);
+        state.loadout().clear_handle(child_slots[index], child_instances[index]);
         continue;
       }
       if (child->health.value > 0.0F)
@@ -139,13 +149,13 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
                                       entity->loot_petals.begin() + entity->loot_count);
     (void)spawn_loot_drops(world, petals, position, target);
     const EntityHandle owner = owning_player(world, attacker);
-    if (owner.valid() && world.player() == owner) {
+    if (auto* player = world.players().by_body(owner)) {
       const auto* definition = Catalog::instance().entity(type_id);
       if (definition != nullptr) {
         // spawnEntity writes the entity definition scale into loot +4; the
         // damage path awards that value to the attacker's player.
         const f32 reward(definition->scale);
-        award_player_experience(world, reward);
+        award_player_experience(world, *player, reward);
       }
     }
     // Mobs also persist as health-0 corpses for one second before the world

@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 #include "engine/abi.h"
 #include "engine/core/byte_reader.hpp"
 #include "engine/core/f32.hpp"

@@ -167,8 +167,7 @@ void test_quadtree_order_and_collision_bounds() {
 
   engine::World world;
   world.initialize();
-  const engine::EntityHandle player = engine::spawn_player(
-    world, "bounds", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
+  const engine::EntityHandle player = engine::spawn_player(world, engine::test::player(world), "bounds", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
   const engine::EntityHandle child = engine::spawn_entity(
     world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(30.0F), engine::f32(0.0F)),
     engine::f32(10.0F));
@@ -197,8 +196,7 @@ void test_area_effects_and_deferred_launch() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player(
-    world, "area", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
+  const engine::EntityHandle player = engine::spawn_player(world, engine::test::player(world), "area", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
   CHECK(player.valid());
   const engine::EntityHandle inside = engine::spawn_entity(
     world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(10.0F), engine::f32(0.0F)),
@@ -258,19 +256,19 @@ void test_attribution_death_and_pickups() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player_default(world, "hero", engine::make_default_profile(), false);
+  const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "hero", engine::make_default_profile(), false);
   CHECK(player.valid());
-  (void)engine::spawn_loadout_petals(world);
-  CHECK(!world.petals().empty());
-  world.loadout().set_score(engine::f32(123.0F));
-  world.profile().set_level(7);
+  (void)engine::spawn_loadout_petals(world, engine::test::player(world));
+  CHECK(!engine::test::player(world).petals().empty());
+  engine::test::player(world).loadout().set_score(engine::f32(123.0F));
+  engine::test::player(world).profile().set_level(7);
 
   const engine::EntityHandle attacker = engine::spawn_entity_from_defaults(
     world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
   CHECK(attacker.valid());
-  const std::size_t petal_count = world.petals().size();
+  const std::size_t petal_count = engine::test::player(world).petals().size();
   std::vector<engine::EntityHandle> owned_petals;
-  for (const auto& petal : world.petals()) owned_petals.push_back(petal.handle);
+  for (const auto& petal : engine::test::player(world).petals()) owned_petals.push_back(petal.handle);
   (void)engine::damage_entity(world, player, world.entities().get(player)->health, attacker);
   const engine::Entity* player_corpse = world.entities().get(player);
   CHECK(player_corpse != nullptr);
@@ -278,17 +276,17 @@ void test_attribution_death_and_pickups() {
   CHECK(player_corpse->death_processed);
   CHECK(player_corpse->health.value == 0.0F);
   CHECK(player_corpse->death_time_ms == world.time_ms() + 1000.0);
-  CHECK(world.player() == player);
-  CHECK(world.petals().empty());
+  CHECK(engine::test::player(world).player() == player);
+  CHECK(engine::test::player(world).petals().empty());
   CHECK(petal_count > 0U);
-  CHECK(world.last_death_score().value == 123.0F);
-  CHECK(world.last_death_level() == 7U);
-  CHECK(world.last_killer_name() == "Ladybug");
+  CHECK(engine::test::player(world).last_death_score().value == 123.0F);
+  CHECK(engine::test::player(world).last_death_level() == 7U);
+  CHECK(engine::test::player(world).last_killer_name() == "Ladybug");
   // Mobs keep dying after the player. Their killer names are per-entity; the
   // local death payload must retain the entity that actually killed the
   // player instead of being overwritten by later unattributed mob deaths.
   (void)engine::damage_entity(world, attacker, world.entities().get(attacker)->health);
-  CHECK(world.last_killer_name() == "Ladybug");
+  CHECK(engine::test::player(world).last_killer_name() == "Ladybug");
   for (const auto petal : owned_petals) {
     const engine::Entity* child_corpse = world.entities().get(petal);
     CHECK(child_corpse != nullptr);
@@ -299,13 +297,13 @@ void test_attribution_death_and_pickups() {
   }
   engine::tick(world, 999.0);
   CHECK(world.entities().get(player) != nullptr);
-  CHECK(world.player() == player);
-  CHECK(world.petals().empty());
+  CHECK(engine::test::player(world).player() == player);
+  CHECK(engine::test::player(world).petals().empty());
   for (const auto petal : owned_petals) CHECK(world.entities().get(petal) != nullptr);
   engine::tick(world, 1.0);
   CHECK(world.entities().get(player) == nullptr);
-  CHECK(!world.player().valid());
-  CHECK(world.petals().empty());
+  CHECK(!engine::test::player(world).player().valid());
+  CHECK(engine::test::player(world).petals().empty());
   for (const auto petal : owned_petals) CHECK(world.entities().get(petal) == nullptr);
   world.clear_hit_events();
 
@@ -347,8 +345,7 @@ void test_killer_name_uses_attacker_identity() {
     engine::World world;
     world.initialize();
     world.set_auto_populate(false);
-    const engine::EntityHandle player = engine::spawn_player_default(
-      world, "hero", engine::make_default_profile(), false);
+    const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "hero", engine::make_default_profile(), false);
     const engine::EntityHandle attacker = engine::spawn_entity_from_defaults(
       world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
     CHECK(player.valid());
@@ -358,105 +355,102 @@ void test_killer_name_uses_attacker_identity() {
     // "Ladybug" if its death throes finish the player.
     world.entities().get(attacker)->killer_name = "hero";
     (void)engine::damage_entity(world, player, world.entities().get(player)->health, attacker);
-    CHECK(world.last_killer_name() == "Ladybug");
+    CHECK(engine::test::player(world).last_killer_name() == "Ladybug");
   }
   {
     engine::World world;
     world.initialize();
     world.set_auto_populate(false);
-    const engine::EntityHandle player = engine::spawn_player_default(
-      world, "", engine::make_default_profile(), false);
+    const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "", engine::make_default_profile(), false);
     CHECK(player.valid());
     (void)engine::damage_entity(world, player, world.entities().get(player)->health, player);
-    CHECK(world.last_killer_name().empty());
+    CHECK(engine::test::player(world).last_killer_name().empty());
   }
 }
 
 void test_loadout_exact_layout() {
   engine::World world;
   world.initialize();
-  const engine::EntityHandle player = engine::spawn_player(
-    world, "layout", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
+  const engine::EntityHandle player = engine::spawn_player(world, engine::test::player(world), "layout", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
   CHECK(player.valid());
-  world.profile().set_level(30);
-  for (std::uint8_t slot = 0; slot < 6; ++slot) world.profile().set_inventory(slot, 1);
-  world.profile().set_inventory(2, 3); // Heavy, so the final swap is a real type change.
-  world.profile().set_inventory_count(6);
-  world.loadout().restore_from_profile(world.profile());
-  CHECK(world.loadout().slots()[0].type_id == 1U);
-  CHECK(!world.loadout().handle(0, 0).valid());
+  engine::test::player(world).profile().set_level(30);
+  for (std::uint8_t slot = 0; slot < 6; ++slot) engine::test::player(world).profile().set_inventory(slot, 1);
+  engine::test::player(world).profile().set_inventory(2, 3); // Heavy, so the final swap is a real type change.
+  engine::test::player(world).profile().set_inventory_count(6);
+  engine::test::player(world).loadout().restore_from_profile(engine::test::player(world).profile());
+  CHECK(engine::test::player(world).loadout().slots()[0].type_id == 1U);
+  CHECK(!engine::test::player(world).loadout().handle(0, 0).valid());
 
-  const std::size_t spawned = engine::spawn_loadout_petals(world);
+  const std::size_t spawned = engine::spawn_loadout_petals(world, engine::test::player(world));
   CHECK(spawned == 6U);
   for (std::uint8_t slot = 0; slot < 6; ++slot) {
-    CHECK(world.loadout().handle(slot, 0).valid());
-    CHECK(world.loadout().slots()[slot].instances[0] == world.loadout().handle(slot, 0));
-    CHECK(!world.loadout().pending(slot, 0));
+    CHECK(engine::test::player(world).loadout().handle(slot, 0).valid());
+    CHECK(engine::test::player(world).loadout().slots()[slot].instances[0] == engine::test::player(world).loadout().handle(slot, 0));
+    CHECK(!engine::test::player(world).loadout().pending(slot, 0));
   }
 
   // Recharge gates respawn: destroying a petal starts the catalog timer and
   // spawn_loadout_petals must not recreate it until the timer expires.
-  const engine::EntityHandle lost = world.loadout().handle(1, 0);
+  const engine::EntityHandle lost = engine::test::player(world).loadout().handle(1, 0);
   CHECK(engine::on_petal_destroyed(world, lost));
   CHECK(world.destroy(lost));
-  CHECK(engine::spawn_loadout_petals(world) == 0U);
-  CHECK(engine::refresh_loadout_petals(world, 2500.0) == 1U);
-  CHECK(world.loadout().handle(1, 0).valid());
+  CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 0U);
+  CHECK(engine::refresh_loadout_petals(world, engine::test::player(world), 2500.0) == 1U);
+  CHECK(engine::test::player(world).loadout().handle(1, 0).valid());
 
-  const engine::EntityHandle old = world.loadout().handle(0, 0);
-  CHECK(world.loadout().change_slot_type(world, world.profile(), 0, 3));
+  const engine::EntityHandle old = engine::test::player(world).loadout().handle(0, 0);
+  CHECK(engine::test::player(world).loadout().change_slot_type(world, engine::test::player(world), engine::test::player(world).profile(), 0, 3));
   const engine::Entity* old_corpse = world.entities().get(old);
   CHECK(old_corpse != nullptr);
   CHECK(old_corpse->death_processed);
-  CHECK(!world.loadout().handle(0, 0).valid());
-  CHECK(world.loadout().slots()[0].type_id == 3U);
-  CHECK(world.profile().inventory(0) == 3U);
-  CHECK(world.loadout().pending(0, 0));
-  CHECK(world.loadout().pending(0, 1));
-  CHECK(world.loadout().pending(0, 2));
-  CHECK(world.loadout().replication_epoch() > 0U);
-  CHECK(world.loadout().slot_epoch(0) > 0U);
+  CHECK(!engine::test::player(world).loadout().handle(0, 0).valid());
+  CHECK(engine::test::player(world).loadout().slots()[0].type_id == 3U);
+  CHECK(engine::test::player(world).profile().inventory(0) == 3U);
+  CHECK(engine::test::player(world).loadout().pending(0, 0));
+  CHECK(engine::test::player(world).loadout().pending(0, 1));
+  CHECK(engine::test::player(world).loadout().pending(0, 2));
+  CHECK(engine::test::player(world).loadout().replication_epoch() > 0U);
+  CHECK(engine::test::player(world).loadout().slot_epoch(0) > 0U);
 
-  world.loadout().set_pending_timer(0, 0, 100U);
-  world.loadout().advance(50.0);
-  CHECK(world.loadout().pending(0, 0));
-  CHECK(world.loadout().pending_timer(0, 0) == 50U);
-  world.loadout().advance(60.0);
-  CHECK(!world.loadout().pending(0, 0));
-  CHECK(world.loadout().pending_timer(0, 0) == 0U);
+  engine::test::player(world).loadout().set_pending_timer(0, 0, 100U);
+  engine::test::player(world).loadout().advance(50.0);
+  CHECK(engine::test::player(world).loadout().pending(0, 0));
+  CHECK(engine::test::player(world).loadout().pending_timer(0, 0) == 50U);
+  engine::test::player(world).loadout().advance(60.0);
+  CHECK(!engine::test::player(world).loadout().pending(0, 0));
+  CHECK(engine::test::player(world).loadout().pending_timer(0, 0) == 0U);
 
-  CHECK(world.loadout().create_equipped_petal(world, 0, 0));
-  const engine::EntityHandle created = world.loadout().handle(0, 0);
+  CHECK(engine::test::player(world).loadout().create_equipped_petal(world, engine::test::player(world), 0, 0));
+  const engine::EntityHandle created = engine::test::player(world).loadout().handle(0, 0);
   CHECK(created.valid());
   CHECK(world.entities().get(created)->type_id == 3U);
   CHECK(world.entities().get(created)->owner == player.raw);
-  CHECK(!world.loadout().pending(0, 0));
+  CHECK(!engine::test::player(world).loadout().pending(0, 0));
 
-  CHECK(world.loadout().handle(1, 0).valid() && world.loadout().handle(2, 0).valid());
-  CHECK(world.loadout().swap(world, world.profile(), 1, 1, 2, 3));
+  CHECK(engine::test::player(world).loadout().handle(1, 0).valid() && engine::test::player(world).loadout().handle(2, 0).valid());
+  CHECK(engine::test::player(world).loadout().swap(world, engine::test::player(world), engine::test::player(world).profile(), 1, 1, 2, 3));
   // Both slots re-enter their catalog recharge; no entity is exchanged.
-  CHECK(!world.loadout().handle(1, 0).valid());
-  CHECK(!world.loadout().handle(2, 0).valid());
-  CHECK(world.loadout().pending(1, 0) && world.loadout().pending(2, 0));
-  CHECK(engine::spawn_loadout_petals(world) == 0U);
+  CHECK(!engine::test::player(world).loadout().handle(1, 0).valid());
+  CHECK(!engine::test::player(world).loadout().handle(2, 0).valid());
+  CHECK(engine::test::player(world).loadout().pending(1, 0) && engine::test::player(world).loadout().pending(2, 0));
+  CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 0U);
   // Slot 2 receives the Basic petal and returns after 2.5 s; slot 1 receives
   // Heavy and stays in recharge until its 5.5 s catalog timer expires.
-  CHECK(engine::refresh_loadout_petals(world, 3000.0) == 1U);
-  CHECK(!world.loadout().handle(1, 0).valid());
-  CHECK(world.loadout().handle(2, 0).valid());
-  CHECK(engine::refresh_loadout_petals(world, 3000.0) == 1U);
-  CHECK(world.loadout().handle(1, 0).valid());
+  CHECK(engine::refresh_loadout_petals(world, engine::test::player(world), 3000.0) == 1U);
+  CHECK(!engine::test::player(world).loadout().handle(1, 0).valid());
+  CHECK(engine::test::player(world).loadout().handle(2, 0).valid());
+  CHECK(engine::refresh_loadout_petals(world, engine::test::player(world), 3000.0) == 1U);
+  CHECK(engine::test::player(world).loadout().handle(1, 0).valid());
 
-  world.loadout().set_score(engine::f32(55.0F));
-  CHECK(world.loadout().score().value == 55.0F);
+  engine::test::player(world).loadout().set_score(engine::f32(55.0F));
+  CHECK(engine::test::player(world).loadout().score().value == 55.0F);
 }
 
 void test_alert_to_attacker_is_local() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player(
-    world, "local", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
+  const engine::EntityHandle player = engine::spawn_player(world, engine::test::player(world), "local", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
   CHECK(player.valid());
   const engine::EntityHandle first = engine::spawn_entity_from_defaults(
     world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)));

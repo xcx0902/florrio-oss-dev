@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 // This executable links only engine_core; no WorkerApi or C ABI initialization.
 #include "engine/model/world_config.hpp"
 #include "engine/diagnostics/entities.hpp"
@@ -36,22 +37,22 @@ State observe(engine::World& world, engine::SnapshotPublisher& publisher) {
         std::bit_cast<std::uint32_t>(entity.health.value), entity.owner,
         entity.ai.target.raw, entity.death_processed, std::bit_cast<std::uint64_t>(entity.death_time_ms)});
   }
-  state.snapshot = publisher.publish(world, static_cast<std::uint32_t>(world.tick() + 1U));
+  state.snapshot = publisher.publish(world, engine::test::player(world).id(), static_cast<std::uint32_t>(world.tick() + 1U));
   return state;
 }
 void setup(engine::World& world, const engine::WorldConfig& config) {
   engine::initialize_world(world, config);
-  CHECK(engine::spawn_player_default(world, "native", engine::make_default_profile()).valid());
-  (void)engine::spawn_loadout_petals(world);
+  CHECK(engine::spawn_player_default(world, engine::test::player(world), "native", engine::make_default_profile()).valid());
+  (void)engine::spawn_loadout_petals(world, engine::test::player(world));
   const auto mob = engine::diagnostics::spawn_mob(world, 4U, {});
   CHECK(mob.valid());
   CHECK(engine::diagnostics::set_entity_field(world, mob, 0U, -5000.0));
   CHECK(!engine::diagnostics::set_entity_field(world, mob, 99U, 0.0));
-  world.apply_input(1U, engine::f32(0.5F), engine::f32(10.0F));
+  engine::test::input(world, 1U, engine::f32(0.5F), engine::f32(10.0F));
 }
 State step(engine::World& world, engine::SnapshotPublisher& publisher, unsigned index) {
   if (index == 2U) {
-    world.record_hit(world.player(), {}, engine::f32(1.0F), engine::f32(99.0F));
+    world.record_hit(engine::test::player(world).player(), {}, engine::f32(1.0F), engine::f32(99.0F));
     (void)world.death_shuffle_random().next();
   }
   if (index == 3U) {

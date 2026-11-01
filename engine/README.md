@@ -9,7 +9,7 @@ let native compilation run without invoking Node.
 ```sh
 npm run build:engine         # incremental native Release configure/build
 npm run build:engine:clean   # explicit fresh configure/build
-npm run test:engine          # build + all 13 manifest-listed CTest targets
+npm run test:engine          # build + all 14 manifest-listed CTest targets
 npm run build:engine:wasm    # pinned Emscripten CMake -> build/wasm/server.wasm
 node tools/verify-abi.mjs    # manifest/header/worker/actual wasm consistency
 ```
@@ -23,6 +23,9 @@ Strict options include `-Wall -Wextra -Werror -ffp-contract=off -fno-fast-math
 - `model/world.hpp` + `src/model/world.cpp`: authoritative domain data,
   reset/initialize/destroy, per-world collision cache and destruction notifications.
 - `model/world_records.hpp`: domain records without a complete World dependency.
+- `model/player_id.hpp`, `player_state.hpp`, `player_registry.*`: persistent
+  room-local identities, independent player state, stable ascending iteration
+  and generation-checked body lookup; no implicit current player in World.
 - `model/entity_relations.*`: distinct controlling-root / owning-player queries.
 - `model/world_config.*`: explicit seeds/population and shared fixed-tick RNG
   compatibility; two population draws and six draws per world tick.
@@ -32,6 +35,8 @@ Strict options include `-Wall -Wextra -Werror -ffp-contract=off -fno-fast-math
 - `net/snapshot_codec.*`: one SnapshotEncoder, schema-checked typed writes,
   sparse/dense framing and event encoding.
 - `sim/combat.cpp`: contact tree update and the current strategy 6 solver.
+- `sim/player_commands.*`: explicit PlayerId/LifeEpoch spawn, input and equipment
+  commands; finite input leases and per-player respawn gates.
 - `sim/damage.cpp`, `death.cpp`, `loot.cpp`: health, death domain and loot rules.
 - `sim/ai.cpp`, `targeting.cpp`, `ai_profiles.cpp`, `species_attacks.cpp`: ordered
   AI entry, eligibility/selection, steering profiles and actual attacks.
@@ -59,6 +64,14 @@ handle, one destruction notice and typed codec rejection). Hand byte vectors and
 current TS decoder. `engine_benchmark` links a separate instrumented core and covers nine fixed
 workloads in native/WASM; it is not an extra CTest or a production dependency.
 Run `npm run perf:engine`; see [M4 measurements](../docs/m4-performance.md).
+
+`engine_multiplayer_state_tests` links only core and covers 15 native scenarios
+for shared-world players, independent input/profile/zone state, control dedup,
+input expiry, body generations, death/respawn and room isolation. Hosts register
+players explicitly, adopt inputs before each tick, then advance the World once.
+The offline Worker owns a local PlayerId and preserves the v1 ABI and persistent
+input lease. See [player state and domain APIs](../docs/multiplayer/player-state.md).
+Network sessions, v2 replication and complete PVP ownership remain later stages.
 
 See [M3 mapping](../docs/m3-structure.md) and [release](../docs/release.md).
 

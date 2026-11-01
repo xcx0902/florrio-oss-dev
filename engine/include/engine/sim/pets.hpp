@@ -2,6 +2,7 @@
 #include "engine/model/entity.hpp"
 
 namespace engine {
+class PlayerState;
 class World;
 
 /** Original 693/719: replace an Egg slot's handle with its friendly hatchling.
@@ -10,5 +11,5 @@ bool hatch_equipped_egg(World& world, EntityHandle egg, std::uint16_t hatchling_
 
 /** Original equipped-slot sweep: a pet's death releases its Egg slot and
  * starts recharge in that sweep, while a living pet continues to occupy it. */
-void refresh_egg_pet_slots(World& world);
+void refresh_egg_pet_slots(World& world, PlayerState& state);
 } // namespace engine

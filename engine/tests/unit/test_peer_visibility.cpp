@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 // Standalone publisher regressions. Build against engine_core; deliberately
 // separate from test_main.cpp, which other implementation work owns.
 #include "engine/core/byte_reader.hpp"
@@ -147,7 +148,7 @@ void empty_populated(WorkerApi& api) {
 EntityHandle join(WorkerApi& api, float x = -5000.0F, float y = 0.0F) {
   const std::array<std::uint8_t, 3> input{{1U, 6U, 0U}};
   require(api.send(input, {}), "join accepted");
-  const auto handle = api.world().player();
+  const auto handle = engine::test::player(api.world()).player();
   require(api.world().entities().get(handle) != nullptr, "controlled player spawned");
   api.world().entities().get(handle)->set_position(point(x, y));
   return handle;
@@ -416,9 +417,11 @@ void test_dense_and_profile_reentry() {
   WorkerApi api;
   empty_populated(api);
   const auto controlled = join(api);
-  const auto other = spawn_entity(api.world(), EntityKind::kPlayer, 0U, point(-4900.0F), f32(25.0F));
+  const auto other_id = register_player(api.world(), "remote");
+  auto& other_state = *api.world().players().get(other_id);
+  const auto other = spawn_player(api.world(), other_state, "remote", point(-4900.0F), {});
   require(other.valid(), "remote player fixture spawned");
-  api.world().loadout().set_score(f32(7.0F));
+  other_state.loadout().set_score(f32(7.0F));
   const auto first = snapshot(api);
   require(first.at(other).dense_count == 1U, "first introduction contains the default dense block");
   for (const auto field : {59U, 60U, 61U})
@@ -466,10 +469,11 @@ void test_death_retains_last_view_and_restart_replaces_it() {
   require(dead.has(old_nearby) && !dead.has(origin) && dead.removes(player), "post-death peer retains its final viewport");
   // This snapshot fixture keeps geometry fixed. Expire the independent 2500ms
   // spawn gate before testing replacement of the retained visibility query.
-  api.world().set_time_ms(2500.0);
+  while (api.world().tick() < engine::test::player(api.world()).next_spawn_tick)
+    api.world().advance_tick(50.0);
   const std::array<std::uint8_t, 2> restart{{2U, 4U}};
   require(api.send(restart, {}), "restart input accepted");
-  const auto next = api.world().player();
+  const auto next = engine::test::player(api.world()).player();
   require(next.valid() && next != player, "restart creates a new controlled handle");
   api.world().entities().get(next)->position = point(10000.0F);
   const auto respawn = snapshot(api, 4U);
@@ -485,12 +489,12 @@ void test_active_wide_view_slot() {
   (void)join(api);
   const auto wide_only = mob(api, -3500.0F);
   require(!snapshot(api).has(wide_only), "default view excludes wide-only mob");
-  require(api.world().loadout().equip(5U, 25U), "reserve view petal equipped");
+  require(engine::test::player(api.world()).loadout().equip(5U, 25U), "reserve view petal equipped");
   require(!snapshot(api, 2U).has(wide_only), "reserve slot does not widen view");
-  require(api.world().loadout().equip(0U, 25U), "active view petal equipped");
-  api.world().loadout().set_pending(0U, 0U, true);
+  require(engine::test::player(api.world()).loadout().equip(0U, 25U), "active view petal equipped");
+  engine::test::player(api.world()).loadout().set_pending(0U, 0U, true);
   require(snapshot(api, 3U).has(wide_only), "active type25 widens view even while pending");
-  require(api.world().loadout().equip(0U, 1U), "restore Basic slot");
+  require(engine::test::player(api.world()).loadout().equip(0U, 1U), "restore Basic slot");
   require(snapshot(api, 4U).removes(wide_only), "view contraction removes former edge entity");
 }
 
@@ -539,7 +543,7 @@ int replay(const char* input_path, unsigned ticks) {
     api.think();
     const auto packet = snapshot(api, tick);
     std::printf("{\"tick\":%u,\"rng\":%u,\"player\":%u,\"visible\":[",
-                tick, api.world().random().state(), api.world().player().raw);
+                tick, api.world().random().state(), engine::test::player(api.world()).player().raw);
     bool separator = false;
     for (const auto& [raw, record] : packet.entities) {
       (void)record;

@@ -2,7 +2,7 @@
 #include "engine/core/fixed_step.hpp"
 #include "engine/model/world.hpp"
 #include "engine/net/snapshot_publisher.hpp"
-#include "engine/sim/player.hpp"
+#include "engine/sim/player_commands.hpp"
 #include "engine/sim/spatial.hpp"
 #include "engine/net/protocol.hpp"
 #include <array>
@@ -33,6 +33,7 @@ class WorkerApi {
   void set_default_dense_groups(bool value) { publisher_.set_dense(value); }
   [[nodiscard]] bool default_dense_groups() const { return publisher_.dense(); }
 
+  [[nodiscard]] PlayerId local_player_id() const { return local_player_id_; }
   [[nodiscard]] World& world() { return world_; }
   [[nodiscard]] const World& world() const { return world_; }
   [[nodiscard]] std::uint32_t last_sequence() const { return last_sequence_; }
@@ -45,6 +46,6 @@ class WorkerApi {
   SnapshotPublisher publisher_;
   OutputQueue output_;
   std::uint32_t last_sequence_ = 0;
-  double next_spawn_time_ms_ = 0.0;
+  PlayerId local_player_id_{};
 };
 } // namespace engine

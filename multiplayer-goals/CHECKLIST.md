@@ -1,6 +1,6 @@
 # 多人联机执行跟踪
 
-> M00、M01 已完成；M02—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
+> M00、M01、M02 已完成；M03—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
 
 ## 1. 阶段看板
 
@@ -8,7 +8,7 @@
 | --- | --- | --- | --- | --- |
 | M00 基线与契约 | 已完成 | 回归/驱动修复 `2bb33bf`；架构契约 `07b36d9` | `2026-10-31T15-09-18.267Z-4432f606`；`reports/multiplayer/baseline/summary.json` | 15/15 gate；12 CTest + 249 Node/浏览器测试通过；失败记录保留 |
 | M01 原生 core 边界 | 已完成 | 工作区实现，未创建提交 | `2026-10-31T23-43-46.442Z-f638c98a`；`reports/multiplayer/m01/2026-10-31T23-43-46.442Z-f638c98a/summary.json` | 17/17 gate；engine 13/13、根 CTest 18/18、Node/浏览器 251/251；20 tick smoke 与纯 core 双 World 通过 |
-| M02 多玩家状态 | 未开始 | — | — | — |
+| M02 多玩家状态 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T00-18-30.561Z-577c7708`；`reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/summary.json` | 17/17 gate；engine 14/14、根 CTest 19/19、15 个 M02 场景及 ASan/UBSan；冻结 M00 摘要一致 |
 | M03 PVP 与玩法归属 | 未开始 | — | — | — |
 | M04 协议与复制 | 未开始 | — | — | — |
 | M05 原生网络服务 | 未开始 | — | — | — |
@@ -34,11 +34,11 @@
 
 ### M02：多玩家
 
-- [ ] MP-020：PlayerId/State/Registry 与 handle 反向索引。
-- [ ] MP-021：profile/loadout/input/death/zone/respawn 字段迁移。
-- [ ] MP-022：出生、输入、恢复生命和控制显式指定玩家。
-- [ ] MP-023：按模拟阶段遍历全部玩家，世界只推进一次。
-- [ ] MP-024：destroy/离线适配/重复出生/换代回归。
+- [x] MP-020：PlayerId/State/Registry 与 handle 反向索引。
+- [x] MP-021：profile/loadout/input/death/zone/respawn 字段迁移。
+- [x] MP-022：出生、输入、恢复生命和控制显式指定玩家。
+- [x] MP-023：按模拟阶段遍历全部玩家，世界只推进一次。
+- [x] MP-024：destroy/离线适配/重复出生/换代回归。
 
 ### M03：PVP
 
@@ -141,3 +141,22 @@ runId / source identity / binary-client hash：
 - 规则或接口偏离及理由：未改玩法/阶段/浮点顺序。手工根构建命令使用 `cmake --build build/native -j 6` 而非只构建 florr_server，以确保接下来的全部 CTest 可执行文件存在；宿主当前配置解析仅覆盖 CLI，完整配置文件与网络监听留给 M05。M01 实现不宣称网络或多人通过。
 - 未解决问题与受影响的后续阶段：M01 无功能阻塞；本轮尚未提交，提交号待后续提交时补录。Linux 发行包/网络/PVP/容量仍按后续阶段实现和验证。
 - 下一步：M02；显式 PlayerId/PlayerState/Registry、玩家输入与生命周期隔离、按全世界阶段推进。M02 尚未执行。
+
+
+## 6. M02 完成交接
+
+- 阶段 / 任务编号：M02；MP-020—MP-024 全部完成，2026-11-01（Asia/Shanghai）。
+- 实际提交：本轮为工作区实现，未创建 Git 提交。`reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/source-changes.json` 保存基准 HEAD、全部本轮文件内容与哈希；验收绑定实际源码身份，不把基准 HEAD 当作实现提交号。
+- 实现范围 / 文件：新增 `model/player_id.hpp`、`player_state.hpp`、`player_registry.*`、`sim/player_commands.*`；World 移除隐式单玩家字段，玩家控制/回血/区域/装备/轨道按稳定 PlayerId 顺序逐阶段推进，AI/碰撞/世界时间只推进一次。实体回调按真实 body/orbit 解析玩家；WorkerApi、diagnostics、v1 snapshot 显式指定本地/观察者 ID。新增 core-only `engine_multiplayer_state_tests` 和真实领域辅助层，旧单玩家测试迁到测试专用适配器；源表、CMake 与两套 CTest 清单同步。
+- 领域边界：PlayerId 房间内单调不复用，完整代际 body 反向索引、稳定 PlayerState 地址；LifeEpoch 每次成功出生递增，旧生命的输入/装备命令拒绝。默认输入 TTL=5 tick，控制每 tick 最多一次；成功出生后 50 tick 冷却，尸体保留 1000ms；身体删除保留档案和死亡统计。网络输入序号与连接身份仍属于 M05。
+- 执行命令：`npm run build:engine`、`node tools/run-tests.mjs engine`、`node --test tests/integration/single-player-baseline.test.mjs`、`npm run test:unit`、`npm run test:tools`、`npm run build:engine:wasm`；完整验收使用 `FLORR_BOOST_ARCHIVE=/private/tmp/florr-boost-1.86.0.tar.bz2 CHROME_PATH=/private/tmp/florr-m3-chromium/chrome-headless-shell-mac-arm64/chrome-headless-shell npm run test:all`。浏览器固定 `156.0.8078.47`，Boost 仍为锁定归档与 SHA256。
+- 内存安全：`cmake -S engine -B build/m02-sanitize -DCMAKE_BUILD_TYPE=Debug '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer' -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined`，构建/运行 `engine_multiplayer_state_tests`，15/15 通过，无 ASan/UBSan 错误。配置、二进制与日志哈希见 `reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/sanitizer.json`。
+- 测试数量与结果：完整 **17/17 gate**，`passed=true`、`stable=true`；独立 engine **14/14 CTest**、根构建 **19/19 CTest**；新多人状态 **15/15** 场景；Node/浏览器 **251/251**（40 单元、24 工具、102 客户端单元、4 跨端、81 浏览器），无失败/跳过。绘制性能 3 profile × 4 场景 × 5 次 × 600 帧通过，native/WASM 引擎及真实 Worker 跨端性能通过；原冻结 M00 JSON 不变，双进程精确重放一致。
+- runId：`2026-11-01T00-18-30.561Z-577c7708`；UTC 完成时间 `2026-11-01T00:34:47.181Z`。
+- source identity：产品 `424460bc140395adfbdaad4088577878a52aeb5be4dade819b4871024a64ef6a`；native `face3075a2ea5aa2589fc18f5f2d2a8065145471250d7effc3e90d96ae0d6fe6`；verification `43f7df772dac57e0700756fccf0caa755989fd2bad02a5ab1c3a5a341c57a296`。
+- binary/client hash：native host `20b44c52d4c942484d41812d3f2905c145698766fbf27b7fa9a31257384f77b9`；WASM `ffc6b73c786c91187c0afec080373a01791e19b863fa59ba22fa674a7c03f676`；client/wasm/static 组合身份 `4935013af48ea839dca11ba138a5a8816873f96125cb7619fabe8b0cdc20d278`。
+- 报告路径：`reports/runs/2026-11-01T00-18-30.561Z-577c7708/run.json`、`reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/{summary,build,ctest,baseline,sanitizer,source-changes}.json` 和 `multiplayer-state.tap`；`accepted/index.json` 冻结全部 gate 日志/报告、交付 manifest、toolchain 的副本及哈希。构建工具仍输出 `reports/multiplayer/m01/<runId>/`，M02 证据目录按实际 runId 归档，不冒充新构建 profile。`releaseEvidence()` 真实通过，现有发布校验和性能预算均未降低。
+- 失败与修复：`2026-11-01T00-13-27.083Z-ab1b22b1` 在冻结 M00 对比发现离线尸体期遗留花瓣轨道坐标变化；修复显式离线持久输入租期兼容分支，保留旧死亡/身体删除时的输入与轨道语义，成功重生仍无条件清空输入，原冻结预期不改。`2026-11-01T00-17-12.307Z-fed00421` 前 14 gate 通过，但 Chromium 被 macOS 沙箱拒绝 MachPortRendezvous；使用同一源码在沙箱外完整重跑，得到本次通过记录。两次原始失败 ledger/日志保留于 `failures/`。
+- 规则或接口偏离及理由：保留旧离线 ABI 的无限输入租期，不将其用于原生多人默认入口；重生不新增区域计时重置。`same_input_sequence_is_independent` 是分别保存 received/applied 序号并调用真实领域输入的宿主夹具，不宣称 M05 网络会话已完成。v1 snapshot 仍消费 World 事件，只读多观察者复制留给 M04。
+- 未解决问题与受影响后续阶段：M02 无阻塞；尚未创建提交。特殊花瓣/宠物/投射物的完整 PVP 归属、每连接复制、真实 WebSocket、容量及 Linux 发布按 M03—M08 继续实现，不能把本次进程内双玩家结果当成联网发布验收。
+- 下一步：M03；控制根/物理 owner/伤害来源分离，完整多人战斗、拾取、掉落与生命周期回归。本轮未开始 M03。

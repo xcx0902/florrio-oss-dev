@@ -130,7 +130,7 @@ bool PlayerLoadout::discard(PlayerProfile& profile, std::uint8_t slot,
   return true;
 }
 
-bool PlayerLoadout::discard(World& world, PlayerProfile& profile, std::uint8_t slot,
+bool PlayerLoadout::discard(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t slot,
                             std::uint16_t expected_type) {
   if (slot >= kSlots || slot >= profile.inventory_size()) return false;
   const auto& value = slots_[slot];
@@ -141,7 +141,7 @@ bool PlayerLoadout::discard(World& world, PlayerProfile& profile, std::uint8_t s
   // orbit record, so remove_slot_petals cannot retire it after this reset.
   clear_handles(&world, slot);
   const bool discarded = discard(profile, slot, expected_type);
-  if (discarded) invalidate_packet_cache(world);
+  if (discarded) invalidate_packet_cache(world, state);
   return discarded;
 }
 
@@ -169,7 +169,7 @@ bool PlayerLoadout::swap(PlayerProfile& profile, std::uint8_t first, std::uint16
   return true;
 }
 
-bool PlayerLoadout::swap(World& world, PlayerProfile& profile, std::uint8_t first,
+bool PlayerLoadout::swap(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t first,
                          std::uint16_t first_type, std::uint8_t second,
                          std::uint16_t second_type) {
   if (first == second) return false;
@@ -183,9 +183,9 @@ bool PlayerLoadout::swap(World& world, PlayerProfile& profile, std::uint8_t firs
   const std::uint16_t second_value = slots_[second].type_id;
   bool changed = false;
   if (second_value != first_value)
-    changed = change_slot_type(world, profile, second, first_value) || changed;
+    changed = change_slot_type(world, state, profile, second, first_value) || changed;
   if (first_value != second_value)
-    changed = change_slot_type(world, profile, first, second_value) || changed;
+    changed = change_slot_type(world, state, profile, first, second_value) || changed;
   return changed;
 }
 
@@ -199,7 +199,7 @@ void PlayerLoadout::restore_from_profile(const PlayerProfile& profile) {
   }
 }
 
-bool PlayerLoadout::change_slot_type(World& world, PlayerProfile& profile, std::uint8_t slot,
+bool PlayerLoadout::change_slot_type(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t slot,
                                      std::uint16_t type_id) {
   if (slot >= kSlots) return false;
   if (slots_[slot].type_id == type_id && slots_[slot].count != 0) return false;
@@ -235,14 +235,14 @@ bool PlayerLoadout::change_slot_type(World& world, PlayerProfile& profile, std::
     static_cast<std::uint32_t>(world.tick() + 1U), replication_epoch_ + 1U);
   replication_epoch_ = epoch;
   slot_epoch_[slot] = epoch;
-  invalidate_packet_cache(world);
+  invalidate_packet_cache(world, state);
   return true;
 }
 
-bool PlayerLoadout::cycle_reserve_slots(World& world, PlayerProfile& profile) {
+bool PlayerLoadout::cycle_reserve_slots(World& world, PlayerState& state, PlayerProfile& profile) {
   const std::uint8_t active = profile.active_slots();
   const std::uint16_t first_type = slots_[0].type_id;
-  (void)change_slot_type(world, profile, active, first_type);
+  (void)change_slot_type(world, state, profile, active, first_type);
   std::uint8_t previous = active;
   for (;;) {
     const std::uint8_t level_active = profile.active_slots();
@@ -253,19 +253,19 @@ bool PlayerLoadout::cycle_reserve_slots(World& world, PlayerProfile& profile) {
     const std::uint32_t petal = existing != 0U
       ? static_cast<std::uint32_t>(total - level_active - 1 + existing)
       : static_cast<std::uint32_t>(slot - level_active);
-    (void)change_slot_type(world, profile, slot,
+    (void)change_slot_type(world, state, profile, slot,
                            static_cast<std::uint16_t>(petal % 39U));
     previous = slot;
   }
   return true;
 }
 
-void PlayerLoadout::invalidate_packet_cache(World& world) {
+void PlayerLoadout::invalidate_packet_cache(World& world, PlayerState& state) {
   const std::uint32_t epoch = std::max(
     static_cast<std::uint32_t>(world.tick() + 1U), replication_epoch_ + 1U);
   packet_cache_epoch_ = epoch;
-  active_slots_ = world.profile().active_slots();
-  Entity* player = world.entities().get(world.player());
+  active_slots_ = state.profile().active_slots();
+  Entity* player = world.entities().get(state.player());
   if (player != nullptr) {
     player->packet_epoch_a = epoch;
     player->packet_epoch_b = epoch;
@@ -293,28 +293,28 @@ bool PlayerLoadout::set_slot_type(PlayerProfile& profile, std::uint8_t slot,
   return true;
 }
 
-bool PlayerLoadout::create_equipped_petal(World& world, std::uint8_t slot,
+bool PlayerLoadout::create_equipped_petal(World& world, PlayerState& state, std::uint8_t slot,
                                           std::uint8_t instance) {
   if (slot > 7U || instance >= kInstances) return false;
   if (handles_[slot][instance].valid()) return false;
   const std::uint16_t type = slots_[slot].type_id;
   if (type == 0U) return false;
-  const std::uint8_t active = active_slot_count(world.profile());
+  const std::uint8_t active = active_slot_count(state.profile());
   if (slot >= active) return false;
   const auto* combat = Catalog::instance().petal_combat(type);
   if (combat == nullptr || combat->drawRadius <= 0.0F) return false;
   const std::uint8_t count = slots_[slot].count == 0U ? 1U : slots_[slot].count;
   if (instance >= count) return false;
-  Entity* owner = world.entities().get(world.player());
+  Entity* owner = world.entities().get(state.player());
   if (owner == nullptr) return false;
-  const std::uint8_t orbit_index = petal_orbit_index(world, slot, instance);
-  const double angle = petal_orbit_angle(world, orbit_index);
-  const EntityHandle handle = spawn_petal(world, type, owner->position, f32(65.0F),
+  const std::uint8_t orbit_index = petal_orbit_index(state, slot, instance);
+  const double angle = petal_orbit_angle(state, orbit_index);
+  const EntityHandle handle = spawn_petal(world, state, type, owner->position, f32(65.0F),
                                           f32::from_double(angle), slot, instance, count,
                                           orbit_index);
   if (!handle.valid()) return false;
-  if (Entity* entity = world.entities().get(handle)) entity->owner = world.player().raw;
-  attach_child(world, world.player(), handle);
+  if (Entity* entity = world.entities().get(handle)) entity->owner = state.player().raw;
+  attach_child(world, state.player(), handle);
   handles_[slot][instance] = handle;
   slots_[slot].instances[instance] = handle;
   pending_[slot][instance] = 0U;
@@ -323,7 +323,7 @@ bool PlayerLoadout::create_equipped_petal(World& world, std::uint8_t slot,
     static_cast<std::uint32_t>(world.tick() + 1U), replication_epoch_ + 1U);
   replication_epoch_ = epoch;
   slot_epoch_[slot] = epoch;
-  invalidate_packet_cache(world);
+  invalidate_packet_cache(world, state);
   return true;
 }
 
@@ -339,11 +339,11 @@ void PlayerLoadout::advance(double delta_milliseconds) {
   }
 }
 
-void PlayerLoadout::refresh_recharge_progress(const World& world) {
-  const Entity* player = world.entities().get(world.player());
+void PlayerLoadout::refresh_recharge_progress(const World& world, const PlayerState& state) {
+  const Entity* player = world.entities().get(state.player());
   if (player == nullptr || player->health.value <= 0.0F) return;
   recharge_progress_.fill(65535U);
-  for (std::uint8_t slot = 0; slot < std::min<std::uint8_t>(world.profile().active_slots(), 8U); ++slot) {
+  for (std::uint8_t slot = 0; slot < std::min<std::uint8_t>(state.profile().active_slots(), 8U); ++slot) {
     const auto* combat = Catalog::instance().petal_combat(slots_[slot].type_id);
     const auto* definition = Catalog::instance().petal(slots_[slot].type_id);
     if (slots_[slot].type_id == 0U || combat == nullptr || definition == nullptr) continue;
@@ -353,7 +353,7 @@ void PlayerLoadout::refresh_recharge_progress(const World& world) {
       if (definition->orbitHidden) continue;
       // Original 654 advances the elapsed timer but publishes zero for an
       // equipped slot whose zone restriction currently blocks spawning.
-      if (world.zone_petals_disabled()) {
+      if (state.zone_petals_disabled()) {
         recharge_progress_[slot] = 0U;
         continue;
       }

@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 #include "engine/model/entity_relations.hpp"
 #include "engine/net/snapshot_codec.hpp"
 #include "engine/net/worker_api.hpp"
@@ -106,9 +107,9 @@ int main() {
   check(state(first) == state(isolated_first), "interleaved first collision world equals isolated");
   check(state(second) == state(isolated_second), "interleaved second collision world equals isolated");
   check(&first.collision().tree != &second.collision().tree, "world owns tree");
-  first.apply_input(3U, engine::f32(1.0F), engine::f32(20.0F));
+  engine::test::input(first, 3U, engine::f32(1.0F), engine::f32(20.0F));
   first.initialize();
-  check(first.input().buttons == 0U && first.input().strength.value == 0.0F, "initialize clears input");
+  check(engine::test::player(first).input().buttons == 0U && engine::test::player(first).input().strength.value == 0.0F, "initialize clears input");
   check(first.destroyed().empty() && first.collision().tick == std::numeric_limits<std::uint64_t>::max(), "initialize clears destruction and tree epoch");
   check(first.bounds_rebuilds() == 0U && first.quadtree_updates() == 0U && first.phase_draws().empty(), "initialize clears scratch counters and phase records");
   const auto a = engine::spawn_entity_from_defaults(first, engine::EntityKind::kMob, 4U, {});

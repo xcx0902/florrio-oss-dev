@@ -3,7 +3,7 @@ void test_petals() {
   world.set_initialized(true);
   CHECK(engine::petal_radius(1).to_float() == 14.0F);
   CHECK(engine::petal_radius(999).to_float() == 0.0F);
-  const auto handle = engine::spawn_petal(world, 1,
+  const auto handle = engine::spawn_petal(world, engine::test::player(world), 1,
     engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::f32(10.0F), engine::f32(0.0F));
   CHECK(handle.valid());
   engine::Entity* entity = world.entities().get(handle);
@@ -15,20 +15,20 @@ void test_petals() {
   // pulls it outward afterwards.
   CHECK(entity->position.x.to_float() == 0.0F);
   CHECK(std::fabs(entity->position.y.to_float()) < 1e-6F);
-  CHECK(world.petals().size() == 1);
-  CHECK(world.petals()[0].handle == handle);
-  CHECK(world.petals()[0].type_id == 1);
-  CHECK(world.petals()[0].orbit_radius.to_float() == 10.0F);
+  CHECK(engine::test::player(world).petals().size() == 1);
+  CHECK(engine::test::player(world).petals()[0].handle == handle);
+  CHECK(engine::test::player(world).petals()[0].type_id == 1);
+  CHECK(engine::test::player(world).petals()[0].orbit_radius.to_float() == 10.0F);
   entity->position = engine::Vec2(engine::f32(0.0F), engine::f32(0.0F));
   entity->velocity = engine::Vec2d(0.0, 0.0);
-  engine::update_petal_orbit(world, world.petals()[0], 16.0);
+  engine::update_petal_orbit(world, engine::test::player(world).petals()[0], 16.0);
   CHECK(entity->velocity.x > 0.0);
   CHECK(std::fabs(entity->velocity.y) < 1e-6);
   entity->health = engine::f32(0.0F);
   engine::tick(world, 50.0);
-  CHECK(world.petals().empty());
+  CHECK(engine::test::player(world).petals().empty());
   world.reset();
-  CHECK(world.petals().empty());
+  CHECK(engine::test::player(world).petals().empty());
   const auto drop = engine::spawn_drop(world, 1, engine::Vec2(engine::f32(3.0F), engine::f32(4.0F)));
   CHECK(drop.valid());
   const engine::Entity* drop_entity = world.entities().get(drop);
@@ -105,18 +105,18 @@ void test_profile_discard_and_swap() {
 void test_discard_removes_petals() {
   engine::World world;
   world.initialize();
-  CHECK(engine::spawn_player_default(world, "discard", engine::make_default_profile()).valid());
-  world.profile().set_inventory(0, 1);
-  world.profile().set_inventory_count(1);
-  world.loadout().clear();
-  CHECK(world.loadout().equip(0, 1));
-  CHECK(engine::spawn_loadout_petals(world) == 1);
-  const engine::EntityHandle petal = world.loadout().slots()[0].instances[0];
+  CHECK(engine::spawn_player_default(world, engine::test::player(world), "discard", engine::make_default_profile()).valid());
+  engine::test::player(world).profile().set_inventory(0, 1);
+  engine::test::player(world).profile().set_inventory_count(1);
+  engine::test::player(world).loadout().clear();
+  CHECK(engine::test::player(world).loadout().equip(0, 1));
+  CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 1);
+  const engine::EntityHandle petal = engine::test::player(world).loadout().slots()[0].instances[0];
   CHECK(petal.valid());
-  CHECK(world.loadout().discard(world.profile(), 0, 1));
-  engine::remove_slot_petals(world, 0);
+  CHECK(engine::test::player(world).loadout().discard(engine::test::player(world).profile(), 0, 1));
+  engine::remove_slot_petals(world, engine::test::player(world), 0);
   CHECK(world.entities().get(petal) == nullptr);
-  CHECK(world.petals().empty());
+  CHECK(engine::test::player(world).petals().empty());
 }
 
 void test_cactus_construction() {
@@ -144,20 +144,20 @@ void test_player_spawn() {
   engine::World world;
   world.set_initialized(true);
   const engine::PlayerConfig config{engine::f32(25.0F), engine::f32(100.0F), engine::f32(100.0F), engine::f32(0.0F)};
-  const auto player = engine::spawn_player(world, "tester",
+  const auto player = engine::spawn_player(world, engine::test::player(world), "tester",
     engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)), config);
   CHECK(player.valid());
-  CHECK(world.player() == player);
-  CHECK(world.player_name() == "tester");
+  CHECK(engine::test::player(world).player() == player);
+  CHECK(engine::test::player(world).player_name() == "tester");
   const engine::Entity* entity = world.entities().get(player);
   CHECK(entity != nullptr);
   CHECK(entity->kind == engine::EntityKind::kPlayer);
   CHECK(entity->radius.to_float() == 25.0F);
   CHECK(entity->health.to_float() == 100.0F);
   CHECK(entity->max_health.to_float() == 100.0F);
-  CHECK(!engine::spawn_player(world, "again",
+  CHECK(!engine::spawn_player(world, engine::test::player(world), "again",
     engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), config).valid());
-  world.apply_input(0, engine::f32(0.0F), engine::f32(23913.0F));
+  engine::test::input(world, 0, engine::f32(0.0F), engine::f32(23913.0F));
   engine::tick(world, 50.0);
   CHECK(entity->position.x.to_float() > 5.0F);
   CHECK(entity->position.x.to_float() < 7.0F);
@@ -168,7 +168,7 @@ void test_drop_pickup() {
   engine::World world;
   world.set_initialized(true);
   const engine::PlayerConfig config{engine::f32(25.0F), engine::f32(100.0F), engine::f32(100.0F), engine::f32(0.0F)};
-  CHECK(engine::spawn_player(world, "p", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), config).valid());
+  CHECK(engine::spawn_player(world, engine::test::player(world), "p", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), config).valid());
   const auto drop = engine::spawn_drop(world, 1, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(drop.valid());
   // Original pickup+48 stores spawn time; collection is gated until +500ms.
@@ -176,17 +176,17 @@ void test_drop_pickup() {
   for (unsigned step = 0; step < 9U; ++step) {
     engine::tick(world, 50.0);
     CHECK(!world.entities().get(drop)->pickup_collected);
-    CHECK(world.loadout().pickup_transfers().empty());
+    CHECK(engine::test::player(world).loadout().pickup_transfers().empty());
   }
   engine::tick(world, 50.0);
   CHECK(world.entities().get(drop) != nullptr);
   CHECK(world.entities().get(drop)->pickup_collected);
-  CHECK(world.loadout().pickup_transfers().size() == 1U);
-  if (world.loadout().pickup_transfers().size() != 1U) return;
-  CHECK(world.loadout().pickup_transfers()[0].drop == drop);
-  CHECK(world.loadout().pickup_transfers()[0].slot == 0U);
-  CHECK(world.loadout().slots()[0].type_id == 1);
-  CHECK(world.loadout().slots()[0].count == 1);
+  CHECK(engine::test::player(world).loadout().pickup_transfers().size() == 1U);
+  if (engine::test::player(world).loadout().pickup_transfers().size() != 1U) return;
+  CHECK(engine::test::player(world).loadout().pickup_transfers()[0].drop == drop);
+  CHECK(engine::test::player(world).loadout().pickup_transfers()[0].slot == 0U);
+  CHECK(engine::test::player(world).loadout().slots()[0].type_id == 1);
+  CHECK(engine::test::player(world).loadout().slots()[0].count == 1);
   engine::tick(world, 1950.0);
   CHECK(world.entities().get(drop) != nullptr);
   engine::tick(world, 50.0);

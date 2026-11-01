@@ -1,3 +1,4 @@
+#include "../support/single_player.hpp"
 #include "engine/model/world.hpp"
 #include "engine/sim/ai.hpp"
 #include "engine/sim/combat.hpp"
@@ -26,7 +27,7 @@ std::vector<EntityHandle> chain(World& world, EntityHandle head) {
 
 void passive_chain() {
   World world; world.initialize(); world.set_auto_populate(false); world.random().seed(787621659U);
-  const auto player = spawn_player(world, "target", at(750), PlayerConfig{});
+  const auto player = spawn_player(world, engine::test::player(world), "target", at(750), PlayerConfig{});
   world.random().seed(787621659U);
   const auto head = spawn_entity_from_defaults(world, EntityKind::kMob, 15, at(0));
   world.entities().get(player)->position = at(100);
@@ -49,7 +50,7 @@ void passive_chain() {
 
 void evil_chain(bool hit) {
   World world; world.initialize(); world.set_auto_populate(false); world.random().seed(787621659U);
-  const auto player = spawn_player(world, "target", at(750), PlayerConfig{});
+  const auto player = spawn_player(world, engine::test::player(world), "target", at(750), PlayerConfig{});
   world.random().seed(787621659U);
   const auto head = spawn_entity_from_defaults(world, EntityKind::kMob, 17, at(0));
   world.entities().get(player)->position = at(100);
@@ -86,7 +87,7 @@ void evil_chain(bool hit) {
 // bypasses precisely the interval that previously stopped the chase.
 void lethal_head(bool trace) {
   World world; world.initialize(); world.set_auto_populate(false); world.set_time_ms(1000);
-  const auto player = spawn_player(world, "target", at(750), PlayerConfig{});
+  const auto player = spawn_player(world, engine::test::player(world), "target", at(750), PlayerConfig{});
   world.random().seed(787621659U);
   const auto head = spawn_entity_from_defaults(world, EntityKind::kMob, 17, at(0));
   const auto segments = chain(world, head);
@@ -122,7 +123,7 @@ void lethal_head(bool trace) {
 
 void lethal_middle() {
   World world; world.initialize(); world.set_auto_populate(false);
-  const auto player = spawn_player(world, "target", at(750), PlayerConfig{});
+  const auto player = spawn_player(world, engine::test::player(world), "target", at(750), PlayerConfig{});
   world.random().seed(787621659U);
   const auto head = spawn_entity_from_defaults(world, EntityKind::kMob, 17, at(0));
   const auto segments = chain(world, head);

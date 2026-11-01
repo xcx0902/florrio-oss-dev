@@ -1,3 +1,4 @@
+#include "../../../../engine/tests/support/single_player.hpp"
 // Product-native cross-endian fixture: real WorkerApi input -> think -> publish
 // -> real domain snapshot bytes. It intentionally uses no archived replay, old
 // WASM export, generated expectation or golden.
@@ -75,7 +76,7 @@ int main(int argc, char** argv) {
   // advances the fixed-step world. No entity is constructed directly.
   if (!api.send(spawn_packet("Fixture"), kKey)) return 3;
   api.think();
-  const engine::EntityHandle player = api.world().player();
+  const engine::EntityHandle player = engine::test::player(api.world()).player();
   if (!player.valid() || api.world().entities().get(player) == nullptr) return 4;
 
   const std::vector<std::uint8_t> baseline = api.domain_snapshot_bytes(6U, 0U);

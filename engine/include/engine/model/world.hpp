@@ -7,7 +7,7 @@
 #include "engine/model/effect_payload.hpp"
 #include "engine/model/entity.hpp"
 #include "engine/model/petal_state.hpp"
-#include "engine/model/player_profile.hpp"
+#include "engine/model/player_registry.hpp"
 #include "engine/sim/player_loadout.hpp"
 #include <string>
 #include <algorithm>
@@ -55,30 +55,14 @@ class World {
     death_shuffle_.seed(entropy % 2147483647U);
   }
   [[nodiscard]] ServerRng& death_shuffle_random() { return death_shuffle_; }
-  [[nodiscard]] const PlayerInput& input() const { return input_; }
-  [[nodiscard]] std::vector<PetalOrbitState>& petals() { return petals_; }
-  [[nodiscard]] const std::vector<PetalOrbitState>& petals() const { return petals_; }
-  [[nodiscard]] EntityHandle player() const { return player_; }
-  void set_player(EntityHandle handle) { player_ = handle; }
-  [[nodiscard]] const std::string& player_name() const { return player_name_; }
-  void set_player_speed(f32 speed) { player_speed_ = speed; }
-  [[nodiscard]] f32 player_speed() const { return player_speed_; }
-  [[nodiscard]] PlayerLoadout& loadout() { return loadout_; }
-  [[nodiscard]] const PlayerLoadout& loadout() const { return loadout_; }
-  [[nodiscard]] PlayerProfile& profile() { return profile_; }
-  [[nodiscard]] const PlayerProfile& profile() const { return profile_; }
-  void set_player_name(std::string name) { player_name_ = std::move(name); }
+  [[nodiscard]] PlayerRegistry& players() { return players_; }
+  [[nodiscard]] const PlayerRegistry& players() const { return players_; }
+  /** Adopt latest input for this identity/life, without simulating movement. */
+  bool apply_input(PlayerId id, LifeEpoch life, std::uint32_t buttons, f32 angle,
+                   f32 strength, std::uint64_t ttl_ticks = kInputTtlTicks);
   [[nodiscard]] f32 width() const { return width_; }
   [[nodiscard]] f32 height() const { return height_; }
   void set_dimensions(f32 width, f32 height) { width_ = width; height_ = height; }
-  /** Zone timer at loadout+288. Overleveled time accumulates while the player
-   * is left of minimumLevelZoneX; it drains at one tenth speed otherwise. */
-  [[nodiscard]] f32 zone_timer_ms() const { return zone_timer_ms_; }
-  void set_zone_timer_ms(f32 value) { zone_timer_ms_ = value; }
-  [[nodiscard]] bool zone_petals_disabled() const { return zone_disabled_; }
-  void set_zone_petals_disabled(bool value) { zone_disabled_ = value; }
-  [[nodiscard]] std::uint8_t zone_progress() const { return zone_progress_; }
-  void set_zone_progress(std::uint8_t value) { zone_progress_ = value; }
   [[nodiscard]] bool compact() const { return compact_; }
   void set_compact(bool compact) { compact_ = compact; }
   [[nodiscard]] bool auto_populate() const { return auto_populate_; }
@@ -243,41 +227,6 @@ class World {
 
   [[nodiscard]] double time_ms() const { return time_ms_; }
   void set_time_ms(double value) { time_ms_ = value; }
-  [[nodiscard]] f32 last_death_score() const { return last_death_score_; }
-  [[nodiscard]] std::uint8_t last_death_level() const { return last_death_level_; }
-  [[nodiscard]] const std::array<std::uint16_t, 10>& last_death_kept() const { return last_death_kept_; }
-  [[nodiscard]] std::uint8_t last_death_kept_count() const { return last_death_kept_count_; }
-  void set_last_death(f32 score, std::uint8_t level) {
-    last_death_score_ = score;
-    last_death_level_ = level;
-  }
-  void set_last_death_kept(std::span<const std::uint16_t> kept) {
-    last_death_kept_.fill(0);
-    last_death_kept_count_ = static_cast<std::uint8_t>(std::min(kept.size(), last_death_kept_.size()));
-    std::copy_n(kept.begin(), last_death_kept_count_, last_death_kept_.begin());
-  }
-  void set_last_killer(EntityHandle handle, std::string name) {
-    last_killer_ = handle;
-    last_killer_name_ = std::move(name);
-  }
-  [[nodiscard]] EntityHandle last_killer() const { return last_killer_; }
-  [[nodiscard]] const std::string& last_killer_name() const { return last_killer_name_; }
-
-  void apply_input(std::uint32_t buttons, f32 angle, f32 strength) {
-    input_.buttons = buttons;
-    input_.angle = angle;
-    input_.strength = f32(strength.value > 0.0F ? strength.value : 0.0F);
-    input_.normalized_angle = f32(std::fmod(static_cast<double>(angle.value), kInputAngleModulus));
-    input_.direction = pack_direction(input_.normalized_angle);
-    if (Entity* player = entities_.get(player_); player != nullptr) {
-      player->player_look = static_cast<std::uint8_t>(input_.direction);
-      player->player_expression = static_cast<std::uint8_t>(
-        (player->player_expression & 0xFCU) | (buttons & 3U));
-    }
-    // The original applies one control impulse per simulation tick in
-    // applyPlayerControls, not once per received packet. The stored input is
-    // consumed by engine::apply_player_controls from the tick.
-  }
   [[nodiscard]] std::uint64_t tick() const { return tick_; }
   /** Number of `collision_bounds` cache misses since initialization. */
   [[nodiscard]] std::uint64_t bounds_rebuilds() const { return bounds_rebuilds_; }
@@ -304,8 +253,7 @@ class World {
   MinstdRng rng_;
   ServerRng random_{285456437U};
   ServerRng death_shuffle_{1U};
-  PlayerInput input_;
-  std::vector<PetalOrbitState> petals_;
+  PlayerRegistry players_;
   std::vector<HitEvent> hit_events_;
   std::vector<HitEvent> pending_hit_events_;
   std::set<std::uint32_t> known_entities_;
@@ -321,22 +269,8 @@ class World {
   std::vector<AntHoleRelease> ant_hole_releases_;
   std::deque<DeathRecord> deaths_;
   double time_ms_ = 0.0;
-  f32 last_death_score_;
-  std::uint8_t last_death_level_ = 0;
-  std::array<std::uint16_t, 10> last_death_kept_{};
-  std::uint8_t last_death_kept_count_ = 0;
-  EntityHandle last_killer_{};
-  std::string last_killer_name_;
-  EntityHandle player_;
-  std::string player_name_;
-  f32 player_speed_;
-  PlayerLoadout loadout_;
-  PlayerProfile profile_;
   f32 width_ = f32(50000.0F);
   f32 height_ = f32(4000.0F);
-  f32 zone_timer_ms_ = f32(0.0F);
-  std::uint8_t zone_progress_ = 0;
-  bool zone_disabled_ = false;
   bool compact_ = false;
   bool auto_populate_ = false;
   std::uint64_t tick_ = 0;
