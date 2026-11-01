@@ -62,7 +62,37 @@
         "engine_peer_visibility_tests",
         "engine_pickup_arrival_tests",
         "engine_structure_tests",
-        "engine_single_player_baseline_tests"
+        "engine_single_player_baseline_tests",
+        "engine_native_link_tests"
+      ]
+    },
+    "server-native": {
+      "runner": "ctest",
+      "argv": [
+        "--test-dir",
+        "build/native",
+        "--output-on-failure",
+        "--no-tests=error"
+      ],
+      "expected": [
+        "engine_tests",
+        "engine_centipede_tests",
+        "engine_death_lifecycle_tests",
+        "engine_sim_tests",
+        "engine_projectile_tests",
+        "engine_poison_flash_tests",
+        "engine_rose_tests",
+        "engine_passives_pets_tests",
+        "engine_peer_visibility_tests",
+        "engine_pickup_arrival_tests",
+        "engine_structure_tests",
+        "engine_single_player_baseline_tests",
+        "engine_native_link_tests",
+        "server_native_tests",
+        "server_help",
+        "server_version",
+        "server_smoke",
+        "server_invalid_config"
       ]
     }
   }

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "description": "M00 native dependency contract; root CMake consumes this lock starting in M01. No download occurs in M00.",
+  "description": "Native dependency contract; root CMake consumes the locked archive headers from M01. Standalone engine builds require no network dependency.",
   "dependencies": {
     "boost": {
       "version": "1.86.0",

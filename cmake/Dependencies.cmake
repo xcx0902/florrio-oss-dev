@@ -1,0 +1,31 @@
+# Consume only the locked official archive's headers, never Boost's project.
+include(FetchContent)
+file(READ "${CMAKE_CURRENT_LIST_DIR}/dependencies.lock.json" FLORR_DEPENDENCIES)
+foreach(field url sha256 expectedBoostVersion)
+  string(JSON FLORR_BOOST_${field} GET "${FLORR_DEPENDENCIES}" dependencies boost ${field})
+endforeach()
+set(FLORR_BOOST_ARCHIVE "" CACHE FILEPATH "Offline copy of the identical locked Boost archive")
+if(FLORR_BOOST_ARCHIVE)
+  file(SHA256 "${FLORR_BOOST_ARCHIVE}" archive_hash)
+  if(NOT archive_hash STREQUAL FLORR_BOOST_sha256)
+    message(FATAL_ERROR "Boost archive SHA256 differs from dependencies.lock.json")
+  endif()
+  set(FLORR_BOOST_url "${FLORR_BOOST_ARCHIVE}")
+endif()
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+FetchContent_Declare(florr_boost
+  URL "${FLORR_BOOST_url}"
+  URL_HASH "SHA256=${FLORR_BOOST_sha256}"
+  TLS_VERIFY TRUE TIMEOUT 300 INACTIVITY_TIMEOUT 30
+  SOURCE_SUBDIR _florr_headers_only)
+FetchContent_MakeAvailable(florr_boost)
+file(STRINGS "${florr_boost_SOURCE_DIR}/boost/version.hpp" version_line REGEX "^#define BOOST_VERSION ")
+if(NOT version_line STREQUAL "#define BOOST_VERSION ${FLORR_BOOST_expectedBoostVersion}")
+  message(FATAL_ERROR "Locked Boost version mismatch: ${version_line}")
+endif()
+find_package(Threads REQUIRED)
+add_library(florr_boost_headers INTERFACE)
+target_include_directories(florr_boost_headers SYSTEM INTERFACE "${florr_boost_SOURCE_DIR}")
+target_compile_definitions(florr_boost_headers INTERFACE BOOST_ERROR_CODE_HEADER_ONLY=1)

@@ -51,7 +51,7 @@ try {
   assert.equal((await buildInputs()).sha256, source.sha256, 'build inputs changed during recording');
   assert.equal((await verificationInputs()).sha256, verification.sha256, 'verification inputs changed during recording');
   assert.equal(sha256(await readFile(executable)), sha256(executableBytes), 'native executable changed during recording');
-  Object.assign(report, { configuration, executable: { path: executable, sha256: sha256(executableBytes) }, engineLibrarySha256: sha256(await readFile('build/engine/libengine_core.a')), fixture: { path: expectedFile, sha256: sha256(expectedBytes) }, contracts: await treeIdentity('.', ['cmake/dependencies.lock.json', 'docs/adr/0002-native-authoritative-multiplayer.md', 'docs/multiplayer/configuration.md', 'docs/multiplayer/testing.md']), captures, complete: true, passed: true });
+  Object.assign(report, { configuration, executable: { path: executable, sha256: sha256(executableBytes) }, engineLibrarySha256: sha256(await readFile('build/engine/libengine_core.a')), workerAdapterSha256: sha256(await readFile('build/engine/libengine_worker_adapter.a')), fixture: { path: expectedFile, sha256: sha256(expectedBytes) }, contracts: await treeIdentity('.', ['cmake/dependencies.lock.json', 'docs/adr/0002-native-authoritative-multiplayer.md', 'docs/multiplayer/configuration.md', 'docs/multiplayer/testing.md']), captures, complete: true, passed: true });
 } catch (error) {
   report.error = error.stack ?? String(error);
   process.exitCode = 1;

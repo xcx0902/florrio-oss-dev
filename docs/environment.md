@@ -61,7 +61,8 @@ npm run build               # schema + wasm + TS + dist-next/
 ```sh
 npm run test:unit           # protocol/wire unit tests
 npm run test:tools          # delivery and verification tool tests
-npm run test:engine         # native build + 12 CTest targets
+npm run test:engine         # native build + 13 CTest targets
+npm run test:server:native  # root native build + 18 CTest targets
 npm run test:client         # typecheck + client unit/integration suites
 npm run test:integration    # native WorkerApi fixture -> TS decoder
 npm run build:dist-next     # packaged delivery tree
@@ -82,7 +83,7 @@ The sole definition is `tools/verification/gates.mjs`: schema check, native
 build/complete CTest, wasm, TS, package once, unit/tools/client unit, cross-end
 integration, ABI, delivery integrity, browser scenarios/entrypoint smoke/render
 performance in one pinned Chromium process, engine performance and integration
-performance (15 gates). Each gate binds the same run and delivery identity.
+performance, plus the M01 native host build/CTest (17 gates). Each gate binds the same run and delivery identity.
 
 It writes `reports/current-verification.json`. A failed or interrupted run does
 not produce a passing record. `reports/` is gitignored; attach the JSON and the
@@ -119,3 +120,14 @@ absolute paths. If a command needs `archive/`, the migration is incomplete.
   from fresh staging; do not edit generated JS. `client/public` is obsolete.
 - **Preparing a release** — see [release.md](release.md); a completed current ledger
   is required, and old reports cannot be inherited.
+
+## M01 native host dependencies
+
+`npm run build:server` / `test:server:native` configure the root CMake project.
+The server consumes only the Boost 1.86.0 official archive headers locked by
+`cmake/dependencies.lock.json`, with mandatory SHA256 validation and no system
+fallback. The first root build requires access to that archive, or an identical
+local copy passed as `FLORR_BOOST_ARCHIVE=/absolute/path/boost_1_86_0.tar.bz2`.
+Standalone `cmake -S engine` and offline WASM builds do not download Boost.
+See [server/README.md](../server/README.md) for the finite smoke command and
+native evidence. This is a build boundary milestone; network play comes later.

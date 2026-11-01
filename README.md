@@ -117,10 +117,19 @@ src/schema/     生成的协议/目录类型（勿手改）
 `npm run schema:generate`；`npm run schema:check` 做只读一致性检查。
 原始布局探针、旧生成器和证据表已归档，不再是生成输入。
 
+### `server/` — M01 原生宿主骨架
+
+已实现 core/离线适配器分离及有限 tick smoke；原生宿主不加载 WASM、不初始化
+Worker/C ABI。`./build/native/server/florr_server --smoke-ticks 20` 输出实际 tick、
+实体数和种子摘要后退出。此阶段尚无网络监听或多人能力，浏览器产品入口保持单机。
+构建、离线依赖归档和证据路径见 [`server/README.md`](server/README.md)。
+
 ## 仓库结构
 
 ```
-engine/       C++20 引擎、C ABI、原生测试
+engine/       C++20 core、离线 Worker/C ABI 适配器、原生测试
+server/       M01 原生宿主骨架、有限 tick smoke 与宿主测试
+cmake/        原生依赖锁和官方归档获取
 client/       TypeScript 客户端、入口页、Worker shim、字体与图标
 schema/       协议、布局、目录及生成器
 tools/        产品构建、打包、校验与验收工具
@@ -135,7 +144,9 @@ serve.mjs     静态服务器
 
 ```bash
 npm run build:engine        # 原生 Release 构建
-npm run test:engine         # 构建 + ctest
+npm run test:engine         # 构建 + 13 项 engine CTest
+npm run build:server        # M01 原生宿主骨架 + 锁定依赖 + native identity
+npm run test:server:native  # 根构建 + 18 项封闭 CTest（含 engine）
 npm run build:engine:wasm   # Emscripten CMake -> build/wasm/server.wasm
 npm run build:client        # tsc -> fresh build/client
 npm run test:unit           # 协议/线格式单元测试
@@ -149,7 +160,7 @@ npm run test:all            # 全流程验收，写 reports/current-verification
 npm run test:m4             # 校验冻结基线 + 全流程 + 性能对比 + 30 分钟资源浸泡
 ```
 
-`test:all` 由唯一 gate 表执行 15 步验收，wasm/TS/交付各构建一次，所有后续检查绑定同一份
+`test:all` 由唯一 gate 表执行 17 步验收，wasm/TS/交付各构建一次，所有后续检查绑定同一份
 交付；包含完整 CTest、跨端、ABI、共享固定 Chrome 的浏览器/真实入口/绘制性能、
 原生与跨端工作负载。失败、中断或输入变化不会写出通过报告。
 `npm run release:prepare` 只为本次通过的 ledger 生成本地 tar.gz、manifest 与 SHA256SUMS。

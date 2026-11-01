@@ -3,6 +3,9 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
+import { nativeInputs, verificationInputs, sha256 } from './lib/identity.mjs';
+import { assertVerificationOwner, atomicJson } from './verification/io.mjs';
 import { parseTap } from './verification/tap.mjs';
 import { chromiumExecutable } from './lib/chromium.mjs';
 import { expandSuite, loadManifest, suiteDefinition, validateManifest } from './test-manifest.mjs';
@@ -29,19 +32,46 @@ if (names.includes('integration')) {
   }
 }
 
-if (names.length === 1 && names[0] === 'engine') {
-  const suite = await suiteDefinition(manifest, 'engine');
-  const listed = spawnSync('ctest', ['--test-dir', 'build/engine', '-N'], { cwd: root, encoding: 'utf8' });
+if (names.length === 1 && ['engine', 'server-native'].includes(names[0])) {
+  const suite = await suiteDefinition(manifest, names[0]);
+  const directory = names[0] === 'engine' ? 'build/engine' : 'build/native';
+  const listed = spawnSync('ctest', ['--test-dir', directory, '-N'], { cwd: root, encoding: 'utf8' });
   if (listed.status !== 0) {
     process.stderr.write(listed.stderr);
-    throw new Error('cannot list native tests; run npm run build:engine');
+    throw new Error(`cannot list native tests; run npm run ${names[0] === 'engine' ? 'build:engine' : 'build:server'}`);
   }
   const actual = [...listed.stdout.matchAll(/Test\s+#\d+:\s+(\S+)/g)].map(match => match[1]);
   const expected = suite.expected;
   if (actual.length !== expected.length || actual.some((test, index) => test !== expected[index])) {
     throw new Error(`CTest inventory differs: expected ${expected.join(', ')}; got ${actual.join(', ')}`);
   }
-  const run = spawnSync('ctest', suite.argv, { cwd: root, stdio: 'inherit', env: process.env });
+  const native = names[0] === 'server-native';
+  let build, source, verification;
+  if (native) {
+    await assertVerificationOwner(root);
+    build = JSON.parse(await readFile('build/native/native-build.json', 'utf8'));
+    source = await nativeInputs(root);
+    verification = await verificationInputs(root);
+    if (!build.passed || !build.stable || build.source.sha256 !== source.sha256
+      || build.verification?.sha256 !== verification.sha256)
+      throw new Error('Native build evidence is missing/stale; run npm run build:server');
+    for (const [file, artifact] of Object.entries(build.artifacts))
+      if (sha256(await readFile(`build/native/${file}`)) !== artifact.sha256)
+        throw new Error(`Native build artifact changed: ${file}`);
+  }
+  const run = spawnSync('ctest', suite.argv, { cwd: root, stdio: native ? 'pipe' : 'inherit', encoding: 'utf8', env: process.env });
+  if (native) {
+    process.stdout.write(run.stdout ?? ''); process.stderr.write(run.stderr ?? '');
+    const stable = source.sha256 === (await nativeInputs(root)).sha256
+      && verification.sha256 === (await verificationInputs(root)).sha256;
+    const result = { schema: 'native-ctest-v1', runId: build.runId, finishedAt: new Date().toISOString(),
+      source: source.sha256, verification: verification.sha256, build: sha256(await readFile('build/native/native-build.json')),
+      tests: actual, total: actual.length, exitCode: run.status, stable,
+      passed: run.status === 0 && stable, outputSha256: sha256((run.stdout ?? '') + (run.stderr ?? '')) };
+    await atomicJson(`reports/multiplayer/m01/${build.runId}/ctest.json`, result);
+    await atomicJson('reports/multiplayer/native-ctest.json', result);
+    if (!stable) throw new Error('Native inputs changed during CTest');
+  }
   process.exitCode = run.status ?? 1;
 } else {
   for (const suiteName of names) {

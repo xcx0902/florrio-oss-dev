@@ -3,6 +3,8 @@ export const gates = Object.freeze([
   { name: 'schema', npm: 'schema:check' },
   { name: 'native build', npm: 'build:engine' },
   { name: 'native CTest', script: 'tools/run-tests.mjs', args: ['engine'], suite: 'engine' },
+  { name: 'server build', npm: 'build:server', reports: ['reports/multiplayer/native-build.json'] },
+  { name: 'server native CTest', script: 'tools/run-tests.mjs', args: ['server-native'], suite: 'server-native', reports: ['reports/multiplayer/native-ctest.json'] },
   { name: 'wasm build', npm: 'build:engine:wasm' },
   { name: 'client build', npm: 'build:client' },
   { name: 'package', script: 'tools/build-dist-next.mjs', args: ['--skip-build'] },

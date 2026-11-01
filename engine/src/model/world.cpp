@@ -47,9 +47,9 @@ void World::reset() {
   initialized_ = false;
 }
 
-void World::initialize() {
+void World::initialize(std::uint64_t handle_seed) {
   reset();
-  MinstdRng rng(0);
+  MinstdRng rng(handle_seed);
   for (std::uint32_t index = 0; index < kEntitySlotCount; ++index) {
     std::uint32_t generation = 0;
     do { generation = rng.next_generation(); } while ((generation & 262143U) == 0U);

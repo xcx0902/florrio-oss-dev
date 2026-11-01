@@ -28,7 +28,7 @@ npm run release:prepare
 
 `test:all` 以 `tools/verification/gates.mjs` 为唯一顺序：schema、native build/全部
 CTest、wasm、client、package once、unit/tools/client unit、跨端、ABI、交付完整性、
-共享固定 Chrome 的浏览器/真实入口/绘制性能、引擎性能、跨端性能，共 15 gates。
+共享固定 Chrome 的浏览器/真实入口/绘制性能、引擎性能、跨端性能，新增 M01 原生宿主构建与 CTest，共 17 gates。
 这条命令已经覆盖 build 与三个 perf，不必为同次发布再次编译。
 
 每次运行创建 `reports/runs/<runId>/run.json` 与各 gate 日志，结束发布

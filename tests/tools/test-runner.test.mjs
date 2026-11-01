@@ -45,6 +45,7 @@ test('manifest rejects an unknown suite and an engine inventory without expected
   const root = await fixture(t, { unit: [] });
   await assert.rejects(validateManifest(root, { schema: 1, suites: { mystery: [] } }), /unknown suite/);
   await assert.rejects(validateManifest(root, { schema: 1, suites: { engine: { runner: 'ctest', expected: [] } } }), /nonempty ctest/);
+  await assert.rejects(validateManifest(root, { schema: 1, suites: { 'server-native': { runner: 'ctest', expected: [] } } }), /nonempty ctest/);
 });
 
 test('runner rejects a suite whose files discover zero tests despite exit code 0', async t => {

@@ -1,4 +1,5 @@
 #include "engine/net/worker_api.hpp"
+#include "engine/model/world_config.hpp"
 #include "engine/net/angle.hpp"
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/petals.hpp"
@@ -21,17 +22,10 @@ void reserve_spawn_placeholder(World& world) {
 }
 }
 void WorkerApi::init(bool populate) {
-  world_.initialize();
-  world_.set_auto_populate(populate);
-  if (populate) {
-    // spServerInit draws one 32-bit value through original 102 (a two-draw
-    // acceptance path for the shipped seed) before original 400 fills the
-    // population bands. Keep the same RNG position so the first species and
-    // every subsequent spawn match the reference world.
-    (void)world_.random().next();
-    (void)world_.random().next();
-    (void)populate_world(world_, SpawnTable::from_catalog());
-  }
+  // The offline API historically keeps its independent death-shuffle stream
+  // across init() on the same object. A new native World uses config's seed.
+  initialize_world(world_, WorldConfig{.populate = populate,
+      .death_shuffle_seed = world_.death_shuffle_random().state()});
   output_.clear();
   last_sequence_ = 0;
   next_spawn_time_ms_ = 0.0;
@@ -109,12 +103,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
 }
 
 void WorkerApi::think() {
-  if (!world_.initialized()) return;
-  tick(world_, static_cast<double>(kTickMilliseconds));
-  // Original 654 appends six random bytes (six original-102 calls) while
-  // building the per-tick snapshot seed. They do not affect simulation state,
-  // but they advance the shared RNG and therefore every later spawn roll.
-  for (int index = 0; index < 6; ++index) (void)world_.random().next();
+  advance_world(world_);
 }
 
 std::deque<OutputPacket> WorkerApi::flush() { return output_.drain(); }

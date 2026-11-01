@@ -1,13 +1,13 @@
 # 多人联机执行跟踪
 
-> M00 已完成；M01—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
+> M00、M01 已完成；M02—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
 
 ## 1. 阶段看板
 
 | 阶段 | 状态 | 实际提交 | 验收 runId/报告 | 备注 |
 | --- | --- | --- | --- | --- |
 | M00 基线与契约 | 已完成 | 回归/驱动修复 `2bb33bf`；架构契约 `07b36d9` | `2026-10-31T15-09-18.267Z-4432f606`；`reports/multiplayer/baseline/summary.json` | 15/15 gate；12 CTest + 249 Node/浏览器测试通过；失败记录保留 |
-| M01 原生 core 边界 | 未开始 | — | — | — |
+| M01 原生 core 边界 | 已完成 | 工作区实现，未创建提交 | `2026-10-31T23-43-46.442Z-f638c98a`；`reports/multiplayer/m01/2026-10-31T23-43-46.442Z-f638c98a/summary.json` | 17/17 gate；engine 13/13、根 CTest 18/18、Node/浏览器 251/251；20 tick smoke 与纯 core 双 World 通过 |
 | M02 多玩家状态 | 未开始 | — | — | — |
 | M03 PVP 与玩法归属 | 未开始 | — | — | — |
 | M04 协议与复制 | 未开始 | — | — | — |
@@ -27,10 +27,10 @@
 
 ### M01：构建边界
 
-- [ ] MP-010：拆 `engine_core` / `engine_worker_adapter` 源表与链接关系。
-- [ ] MP-011：根 CMake + server target + 有限 tick smoke。
-- [ ] MP-012：共享初始化/RNG 契约、纯 native 链接与双 World 回归。
-- [ ] MP-013：native 源码身份/依赖锁定接入；旧 ABI/Worker 回归通过。
+- [x] MP-010：拆 `engine_core` / `engine_worker_adapter` 源表与链接关系。
+- [x] MP-011：根 CMake + server target + 有限 tick smoke。
+- [x] MP-012：共享初始化/RNG 契约、纯 native 链接与双 World 回归。
+- [x] MP-013：native 源码身份/依赖锁定接入；旧 ABI/Worker 回归通过。
 
 ### M02：多玩家
 
@@ -122,3 +122,22 @@ runId / source identity / binary-client hash：
 - 规则或接口偏离及理由：未改变玩法规则。M00 为可重复比较加入一个真实 native CTest 目标和跨端夹具回归；针对发现的既有验收收尾竞争加入两条浏览器回归，避免以偶然 pending 值阻断基线。
 - 未解决问题与受影响后续阶段：M00 无未解决项；多人功能与 Linux/macOS 网络库编译仍按 M01—M08 实现和验收，不能以本次单玩家基线宣称多人通过。
 - 下一步：M01 拆分 native core / Worker adapter，接入原生服务有限 tick smoke、双 World 隔离和 Boost 1.86.0 固定归档；按锁定归档仅消费头文件，不尝试构建其 Boost CMake project。
+
+
+## 5. M01 完成交接
+
+- 阶段 / 任务编号：M01；MP-010—MP-013 全部完成，2026-11-01（Asia/Shanghai）。
+- 实际提交：本轮为工作区实现，未创建 Git 提交。验收绑定当前源码/验证身份；`reports/multiplayer/m01/2026-10-31T23-43-46.442Z-f638c98a/source-changes.json` 保存基准 HEAD、全部本轮文件内容和哈希，可从基准重建本次修改；不能把基准 HEAD 当作 M01 提交号。
+- 实现范围 / 文件：根 `CMakeLists.txt`、`cmake/Dependencies.cmake` 与原锁定文件；`engine/sources.cmake`、core/worker/perf 适配器 target；`model/world_config.*`、显式 World 的 `diagnostics/entities.*`；`server/` 的 CLI/有限 tick runtime/测试；`tools/build-server.mjs`、native identity、test manifest/runner 和两项新增 gate。浏览器默认产品入口与单玩家规则保持既有路径。
+- 执行命令：`npm run build:engine`、`node tools/run-tests.mjs engine`、`npm run build:engine:wasm`、`node tools/verify-abi.mjs`、`npm run test:unit`、`npm run test:tools`、`npm run test:integration`、`npm run test:multiplayer:baseline`；`FLORR_BOOST_ARCHIVE=/private/tmp/florr-boost-1.86.0.tar.bz2 npm run test:server:native`；完整验收为同一 archive 环境加 `CHROME_PATH=/private/tmp/florr-m3-chromium/chrome-headless-shell-mac-arm64/chrome-headless-shell npm run test:all`。固定浏览器仍为 `156.0.8078.47`。
+- 独立边界验证：`cmake -S . -B build/native-core-only -DCMAKE_BUILD_TYPE=Release -DFLORR_BUILD_SERVER=OFF`、构建/运行 `engine_native_link_tests` 通过，无 Boost/Worker 前置。错误归档配置真实返回 1，并明确报告锁定 SHA256 不一致；CLI 未知/缺值/越界参数返回 2。
+- 测试数量与结果：完整 **17/17 gate**，`passed=true`、`stable=true`；独立 engine **13/13 CTest**，根构建 **18/18 CTest**（包含同一 13 项及 5 项宿主回归）；Node/浏览器 **251/251**（40 单元、24 工具、102 客户端单元、4 跨端、81 浏览器），无失败或跳过。绘制性能 3 profile × 4 场景 × 5 次 × 600 帧全部通过；native/WASM 引擎性能和真实 Worker 跨端性能 5 次均通过。原始单玩家冻结摘要继续匹配。
+- runId：`2026-10-31T23-43-46.442Z-f638c98a`；UTC 完成时间 `2026-11-01T00:01:00.413Z`（北京时间 2026-11-01 08:01:00）。
+- source identity：产品 `5209d906b1539edf8f5853b63e71f013d2521e3134f08ca2d25c6a3e30e65e4c`；native `b3eb33209c945a6babdbade3172dfe5cc3c38dc9b628a39f9e3e1f6f5f0f1a02`；verification `84d3c6541021df0018cd08e12801fe271d45b46f9c18f492fe32382bde3ed759`。native identity 另外记录 15829 个实际 Boost 头文件/许可证输入、编译器二进制、CMake、实际 compile commands/cache 和产物哈希；core 严格编译参数未进入宿主。
+- binary/client hash：native host `f9c1985a2d65e90458088aedbdf12625dc9f067e31759aa33f4a33dab3cd4916`；WASM `e706d259c7aaafd254cac36b091f5d59c0cc8fbadddddec1bf9e896b334230a0`；client/wasm/static 组合身份 `993ff27011596e448a987e38f423658f6657b734bea5597c4bd8674bfe150a96`。
+- smoke 实测：`--smoke-ticks 20` 输出 tick=20、timeMs=1000、entities=866、seed=285456437、game RNG state=2044652668/draws=8457、handle RNG state=11065635568950165505、death RNG state=1；无墙钟等待，无 WASM/Worker 初始化。宿主实际链接行为仅 `server_runtime + engine_core`，core/宿主 `nm` 检查无 Worker/cheat ABI。
+- 报告路径：`reports/runs/2026-10-31T23-43-46.442Z-f638c98a/run.json`、`reports/multiplayer/m01/2026-10-31T23-43-46.442Z-f638c98a/{build,ctest,summary}.json`；`accepted/index.json` 冻结当前 gate 报告、交付 manifest、toolchain 和日志哈希。`releaseEvidence()` 已真实通过，新增 native gate 未降低既有交付校验。
+- 失败与修复：首次普通沙箱的官方归档下载因本机代理不可达失败；随后下载同一官方归档，并通过锁定 SHA256 预置给 CMake，未变更依赖版本或回退到系统库。网络失败原日志和篡改归档的预期失败日志保存于本次证据目录。实现期间发现部分原有测试自己使用异常，保留其原有异常支持，只有 core/adapter/perf engine target 禁异常/RTTI；没有把这些参数传播到宿主/Boost。完整 17-gate 运行无失败。
+- 规则或接口偏离及理由：未改玩法/阶段/浮点顺序。手工根构建命令使用 `cmake --build build/native -j 6` 而非只构建 florr_server，以确保接下来的全部 CTest 可执行文件存在；宿主当前配置解析仅覆盖 CLI，完整配置文件与网络监听留给 M05。M01 实现不宣称网络或多人通过。
+- 未解决问题与受影响的后续阶段：M01 无功能阻塞；本轮尚未提交，提交号待后续提交时补录。Linux 发行包/网络/PVP/容量仍按后续阶段实现和验证。
+- 下一步：M02；显式 PlayerId/PlayerState/Registry、玩家输入与生命周期隔离、按全世界阶段推进。M02 尚未执行。

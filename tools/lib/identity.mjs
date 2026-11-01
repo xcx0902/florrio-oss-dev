@@ -54,7 +54,14 @@ export async function buildInputs(root = process.cwd()) {
   return { ...await treeIdentity(root, BUILD_ENTRIES, { exclude: p => p === 'client/src/dev/test-api.ts' }), schema: 'product-build-v1' };
 }
 export async function verificationInputs(root = process.cwd()) {
-  return { ...await treeIdentity(root, [...BUILD_ENTRIES, 'engine/tests', 'client/tests', 'tests', 'tools', '.chromium-version', 'serve.mjs']), schema: 'product-verification-v1' };
+  return { ...await treeIdentity(root, [...BUILD_ENTRIES, ...NATIVE_BUILD_ENTRIES, 'server/tests', 'engine/tests', 'client/tests', 'tests', 'tools', '.chromium-version', 'serve.mjs']), schema: 'product-verification-v1' };
+}
+export const NATIVE_BUILD_ENTRIES = ['CMakeLists.txt', 'cmake', 'server/CMakeLists.txt',
+  'server/include', 'server/src', 'engine/CMakeLists.txt', 'engine/sources.cmake',
+  'engine/src', 'engine/include', 'schema', 'tools/schema', 'tools/generate.mjs',
+  'tools/build-server.mjs', 'tools/lib/identity.mjs', 'package.json', 'package-lock.json'];
+export async function nativeInputs(root = process.cwd()) {
+  return { ...await treeIdentity(root, NATIVE_BUILD_ENTRIES), schema: 'native-build-v1' };
 }
 export async function engineInputs(root = process.cwd()) {
   const identity = await treeIdentity(root, ['engine/src', 'engine/include', 'engine/CMakeLists.txt', 'engine/sources.cmake', 'engine/abi-exports.json', '.emscripten-version', 'tools/build-engine-wasm.mjs']);

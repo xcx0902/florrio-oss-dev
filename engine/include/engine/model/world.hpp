@@ -36,7 +36,7 @@ class World {
 
   /** Match sp_server_init's 16,384 entity-slot handle pass: every index gets a
    * nonzero generation from the 64-bit LCG, rejecting generation & 262143 == 0. */
-  void initialize();
+  void initialize(std::uint64_t handle_seed = 0);
 
   [[nodiscard]] CollisionContext& collision() { return collision_; }
   [[nodiscard]] const std::vector<EntityHandle>& destroyed() const { return destroyed_; }

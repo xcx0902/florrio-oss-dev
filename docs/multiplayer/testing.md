@@ -1,4 +1,4 @@
-# 多人测试与路径交接（M00）
+# 多人测试与路径交接（M00—M01）
 
 本文区分已实现入口与后续计划；任何未来测试必须在对应阶段写出真实断言并同步清单，不能提前注册空 suite 或永久 skip。所有路径相对仓库根目录，不读取 `archive/`。
 
@@ -6,8 +6,9 @@
 
 | 入口 | 用途 | 清单/证据 |
 | --- | --- | --- |
-| `npm run test:all` | 重跑完整当前 WASM/Worker 产品验收（15 gate） | `tools/verification/gates.mjs`；`reports/runs/<runId>/run.json` |
+| `npm run test:all` | 重跑完整当前 WASM/Worker 产品验收（17 gate，含 M01 native 构建/CTest） | `tools/verification/gates.mjs`；`reports/runs/<runId>/run.json` |
 | `npm run test:engine` | native Release + CTest 封闭清单 | `tests/product-tests.json` 的 engine.expected |
+| `npm run build:server`、`test:server:native` | M01 已实现：锁定 Boost 归档、根构建、core-only 链接、18 项封闭 CTest | `build/native/native-build.json`；`reports/multiplayer/m01/<runId>/{build,ctest}.json` |
 | `npm run test:multiplayer:baseline` | M00 已实现：单玩家固定种子双进程重放、冻结领域摘要比较与新报告 | `tools/multiplayer-baseline.mjs`；不表示多人验收通过 |
 | `npm run test:unit`、`test:tools`、`test:integration` | 现有字节/工具/跨 C++→TS 测试 | `tools/test-manifest.mjs` 校验每个实际测试文件 |
 
@@ -23,11 +24,11 @@ M00 的单玩家场景入口及报告见 [baseline.md](baseline.md)。它只证�
 
 以上在 M00 是验收需求，没有占位测试、没有声称通过。每一项均必须先看到对应阶段真实失败，再通过实现修复；记录原始失败与修复 runId。
 
-## 各阶段测试入口（均为计划新增）
+## 各阶段测试入口（M01 已实现；M02—M08 计划新增）
 
 | 阶段 | CTest/Node 文件名或场景 | 计划入口与覆盖 |
 | --- | --- | --- |
-| M01 | `engine_native_link_tests`、`server_smoke_tests` | `build:server`、`test:server:native`；core-only 双 World 交错推进、有限 tick smoke、无 Worker/cheat ABI、保留原有 native/wasm/ABI 回归 |
+| M01 | `engine_native_link_tests`、`server_native_tests`、`server_help/version/smoke/invalid_config` | 已实现 `build:server`、`test:server:native`；core-only 双 World 交错推进、有限 tick smoke、无 Worker/cheat ABI、保留原有 native/wasm/ABI 回归 |
 | M02 | `engine_multiplayer_state_tests` | 现有 engine suite 中显式追加 target；双出生、独立输入/资料、死亡/重生 LifeEpoch、销毁反向索引、全世界只推进一次 |
 | M03 | `engine_multiplayer_combat_tests` | engine suite；真实等级系数、petal/pet/projectile/DOT/治疗归属、怪物 XP、无 PVP 额外 XP、唯一拾取、同时致死、死亡掉落一次性、两个 World 隔离 |
 | M04 | `engine_replication_tests`、`engine_multiplayer_protocol_tests`、`tests/integration/multiplayer-snapshot.test.mjs`、`client/tests/unit/multiplayer-codec.test.mjs` | engine/integration/client-unit；手工字节向量 + native→TS，公开/私有、双观察者、AOI、full/delta/epoch、序号回绕、损坏包事务性、无奖励重放 |

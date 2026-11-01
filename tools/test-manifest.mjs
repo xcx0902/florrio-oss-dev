@@ -4,7 +4,7 @@ import path from 'node:path';
 
 export const MANIFEST_PATH = 'tests/product-tests.json';
 export const COMPOSITES = { client: ['client-unit', 'client-integration'] };
-const KNOWN = new Set(['unit', 'tools', 'client-unit', 'client-integration', 'integration', 'delivery', 'engine']);
+const KNOWN = new Set(['unit', 'tools', 'client-unit', 'client-integration', 'integration', 'delivery', 'engine', 'server-native']);
 
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -28,9 +28,9 @@ export async function validateManifest(root, manifest) {
   const all = [];
   for (const [name, suite] of Object.entries(manifest.suites)) {
     if (!KNOWN.has(name)) throw new Error(`test manifest has unknown suite ${name}`);
-    if (name === 'engine') {
+    if (name === 'engine' || name === 'server-native') {
       if (suite.runner !== 'ctest' || !Array.isArray(suite.expected) || suite.expected.length === 0)
-        throw new Error('test manifest engine suite must be a nonempty ctest inventory');
+        throw new Error(`test manifest ${name} suite must be a nonempty ctest inventory`);
       continue;
     }
     if (!Array.isArray(suite) || suite.length === 0) throw new Error(`test suite ${name} is empty`);

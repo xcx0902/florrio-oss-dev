@@ -1,1 +1,1 @@
-// The standalone target links the shared engine_core and its manifest ABI.
+// The standalone target explicitly links engine_worker_adapter and its manifest ABI.

@@ -1,8 +1,7 @@
-# Single owner for the engine core translation-unit list.
-# Both CMake and tools/build-engine-wasm.mjs read this file; add a source here
-# once and both native and wasm builds see it.
+# Single owner for domain and offline adapter translation units.
 set(ENGINE_CORE_SOURCES
   src/model/world.cpp
+  src/model/world_config.cpp
   src/sim/death.cpp
   src/core/contracts.cpp
   src/sim/tick.cpp
@@ -16,7 +15,7 @@ set(ENGINE_CORE_SOURCES
   src/sim/targeting.cpp
   src/sim/ai_profiles.cpp
   src/model/entity_relations.cpp
-  src/diagnostics/commands.cpp
+  src/diagnostics/entities.cpp
   src/sim/petal_lifecycle.cpp
   src/sim/ai.cpp
   src/sim/loot.cpp
@@ -34,6 +33,10 @@ set(ENGINE_CORE_SOURCES
   src/net/input.cpp
   src/net/snapshot_codec.cpp
   src/net/snapshot_publisher.cpp
+)
+
+set(ENGINE_WORKER_ADAPTER_SOURCES
   src/net/worker_api.cpp
   src/wasm/abi.cpp
+  src/diagnostics/commands.cpp
 )

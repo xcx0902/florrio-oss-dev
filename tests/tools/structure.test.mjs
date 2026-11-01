@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
-import { buildInputs, verificationInputs } from '../../tools/lib/identity.mjs';
+import { buildInputs, verificationInputs, nativeInputs } from '../../tools/lib/identity.mjs';
 import { releaseEvidence } from '../../tools/verification/release.mjs';
 import { gates, gatesPassed } from '../../tools/verification/gates.mjs';
 async function fixture(t) {
@@ -28,6 +28,35 @@ test('build identity excludes tests, archived oracles and reports; verification 
 test('undeclared symbolic links in product input fail without following them', async t => {
   const root = await fixture(t); await symlink('../../archive', path.join(root, 'engine/src/link'));
   await assert.rejects(buildInputs(root), /symlink/);
+});
+test('native identity covers root build, server, dependency lock and schema; verification covers host tests', async t => {
+  const root = await fixture(t);
+  for (const folder of ['cmake', 'server/src', 'server/tests', 'schema'])
+    await mkdir(path.join(root, folder), { recursive: true });
+  for (const file of ['CMakeLists.txt', 'server/src/main.cpp', 'cmake/dependencies.lock.json', 'schema/protocol.yaml']) {
+    const before = await nativeInputs(root);
+    await writeFile(path.join(root, file), `changed ${file}`);
+    assert.notEqual((await nativeInputs(root)).sha256, before.sha256, file);
+  }
+  const native = await nativeInputs(root), verification = await verificationInputs(root);
+  await writeFile(path.join(root, 'server/tests/test_native.cpp'), '// changed test');
+  assert.equal((await nativeInputs(root)).sha256, native.sha256);
+  assert.notEqual((await verificationInputs(root)).sha256, verification.sha256);
+  await writeFile(path.join(root, 'reports/stale-native.json'), 'old evidence');
+  assert.equal((await nativeInputs(root)).sha256, native.sha256);
+});
+test('core sources cannot acquire Worker, ABI or native network/host dependencies', async () => {
+  const sources = await readFile(new URL('../../engine/sources.cmake', import.meta.url), 'utf8');
+  const group = name => sources.match(new RegExp(`set\\(${name}\\s+([\\s\\S]*?)\\)`))[1].trim().split(/\s+/);
+  const core = group('ENGINE_CORE_SOURCES'), adapter = group('ENGINE_WORKER_ADAPTER_SOURCES');
+  assert.equal(new Set([...core, ...adapter]).size, core.length + adapter.length);
+  for (const file of ['src/net/worker_api.cpp', 'src/wasm/abi.cpp', 'src/diagnostics/commands.cpp']) {
+    assert.ok(adapter.includes(file)); assert.ok(!core.includes(file));
+  }
+  for (const file of core) {
+    const source = await readFile(new URL(`../../engine/${file}`, import.meta.url), 'utf8');
+    assert.doesNotMatch(source, /current_worker_api|WorkerApi|engine\/abi\.h|boost\/|florr\/server\//, file);
+  }
 });
 test('release rejects uncompleted or inherited successful ledgers', async t => {
   const root = await fixture(t);
