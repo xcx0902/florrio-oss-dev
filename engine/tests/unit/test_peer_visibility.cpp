@@ -567,22 +567,23 @@ int main(int argc, char** argv) {
     try { return replay(argv[2], static_cast<unsigned>(std::stoul(argv[3]))); }
     catch (const std::exception& error) { std::fprintf(stderr, "%s\n", error.what()); return 1; }
   }
-  const std::array tests{
-    std::pair{"boot and unpopulated fixture", test_boot_and_fixture_bypass},
-    std::pair{"joined population", test_joined_population},
-    std::pair{"inclusive f32 rectangle edges", test_rectangle_edges},
-    std::pair{"recursive attached bounds", test_attached_bounds},
-    std::pair{"per-axis dirty targets, sparse", test_per_axis_dirty_targets<false>},
-    std::pair{"per-axis dirty targets, default dense", test_per_axis_dirty_targets<true>},
-    std::pair{"clamped visual dirty targets, sparse", test_clamped_visual_dirty_targets<false>},
-    std::pair{"clamped visual dirty targets, default dense", test_clamped_visual_dirty_targets<true>},
-    std::pair{"exit delete and sparse re-entry", test_exit_delete_and_sparse_reentry},
-    std::pair{"dense and profile re-entry", test_dense_and_profile_reentry},
-    std::pair{"known and unseen destruction", test_destroy_known_and_unseen},
-    std::pair{"death retention and restart", test_death_retains_last_view_and_restart_replaces_it},
-    std::pair{"active wide-view slot", test_active_wide_view_slot},
-    std::pair{"session reset", test_reset_clears_peer_baselines},
-  };
+  using TestCase = std::pair<const char*, void (*)()>;
+  const std::array<TestCase, 14> tests{{
+    TestCase{"boot and unpopulated fixture", test_boot_and_fixture_bypass},
+    TestCase{"joined population", test_joined_population},
+    TestCase{"inclusive f32 rectangle edges", test_rectangle_edges},
+    TestCase{"recursive attached bounds", test_attached_bounds},
+    TestCase{"per-axis dirty targets, sparse", test_per_axis_dirty_targets<false>},
+    TestCase{"per-axis dirty targets, default dense", test_per_axis_dirty_targets<true>},
+    TestCase{"clamped visual dirty targets, sparse", test_clamped_visual_dirty_targets<false>},
+    TestCase{"clamped visual dirty targets, default dense", test_clamped_visual_dirty_targets<true>},
+    TestCase{"exit delete and sparse re-entry", test_exit_delete_and_sparse_reentry},
+    TestCase{"dense and profile re-entry", test_dense_and_profile_reentry},
+    TestCase{"known and unseen destruction", test_destroy_known_and_unseen},
+    TestCase{"death retention and restart", test_death_retains_last_view_and_restart_replaces_it},
+    TestCase{"active wide-view slot", test_active_wide_view_slot},
+    TestCase{"session reset", test_reset_clears_peer_baselines},
+  }};
   std::printf("TAP version 13\n");
   unsigned failed = 0U, index = 0U;
   for (const auto& [name, run] : tests) {
