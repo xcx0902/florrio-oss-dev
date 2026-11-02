@@ -841,7 +841,7 @@ void test_snapshot_writer_fields() {
   for (std::uint8_t index = 0; index < 16; ++index)
     CHECK(dense152x_reader.read_u8().value() == index);
   for (std::uint16_t index = 0; index < 8; ++index)
-    CHECK(dense152x_reader.read_varint32().value() == 100 + index);
+    CHECK(dense152x_reader.read_varint32().value() == 100u + index);
   CHECK(dense152x_reader.read_u8().value() == 7);
   CHECK(dense152x_reader.read_u8().value() == 8);
   CHECK(dense152x_reader.eof());
