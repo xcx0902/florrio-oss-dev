@@ -270,5 +270,5 @@ runId / source identity / binary-client hash：
 - 完整验收：`2026-11-02T12-44-37.328Z-3e5a6b3d`，17/17 gate，`passed=true`、`stable=true`；engine 19/19、根 CTest 30/30、协议/schema 41/41、工具 24/24、客户端单测 143/143、跨端 9/9、浏览器 88/88，合计 305 项。预测响应 p95 30.9—45.1ms，停止收敛最大 619.8ms，render CPU p95 最大 2.3ms；6 组持续移动 999 帧停顿/回拉均为 0。
 - 发布包：`release/florrio-2.0.0-0f6a2b913cab-2026-11-02T12-44-37.328Z-3e5a6b3d/`，静态客户端 99 个资产 + 2 份清单；`SHA256SUMS` 校验通过，解包逐文件哈希、静态入口和原生 health/readiness/排空 smoke 通过。归档 SHA-256 `d4c1380d12145769faf2d8ff196ce32d2a0681b8dcf08a559ed11f1e353480e5`，manifest `901697b5d745cb3931b6fc69d71266e458861db00241ebbdca18d7146f8d96ae`。
 - 首轮完整验收 `2026-11-02T12-20-17.599Z-f4af75ef` 也通过 17/17，但打包 smoke 发现原生版本仍为 0.1.0；未发布该包，修正版本后从头重跑，首轮 ledger 保留、首轮 `release/` 目录移除。
-- 发布说明与验证摘要见 [v2.0.0](../docs/releases/v2.0.0.md)、[v2.0.0-verification](../docs/releases/v2.0.0-verification.md)。本地提交后创建 `v2.0.0` tag；本次未推送远端、未创建 GitHub Release。
+- 发布说明与验证摘要见 [v2.0.0](../docs/releases/v2.0.0.md)、[v2.0.0-verification](../docs/releases/v2.0.0-verification.md)。源码提交 `b524dec`，`main` 与 `v2.0.0` tag 已推送，GitHub Release 已创建并附 tar.gz、manifest、SHA256SUMS：<https://github.com/xcx0902/florrio-oss-dev/releases/tag/v2.0.0>。
 - M08 仍为进行中：2×8 容量、集中战斗、30 分钟浸泡、Linux 配对发行包、TLS 代理、升级/回退 smoke 均未执行；默认发布容量保持每房两人、最多两房，静态包仍保留显式离线 WASM/Worker。
