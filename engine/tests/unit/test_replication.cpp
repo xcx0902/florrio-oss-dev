@@ -3,6 +3,7 @@
 #include "engine/net/snapshot_codec.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/sim/spawn.hpp"
+#include "engine/sim/loot.hpp"
 #include <iostream>
 #include <cstdlib>
 using namespace engine;
@@ -11,7 +12,8 @@ using namespace engine::net;
 namespace {
 ViewerContext viewer(PlayerId id,unsigned epoch=7) { RoomEpoch room{}; room[0]=1; return {id,room,epoch}; }
 Publication snapshot(const World& w, const TickChanges& changes,ViewerContext v,net::ReplicationSession& s) {
-  auto p=publish(w,changes,v,s); CHECK(p); CHECK(decode_message(p->bytes,false)); return std::move(*p);
+  auto p=publish(w,changes,v,s); CHECK(p); CHECK(decode_message(p->bytes,false));
+  CHECK(decode_message(p->leaderboardBytes,false)); return std::move(*p);
 }
 bool has(const Publication& p, EntityHandle h) { return std::any_of(p.snapshot.entities.begin(),p.snapshot.entities.end(),[&](const auto& e){return e.handle==h.to_wire();}); }
 std::vector<std::uint8_t> digest(const World& w) {
@@ -119,8 +121,53 @@ void oversized_full_snapshot_fails_without_committing_session() {
   CHECK(!publish(*w,*changes,viewer(id),session));
   CHECK(!session.initialized && session.snapshotSeq==0 && session.published.empty());
 }
+void leaderboard_is_room_wide_and_tracks_scores_and_departures() {
+  auto w=test::make_world(); w->set_dimensions(f32(20000),f32(20000));
+  const auto a=test::join_player(*w,"Alice",{f32(-4000),{}}), b=test::join_player(*w,"Bob",{f32(4000),{}});
+  w->players().get(a)->loadout().set_score(f32(10)); w->players().get(b)->loadout().set_score(f32(25));
+  net::ReplicationSession sa,sb; const auto changes=*freeze_tick_changes(*w); const auto before=digest(*w);
+  const auto pa=snapshot(*w,changes,viewer(a),sa), pb=snapshot(*w,changes,viewer(b),sb);
+  CHECK(!has(pa,w->players().get(b)->player()) && !has(pb,w->players().get(a)->player()));
+  CHECK(pa.leaderboardBytes==pb.leaderboardBytes && digest(*w)==before);
+  const auto leaderboard=std::get<Leaderboard>(decode_message(pa.leaderboardBytes,false)->value);
+  CHECK(leaderboard.entries.size()==2 && leaderboard.roomEpoch==viewer(a).roomEpoch);
+  CHECK(leaderboard.entries[0].playerId==a.raw && leaderboard.entries[0].nickname=="Alice" && leaderboard.entries[0].score==10);
+  CHECK(leaderboard.entries[1].playerId==b.raw && leaderboard.entries[1].nickname=="Bob" && leaderboard.entries[1].score==25);
+  w->players().get(b)->loadout().set_score(f32(50));
+  const auto updated=snapshot(*w,*freeze_tick_changes(*w),viewer(a),sa);
+  CHECK(std::get<Leaderboard>(decode_message(updated.leaderboardBytes,false)->value).entries[1].score==50);
+  CHECK(leave_player(*w,b));
+  const auto departed=snapshot(*w,*freeze_tick_changes(*w),viewer(a),sa);
+  CHECK(std::get<Leaderboard>(decode_message(departed.leaderboardBytes,false)->value).entries.size()==1);
+}
+void newborn_drops_spin_but_old_aoi_reentry_and_resync_stay_settled() {
+  for(bool dense:{false,true}) {
+    auto w=test::make_world(); const auto a=test::join_player(*w,"Alice",{});
+    const auto old=spawn_loot_drop(*w,7,{f32(5000),{}},{});
+    test::advance_ticks(*w,3);
+    net::ReplicationSession session; auto view=viewer(a); view.dense=dense;
+    (void)snapshot(*w,*freeze_tick_changes(*w),view,session);
+    w->entities().get(old)->set_position({f32(50),{}});
+    const auto fresh=spawn_loot_drop(*w,7,{f32(100),{}},{});
+    const auto published=snapshot(*w,*freeze_tick_changes(*w),view,session);
+    const auto arriving=[&](const Publication& p,EntityHandle h) {
+      const auto it=std::find_if(p.snapshot.entities.begin(),p.snapshot.entities.end(),[&](const auto& e){return e.handle==h.to_wire();});
+      CHECK(it!=p.snapshot.entities.end()); ByteReader reader(it->fields);
+      CHECK(read_snapshot_header(reader));
+      (void)reader.read_varint32(); (void)reader.read_varint32(); (void)reader.read_varint32();
+      CHECK(reader.read_u32_le()==h.to_wire()); const auto flags=reader.read_u8();
+      CHECK(flags); return (*flags^54)==129;
+    };
+    CHECK(arriving(published,fresh) && !arriving(published,old));
+    test::advance_ticks(*w,3); session.request_full();
+    const auto full=snapshot(*w,*freeze_tick_changes(*w),view,session);
+    CHECK(!arriving(full,fresh) && !arriving(full,old));
+  }
+}
 }
 int main() {
   two_viewers_receive_same_tick_events(); aoi_exit_reentry_and_handle_generation(); public_and_self_are_separate_in_both_encodings();
-  death_camera_respawn_and_full_resync(); overflow_resync_and_slow_consumer(); oversized_full_snapshot_fails_without_committing_session(); std::cout<<"6 replication scenarios passed\n";
+  death_camera_respawn_and_full_resync(); overflow_resync_and_slow_consumer(); oversized_full_snapshot_fails_without_committing_session();
+  leaderboard_is_room_wide_and_tracks_scores_and_departures(); newborn_drops_spin_but_old_aoi_reentry_and_resync_stay_settled();
+  std::cout<<"8 replication scenarios passed\n";
 }

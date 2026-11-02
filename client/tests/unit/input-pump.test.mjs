@@ -8,12 +8,12 @@ test('input pump samples independently, clamps no world clock and neutralizes bl
   globalThis.window = win; globalThis.document = doc;
   const sent = [], calls = [];
   const app = { online: true, disposed: false, frozen: false,
-    transport: { sendInput: intent => sent.push(intent) }, network: { requestResync: () => calls.push('resync') },
+    transport: { sendInput: intent => sent.push(intent) }, network: { requestResync: () => calls.push('resync'), sendInput: intent => sent.push(intent) },
     session: { phase: 'playing', localPlayer: () => ({}), startGame: () => calls.push('join'), continueToMenu: () => calls.push('menu') },
     input: { keyboard: { consumePressed: () => false }, intent: () => ({ buttons: 1, angle: 2, strength: 200 }) },
     server: { think: () => { throw new Error('pump accessed simulation'); } } };
   try {
-    const pump = new InputPump(app); pump.sample(); pump.sample();
+    let at = 0; const pump = new InputPump(app, () => (at += 50)); pump.sample(); pump.sample();
     assert.equal(sent.length, 2);
     win.dispatchEvent(new Event('blur')); assert.deepEqual(sent.at(-1), { buttons: 0, angle: 0, strength: 0 });
     pump.sample(); assert.equal(sent.length, 3);

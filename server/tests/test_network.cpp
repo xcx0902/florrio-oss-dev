@@ -17,6 +17,9 @@ void real_two_clients_input_and_chat() {
   RunningServer server;Client a(server.port),b(server.port);a.join();b.join();
   REQUIRE(a.welcome.playerId!=b.welcome.playerId && a.welcome.roomEpoch==b.welcome.roomEpoch && a.welcome.resumeToken!=b.welcome.resumeToken);
   auto sa=a.spawn(),sb=b.spawn();REQUIRE(sa.controlledHandle!=sb.controlledHandle);
+  const auto roster=a.next<wire::Leaderboard>([](const auto& value){return value.entries.size()==2;});
+  REQUIRE(roster.roomEpoch==a.welcome.roomEpoch);
+  REQUIRE(roster.entries[0].playerId==a.welcome.playerId && roster.entries[1].playerId==b.welcome.playerId);
   a.send(wire::Input{1,sa.selfState.lifeEpoch,sa.serverTick,1,0,100});
   b.send(wire::Input{1,sb.selfState.lifeEpoch,sb.serverTick,2,3,200});
   sa=a.next<wire::Snapshot>([](const auto& s){return s.lastAppliedInputSeq==1;});

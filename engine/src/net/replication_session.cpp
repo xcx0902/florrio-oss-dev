@@ -1,11 +1,12 @@
 #include "engine/net/replication_session.hpp"
+#include "engine/sim/effects.hpp"
 #include "engine/net/snapshot_publisher.hpp"
 #include "engine/model/entity_relations.hpp"
 
 namespace engine::net {
 namespace {
 constexpr std::uint32_t publicMask = kPublicComponentMask;
-std::optional<EntityUpdate> project(const World& world, const Entity& entity, bool dense) {
+std::optional<EntityUpdate> project(const World& world, const Entity& entity, bool dense, bool arriving) {
   EntityUpdate update;
   update.handle = entity.handle.to_wire();
   const auto source = damage_source(world, entity.handle);
@@ -21,7 +22,8 @@ std::optional<EntityUpdate> project(const World& world, const Entity& entity, bo
     entity.position.x.value,entity.position.y.value,entity.angle.value,
     entity.health.value,entity.max_health.value,entity.collision_radius.value,
     entity.death_processed ? 1 : 0, false,false,true,
-    entity.ai.enabled ? std::optional<std::uint8_t>(entity.ai.activity_flags) : std::nullopt);
+    entity.ai.enabled ? std::optional<std::uint8_t>(entity.ai.activity_flags) : std::nullopt,
+    true,true,arriving);
   if (dense) codec.write_dense_public_groups(entity);
   if (const auto* owner = world.players().by_body(entity.handle)) {
     codec.write_mask_string_field(entity.handle,publicMask,4,owner->player_name());
@@ -86,7 +88,13 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
     for (const auto& entity : slots) {
       if (!entity.active || (!body && player->life_epoch == 0)) continue;
       if (entity.handle != player->player() && (!arena.intersects(view) || !publication_body_bounds(world,entity,bounds).intersects(view))) continue;
-      const auto update = project(world,entity,viewer.dense);
+      // Reuse the original creation marker: an old pickup entering the AOI
+      // starts settled, while a just-created pickup grows and spins in.
+      const bool groundWeb = entity.kind == EntityKind::kProjectile && entity.has_tag_component
+        && (entity.type_id == 29U || entity.type_id == 30U);
+      const bool arriving = (entity.kind == EntityKind::kDrop || groundWeb)
+        && !next.published.contains(entity.handle.to_wire()) && world.tick() <= entity.spawn_tick + 1U;
+      const auto update = project(world,entity,viewer.dense,arriving);
       if (!update) { valid = false; continue; }
       auto bytes = identity_bytes(*update);
       const auto prior = next.published.find(update->handle);
@@ -105,6 +113,11 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
   }
   auto& self = snapshot.selfState;
   self.lifeEpoch = static_cast<std::uint32_t>(player->life_epoch); self.life = static_cast<std::uint8_t>(player->life);
+  self.positionX = body ? body->position.x.value : 0; self.positionY = body ? body->position.y.value : 0;
+  self.radius = body ? body->collision_radius.value : 0;
+  self.arenaWidth = world.width().value; self.arenaHeight = world.height().value;
+  self.motionScale = body ? slow_multiplier(*body).value : 1;
+  self.accelerationX = body ? body->acceleration.x : 0; self.accelerationY = body ? body->acceleration.y : 0;
   self.velocityX = body ? body->velocity.x : 0; self.velocityY = body ? body->velocity.y : 0;
   self.speed = player->player_speed().value;
   self.buttons = player->input().buttons; self.angle = player->input().angle.value; self.strength = player->input().strength.value;
@@ -112,8 +125,9 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
   if (player->input_valid_until_tick >= kCounterDrainAt || player->next_spawn_tick >= kCounterDrainAt) return {};
   self.inputExpiresTick = static_cast<std::uint32_t>(player->input_valid_until_tick);
   self.nextSpawnTick = static_cast<std::uint32_t>(player->next_spawn_tick);
+  snapshot.lastReceivedInputSeq = next.receivedInputSeq;
   snapshot.lastAppliedInputSeq = player->input_session_epoch == viewer.sessionEpoch ? player->last_applied_input_sequence : 0;
-  snapshot.inputAppliedTick = player->last_control_tick == UINT64_MAX ? 0 : static_cast<std::uint32_t>(player->last_control_tick);
+  snapshot.inputAppliedTick = static_cast<std::uint32_t>(player->last_applied_input_tick);
   self.level = player->profile().level(); self.experience = player->profile().experience().value;
   self.score = player->loadout().score().value; self.zoneProgress = player->zone_progress();
   for (std::size_t i = 0; i < self.inventory.size(); ++i) self.inventory[i] = player->loadout().slots()[i].type_id;
@@ -124,8 +138,14 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
   self.killerName = player->death.killer_name;
   self.cameraX = next.viewerPosition.x.value; self.cameraY = next.viewerPosition.y.value; self.cameraScale = next.viewerScale.value;
   auto bytes = encode_message(snapshot,viewer.sessionEpoch);
-  if (!valid || !bytes || visible.size() > kMaxSnapshotEntities) return {};
+  Leaderboard leaderboard; leaderboard.roomEpoch = viewer.roomEpoch; leaderboard.serverTick = changes.serverTick;
+  world.players().for_each([&](const PlayerState& member) {
+    if (member.id().raw >= kCounterDrainAt) { valid = false; return; }
+    leaderboard.entries.push_back({static_cast<std::uint32_t>(member.id().raw),member.player_name(),member.loadout().score().value});
+  });
+  auto leaderboardBytes = encode_message(leaderboard,viewer.sessionEpoch);
+  if (!valid || !bytes || !leaderboardBytes || visible.size() > kMaxSnapshotEntities) return {};
   next.needsFull = false; next.published = std::move(visible); session = std::move(next);
-  return Publication{std::move(*bytes),std::move(snapshot)};
+  return Publication{std::move(*bytes),std::move(snapshot),std::move(*leaderboardBytes)};
 }
 } // namespace engine::net

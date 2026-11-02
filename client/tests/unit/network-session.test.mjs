@@ -16,7 +16,7 @@ class Socket {
 function setup(options = {}) {
   const sockets = [], statuses = [], values = [], records = new Map();
   const storage = { getItem: key => records.get(key) ?? null, setItem: (key, value) => records.set(key, value), removeItem: key => records.delete(key) };
-  const network = new NetworkTransport(config, { socket: () => { const socket = new Socket(); sockets.push(socket); return socket; }, storage, ...options });
+  const network = new NetworkTransport(config, { socket: () => { const socket = new Socket(); sockets.push(socket); return socket; }, storage, monotonicNow: () => 100, ...options });
   network.onClose(status => statuses.push(status)); network.onSnapshot(value => values.push(value));
   return { network, sockets, statuses, values, records };
 }
@@ -39,13 +39,20 @@ test('real codec handshake, independent inputs, heartbeat and explicit command c
   h.network.sendInput({ buttons: 3, angle: 1, strength: 1000 }); h.network.sendInput({ buttons: 0, angle: 0, strength: 0 });
   const inputs = socket.sent.filter(m => m.type === 3);
   assert.deepEqual(inputs.map(m => m.value.inputSeq), [1, 2]); assert.equal(inputs[0].value.strength, 200);
-  assert.equal(inputs[0].value.lifeEpoch, 1); assert.equal(inputs[0].value.targetTick, 2);
+  assert.equal(inputs[0].value.lifeEpoch, 1); assert.equal(inputs[0].value.targetTick, 1);
   const pending = h.network.sendCommand({ kind: CommandKind.Spawn, text: 'Alice' });
   socket.receive(5, { commandSeq: 1, code: ResultCode.Cooldown, nextSpawnTick: 50 });
   assert.equal((await pending).nextSpawnTick, 50); assert.equal(h.network.pendingCount, 0);
   socket.receive(8, { nonce: 1, serverTick: 5, monotonicMs: 42 });
   assert.equal(socket.sent.at(-1).type, 9); assert.equal(socket.sent.at(-1).value.nonce, 1);
   assert.equal(h.records.size, 1); assert.ok(!config.url.includes('token'));
+});
+test('leaderboard control traffic is accepted only from the current network session', async t => {
+  const h = setup(); t.after(() => h.network.dispose()); const socket = await connected(h), rosters = [];
+  h.network.onControl(message => { if (message.type === 12) rosters.push(message.value); });
+  const value = { roomEpoch: welcome.roomEpoch, serverTick: 1, entries: [{ playerId: 2, nickname: 'Bob', score: 25 }] };
+  socket.receive(12,value,99); assert.equal(rosters.length,0);
+  socket.receive(12,value); assert.deepEqual(rosters,[value]);
 });
 test('gap/decode failure are atomic and request one bounded resync, full rebind drops old entities/events', async t => {
   const h = setup(); t.after(() => h.network.dispose()); const socket = await connected(h);
@@ -86,6 +93,20 @@ test('pending commands time out, clear on life change/close/dispose and enforce 
   assert.equal(socket.onmessage, null); assert.equal(socket.onclose, null); assert.equal(socket.readyState, 3);
   await assert.rejects(h.network.connect('Alice'), /disposed/);
 });
+test('spawn confirmation survives its own LifeEpoch change in either publication order', async t => {
+  for (const initialLife of [0,1]) for (const snapshotFirst of [true,false]) {
+    const h=setup();t.after(()=>h.network.dispose());
+    const socket=await connected(h,selfState({lifeEpoch:initialLife,life:initialLife?3:0}));
+    const spawn=h.network.sendCommand({kind:CommandKind.Spawn,text:'Alice'});
+    const swap=assert.rejects(h.network.sendCommand({kind:CommandKind.Swap}),/life changed/);
+    const body=()=>socket.receive(6,snapshot({full:false,snapshotSeq:2,selfState:selfState({lifeEpoch:initialLife+1,life:1})}));
+    const result=()=>socket.receive(5,{commandSeq:1,code:ResultCode.Ok});
+    if(snapshotFirst) {body();assert.equal(h.network.pendingCount,1);result();}
+    else {result();body();}
+    assert.equal((await spawn).code,ResultCode.Ok);await swap;
+    assert.equal(h.network.pendingCount,0);
+  }
+});
 test('version/full-room/invalid-token/maintenance failures terminate and clear tokens without retry', async () => {
   for (const code of [ErrorCode.Version, ErrorCode.RoomFull, ErrorCode.Session, ErrorCode.Stopping]) {
     const h = setup(); const promise = assert.rejects(h.network.connect('Alice')); const socket = h.sockets[0]; socket.open();
@@ -101,4 +122,18 @@ test('handshake deadline, expired grace and write backpressure cannot leave pend
   socket.bufferedAmount = LIMITS.maxQueuedWriteBytes;
   slow.network.sendInput({ buttons: 1, angle: 0, strength: 200 }); assert.equal(slow.network.state, 'reconnecting');
   now += 11000; slow.network.dispose(); assert.equal(slow.network.timerCount, 0);
+});
+
+
+test('clock probes bind nonce/echo to this socket and targetTick advances independently of snapshot receipt', async t => {
+  let at=100;const h=setup({monotonicNow:()=>at});t.after(()=>h.network.dispose());
+  const socket=await connected(h,selfState({lifeEpoch:1,life:1}));
+  const probe=socket.sent.find(m=>m.type===8).value;
+  at=180;socket.receive(9,{nonce:probe.nonce,serverTick:2,monotonicMs:probe.monotonicMs,serverMonotonicMs:10000,serverTimeMs:100});
+  assert.equal(h.network.clock.rttMs,80);assert.equal(h.network.clock.sampleCount,1);
+  socket.receive(9,{nonce:probe.nonce,serverTick:200,monotonicMs:probe.monotonicMs,serverMonotonicMs:10000,serverTimeMs:10000});
+  assert.equal(h.network.clock.sampleCount,1);
+  at=230;h.network.sendInput({buttons:0,angle:0,strength:200});
+  assert.equal(socket.sent.at(-1).value.targetTick,3);assert.equal(h.network.serverTick,1);
+  socket.onclose({});assert.equal(h.network.clock.sampleCount,0);assert.equal(h.network.clock.rttMs,0);
 });

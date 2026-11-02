@@ -48,6 +48,7 @@ ResultCode PeerSession::receive_input(const World& world, const Input& input, st
   future_[target] = input;
   // One entry for the immediate phase plus at most two future phases.
   receivedInput_ = input.inputSeq;
+  replication.receivedInputSeq = receivedInput_;
   return ResultCode::Ok;
 }
 void PeerSession::prepare_tick(World& world) {

@@ -33,9 +33,55 @@ enum class EventKind : std::uint8_t { Hit = 1, Pickup = 2, Chat = 3 };
 inline bool valid(EventKind v) { return v == EventKind::Hit || v == EventKind::Pickup || v == EventKind::Chat; }
 inline constexpr std::array<std::uint32_t, 20> kPublicFields = {2,4,7,8,9,11,12,22,26,28,31,36,38,49,50,53,54,55,59,62};
 inline constexpr std::uint32_t kPublicComponentMask = 571998208U;
+struct LeaderboardEntry {
+  std::uint32_t playerId{};
+  std::string nickname{};
+  float score{};
+};
+inline void writeLeaderboardEntry(WireWriter& w, const LeaderboardEntry& v) {
+  w.u32(v.playerId, 1, 4294967295);
+  w.text(v.nickname, 128, 32, "nickname");
+  w.f32(v.score, 0, INFINITY);
+
+}
+inline LeaderboardEntry readLeaderboardEntry(WireReader& r) {
+  LeaderboardEntry v;
+  v.playerId = r.u32(1, 4294967295);
+  v.nickname = r.text(128, 32, "nickname");
+  v.score = r.f32(0, INFINITY);
+
+  return v;
+}
+struct Leaderboard {
+  std::array<std::uint8_t, 16> roomEpoch{};
+  std::uint32_t serverTick{};
+  std::vector<LeaderboardEntry> entries{};
+};
+inline void writeLeaderboard(WireWriter& w, const Leaderboard& v) {
+  w.bytes(v.roomEpoch, 16, 16); if (std::all_of(v.roomEpoch.begin(),v.roomEpoch.end(),[](auto b){return b==0;})) w.fail();
+  w.u32(v.serverTick, 0, 4294967295);
+  w.length(v.entries.size(), 0, 8, true); for (const auto& item : v.entries) { writeLeaderboardEntry(w, item); }
+
+}
+inline Leaderboard readLeaderboard(WireReader& r) {
+  Leaderboard v;
+  r.bytes(v.roomEpoch, 16, 16); if (std::all_of(v.roomEpoch.begin(),v.roomEpoch.end(),[](auto b){return b==0;})) r.fail();
+  v.serverTick = r.u32(0, 4294967295);
+  { const auto count = r.length(0, 8, true); v.entries.resize(count); for (std::size_t i = 0; i < count; ++i) { v.entries[i] = readLeaderboardEntry(r); } }
+
+  return v;
+}
 struct SelfState {
   std::uint32_t lifeEpoch{};
   std::uint8_t life{};
+  float positionX{};
+  float positionY{};
+  float radius{};
+  float arenaWidth{};
+  float arenaHeight{};
+  float motionScale{};
+  double accelerationX{};
+  double accelerationY{};
   double velocityX{};
   double velocityY{};
   float speed{};
@@ -63,6 +109,14 @@ struct SelfState {
 inline void writeSelfState(WireWriter& w, const SelfState& v) {
   w.u32(v.lifeEpoch, 0, 4294967295);
   w.u8(v.life, 0, 3);
+  w.f32(v.positionX, -INFINITY, INFINITY);
+  w.f32(v.positionY, -INFINITY, INFINITY);
+  w.f32(v.radius, 0, INFINITY);
+  w.f32(v.arenaWidth, 0, INFINITY);
+  w.f32(v.arenaHeight, 0, INFINITY);
+  w.f32(v.motionScale, 0, INFINITY);
+  w.f64(v.accelerationX, -INFINITY, INFINITY);
+  w.f64(v.accelerationY, -INFINITY, INFINITY);
   w.f64(v.velocityX, -INFINITY, INFINITY);
   w.f64(v.velocityY, -INFINITY, INFINITY);
   w.f32(v.speed, -INFINITY, INFINITY);
@@ -92,6 +146,14 @@ inline SelfState readSelfState(WireReader& r) {
   SelfState v;
   v.lifeEpoch = r.u32(0, 4294967295);
   v.life = r.u8(0, 3);
+  v.positionX = r.f32(-INFINITY, INFINITY);
+  v.positionY = r.f32(-INFINITY, INFINITY);
+  v.radius = r.f32(0, INFINITY);
+  v.arenaWidth = r.f32(0, INFINITY);
+  v.arenaHeight = r.f32(0, INFINITY);
+  v.motionScale = r.f32(0, INFINITY);
+  v.accelerationX = r.f64(-INFINITY, INFINITY);
+  v.accelerationY = r.f64(-INFINITY, INFINITY);
   v.velocityX = r.f64(-INFINITY, INFINITY);
   v.velocityY = r.f64(-INFINITY, INFINITY);
   v.speed = r.f32(-INFINITY, INFINITY);
@@ -326,6 +388,7 @@ struct Snapshot {
   std::uint32_t snapshotSeq{};
   std::uint32_t baselineId{};
   std::uint32_t serverTick{};
+  std::uint32_t lastReceivedInputSeq{};
   std::uint32_t lastAppliedInputSeq{};
   std::uint32_t inputAppliedTick{};
   std::uint32_t controlledHandle{};
@@ -340,6 +403,7 @@ inline void writeSnapshot(WireWriter& w, const Snapshot& v) {
   w.u32(v.snapshotSeq, 1, 4294967295);
   w.u32(v.baselineId, 1, 4294967295);
   w.u32(v.serverTick, 0, 4294967295);
+  w.u32(v.lastReceivedInputSeq, 0, 4294967295);
   w.u32(v.lastAppliedInputSeq, 0, 4294967295);
   w.u32(v.inputAppliedTick, 0, 4294967295);
   w.u32(v.controlledHandle, 0, 4294967295);
@@ -356,6 +420,7 @@ inline Snapshot readSnapshot(WireReader& r) {
   v.snapshotSeq = r.u32(1, 4294967295);
   v.baselineId = r.u32(1, 4294967295);
   v.serverTick = r.u32(0, 4294967295);
+  v.lastReceivedInputSeq = r.u32(0, 4294967295);
   v.lastAppliedInputSeq = r.u32(0, 4294967295);
   v.inputAppliedTick = r.u32(0, 4294967295);
   v.controlledHandle = r.u32(0, 4294967295);
@@ -408,11 +473,15 @@ struct Pong {
   std::uint32_t nonce{};
   std::uint32_t serverTick{};
   double monotonicMs{};
+  double serverMonotonicMs{};
+  double serverTimeMs{};
 };
 inline void writePong(WireWriter& w, const Pong& v) {
   w.u32(v.nonce, 1, 4294967295);
   w.u32(v.serverTick, 0, 4294967295);
   w.f64(v.monotonicMs, 0, INFINITY);
+  w.f64(v.serverMonotonicMs, 0, INFINITY);
+  w.f64(v.serverTimeMs, 0, INFINITY);
 
 }
 inline Pong readPong(WireReader& r) {
@@ -420,6 +489,8 @@ inline Pong readPong(WireReader& r) {
   v.nonce = r.u32(1, 4294967295);
   v.serverTick = r.u32(0, 4294967295);
   v.monotonicMs = r.f64(0, INFINITY);
+  v.serverMonotonicMs = r.f64(0, INFINITY);
+  v.serverTimeMs = r.f64(0, INFINITY);
 
   return v;
 }
@@ -461,7 +532,7 @@ inline CloseReason readCloseReason(WireReader& r) {
 
   return v;
 }
-using MessageValue = std::variant<Hello, Welcome, Input, Command, CommandResult, Snapshot, ResyncRequest, Ping, Pong, Error, CloseReason>;
+using MessageValue = std::variant<Hello, Welcome, Input, Command, CommandResult, Snapshot, ResyncRequest, Ping, Pong, Error, CloseReason, Leaderboard>;
 struct Message { std::uint32_t sessionEpoch; MessageValue value; };
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Hello& value, std::uint32_t sessionEpoch) {
   if (!(sessionEpoch == 0)) return {};
@@ -518,6 +589,11 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const CloseReason
   WireWriter w; writeCloseReason(w, value);
   return w.frame(11, sessionEpoch, kMaxServerFrameBytes);
 }
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Leaderboard& value, std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) return {};
+  WireWriter w; writeLeaderboard(w, value);
+  return w.frame(12, sessionEpoch, kMaxServerFrameBytes);
+}
 inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes, bool fromClient) {
   auto h = unframe(bytes, fromClient ? kMaxClientFrameBytes : kMaxServerFrameBytes); if (!h) return {};
   WireReader r(bytes.subspan(16));
@@ -533,6 +609,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
     case 9: { if (!(h->sessionEpoch != 0)) return {}; auto v = readPong(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
     case 10: { if (!(true) || fromClient) return {}; auto v = readError(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
     case 11: { if (!(true) || fromClient) return {}; auto v = readCloseReason(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
+    case 12: { if (!(h->sessionEpoch != 0) || fromClient) return {}; auto v = readLeaderboard(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
     default: return {};
   }
 }

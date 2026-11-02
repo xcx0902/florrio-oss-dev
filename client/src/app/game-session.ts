@@ -79,11 +79,20 @@ export class GameSession {
     this.lastLevel = 1;
     this.status = 'Connecting…';
     if (app.online) {
+      if (app.network) {
+        app.world.configureNetwork(app.network.clock, app.config.prediction !== false, () => app.network?.requestResync());
+        app.network.onInput((input, eventAt) => app.world.prediction.input(input, eventAt));
+      }
       this.status = '';
-      app.transport.onControl(message => { if (message.type === 2) this.networkIdentity = message.value; });
+      app.transport.onControl(message => {
+        if (message.type === 2) this.networkIdentity = message.value;
+        if (message.type === 12 && this.networkIdentity
+            && message.value.roomEpoch.every((byte, index) => byte === this.networkIdentity!.roomEpoch[index]))
+          app.world.applyLeaderboard(message.value);
+      });
       app.transport.onSnapshot(event => { if (event.kind === 'network' && !app.disposed) this.applyNetwork(event.value); });
       app.transport.onClose(({ state, message }) => {
-        if (state !== 'connected') this.status = message;
+        if (state !== 'connected') { this.status = message; app.world.prediction.reset(); app.world.snapshotBuffer.reset(); }
         if (state === 'reconnecting' || state === 'error') this.spawning = false;
       });
     }
@@ -114,12 +123,18 @@ export class GameSession {
     world.applyNetworkSnapshot(value, welcome.playerId, now);
     this.nextSpawnTick = value.snapshot.selfState.nextSpawnTick;
     this.deathLifecycle.observe(world);
-    if (this.deathLifecycle.dead && (this.phase === 'joining' || this.enteredWorld)) {
+    // Delayed snapshots from the previous dead life can arrive while a spawn
+    // is pending. Keep joining until the new body reaches prepareFrame so its
+    // final menu pass still captures the entry transition.
+    if (this.deathLifecycle.dead && this.enteredWorld) {
       if (!hadDeath) this.enterPlaying();
       this.enterDead(now);
     }
     if (world.healthyPlayer() && this.phase !== 'menu' && this.phase !== 'returning') {
-      this.spawning = false; this.enterPlaying();
+      // Joining is confirmed by prepareFrame, which retains the last menu
+      // pass and captures it before starting the entry iris.
+      this.spawning = false;
+      if (this.phase !== 'joining') this.enterPlaying();
     }
   }
   applyPacket = (packet: Uint8Array, at: number): boolean => {
@@ -157,7 +172,7 @@ export class GameSession {
       if (this.app.disposed || generation !== this.generation)
         return;
       if (this.app.online) {
-        if (this.app.world.selfState?.life === 1) { this.enterPlaying(); return; }
+        if (this.app.world.selfState?.life === 1) return;
         await this.spawnNetwork(); return;
       }
       this.pendingSpawn = this.app.menuControls.name.value.trim();

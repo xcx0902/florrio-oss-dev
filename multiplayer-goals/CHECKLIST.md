@@ -1,6 +1,6 @@
 # 多人联机执行跟踪
 
-> M00—M06 已完成；M07—M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
+> M00—M07 已完成；M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
 
 ## 1. 阶段看板
 
@@ -13,7 +13,7 @@
 | M04 协议与复制 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T02-58-18.343Z-05f8fff5`；`reports/multiplayer/m04/2026-11-01T02-58-18.343Z-05f8fff5/summary.json` | 17/17 gate；engine 18/18、根 CTest 23/23；12 个新增 native 场景、259 个 Node/浏览器测试与 ASan/UBSan |
 | M05 原生网络服务 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T09-57-01.230Z-e1098481`；`reports/multiplayer/m05/2026-11-01T09-57-01.230Z-e1098481/summary.json` | 17/17 gate；engine 18/18、根 CTest 28/28、259 个 Node/浏览器测试；29 个新增宿主场景及 ASan/UBSan |
 | M06 联机客户端 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T14-40-27.450Z-12bf3d91`；`reports/multiplayer/m06/2026-11-01T14-40-27.450Z-12bf3d91/summary.json` | 17/17 gate；engine 18/18、根 CTest 29/29、273 个 Node/浏览器测试；真实双浏览器 PVP 全程无 WASM/Worker |
-| M07 延迟与预测 | 未开始 | — | — | — |
+| M07 延迟与预测 | 已完成 | 工作区实现，未创建提交 | `2026-11-02T11-11-30.262Z-39513c97`；`reports/multiplayer/m07/2026-11-02T11-11-30.262Z-39513c97/summary.json` | 17/17 gate；engine 19/19、根 30/30 CTest；16 组延迟对照与 250ms PVP，预测响应 p95 29.6—40.7ms |
 | M08 验收与发布 | 未开始 | — | — | — |
 
 ## 2. 可执行任务清单
@@ -74,10 +74,10 @@
 
 ### M07：延迟
 
-- [ ] MP-070：真实网络时钟、targetTick 与采用/TTL 反馈。
-- [ ] MP-071：远端按 serverTick 的快照缓冲/插值/有限外推。
-- [ ] MP-072：纯移动 C++/TS 契约及有界预测/重演/校正。
-- [ ] MP-073：死亡/重生/epoch 清理，RTT/抖动矩阵和实际体验报告。
+- [x] MP-070：真实网络时钟、targetTick 与采用/TTL 反馈。
+- [x] MP-071：远端按 serverTick 的快照缓冲/插值/有限外推。
+- [x] MP-072：纯移动 C++/TS 契约及有界预测/重演/校正。
+- [x] MP-073：死亡/重生/epoch 清理，RTT/抖动矩阵和实际体验报告。
 
 ### M08：交付
 
@@ -236,3 +236,30 @@ runId / source identity / binary-client hash：
 - 规则或接口具体化：字段投影复用 M04 的生成 codec/NetworkSnapshotDecoder，私有 enrichment 集中在 WorldState，无需复制修改旧 v1 snapshot-projection/net/input。现有离线资产继续显式保留，默认在线路径不加载。Input targetTick 暂取最近收到的 serverTick + 1；自动恢复采用默认 grace 的十秒保守上限，更短期限由服务端拒绝，更长期限不延长客户端重试。
 - 未解决问题与后续阶段：M06 无未解决阻塞。网络时钟、采用反馈、快照缓冲与本地移动预测属于 M07；Linux/TLS 代理发布、2×8 容量、30 分钟浸泡和版本发布属于 M08，未宣称这些验收通过。
 - 下一步：M07，按服务端 tick 建立网络时钟、远端快照缓冲和纯移动预测/校正，保留当前权威生命、伤害、掉落与命令边界。
+
+
+## 11. M07 完成交接
+
+- 阶段 / 任务编号：M07；MP-070—MP-073 全部完成，2026-11-02（Asia/Shanghai）。
+- 实际提交：工作区实现，未创建 Git 提交；保留进入本轮时已有修改。`reports/multiplayer/m07/2026-11-02T11-11-30.262Z-39513c97/source-changes.json` 保存基准 HEAD、完整修改文件内容和 SHA256；`reports/multiplayer/m07/entry.patch` 保存进入本轮时的 tracked diff，基准 HEAD 不是 M07 提交号。
+- 实现范围：schema 生成独立 motion C++/TS 常量，selfState 增加真实 position、f64 velocity/acceleration、慢速倍率、身体半径与边界；快照区分 received/adopted seq、实际采用 tick、有效意图与 TTL。Pong 返回宿主单调时间和真实模拟时间；客户端滚动采样 RTT/偏移，targetTick 不再依赖最近收到的快照。接口见 [延迟与预测](../docs/multiplayer/latency-and-prediction.md)。
+- 插值 / 预测：每 handle 最多 8 份 tick 排序样本，初始 100ms、自适应 50—200ms 延迟，最多外推 50ms 后冻结。纯移动契约保留 f32 narrowing、f64 速度、摩擦分组、慢速与夹取的实际顺序及中间 dirty 标记。输入历史最多 256 条，按阶段合并、迟到映射和采用 ACK 重演最多 4 tick；小显示偏移至多 100ms 衰减，超过身体半径直接对齐。缓存超限 / 持续超出前瞻范围清环并请求一次 resync。
+- 生命周期：full、死亡、body 删除、重生、断线 / 离开及房间 / 会话换代清理输入和对应历史。相机与健康本地身体共用显示位置；自己的附着花瓣只有限平移。权威实体表、血量、掉落、装备与交互权限不由预测修改。修复 retained death transform 查询已删除 handle、旧生命死亡快照中断重生入场，以及 Spawn 确认被自身 LifeEpoch 换代取消的竞争。
+- 执行命令：`npm run schema:generate`、`npm run build:engine`、`npm run build:server`、`npm run build:engine:wasm`、`npm run build:client`、`npm run build:dist-next -- --skip-build`、`node tools/run-tests.mjs client-unit`、`node tools/run-tests.mjs integration`、`npm run test:multiplayer:baseline`；完整验收为 `env 'CHROME_PATH=/private/tmp/florr-m05-chrome/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing' npm run test:all`。固定 Chrome `156.0.8078.47`，真实 socket / 浏览器在授权的沙箱外运行。
+- 测试数量与结果：完整 **17/17 gate**，`passed=true`、`stable=true`；独立 engine **19/19 CTest**、根构建 **30/30 CTest**；Node / 浏览器 **301/301**（41 单元、24 工具、140 客户端单元、9 跨端、87 浏览器），无跳过。8 类纯移动轨迹共 640 步，C++ 与提取前独立计算精确相同，TS 位置精确一致、f64 速度容差 1e-14；ASan/UBSan 的 motion/protocol/replication 3/3 通过。冻结 M00 双进程重放继续匹配。原有 3 profile × 4 场景 × 5 次 × 600 帧渲染及 native/WASM/Worker 性能预算通过，未减少采样或放宽预算。
+- 延迟实测：0/80/150/250ms RTT × 0/±20ms RTT 抖动 × 预测开关，共 16 组，128 次真实按键。预测开启的 DOM 事件到完成绘制的身体位移 p95 **29.6—40.7ms**；关闭预测为 **141.9—324.5ms**。250ms RTT 停止后最慢 **580.0ms** 收敛至距最新权威轨迹 ≤1 world unit，且必须先收到松键中立输入的实际采用 ACK；最终位置误差最大 0.000533。16 组实际 render CPU p95 最大 **2.5ms**（原预算 8ms）；逐组 RTT、server processing、误差 / 校正次数与距离、CPU、缓存深度、resync 和恢复均保存于 matrix。
+- 真实闭环：250ms RTT、±20ms 抖动下，预测 on/off 两组均通过完整双 BrowserContext 移动、攻击、防御、死亡、掉落、重生、恢复和两房隔离；权威血量始终等于 decoder 数据。每场两名观察者使用相反预测设置，下一场互换；双方同一 serverTick 的血量和掉落逐项一致。两场胜负摘要一致：胜者 Alice、败者 health=0、重生 LifeEpoch=2、房内人数=2。300ms 有序流阻塞与 socket 中断后恢复新 SessionEpoch / full；离开后计时器、预测和快照历史归零，在线无 Worker/WASM 请求。额外 40/40 次真实首次入场通过。
+- runId：`2026-11-02T11-11-30.262Z-39513c97`；UTC 完成时间 `2026-11-02T11:32:01.607Z`。产品 source identity：`364c828404aa7a8de86ec21e1cfec0d4d7a06aa7f72049df02db44c65bfccabd`；verification：`c0c4fc6f21fd91417d988f7004938238a8d7d72b39abd402e538ed15c93f34fd`；native source：`0c091be94dd18075771a1223de1f9f68c59430ab35d700a7d3fc1ecc3603d8d0`。
+- binary/client hash：native host `ae645f9f18d57fbaac174b479a644c132d18d0574cf04bb2cdfeecbee2571ee3`；browser fixture `1f049da57016b9794f98388edd0ec7ecdc796af3b4ca350ab85c54060e89f65e`；WASM `53ca5377524f099c30a855d028c107962013cafe47a3cbcda4559c6eaf536414`；client/wasm/static `983c7ad69e8cc3ca3c5c5e3cae7141b917e27148d35a26ae1c09262e2ef4bc03`；delivery tree `9d3b8e38b8d6cc8bd3a6a76974f11643bff823470e7d7b6d2c52337ba3cd817c`。
+- 报告路径：`reports/multiplayer/m07/2026-11-02T11-11-30.262Z-39513c97/{summary,build,ctest,baseline,latency-matrix,pvp-on,pvp-off,sanitizer,source-changes}.json`；`accepted/index.json` 冻结 gate 日志、报告、交付 manifest、native toolchain、编译命令及哈希。完整账本为 `reports/runs/2026-11-02T11-11-30.262Z-39513c97/run.json`；`releaseEvidence()` 真实通过，M07 matrix/PVP 报告纳入该账本的哈希校验。报告依仓库惯例不入 Git。
+- 失败与修复：早期事件定时器提前触发而丢失待发送意图，实测 p95=62.7ms，改为按截止时间重排；提取移动时一度漏掉边界夹取前的位置 dirty 标记，原 peer visibility 回归发现并修复。第一次完整验收 `2026-11-02T10-30-35.776Z-3ea5ecaf` 为 85/86 浏览器通过：延迟代理逐块独立计时器会乱序转发字节，真实 TCP 双向字节比较复现失败；改成每方向单一有序队列并加入逐字节回归。它还暴露 Spawn 生命周期竞争，补齐确认先后两种顺序回归。第二次 `2026-11-02T10-42-05.520Z-6303c2c7` 的 87/87 浏览器及矩阵通过后，主动在渲染性能首轮中断，强化停止收敛的中立输入采用 ACK 条件。第三次 `2026-11-02T10-48-09.747Z-d3442dce` 的 85/87 浏览器通过，250ms 一组仅记录 7/8 次停止：驱动在 600ms 后已发下一输入，短于 1 秒验收预算；改为每次观察 1100ms，仍严格拒绝超过 1000ms 的收敛；同轮另有一次 native fixture 排空 hook 达到原有 5s 截止时间，后续独立 PVP 与最终全量通过，未放宽截止时间。第四次 `2026-11-02T11-07-13.785Z-d008387f` 在根 CTest 为 29/30：既有 slow-consumer 注入整 MiB 时仍有普通快照 / 排行榜待写；测试改为填满剩余容量，仍断言总量恰为 1MiB 且多 1 字节拒绝，20 次重复通过，生产上限不变。PVP 扩展对照曾错误要求不同实时战斗的随机掉落完全相同，实测出现 [19,25,25] 与 [25,25,25]；现改为同一共享战斗、同一 serverTick 的预测开关观察者严格比较，保留每场随机结果，并互换角色模式重跑。开发期还保留错误使用旧 dist 的一次失败，随后核对构建退出状态并重建；所有失败 / 中断 ledger、TAP、矩阵、相关原始源码与观察保留在 `reports/multiplayer/m07/failures/` 及同级 attempt 日志。
+- 规则或接口具体化：预测环保存输入、seq / 计划阶段，并按当前权威基点重算至多 4 tick；当前预测状态按渲染时刻缓存，不为每个被合并 packet 保存独立状态，避免把包数当 tick 数。开发中 v2 字段布局已扩展，旧 v2 客户端 / 服务端须配套重建；没有改变领域玩法数值。随机掉落保持原有 RNG 时序，不人为固定死亡抽样；同 tick 对照证明预测不改权威结果，跨独立实时战斗只比较可重复的胜负 / 身份事务。离散权威状态在对应快照 / 事件 receipt 原子应用，不等待视觉 delay。
+- 未解决问题与后续阶段：M07 无未解决阻塞。实际网络测试使用同机原生服务和有序 TCP 字节流延迟 / 抖动代理，不声称完成运营商网络或真实丢包重传认证；动态碰撞 / 击退仍接受服务端校正，没有命中回溯。Linux/TLS 发布、2×8 容量与 30 分钟浸泡留给 M08。
+- 下一步：M08，按当前实际能力执行独立多人验收、容量和生命周期压力、Linux 配对发布包与 TLS 代理 / 健康 / 排空 / 回退。
+
+### 11.1 M07 后续修复：正常游玩画面抖动（2026-11-02）
+
+- 已修复整 50ms 预测状态直接显示导致的停顿跳动：显示按估计模拟时间在相邻固定步之间插值，并移除额外提前的一步；包含插值端点的重演仍不超过 4 tick。时钟偏移 / 自适应 delay 渐进校准，自身花瓣以同缓冲时间的身体坐标计算有限平移。物理数值和服务端代码保持本阶段已验收版本。
+- 新增持续移动浏览器回归进入 client-integration / delivery 清单、源码身份和浏览器 gate 报告，补齐原首次响应 / 最终收敛测试遗漏的中间连续性。0/80/250ms RTT、预测开关共 6 组，996 个稳定移动帧间隔，身体 / 相机停顿及回拉均为 0；修复前预测开启时约 66% 帧间隔停顿。
+- 定向回归：143/143 客户端单元、88/88 浏览器、41/41 协议 / schema 单元、24/24 工具、9/9 跨端，合计 305 项通过；16 组延迟矩阵及 250ms RTT 双浏览器 PVP 继续通过。预测响应 p95 31.5—42.6ms，停止收敛最大 571.8ms，render CPU p95 最大 2.4ms。已重新构建 / 校验 `dist-next`，未重新执行整套 17 gate 发布 / 离线性能认证。
+- 报告：`reports/multiplayer/jitter-fix/summary.json`，记录 `jitter-fix-2026-11-02`、源码 / 构建身份及日志哈希；同目录保留 `before.json`、`smoothness.json`、`latency-matrix.json`、PVP 和单元 / 浏览器日志。历史 M07 完整验收目录保持原样。

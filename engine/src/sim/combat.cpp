@@ -143,7 +143,8 @@ std::size_t resolve_contacts(World& world) {
       Entity& a = *bodies[first].entity;
       Entity& b = *bodies[second].entity;
       if (!a.active || !b.active || b.health.value <= 0.0F) continue;
-      if (a.kind == EntityKind::kPetal && b.kind == EntityKind::kPetal) continue;
+      if (a.kind == EntityKind::kPetal && b.kind == EntityKind::kPetal
+          && same_controlling_root(world, a.handle, b.handle)) continue;
       if (a.kind == EntityKind::kDrop || b.kind == EntityKind::kDrop) continue;
       if (a.kind != EntityKind::kPlayer && a.kind != EntityKind::kMob && a.kind != EntityKind::kPetal && a.kind != EntityKind::kProjectile) continue;
       if (b.kind != EntityKind::kPlayer && b.kind != EntityKind::kMob && b.kind != EntityKind::kPetal && b.kind != EntityKind::kProjectile) continue;

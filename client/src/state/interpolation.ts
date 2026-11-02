@@ -35,6 +35,7 @@ export interface InterpolatedTransform { readonly x: number; readonly y: number;
  * have separate scalar clocks in the original receiver. */
 export function interpolateCameraTarget(entity: EntityState, now: number, durationMs = 120): { x: number; y: number } {
   const displayed = interpolateEntity(entity, now, durationMs);
+  if (entity.networkTransform) return { x: displayed.x, y: displayed.y };
   const scalar = (current: number | undefined, previous: number | undefined,
     received: number | undefined, fallback: number): number => current === undefined ? fallback
     : Math.fround((previous ?? current) + Math.fround(current - (previous ?? current))
@@ -50,6 +51,10 @@ export function interpolateEntity(entity: EntityState, now: number, durationMs =
 export interface MutableTransform { x:number; y:number; angle:number; radius?:number; }
 /** Same scalar arithmetic, with caller-owned storage for the render hot path. */
 export function interpolateEntityInto(entity: EntityState, now: number, result: MutableTransform, durationMs = 120): MutableTransform {
+  if (entity.networkTransform) {
+    result.x = entity.x; result.y = entity.y; result.angle = entity.angle; result.radius = entity.radius;
+    return entity.networkTransform(now, result);
+  }
   const tx = clamp01((now - (entity.receivedXAt ?? entity.receivedAt)) * (1 / durationMs));
   const ty = clamp01((now - (entity.receivedYAt ?? entity.receivedAt)) * (1 / durationMs));
   const ta = clamp01((now - (entity.receivedAngleAt ?? entity.receivedAt)) * (1 / durationMs));

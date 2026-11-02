@@ -8,7 +8,11 @@ struct NetworkTestAccess {
     REQUIRE(!server.impl_->connections.empty());return server.impl_->connections.begin()->second;
   }
   static void slow(NetworkServer& server) {
-    auto c=connection(server);REQUIRE(c->send(Bytes(wire::kMaxQueuedWriteBytes,1)));
+    auto c=connection(server);
+    // A normal snapshot/leaderboard write can still be active after spawn.
+    // Fill the actual remaining budget, then prove one extra byte is refused.
+    REQUIRE(c->queuedBytes_<wire::kMaxQueuedWriteBytes);
+    REQUIRE(c->send(Bytes(wire::kMaxQueuedWriteBytes-c->queuedBytes_,1)));
     REQUIRE(c->writing_ && c->queuedBytes_==wire::kMaxQueuedWriteBytes);
     REQUIRE(!c->send({1}));c->abort(CloseCause::SlowConsumer);c->abort(CloseCause::SlowConsumer);
   }

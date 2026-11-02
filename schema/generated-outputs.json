@@ -27,9 +27,14 @@
       "sha256": "bcc8458d05e92986a770970314c797c2ebb02ee613ec5a620b202e455808758c"
     },
     {
+      "path": "client/src/schema/motion.ts",
+      "bytes": 656,
+      "sha256": "4307591555e47b04590a914dcf6baa27da31304f625709c1204cf51db40f51d5"
+    },
+    {
       "path": "client/src/schema/multiplayer.ts",
-      "bytes": 20318,
-      "sha256": "5bf41ff5413ff4396dc45be5973a461dd980bc9384dec4524dadd800a6067b0e"
+      "bytes": 23226,
+      "sha256": "2933df14e8fd404f94dde08524f3a30c66fdd75d7f27b6bcd539fc6778a5fc48"
     },
     {
       "path": "client/src/schema/packet-key.ts",
@@ -53,8 +58,8 @@
     },
     {
       "path": "docs/multiplayer-protocol.md",
-      "bytes": 8133,
-      "sha256": "039cd3939fc7f99f53e768df3e9af776a819b39b98336d03f097cb410c925588"
+      "bytes": 9022,
+      "sha256": "b2c02c069f7eca8f733d1ef41ad283d988ecf3b1d4af3531de0a0001402984e8"
     },
     {
       "path": "engine/include/engine/catalog/catalog_types.hpp",
@@ -83,8 +88,8 @@
     },
     {
       "path": "engine/include/engine/net/generated_multiplayer.hpp",
-      "bytes": 22602,
-      "sha256": "e31c6aad88b4038bbe6a21869b31546022809765d51e40e77f2155d888cca90d"
+      "bytes": 25629,
+      "sha256": "f4216dd6ac911f90b38b313b569b764fe7aeb9a0079ac4660c1c22b2572b4d66"
     },
     {
       "path": "engine/include/engine/net/generated_protocol.hpp",
@@ -95,6 +100,11 @@
       "path": "engine/include/engine/net/packet_key.hpp",
       "bytes": 1813,
       "sha256": "361c4b7f7be5b7b2f1f20b0166b824e584a3026a798a0f7c38ed0a2b51dabd6e"
+    },
+    {
+      "path": "engine/include/engine/sim/generated_motion.hpp",
+      "bytes": 1154,
+      "sha256": "9037cea494fb1b3218cc838a18a41d0bb8c772f309ed9ef57b14c049261a88e1"
     },
     {
       "path": "schema/catalogs/drop-chances.json",

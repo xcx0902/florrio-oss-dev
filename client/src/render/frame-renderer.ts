@@ -229,7 +229,12 @@ export class FrameRenderer {
       };
     }
     const drawFrameHud = (state: HudState): void => {
-      const target = state.menuPreviewState ?? state;
+      const base = state.menuPreviewState ?? state;
+      const roster = this.app.world.leaderboard;
+      const target: HudState = roster === undefined ? base : { ...base,
+        flowers: roster.length,
+        flowerEntries: roster.map(entry => ({ name: entry.nickname, score: entry.score,
+          local: entry.playerId === this.app.world.controlledPlayerId })) };
       const slotEffects = this.petalTransfers.update(now, delta, target.slots ?? [], target.slotProgress, {
         width: target.width, height: target.height, level: target.level,
         mobile: target.mobile, uiScale: target.uiScale, pixelRatio: target.pixelRatio,
@@ -304,6 +309,8 @@ export class FrameRenderer {
       drawMovementGuide();
       drawFrameHud(playerHudState!);
     }
+    if (this.app.online && player) this.app.world.prediction.presented(now,
+      this.playerTransform.get(player.entity, now, { x: this.app.camera.panX, y: this.app.camera.panY }));
     if (this.app.transitions.entryAt !== undefined && player !== null)
       this.app.transitions.drawEntryTransition(now);
     if (!this.app.frozen && menuInput.active && menuInput.opacity > 0.0001) {

@@ -7,9 +7,18 @@ import { NetworkSnapshotDecoder } from '../../../build/client/net/multiplayer-sn
 
 const welcome={roomId:'a',roomEpoch:Uint8Array.of(1,...Array(15).fill(0)),playerId:1,sessionEpoch:7,tickMs:50,serverTick:0,resumeToken:new Uint8Array(32)};
 function snapshot(overrides={}) {
-  return {roomEpoch:welcome.roomEpoch,full:true,snapshotSeq:1,baselineId:1,serverTick:1,lastAppliedInputSeq:0,inputAppliedTick:0,controlledHandle:0,removed:[],entities:[],events:[],selfState:{lifeEpoch:0,life:0,velocityX:0,velocityY:0,speed:0,buttons:0,angle:0,strength:0,inputNeutral:true,inputExpiresTick:0,nextSpawnTick:0,level:0,experience:0,score:0,zoneProgress:0,inventory:Array(16).fill(0),recharge:Array(8).fill(0),backpack:[],deathScore:0,deathLevel:0,kept:[],killerName:'',cameraX:0,cameraY:0,cameraScale:0.9},...overrides};
+  return {roomEpoch:welcome.roomEpoch,full:true,snapshotSeq:1,baselineId:1,serverTick:1,lastReceivedInputSeq:0,lastAppliedInputSeq:0,inputAppliedTick:0,controlledHandle:0,removed:[],entities:[],events:[],selfState:{lifeEpoch:0,life:0,positionX:0,positionY:0,radius:25,arenaWidth:50000,arenaHeight:4000,motionScale:1,accelerationX:0,accelerationY:0,velocityX:0,velocityY:0,speed:0,buttons:0,angle:0,strength:0,inputNeutral:true,inputExpiresTick:0,nextSpawnTick:0,level:0,experience:0,score:0,zoneProgress:0,inventory:Array(16).fill(0),recharge:Array(8).fill(0),backpack:[],deathScore:0,deathLevel:0,kept:[],killerName:'',cameraX:0,cameraY:0,cameraScale:0.9},...overrides};
 }
 const packet=(s,epoch=7)=>encodeMessage({type:6,sessionEpoch:epoch,value:s});
+test('leaderboard is server-only, room-bound, bounded and validates public scores/nicknames',()=>{
+  const message={type:12,sessionEpoch:7,value:{roomEpoch:welcome.roomEpoch,serverTick:1,
+    entries:[{playerId:1,nickname:'Alice',score:25},{playerId:2,nickname:'玩家😀',score:10}]}};
+  const bytes=encodeMessage(message); assert.deepEqual(decodeMessage(bytes),message); assert.equal(decodeMessage(bytes,true),null);
+  for(const entry of [{playerId:0},{score:-1},{score:NaN},{nickname:'a\nb'}])
+    assert.throws(()=>encodeMessage({...message,value:{...message.value,entries:[{...message.value.entries[0],...entry}]}}));
+  assert.throws(()=>encodeMessage({...message,value:{...message.value,entries:Array(9).fill(message.value.entries[0])}}));
+  assert.throws(()=>encodeMessage({...message,value:{...message.value,roomEpoch:new Uint8Array(16)}}));
+});
 
 test('v2 hand-authored vectors decode and encode exact independent bytes',async()=>{
   const {vectors}=JSON.parse(await readFile(new URL('../../../tests/fixtures/product/multiplayer/manual_vectors.json',import.meta.url)));
@@ -63,4 +72,12 @@ test('full/delta binding, gaps and errors commit atomically; resync deduplicates
   assert.equal(d.decode(packet(snapshot())),null);
   assert.ok(d.decode(packet(snapshot(),8)));
   assert.equal(d.decode(packet(snapshot({snapshotSeq:LIMITS.counterDrainAt,baselineId:2}),8)),null);
+});
+
+test('input receipt/adoption feedback rejects impossible ticks and ACKs transactionally', () => {
+  const receiver=new NetworkSnapshotDecoder();receiver.bind(welcome);
+  for(const patch of [{lastReceivedInputSeq:1,lastAppliedInputSeq:2},{inputAppliedTick:2},{lastReceivedInputSeq:LIMITS.counterDrainAt}]) {
+    assert.equal(receiver.decode(encodeMessage({type:6,sessionEpoch:7,value:snapshot(patch)})),null);
+    assert.equal(receiver.snapshotSeq,0);
+  }
 });

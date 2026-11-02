@@ -58,7 +58,12 @@ void independent_sequences_latest_input_and_ttl() {
   REQUIRE(h.world().tick()==start);h.step();
   REQUIRE(a.last<wire::Snapshot>().lastAppliedInputSeq==10 && b.last<wire::Snapshot>().lastAppliedInputSeq==1);
   REQUIRE(a.last<wire::Snapshot>().inputAppliedTick==start && a.last<wire::Snapshot>().selfState.strength==10);
-  h.step(3);REQUIRE(!a.last<wire::Snapshot>().selfState.inputNeutral);h.step();
+  h.step(3);REQUIRE(!a.last<wire::Snapshot>().selfState.inputNeutral);
+  REQUIRE(a.last<wire::Snapshot>().inputAppliedTick==start && a.last<wire::Snapshot>().lastReceivedInputSeq==10);
+  a.receive(wire::Ping{9,0,123.5},h.now);const auto clock=a.last<wire::Pong>();
+  REQUIRE(clock.nonce==9 && clock.monotonicMs==123.5 && clock.serverMonotonicMs==h.now);
+  REQUIRE(clock.serverTick==h.world().tick() && clock.serverTimeMs==h.world().time_ms());
+  h.step();
   REQUIRE(a.last<wire::Snapshot>().selfState.inputNeutral && b.last<wire::Snapshot>().selfState.inputNeutral);
   REQUIRE(h.world().tick()==start+5);
 }

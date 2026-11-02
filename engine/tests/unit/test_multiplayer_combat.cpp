@@ -50,15 +50,31 @@ void opposing_petals_damage_bodies_at_level_one() {
   }
 }
 
-void petal_pairs_keep_existing_noncontact_rule() {
+void opposing_petals_trade_damage_and_own_petals_are_immune() {
   auto world = make_world();
   const auto a = join_player(*world, "A", at(-1000), profile(1));
   const auto b = join_player(*world, "B", at(1000), profile(1));
-  world->entities().get(petal(*world, a))->set_position(at(0));
-  world->entities().get(petal(*world, b))->set_position(at(1));
+  const auto ha = petal(*world, a), hb = petal(*world, b);
+  auto& pa = *world->entities().get(ha); auto& pb = *world->entities().get(hb);
+  pa.set_position(at(0)); pb.set_position(at(1));
+  pa.health = pb.health = f32(100);
   contacts(*world);
-  CHECK(world->entities().get(petal(*world, a))->health == f32(10));
-  CHECK(world->entities().get(petal(*world, b))->health == f32(10));
+  CHECK(pa.health == f32(90) && pb.health == f32(90));
+  CHECK(pa.last_damage_source.player == b && pb.last_damage_source.player == a);
+  CHECK(world->hit_events().size() == 2);
+  // With one hit left, both attacks still land before either slot recharges.
+  pa.health = pb.health = f32(10); pa.set_position(at(0)); pb.set_position(at(1));
+  contacts(*world);
+  CHECK(!world->entities().get(ha) || world->entities().get(ha)->health == f32(0));
+  CHECK(!world->entities().get(hb) || world->entities().get(hb)->health == f32(0));
+  CHECK(!petal(*world, a).valid() && !petal(*world, b).valid());
+
+  auto own = profile(1); own.set_inventory(1,1); own.set_inventory_count(2);
+  const auto c = join_player(*world, "C", at(2000), own);
+  const auto hc = petal(*world,c), hd = state(*world,c).loadout().handle(1,0);
+  world->entities().get(hc)->set_position(at(3000)); world->entities().get(hd)->set_position(at(3001));
+  contacts(*world);
+  CHECK(world->entities().get(hc)->health == f32(10) && world->entities().get(hd)->health == f32(10));
 }
 
 void self_petal_pet_projectile_and_wild_roots() {
@@ -417,7 +433,7 @@ int main() {
 #define RUN(name) engine::test::runTest(#name, name)
   RUN(body_contacts_use_both_actual_levels);
   RUN(opposing_petals_damage_bodies_at_level_one);
-  RUN(petal_pairs_keep_existing_noncontact_rule);
+  RUN(opposing_petals_trade_damage_and_own_petals_are_immune);
   RUN(self_petal_pet_projectile_and_wild_roots);
   RUN(catalog_equipment_ownership_and_recharge);
   RUN(roses_heal_only_their_owner);

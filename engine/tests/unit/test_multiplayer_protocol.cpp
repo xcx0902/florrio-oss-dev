@@ -45,6 +45,11 @@ void strict_text_and_all_message_roundtrips() {
   CHECK(decode_message(*encode_message(Pong{1,2,3},7),false));
   CHECK(decode_message(*encode_message(net::Error{ErrorCode::RoomFull,"full",true},0),false));
   CHECK(decode_message(*encode_message(CloseReason{ErrorCode::Stopping,"stop",false},7),false));
+  Leaderboard leaderboard{welcome.roomEpoch,2,{{1,"Alice",10},{2,"玩家😀",25}}};
+  const auto roster=encode_message(leaderboard,7); CHECK(roster);
+  CHECK(std::get<Leaderboard>(decode_message(*roster,false)->value).entries[1].score==25);
+  CHECK(!decode_message(*roster,true) && !encode_message(leaderboard,0));
+  leaderboard.entries.resize(9); CHECK(!encode_message(leaderboard,7));
   SelfState self; WireWriter w; self.backpack.resize(17); writeSelfState(w,self); CHECK(!w.frame(6,7,kMaxServerFrameBytes));
 }
 void independent_receipt_adoption_and_ttl() {
@@ -53,6 +58,8 @@ void independent_receipt_adoption_and_ttl() {
   Input input{1,1,0,1,0,200};
   CHECK(pa.receive_input(*world,input,7)==ResultCode::Ok && pb.receive_input(*world,input,7)==ResultCode::Ok);
   CHECK(pa.last_received_input_seq()==1 && world->players().get(a)->last_applied_input_sequence==0);
+  const auto before=publish(*world,*freeze_tick_changes(*world),viewer(a),pa.replication); CHECK(before);
+  CHECK(before->snapshot.lastReceivedInputSeq==1 && before->snapshot.lastAppliedInputSeq==0);
   pa.prepare_tick(*world); pb.prepare_tick(*world);
   CHECK(world->players().get(a)->last_applied_input_sequence==0);
   advance_world(*world);
@@ -62,6 +69,10 @@ void independent_receipt_adoption_and_ttl() {
   for(unsigned i=0;i<5;i++) { pa.prepare_tick(*world); advance_world(*world); }
   CHECK(world->players().get(a)->input().strength.value==0 && world->players().get(a)->last_applied_input_sequence==1);
   CHECK(expires==5 && world->players().get(a)->last_control_tick==5);
+  const auto reused=publish(*world,*freeze_tick_changes(*world),viewer(a),pa.replication); CHECK(reused);
+  CHECK(reused->snapshot.lastAppliedInputSeq==1 && reused->snapshot.inputAppliedTick==0);
+  CHECK(reused->snapshot.selfState.inputNeutral && reused->snapshot.selfState.inputExpiresTick==0);
+  CHECK(reused->snapshot.selfState.positionX==world->entities().get(world->players().get(a)->player())->position.x.value);
 }
 void input_windows_and_life_revalidation() {
   auto world=test::make_world(); const auto id=test::join_player(*world,"A",{}); PeerSession peer(*world,viewer(id));

@@ -79,7 +79,7 @@ test('product generator check passes and is read-only', async () => {
 test('multiplayer schema owns v2 fields, limits and visibility in all generated views', async () => {
   const inputs=await loadSchemaInputs(root), {contract}=validateInputs(inputs);
   const outputs=multiplayerOutputs(inputs.multiplayerSource,[],contract);
-  assert.equal(outputs.size,3);
+  assert.equal(outputs.size,5);
   const changed=multiplayerOutputs(inputs.multiplayerSource.replace('maxSequenceAdvance: 1024','maxSequenceAdvance: 512'),[],contract);
   assert.notEqual(changed.get('engine/include/engine/net/generated_multiplayer.hpp'),outputs.get('engine/include/engine/net/generated_multiplayer.hpp'));
   assert.notEqual(changed.get('client/src/schema/multiplayer.ts'),outputs.get('client/src/schema/multiplayer.ts'));

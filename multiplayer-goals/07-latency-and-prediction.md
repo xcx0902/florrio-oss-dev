@@ -1,6 +1,6 @@
 # M07：网络时钟、插值与本地移动预测
 
-状态：未开始。依赖：M06；协议所需字段在 M04 预留并测试。产出：可测量的公网操作体验，以及不会改变权威战斗结果的基础移动预测。
+状态：已完成（2026-11-02）。依赖：M06；协议所需字段在 M04 预留并测试。产出：可测量的公网操作体验，以及不会改变权威战斗结果的基础移动预测。
 
 ## 07.1 范围与正确性边界
 
@@ -18,7 +18,7 @@
 
 ## 07.3 远端插值步骤
 
-计划新增 `client/src/state/network-clock.ts`、`snapshot-buffer.ts`，调整 `interpolation.ts`、相机目标和 entity scalar 的时间来源。
+已实现 `client/src/state/network-clock.ts`、`snapshot-buffer.ts`，调整 `interpolation.ts`、相机目标和 entity scalar 的时间来源。
 
 1. 为远端实体保留短小的按 serverTick 排序快照环，不再只按接收时刻固定 120ms 拉向最新目标。
 2. renderTime = estimatedServerTime - interpolationDelay。起始 delay 为 2 tick（100ms），按测得的抖动在 1—4 tick 内调节；参数有上限且计入报告。
@@ -28,7 +28,7 @@
 
 ## 07.4 本地移动预测步骤
 
-计划提取 `engine/sim/player_motion.*` 的纯移动计算契约，并新增 `client/src/state/local-prediction.ts`。C++/TS 实现使用同一份参数与独立 fixture；保留现有 f32 narrowing、double velocity、摩擦/边界/慢速效果的实际运算顺序。
+已提取 `engine/sim/player_motion.*` 的纯移动计算契约，并新增 `client/src/state/local-prediction.ts`。C++/TS 实现使用同一份参数与独立 fixture；保留现有 f32 narrowing、double velocity、摩擦/边界/慢速效果的实际运算顺序。
 
 1. 先把领域移动计算从碰撞/战斗中提取成可单测函数，证明原生单玩家轨迹没有变化。
 2. 浏览器按固定 50ms 维护本地预测时间线，InputPump 发送相同意图及目标 tick。渲染帧率变化不改变预测步长。
@@ -59,10 +59,12 @@ WebSocket 基于可靠有序传输。模拟 TCP 丢包时用受控网络代理�
 
 ## 07.6 完成条件
 
-- [ ] serverTime/输入采用确认具有真实语义，时钟/序列边界通过测试。
-- [ ] 远端插值和本地预测各自拥有明确时间线及 reset 路径。
-- [ ] 延迟下 PVP 的权威血量、掉落、胜负与关闭预测模式一致。
-- [ ] 预测帧耗时计入原有渲染预算，缓存/回调无泄漏。
-- [ ] 延迟能力和动态碰撞限制有实际测量；不把 LAN 流畅当成公网验收。
+- [x] serverTime/输入采用确认具有真实语义，时钟/序列边界通过测试。
+- [x] 远端插值和本地预测各自拥有明确时间线及 reset 路径。
+- [x] 延迟下 PVP 的权威血量、掉落、胜负与关闭预测模式一致。
+- [x] 预测帧耗时计入原有渲染预算，缓存/回调无泄漏。
+- [x] 延迟能力和动态碰撞限制有实际测量；不把 LAN 流畅当成公网验收。
 
 建议提交顺序：真实 tick/ACK → 网络时钟 → 远端快照缓冲 → 纯移动契约 → 本地预测/校正 → 延迟矩阵。
+
+实际验收：`2026-11-02T11-11-30.262Z-39513c97`，17/17 gate；16 组真实 TCP 延迟 / 抖动对照，预测输入响应 p95 29.6—40.7ms，250ms RTT 停止后 580.0ms 内收敛。证据、失败和能力限制见 [M07 交接](CHECKLIST.md#11-m07-完成交接)。

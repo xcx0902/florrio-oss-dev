@@ -1,6 +1,6 @@
 # 多人配置契约（M00）
 
-状态：M04/M05 消费者已实现。唯一初始参数表在本文；M05 的 `server/config/default.json` 与下表逐键一致，完整配置使用严格类型/有限范围校验；网络宿主使用方式见 [server/README.md](../../server/README.md)。浏览器接入属于 M06。ADR 语义见 [0002](../adr/0002-native-authoritative-multiplayer.md)。
+状态：M04—M07 消费者已实现。M05 的 `server/config/default.json` 与下表逐键一致，完整配置使用严格类型/有限范围校验；网络宿主使用方式见 [server/README.md](../../server/README.md)。M07 的运动与显示参数由 `schema/multiplayer.yaml` 生成 C++/TS 常量。ADR 语义见 [0002](../adr/0002-native-authoritative-multiplayer.md)。
 
 ## 模拟与容量
 
@@ -77,6 +77,22 @@ nickname 修剪首尾空白后非空，随后检查完整 Unicode/字节上限�
 | trustedProxies | `[]` | 默认不信任任何转发来源头 | M05 |
 
 M05 已验证 Ping/Pong、active write/close 与 shutdown 的取消顺序。WebSocket 握手超时使用 Beast WebSocket 层；写入、关闭和排空另有单调 deadline，不保留冲突的底层 tcp_stream 超时。Hello 尚未成功时绝不创建 PlayerState。
+
+## M07 客户端时间与预测
+
+以下参数来自 `schema/multiplayer.yaml` 的 `motion` 区域，生成 `client/src/schema/motion.ts` 与 `engine/include/engine/sim/generated_motion.hpp`。它们不属于宿主配置文件；公开 `connection.json` 的 `prediction: false` 或 `?prediction=off` 可关闭本地预测，远端仍使用权威快照缓冲。
+
+| 参数 | 值 | 语义 |
+| --- | ---: | --- |
+| pingIntervalMs / clockSamples / maxRttMs | 1000 / 20 / 2000 | 客户端时钟采样间隔、窗口和异常 RTT 上限；独立于宿主 5000ms 心跳 |
+| inputEventMinMs | 25 | DOM 意图变更发送的最小间隔；保留 50ms 独立输入泵 |
+| initialDelayMs / minDelayMs / maxDelayMs | 100 / 50 / 200 | 远端显示缓冲的初始值与调整边界 |
+| extrapolateMs / snapshotLimit | 50 / 8 | 无未来快照时最多外推一 tick；每实体最多 8 样本 |
+| historyLimit / replayTicks | 256 / 4 | 未确认输入环和按时间重演的硬上限 |
+| correctionMs / resyncAfterMs | 100 / 1000 | 小显示校正最长衰减时间；持续超出前瞻范围后请求全量 |
+| teleportRadii / teleportMinimum | 4 / 100 | 远端相邻位置跳跃超过 max(半径×4,100) 时重置历史；本地大于自身半径直接对齐 |
+
+控制、摩擦、f32 narrowing 和边界运算的常量也在同一生成源中，保持提取前数值。修改它们属于玩法变更，须重新核对独立 C++/TS 轨迹 fixture；不能把显示参数调整当作更改领域运动的理由。实际测量与限制见 [延迟和预测](latency-and-prediction.md)。
 
 ## 修改与验收
 

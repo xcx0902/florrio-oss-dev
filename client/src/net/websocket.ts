@@ -1,5 +1,8 @@
 import { decodeMessage, encodeMessage, LIMITS, NetworkSnapshotDecoder } from './multiplayer-codec.js';
 import { CommandKind, ErrorCode, ResyncReason, type CommandResult, type Message, type Welcome } from '../schema/multiplayer.js';
+import { NetworkClock } from '../state/network-clock.js';
+import { MOTION } from '../schema/motion.js';
+import type { Input } from '../schema/multiplayer.js';
 import type { ConnectionConfig } from './connection-config.js';
 import type { Transport, ConnectionState, ConnectionStatus, TransportSnapshot, InputIntent, CommandIntent } from './transport.js';
 
@@ -9,6 +12,7 @@ export interface NetworkOptions {
   socket?: (url: string) => WebSocket;
   storage?: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
   now?: () => number;
+  monotonicNow?: () => number;
   commandTimeoutMs?: number;
   handshakeTimeoutMs?: number;
 }
@@ -17,6 +21,13 @@ const GRACE_MS = 10_000;
 /** A connection owns its callbacks, counters, baseline and bounded promises. */
 export class NetworkTransport implements Transport {
   readonly mode = 'network';
+  readonly clock = new NetworkClock();
+  resyncCount = 0;
+  private pingTimer?: ReturnType<typeof setInterval>;
+  private pingNonce = 0;
+  private ping?: { nonce: number; sentAt: number };
+  private readonly inputs = new Set<(input: Input, eventAt?: number) => void>();
+  private readonly monotonicNow: () => number;
   state: ConnectionState = 'disconnected';
   readonly decoder = new NetworkSnapshotDecoder();
   welcome?: Welcome;
@@ -47,6 +58,7 @@ export class NetworkTransport implements Transport {
   private readonly storageKey: string;
   constructor(readonly config: ConnectionConfig, private readonly options: NetworkOptions = {}) {
     this.now = options.now ?? Date.now;
+    this.monotonicNow = options.monotonicNow ?? (() => performance.now());
     this.storageKey = `florr:resume:${config.url}:${config.roomId}`;
     try { this.storage = options.storage ?? (typeof sessionStorage === 'undefined' ? undefined : sessionStorage); } catch { /* memory-only */ }
     try {
@@ -107,6 +119,9 @@ export class NetworkTransport implements Transport {
       const welcome = message.value;
       this.decoder.bind(welcome);
       this.welcome = welcome; this.serverTick = welcome.serverTick;
+      this.clock.reset(welcome.serverTick, this.monotonicNow());
+      this.pingNonce = 0; this.ping = undefined;
+      this.pingTimer = setInterval(() => this.sampleClock(), MOTION.pingIntervalMs);
       this.lifeEpoch = 0; this.inputSeq = 0; this.commandSeq = 0; this.resyncPending = false;
       this.resume = { token: Array.from(welcome.resumeToken), seenAt: this.now() }; this.saveResume();
       this.attempt = 0; this.lostAt = undefined;
@@ -134,23 +149,39 @@ export class NetworkTransport implements Transport {
       }
       if (this.lifeEpoch !== applied.snapshot.selfState.lifeEpoch) this.cancelCommands('Player life changed', true);
       this.lifeEpoch = applied.snapshot.selfState.lifeEpoch; this.serverTick = applied.snapshot.serverTick;
+      this.clock.observeSnapshot(this.serverTick, this.monotonicNow());
       if (this.resume) { this.resume.seenAt = this.now(); this.saveResume(); }
       for (const listener of this.snapshots) listener({ kind: 'network', value: applied });
       this.resolveConnect?.(); this.clearConnect();
+      if (!this.ping && !this.clock.sampleCount) this.sampleClock();
     } else if (message.type === 5) {
       const pending = this.pending.get(message.value.commandSeq);
       if (pending) { clearTimeout(pending.timer); this.pending.delete(message.value.commandSeq); pending.resolve(message.value); }
     } else if (message.type === 8) {
-      this.write({ type: 9, sessionEpoch: this.welcome.sessionEpoch, value: message.value });
+      this.write({ type: 9, sessionEpoch: this.welcome.sessionEpoch, value: { ...message.value, serverMonotonicMs: 0, serverTimeMs: 0 } });
+    } else if (message.type === 9 && this.ping && message.value.nonce === this.ping.nonce) {
+      this.clock.sample(message.value, this.ping.sentAt, this.monotonicNow()); this.ping = undefined;
     }
     for (const listener of this.controls) listener(message);
   }
-  sendInput(intent: InputIntent): void {
+  private sampleClock(): void {
+    if (!this.welcome || this.state !== 'connected') return;
+    if (this.ping && this.monotonicNow() - this.ping.sentAt < MOTION.maxRttMs) return;
+    if (this.pingNonce + 1 >= LIMITS.counterDrainAt) { this.failedConnection(); return; }
+    const sentAt = this.monotonicNow();
+    this.ping = { nonce: ++this.pingNonce, sentAt };
+    try { this.write({ type: 8, sessionEpoch: this.welcome.sessionEpoch, value: { nonce: this.ping.nonce, serverTick: this.serverTick, monotonicMs: sentAt } }); }
+    catch { this.failedConnection(); }
+  }
+  onInput(listener: (input: Input, eventAt?: number) => void): () => void { this.inputs.add(listener); return () => this.inputs.delete(listener); }
+  sendInput(intent: InputIntent, eventAt?: number): void {
     if (this.state !== 'connected' || !this.welcome || !this.lifeEpoch || this.resyncPending) return;
     try {
       if (this.inputSeq + 1 >= LIMITS.counterDrainAt) throw new Error('Connection counter exhausted');
-      this.write({ type: 3, sessionEpoch: this.welcome.sessionEpoch, value: { ...intent, strength: Math.max(0, Math.min(200, intent.strength)),
-        lifeEpoch: this.lifeEpoch, inputSeq: ++this.inputSeq, targetTick: this.serverTick + 1 } });
+      const input = { ...intent, angle: Math.fround(intent.angle), strength: Math.fround(Math.max(0, Math.min(200, intent.strength))),
+        lifeEpoch: this.lifeEpoch, inputSeq: ++this.inputSeq, targetTick: this.clock.targetTick(this.monotonicNow()) };
+      this.write({ type: 3, sessionEpoch: this.welcome.sessionEpoch, value: input });
+      for (const listener of this.inputs) listener(input, eventAt);
     } catch { this.failedConnection(); }
   }
   sendCommand(intent: CommandIntent): Promise<CommandResult> {
@@ -161,7 +192,9 @@ export class NetworkTransport implements Transport {
     const command = { slotA: 0, typeA: 0, slotB: 0, typeB: 0, text: '', ...intent, commandSeq, lifeEpoch: this.lifeEpoch };
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => { this.pending.delete(commandSeq); reject(new Error('Command confirmation timed out')); }, this.options.commandTimeoutMs ?? 5000);
-      this.pending.set(commandSeq, { resolve, reject, timer, life: intent.kind !== CommandKind.Chat && intent.kind !== CommandKind.Leave });
+      // Spawn itself changes LifeEpoch. Its new-body snapshot can precede the
+      // command confirmation, so retain this bounded promise across that change.
+      this.pending.set(commandSeq, { resolve, reject, timer, life: intent.kind !== CommandKind.Spawn && intent.kind !== CommandKind.Chat && intent.kind !== CommandKind.Leave });
       try { this.write({ type: 4, sessionEpoch: this.welcome!.sessionEpoch, value: command }); this.commandSeq = commandSeq; }
       catch (error) { clearTimeout(timer); this.pending.delete(commandSeq); reject(error); this.failedConnection(); }
     });
@@ -170,7 +203,7 @@ export class NetworkTransport implements Transport {
     if (this.state !== 'connected' || !this.welcome || this.resyncPending) return;
     // A missing initial baseline cannot be recovered by a baseline-bound request.
     if (!this.decoder.baselineId) { this.failedConnection(); return; }
-    this.resyncPending = true;
+    this.resyncPending = true; this.resyncCount++;
     this.resyncTimer = setTimeout(() => this.failedConnection(), 5000);
     try { this.write({ type: 7, sessionEpoch: this.welcome.sessionEpoch, value: { reason, baselineId: this.decoder.baselineId, snapshotSeq: this.decoder.snapshotSeq } }); }
     catch { this.failedConnection(); }
@@ -199,6 +232,8 @@ export class NetworkTransport implements Transport {
     this.rejectConnect?.(new Error(message)); this.clearConnect(); this.status('error', message);
   }
   private detach(): void {
+    clearInterval(this.pingTimer); this.pingTimer = undefined; this.ping = undefined;
+    this.clock.reset();
     clearTimeout(this.handshakeTimer); this.handshakeTimer = undefined;
     clearTimeout(this.resyncTimer); this.resyncTimer = undefined;
     const socket = this.socket; this.socket = undefined;
@@ -223,11 +258,11 @@ export class NetworkTransport implements Transport {
   onControl(listener: (message: Message) => void): () => void { this.controls.add(listener); return () => this.controls.delete(listener); }
   onClose(listener: (status: ConnectionStatus) => void): () => void { this.closes.add(listener); return () => this.closes.delete(listener); }
   get pendingCount(): number { return this.pending.size; }
-  get timerCount(): number { return this.pending.size + Number(this.retryTimer !== undefined) + Number(this.handshakeTimer !== undefined) + Number(this.resyncTimer !== undefined); }
+  get timerCount(): number { return this.pending.size + Number(this.retryTimer !== undefined) + Number(this.handshakeTimer !== undefined) + Number(this.resyncTimer !== undefined) + Number(this.pingTimer !== undefined); }
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true; this.detach(); this.generation++; clearTimeout(this.retryTimer); this.retryTimer = undefined;
     this.cancelCommands('Connection disposed'); this.rejectConnect?.(new Error('Connection disposed')); this.clearConnect();
-    this.status('closed', ''); this.snapshots.clear(); this.controls.clear(); this.closes.clear();
+    this.status('closed', ''); this.snapshots.clear(); this.controls.clear(); this.closes.clear(); this.inputs.clear();
   }
 }

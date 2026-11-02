@@ -75,7 +75,7 @@ export function validatePublicEntity(bytes: Uint8Array, handle: number): void {
       if(mask!==core) throw new Error('private dense group');
       r.f32(); r.f32(); r.u16(); r.f32(); r.f32(); r.f32(); r.u8(); r.u8(); r.u8(); continue;
     }
-    if(flags!==1) throw new Error('entity flags');
+    if(flags!==1 && flags!==129) throw new Error('entity flags');
     mask=r.u32(); if((mask&~(core|render)) || (mask&core)!==core) throw new Error('private mask');
     let field=0;
     for(;;) {

@@ -42,7 +42,7 @@ void Session::receive(const wire::Message& message,std::uint64_t now) {
   } else if(const auto* resync=std::get_if<wire::ResyncRequest>(&message.value)) {
     if(permit(control_,now) && !peer_->accept_resync(*resync,message.sessionEpoch))fail(wire::ErrorCode::Session,"RESYNC");
   } else if(const auto* ping=std::get_if<wire::Ping>(&message.value)) {
-    if(permit(control_,now))(void)send(wire::Pong{ping->nonce,ping->serverTick,ping->monotonicMs});
+    if(permit(control_,now))(void)send(wire::Pong{ping->nonce,static_cast<std::uint32_t>(world_->tick()),ping->monotonicMs,static_cast<double>(now),world_->time_ms()});
   } else if(const auto* pong=std::get_if<wire::Pong>(&message.value)) {
     if(!permit(control_,now))return;
     if(outstanding_ && pong->nonce==outstanding_->nonce && pong->serverTick==outstanding_->serverTick

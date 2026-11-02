@@ -1,5 +1,6 @@
 #include "engine/core/perf.hpp"
 #include "engine/sim/player.hpp"
+#include "engine/sim/player_motion.hpp"
 #include "engine/sim/player_commands.hpp"
 #include "engine/model/catalog.hpp"
 #include "engine/model/entity_relations.hpp"
@@ -120,24 +121,10 @@ void apply_player_controls(World& world, PlayerState& state, double delta_millis
   if (!(delta_milliseconds > 0.0) || state.last_control_tick == world.tick()) return;
   state.last_control_tick = world.tick();
   if (state.input_sequence != 0) state.last_applied_input_sequence = state.input_sequence;
-  const PlayerInput& input = state.input();
-  const double strength = static_cast<double>(input.strength.value);
-  // Original608 seeds its multiplier with 1.0, then multiplies the vtable+20
-  // value of every active effect on the player before scaling dt and 0.001.
-  // Web/honey therefore reduce the control impulse itself, not acceleration.
-  const f32 effect_scale = slow_multiplier(*player);
-  const f32 behavior_scale = f32(effect_scale.value * 2.5F);
-  const double base = static_cast<double>(f32::from_double(
-    delta_milliseconds * static_cast<double>(behavior_scale.value) * 0.001).value);
-  const f32 impulse = strength < 200.0
-    ? f32::from_double(base * static_cast<double>(
-        f32::from_double(strength * 0.004999999888241291).value))
-    : f32::from_double(base);
-  const double radians = static_cast<double>(input.normalized_angle.value);
-  const f32 cosine = f32::from_double(std::cos(radians));
-  const f32 sine = f32::from_double(std::sin(radians));
-  player->velocity.x += static_cast<double>(f32(cosine.value * impulse.value).value);
-  player->velocity.y += static_cast<double>(f32(sine.value * impulse.value).value);
+  const auto& input = state.input();
+  MotionState motion{player->position.x.value, player->position.y.value, player->velocity.x, player->velocity.y};
+  add_motion_control(motion, input.angle.value, input.strength.value, slow_multiplier(*player).value, delta_milliseconds);
+  player->velocity.x = motion.vx; player->velocity.y = motion.vy;
 }
 
 void regenerate_players(World& world, double delta_milliseconds) {

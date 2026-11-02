@@ -1,21 +1,24 @@
-import test, { before, after } from 'node:test';
+import test, { before, after, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { startTestServer } from '../../../tools/lib/test-server.mjs';
 import { launchBrowser } from '../../../tools/lib/browser-harness.mjs';
+import { startLatencyProxy } from '../support/latency-proxy.mjs';
 import { startNativeServer } from '../support/native-server.mjs';
 import { evidence, sameEvidence, sha256 } from '../../../tools/verification-evidence.mjs';
 
-let http, native, browser;
-before(async () => { http = await startTestServer(path.resolve(process.env.CLIENT_ROOT || 'dist-next')); native = await startNativeServer(http.origin); browser = await launchBrowser(); });
-after(async () => { await browser?.close(); await native?.close(); await http?.close(); });
-async function player(name, roomId = 'garden') {
+let http, native, browser, proxy, predictionMode = true;
+before(async () => { http = await startTestServer(path.resolve(process.env.CLIENT_ROOT || 'dist-next')); browser = await launchBrowser(); });
+beforeEach(async t => { native = await startNativeServer(http.origin); if (t.name.includes('250ms')) proxy = await startLatencyProxy(native.port, { rttMs: 250, jitterMs: 20 }); });
+afterEach(async () => { await proxy?.close(); proxy = undefined; predictionMode = true; await native?.close(); });
+after(async () => { await browser?.close(); await http?.close(); });
+async function player(name, roomId = 'garden', prediction = predictionMode) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   const page = await context.newPage(), requests = [], errors = [];
   page.on('request', request => requests.push(new URL(request.url()).pathname));
   page.on('pageerror', error => errors.push(error.message));
-  await context.route('**/connection.json', route => route.fulfill({ json: { profile: 'network', url: `ws://127.0.0.1:${native.port}/ws`, roomId } }));
+  await context.route('**/connection.json', route => route.fulfill({ json: { profile: 'network', url: `ws://127.0.0.1:${(proxy?.port ?? native.port)}/ws`, roomId, prediction } }));
   await page.addInitScript(() => {
     window.Worker = class { constructor() { throw new Error('Online entry constructed a Worker'); } };
     window.__sockets = []; window.__socketEvents = [];
@@ -25,12 +28,38 @@ async function player(name, roomId = 'garden') {
   });
   await page.goto(http.origin + '/?test=1&cheat=1');
   await page.waitForFunction(() => document.querySelector('#menu-controls input'));
-  await page.evaluate(async () => { window.__observedApp = (await import('/main.js')).app; window.__observedApp.menuControls.keyboardMovement = true; });
+  await page.evaluate(async () => {
+    const app = window.__observedApp = (await import('/main.js')).app;
+    app.menuControls.keyboardMovement = true;
+    window.__authorityTimeline = new Map();
+    app.transport.onSnapshot(event => {
+      if (event.kind !== 'network') return;
+      window.__authorityTimeline.set(event.value.snapshot.serverTick, {
+        health: [...app.world.entitiesOfKind(1)].map(e => [e.ownerPlayerId,e.health]).sort((a,b) => a[0]-b[0]),
+        drops: [...app.world.entitiesOfKind(4)].map(e => e.speciesId).sort((a,b) => a-b),
+      });
+      if (window.__authorityTimeline.size > 256) window.__authorityTimeline.delete(window.__authorityTimeline.keys().next().value);
+    });
+    window.__entryFrames = [];
+    const draw = app.transitions.drawEntryTransition;
+    app.transitions.drawEntryTransition = now => {
+      window.__entryFrames.push({ at: now, start: app.transitions.entryAt, capturedMenu: !!app.transitions.entryCanvas });
+      draw(now);
+    };
+  });
   await page.locator('#menu-controls input').fill(name);
   await page.mouse.move(640, 360);
   await page.waitForTimeout(400);
   await page.keyboard.press('Enter');
-  await page.waitForFunction(() => window.__observedApp?.session.phase === 'playing', undefined, { timeout: 15000 });
+  try { await page.waitForFunction(() => window.__observedApp?.session.phase === 'playing', undefined, { timeout: 15000 }); }
+  catch (error) {
+    await mkdir('reports/multiplayer/m07', { recursive: true });
+    const observation = { name, prediction: predictionMode, errors, state: await read(page) };
+    await writeFile(`reports/multiplayer/m07/join-failure-${Date.now()}.json`, JSON.stringify(observation, null, 2) + '\n');
+    console.error(JSON.stringify(observation)); await context.close(); throw error;
+  }
+  await page.waitForFunction(() => window.__entryFrames.length >= 2);
+  assert.ok(await page.evaluate(() => window.__entryFrames.every(frame => frame.capturedMenu)), 'entry reveals the garden over a captured menu');
   await page.waitForFunction(() => Math.abs(window.__observedApp.world.playerEntity()?.x ?? 10000) < 1000);
   await page.waitForFunction(() => {
     const app = window.__observedApp, self = app.world.selfState;
@@ -43,25 +72,40 @@ async function read(page) {
     const { app } = await import('/main.js'); const network = app.network;
     return { playerId: app.world.controlledPlayerId, handle: app.world.playerEntity()?.handle ?? 0, sessionEpoch: network.welcome?.sessionEpoch,
       roomEpoch: Array.from(network.welcome?.roomEpoch ?? []), tick: network.serverTick, sequence: app.world.lastSequence, baseline: network.decoder.baselineId,
+      rttMs: network.clock.rttMs, predictionMetrics: app.world.prediction.metrics, bufferDepth: app.world.snapshotBuffer.depth,
+      predictionEnabled: app.world.prediction.enabled,
       connection: app.transport.state, notice: app.connectionStatus.textContent, socketEvents: window.__socketEvents, phase: app.session.phase, dead: app.session.dead, self: app.world.selfState, status: app.session.status,
       camera: { x: app.camera.x, y: app.camera.y }, slots: [...app.loadout.hotbarTypes],
-      players: [...app.world.entitiesOfKind(1)].map(e => ({ handle: e.handle, owner: e.ownerPlayerId, x: e.x, y: e.y, health: e.health, flags: e.byteFields?.[31], name: e.nickname })),
+      players: [...app.world.entitiesOfKind(1)].map(e => ({ handle: e.handle, owner: e.ownerPlayerId, x: e.x, y: e.y, health: e.health, wireHealth: network.decoder.entities.get(e.handle)?.records.findLast(record => record.healthKnown)?.health, flags: e.byteFields?.[31], name: e.nickname })),
       petals: [...app.world.entitiesOfKind(3)].map(e => ({ handle: e.handle, owner: e.ownerPlayerId, ownerHandle: e.ownerHandle, slot: e.slot, type: e.speciesId })),
-      drops: [...app.world.entitiesOfKind(4)].length, chat: [...app.world.chat],
+      drops: [...app.world.entitiesOfKind(4)].length,
+      dropTypes: [...app.world.entitiesOfKind(4)].map(e => e.speciesId).sort((a,b) => a-b), chat: [...app.world.chat],
+      leaderboard: app.world.leaderboard, rows: app.renderer.resources.panelSurface?.rows,
+      entryStarts: [...new Set(window.__entryFrames?.map(frame => frame.start))],
       hasDiagnostics: !!window.__florr || !!document.querySelector('#florr-cheat-panel') };
   });
 }
-test('two real BrowserContexts: independent controls, PVP death/drop/respawn, resume and room isolation without WASM', { timeout: 65000 }, async () => {
+for (const prediction of [true, false]) {
+test(`two real BrowserContexts at 250ms RTT: PVP death/drop/respawn, resume and isolation, prediction ${prediction ? 'on' : 'off'}`, { timeout: 80000 }, async () => {
+  predictionMode = prediction;
   const initial = await evidence();
-  const a = await player('Alice'), b = await player('Bob'); let other;
+  const a = await player('Alice'), b = await player('Bob','garden',!prediction); let other;
   const checkpoints = {};
   try {
     await a.page.waitForFunction(() => [...window.__observedApp.world.entitiesOfKind(1)].length === 2);
+    for (const client of [a,b])
+      await client.page.waitForFunction(() => window.__observedApp.renderer.resources.panelSurface?.rows.length === 2);
+    for (const client of [a,b]) await client.page.waitForFunction(() => window.__observedApp.network.clock.sampleCount > 0);
     const firstA = await read(a.page), firstB = await read(b.page); checkpoints.join = [firstA, firstB];
+    assert.ok(firstA.rttMs >= 200 && firstB.rttMs >= 200, 'PVP really traverses the TCP delay proxy');
+    assert.equal(firstA.predictionEnabled,prediction); assert.equal(firstB.predictionEnabled,!prediction);
     assert.notEqual(firstA.playerId, firstB.playerId); assert.notEqual(firstA.handle, firstB.handle); assert.deepEqual(firstA.roomEpoch, firstB.roomEpoch);
     assert.ok(firstA.petals.some(p => p.owner === firstA.playerId)); assert.ok(firstA.petals.some(p => p.owner === firstB.playerId));
     assert.equal(firstA.self.inventory[0], 26); assert.equal(firstB.self.inventory[0], 1);
     assert.equal(firstA.players.find(p => p.owner === firstB.playerId).name, 'Bob');
+    assert.deepEqual(firstA.rows.map(row => row[0]).sort(), ['Alice', 'Bob']);
+    assert.deepEqual(firstB.rows.map(row => row[0]).sort(), ['Alice', 'Bob']);
+    assert.equal(firstA.entryStarts.length,1); assert.equal(firstB.entryStarts.length,1);
     await a.page.evaluate(() => window.__observedApp.simulation.stop());
     await a.page.waitForFunction(tick => window.__observedApp.network.serverTick >= tick + 5, firstA.tick);
     await a.page.evaluate(() => window.__observedApp.simulation.start());
@@ -101,7 +145,19 @@ test('two real BrowserContexts: independent controls, PVP death/drop/respawn, re
     assert.equal(deadA.dead, false); assert.equal(deadB.self.killerName, 'Alice'); assert.equal(deadB.self.deathLevel, 1);
     assert.ok(deadA.drops > 0 || deadB.drops > 0); assert.equal(deadB.playerId, firstB.playerId);
     assert.ok(Math.abs(deadB.camera.x - deadB.self.cameraX) < 20, 'death camera stays with Bob');
+    // Compare observers of the same simulation tick. Separate real-time fights
+    // consume RNG at different ticks, so their random loot rolls may differ.
+    const aTimeline = await a.page.evaluate(() => [...window.__authorityTimeline]);
+    const bTimeline = new Map(await b.page.evaluate(() => [...window.__authorityTimeline]));
+    const sharedDeath = aTimeline.findLast(([tick,state]) => bTimeline.has(tick)
+      && state.health.some(([id,health]) => id === firstB.playerId && health === 0) && state.drops.length);
+    assert.ok(sharedDeath,'both prediction modes observed the death publication');
+    assert.deepEqual(sharedDeath[1],bTimeline.get(sharedDeath[0]),'same-tick health and drops agree with prediction on/off');
     await b.page.waitForFunction(() => { const app = window.__observedApp; return app.network.serverTick >= app.world.selfState.nextSpawnTick && app.world.selfState.life === 3; });
+    // Retained items are finalized by authoritative corpse cleanup, after the
+    // first dying snapshot. Compare that completed death transaction.
+    const completedDeath = await read(b.page);
+    checkpoints.deathFinal = [await read(a.page), completedDeath];
     await b.page.keyboard.press('Enter');
     await b.page.waitForFunction(() => window.__observedApp.session.phase === 'menu');
     await b.page.keyboard.press('Enter');
@@ -114,6 +170,7 @@ test('two real BrowserContexts: independent controls, PVP death/drop/respawn, re
     });
     const respawned = await read(b.page); checkpoints.respawn = [await read(a.page), respawned];
     assert.equal(respawned.playerId, firstB.playerId); assert.equal(respawned.self.lifeEpoch, 2); assert.ok(respawned.camera.x > 0);
+    assert.equal(respawned.entryStarts.length,2,'respawn plays one new entry transition');
     const stillA = await read(a.page);
     assert.equal(stillA.handle, firstA.handle); assert.ok(Math.abs(stillA.camera.x - stillA.self.cameraX) < 20);
     const before = await read(b.page), aTick = (await read(a.page)).tick;
@@ -121,6 +178,7 @@ test('two real BrowserContexts: independent controls, PVP death/drop/respawn, re
     await b.page.waitForFunction(epoch => { const app = window.__observedApp; return app.transport.state === 'connected' && app.network.welcome.sessionEpoch !== epoch && app.network.decoder.baselineId > 0 && app.world.lastSequence === app.network.decoder.snapshotSeq; }, before.sessionEpoch);
     const resumed = await read(b.page); checkpoints.resume = [await read(a.page), resumed];
     assert.equal(resumed.playerId, before.playerId); assert.equal(resumed.handle, before.handle); assert.ok(resumed.baseline >= 1);
+    assert.equal(resumed.entryStarts.length,2,'resume does not replay entry');
     assert.equal(resumed.players.length, 2); assert.ok((await read(a.page)).tick > aTick);
     // Neutral input on blur, then server TTL protection while the tab is suspended.
     await b.page.keyboard.down('KeyD'); await b.page.waitForFunction(() => window.__observedApp.world.selfState.strength > 0);
@@ -143,6 +201,15 @@ test('two real BrowserContexts: independent controls, PVP death/drop/respawn, re
       assert.deepEqual(p.requests.filter(url => /server\.wasm|server-worker\.js|dev\/test-api|dev\/cheat/.test(url)), []);
       assert.deepEqual(p.errors, []); assert.equal((await read(p.page)).hasDiagnostics, false);
     }
+    for (const checkpoint of Object.values(checkpoints)) for (const state of checkpoint)
+      for (const player of state.players) assert.equal(player.health, player.wireHealth, 'rendering never changes wire-authoritative health');
+    const summary = { killer: deadB.self.killerName, loserHealth: deadB.players.find(p => p.owner === firstB.playerId)?.health ?? 0,
+      deathLevel: deadB.self.deathLevel, deathScore: deadB.self.deathScore,
+      respawnLife: respawned.self.lifeEpoch, playerCount: respawned.players.length };
+    await mkdir('reports/multiplayer/m07', { recursive: true });
+    await writeFile(`reports/multiplayer/m07/pvp-${prediction ? 'on' : 'off'}.json`, JSON.stringify({ runId: process.env.VERIFY_RUN_ID ?? null, rttMs: 250, jitterMs: 20,
+      prediction: { Alice: prediction, Bob: !prediction }, sharedDeath: { tick: sharedDeath[0], ...sharedDeath[1] }, kept: completedDeath.self.kept, summary, checkpoints }, null, 2) + '\n');
+    if (!prediction) assert.deepEqual(summary, JSON.parse(await readFile('reports/multiplayer/m07/pvp-on.json', 'utf8')).summary);
     const stable = sameEvidence(initial, await evidence()); assert.equal(stable, true);
     const artifacts = {};
     for (const name of ['florr_server', 'server_browser_fixture']) artifacts[name] = sha256(await readFile(`build/native/server/${name}`));
@@ -151,7 +218,32 @@ test('two real BrowserContexts: independent controls, PVP death/drop/respawn, re
   } finally {
     await mkdir('reports/multiplayer/m06', { recursive: true });
     await writeFile('reports/multiplayer/m06/browser-attempt.json', JSON.stringify({ checkpoints, final: [await read(a.page), await read(b.page)] }, null, 2) + '\n');
+    for (const client of [a,b,other].filter(Boolean))
+      await client.page.evaluate(() => window.__observedApp.session.returnToNetworkMenu());
     await a.context.close(); await b.context.close(); await other?.context.close();
+  }
+});
+}
+test('leaderboard renders all room players outside the AOI and removes a player after Leave', { timeout: 35000 }, async () => {
+  const a = await player('Alice'), b = await player('Bob');
+  try {
+    await b.page.waitForFunction(() => window.__observedApp.renderer.resources.panelSurface?.rows.length === 2);
+    await b.page.keyboard.down('KeyD');
+    await b.page.waitForFunction(() => [...window.__observedApp.world.entitiesOfKind(1)].length === 1, undefined, { timeout: 12000 });
+    await b.page.keyboard.up('KeyD');
+    const distant = await read(b.page);
+    assert.deepEqual(distant.rows.map(row => row[0]).sort(),['Alice','Bob']);
+    assert.equal(distant.leaderboard.length,2);
+    assert.equal(distant.rows.find(row => row[0] === 'Bob')[1],true);
+    assert.equal(distant.rows.find(row => row[0] === 'Alice')[1],false);
+    await a.page.evaluate(() => window.__observedApp.session.returnToNetworkMenu());
+    await b.page.waitForFunction(() => window.__observedApp.renderer.resources.panelSurface?.rows.length === 1);
+    assert.deepEqual((await read(b.page)).rows.map(row => row[0]),['Bob']);
+    assert.deepEqual(a.errors,[]); assert.deepEqual(b.errors,[]);
+  } finally {
+    await a.page.evaluate(() => window.__observedApp.session.returnToNetworkMenu());
+    await b.page.evaluate(() => window.__observedApp.session.returnToNetworkMenu());
+    await a.context.close(); await b.context.close();
   }
 });
 test('ordinary online entry reports an unavailable server and retains nickname/menu without loading local simulation', { timeout: 15000 }, async () => {

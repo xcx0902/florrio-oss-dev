@@ -1,6 +1,7 @@
 #include "engine/net/peer_session.hpp"
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/combat.hpp"
+#include "engine/sim/loot.hpp"
 #include "../../../../engine/tests/support/multiplayer.hpp"
 #include <fstream>
 #include <iostream>
@@ -48,6 +49,9 @@ int main(int argc,char** argv) {
   emit(context(a),peer.replication,*freeze_tick_changes(*world));finish_tick_changes(*world);
   append(welcome(a,8),8);net::ReplicationSession reconnected;emit(context(a,8),reconnected,*freeze_tick_changes(*world));
   net::ReplicationSession sparse;emit(context(b,7,false),sparse,*freeze_tick_changes(*world));
+  (void)spawn_loot_drop(*world,7,world->entities().get(pb->player())->position+Vec2{f32(150),{}},{});
+  auto pickup=publish(*world,*freeze_tick_changes(*world),context(b,7,false),sparse); if(!pickup)return 10;
+  frames.push_back(std::move(pickup->bytes)); frames.push_back(std::move(pickup->leaderboardBytes));
   ByteWriter output;output.write_bytes(std::array<std::uint8_t,4>{'M','0','4','F'});output.write_u32_le(frames.size());
   for(const auto& bytes:frames){output.write_u32_le(bytes.size());output.write_bytes(bytes);}
   std::ofstream file(argv[1],std::ios::binary);file.write(reinterpret_cast<const char*>(output.bytes().data()),output.bytes().size());return file?0:9;

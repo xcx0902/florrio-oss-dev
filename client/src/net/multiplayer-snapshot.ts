@@ -41,6 +41,8 @@ export class NetworkSnapshotDecoder {
     if(!message || message.type!==6 || !this.binding || message.sessionEpoch!==this.binding.sessionEpoch) return null;
     const s=message.value;
     if(!same(s.roomEpoch,this.binding.roomEpoch) || s.snapshotSeq>=LIMITS.counterDrainAt || s.baselineId>=LIMITS.counterDrainAt
+      || s.lastReceivedInputSeq>=LIMITS.counterDrainAt || s.lastAppliedInputSeq>s.lastReceivedInputSeq
+      || s.inputAppliedTick>s.serverTick || s.selfState.inputExpiresTick>=LIMITS.counterDrainAt
       || s.serverTick>=LIMITS.counterDrainAt || s.serverTick<this.serverTick || s.snapshotSeq<=this.sequence) return null;
     if(s.full ? s.baselineId<=this.baseline : (!this.baseline || s.baselineId!==this.baseline || s.snapshotSeq!==this.sequence+1)) return null;
     if(s.full && s.removed.length) return null;

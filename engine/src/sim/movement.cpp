@@ -1,5 +1,6 @@
 #include "engine/core/perf.hpp"
 #include "engine/sim/movement.hpp"
+#include "engine/sim/player_motion.hpp"
 #include "engine/sim/bounds.hpp"
 #include <cmath>
 
@@ -8,8 +9,6 @@ namespace engine {
 namespace {
 
 constexpr double kTau = 6.283185307179586476925286766559;
-// Original integrateMovement ships 124.99999999999989, not 125.
-constexpr double kDragScale = 124.99999999999989;
 
 double wrap_angle(double value) {
   double wrapped = std::fmod(value, kTau);
@@ -34,8 +33,7 @@ void integrate_positions(World& world, double seconds) {
 
 void integrate_movement(World& world, double delta_milliseconds) {
   if (!(delta_milliseconds > 0.0)) return;
-  const double damping = std::pow(0.992, delta_milliseconds);
-  const double drag = kDragScale - damping * kDragScale;
+  const auto rates = motion_integration(delta_milliseconds);
   world.entities().with_ordered_slots([&](auto&& slots) {
     for (auto& entity : slots) { PERF_ADD(visits, 1);
       if (!entity.active) continue;
@@ -46,43 +44,17 @@ void integrate_movement(World& world, double delta_milliseconds) {
         entity.angle = f32::from_double(wrap_angle(static_cast<double>(entity.angle.value)
                                                    + static_cast<double>(angular_step.value)));
       }
-      const double vx = entity.velocity.x;
-      const double vy = entity.velocity.y;
-      // Acceleration is the original +56/+64 additive impulse: it enters the
-      // displacement once, unscaled by the drag factor, and is NOT added to
-      // velocity. Original 654 writes:
-      //   position += drag * velocity + dt * acceleration
-      //   velocity  = damping * velocity
-      // Slow effects act where a behavior produces velocity (player controls
-      // and AI), never inside integrateMovement.
-      const double ax = entity.acceleration.x;
-      const double ay = entity.acceleration.y;
-      // Original 654 evaluates (drag * velocity + dt * acceleration) first and
-      // adds the local position last; the grouping is observable at f32 ULP
-      // level for positions in the tens of thousands.
-      const double x = (drag * vx + delta_milliseconds * ax)
-                     + static_cast<double>(entity.position.x.value);
-      const double y = (drag * vy + delta_milliseconds * ay)
-                     + static_cast<double>(entity.position.y.value);
-      entity.set_position_x(f32::from_double(x));
-      entity.set_position_y(f32::from_double(y));
-      double next_vx = damping * vx;
-      double next_vy = damping * vy;
-      if (entity.kind == EntityKind::kPlayer || entity.kind == EntityKind::kMob) {
-        const double half_width = static_cast<double>(world.width().value) * 0.5;
-        const double half_height = static_cast<double>(world.height().value) * 0.5;
-        const double radius = static_cast<double>(entity.collision_radius.value);
-        const double limit_x = half_width - radius;
-        const double limit_y = half_height - radius;
-        if (entity.position.x.value > limit_x) { entity.set_position_x(f32::from_double(limit_x)); next_vx = 0.0; }
-        if (entity.position.x.value < -limit_x) { entity.set_position_x(f32::from_double(-limit_x)); next_vx = 0.0; }
-        if (entity.position.y.value > limit_y) { entity.set_position_y(f32::from_double(limit_y)); next_vy = 0.0; }
-        if (entity.position.y.value < -limit_y) { entity.set_position_y(f32::from_double(-limit_y)); next_vy = 0.0; }
-      }
-      if (std::fabs(next_vx) < 2.220446049250313e-16) next_vx = 0.0;
-      if (std::fabs(next_vy) < 2.220446049250313e-16) next_vy = 0.0;
-      entity.velocity.x = next_vx;
-      entity.velocity.y = next_vy;
+      MotionState motion{entity.position.x.value, entity.position.y.value, entity.velocity.x, entity.velocity.y};
+      MotionState unbounded;
+      integrate_linear_motion(motion, entity.acceleration.x, entity.acceleration.y, delta_milliseconds,
+        entity.kind == EntityKind::kPlayer || entity.kind == EntityKind::kMob,
+        static_cast<double>(world.width().value) * 0.5, static_cast<double>(world.height().value) * 0.5,
+        entity.collision_radius.value, rates, &unbounded);
+      // Retain intermediate writes: a clamped axis can be dirty even when its
+      // final position equals the previous snapshot target.
+      entity.set_position_x(f32(unbounded.x)); entity.set_position_y(f32(unbounded.y));
+      entity.set_position_x(f32(motion.x)); entity.set_position_y(f32(motion.y));
+      entity.velocity.x = motion.vx; entity.velocity.y = motion.vy;
       // Original 167 caches a union including attached children; any transform
       // change invalidates the entity and its owner chain.
       invalidate_bounds(world, entity.handle);

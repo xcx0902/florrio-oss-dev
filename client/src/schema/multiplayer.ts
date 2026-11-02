@@ -26,9 +26,55 @@ export enum ErrorCode { Protocol = 1, Version = 2, Catalog = 3, RoomFull = 4, Sl
 export enum ResyncReason { Gap = 1, Baseline = 2, Decode = 3 }
 export enum EventKind { Hit = 1, Pickup = 2, Chat = 3 }
 export const PUBLIC_COMPONENT_MASK = 571998208;
+export interface LeaderboardEntry {
+  playerId: number;
+  nickname: string;
+  score: number;
+}
+export function writeLeaderboardEntry(w: WireWriter, v: LeaderboardEntry): void {
+  w.u32(v.playerId, 1, 4294967295);
+  w.text(v.nickname, 128, 32, "nickname");
+  w.f32(v.score, 0, Infinity);
+
+}
+export function readLeaderboardEntry(r: WireReader): LeaderboardEntry {
+  const v = {} as LeaderboardEntry;
+  v.playerId = r.u32(1, 4294967295);
+  v.nickname = r.text(128, 32, "nickname");
+  v.score = r.f32(0, Infinity);
+
+  return v;
+}
+export interface Leaderboard {
+  roomEpoch: Uint8Array;
+  serverTick: number;
+  entries: Array<LeaderboardEntry>;
+}
+export function writeLeaderboard(w: WireWriter, v: Leaderboard): void {
+  w.bytes(v.roomEpoch, 16, 16); if (!v.roomEpoch.some(b=>b!==0)) throw new Error('zero identity');
+  w.u32(v.serverTick, 0, 4294967295);
+  w.length(v.entries.length, 0, 8, true); for (const item of v.entries) { writeLeaderboardEntry(w, item); }
+
+}
+export function readLeaderboard(r: WireReader): Leaderboard {
+  const v = {} as Leaderboard;
+  v.roomEpoch = r.bytes(16, 16); if (!v.roomEpoch.some(b=>b!==0)) throw new Error('zero identity');
+  v.serverTick = r.u32(0, 4294967295);
+  { const count = r.length(0, 8, true); v.entries = []; for (let i = 0; i < count; ++i) { v.entries[i] = readLeaderboardEntry(r); } }
+
+  return v;
+}
 export interface SelfState {
   lifeEpoch: number;
   life: number;
+  positionX: number;
+  positionY: number;
+  radius: number;
+  arenaWidth: number;
+  arenaHeight: number;
+  motionScale: number;
+  accelerationX: number;
+  accelerationY: number;
   velocityX: number;
   velocityY: number;
   speed: number;
@@ -56,6 +102,14 @@ export interface SelfState {
 export function writeSelfState(w: WireWriter, v: SelfState): void {
   w.u32(v.lifeEpoch, 0, 4294967295);
   w.u8(v.life, 0, 3);
+  w.f32(v.positionX, -Infinity, Infinity);
+  w.f32(v.positionY, -Infinity, Infinity);
+  w.f32(v.radius, 0, Infinity);
+  w.f32(v.arenaWidth, 0, Infinity);
+  w.f32(v.arenaHeight, 0, Infinity);
+  w.f32(v.motionScale, 0, Infinity);
+  w.f64(v.accelerationX, -Infinity, Infinity);
+  w.f64(v.accelerationY, -Infinity, Infinity);
   w.f64(v.velocityX, -Infinity, Infinity);
   w.f64(v.velocityY, -Infinity, Infinity);
   w.f32(v.speed, -Infinity, Infinity);
@@ -85,6 +139,14 @@ export function readSelfState(r: WireReader): SelfState {
   const v = {} as SelfState;
   v.lifeEpoch = r.u32(0, 4294967295);
   v.life = r.u8(0, 3);
+  v.positionX = r.f32(-Infinity, Infinity);
+  v.positionY = r.f32(-Infinity, Infinity);
+  v.radius = r.f32(0, Infinity);
+  v.arenaWidth = r.f32(0, Infinity);
+  v.arenaHeight = r.f32(0, Infinity);
+  v.motionScale = r.f32(0, Infinity);
+  v.accelerationX = r.f64(-Infinity, Infinity);
+  v.accelerationY = r.f64(-Infinity, Infinity);
   v.velocityX = r.f64(-Infinity, Infinity);
   v.velocityY = r.f64(-Infinity, Infinity);
   v.speed = r.f32(-Infinity, Infinity);
@@ -319,6 +381,7 @@ export interface Snapshot {
   snapshotSeq: number;
   baselineId: number;
   serverTick: number;
+  lastReceivedInputSeq: number;
   lastAppliedInputSeq: number;
   inputAppliedTick: number;
   controlledHandle: number;
@@ -333,6 +396,7 @@ export function writeSnapshot(w: WireWriter, v: Snapshot): void {
   w.u32(v.snapshotSeq, 1, 4294967295);
   w.u32(v.baselineId, 1, 4294967295);
   w.u32(v.serverTick, 0, 4294967295);
+  w.u32(v.lastReceivedInputSeq, 0, 4294967295);
   w.u32(v.lastAppliedInputSeq, 0, 4294967295);
   w.u32(v.inputAppliedTick, 0, 4294967295);
   w.u32(v.controlledHandle, 0, 4294967295);
@@ -349,6 +413,7 @@ export function readSnapshot(r: WireReader): Snapshot {
   v.snapshotSeq = r.u32(1, 4294967295);
   v.baselineId = r.u32(1, 4294967295);
   v.serverTick = r.u32(0, 4294967295);
+  v.lastReceivedInputSeq = r.u32(0, 4294967295);
   v.lastAppliedInputSeq = r.u32(0, 4294967295);
   v.inputAppliedTick = r.u32(0, 4294967295);
   v.controlledHandle = r.u32(0, 4294967295);
@@ -401,11 +466,15 @@ export interface Pong {
   nonce: number;
   serverTick: number;
   monotonicMs: number;
+  serverMonotonicMs: number;
+  serverTimeMs: number;
 }
 export function writePong(w: WireWriter, v: Pong): void {
   w.u32(v.nonce, 1, 4294967295);
   w.u32(v.serverTick, 0, 4294967295);
   w.f64(v.monotonicMs, 0, Infinity);
+  w.f64(v.serverMonotonicMs, 0, Infinity);
+  w.f64(v.serverTimeMs, 0, Infinity);
 
 }
 export function readPong(r: WireReader): Pong {
@@ -413,6 +482,8 @@ export function readPong(r: WireReader): Pong {
   v.nonce = r.u32(1, 4294967295);
   v.serverTick = r.u32(0, 4294967295);
   v.monotonicMs = r.f64(0, Infinity);
+  v.serverMonotonicMs = r.f64(0, Infinity);
+  v.serverTimeMs = r.f64(0, Infinity);
 
   return v;
 }
@@ -454,7 +525,7 @@ export function readCloseReason(r: WireReader): CloseReason {
 
   return v;
 }
-export type Message = { type: 1; sessionEpoch: number; value: Hello } | { type: 2; sessionEpoch: number; value: Welcome } | { type: 3; sessionEpoch: number; value: Input } | { type: 4; sessionEpoch: number; value: Command } | { type: 5; sessionEpoch: number; value: CommandResult } | { type: 6; sessionEpoch: number; value: Snapshot } | { type: 7; sessionEpoch: number; value: ResyncRequest } | { type: 8; sessionEpoch: number; value: Ping } | { type: 9; sessionEpoch: number; value: Pong } | { type: 10; sessionEpoch: number; value: Error } | { type: 11; sessionEpoch: number; value: CloseReason };
+export type Message = { type: 1; sessionEpoch: number; value: Hello } | { type: 2; sessionEpoch: number; value: Welcome } | { type: 3; sessionEpoch: number; value: Input } | { type: 4; sessionEpoch: number; value: Command } | { type: 5; sessionEpoch: number; value: CommandResult } | { type: 6; sessionEpoch: number; value: Snapshot } | { type: 7; sessionEpoch: number; value: ResyncRequest } | { type: 8; sessionEpoch: number; value: Ping } | { type: 9; sessionEpoch: number; value: Pong } | { type: 10; sessionEpoch: number; value: Error } | { type: 11; sessionEpoch: number; value: CloseReason } | { type: 12; sessionEpoch: number; value: Leaderboard };
 export function encodeMessage(m: Message): Uint8Array {
   const w = new WireWriter();
   switch (m.type) {
@@ -469,6 +540,7 @@ export function encodeMessage(m: Message): Uint8Array {
     case 9: if (!(m.sessionEpoch != 0)) throw new Error('epoch'); writePong(w, m.value); return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
     case 10: if (!(true)) throw new Error('epoch'); writeError(w, m.value); return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
     case 11: if (!(true)) throw new Error('epoch'); writeCloseReason(w, m.value); return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
+    case 12: if (!(m.sessionEpoch != 0)) throw new Error('epoch'); writeLeaderboard(w, m.value); return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
   }
 }
 export function decodeMessage(bytes: Uint8Array, fromClient = false): Message | null {
@@ -488,6 +560,7 @@ export function decodeMessage(bytes: Uint8Array, fromClient = false): Message | 
       case 9: if (!(h.sessionEpoch != 0)) return null; result = { type: 9, sessionEpoch: h.sessionEpoch, value: readPong(r) }; break;
       case 10: if (!(true) || fromClient) return null; result = { type: 10, sessionEpoch: h.sessionEpoch, value: readError(r) }; break;
       case 11: if (!(true) || fromClient) return null; result = { type: 11, sessionEpoch: h.sessionEpoch, value: readCloseReason(r) }; break;
+      case 12: if (!(h.sessionEpoch != 0) || fromClient) return null; result = { type: 12, sessionEpoch: h.sessionEpoch, value: readLeaderboard(r) }; break;
       default: return null;
     }
     r.done(); if (result.type === 2 && result.value.sessionEpoch !== result.sessionEpoch) return null; return result;

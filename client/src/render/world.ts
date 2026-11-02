@@ -334,7 +334,7 @@ function drawEntityBlock(
       // Native player rendering reads ctor 756 (entity+144), protocol field
       // 14. These effect flags are independent of the field-31 expression
       // byte and field-22 pickup type.
-      const actions = entity.ownerPlayerId === undefined ? field(14) : field(31) & 3;
+      const actions = field(14);
       drawPlayerFace(context, {
         state: playerVisual?.face,
         deltaMs,

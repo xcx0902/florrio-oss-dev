@@ -15,6 +15,7 @@ struct ReplicationSession {
   PlayerId player{};
   std::uint32_t sessionEpoch = 0, baselineId = 0, snapshotSeq = 0;
   std::uint32_t controlledHandle = 0;
+  std::uint32_t receivedInputSeq = 0;
   std::uint32_t eventTick = 0, eventOrdinal = 0;
   bool initialized = false, needsFull = true;
   Vec2 viewerPosition;
@@ -26,6 +27,7 @@ struct ReplicationSession {
 struct Publication {
   std::vector<std::uint8_t> bytes;
   Snapshot snapshot;
+  std::vector<std::uint8_t> leaderboardBytes;
 };
 /** Transactional: failure changes neither World nor session. Bytes own their memory. */
 [[nodiscard]] std::optional<Publication> publish(const World& world, const TickChanges& changes,

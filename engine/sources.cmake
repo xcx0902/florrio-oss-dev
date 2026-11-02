@@ -27,6 +27,7 @@ set(ENGINE_CORE_SOURCES
   src/sim/petals.cpp
   src/sim/passives.cpp
   src/sim/pets.cpp
+  src/sim/player_motion.cpp
   src/sim/player.cpp
   src/sim/player_loadout.cpp
   src/sim/spatial.cpp

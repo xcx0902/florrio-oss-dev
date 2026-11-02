@@ -119,7 +119,7 @@ bool validate_public_entity(std::span<const std::uint8_t> bytes, std::uint32_t h
           || !r.read_u8() || !r.read_u8() || !r.read_u8()) return false;
       continue;
     }
-    if ((*flags ^ 54) != 1) return false;
+    if ((*flags ^ 54) != 1 && (*flags ^ 54) != 129) return false;
     const auto declared = r.read_u32_le();
     if (!declared || (*declared & ~(core|render)) || (*declared & core) != core) return false;
     mask = *declared;

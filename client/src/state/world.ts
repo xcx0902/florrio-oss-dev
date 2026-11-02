@@ -1,3 +1,6 @@
+import { SnapshotBuffer } from './snapshot-buffer.js';
+import { LocalPrediction } from './local-prediction.js';
+import type { NetworkClock } from './network-clock.js';
 import { mergeScalar } from './scalar.js';
 import type { DeathMetadata } from './snapshot-types.js';
 import { playerLoadoutSlots,loadoutSlots, projectDeathMetadata, isController, hasDeathMetadata } from './snapshot-projection.js';
@@ -6,7 +9,7 @@ import { interpolateCameraTarget,interpolateEntity } from './interpolation.js';
 import type { Snapshot,SnapshotEvent } from './snapshot.js';
 
 import type { EntityState } from './entity-state.js';
-import type { SelfState } from '../schema/multiplayer.js';
+import type { Leaderboard, LeaderboardEntry, SelfState } from '../schema/multiplayer.js';
 import type { AppliedNetworkSnapshot } from '../net/multiplayer-snapshot.js';
 export type { EntityState } from './entity-state.js';
 export type { DeathMetadata } from './snapshot-types.js';
@@ -18,12 +21,26 @@ export interface VisualEventState {
 
 /** Client-side entity table. Server snapshots are authoritative. */
 export class WorldState {
+  networkClock?: NetworkClock;
+  readonly snapshotBuffer = new SnapshotBuffer();
+  prediction = new LocalPrediction();
+  configureNetwork(clock: NetworkClock, enabled: boolean, resync: () => void): void {
+    this.networkClock = clock; this.prediction = new LocalPrediction(resync); this.prediction.enabled = enabled;
+  }
   private readonly entities = new Map<number, EntityState>();
   private sequence = 0;
   private playerHandle: number | undefined;
   private explicitControl = false;
   controlledPlayerId = 0;
   selfState: SelfState | undefined;
+  leaderboard: readonly LeaderboardEntry[] | undefined;
+  private leaderboardTick = -1;
+  applyLeaderboard(value: Leaderboard): void {
+    if (value.serverTick < this.leaderboardTick
+        || new Set(value.entries.map(entry => entry.playerId)).size !== value.entries.length) return;
+    this.leaderboard = value.entries.map(entry => ({ ...entry }));
+    this.leaderboardTick = value.serverTick;
+  }
   setControlledPlayer(playerId: number, handle: number): void {
     this.explicitControl = true;
     this.controlledPlayerId = playerId;
@@ -315,6 +332,7 @@ export class WorldState {
   /** Clear all client-side state (used when replacing a product fixture or session). */
   reset(): void {
     this.lifetimeRevision++;
+    this.snapshotBuffer.reset(); this.prediction.reset();
     this.entities.clear();
     this.byKind.clear(); this.playerHandle = undefined; this.membershipRevision++;
     this.membershipDirty=false;this.controllerHandle=undefined;this.loadoutCache=undefined;this.renderOrderRevision++;this.discoveryRevision++;
@@ -327,6 +345,7 @@ export class WorldState {
     this.sequence = 0;
     this.serverTime = 0;
     this.explicitControl = false; this.controlledPlayerId = 0; this.selfState = undefined;
+    this.leaderboard = undefined; this.leaderboardTick = -1;
   }
 
   /** All records have already been validated before this atomic receipt step. */
@@ -343,7 +362,8 @@ export class WorldState {
       if (!entry) return [];
       const nickname = entry.records.find(record => record.stringField4)?.stringField4;
       return entry.records.map(record => {
-        const entity = { ...record, ...entry.ownership, nickname };
+        const entity = { ...record, ...entry.ownership, nickname,
+          networkTransform: this.networkClock ? (at: number, result: import('./interpolation.js').MutableTransform) => this.networkTransform(handle, at, result) : undefined };
         if (handle !== s.controlledHandle) return entity;
         const self = s.selfState;
         const threshold = Math.fround(Math.floor(self.level * 1.06 ** (self.level - 1)) + 3);
@@ -364,6 +384,37 @@ export class WorldState {
     this.applyDeltaSnapshot({ sequence: s.snapshotSeq, serverTime: s.serverTick * 50, entities, deletedHandles: s.removed, events }, now);
     // Removal never changes the explicit binding or selects another player.
     this.setControlledPlayer(playerId, s.controlledHandle);
+    this.snapshotBuffer.push(s.serverTick, this.entities.values());
+    if (this.networkClock) this.prediction.reconcile(s, now, this.networkClock);
+  }
+
+  private networkTransform(handle: number, now: number, result: import('./interpolation.js').MutableTransform): import('./interpolation.js').MutableTransform {
+    const entity = this.entities.get(handle);
+    // A retained death/camera transform can outlive its authoritative handle.
+    if (!entity) return result;
+    result.x = entity.x; result.y = entity.y; result.angle = entity.angle; result.radius = entity.radius;
+    if (!this.networkClock) return result;
+    if (handle === this.playerHandle && this.prediction.active) {
+      const position = this.prediction.display(now, this.networkClock);
+      if (position) { result.x = position.x; result.y = position.y; return result; }
+    }
+    const renderTime = this.networkClock.estimate(now) - this.networkClock.delayMs;
+    this.snapshotBuffer.sample(handle, renderTime, result);
+    // Attached petals follow a bounded translation of their own authoritative
+    // trajectory. Ownership, launch, cooldown and damage stay authoritative.
+    if (entity.ownerHandle === this.playerHandle && entity.kind === 3 && this.prediction.active) {
+      const body = this.playerEntity(), display = this.prediction.display(now, this.networkClock);
+      if (body && display) {
+        // Body and petal must share the same buffered time before translation.
+        // Subtracting the newest raw body made petals jump on every receipt.
+        const origin = { x: body.x, y: body.y, angle: body.angle };
+        this.snapshotBuffer.sample(body.handle, renderTime, origin);
+        const dx = display.x - origin.x, dy = display.y - origin.y, distance = Math.hypot(dx, dy);
+        const scale = distance ? Math.min(1, (body.radius ?? 25) / distance) : 0;
+        result.x += dx * scale; result.y += dy * scale;
+      }
+    }
+    return result;
   }
 
   get(handle: number): EntityState | undefined { return this.entities.get(handle); }

@@ -14,7 +14,7 @@ export class FrameContext {
   private readonly transforms=new Map<number,{entity:EntityState;value:MutableTransform;settled:boolean;at:number}>();
   transform(entity:EntityState,now:number):MutableTransform {
     let cached=this.transforms.get(entity.handle);
-    if(cached?.entity===entity&&cached.settled&&now>=cached.at)return cached.value;
+    if(!entity.networkTransform&&cached?.entity===entity&&cached.settled&&now>=cached.at)return cached.value;
     if(!cached){cached={entity,value:{x:0,y:0,angle:0},settled:false,at:now};this.transforms.set(entity.handle,cached);}
     interpolateEntityInto(entity,now,cached.value);this.stats.interpolations++;
     cached.entity=entity;cached.at=now;

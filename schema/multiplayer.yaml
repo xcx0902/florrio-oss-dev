@@ -19,6 +19,29 @@ limits:
   inputTtlTicks: 5
   tickMs: 50
   counterDrainAt: 4294966271
+motion:
+  damping: 0.992
+  dragScale: 124.99999999999989
+  controlScale: 2.5
+  strengthScale: 0.004999999888241291
+  maxStrength: 200
+  angleModulus: 6.283185307179586
+  velocityEpsilon: 2.220446049250313e-16
+  inputEventMinMs: 25
+  resyncAfterMs: 1000
+  historyLimit: 256
+  replayTicks: 4
+  correctionMs: 100
+  initialDelayMs: 100
+  minDelayMs: 50
+  maxDelayMs: 200
+  extrapolateMs: 50
+  teleportRadii: 4
+  teleportMinimum: 100
+  snapshotLimit: 8
+  clockSamples: 20
+  maxRttMs: 2000
+  pingIntervalMs: 1000
 enums:
   CommandKind: { Spawn: 1, Swap: 2, Discard: 3, Suicide: 4, Chat: 5, Leave: 6 }
   ResultCode: { Ok: 0, StaleLife: 1, InvalidState: 2, Cooldown: 3, Duplicate: 4, InvalidSequence: 5, QueueFull: 6 }
@@ -26,9 +49,25 @@ enums:
   ResyncReason: { Gap: 1, Baseline: 2, Decode: 3 }
   EventKind: { Hit: 1, Pickup: 2, Chat: 3 }
 records:
+  LeaderboardEntry:
+    playerId: { type: u32, min: 1 }
+    nickname: { type: string, max: 128, codePoints: 32, text: nickname }
+    score: { type: f32, min: 0 }
+  Leaderboard:
+    roomEpoch: { type: bytes, count: 16, nonzero: true }
+    serverTick: { type: u32 }
+    entries: { type: array, items: LeaderboardEntry, max: 8 }
   SelfState:
     lifeEpoch: { type: u32 }
     life: { type: u8, max: 3 }
+    positionX: { type: f32 }
+    positionY: { type: f32 }
+    radius: { type: f32, min: 0 }
+    arenaWidth: { type: f32, min: 0 }
+    arenaHeight: { type: f32, min: 0 }
+    motionScale: { type: f32, min: 0 }
+    accelerationX: { type: f64 }
+    accelerationY: { type: f64 }
     velocityX: { type: f64 }
     velocityY: { type: f64 }
     speed: { type: f32 }
@@ -109,6 +148,7 @@ records:
     snapshotSeq: { type: u32, min: 1 }
     baselineId: { type: u32, min: 1 }
     serverTick: { type: u32 }
+    lastReceivedInputSeq: { type: u32 }
     lastAppliedInputSeq: { type: u32 }
     inputAppliedTick: { type: u32 }
     controlledHandle: { type: u32 }
@@ -128,6 +168,8 @@ records:
     nonce: { type: u32, min: 1 }
     serverTick: { type: u32 }
     monotonicMs: { type: f64, min: 0 }
+    serverMonotonicMs: { type: f64, min: 0 }
+    serverTimeMs: { type: f64, min: 0 }
   Error:
     code: { type: ErrorCode }
     message: { type: string, max: 512, codePoints: 256, text: plain }
@@ -148,6 +190,7 @@ messages:
   Pong: { id: 9, direction: both, epoch: nonzero }
   Error: { id: 10, direction: server, epoch: any }
   CloseReason: { id: 11, direction: server, epoch: any }
+  Leaderboard: { id: 12, direction: server, epoch: nonzero }
 visibility:
   publicFields: [2, 4, 7, 8, 9, 11, 12, 22, 26, 28, 31, 36, 38, 49, 50, 53, 54, 55, 59, 62]
   publicDenseGroups: [116, 120, 140, 152]

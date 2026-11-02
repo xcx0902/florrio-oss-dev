@@ -17,9 +17,18 @@ async function fixture() {
   const bytes=await readFile(file);assert.equal(bytes.subarray(0,4).toString(),'M04F');
   let offset=8;const frames=[];
   for(let i=0;i<bytes.readUInt32LE(4);i++){const n=bytes.readUInt32LE(offset);offset+=4;frames.push(Uint8Array.from(bytes.subarray(offset,offset+n)));offset+=n;}
-  assert.equal(offset,bytes.length);assert.equal(frames.length,13);cached=frames;return frames;
+  assert.equal(offset,bytes.length);assert.equal(frames.length,15);cached=frames;return frames;
 }
 function nativeDecode(bytes,direction='server') {return spawnSync(executable,['--decode',direction,Buffer.from(bytes).toString('hex')],{encoding:'utf8'});}
+test('native newborn pickup marker reaches the client and room leaderboard is public without inventory or positions',async()=>{
+  const frames=await fixture(),d=new NetworkSnapshotDecoder();d.bind(decodeMessage(frames[1]).value);
+  assert.ok(d.decode(frames[12])); const born=d.decode(frames[13]);assert.ok(born);
+  assert.ok([...born.entities.values()].some(e=>e.records.some(r=>r.kind===4&&(r.flags&128))));
+  const roster=decodeMessage(frames[14]);assert.equal(roster.type,12);
+  assert.deepEqual(roster.value.entries.map(e=>e.nickname),['Alice','Bob']);
+  for(const entry of roster.value.entries) assert.deepEqual(Object.keys(entry).sort(),['nickname','playerId','score']);
+  assert.equal(nativeDecode(encodeMessage(roster),'client').status,1);
+});
 test('native and TS agree on independent manual vectors and real full/delta/resync/reconnect bytes',async()=>{
   const {vectors}=JSON.parse(await readFile('tests/fixtures/product/multiplayer/manual_vectors.json','utf8'));
   for(const v of vectors){const result=nativeDecode(Buffer.from(v.hex,'hex'),v.direction);assert.equal(result.status,0,v.name);assert.equal(result.stdout.trim(),v.hex);}
@@ -66,7 +75,7 @@ test('native and TS reject damaged real frames and decoder failure leaves the ba
   const original=entity.fields.slice(),malicious=entity.fields.slice();malicious[11]|=32;entity.fields=malicious;
   assert.throws(()=>encodeMessage(m));entity.fields=original;
   // Repair the envelope byte count after adding an impossible entity-array count.
-  const oversized=good.slice();oversized[58]=255;oversized[59]=255;oversized[60]=127;
+  const oversized=good.slice();oversized[62]=255;oversized[63]=255;oversized[64]=127;
   assert.equal(decodeMessage(oversized),null);assert.equal(nativeDecode(oversized).status,1);
   assert.ok(d.decode(good));const count=d.entities.size;assert.equal(d.decode(frames[4].slice(0,-1)),null);assert.equal(d.entities.size,count);assert.equal(d.snapshotSeq,1);assert.ok(d.decode(frames[4]));
 });

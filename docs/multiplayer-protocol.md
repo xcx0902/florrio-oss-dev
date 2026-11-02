@@ -82,6 +82,7 @@ Direction: server; envelope epoch: nonzero.
 | snapshotSeq | {"type":"u32","min":1} |
 | baselineId | {"type":"u32","min":1} |
 | serverTick | {"type":"u32"} |
+| lastReceivedInputSeq | {"type":"u32"} |
 | lastAppliedInputSeq | {"type":"u32"} |
 | inputAppliedTick | {"type":"u32"} |
 | controlledHandle | {"type":"u32"} |
@@ -119,6 +120,8 @@ Direction: both; envelope epoch: nonzero.
 | nonce | {"type":"u32","min":1} |
 | serverTick | {"type":"u32"} |
 | monotonicMs | {"type":"f64","min":0} |
+| serverMonotonicMs | {"type":"f64","min":0} |
+| serverTimeMs | {"type":"f64","min":0} |
 
 ## 10: Error
 
@@ -140,7 +143,25 @@ Direction: server; envelope epoch: any.
 | message | {"type":"string","max":512,"codePoints":256,"text":"plain"} |
 | retryable | {"type":"bool"} |
 
+## 12: Leaderboard
+
+Direction: server; envelope epoch: nonzero.
+
+| Field | Wire rule |
+| --- | --- |
+| roomEpoch | {"type":"bytes","count":16,"nonzero":true} |
+| serverTick | {"type":"u32"} |
+| entries | {"type":"array","items":"LeaderboardEntry","max":8} |
+
 ## Nested records
+
+### LeaderboardEntry
+
+| Field | Wire rule |
+| --- | --- |
+| playerId | {"type":"u32","min":1} |
+| nickname | {"type":"string","max":128,"codePoints":32,"text":"nickname"} |
+| score | {"type":"f32","min":0} |
 
 ### SelfState
 
@@ -148,6 +169,14 @@ Direction: server; envelope epoch: any.
 | --- | --- |
 | lifeEpoch | {"type":"u32"} |
 | life | {"type":"u8","max":3} |
+| positionX | {"type":"f32"} |
+| positionY | {"type":"f32"} |
+| radius | {"type":"f32","min":0} |
+| arenaWidth | {"type":"f32","min":0} |
+| arenaHeight | {"type":"f32","min":0} |
+| motionScale | {"type":"f32","min":0} |
+| accelerationX | {"type":"f64"} |
+| accelerationY | {"type":"f64"} |
 | velocityX | {"type":"f64"} |
 | velocityY | {"type":"f64"} |
 | speed | {"type":"f32"} |

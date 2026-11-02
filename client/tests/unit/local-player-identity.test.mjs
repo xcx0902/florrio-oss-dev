@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WorldState } from '../../../build/client/state/world.js';
+import { NetworkClock } from '../../../build/client/state/network-clock.js';
+import { interpolateEntity } from '../../../build/client/state/interpolation.js';
 import { DeathLifecycle } from '../../../build/client/state/death.js';
 import { snapshot, selfState } from '../support/multiplayer.mjs';
 const entity = (handle, ownerPlayerId, kind = 1, health = 100) => ({ ownership: { handle, ownerPlayerId, ownerHandle: handle, slot: 0, instance: 0 }, records: [{ handle, kind, typeId: kind, health, maxHealth: 100, healthKnown: true, maxHealthKnown: true, x: handle, y: 0, angle: 0, flags: 0, floatFields: { 49: handle, 28: 0 } }] });
@@ -42,4 +44,36 @@ test('resuming a dead player after the corpse was removed retains death UI witho
   const world = new WorldState(), death = new DeathLifecycle();
   apply(world, { controlledHandle: 0, selfState: selfState({ lifeEpoch: 2, life: 3, killerName: 'Alice', deathLevel: 12, kept: [1] }) }, [entity(10, 1)]);
   death.observe(world); assert.equal(death.dead, true); assert.equal(death.snapshot.metadata.killerName, 'Alice'); assert.equal(world.healthyPlayer(), undefined);
+});
+
+test('network corpse/camera history can outlive deletion and respawn without resolving a dead handle', () => {
+  const world=new WorldState(),clock=new NetworkClock();clock.reset(1,50);world.configureNetwork(clock,true,()=>{});
+  apply(world,{});const retained=world.playerEntity();
+  apply(world,{full:false,snapshotSeq:2,controlledHandle:0,removed:[20],selfState:selfState({lifeEpoch:1,life:3})},[entity(10,1)]);
+  assert.doesNotThrow(()=>interpolateEntity(retained,100));assert.equal(world.get(20),undefined);
+  apply(world,{full:false,snapshotSeq:3,controlledHandle:30,selfState:selfState({lifeEpoch:2,life:1,positionX:30})},[entity(10,1),entity(30,2)]);
+  assert.equal(world.healthyPlayer().handle,30);assert.equal(world.get(20),undefined);assert.equal(world.prediction.depth,0);
+});
+
+test('own petals translate from the buffered body at the same time without jumping on a new receipt', () => {
+  const world=new WorldState(),clock=new NetworkClock();clock.reset(10,0);world.configureNetwork(clock,true,()=>{});
+  const receive=(tick,x)=>{
+    const body=entity(20,2),petal=entity(30,2,3);
+    for(const [entry,position] of [[body,x],[petal,x+40]]) {
+      entry.records[0].x=position;entry.records[0].floatFields[49]=position;
+    }
+    petal.ownership.ownerHandle=20;
+    const s=snapshot({full:tick===10,snapshotSeq:tick,serverTick:tick,controlledHandle:20,
+      entities:[body,petal].map(e=>({...e.ownership,fields:new Uint8Array()})),
+      selfState:selfState({lifeEpoch:1,life:1,positionX:x})});
+    world.applyNetworkSnapshot({snapshot:s,entities:new Map([[20,body],[30,petal]]),events:[]},2,(tick-10)*50);
+  };
+  receive(10,0);receive(11,10);
+  world.prediction.display=()=>({x:30,y:0,vx:0,vy:0});
+  const before=interpolateEntity(world.get(30),100);
+  receive(12,20);
+  const after=interpolateEntity(world.get(30),100);
+  assert.equal(before.x,65,'translation remains bounded to one body radius');
+  assert.equal(after.x,before.x,'same render time keeps the same petal position across receipt');
+  assert.equal(world.get(20).x,20);assert.equal(world.get(30).x,60,'authority stays unchanged');
 });
