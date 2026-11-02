@@ -7,6 +7,22 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    "date": "2.0.0 - 2026-11-02",
+    "notes": [
+      "Added: Native authoritative C++20 game server on Boost.Asio/Beast: binary v2 WebSocket, one shared World per room, fixed 50 ms tick, independent per-connection snapshots, health/readiness/metrics and graceful drain.",
+      "Added: Multiple PlayerStates in one World with explicit PlayerId, LifeEpoch input adoption, PVP ownership, unique pickups, death drops and respawn.",
+      "Added: Schema-generated v2 protocol with full/delta snapshots, area-of-interest filtering, public/private field projection and reconnect tokens.",
+      "Added: Default browser network client with a 50 ms InputPump, explicit PlayerId/controlled handle, command results and bounded reconnect. The online entry does not load `server.wasm` or `server-worker.js`.",
+      "Added: Network clock sampled from Pong, tick-ordered remote interpolation and bounded local movement prediction/replay with bounded visual correction.",
+      "Added: Native, protocol, real-socket and dual-browser multiplayer regression suites, including a 16-case RTT/jitter matrix and 250 ms RTT PVP comparison.",
+      "Changed: The default runtime is now the native WebSocket server plus browser network client. `?profile=offline` keeps the previous Worker/WASM single-player path as an explicit diagnostic profile.",
+      "Changed: v2 field layouts changed during development; client and server must be rebuilt together. Earlier development v2 builds are not compatible.",
+      "Changed: Room defaults remain two players and two rooms. The eight-player capacity target, Linux release package and TLS deployment profile are not certified by this release.",
+      "Fixed: Continuous movement no longer stops and jumps between 50 ms prediction states; the displayed body, camera and own petals interpolate between fixed steps and calibrate the server clock gradually.",
+      "Fixed: Reconnect/respawn races no longer apply a stale life's input or replace a fresh spawn confirmation with an older death snapshot."
+    ]
+  },
+  {
     "date": "1.0.0 - 2026-10-31",
     "notes": [
       "Added: C++20 server engine compiled to WebAssembly, with a deterministic fixed-step simulation and a native test suite.",

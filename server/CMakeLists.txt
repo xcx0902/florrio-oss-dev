@@ -34,7 +34,7 @@ add_test(NAME server_native_tests COMMAND server_native_tests)
 add_test(NAME server_help COMMAND florr_server --help)
 set_tests_properties(server_help PROPERTIES PASS_REGULAR_EXPRESSION "smoke-ticks")
 add_test(NAME server_version COMMAND florr_server --version)
-set_tests_properties(server_version PROPERTIES PASS_REGULAR_EXPRESSION "florr_server 0.1.0")
+set_tests_properties(server_version PROPERTIES PASS_REGULAR_EXPRESSION "florr_server 2.0.0")
 add_test(NAME server_smoke COMMAND florr_server --smoke-ticks 20)
 set_tests_properties(server_smoke PROPERTIES PASS_REGULAR_EXPRESSION "\"tick\":20,\"timeMs\":1000")
 add_test(NAME server_invalid_config COMMAND "${CMAKE_COMMAND}"

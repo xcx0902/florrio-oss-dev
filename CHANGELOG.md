@@ -8,6 +8,44 @@ Changelog panel is generated from this file by
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Dates use `YYYY-MM-DD`.
 
+## [2.0.0] - 2026-11-02
+
+### Added
+
+- Native authoritative C++20 game server on Boost.Asio/Beast: binary v2
+  WebSocket, one shared World per room, fixed 50 ms tick, independent
+  per-connection snapshots, health/readiness/metrics and graceful drain.
+- Multiple `PlayerState`s in one World with explicit PlayerId, LifeEpoch input
+  adoption, PVP ownership, unique pickups, death drops and respawn.
+- Schema-generated v2 protocol with full/delta snapshots, area-of-interest
+  filtering, public/private field projection and reconnect tokens.
+- Default browser network client with a 50 ms InputPump, explicit
+  PlayerId/controlled handle, command results and bounded reconnect. The online
+  entry does not load `server.wasm` or `server-worker.js`.
+- Network clock sampled from Pong, tick-ordered remote interpolation and bounded
+  local movement prediction/replay with bounded visual correction.
+- Native, protocol, real-socket and dual-browser multiplayer regression suites,
+  including a 16-case RTT/jitter matrix and 250 ms RTT PVP comparison.
+
+### Changed
+
+- The default runtime is now the native WebSocket server plus browser network
+  client. `?profile=offline` keeps the previous Worker/WASM single-player path
+  as an explicit diagnostic profile.
+- v2 field layouts changed during development; client and server must be
+  rebuilt together. Earlier development v2 builds are not compatible.
+- Room defaults remain two players and two rooms. The eight-player capacity
+  target, Linux release package and TLS deployment profile are not certified by
+  this release.
+
+### Fixed
+
+- Continuous movement no longer stops and jumps between 50 ms prediction
+  states; the displayed body, camera and own petals interpolate between fixed
+  steps and calibrate the server clock gradually.
+- Reconnect/respawn races no longer apply a stale life's input or replace a
+  fresh spawn confirmation with an older death snapshot.
+
 ## [1.0.0] - 2026-10-31
 
 ### Added

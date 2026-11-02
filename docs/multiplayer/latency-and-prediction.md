@@ -65,4 +65,8 @@ selfState 另有 position、f64 velocity/acceleration、f32 motionScale、碰撞
 
 修复后，6 组持续移动共 996 个稳定帧间隔，身体和相机的停顿 / 回拉均为 0；16 组延迟矩阵继续通过，预测响应 p95 为 31.5—42.6ms，停止收敛最大 571.8ms，实际 renderer CPU p95 最大 2.4ms。143 项客户端单元、88 项浏览器、41 项协议 / schema 单元、24 项工具及 9 项跨端回归全部通过，`dist-next` 已重新构建并验证。
 
-本次定向修复记录为 `jitter-fix-2026-11-02`，汇总和源码 / 构建身份保存在 `reports/multiplayer/jitter-fix/summary.json`，逐帧数据为同目录 `smoothness.json`，另保留修复前探针及延迟 / PVP 报告。这里的回归结果独立于上述历史 M07 的 17 gate 验收；本次没有重跑整套发布 / 离线性能认证。
+本次定向修复记录为 `jitter-fix-2026-11-02`，汇总和源码 / 构建身份保存在 `reports/multiplayer/jitter-fix/summary.json`，逐帧数据为同目录 `smoothness.json`，另保留修复前探针及延迟 / PVP 报告。这里的回归结果独立于上述历史 M07 的 17 gate 验收；当时没有重跑整套发布 / 离线性能认证。
+
+## v2.0.0 发布验收（2026-11-02）
+
+发布候选从修正后的 2.0.0 源码重新执行完整 17 gate，runId `2026-11-02T12-44-37.328Z-3e5a6b3d`，全部通过。16 组延迟矩阵的预测响应 p95 为 **30.9—45.1ms**，250ms RTT 停止收敛最大 **619.8ms**，最终位置误差最大 **0.00105** world unit，render CPU p95 最大 **2.3ms**；6 组持续移动共 999 帧，身体和相机停顿 / 回拉均为 0。发布验证摘要见 [v2.0.0-verification](../releases/v2.0.0-verification.md)。

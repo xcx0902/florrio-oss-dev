@@ -1,20 +1,20 @@
 # 多人联机执行跟踪
 
-> M00—M07 已完成；M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
+> M00—M07 已完成；M08 进行中（仅完成 v2.0.0 版本与本地发布准备，容量、Linux 生产包与部署验收未完成）。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
 
 ## 1. 阶段看板
 
 | 阶段 | 状态 | 实际提交 | 验收 runId/报告 | 备注 |
 | --- | --- | --- | --- | --- |
 | M00 基线与契约 | 已完成 | 回归/驱动修复 `2bb33bf`；架构契约 `07b36d9` | `2026-10-31T15-09-18.267Z-4432f606`；`reports/multiplayer/baseline/summary.json` | 15/15 gate；12 CTest + 249 Node/浏览器测试通过；失败记录保留 |
-| M01 原生 core 边界 | 已完成 | 工作区实现，未创建提交 | `2026-10-31T23-43-46.442Z-f638c98a`；`reports/multiplayer/m01/2026-10-31T23-43-46.442Z-f638c98a/summary.json` | 17/17 gate；engine 13/13、根 CTest 18/18、Node/浏览器 251/251；20 tick smoke 与纯 core 双 World 通过 |
-| M02 多玩家状态 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T00-18-30.561Z-577c7708`；`reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/summary.json` | 17/17 gate；engine 14/14、根 CTest 19/19、15 个 M02 场景及 ASan/UBSan；冻结 M00 摘要一致 |
-| M03 PVP 与玩法归属 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T01-54-57.347Z-2c94ac23`；`reports/multiplayer/m03/2026-11-01T01-54-57.347Z-2c94ac23/summary.json` | 17/17 gate；engine 16/16、根 CTest 21/21；26 个新增场景、100 次生命周期及 ASan/UBSan 通过 |
-| M04 协议与复制 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T02-58-18.343Z-05f8fff5`；`reports/multiplayer/m04/2026-11-01T02-58-18.343Z-05f8fff5/summary.json` | 17/17 gate；engine 18/18、根 CTest 23/23；12 个新增 native 场景、259 个 Node/浏览器测试与 ASan/UBSan |
-| M05 原生网络服务 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T09-57-01.230Z-e1098481`；`reports/multiplayer/m05/2026-11-01T09-57-01.230Z-e1098481/summary.json` | 17/17 gate；engine 18/18、根 CTest 28/28、259 个 Node/浏览器测试；29 个新增宿主场景及 ASan/UBSan |
-| M06 联机客户端 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T14-40-27.450Z-12bf3d91`；`reports/multiplayer/m06/2026-11-01T14-40-27.450Z-12bf3d91/summary.json` | 17/17 gate；engine 18/18、根 CTest 29/29、273 个 Node/浏览器测试；真实双浏览器 PVP 全程无 WASM/Worker |
-| M07 延迟与预测 | 已完成 | 工作区实现，未创建提交 | `2026-11-02T11-11-30.262Z-39513c97`；`reports/multiplayer/m07/2026-11-02T11-11-30.262Z-39513c97/summary.json` | 17/17 gate；engine 19/19、根 30/30 CTest；16 组延迟对照与 250ms PVP，预测响应 p95 29.6—40.7ms |
-| M08 验收与发布 | 未开始 | — | — | — |
+| M01 原生 core 边界 | 已完成 | `ef3eaa4` | `2026-10-31T23-43-46.442Z-f638c98a`；`reports/multiplayer/m01/2026-10-31T23-43-46.442Z-f638c98a/summary.json` | 17/17 gate；engine 13/13、根 CTest 18/18、Node/浏览器 251/251；20 tick smoke 与纯 core 双 World 通过 |
+| M02 多玩家状态 | 已完成 | `611e99b` | `2026-11-01T00-18-30.561Z-577c7708`；`reports/multiplayer/m02/2026-11-01T00-18-30.561Z-577c7708/summary.json` | 17/17 gate；engine 14/14、根 CTest 19/19、15 个 M02 场景及 ASan/UBSan；冻结 M00 摘要一致 |
+| M03 PVP 与玩法归属 | 已完成 | `a421ab3` | `2026-11-01T01-54-57.347Z-2c94ac23`；`reports/multiplayer/m03/2026-11-01T01-54-57.347Z-2c94ac23/summary.json` | 17/17 gate；engine 16/16、根 CTest 21/21；26 个新增场景、100 次生命周期及 ASan/UBSan 通过 |
+| M04 协议与复制 | 已完成 | `b527a47` | `2026-11-01T02-58-18.343Z-05f8fff5`；`reports/multiplayer/m04/2026-11-01T02-58-18.343Z-05f8fff5/summary.json` | 17/17 gate；engine 18/18、根 CTest 23/23；12 个新增 native 场景、259 个 Node/浏览器测试与 ASan/UBSan |
+| M05 原生网络服务 | 已完成 | `ead44ea` | `2026-11-01T09-57-01.230Z-e1098481`；`reports/multiplayer/m05/2026-11-01T09-57-01.230Z-e1098481/summary.json` | 17/17 gate；engine 18/18、根 CTest 28/28、259 个 Node/浏览器测试；29 个新增宿主场景及 ASan/UBSan |
+| M06 联机客户端 | 已完成 | `4fd0ae4` | `2026-11-01T14-40-27.450Z-12bf3d91`；`reports/multiplayer/m06/2026-11-01T14-40-27.450Z-12bf3d91/summary.json` | 17/17 gate；engine 18/18、根 CTest 29/29、273 个 Node/浏览器测试；真实双浏览器 PVP 全程无 WASM/Worker |
+| M07 延迟与预测 | 已完成 | `4fd0ae4` | `2026-11-02T11-11-30.262Z-39513c97`；`reports/multiplayer/m07/2026-11-02T11-11-30.262Z-39513c97/summary.json` | 17/17 gate；engine 19/19、根 30/30 CTest；16 组延迟对照与 250ms PVP，预测响应 p95 29.6—40.7ms |
+| M08 验收与发布 | 进行中 | 本次发布提交 | `2026-11-02T12-44-37.328Z-3e5a6b3d`；`reports/runs/2026-11-02T12-44-37.328Z-3e5a6b3d/run.json` | v2.0.0 通过 17/17 gate；2×8 容量、Linux 包、TLS/回退与 30 分钟浸泡未执行 |
 
 ## 2. 可执行任务清单
 
@@ -263,3 +263,12 @@ runId / source identity / binary-client hash：
 - 新增持续移动浏览器回归进入 client-integration / delivery 清单、源码身份和浏览器 gate 报告，补齐原首次响应 / 最终收敛测试遗漏的中间连续性。0/80/250ms RTT、预测开关共 6 组，996 个稳定移动帧间隔，身体 / 相机停顿及回拉均为 0；修复前预测开启时约 66% 帧间隔停顿。
 - 定向回归：143/143 客户端单元、88/88 浏览器、41/41 协议 / schema 单元、24/24 工具、9/9 跨端，合计 305 项通过；16 组延迟矩阵及 250ms RTT 双浏览器 PVP 继续通过。预测响应 p95 31.5—42.6ms，停止收敛最大 571.8ms，render CPU p95 最大 2.4ms。已重新构建 / 校验 `dist-next`，未重新执行整套 17 gate 发布 / 离线性能认证。
 - 报告：`reports/multiplayer/jitter-fix/summary.json`，记录 `jitter-fix-2026-11-02`、源码 / 构建身份及日志哈希；同目录保留 `before.json`、`smoothness.json`、`latency-matrix.json`、PVP 和单元 / 浏览器日志。历史 M07 完整验收目录保持原样。
+
+### 11.2 v2.0.0 发布（2026-11-02）
+
+- 版本：根目录与客户端 `package.json`、`package-lock.json`、根 CMake 项目版本均为 `2.0.0`；`florr_server --version` 输出 `florr_server 2.0.0`，`server_version` CTest 同步断言。`CHANGELOG.md` 新增 2.0.0 段，并重新生成 `client/src/schema/menu-content.ts`。
+- 完整验收：`2026-11-02T12-44-37.328Z-3e5a6b3d`，17/17 gate，`passed=true`、`stable=true`；engine 19/19、根 CTest 30/30、协议/schema 41/41、工具 24/24、客户端单测 143/143、跨端 9/9、浏览器 88/88，合计 305 项。预测响应 p95 30.9—45.1ms，停止收敛最大 619.8ms，render CPU p95 最大 2.3ms；6 组持续移动 999 帧停顿/回拉均为 0。
+- 发布包：`release/florrio-2.0.0-0f6a2b913cab-2026-11-02T12-44-37.328Z-3e5a6b3d/`，静态客户端 99 个资产 + 2 份清单；`SHA256SUMS` 校验通过，解包逐文件哈希、静态入口和原生 health/readiness/排空 smoke 通过。归档 SHA-256 `d4c1380d12145769faf2d8ff196ce32d2a0681b8dcf08a559ed11f1e353480e5`，manifest `901697b5d745cb3931b6fc69d71266e458861db00241ebbdca18d7146f8d96ae`。
+- 首轮完整验收 `2026-11-02T12-20-17.599Z-f4af75ef` 也通过 17/17，但打包 smoke 发现原生版本仍为 0.1.0；未发布该包，修正版本后从头重跑，首轮 ledger 保留、首轮 `release/` 目录移除。
+- 发布说明与验证摘要见 [v2.0.0](../docs/releases/v2.0.0.md)、[v2.0.0-verification](../docs/releases/v2.0.0-verification.md)。本地提交后创建 `v2.0.0` tag；本次未推送远端、未创建 GitHub Release。
+- M08 仍为进行中：2×8 容量、集中战斗、30 分钟浸泡、Linux 配对发行包、TLS 代理、升级/回退 smoke 均未执行；默认发布容量保持每房两人、最多两房，静态包仍保留显式离线 WASM/Worker。
