@@ -8,6 +8,12 @@ on:
 permissions:
   contents: read
 
+# GCC 13 flags the generator's intentional one-line `if (bad) fail(); write()`
+# field writes as misleading indentation. Keep -Werror for all real warnings;
+# this is a generator formatting false positive, not a runtime gate.
+env:
+  CXXFLAGS: -Wno-misleading-indentation
+
 jobs:
   package:
     runs-on: ubuntu-24.04
