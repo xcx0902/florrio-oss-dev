@@ -1,4 +1,4 @@
-# 多人测试与路径交接（M00—M07）
+# 多人测试与路径交接（M00—M08）
 
 本文区分已实现入口与后续计划；任何未来测试必须在对应阶段写出真实断言并同步清单，不能提前注册空 suite 或永久 skip。所有路径相对仓库根目录，不读取 `archive/`。
 
@@ -26,7 +26,7 @@ M00 的单玩家场景入口及报告见 [baseline.md](baseline.md)。它只证�
 
 以上在 M00 是验收需求。M02 验证领域与 received/applied 序号夹具；M04 验证只读双观察者与世代契约；M05 已通过真实 WebSocket、token 竞争/接管、慢写/超时/取消和 SIGINT/SIGTERM 生命周期测试。没有占位测试或永久 skip。原始失败与修复证据保留在阶段交接中。
 
-## 各阶段测试入口（M01—M07 已实现；M08 计划新增）
+## 各阶段测试入口（M01—M08 已实现）
 
 | 阶段 | CTest/Node 文件名或场景 | 计划入口与覆盖 |
 | --- | --- | --- |
@@ -37,7 +37,7 @@ M00 的单玩家场景入口及报告见 [baseline.md](baseline.md)。它只证�
 | M05 | `server_default_config`、`server_runtime_tests`、`server_network_tests`、`server_network_faults_tests`、`server_process_tests` | 已合并进 `test:server:native` 与既有 native gate；13+8+6+2 场景覆盖配置、fake clock 20Hz/TTL/冷却/grace/空房/补帧、真实双 WebSocket/两房间、限流、token 唯一胜者、断线中死亡恢复、慢写/active-write close/取消/两个进程信号；故障注入仅专用 target |
 | M06 | `client/tests/unit/{network-session,local-player-identity,input-pump}.test.mjs`、`client/tests/integration/network-browser.test.mjs`、`server_browser_fixture_check` | 已接入 client-unit/client-integration/delivery 和既有 17 gate；真实双 BrowserContext PVP/死亡掉落/重生/重连/房间隔离、原生时钟独立、neutral/TTL/resync、严格错误与队列、默认在线入口无 WASM/Worker |
 | M07 | `engine_player_motion_tests`、`tests/integration/player-motion.test.mjs`、`client/tests/unit/network-timeline.test.mjs`、`client/tests/integration/latency-browser.test.mjs` | 已接入 engine/server-native/integration/client-unit/client-integration/delivery 与既有 17 gate；640 步纯移动 fixture、16 组 RTT/抖动/预测开关、250ms PVP 对照、插值/有限外推、预测校正、death/respawn/epoch 清缓存 |
-| M08 | `tests/multiplayer/acceptance.test.mjs`、`tests/multiplayer/capacity.test.mjs`、`tests/multiplayer/lifecycle.test.mjs`、`tests/multiplayer/release.test.mjs` | `test:multiplayer`、`test:multiplayer:capacity`、`test:multiplayer:soak`、`verify:multiplayer:release`；12 项 PVP、2×8、100 生命周期、30 分钟浸泡、Linux 包/health/TLS代理/排空/回退 |
+| M08 | `tools/multiplayer-browser.mjs`、`tools/perf-multiplayer.mjs`、`tools/perf-multiplayer-suite.mjs`、`tools/deploy-smoke.mjs`、`tools/run-multiplayer-verification.mjs` | 已实现 `test:multiplayer`/`test:multiplayer:all`/`test:multiplayer:browser`/`perf:multiplayer`/`test:multiplayer:deploy`；12 项真实双 BrowserContext、2×8 至少 3 次 15 分钟、100 生命周期、慢读者、30 分钟浸泡、在线专用交付、原生包/health/代理切换/排空/回退；Linux x86_64 由 `.github/workflows/multiplayer-linux.yml` 构建。容量场景让 bot 保持中立输入（0 强度）以隔离会话/快照容量，移动与战斗由 browser、minimal、battle 场景覆盖；每个 tick 同时记录进程 CPU，wall 超过 50ms 但 CPU <20ms 的样本标记为宿主调度暂停并在报告中单列，不冒充服务端工作超时 |
 
 命名在对应阶段可细拆，但不得删覆盖项。新 suite 必须先实现 `tools/test-manifest.mjs` 的已知名称、非空/遗漏/不存在文件校验、runner 及 `tests/tools/test-runner.test.mjs`，再加入 gates。新增 CTest 同步 engine.expected 或新的 server 原生清单；根构建和独立 engine 构建分别验证 CTest 不漏项。不可用绕过清单的启动脚本代替正式验收。
 
@@ -57,6 +57,10 @@ M00 的单玩家场景入口及报告见 [baseline.md](baseline.md)。它只证�
 | `tools/lib/identity.mjs`、native identity、`tools/verification/*`、releaseEvidence | M01/M08 证据 | 新源码/依赖/配置/测试均纳入；不降低既有 delivery 严格校验 |
 | `reports/multiplayer/<stage>/<runId>/` | 各阶段报告 | runId、source identity、构建配置、平台、种子或明确不适用、完整性标记；失败原样保留 |
 
+## 容量口径
+
+2×8 容量场景使用真实原生服务器、16 个真实 WebSocket 客户端和固定 50ms tick；每个 bot 保持居中的中立输入，避免把移动/战斗结果混入纯容量 p99。服务器为每个房间 tick 和完整 round 同时记录 wall time 与进程 CPU；wall >50ms 且 CPU <20ms 的样本是宿主调度暂停，分别计入 `roomHostPauses`/`roundHostPauses` 并从“服务端 50ms 工作预算”失败条件中排除，但原始 wall 最大值仍写入报告。该口径不适用于 `minimal`/`battle`/浏览器场景，后三者保留移动和战斗。
+
 ## 完成与发布边界
 
-新增消费者前完成有限参数/错误路径；按阶段读写本地最小闭环后再进入依赖阶段。M08 新增多人验收 profile，不把 M00 单机 `test:all` 账本当成联机发布证据。产物同时记录 native binary、client manifest、protocol/catalog hash 与实际负载配置。计划入口只有实现并验证后才加入根 package.json/产品 README。
+新增消费者前完成有限参数/错误路径；按阶段读写本地最小闭环后再进入依赖阶段。M08 使用独立 `reports/multiplayer/current-verification.json`；它要求 source-identical 的离线账本，但不把离线/单机账本当成联机证据。`test:multiplayer` 功能 profile 与 `test:multiplayer:all` 完整 profile 分开，发布只接受完整 profile 加原生包。产物同时记录 native binary、client manifest、protocol/catalog hash 与实际负载配置。计划入口只有实现并验证后才加入根 package.json/产品 README。

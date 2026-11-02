@@ -14,7 +14,7 @@
 Firefox, WebKit and physical mobile devices are not supported targets. The
 browser runner uses Chromium desktop plus a 390×844/DPR3 emulated touch profile.
 
-No remote CI is configured in this checkout. All commands below run locally.
+The M08 Linux x86_64 package is built by `.github/workflows/multiplayer-linux.yml` on `ubuntu-24.04`; local macOS commands build the host package only. GitHub Actions must be enabled for the repository to use it.
 
 ## Install
 
@@ -50,6 +50,10 @@ npm run build:engine        # native Release build in build/engine
 npm run build:engine:wasm   # Emscripten CMake -> build/wasm/server.wasm
 npm run build:client        # tsc -> fresh build/client
 npm run build               # schema + wasm + TS + dist-next/
+npm run build:multiplayer   # native server + online-only dist-multiplayer/
+npm run verify:multiplayer  # reject wasm/worker/dev assets and verify hashes
+npm run start:multiplayer   # local native server + static UI
+npm run pack:native         # platform package; use --target linux-x86_64 in CI
 ```
 
 `build:dist-next` runs the engine wasm, client build and packaging steps unless
@@ -68,6 +72,10 @@ npm run test:integration    # native WorkerApi fixture -> TS decoder
 npm run build:dist-next     # packaged delivery tree
 npm run verify:delivery    # delivery manifest, hashes and source identity
 npm run test:delivery       # dist-next online PVP and offline menu smoke
+npm run test:multiplayer:browser  # 12 real dual-BrowserContext online cases
+npm run test:multiplayer:deploy   # package start/drain/proxy switch/rollback
+npm run test:multiplayer          # functional M08 profile (requires test:all)
+npm run perf:multiplayer          # 3x15min capacity + 30min soak + edge scenarios
 ```
 
 The client tests launch a real Chromium and load the packaged `dist-next`
@@ -85,7 +93,11 @@ integration, ABI, delivery integrity, browser scenarios/entrypoint smoke/render
 performance in one pinned Chromium process, engine performance and integration
 performance, plus the M01 native host build/CTest (17 gates). Each gate binds the same run and delivery identity.
 
-It writes `reports/current-verification.json`. A failed or interrupted run does
+The M08 multiplayer profile is `tools/run-multiplayer-verification.mjs`; it consumes
+the passing offline ledger and writes `reports/multiplayer/current-verification.json`.
+`npm run test:multiplayer:all` runs the full profile (including capacity/soak), while
+`npm run test:multiplayer` runs the functional subset. Local native packages are host
+packages; the Linux target is produced only by the CI workflow. A failed or interrupted run does
 not produce a passing record. `reports/` is gitignored; attach the JSON and the
 entrypoint screenshots when a result needs to be shared.
 

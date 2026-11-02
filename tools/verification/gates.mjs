@@ -21,3 +21,22 @@ export const gates = Object.freeze([
 export function gatesPassed(steps) {
   return steps?.length === gates.length && gates.every((gate, index) => steps[index].name === gate.name && steps[index].exitCode === 0 && steps[index].finishedAt && /^[a-f0-9]{64}$/.test(steps[index].logSha256 ?? ''));
 }
+
+/**
+ * M08 multiplayer gate profile. It is intentionally ordered after a passing
+ * offline ledger: the offline profile owns shared native/CTest/unit evidence,
+ * while this profile owns the online-only delivery, real dual-browser cases,
+ * native package, deployment smoke and capacity evidence.
+ */
+export const multiplayerGates = Object.freeze([
+  { name: 'multiplayer build', npm: 'build:multiplayer', reports: ['dist-multiplayer/build-manifest.json'] },
+  { name: 'multiplayer delivery integrity', npm: 'verify:multiplayer', reports: ['dist-multiplayer/build-manifest.json'] },
+  { name: 'multiplayer browser acceptance', npm: 'test:multiplayer:browser', timeoutMs: 20 * 60 * 1000, reports: ['reports/multiplayer/browser-pvp.json'] },
+  { name: 'multiplayer native package', script: 'tools/pack-native.mjs', args: ['--skip-build'], timeoutMs: 15 * 60 * 1000 },
+  { name: 'multiplayer deployment smoke', npm: 'test:multiplayer:deploy', timeoutMs: 10 * 60 * 1000, reports: ['reports/multiplayer/deploy-smoke.json'] },
+  { name: 'multiplayer capacity and soak', script: 'tools/verify-multiplayer-performance.mjs', timeoutMs: 10 * 60 * 1000, reports: ['reports/multiplayer/performance-summary.json', 'reports/multiplayer/capacity/summary.json'] },
+]);
+export function multiplayerGatesPassed(steps) {
+  return steps?.length === multiplayerGates.length && multiplayerGates.every((gate, index) => steps[index].name === gate.name
+    && steps[index].exitCode === 0 && steps[index].finishedAt && /^[a-f0-9]{64}$/.test(steps[index].logSha256 ?? ''));
+}

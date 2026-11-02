@@ -1,0 +1,42 @@
+name: multiplayer-linux-x86_64
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install native toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake g++ make curl ca-certificates
+          cmake --version
+          g++ --version
+      - run: npm ci
+      - run: node tools/generate.mjs --check
+      - name: Build online delivery and native server
+        run: npm run build:multiplayer
+      - name: Verify online-only graph
+        run: npm run verify:multiplayer
+      - name: Package Linux x86_64
+        run: npm run pack:native -- --skip-build --target linux-x86_64 --run-id "gh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+      - name: Deployment smoke
+        run: npm run test:multiplayer:deploy
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: florrio-multiplayer-linux-x86_64
+          path: release/multiplayer/**
+          if-no-files-found: error

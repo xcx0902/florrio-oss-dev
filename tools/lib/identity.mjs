@@ -57,7 +57,7 @@ export async function verificationInputs(root = process.cwd()) {
   return { ...await treeIdentity(root, [...BUILD_ENTRIES, ...NATIVE_BUILD_ENTRIES, 'server/tests', 'engine/tests', 'client/tests', 'tests', 'tools', '.chromium-version', 'serve.mjs']), schema: 'product-verification-v1' };
 }
 export const NATIVE_BUILD_ENTRIES = ['CMakeLists.txt', 'cmake', 'server/CMakeLists.txt',
-  'server/sources.cmake', 'server/config', 'server/include', 'server/src', 'engine/CMakeLists.txt', 'engine/sources.cmake',
+  'server/sources.cmake', 'server/config', 'server/deploy', 'server/include', 'server/src', 'engine/CMakeLists.txt', 'engine/sources.cmake',
   'engine/src', 'engine/include', 'schema', 'tools/schema', 'tools/generate.mjs',
   'tools/build-server.mjs', 'tools/lib/identity.mjs', 'package.json', 'package-lock.json'];
 export async function nativeInputs(root = process.cwd()) {

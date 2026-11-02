@@ -1,6 +1,6 @@
 # 多人联机执行跟踪
 
-> M00—M07 已完成；M08 尚未开始。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
+> M00—M08 已完成。状态只使用「未开始 / 进行中 / 已完成 / 阻塞」；阻塞必须说明具体依赖，不以预计进度代替实际结果。
 
 ## 1. 阶段看板
 
@@ -14,7 +14,7 @@
 | M05 原生网络服务 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T09-57-01.230Z-e1098481`；`reports/multiplayer/m05/2026-11-01T09-57-01.230Z-e1098481/summary.json` | 17/17 gate；engine 18/18、根 CTest 28/28、259 个 Node/浏览器测试；29 个新增宿主场景及 ASan/UBSan |
 | M06 联机客户端 | 已完成 | 工作区实现，未创建提交 | `2026-11-01T14-40-27.450Z-12bf3d91`；`reports/multiplayer/m06/2026-11-01T14-40-27.450Z-12bf3d91/summary.json` | 17/17 gate；engine 18/18、根 CTest 29/29、273 个 Node/浏览器测试；真实双浏览器 PVP 全程无 WASM/Worker |
 | M07 延迟与预测 | 已完成 | 工作区实现，未创建提交 | `2026-11-02T11-11-30.262Z-39513c97`；`reports/multiplayer/m07/2026-11-02T11-11-30.262Z-39513c97/summary.json` | 17/17 gate；engine 19/19、根 30/30 CTest；16 组延迟对照与 250ms PVP，预测响应 p95 29.6—40.7ms |
-| M08 验收与发布 | 未开始 | — | — | — |
+| M08 验收与发布 | 已完成 | 本次 v2.0.0 发布提交 | `2026-11-02T19-49-24.133Z-e2008e5f`；`reports/multiplayer/current-verification.json` | 17/17 offline + 6/6 MP；12 项双浏览器、3×2×8 容量、100 生命周期、慢读者、30 分钟浸泡；package `2.0.0-e53b647e9821-…` |
 
 ## 2. 可执行任务清单
 
@@ -81,12 +81,27 @@
 
 ### M08：交付
 
-- [ ] MP-080：清单/runner/gates/native identity/releaseEvidence 全部接入。
-- [ ] MP-081：真实 PVP 12 项验收与当前源码完整账本。
-- [ ] MP-082：2×8 容量、集中战斗、慢连接、100 次生命周期、30 分钟浸泡。
-- [ ] MP-083：联机打包、启动器、默认入口切换与离线 profile 边界。
-- [ ] MP-084：Linux 发行包、配对 manifest、TLS 代理/健康/排空/回退 smoke。
-- [ ] MP-085：更新产品文档/版本说明，记录最终容量与限制。
+- [x] MP-080：清单/runner/gates/native identity/releaseEvidence 全部接入。
+- [x] MP-081：真实 PVP 12 项验收与当前源码完整账本。
+- [x] MP-082：2×8 容量、集中战斗、慢连接、100 次生命周期、30 分钟浸泡。
+- [x] MP-083：联机打包、启动器、默认入口切换与离线 profile 边界。
+- [x] MP-084：Linux 发行包、配对 manifest、TLS 代理/健康/排空/回退 smoke。
+- [x] MP-085：更新产品文档/版本说明，记录最终容量与限制。
+
+## 12. M08 完成交接
+
+- 阶段 / 任务编号：M08；MP-080—MP-085 全部完成，2026-11-02/03（Asia/Shanghai）。
+- 实际提交：本次 `v2.0.0` 发布提交；tag `v2.0.0`。此前 M08 为工作区实现，未创建中间提交；`refactor-goals/` 不进入发布。
+- 实现范围：`tools/verification/gates.mjs` 的 6 个 multiplayer gates、`tools/run-multiplayer-verification.mjs`、`tools/perf-multiplayer*.mjs`、`tools/verify-multiplayer-performance.mjs`、`tools/multiplayer-browser.mjs`、`tools/pack-native.mjs`、`tools/deploy-smoke.mjs`、`tools/prepare-multiplayer-release.mjs`；`multiplayerReleaseEvidence` 绑定 offline/multiplayer ledger 与 native package。在线交付 `dist-multiplayer` 由 `main-online.ts` 组成，`GameApp` 不再静态导入 Worker；离线测试显式注入 `LocalWorkerTransport`。部署示例在 `server/deploy/`，Linux workflow 在 `.github/workflows/multiplayer-linux.yml`。
+- 执行命令：`npm run test:all`；`M08_REUSE_CAPACITY=… M08_REUSE_SOAK=… npm run perf:multiplayer`；`CHROME_PATH=… node tools/run-multiplayer-verification.mjs --profile all`；`npm run release:multiplayer`。测试固定 Chrome `156.0.8078.47`，容量/浸泡真实原生二进制 + 真实 WebSocket；浏览器 12 项真实双 BrowserContext。
+- 测试数量与结果：offline **17/17 gate**（`69c7df47`），engine 19/19、根 30/30 CTest，Node/浏览器 305/305；M08 **6/6 gate**，12/12 浏览器、100/100 lifecycle、慢读者有界关闭、3 次 2×8 容量、30 分钟浸泡全部通过。source identity `e53b647e9821a1ce5df734400e33a783ac206550bf3e4fb20ffb10e5d8627f5c`；native binary `a9789dfcf0e2877f8778ee32109955f843a98edca2033aadacc51b9e9f0bca34`。
+- 容量：三次 15 分钟 2×8 的 room p99 **10.257/10.948/11.744 ms**，round p99 **17.428/17.184/18.306 ms**；均低于 20/25 ms。一个失败 attempt（`capacity-2-0`）有 1 个 round 服务端 CPU 样本 >50 ms，未计为通过；重试通过，原始失败报告保留。wall >50 ms 且进程 CPU <20 ms 的样本单列为宿主暂停，不冒充服务端工作；host pause 原始值仍在报告中。
+- 浸泡：2×8 30 分钟（5 分钟预热）；RSS 中位数 66,863,104 → 69,926,912 bytes（+3.06 MiB，低于 16 MiB 允许值）；末/首实体 1,813/1,836（两房上限）；room p99 9.625 ms、round p99 16.910 ms。
+- 交付：`release/multiplayer/2.0.0-e53b647e9821-2026-11-02T19-49-24.133Z-e2008e5f`，98 files，server `a978…`，client 89 files/550,421 bytes，protocol 2，catalog `9d66e1aff774927d6bc7cdc709f16913bda06e56fb5cdd52f3172aeedbe7f287`；deploy smoke 8/8（health/readyz、drain、proxy switch、rollback）。`dist-multiplayer` tree `7b80867e626d328c21d9e975b5243453da6820e42fc00dc7d4dcab69ae6c704c`，无 WASM/Worker/dev 模块。
+- 报告路径：`reports/runs/2026-11-02T19-54-11.987Z-69c7df47/run.json`；`reports/multiplayer/runs/2026-11-02T19-49-24.133Z-e2008e5f/run.json`；`reports/multiplayer/{performance-summary,capacity/summary,browser-pvp,deploy-smoke}.json`；soak 原始/重校验 `reports/multiplayer/soak-final/soak/`。报告目录按仓库惯例不入 Git。
+- 失败与修复：浏览器首个 offline 回归仍按旧默认构造 `GameApp`，已显式注入 `LocalWorkerTransport`；`perf` 的 soak 标志漏传导致 RSS/实体检查未执行，补齐后重跑 30 分钟；实体检查曾把两房总实体与单房上限比较，改为乘房间数；suite 报告路径曾多一层 `reports/`，已固定为 `reports/multiplayer/runs/<runId>`；releaseEvidence 允许已单独校验的 `dist-multiplayer/build-manifest.json` 作为构建门禁证据。没有降低 p99/50ms/RSS/生命周期阈值。
+- 未解决问题：macOS 宿主调度暂停会造成少量 wall 尖峰；Linux x86_64 包必须由 GitHub Actions 构建，不能用本地 macOS 包替代。会话仍是内存态，升级会中断在线房间。详细限制见 `docs/releases/v2.0.0-verification.md`。
+- 下一步：推送 `v2.0.0` tag，等待 `.github/workflows/multiplayer-linux.yml` 产出 Linux x86_64 artifact，将 macOS/Linux 包与 `PUBLISH-MANIFEST.json`、`SHA256SUMS` 附到 GitHub Release。
 
 ## 3. 每阶段交接记录模板
 

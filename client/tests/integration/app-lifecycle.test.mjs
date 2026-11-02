@@ -10,9 +10,10 @@ test('repeated app boot/dispose removes input, timers, worker requests, cheat pa
     await page.goto(origin + '/?profile=offline&cheat=1');
     const results = await page.evaluate(async () => {
       const { GameApp } = await import('/app/game-app.js');
+      const { LocalWorkerTransport } = await import('/net/local-worker.js');
       const canvas = document.querySelector('canvas'), results = [];
       for (let index = 0; index < 3; index++) {
-        const app = new GameApp(canvas);
+        const app = new GameApp(canvas, { transport: new LocalWorkerTransport() });
         const first = app.start(), second = app.start();
         await first;
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -38,9 +39,10 @@ test('late initialization after returning to menu or disposing cannot schedule a
     await page.goto(origin + '/?profile=offline');
     const result = await page.evaluate(async () => {
       const { GameApp } = await import('/app/game-app.js');
+      const { LocalWorkerTransport } = await import('/net/local-worker.js');
       const results = [];
       for (const disposal of [false, true]) {
-        const app = new GameApp(document.querySelector('canvas'));
+        const app = new GameApp(document.querySelector('canvas'), { transport: new LocalWorkerTransport() });
         app.server.terminate();
         let resolveReady;
         app.server = { init: () => new Promise(resolve => resolveReady = resolve), terminate() {} };

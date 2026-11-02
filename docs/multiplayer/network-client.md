@@ -12,7 +12,7 @@ node serve.mjs --port 8477 --server ws://127.0.0.1:8787/ws
 
 `client/static/connection.json` 随资产白名单打包，包含公开的 profile、URL、roomId。协议版本和 catalog hash 默认取生成 schema；也可以在公开配置中指定，客户端启动时拒绝不匹配值。默认 URL `/ws` 相对于网页 Origin，HTTPS 自动转换为 WSS；本地 HTTP 可以明确配置 WS 地址。URL 不允许凭据、query 或 fragment。`serve.mjs --server` 仅覆盖运行时返回的 URL，不改前端 bundle 或交付 manifest。
 
-生产网络端点应由同源 TLS 代理提供。M06 不提供 Linux 发布包或代理部署验收；它们仍属于 M08。当前 `dist-next` 保留显式离线诊断资产，但普通在线启动、游玩、死亡、重生和重连不请求 `server.wasm` / `server-worker.js`。在线 `?test`/`?cheat` 不安装离线诊断 API 和本地 RPC 面板。
+生产网络端点应由同源 TLS 代理提供。M08 提供 Linux x86_64 部署包、反向代理示例、排空和回滚 smoke；见 [部署契约](deployment.md)。当前 `dist-next` 保留显式离线诊断资产，但普通在线启动、游玩、死亡、重生和重连不请求 `server.wasm` / `server-worker.js`。在线 `?test`/`?cheat` 不安装离线诊断 API 和本地 RPC 面板。
 
 ## 状态、输入和命令
 
@@ -40,4 +40,4 @@ WorldState.setControlledPlayer(PlayerId, handle) 是在线本地身份来源，h
 
 专用 `server_browser_fixture` 链接同一 server_runtime / engine_core，使用不填充怪物的确定性 World。固定出生点及目录装备只存在于该测试可执行文件；公开服务没有测试 RPC。两个独立 BrowserContext 从真实 main/index 启动，使用键盘与正常 Command，在真实碰撞中完成击杀、死亡掉落、重生、恢复及两房间聊天隔离。测试同时阻止 Worker 构造并检查请求清单。`smoke-entrypoints.mjs` 另启动真实 serve.mjs，验证普通入口。
 
-结果、源码/二进制身份和历史失败见 [M06 交接](../../multiplayer-goals/CHECKLIST.md)。M06 不代表 M08 的 2×8 容量、30 分钟浸泡或生产发布已通过。
+结果、源码/二进制身份和历史失败见 [M06 交接](../../multiplayer-goals/CHECKLIST.md)。M08 的 2×8 容量、30 分钟浸泡和生产部署证据见 [CHECKLIST](../../multiplayer-goals/CHECKLIST.md)。

@@ -7,6 +7,22 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    "date": "2.0.0 - 2026-11-02",
+    "notes": [
+      "Added: Native authoritative multiplayer server with a real binary WebSocket v2 transport, room admission, reconnect tokens, bounded queues, heartbeats, graceful drain and fixed-label internal metrics.",
+      "Added: Online-capable client transport, input pump, authoritative lifecycle, snapshot decoding/resync, network clock, interpolation and bounded local motion prediction.",
+      "Added: Online-only dist-multiplayer delivery and tools/dev-multiplayer.mjs local launcher; it contains no `server.wasm`, Worker, test API or cheat assets.",
+      "Added: Native deployment package with Linux x86_64 CI target, nginx/Caddy examples, systemd unit, SHA-256 inventory and a start/drain/proxy-switch/rollback smoke.",
+      "Added: M08 multiplayer verification profile: real dual-browser acceptance, 2 rooms x 8 players capacity repetitions, 100 lifecycle cycles, slow-consumer isolation and a 30-minute RSS/entity soak.",
+      "Added: Source-bound release evidence now binds the offline ledger, multiplayer ledger and native package to the same source identity.",
+      "Changed: The default browser entry is online and constructs only NetworkTransport; the explicit local profile remains available in the offline delivery for tests.",
+      "Changed: New packaging and capacity tools are part of the verification/source identity.",
+      "Changed: Deployment requires paired client/server protocol and catalog hashes; sessions are memory-only and are interrupted by upgrades.",
+      "Fixed: Slow readers are closed at the 1 MiB per-connection queue bound while healthy peers continue receiving snapshots.",
+      "Fixed: Capacity measurements exclude warmup and use the same generated protocol codec, native server and fixed 50 ms tick as production."
+    ]
+  },
+  {
     "date": "1.0.0 - 2026-10-31",
     "notes": [
       "Added: C++20 server engine compiled to WebAssembly, with a deterministic fixed-step simulation and a native test suite.",

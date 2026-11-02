@@ -10,6 +10,9 @@ node_modules/
 
 # Delivery and build trees (tools/build-dist-next.mjs, tools/build-engine-wasm.mjs, CMake)
 dist-next/
+dist-multiplayer/
+dist-multiplayer.lock
+dist-multiplayer.stage-*/
 dist-next.lock
 dist-next.stage-*/
 build/

@@ -1,4 +1,4 @@
-# 原生 WebSocket 宿主（M05）
+# 原生 WebSocket 宿主（M08）
 
 `florr_server` 通过异步 Boost.Asio/Beast 接受二进制 v2 WebSocket，以独立单调时钟
 推进房间。一个 `io_context::run()` 线程独占 I/O 和全部房间；每个房间每 50ms
@@ -65,7 +65,7 @@ grace 权限；退出 UI 不授予无敌。空房 1200 tick 后销毁，同名�
 
 调度器最多补 4 tick，记录并丢弃超量墙钟积压，保持 50ms dt 和真实模拟计数；过载时
 readiness 为非就绪且不接受加入。默认两房间、每房间两人（含 grace 保留身份）。
-8 人是 M08 的显式容量验收目标，本阶段不提高发布默认容量。
+2 房间 × 8 人是 M08 的显式容量验收目标；`server/config/default.json` 仍保留保守的 2 人/房默认值，生产扩容通过完整配置显式设置。
 
 ## 依赖与验证
 
@@ -81,8 +81,7 @@ FLORR_BOOST_ARCHIVE=/absolute/path/boost_1_86_0.tar.bz2 npm run build:server
 `florr_server -> server_runtime -> engine_core` 没有 Worker/cheat ABI 链接。
 正式消息只有 schema v2 的输入/领域命令，不提供远程诊断；网络故障注入仅编译进测试 target。
 
-`test:server:native` 对照 `tests/product-tests.json` 精确检查根构建 **29 项 CTest**，
-包含 18 项 engine、10 项宿主回归和 1 项浏览器 fixture 检查。M05 新增 runtime 13、network 8、faults 6、process 2
+`test:server:native` 对照 `tests/product-tests.json` 精确检查根构建 CTest（engine 19 项、宿主回归与浏览器 fixture），具体数量由 `tests/product-tests.json` 唯一给出。M05 新增 runtime 13、network 8、faults 6、process 2
 共 29 个场景，覆盖 fake clock、真实双 WebSocket、token 竞争、慢连接、取消和两个进程信号。
 构建记录源码/配置/依赖/实际 Boost 树、编译器、选项和产物 hash；包含新测试可执行文件，
 运行前拒绝过期或篡改产物。现有 `test:all` 的两项 native gate 包含全部宿主回归。
@@ -91,4 +90,34 @@ FLORR_BOOST_ARCHIVE=/absolute/path/boost_1_86_0.tar.bz2 npm run build:server
 `reports/multiplayer/native-{build,ctest}.json`；M05 完整归档和命令见
 [执行清单](../multiplayer-goals/CHECKLIST.md)。M06 的专用原生 fixture 使用同一 runtime/core，
 固定测试出生点和装备；真实双浏览器负责移动、战斗、死亡、重生、恢复和隔离验证，
-不增加公开 debug RPC。延迟预测和 Linux 发布包、2×8 容量认证留给 M07/M08。
+不增加公开 debug RPC。M08 提供 `build:multiplayer`、`dist-multiplayer` 在线专用交付、`pack:native` 原生部署包、`test:multiplayer` 功能门禁与 `perf:multiplayer` 容量/浸泡证据。Linux x86_64 包由 `.github/workflows/multiplayer-linux.yml` 在 `ubuntu-24.04` 上构建；本地 macOS 包用于同机部署 smoke，不能冒充 Linux 产物。
+
+
+## M08 部署包与生命周期
+
+```sh
+npm run build:multiplayer       # dist-multiplayer + native server, online-only graph
+npm run verify:multiplayer      # no wasm/worker/dev modules; server/protocol hashes
+npm run start:multiplayer       # one-command local native server + static UI
+npm run pack:native             # release/multiplayer/<version>-<source12>-<runId>/
+npm run test:multiplayer:deploy # start -> drain -> proxy switch -> rollback smoke
+```
+
+`dist-multiplayer` 只有 `index.html`、`main.js`、`connection.json` 和在线客户端资产；
+它不包含 `server.wasm`、`server-worker.js`、`worker.js`、`local-worker.js`、`dev/` 或
+`wasm/`。`verify-multiplayer-dist.mjs` 从 `main-online.js` 走静态导入闭包，拒绝离线
+Worker/`new Worker`/`.wasm` 引用，并核对 `build-manifest.json`、源码身份、原生二进制
+hash、版本、协议版本和 catalog hash。
+
+部署包包含静态 `client/`、`server/florr_server`、严格配置模板、nginx/Caddy 示例、
+systemd unit、许可证、`release-manifest.json` 和 `SHA256SUMS`。反向代理必须把 `/ws`
+与 `/healthz` 转到原生进程，`/metrics` 只允许本机/监控访问，不能公开。服务端只保存
+内存会话；升级会中断在线会话，必须先停止准入并排空。客户端与服务端必须成对切换：
+只替换客户端在协议/目录 hash 不变时兼容，只替换服务端不向后兼容。回滚保留上一份
+完整包和配置；`test:multiplayer:deploy` 用真实进程验证启动、`/readyz` 排空、
+代理切换和回滚后的新会话，不能把内存会话当作可恢复状态。
+
+容量证据由 `perf:multiplayer` 产生：2 房间 × 8 玩家至少 15 分钟、至少 3 次，
+p99 房间 tick ≤20ms、双房间完整 round ≤25ms、稳态无 50ms deadline 违约、慢读者
+有界关闭且健康玩家继续、100 次连接/出生/死亡/重生、30 分钟浸泡 RSS 增长
+≤max(16MiB, 前 10%)。报告在 `reports/multiplayer/`，不进入发布包。

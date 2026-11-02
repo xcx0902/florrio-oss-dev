@@ -6,8 +6,7 @@ import { GameInput } from '../input/game-input.js';
 import { LoadoutController } from '../input/loadout-controller.js';
 import { MenuControls } from '../input/menu.js';
 import { InputPacketEncoder } from '../net/input.js';
-import { ServerWorkerClient } from '../net/worker.js';
-import { LocalWorkerTransport } from '../net/local-worker.js';
+import type { ServerWorkerClient } from '../net/worker.js';
 import { NetworkTransport } from '../net/websocket.js';
 import { connectionConfig, type ConnectionConfig } from '../net/connection-config.js';
 import type { Transport } from '../net/transport.js';
@@ -54,7 +53,7 @@ export class GameApp {
   readonly loadout: LoadoutController;
   readonly renderer: FrameRenderer;
   readonly transitions: Transitions;
-  constructor(canvas: HTMLCanvasElement, options: { transport?: Transport; config?: Partial<ConnectionConfig> } = {}) {
+  constructor(canvas: HTMLCanvasElement, options: { transport?: Transport; transportFactory?: (config: ConnectionConfig) => Transport | undefined; config?: Partial<ConnectionConfig> } = {}) {
     this.canvas = canvas;
     const context = canvas.getContext('2d');
     if (!context)
@@ -68,8 +67,11 @@ export class GameApp {
     this.injectedSequence = 0;
     this.audio = new SilentAudioBus();
     this.config = connectionConfig(options.config);
-    this.transport = options.transport ?? (this.config.profile === 'local' ? new LocalWorkerTransport() : new NetworkTransport(this.config));
-    if (this.transport instanceof ServerWorkerClient) this.worker = this.transport;
+    // The online composition never imports Worker adapters. Offline builds
+    // inject LocalWorkerTransport from their own entry point, so the online
+    // delivery graph contains no runtime simulation modules.
+    this.transport = options.transport ?? options.transportFactory?.(this.config) ?? new NetworkTransport(this.config);
+    if (this.transport.mode === 'local') this.worker = this.transport as unknown as ServerWorkerClient;
     this.inputEncoder = new InputPacketEncoder();
     this.renderContext = wrapContext(this.context2d);
     this.menuControls = new MenuControls();

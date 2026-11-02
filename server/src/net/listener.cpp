@@ -35,17 +35,17 @@ void NetworkServer::Impl::accept() {
 }
 void NetworkServer::Impl::schedule() {
   if(stopping || finished)return;
-  tickTimer.expires_at(std::chrono::steady_clock::time_point(std::chrono::milliseconds(scheduler.next())));
-  tickTimer.async_wait([self=shared_from_this()](Error ec) {
+  const auto scheduled=scheduler.next();
+  tickTimer.expires_at(std::chrono::steady_clock::time_point(std::chrono::milliseconds(scheduled)));
+  tickTimer.async_wait([self=shared_from_this(),scheduled](Error ec) {
     if(ec || self->stopping)return;
-    const auto now=monotonic_ms();const auto due=self->scheduler.poll(now);
+    const auto now=monotonic_ms();
+    const auto lag=now>=scheduled?now-scheduled:0;
+    self->metrics.record_event_loop_lag(lag*1000,self->metrics.ticks);
+    const auto due=self->scheduler.poll(now);
     if(due.overloaded) {++self->metrics.overloads;self->metrics.discardedWallMs+=due.discardedMs;}
     self->rooms.overloaded(due.overloaded);
-    for(std::uint32_t i=0;i<due.ticks;++i) {
-      const auto start=std::chrono::steady_clock::now();self->rooms.tick(now);
-      const auto elapsed=std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-start).count();
-      self->metrics.maxTickMicros=std::max(self->metrics.maxTickMicros,static_cast<std::uint64_t>(elapsed));
-    }
+    for(std::uint32_t i=0;i<due.ticks;++i)self->rooms.tick(now);
     self->schedule();
   });
 }

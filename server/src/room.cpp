@@ -80,7 +80,11 @@ void Room::tick() {
     auto* peer=session->peer();
     const auto publication=wire::publish(*world_,*changes,peer->identity(),peer->replication);
     if(!publication)session->fail(wire::ErrorCode::SnapshotTooLarge,"SNAPSHOT_LIMIT");
-    else if (session->send(publication->bytes)) (void)session->send(publication->leaderboardBytes);
+    else {
+      metrics_.snapshotBytes+=publication->bytes.size()+publication->leaderboardBytes.size();
+      ++metrics_.snapshotMessages;
+      if (session->send(publication->bytes)) (void)session->send(publication->leaderboardBytes);
+    }
   }
   wire::finish_tick_changes(*world_);
   if(members_.empty() && !emptySince_)emptySince_=world_->tick();

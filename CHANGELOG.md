@@ -8,6 +8,40 @@ Changelog panel is generated from this file by
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Dates use `YYYY-MM-DD`.
 
+## [2.0.0] - 2026-11-02
+
+### Added
+
+- Native authoritative multiplayer server with a real binary WebSocket v2 transport,
+  room admission, reconnect tokens, bounded queues, heartbeats, graceful drain and
+  fixed-label internal metrics.
+- Online-capable client transport, input pump, authoritative lifecycle, snapshot
+  decoding/resync, network clock, interpolation and bounded local motion prediction.
+- Online-only `dist-multiplayer` delivery and `tools/dev-multiplayer.mjs` local
+  launcher; it contains no `server.wasm`, Worker, test API or cheat assets.
+- Native deployment package with Linux x86_64 CI target, nginx/Caddy examples,
+  systemd unit, SHA-256 inventory and a start/drain/proxy-switch/rollback smoke.
+- M08 multiplayer verification profile: real dual-browser acceptance, 2 rooms x 8
+  players capacity repetitions, 100 lifecycle cycles, slow-consumer isolation and a
+  30-minute RSS/entity soak.
+- Source-bound release evidence now binds the offline ledger, multiplayer ledger and
+  native package to the same source identity.
+
+### Changed
+
+- The default browser entry is online and constructs only `NetworkTransport`;
+  the explicit local profile remains available in the offline delivery for tests.
+- New packaging and capacity tools are part of the verification/source identity.
+- Deployment requires paired client/server protocol and catalog hashes; sessions are
+  memory-only and are interrupted by upgrades.
+
+### Fixed
+
+- Slow readers are closed at the 1 MiB per-connection queue bound while healthy
+  peers continue receiving snapshots.
+- Capacity measurements exclude warmup and use the same generated protocol codec,
+  native server and fixed 50 ms tick as production.
+
 ## [1.0.0] - 2026-10-31
 
 ### Added

@@ -29,7 +29,9 @@ void Connection::http_read() {
       const auto ready=self->host_->rooms.ready() && !self->host_->stopping;
       self->http_reply(ready?http::status::ok:http::status::service_unavailable,ready?"{\"ready\":true}":"{\"ready\":false}");return;
     }
-    if(request.target()=="/metrics") {self->http_reply(http::status::ok,self->host_->metrics.json());return;}
+    if(request.target()=="/metrics" || request.target()=="/metrics?detail=1") {
+      self->http_reply(http::status::ok,self->host_->metrics.json(request.target()=="/metrics?detail=1"));return;
+    }
     if(request.target()!=self->host_->config.websocketPath || !websocket::is_upgrade(request)) {
       self->http_reply(http::status::not_found,"{\"error\":\"NOT_FOUND\"}");return;
     }
@@ -95,7 +97,9 @@ bool Connection::send(Bytes bytes) {
     // Pending and active buffers both count. Never discard an accepted delta.
     abort(CloseCause::SlowConsumer);return false;
   }
-  queuedBytes_+=bytes.size();writes_.push_back(std::make_shared<const Bytes>(std::move(bytes)));pump();return true;
+  queuedBytes_+=bytes.size();
+  if(queuedBytes_>host_->metrics.maxQueuedWriteBytes)host_->metrics.maxQueuedWriteBytes=queuedBytes_;
+  writes_.push_back(std::make_shared<const Bytes>(std::move(bytes)));pump();return true;
 }
 void Connection::pump() {
   if(done_ || writing_ || !upgraded_ || closeStarted_)return;

@@ -9,8 +9,8 @@
 
 ## 当前状态
 
-当前产品版本为 **v1.0.0**。本次功能、修复、使用方式与已知限制见
-[Release notes](docs/releases/v1.0.0.md)；发布包准备与校验见
+当前产品版本为 **v2.0.0**。本次功能、修复、使用方式与已知限制见
+[Release notes](docs/releases/v2.0.0.md)；发布包准备与校验见
 [发布流程](docs/release.md)。
 
 | 项目 | 状态 |
@@ -19,9 +19,9 @@
 | 服务端 | 原生 C++20 / engine_core；Worker/WASM 仅用于离线回归 |
 | 客户端 | TypeScript + Canvas2D |
 | 协议/布局/目录 | [`schema/`](schema/README.md) 为单一事实来源 |
-| 交付 | `dist-next/`，由源码重新构建并校验 |
+| 交付 | 在线 `dist-multiplayer/`（无 WASM/Worker）；离线诊断 `dist-next/`，均由源码重新构建并校验 |
 | 浏览器 | Chromium 桌面 + 模拟触控；Firefox / WebKit / 真机非目标 |
-| CI | 本仓库未配置远端 CI；验收以本地 `npm run test:all` 为准 |
+| CI | Linux x86_64 原生包由 GitHub Actions `.github/workflows/multiplayer-linux.yml` 构建；完整验收仍以本地 `npm run test:all` + `test:multiplayer:all` 为准 |
 
 历史逆向与 parity 结论不构成当前通过证明。当前源码是否通过，重新执行完整验收后生成的
 `reports/current-verification.json` 是唯一依据。
@@ -136,7 +136,7 @@ src/schema/     生成的协议/目录类型（勿手改）
 已实现 core/离线适配器分离及有限 tick smoke；原生宿主不加载 WASM、不初始化
 Worker/C ABI。`./build/native/server/florr_server --smoke-ticks 20` 输出实际 tick、
 实体数和种子摘要后退出。M02 已在 engine_core 实现同 World 多玩家状态和显式领域
-命令，M03 已补齐原生 PVP、特殊花瓣来源、唯一拾取和死亡重生闭环；M04 实现 v2 协议与只读每连接复制，见 [协议和复制](docs/multiplayer/replication.md)。M05 提供 `/ws`、health/readiness、独立 20Hz 房间时钟、限流和 token/grace 重连。M06 已接入真实浏览器在线 PVP、死亡重生、重连及房间隔离；网络预测和发布验收仍属于 M07/M08。接口见
+命令，M03 已补齐原生 PVP、特殊花瓣来源、唯一拾取和死亡重生闭环；M04 实现 v2 协议与只读每连接复制，见 [协议和复制](docs/multiplayer/replication.md)。M05 提供 `/ws`、health/readiness、独立 20Hz 房间时钟、限流和 token/grace 重连。M06 已接入真实浏览器在线 PVP、死亡重生、重连及房间隔离；M07 增加网络时钟/插值/预测；M08 提供在线专用 `dist-multiplayer`、原生部署包、12 项真实双浏览器验收、2×8 容量/30 分钟浸泡和回滚 smoke。接口见
 [玩家状态与领域命令](docs/multiplayer/player-state.md)、[玩法归属](docs/multiplayer/gameplay-ownership.md)。
 构建、离线依赖归档和证据路径见 [`server/README.md`](server/README.md)。
 
@@ -179,14 +179,15 @@ npm run test:integration    # 原生 WorkerApi -> TS 解码器
 npm run build               # 完整交付树
 npm run verify:delivery     # 交付完整性
 npm run test:delivery       # dist-next 交付冒烟
-npm run test:all            # 全流程验收，写 reports/current-verification.json
+npm run test:all            # 离线全流程验收，写 reports/current-verification.json
+npm run test:multiplayer:all # M08 完整联机验收（需先通过 test:all）
 npm run test:m4             # 校验冻结基线 + 全流程 + 性能对比 + 30 分钟资源浸泡
 ```
 
 `test:all` 由唯一 gate 表执行 17 步验收，wasm/TS/交付各构建一次，所有后续检查绑定同一份
 交付；包含完整 CTest、跨端、ABI、共享固定 Chrome 的浏览器/真实入口/绘制性能、
 原生与跨端工作负载。失败、中断或输入变化不会写出通过报告。
-`npm run release:prepare` 只为本次通过的 ledger 生成本地 tar.gz、manifest 与 SHA256SUMS。
+`npm run release:multiplayer` 只为本次通过的 ledger 生成在线原生包、tar.gz、manifest 与 SHA256SUMS。
 发布、校验与回退见 [`docs/release.md`](docs/release.md)，M3 映射见
 [`docs/m3-structure.md`](docs/m3-structure.md)。
 
@@ -204,7 +205,7 @@ JS、字体与清单。手写资产只在 `client/static/`，编译输出只在 
 `build/wasm/`；打包器按白名单及本次编译清单合成，排除测试 API、声明与 source map。
 `tools/verify-dist-next.mjs` 校验清单、哈希、imports、ABI 配置和源码身份；
 `tools/smoke-entrypoints.mjs` 用原生 WebSocket fixture 与真实键盘启动普通在线入口，验证无 Worker/WASM 请求。
-当前交付仍包含显式离线所需的 WASM/Worker；M08 负责最终在线发布包和容量验收。
+`dist-next` 保留显式离线所需的 WASM/Worker；`dist-multiplayer` 是 M08 的在线专用发布树，不包含这些资产。
 
 `dist/`、`dist-readable/`、`dist-reference/` 是历史产物，已移入归档，不再由本仓库构建。
 

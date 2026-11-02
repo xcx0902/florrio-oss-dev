@@ -1,6 +1,6 @@
 {
   "name": "florrio",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -35,7 +35,18 @@
     "perf:integration": "node tools/perf-integration.mjs",
     "test:multiplayer:baseline": "npm run build:engine && node tools/multiplayer-baseline.mjs",
     "build:server": "node tools/build-server.mjs",
-    "test:server:native": "npm run build:server && node tools/run-tests.mjs server-native"
+    "build:multiplayer": "node tools/build-multiplayer.mjs",
+    "verify:multiplayer": "node tools/verify-multiplayer-dist.mjs",
+    "start:multiplayer": "node tools/dev-multiplayer.mjs",
+    "dev:multiplayer": "node tools/dev-multiplayer.mjs",
+    "test:server:native": "npm run build:server && node tools/run-tests.mjs server-native",
+    "test:multiplayer": "node tools/run-multiplayer-verification.mjs --profile functional",
+    "test:multiplayer:all": "npm run perf:multiplayer && node tools/run-multiplayer-verification.mjs --profile all",
+    "test:multiplayer:browser": "node tools/multiplayer-browser.mjs",
+    "test:multiplayer:deploy": "node tools/deploy-smoke.mjs",
+    "perf:multiplayer": "node tools/perf-multiplayer-suite.mjs",
+    "pack:native": "node tools/pack-native.mjs",
+    "release:multiplayer": "node tools/prepare-multiplayer-release.mjs"
   },
   "devDependencies": {
     "playwright-core": "^1.49.1",
