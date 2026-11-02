@@ -9,9 +9,9 @@
 
 ## 当前状态
 
-当前产品版本为 **v2.0.0**。本次联机功能、使用方式与已知限制见
-[Release notes](docs/releases/v2.0.0.md)；发布包准备与校验见
-[发布流程](docs/release.md)。M08 的容量认证与 Linux 生产发行包仍未完成。
+当前产品版本为 **v1.0.0**。本次功能、修复、使用方式与已知限制见
+[Release notes](docs/releases/v1.0.0.md)；发布包准备与校验见
+[发布流程](docs/release.md)。
 
 | 项目 | 状态 |
 | --- | --- |
@@ -131,12 +131,12 @@ src/schema/     生成的协议/目录类型（勿手改）
 `npm run schema:generate`；`npm run schema:check` 做只读一致性检查。
 原始布局探针、旧生成器和证据表已归档，不再是生成输入。
 
-### `server/` — 原生 WebSocket 服务
+### `server/` — M05 原生 WebSocket 服务
 
 已实现 core/离线适配器分离及有限 tick smoke；原生宿主不加载 WASM、不初始化
 Worker/C ABI。`./build/native/server/florr_server --smoke-ticks 20` 输出实际 tick、
 实体数和种子摘要后退出。M02 已在 engine_core 实现同 World 多玩家状态和显式领域
-命令，M03 已补齐原生 PVP、特殊花瓣来源、唯一拾取和死亡重生闭环；M04 实现 v2 协议与只读每连接复制，见 [协议和复制](docs/multiplayer/replication.md)。M05 提供 `/ws`、health/readiness、独立 20Hz 房间时钟、限流和 token/grace 重连。M06 已接入真实浏览器在线 PVP、死亡重生、重连及房间隔离；M07 补齐网络时钟、远端插值和本地移动预测，见 [延迟与预测](docs/multiplayer/latency-and-prediction.md)。容量认证与 Linux 发布仍属于 M08。接口见
+命令，M03 已补齐原生 PVP、特殊花瓣来源、唯一拾取和死亡重生闭环；M04 实现 v2 协议与只读每连接复制，见 [协议和复制](docs/multiplayer/replication.md)。M05 提供 `/ws`、health/readiness、独立 20Hz 房间时钟、限流和 token/grace 重连。M06 已接入真实浏览器在线 PVP、死亡重生、重连及房间隔离；网络预测和发布验收仍属于 M07/M08。接口见
 [玩家状态与领域命令](docs/multiplayer/player-state.md)、[玩法归属](docs/multiplayer/gameplay-ownership.md)。
 构建、离线依赖归档和证据路径见 [`server/README.md`](server/README.md)。
 
@@ -167,9 +167,9 @@ serve.mjs     静态服务器
 
 ```bash
 npm run build:engine        # 原生 Release 构建
-npm run test:engine         # 构建 + 19 项 engine CTest（含 M02—M07）
+npm run test:engine         # 构建 + 18 项 engine CTest（含 M02—M04）
 npm run build:server        # 原生 WebSocket 服务 + 锁定依赖 + native identity
-npm run test:server:native  # 根构建 + 30 项封闭 CTest（含 engine/真实网络/信号）
+npm run test:server:native  # 根构建 + 29 项封闭 CTest（含 engine/真实网络/信号）
 npm run build:engine:wasm   # Emscripten CMake -> build/wasm/server.wasm
 npm run build:client        # tsc -> fresh build/client
 npm run test:unit           # 协议/线格式单元测试

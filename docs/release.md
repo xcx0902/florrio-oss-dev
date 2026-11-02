@@ -1,34 +1,21 @@
 # 本地产品发布
 
-发布目录是 `dist-next/`，对外是纯静态客户端。联机服务端从同一源码标签单独构建；
-项目保持 private，不向 npm 或远端自动发布。依赖与固定版本工具链见
-[environment.md](environment.md)。
+发布目录是 `dist-next/`，对外是纯静态页面。项目保持 private，不向 npm 或远端自动发布。
+依赖与固定版本工具链见 [environment.md](environment.md)。
 
-## v2.0.0 发布内容
+## v1.0.0 发布内容
 
-- 版本：根目录与客户端的 `package.json`、根目录 `package-lock.json` 均为 `2.0.0`。
-- 发布说明：[releases/v2.0.0.md](releases/v2.0.0.md)，可直接用于 GitHub Release 正文。
-- 本地验证摘要与包校验和：[releases/v2.0.0-verification.md](releases/v2.0.0-verification.md)。
-- 附件 `florrio-2.0.0-<source12>.tar.gz` 是静态 Web 客户端；`florr_server` 需从同一
-  `v2.0.0` 标签执行 `npm run build:server` 构建。不要把其他版本或开发中间构建的
-  服务端与客户端混用。
+- 版本：根目录与客户端的 `package.json`、根目录 `package-lock.json` 均为 `1.0.0`。
+- 发布说明：[releases/v1.0.0.md](releases/v1.0.0.md)，可直接用于 GitHub Release 正文。
+- 本地验证摘要与包校验和：[releases/v1.0.0-verification.md](releases/v1.0.0-verification.md)。
 - 游戏内更新日志：编辑根目录 `CHANGELOG.md` 后运行 `npm run schema:generate`；
   生成的菜单内容与交付一起验收，不手改生成文件。
-- 本地准备完成不代表已发布。提交本次源码后再创建 `v2.0.0` tag，并将已校验的
+- 本地准备完成不代表已发布。提交本次源码后再创建 `v1.0.0` tag，并将已校验的
   tar.gz、`release-manifest.json`、`SHA256SUMS` 附到对应 Release；发布前确认包中
   `source.sha256` 与待发布源码一致。manifest 的 `revision` 是打包时的 HEAD，
   若当时仍有未提交改动，它不是最终发布提交，不能仅据此认定包与 tag 一致。
-- 本版本仍按默认每房两人发布；M08 的 2×8 容量认证、Linux 生产发行包和 TLS 部署
-  smoke 未完成，发布说明必须保留这些限制。
 - 当前未附统一开源许可证；沿用 README 的来源与授权说明，字体按包内 Ubuntu
   Font License 分发。发布记录不应宣称全仓库采用某一开源许可证。
-
-## v1.0.0 发布内容（历史）
-
-- 版本：根目录与客户端的 `package.json`、根目录 `package-lock.json` 均为 `1.0.0`。
-- 发布说明：[releases/v1.0.0.md](releases/v1.0.0.md)。
-- 本地验证摘要与包校验和：[releases/v1.0.0-verification.md](releases/v1.0.0-verification.md)。
-- 该版本为单机 Worker/WASM 交付；v2.0.0 保留其显式离线 profile 作为诊断入口。
 
 ## 验收并准备包
 
