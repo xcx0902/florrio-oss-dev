@@ -44,8 +44,28 @@ motion:
   pingIntervalMs: 1000
 enums:
   CommandKind: { Spawn: 1, Swap: 2, Discard: 3, Suicide: 4, Chat: 5, Leave: 6 }
-  ResultCode: { Ok: 0, StaleLife: 1, InvalidState: 2, Cooldown: 3, Duplicate: 4, InvalidSequence: 5, QueueFull: 6 }
-  ErrorCode: { Protocol: 1, Version: 2, Catalog: 3, RoomFull: 4, SlowConsumer: 5, Stopping: 6, EpochExhausted: 7, SnapshotTooLarge: 8, Session: 9 }
+  ResultCode:
+    {
+      Ok: 0,
+      StaleLife: 1,
+      InvalidState: 2,
+      Cooldown: 3,
+      Duplicate: 4,
+      InvalidSequence: 5,
+      QueueFull: 6,
+    }
+  ErrorCode:
+    {
+      Protocol: 1,
+      Version: 2,
+      Catalog: 3,
+      RoomFull: 4,
+      SlowConsumer: 5,
+      Stopping: 6,
+      EpochExhausted: 7,
+      SnapshotTooLarge: 8,
+      Session: 9,
+    }
   ResyncReason: { Gap: 1, Baseline: 2, Decode: 3 }
   EventKind: { Hit: 1, Pickup: 2, Chat: 3 }
 records:
@@ -194,5 +214,17 @@ messages:
 visibility:
   publicFields: [2, 4, 7, 8, 9, 11, 12, 22, 26, 28, 31, 36, 38, 49, 50, 53, 54, 55, 59, 62]
   publicDenseGroups: [116, 120, 140, 152]
-  private: [inventory, recharge, backpack, experience, zoneProgress, deathScore, deathLevel, kept, killerName, nextSpawnTick]
+  private:
+    [
+      inventory,
+      recharge,
+      backpack,
+      experience,
+      zoneProgress,
+      deathScore,
+      deathLevel,
+      kept,
+      killerName,
+      nextSpawnTick,
+    ]
   entityCodec: 'protocol.yaml sparse fields; optional public dense groups, group 152 base only; each fields blob is a complete independent type-1 entity block, sequence=1 ack=0, no deletes/events'

@@ -50,18 +50,19 @@ class World {
    * Original130 obtains four host entropy bytes; seed modulo INT_MAX, zero->1.
    * Host entropy is not shared with this deterministic reconstruction: seed1
    * is the bounded fixture default. Callers can supply an explicit raw seed. */
-  void seed_death_shuffle(std::uint32_t entropy) {
-    death_shuffle_.seed(entropy % 2147483647U);
-  }
+  void seed_death_shuffle(std::uint32_t entropy) { death_shuffle_.seed(entropy % 2147483647U); }
   [[nodiscard]] ServerRng& death_shuffle_random() { return death_shuffle_; }
   [[nodiscard]] PlayerRegistry& players() { return players_; }
   [[nodiscard]] const PlayerRegistry& players() const { return players_; }
   /** Adopt latest input for this identity/life, without simulating movement. */
-  bool apply_input(PlayerId id, LifeEpoch life, std::uint32_t buttons, f32 angle,
-                   f32 strength, std::uint64_t ttl_ticks = kInputTtlTicks);
+  bool apply_input(PlayerId id, LifeEpoch life, std::uint32_t buttons, f32 angle, f32 strength,
+                   std::uint64_t ttl_ticks = kInputTtlTicks);
   [[nodiscard]] f32 width() const { return width_; }
   [[nodiscard]] f32 height() const { return height_; }
-  void set_dimensions(f32 width, f32 height) { width_ = width; height_ = height; }
+  void set_dimensions(f32 width, f32 height) {
+    width_ = width;
+    height_ = height;
+  }
   [[nodiscard]] bool compact() const { return compact_; }
   void set_compact(bool compact) { compact_ = compact; }
   [[nodiscard]] bool auto_populate() const { return auto_populate_; }
@@ -79,13 +80,13 @@ class World {
     float y = 0.0F;
   };
   void record_death(EntityKind kind, std::uint16_t type_id, Vec2 position,
-                    EntityKind attacker_kind = EntityKind::kNone,
-                    std::uint16_t attacker_type = 0) {
-    deaths_.push_back(DeathRecord{tick_, type_id, attacker_type,
-                                  static_cast<std::uint8_t>(kind),
-                                  static_cast<std::uint8_t>(attacker_kind),
-                                  position.x.value, position.y.value});
-    if (deaths_.size() > 128U) deaths_.pop_front();
+                    EntityKind attacker_kind = EntityKind::kNone, std::uint16_t attacker_type = 0) {
+    deaths_.push_back(DeathRecord{tick_, type_id, attacker_type, static_cast<std::uint8_t>(kind),
+                                  static_cast<std::uint8_t>(attacker_kind), position.x.value,
+                                  position.y.value});
+    if (deaths_.size() > 128U) {
+      deaths_.pop_front();
+    }
   }
   [[nodiscard]] const std::deque<DeathRecord>& deaths() const { return deaths_; }
 
@@ -105,22 +106,34 @@ class World {
   /** Pickup intrusive registry (world +36 count / +44 pointer vector). */
   void register_pickup(EntityHandle handle) {
     Entity* entity = entities_.get(handle);
-    if (entity == nullptr || entity->pickup_listed) return;
+    if (entity == nullptr || entity->pickup_listed) {
+      return;
+    }
     entity->pickup_listed = true;
     entity->pickup_prev = pickups_.empty() ? EntityHandle{} : pickups_.back();
     entity->pickup_next = EntityHandle{};
     if (!pickups_.empty()) {
-      if (Entity* previous = entities_.get(pickups_.back())) previous->pickup_next = handle;
+      if (Entity* previous = entities_.get(pickups_.back())) {
+        previous->pickup_next = handle;
+      }
     }
     pickups_.push_back(handle);
   }
   void unregister_pickup(EntityHandle handle) {
     Entity* entity = entities_.get(handle);
-    if (entity == nullptr || !entity->pickup_listed) return;
-    if (Entity* previous = entities_.get(entity->pickup_prev)) previous->pickup_next = entity->pickup_next;
-    if (Entity* next = entities_.get(entity->pickup_next)) next->pickup_prev = entity->pickup_prev;
+    if (entity == nullptr || !entity->pickup_listed) {
+      return;
+    }
+    if (Entity* previous = entities_.get(entity->pickup_prev)) {
+      previous->pickup_next = entity->pickup_next;
+    }
+    if (Entity* next = entities_.get(entity->pickup_next)) {
+      next->pickup_prev = entity->pickup_prev;
+    }
     const auto found = std::find(pickups_.begin(), pickups_.end(), handle);
-    if (found != pickups_.end()) pickups_.erase(found);
+    if (found != pickups_.end()) {
+      pickups_.erase(found);
+    }
     entity->pickup_listed = false;
     entity->pickup_prev = EntityHandle{};
     entity->pickup_next = EntityHandle{};
@@ -131,8 +144,12 @@ class World {
    * matching the original dense component vector. Its order determines RNG
    * assignment when several wandering timers fire in one tick. */
   void register_ai(EntityHandle handle) {
-    if (!handle.valid()) return;
-    if (std::find(ai_order_.begin(), ai_order_.end(), handle) != ai_order_.end()) return;
+    if (!handle.valid()) {
+      return;
+    }
+    if (std::find(ai_order_.begin(), ai_order_.end(), handle) != ai_order_.end()) {
+      return;
+    }
     ai_order_.push_back(handle);
   }
   void unregister_ai(EntityHandle handle) {
@@ -149,22 +166,30 @@ class World {
    * which holes were spawned, which determines RNG assignment when several
    * holes cross a threshold in the same tick. */
   void register_ant_hole(EntityHandle handle) {
-    if (!handle.valid()) return;
+    if (!handle.valid()) {
+      return;
+    }
     for (const auto& entry : ant_hole_releases_) {
-      if (entry.entity == handle) return;
+      if (entry.entity == handle) {
+        return;
+      }
     }
     ant_hole_releases_.push_back(AntHoleRelease{handle, 0U});
   }
   void unregister_ant_hole(EntityHandle handle) {
     for (std::size_t index = 0; index < ant_hole_releases_.size(); ++index) {
-      if (ant_hole_releases_[index].entity != handle) continue;
+      if (ant_hole_releases_[index].entity != handle) {
+        continue;
+      }
       ant_hole_releases_[index] = ant_hole_releases_.back();
       ant_hole_releases_.pop_back();
       return;
     }
   }
   [[nodiscard]] std::vector<AntHoleRelease>& ant_hole_releases() { return ant_hole_releases_; }
-  [[nodiscard]] const std::vector<AntHoleRelease>& ant_hole_releases() const { return ant_hole_releases_; }
+  [[nodiscard]] const std::vector<AntHoleRelease>& ant_hole_releases() const {
+    return ant_hole_releases_;
+  }
 
   /** Area-effect domain (original world+24780 vector and function 271). */
   std::shared_ptr<EffectPayload> replace_area_effect(EntityHandle owner, f32 scale,
@@ -184,9 +209,13 @@ class World {
     deferred_launches_.push_back(std::move(launch));
   }
   std::size_t run_deferred_launches(double now_ms);
-  [[nodiscard]] const std::vector<DeferredLaunch>& deferred_launches() const { return deferred_launches_; }
+  [[nodiscard]] const std::vector<DeferredLaunch>& deferred_launches() const {
+    return deferred_launches_;
+  }
   /** Sequences processed by the last run_deferred_launches call, in order. */
-  [[nodiscard]] const std::vector<std::uint64_t>& last_launch_order() const { return last_launch_order_; }
+  [[nodiscard]] const std::vector<std::uint64_t>& last_launch_order() const {
+    return last_launch_order_;
+  }
 
   /** R05 phase trace: the ordered system names executed by the last tick.
    * This is evidence for the phase-level comparison against spServerThink. */
@@ -195,7 +224,11 @@ class World {
     phase_trace_.push_back(phase);
     phase_draws_.push_back(random_.draws());
   }
-  void clear_phase_trace() { PERF_START(); phase_trace_.clear(); phase_draws_.clear(); }
+  void clear_phase_trace() {
+    PERF_START();
+    phase_trace_.clear();
+    phase_draws_.clear();
+  }
   [[nodiscard]] const std::vector<const char*>& phase_trace() const { return phase_trace_; }
   /** Cumulative server-RNG draw count at each recorded phase (diagnostics). */
   [[nodiscard]] const std::vector<std::uint32_t>& phase_draws() const { return phase_draws_; }
@@ -255,4 +288,4 @@ class World {
   bool initialized_ = false;
 };
 
-} // namespace engine
+}  // namespace engine

@@ -16,8 +16,8 @@ struct Aabb {
   f32 max_y;
 
   [[nodiscard]] bool intersects(const Aabb& other) const {
-    return min_x <= other.max_x && max_x >= other.min_x &&
-           min_y <= other.max_y && max_y >= other.min_y;
+    return min_x <= other.max_x && max_x >= other.min_x && min_y <= other.max_y &&
+           max_y >= other.min_y;
   }
 };
 
@@ -76,4 +76,4 @@ class QuadTree {
   std::size_t size_ = 0;
 };
 
-} // namespace engine
+}  // namespace engine

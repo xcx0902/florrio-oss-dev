@@ -17,9 +17,7 @@
       "note": "type=1, sequence=12, ack=4, deletes=0, updates=1, events=0; handle 0x12345678 LE; wire flags 0x34 xor 0x36 = 2 (bare); zero-length body",
       "sequence": 12,
       "deletedHandles": [],
-      "entities": [
-        { "handle": 305419896, "flags": 2, "typeId": 0 }
-      ],
+      "entities": [{ "handle": 305419896, "flags": 2, "typeId": 0 }],
       "events": []
     }
   ]

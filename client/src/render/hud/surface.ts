@@ -8,26 +8,42 @@ export function wrapHudSurface(native: RasterContext2D): HudContext {
   // hexadecimal string conversion on every HUD color setter.
   const bridge = {
     ...wrapContext(native),
-    stroke(path?: Path2D) { if (path)
-      native.stroke(path);
-    else
-      native.stroke(); },
-    setGlobalCompositeOperation(operation: GlobalCompositeOperation) { native.globalCompositeOperation = operation; },
+    stroke(path?: Path2D) {
+      if (path) {
+        native.stroke(path);
+      } else {
+        native.stroke();
+      }
+    },
+    setGlobalCompositeOperation(operation: GlobalCompositeOperation) {
+      native.globalCompositeOperation = operation;
+    },
   };
   return hudRenderer(bridge);
 }
-export function getHudSurface(width: number, height: number): ReturnType<typeof renderResources>['hudSurface'] {
+export function getHudSurface(
+  width: number,
+  height: number,
+): ReturnType<typeof renderResources>['hudSurface'] {
   const resources = renderResources();
-  if (!canvasAvailable())
+  if (!canvasAvailable()) {
     return undefined;
-  if (resources.hudSurface && resources.hudSurface.canvas.width === width && resources.hudSurface.canvas.height === height)
+  }
+  if (
+    resources.hudSurface &&
+    resources.hudSurface.canvas.width === width &&
+    resources.hudSurface.canvas.height === height
+  ) {
     return resources.hudSurface;
+  }
   const canvas = createRasterCanvas(width, height);
-  if (!canvas)
+  if (!canvas) {
     return undefined;
+  }
   const native = getRasterContext(canvas);
-  if (!native)
+  if (!native) {
     return undefined;
+  }
   resources.hudSurface = { canvas, context: wrapHudSurface(native) };
   return resources.hudSurface;
 }

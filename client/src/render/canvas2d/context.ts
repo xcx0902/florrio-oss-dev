@@ -17,7 +17,16 @@ export interface Canvas2DContext {
   quadraticCurveTo(cx: number, cy: number, x: number, y: number): void;
   bezierCurveTo(c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): void;
   arc(x: number, y: number, r: number, start: number, end: number, ccw?: boolean): void;
-  ellipse(x: number, y: number, rx: number, ry: number, rotation: number, start: number, end: number, ccw?: boolean): void;
+  ellipse(
+    x: number,
+    y: number,
+    rx: number,
+    ry: number,
+    rotation: number,
+    start: number,
+    end: number,
+    ccw?: boolean,
+  ): void;
   fill(path?: Path2D): void;
   stroke(path?: Path2D): void;
   clip(path?: Path2D): void;
@@ -40,7 +49,9 @@ export interface Canvas2DContext {
   drawImage(image: CanvasImageSource, ...args: number[]): void;
 }
 
-export function wrapContext(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D): Canvas2DContext {
+export function wrapContext(
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+): Canvas2DContext {
   const color = (r: number, g: number, b: number): string =>
     '#' + HEX[r & 255] + HEX[g & 255] + HEX[b & 255];
   type Matrix = [number, number, number, number, number, number];
@@ -54,60 +65,164 @@ export function wrapContext(context: CanvasRenderingContext2D | OffscreenCanvasR
   // The recovered renderer keeps a logical f32 matrix and flushes its cache
   // at coordinate/path-resource operations, after intervening style setters.
   const flush = (): void => {
-    if (matrix[0] !== flushed[0] || matrix[1] !== flushed[1] || matrix[2] !== flushed[2]
-        || matrix[3] !== flushed[3] || matrix[4] !== flushed[4] || matrix[5] !== flushed[5]) {
+    if (
+      matrix[0] !== flushed[0] ||
+      matrix[1] !== flushed[1] ||
+      matrix[2] !== flushed[2] ||
+      matrix[3] !== flushed[3] ||
+      matrix[4] !== flushed[4] ||
+      matrix[5] !== flushed[5]
+    ) {
       context.setTransform(...matrix);
       flushed = matrix;
     }
   };
   return {
-    save: () => { stack.push({ matrix, flushed }); context.save(); },
+    save: () => {
+      stack.push({ matrix, flushed });
+      context.save();
+    },
     restore: () => {
       context.restore();
       const state = stack.pop();
-      if (state) { matrix = state.matrix; flushed = state.flushed; }
+      if (state) {
+        matrix = state.matrix;
+        flushed = state.flushed;
+      }
     },
-    setTransform: (a, b, c, d, e, f) => { matrix = [a, b, c, d, e, f]; },
+    setTransform: (a, b, c, d, e, f) => {
+      matrix = [a, b, c, d, e, f];
+    },
     getTransform: () => matrix,
-    syncTransform: () => { flushed = current(); },
+    syncTransform: () => {
+      flushed = current();
+    },
     transform: (a, b, c, d, e, offsetY) => {
-      const [ma, mb, mc, md, me, mf] = matrix, f = Math.fround;
-      matrix = [f(f(ma * a) + f(mc * b)), f(f(mb * a) + f(md * b)),
-        f(f(ma * c) + f(mc * d)), f(f(mb * c) + f(md * d)),
+      const [ma, mb, mc, md, me, mf] = matrix,
+        f = Math.fround;
+      matrix = [
+        f(f(ma * a) + f(mc * b)),
+        f(f(mb * a) + f(md * b)),
+        f(f(ma * c) + f(mc * d)),
+        f(f(mb * c) + f(md * d)),
         f(me + f(f(ma * e) + f(mc * offsetY))),
-        f(mf + f(f(mb * e) + f(md * offsetY)))];
+        f(mf + f(f(mb * e) + f(md * offsetY))),
+      ];
     },
     createPath: () => new Path2D(),
     beginPath: () => context.beginPath(),
     closePath: () => context.closePath(),
-    rect: (x, y, w, h) => { flush(); context.rect(x, y, w, h); },
-    moveTo: (x, y) => { flush(); context.moveTo(x, y); },
-    lineTo: (x, y) => { flush(); context.lineTo(x, y); },
-    quadraticCurveTo: (cx, cy, x, y) => { flush(); context.quadraticCurveTo(cx, cy, x, y); },
-    bezierCurveTo: (c1x, c1y, c2x, c2y, x, y) => { flush(); context.bezierCurveTo(c1x, c1y, c2x, c2y, x, y); },
-    arc: (x, y, r, start, end, ccw) => { flush(); context.arc(x, y, r, start, end, ccw ?? false); },
-    ellipse: (x, y, rx, ry, rotation, start, end, ccw) => { flush(); context.ellipse(x, y, rx, ry, rotation, start, end, ccw ?? false); },
-    fill: path => { flush(); path === undefined ? context.fill() : context.fill(path); },
-    stroke: path => { flush(); path === undefined ? context.stroke() : context.stroke(path); },
-    clip: path => { flush(); path === undefined ? context.clip() : context.clip(path); },
-    fillRect: (x, y, w, h) => { flush(); context.fillRect(x, y, w, h); },
-    strokeRect: (x, y, w, h) => { flush(); context.strokeRect(x, y, w, h); },
-    clearRect: (x, y, w, h) => { flush(); context.clearRect(x, y, w, h); },
-    setFillRgb: (r, g, b) => { context.fillStyle = color(r, g, b); },
-    setStrokeRgb: (r, g, b) => { context.strokeStyle = color(r, g, b); },
-    setGlobalAlpha: alpha => { context.globalAlpha = alpha; },
-    setGlobalCompositeOperation: operation => { context.globalCompositeOperation = operation; },
-    setLineWidth: width => { context.lineWidth = width; },
-    setLineCap: cap => { context.lineCap = cap; },
-    setLineJoin: join => { context.lineJoin = join; },
-    setMiterLimit: limit => { context.miterLimit = limit; },
+    rect: (x, y, w, h) => {
+      flush();
+      context.rect(x, y, w, h);
+    },
+    moveTo: (x, y) => {
+      flush();
+      context.moveTo(x, y);
+    },
+    lineTo: (x, y) => {
+      flush();
+      context.lineTo(x, y);
+    },
+    quadraticCurveTo: (cx, cy, x, y) => {
+      flush();
+      context.quadraticCurveTo(cx, cy, x, y);
+    },
+    bezierCurveTo: (c1x, c1y, c2x, c2y, x, y) => {
+      flush();
+      context.bezierCurveTo(c1x, c1y, c2x, c2y, x, y);
+    },
+    arc: (x, y, r, start, end, ccw) => {
+      flush();
+      context.arc(x, y, r, start, end, ccw ?? false);
+    },
+    ellipse: (x, y, rx, ry, rotation, start, end, ccw) => {
+      flush();
+      context.ellipse(x, y, rx, ry, rotation, start, end, ccw ?? false);
+    },
+    fill: (path) => {
+      flush();
+      if (path === undefined) {
+        context.fill();
+      } else {
+        context.fill(path);
+      }
+    },
+    stroke: (path) => {
+      flush();
+      if (path === undefined) {
+        context.stroke();
+      } else {
+        context.stroke(path);
+      }
+    },
+    clip: (path) => {
+      flush();
+      if (path === undefined) {
+        context.clip();
+      } else {
+        context.clip(path);
+      }
+    },
+    fillRect: (x, y, w, h) => {
+      flush();
+      context.fillRect(x, y, w, h);
+    },
+    strokeRect: (x, y, w, h) => {
+      flush();
+      context.strokeRect(x, y, w, h);
+    },
+    clearRect: (x, y, w, h) => {
+      flush();
+      context.clearRect(x, y, w, h);
+    },
+    setFillRgb: (r, g, b) => {
+      context.fillStyle = color(r, g, b);
+    },
+    setStrokeRgb: (r, g, b) => {
+      context.strokeStyle = color(r, g, b);
+    },
+    setGlobalAlpha: (alpha) => {
+      context.globalAlpha = alpha;
+    },
+    setGlobalCompositeOperation: (operation) => {
+      context.globalCompositeOperation = operation;
+    },
+    setLineWidth: (width) => {
+      context.lineWidth = width;
+    },
+    setLineCap: (cap) => {
+      context.lineCap = cap;
+    },
+    setLineJoin: (join) => {
+      context.lineJoin = join;
+    },
+    setMiterLimit: (limit) => {
+      context.miterLimit = limit;
+    },
     getGlobalAlpha: () => context.globalAlpha,
-    setFont: font => { context.font = font; },
-    fillText: (text, x, y) => { flush(); context.fillText(text, x, y); },
-    strokeText: (text, x, y) => { flush(); context.strokeText(text, x, y); },
-    measureText: text => context.measureText(text),
-    drawImage: (image, ...args) => { flush(); (context.drawImage as unknown as (image: CanvasImageSource, ...values: number[]) => void)(image, ...args); },
+    setFont: (font) => {
+      context.font = font;
+    },
+    fillText: (text, x, y) => {
+      flush();
+      context.fillText(text, x, y);
+    },
+    strokeText: (text, x, y) => {
+      flush();
+      context.strokeText(text, x, y);
+    },
+    measureText: (text) => context.measureText(text),
+    drawImage: (image, ...args) => {
+      flush();
+      (context.drawImage as unknown as (image: CanvasImageSource, ...values: number[]) => void)(
+        image,
+        ...args,
+      );
+    },
   };
 }
 
-const HEX = Array.from({ length: 256 }, (_, value) => value.toString(16).padStart(2, '0').toUpperCase());
+const HEX = Array.from({ length: 256 }, (_, value) =>
+  value.toString(16).padStart(2, '0').toUpperCase(),
+);

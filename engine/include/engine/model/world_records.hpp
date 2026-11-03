@@ -14,10 +14,13 @@ inline constexpr double kDirectionScale = 0x144ad13d5bfebaULL * 0x1p-47;
 
 /** Original inputButtons direction packing. */
 [[nodiscard]] inline std::uint32_t pack_direction(f32 angle) {
-  const f32 normalized(static_cast<float>(std::fmod(static_cast<double>(angle.value), kInputAngleModulus)));
+  const f32 normalized(
+      static_cast<float>(std::fmod(static_cast<double>(angle.value), kInputAngleModulus)));
   const double wrapped = std::fmod(static_cast<double>(normalized.value), kInputTau);
   const double scaled = std::floor(std::fmod(wrapped + kInputTau, kInputTau) * kDirectionScale);
-  if (scaled >= 0.0 && scaled < 4294967296.0) return static_cast<std::uint32_t>(scaled);
+  if (scaled >= 0.0 && scaled < 4294967296.0) {
+    return static_cast<std::uint32_t>(scaled);
+  }
   return 0U;
 }
 
@@ -73,5 +76,4 @@ struct PlayerInput {
   std::uint32_t direction = 0;
 };
 
-
-} // namespace engine
+}  // namespace engine

@@ -6,15 +6,15 @@
 damage, maximum health and orbit profile. The generated view is
 `engine/include/engine/catalog/petal_combat.hpp`. Examples:
 
-| Petal | Collision radius | Damage | Health | Orbit |
-| --- | ---: | ---: | ---: | --- |
-| Basic (1) | 10 | 10 | 10 | basic 130/40 |
-| Fast (2) | 7 | 8 | 5 | fast 145/40 |
-| Heavy (3) | 12 | 20 | 20 | heavy 120/50 |
-| Rock (4) | 14 | 10 | 90 | rock 110/55 |
-| Stinger (7) | 7 | 35 | 8 | basic 130/40 |
-| Heaviest (26) | 16 | 10 | 200 | heaviest 100/65 |
-| Corn (38) | 10 | 1 | 2000 | basic 130/40 |
+| Petal         | Collision radius | Damage | Health | Orbit           |
+| ------------- | ---------------: | -----: | -----: | --------------- |
+| Basic (1)     |               10 |     10 |     10 | basic 130/40    |
+| Fast (2)      |                7 |      8 |      5 | fast 145/40     |
+| Heavy (3)     |               12 |     20 |     20 | heavy 120/50    |
+| Rock (4)      |               14 |     10 |     90 | rock 110/55     |
+| Stinger (7)   |                7 |     35 |      8 | basic 130/40    |
+| Heaviest (26) |               16 |     10 |    200 | heaviest 100/65 |
+| Corn (38)     |               10 |      1 |   2000 | basic 130/40    |
 
 The catalog `radius` (14 or 11/12) remains the draw radius. `Entity` carries
 both `radius` and `collision_radius` so rendering and collision can differ.

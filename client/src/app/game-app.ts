@@ -28,10 +28,21 @@ export class GameApp {
   readonly transport: Transport;
   readonly config: ConnectionConfig;
   readonly inputPump: InputPump;
-  get online(): boolean { return this.transport.mode === 'network'; }
-  get network(): NetworkTransport | undefined { return this.transport instanceof NetworkTransport ? this.transport : undefined; }
-  get server(): ServerWorkerClient { if (!this.worker) throw new Error('Local simulation is unavailable online'); return this.worker; }
-  set server(value: ServerWorkerClient) { this.worker = value; }
+  get online(): boolean {
+    return this.transport.mode === 'network';
+  }
+  get network(): NetworkTransport | undefined {
+    return this.transport instanceof NetworkTransport ? this.transport : undefined;
+  }
+  get server(): ServerWorkerClient {
+    if (!this.worker) {
+      throw new Error('Local simulation is unavailable online');
+    }
+    return this.worker;
+  }
+  set server(value: ServerWorkerClient) {
+    this.worker = value;
+  }
   readonly connectionStatus = document.createElement('div');
   inputEncoder: InputPacketEncoder;
   renderContext: import('../render/canvas2d/context.js').Canvas2DContext;
@@ -53,11 +64,19 @@ export class GameApp {
   readonly loadout: LoadoutController;
   readonly renderer: FrameRenderer;
   readonly transitions: Transitions;
-  constructor(canvas: HTMLCanvasElement, options: { transport?: Transport; transportFactory?: (config: ConnectionConfig) => Transport | undefined; config?: Partial<ConnectionConfig> } = {}) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    options: {
+      transport?: Transport;
+      transportFactory?: (config: ConnectionConfig) => Transport | undefined;
+      config?: Partial<ConnectionConfig>;
+    } = {},
+  ) {
     this.canvas = canvas;
     const context = canvas.getContext('2d');
-    if (!context)
+    if (!context) {
       throw new Error('Canvas2D unavailable');
+    }
     this.context2d = context;
     this.world = new WorldState();
     this.camera = new CameraState();
@@ -70,8 +89,13 @@ export class GameApp {
     // The online composition never imports Worker adapters. Offline builds
     // inject LocalWorkerTransport from their own entry point, so the online
     // delivery graph contains no runtime simulation modules.
-    this.transport = options.transport ?? options.transportFactory?.(this.config) ?? new NetworkTransport(this.config);
-    if (this.transport.mode === 'local') this.worker = this.transport as unknown as ServerWorkerClient;
+    this.transport =
+      options.transport ??
+      options.transportFactory?.(this.config) ??
+      new NetworkTransport(this.config);
+    if (this.transport.mode === 'local') {
+      this.worker = this.transport as unknown as ServerWorkerClient;
+    }
     this.inputEncoder = new InputPacketEncoder();
     this.renderContext = wrapContext(this.context2d);
     this.menuControls = new MenuControls();
@@ -88,42 +112,70 @@ export class GameApp {
     if (this.online) {
       this.connectionStatus.id = 'connection-status';
       this.connectionStatus.setAttribute('role', 'status');
-      Object.assign(this.connectionStatus.style, { position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)',
-        color: 'white', background: '#173e2ddd', padding: '12px 18px', font: '16px sans-serif', borderRadius: '8px', display: 'none', zIndex: '10' });
+      Object.assign(this.connectionStatus.style, {
+        position: 'absolute',
+        top: '16px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        color: 'white',
+        background: '#173e2ddd',
+        padding: '12px 18px',
+        font: '16px sans-serif',
+        borderRadius: '8px',
+        display: 'none',
+        zIndex: '10',
+      });
       document.body.append(this.connectionStatus);
       this.transport.onClose(({ state, message }) => {
         this.connectionStatus.replaceChildren(document.createTextNode(message));
         this.connectionStatus.style.display = message ? 'block' : 'none';
         if (state === 'error' || state === 'reconnecting') {
-          const button = document.createElement('button'); button.textContent = 'Return to menu';
-          button.onclick = () => this.session.returnToNetworkMenu(); this.connectionStatus.append(' ', button);
+          const button = document.createElement('button');
+          button.textContent = 'Return to menu';
+          button.onclick = () => this.session.returnToNetworkMenu();
+          this.connectionStatus.append(' ', button);
         }
       });
     }
     this.camera.zoom = 2 / 3;
-    this.canvas.addEventListener('wheel', event => {
-      // Mouse wheel: deltaY/175, multiplied by three for the
-      // Chrome wheelDeltaY convention, then adjusted for line/page delta modes.
-      const legacyWheel = event as WheelEvent & {
-        wheelDeltaY?: number;
-      };
-      let delta = event.deltaY / 175;
-      if (legacyWheel.wheelDeltaY !== undefined ? legacyWheel.wheelDeltaY === -3 * event.deltaY
-        : event.deltaMode === 0)
-        delta *= 3;
-      if (event.deltaMode === 1)
-        delta /= 18;
-      else if (event.deltaMode === 2)
-        delta /= 1000;
-      if (!this.session.started && this.menuControls.wheel(delta))
+    this.canvas.addEventListener(
+      'wheel',
+      (event) => {
+        // Mouse wheel: deltaY/175, multiplied by three for the
+        // Chrome wheelDeltaY convention, then adjusted for line/page delta modes.
+        const legacyWheel = event as WheelEvent & {
+          wheelDeltaY?: number;
+        };
+        let delta = event.deltaY / 175;
+        if (
+          legacyWheel.wheelDeltaY !== undefined
+            ? legacyWheel.wheelDeltaY === -3 * event.deltaY
+            : event.deltaMode === 0
+        ) {
+          delta *= 3;
+        }
+        if (event.deltaMode === 1) {
+          delta /= 18;
+        } else if (event.deltaMode === 2) {
+          delta /= 1000;
+        }
+        if (!this.session.started && this.menuControls.wheel(delta)) {
+          event.preventDefault();
+        }
+      },
+      { passive: false, signal: this.listeners.signal },
+    );
+    window.addEventListener(
+      'beforeunload',
+      (event) => {
+        if (!this.session.started || !this.session.enteredWorld || this.frozen) {
+          return;
+        }
         event.preventDefault();
-    }, { passive: false, signal: this.listeners.signal });
-    window.addEventListener('beforeunload', event => {
-      if (!this.session.started || !this.session.enteredWorld || this.frozen)
-        return;
-      event.preventDefault();
-      event.returnValue = '';
-    }, { signal: this.listeners.signal });
+        event.returnValue = '';
+      },
+      { signal: this.listeners.signal },
+    );
   }
   resize = (): void => {
     this.dpr = window.devicePixelRatio || 1;
@@ -137,12 +189,16 @@ export class GameApp {
     this.menuControls.resize(width, height);
   };
   installDevelopmentCheats = (): void => {
-    if (this.online) return;
-    if (!new URLSearchParams(location.search).has('cheat'))
+    if (this.online) {
       return;
+    }
+    if (!new URLSearchParams(location.search).has('cheat')) {
+      return;
+    }
     void import('../dev/cheat.js').then(({ installCheatPanel }) => {
-      if (this.disposed)
+      if (this.disposed) {
         return;
+      }
       this.removeCheatPanel = installCheatPanel({
         coordinates: () => {
           const player = this.session.localPlayer();
@@ -182,11 +238,13 @@ export class GameApp {
     // the same metrics (otherwise frame 1 falls back and the trace is flaky).
     try {
       await document.fonts.load('bold 24px Ubuntu, sans-serif');
+    } catch {
+      /* keep the fallback */
     }
-    catch { /* keep the fallback */ }
     await document.fonts.ready;
-    if (this.disposed)
+    if (this.disposed) {
       return;
+    }
     document.getElementById('status')?.remove();
     this.menuControls.name.focus({ preventScroll: true });
     this.simulation.start();
@@ -194,46 +252,66 @@ export class GameApp {
     this.animationFrame = requestAnimationFrame(this.frame);
   };
   private frame = (now: number): void => {
-    if (!this.running) return;
+    if (!this.running) {
+      return;
+    }
     const delta = Math.min(50, Math.max(0, now - this.lastFrame));
     this.lastFrame = now;
     this.loadout.handleUiKeys();
     this.handleMenuPointer();
     this.menuControls.advance(delta, this.input.pointer.buttons.left);
     this.loadout.handleHotbarPointer();
-    const layout = getHudLayout(this.canvas.clientWidth, this.canvas.clientHeight,
-      this.session.localPlayer()?.entity.level ?? 1, this.mobileUi);
+    const layout = getHudLayout(
+      this.canvas.clientWidth,
+      this.canvas.clientHeight,
+      this.session.localPlayer()?.entity.level ?? 1,
+      this.mobileUi,
+    );
     this.input.updateMovementDisabled(layout);
     const view = this.session.prepareFrame(now, delta);
     this.renderer.frame(now, delta, layout, view);
-    if (this.running) this.animationFrame = requestAnimationFrame(this.frame);
+    if (this.running) {
+      this.animationFrame = requestAnimationFrame(this.frame);
+    }
   };
   handleMenuPointer = (): void => {
-    if (this.session.started)
+    if (this.session.started) {
       return;
+    }
     this.menuControls.pointerMove(this.input.pointer.position.x, this.input.pointer.position.y);
     const press = this.input.pointer.consumeLeftPress();
-    if (press)
+    if (press) {
       this.menuControls.pointerDown(press.x, press.y);
-    this.menuControls.pointerDrag(this.input.pointer.position.x, this.input.pointer.position.y, this.input.pointer.buttons.left);
+    }
+    this.menuControls.pointerDrag(
+      this.input.pointer.position.x,
+      this.input.pointer.position.y,
+      this.input.pointer.buttons.left,
+    );
     this.input.pointer.consumeLeftRelease();
     this.input.pointer.consumeRightClick();
     this.input.pointer.consumeDoubleClick();
   };
   start(): Promise<void> {
-    return this.starting ??= this.startOnce();
+    return (this.starting ??= this.startOnce());
   }
   private async startOnce(): Promise<void> {
-    if (this.disposed) throw new Error('Application disposed');
+    if (this.disposed) {
+      throw new Error('Application disposed');
+    }
     if (!this.online && new URLSearchParams(location.search).has('test')) {
       const { installTestApi } = await import('../dev/test-api.js');
-      if (this.disposed) return;
+      if (this.disposed) {
+        return;
+      }
       this.removeTestApi = installTestApi(this);
     }
     await this.boot();
   }
   dispose(): void {
-    if (this.disposed) return;
+    if (this.disposed) {
+      return;
+    }
     this.disposed = true;
     this.running = false;
     this.session.invalidate();

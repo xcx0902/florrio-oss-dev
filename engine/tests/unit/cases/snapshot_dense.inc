@@ -15,8 +15,8 @@ void test_domain_dense_live_values() {
 void test_default_dense_groups() {
   engine::WorkerApi api;
   api.init();
-  const engine::EntityHandle mob = api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(7.0F), engine::f32(8.0F)));
+  const engine::EntityHandle mob =
+      api.spawn(engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(7.0F), engine::f32(8.0F)));
   CHECK(mob.valid());
   CHECK(api.default_dense_groups());
   const auto bytes = api.domain_snapshot_bytes(62, 0);
@@ -37,14 +37,16 @@ void test_domain_dense_player_wire_boundaries() {
   api.init(false);
   // Put another entity after the player: the old writer consumed the next
   // handle's first three bytes as the player's missing group-152 payload.
-  const auto player = engine::spawn_player_default(api.world(), engine::test::player(api.world()), "wire",
-    engine::make_default_profile(), false);
+  const auto player = engine::spawn_player_default(api.world(), engine::test::player(api.world()),
+                                                   "wire", engine::make_default_profile(), false);
   CHECK(player.valid());
   const auto mob = api.spawn(engine::EntityKind::kMob, 14,
-    engine::Vec2(engine::f32(12345.0F), engine::f32(-321.0F)));
+                             engine::Vec2(engine::f32(12345.0F), engine::f32(-321.0F)));
   CHECK(mob.valid());
   CHECK(engine::test::player(api.world()).loadout().equip(2U, 3U));
-  CHECK(engine::test::player(api.world()).loadout().create_equipped_petal(api.world(), engine::test::player(api.world()), 2U, 0U));
+  CHECK(engine::test::player(api.world())
+            .loadout()
+            .create_equipped_petal(api.world(), engine::test::player(api.world()), 2U, 0U));
   const auto petal = engine::test::player(api.world()).loadout().handle(2U, 0U);
   CHECK(petal.valid());
   engine::test::player(api.world()).profile().set_experience(engine::f32(3.0F));
@@ -64,10 +66,10 @@ void test_domain_dense_player_wire_boundaries() {
     CHECK(reader.read_u8().value() == 1U);
     CHECK(reader.read_varint32().value() == sequence);
     CHECK(reader.read_varint32().value() == 7U);
-    CHECK(reader.read_varint32().value() == 0U); // deletes
+    CHECK(reader.read_varint32().value() == 0U);  // deletes
     const unsigned expected_records = sequence == 127U ? 13U : 8U;
     CHECK(reader.read_varint32().value() == expected_records);
-    CHECK(reader.read_varint32().value() == 0U); // events
+    CHECK(reader.read_varint32().value() == 0U);  // events
     unsigned dense_count = 0;
     unsigned profile_count = 0;
     unsigned loadout_count = 0;
@@ -78,10 +80,12 @@ void test_domain_dense_player_wire_boundaries() {
       const auto handle = engine::EntityHandle::from_wire(reader.read_u32_le().value());
       const auto* entity = api.world().entities().get(handle);
       CHECK(entity != nullptr);
-      if (entity == nullptr) return;
+      if (entity == nullptr) {
+        return;
+      }
       const auto flags = reader.read_u8().value() ^ 54U;
       if ((flags & 8U) != 0U) {
-        CHECK(flags == 8U); // group 152 base, no profile extension
+        CHECK(flags == 8U);  // group 152 base, no profile extension
         const auto start = reader.cursor();
         // Decode by component order, independently of the writer, through EOF.
         CHECK(reader.read_u8().value() == static_cast<std::uint8_t>(entity->entity_flags));
@@ -90,7 +94,9 @@ void test_domain_dense_player_wire_boundaries() {
         CHECK(reader.read_u8().value() == static_cast<std::uint8_t>(entity->world_flags));
         CHECK(reader.read_f32_le().value() == entity->position.x.value);
         CHECK(reader.read_cstring().value().empty());
-        for (unsigned index = 0; index < 10; ++index) CHECK(reader.read_u8().value() == 0U);
+        for (unsigned index = 0; index < 10; ++index) {
+          CHECK(reader.read_u8().value() == 0U);
+        }
         CHECK(reader.read_u8().value() == 0U);
         CHECK(reader.read_f32_le().value() == 0.0F);
         CHECK(reader.read_f32_le().value() == entity->position.y.value);
@@ -101,9 +107,10 @@ void test_domain_dense_player_wire_boundaries() {
         CHECK(reader.read_f32_le().value() == entity->health.value);
         CHECK(reader.read_f32_le().value() == entity->max_health.value);
         (void)reader.read_u16_le();
-        CHECK(reader.read_f32_le().value() == entity->position.y.value); // field 28
-        CHECK(reader.read_f32_le().value() == entity->position.x.value); // field 49
-        CHECK(reader.read_f32_le().value() == entity->collision_radius.value); // field 7, group 140
+        CHECK(reader.read_f32_le().value() == entity->position.y.value);  // field 28
+        CHECK(reader.read_f32_le().value() == entity->position.x.value);  // field 49
+        CHECK(reader.read_f32_le().value() ==
+              entity->collision_radius.value);  // field 7, group 140
         CHECK(reader.read_u8().value() == (handle == player ? 40U : entity->type_id));
         CHECK(reader.read_u8().value() == static_cast<std::uint8_t>(entity->kind));
         CHECK(reader.read_u8().value() == (handle == player ? 3U : entity->loadout_instance));
@@ -114,38 +121,70 @@ void test_domain_dense_player_wire_boundaries() {
         // All profile records preserve the entire dense declaration, not just
         // bit 29. The last declaration determines the following dense length.
         const auto component_mask = reader.read_u32_le().value();
-        CHECK(component_mask == engine::SnapshotEncoder::kDefaultDenseComponentMask
-          || (handle == petal && component_mask ==
-              (engine::SnapshotEncoder::kDefaultDenseComponentMask | (1U << 6U))));
+        CHECK(
+            component_mask == engine::SnapshotEncoder::kDefaultDenseComponentMask ||
+            (handle == petal &&
+             component_mask == (engine::SnapshotEncoder::kDefaultDenseComponentMask | (1U << 6U))));
         std::uint32_t field = 0;
         for (auto delta = reader.read_varint32().value(); delta != 0U;
              delta = reader.read_varint32().value()) {
           field += delta;
-          if (field == 2U || field == 11U || field == 12U || field == 26U || field == 31U || field == 36U || field == 38U || field == 50U || field == 62U) {
+          if (field == 2U || field == 11U || field == 12U || field == 26U || field == 31U ||
+              field == 36U || field == 38U || field == 50U || field == 62U) {
             const auto value = reader.read_u8().value();
-            if (field == 2U) CHECK(value == (handle == player ? 40U : entity->type_id));
-            if (field == 11U) { CHECK(handle == petal); CHECK(value == 2U); ++loadout_count; }
-            if (field == 12U) { CHECK(handle == petal); CHECK(value == 0U); ++loadout_count; }
-            if (field == 26U) CHECK(value == static_cast<std::uint8_t>(entity->kind));
-            if (field == 31U) CHECK(value == (handle == player ? 3U : entity->loadout_instance));
+            if (field == 2U) {
+              CHECK(value == (handle == player ? 40U : entity->type_id));
+            }
+            if (field == 11U) {
+              CHECK(handle == petal);
+              CHECK(value == 2U);
+              ++loadout_count;
+            }
+            if (field == 12U) {
+              CHECK(handle == petal);
+              CHECK(value == 0U);
+              ++loadout_count;
+            }
+            if (field == 26U) {
+              CHECK(value == static_cast<std::uint8_t>(entity->kind));
+            }
+            if (field == 31U) {
+              CHECK(value == (handle == player ? 3U : entity->loadout_instance));
+            }
             if (field == 38U) {
               CHECK(value == (entity->death_processed ? 1U : 0U));
-              if (handle == petal) CHECK(value == (sequence == 127U ? 0U : 1U));
+              if (handle == petal) {
+                CHECK(value == (sequence == 127U ? 0U : 1U));
+              }
               ++lifecycle_count;
             }
-            if (field == 62U) { CHECK(handle == player); CHECK(value == 1U); ++profile_count; }
+            if (field == 62U) {
+              CHECK(handle == player);
+              CHECK(value == 1U);
+              ++profile_count;
+            }
             if (field == 50U) {
               CHECK(handle == petal && value == 3U);
               CHECK((component_mask & (1U << 6U)) != 0U);
               ++render_count;
             }
-          } else if (field == 5U || field == 7U || field == 24U || field == 28U || field == 49U
-                     || field == 53U || field == 55U || field == 59U) {
+          } else if (field == 5U || field == 7U || field == 24U || field == 28U || field == 49U ||
+                     field == 53U || field == 55U || field == 59U) {
             const auto value = reader.read_f32_le().value();
-            if (field == 7U) CHECK(value == entity->collision_radius.value);
-            if (field == 28U) CHECK(value == entity->position.y.value);
-            if (field == 49U) CHECK(value == entity->position.x.value);
-            if (field == 59U) { CHECK(handle == player); CHECK(value == 9.0F); ++profile_count; }
+            if (field == 7U) {
+              CHECK(value == entity->collision_radius.value);
+            }
+            if (field == 28U) {
+              CHECK(value == entity->position.y.value);
+            }
+            if (field == 49U) {
+              CHECK(value == entity->position.x.value);
+            }
+            if (field == 59U) {
+              CHECK(handle == player);
+              CHECK(value == 9.0F);
+              ++profile_count;
+            }
           } else if (field == 8U) {
             (void)reader.read_u16_le();
           } else if (field == 58U) {
@@ -158,14 +197,21 @@ void test_domain_dense_player_wire_boundaries() {
             for (auto index_delta = reader.read_varint32().value(); index_delta != 0U;
                  index_delta = reader.read_varint32().value()) {
               CHECK(index_delta == 1U);
-              const auto value = field == 60U ? reader.read_u8().value() : reader.read_varint32().value();
+              const auto value =
+                  field == 60U ? reader.read_u8().value() : reader.read_varint32().value();
               if (field == 60U) {
                 CHECK(value == engine::test::player(api.world()).loadout().slots()[slot].type_id);
                 ++inventory_count;
-              } else { CHECK(value == 0U); ++recharge_count; }
+              } else {
+                CHECK(value == 0U);
+                ++recharge_count;
+              }
               ++slot;
             }
-          } else { CHECK(false); return; }
+          } else {
+            CHECK(false);
+            return;
+          }
         }
       }
     }
@@ -199,10 +245,14 @@ void test_full_field_effect_flags() {
     writer.write_mask_byte_field(mob, 0U, 14U, flags);
     const auto packet = writer.finish();
     engine::ByteWriter expected;
-    expected.write_u32_le(mob.to_wire()); expected.write_u8(55U);
-    expected.write_u32_le(0U); expected.write_varint32(14U);
-    expected.write_u8(flags); expected.write_u8(0U);
-    CHECK(std::search(packet.begin(), packet.end(), expected.bytes().begin(), expected.bytes().end()) != packet.end());
+    expected.write_u32_le(mob.to_wire());
+    expected.write_u8(55U);
+    expected.write_u32_le(0U);
+    expected.write_varint32(14U);
+    expected.write_u8(flags);
+    expected.write_u8(0U);
+    CHECK(std::search(packet.begin(), packet.end(), expected.bytes().begin(),
+                      expected.bytes().end()) != packet.end());
   }
 }
 
@@ -211,25 +261,35 @@ void test_input_discard_deletion_then_swap() {
   api.init(false);
   const std::array<std::uint8_t, 4> key{0x11, 0x22, 0x33, 0x44};
   const auto send = [&api, &key](engine::ByteWriter& writer) {
-    auto packet = writer.bytes(); engine::apply_packet_xor(packet, key);
+    auto packet = writer.bytes();
+    engine::apply_packet_xor(packet, key);
     CHECK(api.send(packet, key));
   };
   engine::ByteWriter spawn;
-  spawn.write_varint32(1U); spawn.write_varint32(6U);
-  for (const char byte : std::string("deletion")) spawn.write_u8(static_cast<std::uint8_t>(byte));
-  spawn.write_u8(0U); send(spawn);
+  spawn.write_varint32(1U);
+  spawn.write_varint32(6U);
+  for (const char byte : std::string("deletion")) {
+    spawn.write_u8(static_cast<std::uint8_t>(byte));
+  }
+  spawn.write_u8(0U);
+  send(spawn);
   (void)api.domain_snapshot_bytes(1U);
   const auto discarded = engine::test::player(api.world()).loadout().handle(2U, 0U);
   CHECK(discarded.valid());
   engine::ByteWriter discard;
-  discard.write_varint32(2U); discard.write_varint32(8U);
-  discard.write_varint32(2U); discard.write_varint32(1U); send(discard);
+  discard.write_varint32(2U);
+  discard.write_varint32(8U);
+  discard.write_varint32(2U);
+  discard.write_varint32(1U);
+  send(discard);
   // Original125 damages the slot occupant through43. Its healthless body
   // remains visible for1000ms, then the ordinary removal is replicated.
   const auto* discarded_body = api.world().entities().get(discarded);
   CHECK(discarded_body != nullptr);
   CHECK(discarded_body != nullptr && discarded_body->health.value == 0.0F);
-  for (int tick = 0; tick < 19; ++tick) api.think();
+  for (int tick = 0; tick < 19; ++tick) {
+    api.think();
+  }
   CHECK(api.world().entities().get(discarded) != nullptr);
   api.think();
   CHECK(api.world().entities().get(discarded) == nullptr);
@@ -238,14 +298,19 @@ void test_input_discard_deletion_then_swap() {
   CHECK(output.size() == 1U);
   engine::ByteReader reader(output.front().payload);
   CHECK(reader.read_u8().value() == 1U);
-  (void)reader.read_varint32(); (void)reader.read_varint32();
+  (void)reader.read_varint32();
+  (void)reader.read_varint32();
   CHECK(reader.read_varint32().value() == 1U);
-  (void)reader.read_varint32(); (void)reader.read_varint32(); // update/event counts precede delete payload
+  (void)reader.read_varint32();
+  (void)reader.read_varint32();  // update/event counts precede delete payload
   CHECK(reader.read_u32_le().value() == discarded.to_wire());
   const auto moved = engine::test::player(api.world()).loadout().handle(0U, 0U);
   engine::ByteWriter swap;
-  swap.write_varint32(3U); swap.write_varint32(10U);
-  for (const unsigned value : {0U, 1U, 2U, 0U}) swap.write_varint32(value);
+  swap.write_varint32(3U);
+  swap.write_varint32(10U);
+  for (const unsigned value : {0U, 1U, 2U, 0U}) {
+    swap.write_varint32(value);
+  }
   send(swap);
   api.think();
   // Original swap is two changeSlotType calls: the old slot-0 petal is retired
@@ -255,22 +320,38 @@ void test_input_discard_deletion_then_swap() {
   CHECK(engine::test::player(api.world()).loadout().slots()[2].type_id == 1U);
   unsigned count = 0U, slot2 = 0U;
   for (const auto& entity : api.world().entities().entities()) {
-    if (!entity.active || entity.health.value <= 0.0F || entity.kind != engine::EntityKind::kPetal) continue;
-    ++count; if (entity.loadout_slot == 2U) ++slot2;
+    if (!entity.active || entity.health.value <= 0.0F ||
+        entity.kind != engine::EntityKind::kPetal) {
+      continue;
+    }
+    ++count;
+    if (entity.loadout_slot == 2U) {
+      ++slot2;
+    }
     CHECK(entity.handle != discarded);
     CHECK(entity.handle != moved);
   }
   CHECK(count == 3U && slot2 == 0U);
-  CHECK(engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 3000.0) == 1U);
+  CHECK(engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 3000.0) ==
+        1U);
   CHECK(engine::test::player(api.world()).loadout().handle(2U, 0U).valid());
-  count = 0U; slot2 = 0U;
+  count = 0U;
+  slot2 = 0U;
   for (const auto& entity : api.world().entities().entities()) {
-    if (!entity.active || entity.health.value <= 0.0F || entity.kind != engine::EntityKind::kPetal) continue;
-    ++count; if (entity.loadout_slot == 2U) ++slot2;
+    if (!entity.active || entity.health.value <= 0.0F ||
+        entity.kind != engine::EntityKind::kPetal) {
+      continue;
+    }
+    ++count;
+    if (entity.loadout_slot == 2U) {
+      ++slot2;
+    }
   }
   CHECK(count == 4U && slot2 == 1U);
   const auto next = api.domain_snapshot_bytes(3U);
   engine::ByteReader next_reader(next);
-  (void)next_reader.read_u8(); (void)next_reader.read_varint32(); (void)next_reader.read_varint32();
+  (void)next_reader.read_u8();
+  (void)next_reader.read_varint32();
+  (void)next_reader.read_varint32();
   CHECK(next_reader.read_varint32().value() == 0U);
 }

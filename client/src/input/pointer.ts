@@ -1,4 +1,7 @@
-export interface PointerPosition { readonly x: number; readonly y: number; }
+export interface PointerPosition {
+  readonly x: number;
+  readonly y: number;
+}
 
 /** Pointer state in CSS pixels relative to the canvas. */
 export class PointerInput {
@@ -20,7 +23,9 @@ export class PointerInput {
     canvas.addEventListener('pointerdown', this.onDown, { signal: this.listeners.signal });
     window.addEventListener('pointerup', this.onUp, { signal: this.listeners.signal });
     window.addEventListener('blur', () => this.reset(), { signal: this.listeners.signal });
-    canvas.addEventListener('contextmenu', event => event.preventDefault(), { signal: this.listeners.signal });
+    canvas.addEventListener('contextmenu', (event) => event.preventDefault(), {
+      signal: this.listeners.signal,
+    });
   }
 
   private readonly onMove = (event: PointerEvent): void => {
@@ -35,8 +40,12 @@ export class PointerInput {
     const y = event.clientY - rect.top;
     if (event.button === 0) {
       const now = performance.now();
-      if (now - this.lastLeftDownMs < 300 && Math.hypot(x - this.lastLeftX, y - this.lastLeftY) < 12)
+      if (
+        now - this.lastLeftDownMs < 300 &&
+        Math.hypot(x - this.lastLeftX, y - this.lastLeftY) < 12
+      ) {
         this.doubleClickPending = true;
+      }
       this.lastLeftDownMs = now;
       this.lastLeftX = x;
       this.lastLeftY = y;
@@ -49,12 +58,17 @@ export class PointerInput {
     }
   };
   consumeLeftPress(): PointerPosition | undefined {
-    const pending = this.leftPressPending; this.leftPressPending = undefined; return pending;
+    const pending = this.leftPressPending;
+    this.leftPressPending = undefined;
+    return pending;
   }
   reset(): void {
-    this.buttons.left = this.buttons.right = false;
+    this.buttons.left = false;
+    this.buttons.right = false;
     this.leftPressPending = undefined;
-    this.leftReleasePending = this.rightClickPending = this.doubleClickPending = false;
+    this.leftReleasePending = false;
+    this.rightClickPending = false;
+    this.doubleClickPending = false;
   }
   /** Consume a right-click edge (one shot). */
   consumeRightClick(): boolean {
@@ -80,7 +94,12 @@ export class PointerInput {
       this.buttons.left = false;
       this.leftReleasePending = true;
     }
-    if (event.button === 2) this.buttons.right = false;
+    if (event.button === 2) {
+      this.buttons.right = false;
+    }
   };
-  dispose(): void { this.listeners.abort(); this.reset(); }
+  dispose(): void {
+    this.listeners.abort();
+    this.reset();
+  }
 }

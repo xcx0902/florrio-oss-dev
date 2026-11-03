@@ -16,7 +16,12 @@ inline constexpr std::uint64_t kInputTtlTicks = 5;
 // spawn. Native multiplayer input uses a finite lease instead.
 inline constexpr std::uint64_t kOfflineInputTtl = UINT64_MAX;
 
-enum class PlayerLife { kRegistered, kAlive, kCorpse, kRespawnable };
+enum class PlayerLife {
+  kRegistered,
+  kAlive,
+  kCorpse,
+  kRespawnable
+};
 
 struct DeathState {
   Vec2 position;
@@ -56,14 +61,18 @@ class PlayerState {
   [[nodiscard]] std::uint8_t last_death_level() const { return death.level; }
   [[nodiscard]] const auto& last_death_kept() const { return death.kept; }
   [[nodiscard]] std::uint8_t last_death_kept_count() const { return death.kept_count; }
-  void set_last_death(f32 score, std::uint8_t level) { death.score = score; death.level = level; }
+  void set_last_death(f32 score, std::uint8_t level) {
+    death.score = score;
+    death.level = level;
+  }
   void set_last_death_kept(std::span<const std::uint16_t> kept) {
     death.kept.fill(0);
     death.kept_count = static_cast<std::uint8_t>(std::min(kept.size(), death.kept.size()));
     std::copy_n(kept.begin(), death.kept_count, death.kept.begin());
   }
   void set_last_killer(EntityHandle handle, std::string name) {
-    death.killer = handle; death.killer_name = std::move(name);
+    death.killer = handle;
+    death.killer_name = std::move(name);
   }
   [[nodiscard]] EntityHandle last_killer() const { return death.killer; }
   [[nodiscard]] const std::string& last_killer_name() const { return death.killer_name; }
@@ -80,7 +89,11 @@ class PlayerState {
   std::uint64_t last_control_tick = UINT64_MAX;
 
   void store_input(PlayerInput input) { input_ = input; }
-  void clear_input() { input_ = {}; input_sequence = 0; input_valid_until_tick = 0; }
+  void clear_input() {
+    input_ = {};
+    input_sequence = 0;
+    input_valid_until_tick = 0;
+  }
   [[nodiscard]] bool has_offline_input_lease() const {
     return input_valid_until_tick == kOfflineInputTtl;
   }
@@ -99,4 +112,4 @@ class PlayerState {
   std::uint8_t zone_progress_ = 0;
   bool zone_disabled_ = false;
 };
-} // namespace engine
+}  // namespace engine

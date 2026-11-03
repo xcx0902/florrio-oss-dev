@@ -24,7 +24,10 @@ class PlayerState;
  * The domain keeps the same information without exposing byte offsets. */
 class PlayerLoadout {
  public:
-  struct PickupTransfer { EntityHandle drop{}; std::uint8_t slot = 0U; };
+  struct PickupTransfer {
+    EntityHandle drop{};
+    std::uint8_t slot = 0U;
+  };
   static constexpr std::size_t kSlots = 16;
   static constexpr std::size_t kInstances = 3;
 
@@ -35,8 +38,8 @@ class PlayerLoadout {
    * slot, including a hatched Egg's mob handle. */
   bool discard(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t slot,
                std::uint16_t expected_type);
-  bool swap(std::uint8_t first, std::uint16_t first_type,
-            std::uint8_t second, std::uint16_t second_type);
+  bool swap(std::uint8_t first, std::uint16_t first_type, std::uint8_t second,
+            std::uint16_t second_type);
   bool swap(PlayerProfile& profile, std::uint8_t first, std::uint16_t first_type,
             std::uint8_t second, std::uint16_t second_type);
   bool swap(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t first,
@@ -67,7 +70,8 @@ class PlayerLoadout {
   void set_active_slots(std::uint8_t value) { active_slots_ = value; }
   /** Domain form of original 397: create one equipped petal entity for a slot
    * instance when the slot is active and the catalog count allows it. */
-  bool create_equipped_petal(World& world, PlayerState& state, std::uint8_t slot, std::uint8_t instance);
+  bool create_equipped_petal(World& world, PlayerState& state, std::uint8_t slot,
+                             std::uint8_t instance);
   void advance(double delta_milliseconds);
   /** Original updateEquippedPetals loadout+100: minimum progress over missing
    * instances (65535 = ready), latched before this tick's collisions. */
@@ -78,7 +82,9 @@ class PlayerLoadout {
   void record_pickup_transfer(EntityHandle drop, std::uint8_t slot) {
     pickup_transfers_.push_back({drop, slot});
   }
-  [[nodiscard]] const std::vector<PickupTransfer>& pickup_transfers() const { return pickup_transfers_; }
+  [[nodiscard]] const std::vector<PickupTransfer>& pickup_transfers() const {
+    return pickup_transfers_;
+  }
   void clear_pickup_transfers() { pickup_transfers_.clear(); }
   void clear();
 
@@ -92,22 +98,30 @@ class PlayerLoadout {
     return slot < kSlots && instance < kInstances ? handles_[slot][instance] : EntityHandle{};
   }
   void set_handle(std::uint8_t slot, std::uint8_t instance, EntityHandle handle) {
-    if (slot < kSlots && instance < kInstances) handles_[slot][instance] = handle;
+    if (slot < kSlots && instance < kInstances) {
+      handles_[slot][instance] = handle;
+    }
   }
   void clear_handle(std::uint8_t slot, std::uint8_t instance) {
-    if (slot < kSlots && instance < kInstances) handles_[slot][instance] = EntityHandle{};
+    if (slot < kSlots && instance < kInstances) {
+      handles_[slot][instance] = EntityHandle{};
+    }
   }
   [[nodiscard]] bool pending(std::uint8_t slot, std::uint8_t instance) const {
     return slot < kSlots && instance < kInstances && pending_[slot][instance] != 0U;
   }
   void set_pending(std::uint8_t slot, std::uint8_t instance, bool value) {
-    if (slot < kSlots && instance < kInstances) pending_[slot][instance] = value ? 1U : 0U;
+    if (slot < kSlots && instance < kInstances) {
+      pending_[slot][instance] = value ? 1U : 0U;
+    }
   }
   [[nodiscard]] std::uint32_t pending_timer(std::uint8_t slot, std::uint8_t instance) const {
     return slot < kSlots && instance < kInstances ? timers_[slot][instance] : 0U;
   }
   void set_pending_timer(std::uint8_t slot, std::uint8_t instance, std::uint32_t value) {
-    if (slot < kSlots && instance < kInstances) timers_[slot][instance] = value;
+    if (slot < kSlots && instance < kInstances) {
+      timers_[slot][instance] = value;
+    }
   }
   [[nodiscard]] std::uint32_t replication_epoch() const { return replication_epoch_; }
   [[nodiscard]] std::uint32_t slot_epoch(std::uint8_t slot) const {
@@ -115,10 +129,14 @@ class PlayerLoadout {
   }
   void bump_replication(std::uint32_t epoch) {
     replication_epoch_ = epoch;
-    for (auto& value : slot_epoch_) value = epoch;
+    for (auto& value : slot_epoch_) {
+      value = epoch;
+    }
   }
   void bump_slot(std::uint8_t slot, std::uint32_t epoch) {
-    if (slot < kSlots) slot_epoch_[slot] = epoch;
+    if (slot < kSlots) {
+      slot_epoch_[slot] = epoch;
+    }
   }
   [[nodiscard]] f32 score() const { return score_; }
   void set_score(f32 value) { score_ = value; }
@@ -134,8 +152,8 @@ class PlayerLoadout {
   [[nodiscard]] f32 orbit_phase() const { return orbit_phase_; }
   void set_orbit_phase(f32 value) { orbit_phase_ = value; }
   void advance_orbit_phase(double step_milliseconds) {
-    orbit_phase_ = f32::from_double(static_cast<double>(orbit_phase_.value)
-                                    + 2.5 * step_milliseconds * 0.001);
+    orbit_phase_ =
+        f32::from_double(static_cast<double>(orbit_phase_.value) + 2.5 * step_milliseconds * 0.001);
   }
   [[nodiscard]] std::uint32_t packet_cache_epoch() const { return packet_cache_epoch_; }
 
@@ -162,4 +180,4 @@ class PlayerLoadout {
   f32 orbit_phase_ = f32(0.0F);
 };
 
-} // namespace engine
+}  // namespace engine

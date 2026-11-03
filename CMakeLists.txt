@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
-project(florr_native VERSION 2.0.0 LANGUAGES CXX)
+project(
+  florr_native
+  VERSION 2.0.0
+  LANGUAGES CXX
+)
 
 include(CTest)
 enable_testing()

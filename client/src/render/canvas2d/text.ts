@@ -3,9 +3,13 @@ export class TextRenderer {
   private readonly context: CanvasRenderingContext2D;
   private readonly widths = new Map<string, number>();
 
-  constructor(context: CanvasRenderingContext2D) { this.context = context; }
+  constructor(context: CanvasRenderingContext2D) {
+    this.context = context;
+  }
 
-  setFont(font: string): void { this.context.font = font; }
+  setFont(font: string): void {
+    this.context.font = font;
+  }
 
   measure(text: string): number {
     const key = this.context.font + '\0' + text;
@@ -17,5 +21,7 @@ export class TextRenderer {
     return width;
   }
 
-  clear(): void { this.widths.clear(); }
+  clear(): void {
+    this.widths.clear();
+  }
 }

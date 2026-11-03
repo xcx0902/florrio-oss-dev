@@ -5,9 +5,7 @@
     {
       "typeId": 0,
       "name": "None",
-      "descriptions": [
-        "???"
-      ],
+      "descriptions": ["???"],
       "rarity": 0,
       "scale": 0,
       "petalTypeIds": [],
@@ -22,16 +20,10 @@
     {
       "typeId": 1,
       "name": "Rock",
-      "descriptions": [
-        "A rock. It doesn't do much."
-      ],
+      "descriptions": ["A rock. It doesn't do much."],
       "rarity": 0,
       "scale": 1,
-      "petalTypeIds": [
-        2,
-        3,
-        4
-      ],
+      "petalTypeIds": [2, 3, 4],
       "componentDrawCount": 3,
       "opaque100": 51,
       "opaque104": 0,
@@ -43,16 +35,10 @@
     {
       "typeId": 2,
       "name": "Boulder",
-      "descriptions": [
-        "A bigger rock. It doesn't do much either."
-      ],
+      "descriptions": ["A bigger rock. It doesn't do much either."],
       "rarity": 1,
       "scale": 10,
-      "petalTypeIds": [
-        3,
-        4,
-        26
-      ],
+      "petalTypeIds": [3, 4, 26],
       "componentDrawCount": 3,
       "opaque100": 52,
       "opaque104": 0,
@@ -64,18 +50,10 @@
     {
       "typeId": 3,
       "name": "Cactus",
-      "descriptions": [
-        "Avoid touching it, it hurts."
-      ],
+      "descriptions": ["Avoid touching it, it hurts."],
       "rarity": 0,
       "scale": 2,
-      "petalTypeIds": [
-        7,
-        10,
-        13,
-        21,
-        33
-      ],
+      "petalTypeIds": [7, 10, 13, 21, 33],
       "componentDrawCount": 5,
       "opaque100": 53,
       "opaque104": 0,
@@ -87,18 +65,10 @@
     {
       "typeId": 4,
       "name": "Ladybug",
-      "descriptions": [
-        "Cute and harmless."
-      ],
+      "descriptions": ["Cute and harmless."],
       "rarity": 0,
       "scale": 3,
-      "petalTypeIds": [
-        2,
-        6,
-        16,
-        9,
-        18
-      ],
+      "petalTypeIds": [2, 6, 16, 9, 18],
       "componentDrawCount": 5,
       "opaque100": 54,
       "opaque104": 0,
@@ -110,17 +80,10 @@
     {
       "typeId": 5,
       "name": "Massive Ladybug",
-      "descriptions": [
-        "This one is really big, but still cute."
-      ],
+      "descriptions": ["This one is really big, but still cute."],
       "rarity": 3,
       "scale": 50,
-      "petalTypeIds": [
-        6,
-        18,
-        24,
-        15
-      ],
+      "petalTypeIds": [6, 18, 24, 15],
       "componentDrawCount": 4,
       "opaque100": 55,
       "opaque104": 0,
@@ -132,19 +95,10 @@
     {
       "typeId": 6,
       "name": "Bee",
-      "descriptions": [
-        "It stings. Don't touch it."
-      ],
+      "descriptions": ["It stings. Don't touch it."],
       "rarity": 0,
       "scale": 3,
-      "petalTypeIds": [
-        2,
-        7,
-        16,
-        9,
-        18,
-        31
-      ],
+      "petalTypeIds": [2, 7, 16, 9, 18, 31],
       "componentDrawCount": 6,
       "opaque100": 56,
       "opaque104": 0,
@@ -156,18 +110,10 @@
     {
       "typeId": 7,
       "name": "Baby Ant",
-      "descriptions": [
-        "Weak and defenseless, but big dreams."
-      ],
+      "descriptions": ["Weak and defenseless, but big dreams."],
       "rarity": 0,
       "scale": 1,
-      "petalTypeIds": [
-        2,
-        32,
-        16,
-        17,
-        37
-      ],
+      "petalTypeIds": [2, 32, 16, 17, 37],
       "componentDrawCount": 5,
       "opaque100": 57,
       "opaque104": 0,
@@ -179,18 +125,10 @@
     {
       "typeId": 8,
       "name": "Worker Ant",
-      "descriptions": [
-        "It's a bit temperamental, probably from working all the time."
-      ],
+      "descriptions": ["It's a bit temperamental, probably from working all the time."],
       "rarity": 0,
       "scale": 2,
-      "petalTypeIds": [
-        2,
-        32,
-        16,
-        17,
-        38
-      ],
+      "petalTypeIds": [2, 32, 16, 17, 38],
       "componentDrawCount": 5,
       "opaque100": 58,
       "opaque104": 0,
@@ -202,18 +140,10 @@
     {
       "typeId": 9,
       "name": "Soldier Ant",
-      "descriptions": [
-        "It's got wings and it's ready to use them."
-      ],
+      "descriptions": ["It's got wings and it's ready to use them."],
       "rarity": 1,
       "scale": 5,
-      "petalTypeIds": [
-        16,
-        8,
-        9,
-        14,
-        17
-      ],
+      "petalTypeIds": [16, 8, 9, 14, 17],
       "componentDrawCount": 5,
       "opaque100": 59,
       "opaque104": 0,
@@ -225,19 +155,10 @@
     {
       "typeId": 10,
       "name": "Queen Ant",
-      "descriptions": [
-        "You must have done something really bad if she's chasing you."
-      ],
+      "descriptions": ["You must have done something really bad if she's chasing you."],
       "rarity": 2,
       "scale": 20,
-      "petalTypeIds": [
-        16,
-        9,
-        14,
-        17,
-        22,
-        27
-      ],
+      "petalTypeIds": [16, 9, 14, 17, 22, 27],
       "componentDrawCount": 6,
       "opaque100": 60,
       "opaque104": 0,
@@ -249,16 +170,10 @@
     {
       "typeId": 11,
       "name": "Ant Hole",
-      "descriptions": [
-        "Ants go in, and come out. Can't explain that."
-      ],
+      "descriptions": ["Ants go in, and come out. Can't explain that."],
       "rarity": 2,
       "scale": 20,
-      "petalTypeIds": [
-        8,
-        9,
-        22
-      ],
+      "petalTypeIds": [8, 9, 22],
       "componentDrawCount": 3,
       "opaque100": 61,
       "opaque104": 0,
@@ -270,17 +185,10 @@
     {
       "typeId": 12,
       "name": "Beetle",
-      "descriptions": [
-        "It's hungry and flowers are its favorite meal."
-      ],
+      "descriptions": ["It's hungry and flowers are its favorite meal."],
       "rarity": 1,
       "scale": 5,
-      "petalTypeIds": [
-        8,
-        9,
-        36,
-        17
-      ],
+      "petalTypeIds": [8, 9, 36, 17],
       "componentDrawCount": 4,
       "opaque100": 62,
       "opaque104": 0,
@@ -292,17 +200,10 @@
     {
       "typeId": 13,
       "name": "Massive Beetle",
-      "descriptions": [
-        "Someone overfed this one, you might be next."
-      ],
+      "descriptions": ["Someone overfed this one, you might be next."],
       "rarity": 2,
       "scale": 50,
-      "petalTypeIds": [
-        8,
-        9,
-        17,
-        23
-      ],
+      "petalTypeIds": [8, 9, 17, 23],
       "componentDrawCount": 4,
       "opaque100": 63,
       "opaque104": 0,
@@ -314,19 +215,10 @@
     {
       "typeId": 14,
       "name": "Hornet",
-      "descriptions": [
-        "These aren't quite as nice as the little bees."
-      ],
+      "descriptions": ["These aren't quite as nice as the little bees."],
       "rarity": 1,
       "scale": 10,
-      "petalTypeIds": [
-        10,
-        9,
-        31,
-        18,
-        20,
-        25
-      ],
+      "petalTypeIds": [10, 9, 31, 18, 20, 25],
       "componentDrawCount": 6,
       "opaque100": 64,
       "opaque104": 0,
@@ -338,19 +230,10 @@
     {
       "typeId": 15,
       "name": "Centipede",
-      "descriptions": [
-        "It's just there doing its thing."
-      ],
+      "descriptions": ["It's just there doing its thing."],
       "rarity": 1,
       "scale": 3,
-      "petalTypeIds": [
-        2,
-        32,
-        16,
-        11,
-        12,
-        17
-      ],
+      "petalTypeIds": [2, 32, 16, 11, 12, 17],
       "componentDrawCount": 6,
       "opaque100": 65,
       "opaque104": 0,
@@ -362,9 +245,7 @@
     {
       "typeId": 16,
       "name": "Centipede",
-      "descriptions": [
-        "It's just there doing its thing."
-      ],
+      "descriptions": ["It's just there doing its thing."],
       "rarity": 1,
       "scale": 3,
       "petalTypeIds": [],
@@ -379,17 +260,10 @@
     {
       "typeId": 17,
       "name": "Evil Centipede",
-      "descriptions": [
-        "This one loves flowers."
-      ],
+      "descriptions": ["This one loves flowers."],
       "rarity": 2,
       "scale": 5,
-      "petalTypeIds": [
-        8,
-        12,
-        34,
-        17
-      ],
+      "petalTypeIds": [8, 12, 34, 17],
       "componentDrawCount": 4,
       "opaque100": 67,
       "opaque104": 0,
@@ -401,9 +275,7 @@
     {
       "typeId": 18,
       "name": "Evil Centipede",
-      "descriptions": [
-        "This one loves flowers."
-      ],
+      "descriptions": ["This one loves flowers."],
       "rarity": 2,
       "scale": 5,
       "petalTypeIds": [],
@@ -418,14 +290,10 @@
     {
       "typeId": 19,
       "name": "Square",
-      "descriptions": [
-        "This shape... it looks familiar..."
-      ],
+      "descriptions": ["This shape... it looks familiar..."],
       "rarity": 5,
       "scale": 10,
-      "petalTypeIds": [
-        5
-      ],
+      "petalTypeIds": [5],
       "componentDrawCount": 1,
       "opaque100": 69,
       "opaque104": 0,
@@ -437,19 +305,10 @@
     {
       "typeId": 20,
       "name": "Ladybug",
-      "descriptions": [
-        "Cute and harmless... if left unprovoked."
-      ],
+      "descriptions": ["Cute and harmless... if left unprovoked."],
       "rarity": 1,
       "scale": 5,
-      "petalTypeIds": [
-        15,
-        24,
-        9,
-        18,
-        17,
-        28
-      ],
+      "petalTypeIds": [15, 24, 9, 18, 17, 28],
       "componentDrawCount": 6,
       "opaque100": 70,
       "opaque104": 0,
@@ -461,19 +320,10 @@
     {
       "typeId": 21,
       "name": "Ladybug",
-      "descriptions": [
-        "Shiny, cute and mostly harmless."
-      ],
+      "descriptions": ["Shiny, cute and mostly harmless."],
       "rarity": 1,
       "scale": 5,
-      "petalTypeIds": [
-        6,
-        24,
-        16,
-        9,
-        18,
-        17
-      ],
+      "petalTypeIds": [6, 24, 16, 9, 18, 17],
       "componentDrawCount": 6,
       "opaque100": 71,
       "opaque104": 0,
@@ -485,18 +335,10 @@
     {
       "typeId": 22,
       "name": "Spider",
-      "descriptions": [
-        "Spooky."
-      ],
+      "descriptions": ["Spooky."],
       "rarity": 1,
       "scale": 5,
-      "petalTypeIds": [
-        8,
-        7,
-        14,
-        29,
-        30
-      ],
+      "petalTypeIds": [8, 7, 14, 29, 30],
       "componentDrawCount": 5,
       "opaque100": 72,
       "opaque104": 0,

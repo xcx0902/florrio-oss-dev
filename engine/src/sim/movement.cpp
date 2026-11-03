@@ -12,56 +12,73 @@ constexpr double kTau = 6.283185307179586476925286766559;
 
 double wrap_angle(double value) {
   double wrapped = std::fmod(value, kTau);
-  if (wrapped < -3.141592653589793) wrapped += kTau;
-  if (wrapped > 3.141592653589793) wrapped -= kTau;
+  if (wrapped < -3.141592653589793) {
+    wrapped += kTau;
+  }
+  if (wrapped > 3.141592653589793) {
+    wrapped -= kTau;
+  }
   return wrapped;
 }
 
-} // namespace
+}  // namespace
 
 void integrate_positions(World& world, double seconds) {
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active) continue;
-      entity.set_position_x(f32::from_double(static_cast<double>(entity.position.x.value)
-                                           + entity.velocity.x * seconds));
-      entity.set_position_y(f32::from_double(static_cast<double>(entity.position.y.value)
-                                           + entity.velocity.y * seconds));
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active) {
+        continue;
+      }
+      entity.set_position_x(f32::from_double(static_cast<double>(entity.position.x.value) +
+                                             entity.velocity.x * seconds));
+      entity.set_position_y(f32::from_double(static_cast<double>(entity.position.y.value) +
+                                             entity.velocity.y * seconds));
     }
   });
 }
 
 void integrate_movement(World& world, double delta_milliseconds) {
-  if (!(delta_milliseconds > 0.0)) return;
+  if (!(delta_milliseconds > 0.0)) {
+    return;
+  }
   const auto rates = motion_integration(delta_milliseconds);
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active) continue;
-      // Original 654 integrates local angle first (transform +8 / +72).
-      const f32 angular_step = f32::from_double(delta_milliseconds * 0.001
-                                                * static_cast<double>(entity.angular_velocity.value));
-      if (std::fabs(static_cast<double>(angular_step.value)) >= 1.1920928955078125e-07) {
-        entity.angle = f32::from_double(wrap_angle(static_cast<double>(entity.angle.value)
-                                                   + static_cast<double>(angular_step.value)));
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active) {
+        continue;
       }
-      MotionState motion{entity.position.x.value, entity.position.y.value, entity.velocity.x, entity.velocity.y};
+      // Original 654 integrates local angle first (transform +8 / +72).
+      const f32 angular_step = f32::from_double(delta_milliseconds * 0.001 *
+                                                static_cast<double>(entity.angular_velocity.value));
+      if (std::fabs(static_cast<double>(angular_step.value)) >= 1.1920928955078125e-07) {
+        entity.angle = f32::from_double(wrap_angle(static_cast<double>(entity.angle.value) +
+                                                   static_cast<double>(angular_step.value)));
+      }
+      MotionState motion{entity.position.x.value, entity.position.y.value, entity.velocity.x,
+                         entity.velocity.y};
       MotionState unbounded;
-      integrate_linear_motion(motion, entity.acceleration.x, entity.acceleration.y, delta_milliseconds,
-        entity.kind == EntityKind::kPlayer || entity.kind == EntityKind::kMob,
-        static_cast<double>(world.width().value) * 0.5, static_cast<double>(world.height().value) * 0.5,
-        entity.collision_radius.value, rates, &unbounded);
+      integrate_linear_motion(motion, entity.acceleration.x, entity.acceleration.y,
+                              delta_milliseconds,
+                              entity.kind == EntityKind::kPlayer || entity.kind == EntityKind::kMob,
+                              static_cast<double>(world.width().value) * 0.5,
+                              static_cast<double>(world.height().value) * 0.5,
+                              entity.collision_radius.value, rates, &unbounded);
       // Retain intermediate writes: a clamped axis can be dirty even when its
       // final position equals the previous snapshot target.
-      entity.set_position_x(f32(unbounded.x)); entity.set_position_y(f32(unbounded.y));
-      entity.set_position_x(f32(motion.x)); entity.set_position_y(f32(motion.y));
-      entity.velocity.x = motion.vx; entity.velocity.y = motion.vy;
+      entity.set_position_x(f32(unbounded.x));
+      entity.set_position_y(f32(unbounded.y));
+      entity.set_position_x(f32(motion.x));
+      entity.set_position_y(f32(motion.y));
+      entity.velocity.x = motion.vx;
+      entity.velocity.y = motion.vy;
       // Original 167 caches a union including attached children; any transform
       // change invalidates the entity and its owner chain.
       invalidate_bounds(world, entity.handle);
     }
   });
 }
-
 
 namespace {
 
@@ -71,7 +88,9 @@ double linked_angle(double dy, double dx) {
 
 void constrain_entity(World& world, EntityHandle handle) {
   Entity* entity = world.entities().get(handle);
-  if (entity == nullptr || !entity->active) return;
+  if (entity == nullptr || !entity->active) {
+    return;
+  }
   // Original 401 skips only when the dedicated +56 parent link is live. The
   // shipped centipede/ant-hole records leave +56 at zero (the owner at +236 is
   // a different field), so no domain skip is needed here.
@@ -84,10 +103,10 @@ void constrain_entity(World& world, EntityHandle handle) {
       const f32 own_plus = f32(entity->collision_radius.value + 0.0001F);
       const f32 link_radius = f32(own_plus.value + parent->collision_radius.value);
       const double distance = static_cast<double>(link_radius.value);
-      double dx = static_cast<double>(parent->position.x.value)
-                - static_cast<double>(entity->position.x.value);
-      double dy = static_cast<double>(parent->position.y.value)
-                - static_cast<double>(entity->position.y.value);
+      double dx = static_cast<double>(parent->position.x.value) -
+                  static_cast<double>(entity->position.x.value);
+      double dy = static_cast<double>(parent->position.y.value) -
+                  static_cast<double>(entity->position.y.value);
       // Original 401 first writes the facing angle from the unclamped vector.
       entity->angle = f32::from_double(linked_angle(dy, dx));
       const double length_squared = dx * dx + dy * dy;
@@ -107,12 +126,13 @@ void constrain_entity(World& world, EntityHandle handle) {
   const std::vector<EntityHandle> children = entity->children;
   for (const EntityHandle child : children) {
     const Entity* segment = world.entities().get(child);
-    if (segment != nullptr && segment->ai.predecessor == handle)
+    if (segment != nullptr && segment->ai.predecessor == handle) {
       constrain_entity(world, child);
+    }
   }
 }
 
-} // namespace
+}  // namespace
 
 void constrain_linked_entities(World& world) {
   // Only chain roots are entry points: a segment with a live predecessor is
@@ -120,25 +140,39 @@ void constrain_linked_entities(World& world) {
   // link and are not affected by original 401.
   std::vector<EntityHandle> roots;
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (const auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active) continue;
-      if (entity.children.empty()) continue;
-      if (entity.ai.predecessor.valid()) continue;
-      if (entity.type_id != 15U && entity.type_id != 16U && entity.type_id != 17U
-          && entity.type_id != 18U) continue;
+    for (const auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active) {
+        continue;
+      }
+      if (entity.children.empty()) {
+        continue;
+      }
+      if (entity.ai.predecessor.valid()) {
+        continue;
+      }
+      if (entity.type_id != 15U && entity.type_id != 16U && entity.type_id != 17U &&
+          entity.type_id != 18U) {
+        continue;
+      }
       roots.push_back(entity.handle);
     }
   });
-  for (const EntityHandle root : roots) constrain_entity(world, root);
+  for (const EntityHandle root : roots) {
+    constrain_entity(world, root);
+  }
 }
 
 std::uint32_t debug_linked_roots(const World& world) {
   std::uint32_t count = 0;
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (const auto& entity : slots)
-      if (entity.active && !entity.children.empty() && !entity.ai.predecessor.valid()
-          && (entity.type_id == 15U || entity.type_id == 16U || entity.type_id == 17U
-              || entity.type_id == 18U)) ++count;
+    for (const auto& entity : slots) {
+      if (entity.active && !entity.children.empty() && !entity.ai.predecessor.valid() &&
+          (entity.type_id == 15U || entity.type_id == 16U || entity.type_id == 17U ||
+           entity.type_id == 18U)) {
+        ++count;
+      }
+    }
   });
   return count;
 }
@@ -146,10 +180,13 @@ std::uint32_t debug_linked_roots(const World& world) {
 std::uint32_t debug_linked_segments(const World& world) {
   std::uint32_t count = 0;
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (const auto& entity : slots)
-      if (entity.active && entity.ai.predecessor.valid()) ++count;
+    for (const auto& entity : slots) {
+      if (entity.active && entity.ai.predecessor.valid()) {
+        ++count;
+      }
+    }
   });
   return count;
 }
 
-} // namespace engine
+}  // namespace engine

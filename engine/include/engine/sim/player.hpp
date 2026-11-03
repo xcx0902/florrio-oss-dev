@@ -29,8 +29,8 @@ struct PlayerConfig {
 /** Original spawn path defaults: choose a level band position from the world
  * width/height, equip five Basic petals (or the rare starter), and restore a
  * prior level/inventory when supplied. */
-[[nodiscard]] EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_view name,
-                                                PlayerProfile profile = {},
+[[nodiscard]] EntityHandle spawn_player_default(World& world, PlayerState& state,
+                                                std::string_view name, PlayerProfile profile = {},
                                                 bool allow_rare_starter = true);
 
 /** Build the initial profile: level 1 and five Basic petals. The original
@@ -56,4 +56,4 @@ void regenerate_players(World& world, double delta_milliseconds);
  * proportional health rescale after every level gained. */
 void award_player_experience(World& world, PlayerId player, f32 amount);
 
-} // namespace engine
+}  // namespace engine

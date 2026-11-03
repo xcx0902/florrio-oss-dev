@@ -27,7 +27,8 @@ void test_rng() {
   const std::uint64_t second = lcg.next_state();
   CHECK(second == 6364136223846793006ULL);
   const std::uint64_t third = lcg.next_state();
-  CHECK(lcg.next_generation() == static_cast<std::uint32_t>((third * 6364136223846793005ULL + 1ULL) >> 33U));
+  CHECK(lcg.next_generation() ==
+        static_cast<std::uint32_t>((third * 6364136223846793005ULL + 1ULL) >> 33U));
 }
 
 void test_varint_roundtrip() {
@@ -70,7 +71,9 @@ void test_fixed_step() {
   CHECK(clock.advance(0.0) == 0);
   CHECK(clock.advance(49.0) == 0);
   CHECK(clock.advance(50.0) == 1);
-  CHECK(clock.advance(1000.0) == 2); // 950 ms clamped to 100 ms => two ticks
+  CHECK(clock.advance(1000.0) == 2);  // 950 ms clamped to 100 ms => two ticks
   engine::FixedStepClock steady;
-  for (int index = 0; index < 20; ++index) CHECK(steady.advance((index + 1) * 50.0) == 1);
+  for (int index = 0; index < 20; ++index) {
+    CHECK(steady.advance((index + 1) * 50.0) == 1);
+  }
 }

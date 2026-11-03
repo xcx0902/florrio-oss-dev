@@ -18,4 +18,4 @@ namespace engine {
  * from the original server data table at 6960. */
 [[nodiscard]] f32 rarity_experience(std::uint32_t rarity_index);
 
-} // namespace engine
+}  // namespace engine

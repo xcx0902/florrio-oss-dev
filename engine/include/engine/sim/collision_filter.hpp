@@ -15,4 +15,4 @@ namespace engine {
  * matches the other body's probe. */
 [[nodiscard]] bool layers_collide(const Entity& first, const Entity& second);
 
-} // namespace engine
+}  // namespace engine

@@ -1,7 +1,10 @@
 import type { EntitySnapshot } from './snapshot-types.js';
 
 export interface EntityState extends EntitySnapshot {
-  readonly networkTransform?: (now: number, result: import('./interpolation.js').MutableTransform) => import('./interpolation.js').MutableTransform;
+  readonly networkTransform?: (
+    now: number,
+    result: import('./interpolation.js').MutableTransform,
+  ) => import('./interpolation.js').MutableTransform;
   readonly previousX: number;
   readonly previousY: number;
   readonly previousAngle: number;
@@ -24,4 +27,3 @@ export interface EntityState extends EntitySnapshot {
   /** Retain the constructor marker across deltas received before a render. */
   readonly arrivalMarked?: boolean;
 }
-

@@ -5,6 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "npm run build:dist-next",
+    "setup:format": "node tools/setup-format-tools.mjs",
+    "format": "node tools/format.mjs",
+    "format:check": "node tools/format.mjs --check",
+    "lint": "eslint --max-warnings=0 .",
+    "check:refactor": "node tools/check-refactor.mjs",
     "start": "node serve.mjs --root dist-next",
     "serve:dist-next": "node serve.mjs --root dist-next",
     "build:engine": "cmake -S engine -B build/engine -DCMAKE_BUILD_TYPE=Release && cmake --build build/engine -j 6",
@@ -24,7 +29,7 @@
     "test:delivery": "CLIENT_ROOT=dist-next node tools/run-tests.mjs delivery",
     "test:all": "node tools/run-verification.mjs",
     "test:m4": "node tools/performance/verify.mjs",
-    "test:light": "npm run test:unit && npm run test:tools && npm run test:engine && npm run build:engine:wasm && npm run test:client && npm run build:dist-next -- --skip-build && npm run verify:dist-next",
+    "test:light": "npm run format:check && npm run lint && npm run check:refactor && npm run test:unit && npm run test:tools && npm run test:engine && npm run build:engine:wasm && npm run test:client && npm run build:dist-next -- --skip-build && npm run verify:dist-next",
     "perf:client": "node tools/perf-client.mjs --frames 600",
     "schema:check": "node tools/generate.mjs --check",
     "test:integration": "npm run build:engine && node tools/run-tests.mjs integration",
@@ -49,8 +54,13 @@
     "release:multiplayer": "node tools/prepare-multiplayer-release.mjs"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
     "playwright-core": "^1.49.1",
+    "prettier": "3.9.10",
     "typescript": "^5.7.2",
+    "typescript-eslint": "8.72.1",
     "yaml": "^2.6.1"
   }
 }

@@ -34,7 +34,9 @@ struct OutputPacket {
 class OutputQueue {
  public:
   [[nodiscard]] bool enqueue(OutputPacket packet) {
-    if (packets_.size() >= kOutputQueueCapacity) return false;
+    if (packets_.size() >= kOutputQueueCapacity) {
+      return false;
+    }
     packets_.push_back(std::move(packet));
     return true;
   }
@@ -60,4 +62,4 @@ inline void apply_packet_xor(std::span<std::uint8_t> bytes, std::span<const std:
   xor_in_place(bytes, key);
 }
 
-} // namespace engine
+}  // namespace engine

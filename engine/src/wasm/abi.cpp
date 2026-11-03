@@ -21,16 +21,19 @@ engine::WorkerApi* g_api = nullptr;
 std::vector<std::vector<std::uint8_t>> g_flushed;
 std::uint32_t g_snapshot_sequence = 0;
 
-
 engine::WorkerApi& api() {
-  if (g_api == nullptr) g_api = new (g_api_storage) engine::WorkerApi();
+  if (g_api == nullptr) {
+    g_api = new (g_api_storage) engine::WorkerApi();
+  }
   return *g_api;
 }
 
-} // namespace
+}  // namespace
 
 extern "C" void sp_server_init(void) {
-  if (g_api != nullptr) g_api->~WorkerApi();
+  if (g_api != nullptr) {
+    g_api->~WorkerApi();
+  }
   g_api = new (g_api_storage) engine::WorkerApi();
   g_api->init(true);
   g_flushed.clear();
@@ -38,7 +41,9 @@ extern "C" void sp_server_init(void) {
 }
 
 extern "C" void sp_server_send(const std::uint8_t* data, std::uint32_t length) {
-  if (data == nullptr || length == 0U) return;
+  if (data == nullptr || length == 0U) {
+    return;
+  }
   (void)api().send(std::span<const std::uint8_t>(data, length),
                    std::span<const std::uint8_t>(engine::net::kPacketXorKey));
 }
@@ -50,7 +55,9 @@ extern "C" void sp_server_think(void) {
 
 extern "C" void sp_server_flush(void) {
   g_flushed.clear();
-  for (auto& packet : api().flush()) g_flushed.push_back(std::move(packet.payload));
+  for (auto& packet : api().flush()) {
+    g_flushed.push_back(std::move(packet.payload));
+  }
 }
 
 extern "C" std::uint32_t sp_server_entity_count(void) {
@@ -62,13 +69,21 @@ extern "C" std::uint32_t sp_server_output_count(void) {
 }
 
 extern "C" const std::uint8_t* sp_server_output_data(std::uint32_t index) {
-  if (index >= g_flushed.size()) return nullptr;
+  if (index >= g_flushed.size()) {
+    return nullptr;
+  }
   return g_flushed[index].data();
 }
 
 extern "C" std::uint32_t sp_server_output_size(std::uint32_t index) {
-  if (index >= g_flushed.size()) return 0U;
+  if (index >= g_flushed.size()) {
+    return 0U;
+  }
   return static_cast<std::uint32_t>(g_flushed[index].size());
 }
 
-namespace engine { WorkerApi& current_worker_api() { return api(); } }
+namespace engine {
+WorkerApi& current_worker_api() {
+  return api();
+}
+}

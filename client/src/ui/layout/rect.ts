@@ -6,6 +6,10 @@ export interface Rect {
   readonly height: number;
 }
 export function contains(rect: Rect, x: number, y: number, margin = 0): boolean {
-  return x >= rect.x - margin && x < rect.x + rect.width + margin
-    && y >= rect.y - margin && y < rect.y + rect.height + margin;
+  return (
+    x >= rect.x - margin &&
+    x < rect.x + rect.width + margin &&
+    y >= rect.y - margin &&
+    y < rect.y + rect.height + margin
+  );
 }

@@ -17,43 +17,59 @@ constexpr double kTau = 6.283185307179586476925286766559;
 Effect* find_effect(Entity& entity, EffectType type, EntityHandle source) {
   for (std::size_t index = 0; index < kMaxEffects; ++index) {
     Effect& effect = entity.effects[index];
-    if (!effect.active || effect.type != type) continue;
-    if (source.valid() && effect.source != source) continue;
+    if (!effect.active || effect.type != type) {
+      continue;
+    }
+    if (source.valid() && effect.source != source) {
+      continue;
+    }
     return &effect;
   }
   return nullptr;
 }
 
 Effect* find_payload(Entity& entity, const EffectPayload* payload) {
-  for (std::size_t index = 0; index < kMaxEffects; ++index)
-    if (entity.effects[index].active && entity.effects[index].payload.get() == payload)
+  for (std::size_t index = 0; index < kMaxEffects; ++index) {
+    if (entity.effects[index].active && entity.effects[index].payload.get() == payload) {
       return &entity.effects[index];
+    }
+  }
   return nullptr;
 }
 
 Effect* free_effect(Entity& entity) {
-  for (std::size_t index = 0; index < kMaxEffects; ++index)
-    if (!entity.effects[index].active) return &entity.effects[index];
+  for (std::size_t index = 0; index < kMaxEffects; ++index) {
+    if (!entity.effects[index].active) {
+      return &entity.effects[index];
+    }
+  }
   // All slots are occupied: replace the effect with the shortest remaining
   // lifetime. The original effect vector can grow without bound; a bounded
   // domain record is sufficient for the recovered poison/slow/heal families.
   Effect* shortest = &entity.effects[0];
-  for (std::size_t index = 1; index < kMaxEffects; ++index)
-    if (entity.effects[index].remaining_ms < shortest->remaining_ms)
+  for (std::size_t index = 1; index < kMaxEffects; ++index) {
+    if (entity.effects[index].remaining_ms < shortest->remaining_ms) {
       shortest = &entity.effects[index];
+    }
+  }
   return shortest;
 }
 
 void refresh_count(Entity& entity) {
   std::uint8_t count = 0;
-  for (const Effect& effect : entity.effects)
-    if (effect.active) ++count;
+  for (const Effect& effect : entity.effects) {
+    if (effect.active) {
+      ++count;
+    }
+  }
   entity.effect_count = count;
   entity.effect_flags = effect_flags(entity);
 }
 
 void sync_effect(Effect& effect) {
-  if (!effect.payload) return;
+  if (!effect.payload) {
+    return;
+  }
   effect.type = effect.payload->type;
   effect.source = effect.payload->source;
   effect.attribution = effect.payload->attribution;
@@ -62,7 +78,7 @@ void sync_effect(Effect& effect) {
   effect.active = effect.payload->active;
 }
 
-} // namespace
+}  // namespace
 
 std::shared_ptr<EffectPayload> make_effect_payload(World& world, EffectType type, f32 intensity,
                                                    double duration_ms, EntityHandle source) {
@@ -78,10 +94,16 @@ std::shared_ptr<EffectPayload> make_effect_payload(World& world, EffectType type
 }
 
 bool attach_effect_payload(Entity& entity, const std::shared_ptr<EffectPayload>& payload) {
-  if (!payload || !payload->active) return false;
-  if (find_payload(entity, payload.get()) != nullptr) return true;
+  if (!payload || !payload->active) {
+    return false;
+  }
+  if (find_payload(entity, payload.get()) != nullptr) {
+    return true;
+  }
   Effect* effect = free_effect(entity);
-  if (effect->payload && effect->payload->refcount > 0U) --effect->payload->refcount;
+  if (effect->payload && effect->payload->refcount > 0U) {
+    --effect->payload->refcount;
+  }
   effect->payload = payload;
   effect->type = payload->type;
   effect->source = payload->source;
@@ -96,8 +118,12 @@ bool attach_effect_payload(Entity& entity, const std::shared_ptr<EffectPayload>&
 
 bool detach_effect_payload(Entity& entity, const std::shared_ptr<EffectPayload>& payload) {
   Effect* effect = payload ? find_payload(entity, payload.get()) : nullptr;
-  if (effect == nullptr) return false;
-  if (effect->payload && effect->payload->refcount > 0U) --effect->payload->refcount;
+  if (effect == nullptr) {
+    return false;
+  }
+  if (effect->payload && effect->payload->refcount > 0U) {
+    --effect->payload->refcount;
+  }
   *effect = Effect{};
   refresh_count(entity);
   return true;
@@ -106,18 +132,34 @@ bool detach_effect_payload(Entity& entity, const std::shared_ptr<EffectPayload>&
 bool apply_effect(World& world, EntityHandle target, EffectType type, f32 intensity,
                   double duration_ms, EntityHandle source, const DamageSource* attribution) {
   Entity* entity = world.entities().get(target);
-  if (entity == nullptr || entity->health.value <= 0.0F) return false;
-  if (!(duration_ms > 0.0)) return false;
-  if (type == EffectType::kPoison && !(intensity.value > 0.0F)) return false;
+  if (entity == nullptr || entity->health.value <= 0.0F) {
+    return false;
+  }
+  if (!(duration_ms > 0.0)) {
+    return false;
+  }
+  if (type == EffectType::kPoison && !(intensity.value > 0.0F)) {
+    return false;
+  }
   if (type == EffectType::kSlow) {
-    if (!(intensity.value > 0.0F)) return false;
-    if (intensity.value > 1.0F) intensity = f32(1.0F);
+    if (!(intensity.value > 0.0F)) {
+      return false;
+    }
+    if (intensity.value > 1.0F) {
+      intensity = f32(1.0F);
+    }
   }
   const auto payload = make_effect_payload(world, type, intensity, duration_ms, source);
-  if (attribution != nullptr) payload->attribution = *attribution;
+  if (attribution != nullptr) {
+    payload->attribution = *attribution;
+  }
   Effect* effect = find_effect(*entity, type, source);
-  if (effect == nullptr) effect = free_effect(*entity);
-  if (effect->payload && effect->payload->refcount > 0U) --effect->payload->refcount;
+  if (effect == nullptr) {
+    effect = free_effect(*entity);
+  }
+  if (effect->payload && effect->payload->refcount > 0U) {
+    --effect->payload->refcount;
+  }
   effect->payload = payload;
   effect->type = type;
   effect->source = source;
@@ -130,7 +172,9 @@ bool apply_effect(World& world, EntityHandle target, EffectType type, f32 intens
 }
 
 std::size_t update_effects(World& world, double delta_milliseconds) {
-  if (!(delta_milliseconds > 0.0)) return 0;
+  if (!(delta_milliseconds > 0.0)) {
+    return 0;
+  }
   std::size_t damaged = 0;
 
   // Shared payloads (area effects) are advanced exactly once per tick.
@@ -138,26 +182,38 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
   // every payload until its one timer advance has finished.
   std::vector<std::shared_ptr<EffectPayload>> payloads;
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active) continue;
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active) {
+        continue;
+      }
       for (const auto& effect : entity.effects) {
-        if (!effect.active || !effect.payload) continue;
-        if (std::find(payloads.begin(), payloads.end(), effect.payload) == payloads.end())
+        if (!effect.active || !effect.payload) {
+          continue;
+        }
+        if (std::find(payloads.begin(), payloads.end(), effect.payload) == payloads.end()) {
           payloads.push_back(effect.payload);
+        }
       }
     }
   });
 
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active) continue;
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active) {
+        continue;
+      }
       // The tick applies only the strongest active damage effect; the original
       // does not stack every poison instance in the same frame.
       const Effect* strongest = nullptr;
       for (const auto& effect : entity.effects) {
-        if (!effect.active || effect.type != EffectType::kPoison) continue;
-        if (strongest == nullptr || effect.intensity.value > strongest->intensity.value)
+        if (!effect.active || effect.type != EffectType::kPoison) {
+          continue;
+        }
+        if (strongest == nullptr || effect.intensity.value > strongest->intensity.value) {
           strongest = &effect;
+        }
       }
       if (strongest != nullptr && entity.health.value > 0.0F) {
         const double duration = std::min(delta_milliseconds, strongest->remaining_ms);
@@ -166,19 +222,25 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
           // Original654 effects+40/+48 gates feedback, not poison damage.
           // A replacement/stronger poison shares this entity's same clock.
           const bool quiet = world.time_ms() - entity.poison_hit_time_ms < 600.0;
-          if (!quiet) entity.poison_hit_time_ms = world.time_ms();
-          (void)damage_entity_from_source(world, entity.handle, f32::from_double(amount), strongest->attribution,
-            quiet ? 1U : 0U);
+          if (!quiet) {
+            entity.poison_hit_time_ms = world.time_ms();
+          }
+          (void)damage_entity_from_source(world, entity.handle, f32::from_double(amount),
+                                          strongest->attribution, quiet ? 1U : 0U);
           ++damaged;
         }
       }
 
       bool changed = false;
       for (auto& effect : entity.effects) {
-        if (!effect.active) continue;
+        if (!effect.active) {
+          continue;
+        }
         if (effect.payload) {
           if (!effect.payload->active || effect.payload->remaining_ms < 0.0) {
-            if (effect.payload->refcount > 0U) --effect.payload->refcount;
+            if (effect.payload->refcount > 0U) {
+              --effect.payload->refcount;
+            }
             effect = Effect{};
             changed = true;
           } else {
@@ -193,12 +255,16 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
           effect.remaining_ms -= delta_milliseconds;
         }
       }
-      if (changed) refresh_count(entity);
+      if (changed) {
+        refresh_count(entity);
+      }
     }
   });
 
   for (const auto& payload : payloads) {
-    if (!payload->active) continue;
+    if (!payload->active) {
+      continue;
+    }
     payload->remaining_ms -= delta_milliseconds;
     if (payload->remaining_ms <= 0.0) {
       payload->remaining_ms = 0.0;
@@ -207,10 +273,15 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
   }
   // Mirror the once-per-tick payload advance into every target slot.
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active) continue;
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active) {
+        continue;
+      }
       for (auto& effect : entity.effects) {
-        if (effect.active && effect.payload) sync_effect(effect);
+        if (effect.active && effect.payload) {
+          sync_effect(effect);
+        }
       }
     }
   });
@@ -218,8 +289,11 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
 }
 
 bool has_effect(const Entity& entity, EffectType type) {
-  for (const auto& effect : entity.effects)
-    if (effect.active && effect.type == type) return true;
+  for (const auto& effect : entity.effects) {
+    if (effect.active && effect.type == type) {
+      return true;
+    }
+  }
   return false;
 }
 
@@ -230,7 +304,9 @@ bool blocks_healing(const Entity& entity) {
 f32 slow_multiplier(const Entity& entity) {
   f32 multiplier(1.0F);
   for (const auto& effect : entity.effects) {
-    if (!effect.active || effect.type != EffectType::kSlow) continue;
+    if (!effect.active || effect.type != EffectType::kSlow) {
+      continue;
+    }
     // Original608 multiplies every effect's vtable+20 return value into one
     // float32, starting at 1.0; it does not take the minimum.
     multiplier = f32(multiplier.value * effect.intensity.value);
@@ -241,17 +317,25 @@ f32 slow_multiplier(const Entity& entity) {
 std::uint8_t effect_flags(const Entity& entity) {
   std::uint8_t flags = 0;
   for (const auto& effect : entity.effects) {
-    if (!effect.active) continue;
-    if (effect.type == EffectType::kPoison) flags |= 1U;
-    else if (effect.type == EffectType::kHealBlock) flags |= 2U;
-    else if (effect.type == EffectType::kSlow) flags |= 4U;
+    if (!effect.active) {
+      continue;
+    }
+    if (effect.type == EffectType::kPoison) {
+      flags |= 1U;
+    } else if (effect.type == EffectType::kHealBlock) {
+      flags |= 2U;
+    } else if (effect.type == EffectType::kSlow) {
+      flags |= 4U;
+    }
   }
   return flags;
 }
 
 void clear_effects(Entity& entity) {
   for (auto& effect : entity.effects) {
-    if (effect.payload && effect.payload->refcount > 0U) --effect.payload->refcount;
+    if (effect.payload && effect.payload->refcount > 0U) {
+      --effect.payload->refcount;
+    }
     effect = Effect{};
   }
   entity.effect_count = 0;
@@ -259,8 +343,8 @@ void clear_effects(Entity& entity) {
 }
 
 std::shared_ptr<EffectPayload> add_area_effect(World& world, EntityHandle owner, f32 scale,
-                                               EffectType type, f32 intensity,
-                                               double duration_ms, EntityHandle source) {
+                                               EffectType type, f32 intensity, double duration_ms,
+                                               EntityHandle source) {
   const auto payload = make_effect_payload(world, type, intensity, duration_ms, source);
   (void)world.replace_area_effect(owner, scale, payload);
   return payload;
@@ -270,7 +354,10 @@ std::shared_ptr<EffectPayload> World::replace_area_effect(EntityHandle owner, f3
                                                           std::shared_ptr<EffectPayload> payload) {
   AreaEffect* area = nullptr;
   for (auto& candidate : area_effects_) {
-    if (candidate.owner == owner) { area = &candidate; break; }
+    if (candidate.owner == owner) {
+      area = &candidate;
+      break;
+    }
   }
   if (area == nullptr) {
     area_effects_.push_back(AreaEffect{owner, scale, nullptr, {}});
@@ -282,15 +369,21 @@ std::shared_ptr<EffectPayload> World::replace_area_effect(EntityHandle owner, f3
     area->payload = payload;
     for (const EntityHandle target : area->targets) {
       Entity* entity = entities_.get(target);
-      if (entity == nullptr) continue;
-      if (previous) (void)detach_effect_payload(*entity, previous);
+      if (entity == nullptr) {
+        continue;
+      }
+      if (previous) {
+        (void)detach_effect_payload(*entity, previous);
+      }
       (void)attach_effect_payload(*entity, payload);
     }
     return area->payload;
   }
   for (const EntityHandle target : area->targets) {
     Entity* entity = entities_.get(target);
-    if (entity != nullptr && previous) (void)detach_effect_payload(*entity, previous);
+    if (entity != nullptr && previous) {
+      (void)detach_effect_payload(*entity, previous);
+    }
   }
   area->targets.clear();
   area->payload.reset();
@@ -300,11 +393,15 @@ std::shared_ptr<EffectPayload> World::replace_area_effect(EntityHandle owner, f3
 std::size_t World::update_area_effects() {
   std::size_t updated = 0;
   std::optional<SpatialQuery> phase_query;
-  auto& alive = area_alive_; auto& candidates = area_candidates_;
-  auto& added = area_added_; auto& removed = area_removed_;
+  auto& alive = area_alive_;
+  auto& candidates = area_candidates_;
+  auto& added = area_added_;
+  auto& removed = area_removed_;
   const auto less = [](EntityHandle a, EntityHandle b) { return a.raw < b.raw; };
   for (auto& area : area_effects_) {
-    if (!area.payload) continue;
+    if (!area.payload) {
+      continue;
+    }
     if (area.payload->remaining_ms < 0.0 || !area.payload->active) {
       (void)replace_area_effect(area.owner, area.scale, nullptr);
       continue;
@@ -320,7 +417,9 @@ std::size_t World::update_area_effects() {
     for (const EntityHandle target : area.targets) {
       Entity* entity = entities_.get(target);
       if (entity == nullptr || entity->health.value <= 0.0F) {
-        if (entity != nullptr) (void)detach_effect_payload(*entity, area.payload);
+        if (entity != nullptr) {
+          (void)detach_effect_payload(*entity, area.payload);
+        }
         continue;
       }
       alive.push_back(target);
@@ -328,35 +427,42 @@ std::size_t World::update_area_effects() {
     // The original query rectangle is owner centre +/- scale (a square).
     // Payload attach/detach does not mutate geometry. This view ends before
     // petal spawning, movement or destruction in later phases.
-    if (!phase_query) phase_query.emplace(SpatialQuery::from_world(*this));
+    if (!phase_query) {
+      phase_query.emplace(SpatialQuery::from_world(*this));
+    }
     const auto& query = *phase_query;
     const f32 half = area.scale;
-    query.query_box(Aabb{f32::from_double(static_cast<double>(owner->position.x.value)
-                                          - static_cast<double>(half.value)),
-                         f32::from_double(static_cast<double>(owner->position.y.value)
-                                          - static_cast<double>(half.value)),
-                         f32::from_double(static_cast<double>(owner->position.x.value)
-                                          + static_cast<double>(half.value)),
-                         f32::from_double(static_cast<double>(owner->position.y.value)
-                                          + static_cast<double>(half.value))},
+    query.query_box(Aabb{f32::from_double(static_cast<double>(owner->position.x.value) -
+                                          static_cast<double>(half.value)),
+                         f32::from_double(static_cast<double>(owner->position.y.value) -
+                                          static_cast<double>(half.value)),
+                         f32::from_double(static_cast<double>(owner->position.x.value) +
+                                          static_cast<double>(half.value)),
+                         f32::from_double(static_cast<double>(owner->position.y.value) +
+                                          static_cast<double>(half.value))},
                     candidates);
     std::sort(candidates.begin(), candidates.end(),
               [](EntityHandle left, EntityHandle right) { return left.raw < right.raw; });
     std::sort(alive.begin(), alive.end(),
               [](EntityHandle left, EntityHandle right) { return left.raw < right.raw; });
-    added.clear(); removed.clear();
-    std::set_difference(candidates.begin(), candidates.end(), alive.begin(), alive.end(), std::back_inserter(added), less);
-    std::set_difference(alive.begin(), alive.end(), candidates.begin(), candidates.end(), std::back_inserter(removed), less);
+    added.clear();
+    removed.clear();
+    std::set_difference(candidates.begin(), candidates.end(), alive.begin(), alive.end(),
+                        std::back_inserter(added), less);
+    std::set_difference(alive.begin(), alive.end(), candidates.begin(), candidates.end(),
+                        std::back_inserter(removed), less);
     for (const EntityHandle handle : removed) {
       Entity* entity = entities_.get(handle);
-      if (entity != nullptr) (void)detach_effect_payload(*entity, area.payload);
-
+      if (entity != nullptr) {
+        (void)detach_effect_payload(*entity, area.payload);
+      }
     }
     for (const EntityHandle handle : added) {
       Entity* entity = entities_.get(handle);
-      if (entity == nullptr) continue;
+      if (entity == nullptr) {
+        continue;
+      }
       (void)attach_effect_payload(*entity, area.payload);
-
     }
     area.targets.assign(candidates.begin(), candidates.end());
     ++updated;
@@ -373,24 +479,34 @@ std::size_t World::run_deferred_launches(double now_ms) {
   // callbacks scheduled in the same tick have a deterministic order.
   std::vector<DeferredLaunch> due;
   for (auto it = deferred_launches_.begin(); it != deferred_launches_.end();) {
-    if (it->due_ms > now_ms) { ++it; continue; }
+    if (it->due_ms > now_ms) {
+      ++it;
+      continue;
+    }
     due.push_back(std::move(*it));
     it = deferred_launches_.erase(it);
   }
-  std::stable_sort(due.begin(), due.end(), [](const DeferredLaunch& left, const DeferredLaunch& right) {
-    if (left.due_ms != right.due_ms) return left.due_ms < right.due_ms;
-    return left.sequence < right.sequence;
-  });
+  std::stable_sort(due.begin(), due.end(),
+                   [](const DeferredLaunch& left, const DeferredLaunch& right) {
+                     if (left.due_ms != right.due_ms) {
+                       return left.due_ms < right.due_ms;
+                     }
+                     return left.sequence < right.sequence;
+                   });
   for (auto& launch : due) {
     last_launch_order_.push_back(launch.sequence);
     const std::size_t count = launch.children.size();
-    if (count == 0U) continue;
+    if (count == 0U) {
+      continue;
+    }
     const double step = kTau / static_cast<double>(count);
     f32 angle = launch.phase;
     for (const EntityHandle handle : launch.children) {
       angle = f32(step + static_cast<double>(angle.value));
       Entity* child = entities_.get(handle);
-      if (child == nullptr) continue;
+      if (child == nullptr) {
+        continue;
+      }
       // Original launchPeas only adds an impulse to velocity (+40/+48) and
       // acceleration (+56/+64); the radial offset was written by splitPeas.
       const double x = static_cast<double>(projectile_math::peas_cos(angle.value));
@@ -410,4 +526,4 @@ std::size_t World::run_deferred_launches(double now_ms) {
   return launched;
 }
 
-} // namespace engine
+}  // namespace engine

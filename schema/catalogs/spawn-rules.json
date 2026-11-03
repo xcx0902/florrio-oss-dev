@@ -5,217 +5,121 @@
     {
       "index": 0,
       "weight": 0.5,
-      "regionIds": [
-        0,
-        1
-      ],
+      "regionIds": [0, 1],
       "entityTypeId": 1
     },
     {
       "index": 1,
       "weight": 0.009999999776482582,
-      "regionIds": [
-        0,
-        1
-      ],
+      "regionIds": [0, 1],
       "entityTypeId": 2
     },
     {
       "index": 2,
       "weight": 0.10000000149011612,
-      "regionIds": [
-        4,
-        5,
-        6
-      ],
+      "regionIds": [4, 5, 6],
       "entityTypeId": 2
     },
     {
       "index": 3,
       "weight": 0.4000000059604645,
-      "regionIds": [
-        2,
-        3
-      ],
+      "regionIds": [2, 3],
       "entityTypeId": 3
     },
     {
       "index": 4,
       "weight": 0.15000000596046448,
-      "regionIds": [
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
+      "regionIds": [0, 1, 2, 3, 4],
       "entityTypeId": 4
     },
     {
       "index": 5,
       "weight": 0.004999999888241291,
-      "regionIds": [
-        2,
-        3
-      ],
+      "regionIds": [2, 3],
       "entityTypeId": 21
     },
     {
       "index": 6,
       "weight": 0.00019999999494757503,
-      "regionIds": [
-        0,
-        1
-      ],
+      "regionIds": [0, 1],
       "entityTypeId": 5
     },
     {
       "index": 7,
       "weight": 0.10000000149011612,
-      "regionIds": [
-        0,
-        1,
-        2,
-        3
-      ],
+      "regionIds": [0, 1, 2, 3],
       "entityTypeId": 6
     },
     {
       "index": 8,
       "weight": 0.02500000037252903,
-      "regionIds": [
-        0,
-        1,
-        2
-      ],
+      "regionIds": [0, 1, 2],
       "entityTypeId": 7
     },
     {
       "index": 9,
       "weight": 0.02500000037252903,
-      "regionIds": [
-        1,
-        2,
-        3
-      ],
+      "regionIds": [1, 2, 3],
       "entityTypeId": 8
     },
     {
       "index": 10,
       "weight": 0.02500000037252903,
-      "regionIds": [
-        2,
-        3,
-        4
-      ],
+      "regionIds": [2, 3, 4],
       "entityTypeId": 9
     },
     {
       "index": 11,
       "weight": 0.0020000000949949026,
-      "regionIds": [
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
+      "regionIds": [3, 4, 5, 6, 7],
       "entityTypeId": 11
     },
     {
       "index": 12,
       "weight": 0.10000000149011612,
-      "regionIds": [
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
+      "regionIds": [3, 4, 5, 6, 7],
       "entityTypeId": 12
     },
     {
       "index": 13,
       "weight": 0.0020000000949949026,
-      "regionIds": [
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
+      "regionIds": [3, 4, 5, 6, 7],
       "entityTypeId": 13
     },
     {
       "index": 14,
       "weight": 0.10000000149011612,
-      "regionIds": [
-        5,
-        6,
-        7
-      ],
+      "regionIds": [5, 6, 7],
       "entityTypeId": 14
     },
     {
       "index": 15,
       "weight": 0.10000000149011612,
-      "regionIds": [
-        4,
-        5,
-        6,
-        7
-      ],
+      "regionIds": [4, 5, 6, 7],
       "entityTypeId": 22
     },
     {
       "index": 16,
       "weight": 0.10000000149011612,
-      "regionIds": [
-        6,
-        7
-      ],
+      "regionIds": [6, 7],
       "entityTypeId": 20
     },
     {
       "index": 17,
       "weight": 0.008999999612569809,
-      "regionIds": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
+      "regionIds": [0, 1, 2, 3, 4, 5, 6, 7],
       "entityTypeId": 15
     },
     {
       "index": 18,
       "weight": 0.0010000000474974513,
-      "regionIds": [
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
+      "regionIds": [3, 4, 5, 6, 7],
       "entityTypeId": 17
     },
     {
       "index": 19,
       "weight": 9.999999974752427e-7,
-      "regionIds": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
+      "regionIds": [0, 1, 2, 3, 4, 5, 6, 7],
       "entityTypeId": 19
     }
   ]

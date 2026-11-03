@@ -21,20 +21,28 @@ namespace {
 void reap_dead(World& world) {
   auto& entities = world.entities();
   entities.with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active) continue;
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active) {
+        continue;
+      }
       // Pickups have no original health component; their 0/0 state is not death.
-      if (entity.kind == EntityKind::kDrop) continue;
-      if (entity.health.value > 0.0F) continue;
+      if (entity.kind == EntityKind::kDrop) {
+        continue;
+      }
+      if (entity.health.value > 0.0F) {
+        continue;
+      }
       kill_entity(world, entity.handle, EntityHandle{});
     }
   });
   world.players().for_each([&](PlayerState& state) {
     auto& petals = state.petals();
     petals.erase(std::remove_if(petals.begin(), petals.end(),
-      [&world](const PetalOrbitState& petal) {
-        return world.entities().get(petal.handle) == nullptr;
-      }), petals.end());
+                                [&world](const PetalOrbitState& petal) {
+                                  return world.entities().get(petal.handle) == nullptr;
+                                }),
+                 petals.end());
   });
 }
 
@@ -42,12 +50,18 @@ void reap_dead(World& world) {
 void expire_drops(World& world) {
   auto& entities = world.entities();
   entities.with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active) continue;
-      if (entity.kind != EntityKind::kDrop) continue;
-      if (entity.pickup_transfer_deadline_ms > 0.0
-          && world.time_ms() >= entity.pickup_transfer_deadline_ms)
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active) {
+        continue;
+      }
+      if (entity.kind != EntityKind::kDrop) {
+        continue;
+      }
+      if (entity.pickup_transfer_deadline_ms > 0.0 &&
+          world.time_ms() >= entity.pickup_transfer_deadline_ms) {
         (void)world.destroy(entity.handle);
+      }
     }
   });
 }
@@ -56,20 +70,27 @@ void expire_drops(World& world) {
  * the zero-health body then persists for the ordinary 1000 ms death window. */
 void expire_projectiles(World& world, double delta_milliseconds) {
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active || entity.kind != EntityKind::kProjectile
-          || entity.health.value <= 0.0F || entity.lifetime_remaining_ms <= 0.0) continue;
-      entity.lifetime_remaining_ms = std::max(0.0, entity.lifetime_remaining_ms - delta_milliseconds);
-      if (entity.lifetime_remaining_ms == 0.0)
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active || entity.kind != EntityKind::kProjectile || entity.health.value <= 0.0F ||
+          entity.lifetime_remaining_ms <= 0.0) {
+        continue;
+      }
+      entity.lifetime_remaining_ms =
+          std::max(0.0, entity.lifetime_remaining_ms - delta_milliseconds);
+      if (entity.lifetime_remaining_ms == 0.0) {
         (void)damage_entity(world, entity.handle, entity.health, EntityHandle{});
+      }
     }
   });
 }
 
-} // namespace
+}  // namespace
 
 void tick(World& world, double delta_milliseconds) {
-  if (!world.initialized()) return;
+  if (!world.initialized()) {
+    return;
+  }
   // The original tick reads the absolute clock (readClock) while simulating.
   // `time_ms()` is therefore advanced to the tick's target time before any
   // system runs; `advance_tick` at the end only bumps the tick counter.
@@ -109,27 +130,30 @@ void tick(World& world, double delta_milliseconds) {
   // Original updateEquippedPetals computes the overlevel zone countdown first.
   // At the limit it skips the ring phase, slot recharge and all spawning, then
   // damages the petals that are still equipped.
-  world.players().for_each([&](PlayerState& state) {
-    update_zone_restriction(world, state, delta_milliseconds);
-  });
+  world.players().for_each(
+      [&](PlayerState& state) { update_zone_restriction(world, state, delta_milliseconds); });
   bool has_enabled_player = false;
   world.players().for_each([&](PlayerState& state) {
-    if (state.zone_petals_disabled()) return;
+    if (state.zone_petals_disabled()) {
+      return;
+    }
     has_enabled_player = true;
     advance_loadout_orbit_phase(world, state, delta_milliseconds);
   });
   // Preserve the legacy phase trace for empty/single-player worlds too.
-  if (has_enabled_player || world.players().size() == 0) world.record_phase("petal-phase");
+  if (has_enabled_player || world.players().size() == 0) {
+    world.record_phase("petal-phase");
+  }
   world.players().for_each([&](PlayerState& state) {
-    if (!state.zone_petals_disabled())
+    if (!state.zone_petals_disabled()) {
       (void)refresh_loadout_petals(world, state, delta_milliseconds);
-    else
+    } else {
       damage_zone_locked_petals(world, state, delta_milliseconds);
+    }
   });
   world.record_phase("loadout-petals");
-  world.players().for_each([&](PlayerState& state) {
-    update_petal_orbits(world, state, delta_milliseconds);
-  });
+  world.players().for_each(
+      [&](PlayerState& state) { update_petal_orbits(world, state, delta_milliseconds); });
   world.record_phase("petal-orbits");
   apply_all_player_controls(world, delta_milliseconds);
   world.record_phase("player-controls");
@@ -150,20 +174,28 @@ void tick(World& world, double delta_milliseconds) {
   expire_drops(world);
   world.record_phase("expire-drops");
   world.entities().with_ordered_slots([&](auto&& slots) {
-    for (auto& entity : slots) { PERF_ADD(visits, 1);
-      if (!entity.active || !entity.death_processed) continue;
-      if (entity.kind != EntityKind::kPlayer && entity.kind != EntityKind::kPetal && entity.kind != EntityKind::kMob
-          && entity.kind != EntityKind::kProjectile) continue;
-      if (entity.death_time_ms > world.time_ms()) continue;
+    for (auto& entity : slots) {
+      PERF_ADD(visits, 1);
+      if (!entity.active || !entity.death_processed) {
+        continue;
+      }
+      if (entity.kind != EntityKind::kPlayer && entity.kind != EntityKind::kPetal &&
+          entity.kind != EntityKind::kMob && entity.kind != EntityKind::kProjectile) {
+        continue;
+      }
+      if (entity.death_time_ms > world.time_ms()) {
+        continue;
+      }
       (void)world.destroy(entity.handle);
     }
   });
   world.players().for_each([&](PlayerState& state) {
     auto& petals = state.petals();
     petals.erase(std::remove_if(petals.begin(), petals.end(),
-      [&world](const PetalOrbitState& petal) {
-        return world.entities().get(petal.handle) == nullptr;
-      }), petals.end());
+                                [&world](const PetalOrbitState& petal) {
+                                  return world.entities().get(petal.handle) == nullptr;
+                                }),
+                 petals.end());
   });
   world.record_phase("corpse-sweep");
   world.record_phase("hit-flush");
@@ -172,4 +204,4 @@ void tick(World& world, double delta_milliseconds) {
   prepare_players(world);
 }
 
-} // namespace engine
+}  // namespace engine

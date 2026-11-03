@@ -23,12 +23,16 @@ struct PetalSlot {
   }
 
   bool advance(double delta_milliseconds) {
-    if (count == 0 || recharge_remaining_ms <= 0.0) return false;
+    if (count == 0 || recharge_remaining_ms <= 0.0) {
+      return false;
+    }
     recharge_remaining_ms -= delta_milliseconds;
-    if (recharge_remaining_ms > 0.0) return false;
+    if (recharge_remaining_ms > 0.0) {
+      return false;
+    }
     recharge_remaining_ms = 0.0;
     return true;
   }
 };
 
-} // namespace engine
+}  // namespace engine

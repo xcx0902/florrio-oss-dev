@@ -29,15 +29,14 @@ struct LootResult {
  * save the next ten for respawn, and convert 1% of ground rarity>=2 petals to
  * Pollen (19). The profile argument is scratch storage; pass a copy at death. */
 [[nodiscard]] LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng,
-                                           ServerRng& shuffle_rng);
+                                            ServerRng& shuffle_rng);
 
 /** Spawn one pickup entity for a petal type with the original pickup radius
  * (35), lifetime (32s, or 42/52/62/62s by rarity 2..5) and radial impulse.
  * `base_velocity` is the dead entity's velocity + acceleration (original
  * transform +40/+48 plus +56/+64); the drop inherits it additively. */
 [[nodiscard]] EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 position,
-                                           Vec2 impulse = Vec2{},
-                                           Vec2d base_velocity = Vec2d{});
+                                           Vec2 impulse = Vec2{}, Vec2d base_velocity = Vec2d{});
 
 /** Convenience: spawn every petal in a loot list at `position`, spreading
  * multi-drop impulses over the circle. Tier-5 (legendary) petals are skipped
@@ -54,4 +53,4 @@ std::vector<EntityHandle> spawn_loot_drops(World& world, const std::vector<std::
 /** Lifetime in milliseconds for a pickup of the given petal type. */
 [[nodiscard]] double loot_lifetime_ms(std::uint16_t petal_type);
 
-} // namespace engine
+}  // namespace engine

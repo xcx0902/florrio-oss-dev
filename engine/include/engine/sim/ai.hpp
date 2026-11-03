@@ -7,14 +7,13 @@ namespace engine {
 namespace ai_debug {
 extern std::uint32_t last_timer_handle;
 extern std::uint32_t timer_fires;
-} // namespace ai_debug
+}  // namespace ai_debug
 
 class SpatialQuery;
 
 /** Original function 168 gates: arena position, AI range, live health, owner
  * leash and controlling-root separation. */
-[[nodiscard]] bool target_eligible(const World& world, const Entity& seeker,
-                                   const Entity& target);
+[[nodiscard]] bool target_eligible(const World& world, const Entity& seeker, const Entity& target);
 
 /** Original function 196: nearby untargeted AI acquire the attacker. Returns
  * the number of AI records that changed target. */
@@ -39,8 +38,7 @@ std::size_t alert_nearby(World& world, EntityHandle attacker, f32 radius);
 void update_ai(World& world, double delta_milliseconds);
 
 /** Fill the AI record from the recovered family profile. */
-void configure_mob_ai(Entity& entity, f32 radius, f32 speed, bool aggressive,
-                      bool can_alert);
+void configure_mob_ai(Entity& entity, f32 radius, f32 speed, bool aggressive, bool can_alert);
 
 /** Recovered family profiles (original 205/208/210/415/115). These write the
  * exact health/radius/contact/speed/range/leash values, the 92-byte AI behavior
@@ -67,4 +65,4 @@ std::size_t alert_to_attacker(World& world, EntityHandle target, EntityHandle at
 [[nodiscard]] bool same_controlling_root(const World& world, EntityHandle first,
                                          EntityHandle second);
 
-} // namespace engine
+}  // namespace engine

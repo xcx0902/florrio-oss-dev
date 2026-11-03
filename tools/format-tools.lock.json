@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "note": "Exact formatting toolchain. Node packages are pinned in package.json/package-lock.json; this file pins the external binaries and the packages that provide them. Generated output identity depends on these versions, so a mismatch is a hard failure.",
+  "tools": {
+    "clang-format": "21.1.8",
+    "cmake-format": "0.6.13",
+    "prettier": "3.9.10",
+    "eslint": "10.14.0"
+  },
+  "packages": {
+    "clang-format": "clang-format==21.1.8",
+    "cmake-format": "cmakelang==0.6.13",
+    "PyYAML": "PyYAML==6.0.3"
+  },
+  "searchPaths": ["$CLANG_FORMAT / $CMAKE_FORMAT", ".emcache/tools/format/bin", "PATH"]
+}

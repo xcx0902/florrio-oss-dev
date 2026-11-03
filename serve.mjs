@@ -29,13 +29,21 @@ function parseArgs(argv) {
   const opts = { port: 8477, host: '127.0.0.1', open: true, root: 'dist-next' };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--port' || a === '-p') opts.port = Number(argv[++i]);
-    else if (a === '--host') opts.host = argv[++i];
-    else if (a === '--no-open') opts.open = false;
-    else if (a === '--root') opts.root = argv[++i];
-    else if (a === '--server') opts.server = argv[++i];
-    else if (a === '--help' || a === '-h') opts.help = true;
-    else if (/^\d+$/.test(a)) opts.port = Number(a);
+    if (a === '--port' || a === '-p') {
+      opts.port = Number(argv[++i]);
+    } else if (a === '--host') {
+      opts.host = argv[++i];
+    } else if (a === '--no-open') {
+      opts.open = false;
+    } else if (a === '--root') {
+      opts.root = argv[++i];
+    } else if (a === '--server') {
+      opts.server = argv[++i];
+    } else if (a === '--help' || a === '-h') {
+      opts.help = true;
+    } else if (/^\d+$/.test(a)) {
+      opts.port = Number(a);
+    }
   }
   return opts;
 }
@@ -50,12 +58,17 @@ function probePort(host, port) {
 }
 
 function openBrowser(url) {
-  const cmd = process.platform === 'darwin' ? 'open'
-    : process.platform === 'win32' ? 'start'
-    : 'xdg-open';
+  const cmd =
+    process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
   try {
-    spawn(cmd, [url], { stdio: 'ignore', detached: true, shell: process.platform === 'win32' }).unref();
-  } catch { /* 打不开就算了，手动访问即可 */ }
+    spawn(cmd, [url], {
+      stdio: 'ignore',
+      detached: true,
+      shell: process.platform === 'win32',
+    }).unref();
+  } catch {
+    /* 打不开就算了，手动访问即可 */
+  }
 }
 
 const opts = parseArgs(process.argv.slice(2));
@@ -66,7 +79,12 @@ if (ROOT === archiveRoot || ROOT.startsWith(archiveRoot + path.sep)) {
   process.exit(1);
 }
 if (opts.help) {
-  console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('*/')[0].replace(/^#!.*\n/, ''));
+  console.log(
+    fs
+      .readFileSync(fileURLToPath(import.meta.url), 'utf8')
+      .split('*/')[0]
+      .replace(/^#!.*\n/, ''),
+  );
   process.exit(0);
 }
 
@@ -78,7 +96,9 @@ if (!fs.existsSync(path.join(ROOT, 'index.html'))) {
 // 端口被占用就顺延，避免和别的东西打架
 let port = opts.port;
 for (let i = 0; i < 20; i++) {
-  if (await probePort(opts.host, port)) break;
+  if (await probePort(opts.host, port)) {
+    break;
+  }
   console.log(`端口 ${port} 被占用，尝试 ${port + 1} ...`);
   port++;
 }
@@ -86,13 +106,27 @@ for (let i = 0; i < 20; i++) {
 const routes = {};
 if (opts.server) {
   const url = new URL(opts.server);
-  if (!['ws:', 'wss:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) throw new Error('Invalid --server WebSocket URL');
+  if (
+    !['ws:', 'wss:'].includes(url.protocol) ||
+    url.username ||
+    url.password ||
+    url.search ||
+    url.hash
+  ) {
+    throw new Error('Invalid --server WebSocket URL');
+  }
   const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'connection.json'), 'utf8'));
-  routes['/connection.json'] = (_request, response) => response.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(JSON.stringify({ ...config, url: url.href }));
+  routes['/connection.json'] = (_request, response) =>
+    response
+      .writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
+      .end(JSON.stringify({ ...config, url: url.href }));
 }
 const server = http.createServer(staticHandler(ROOT, { routes }));
 server.listen(port, opts.host, () => {
-  const target = opts.host === '0.0.0.0' || opts.host === '::' ? `http://localhost:${port}/` : `http://${opts.host}:${port}/`;
+  const target =
+    opts.host === '0.0.0.0' || opts.host === '::'
+      ? `http://localhost:${port}/`
+      : `http://${opts.host}:${port}/`;
   console.log('');
   console.log('  Florr.io 浏览器客户端已启动');
   console.log('  ------------------------------------');
@@ -103,7 +137,9 @@ server.listen(port, opts.host, () => {
   console.log('  离线诊断入口: ?profile=offline');
   console.log('  Ctrl+C 停止服务。');
   console.log('');
-  if (opts.open) openBrowser(target);
+  if (opts.open) {
+    openBrowser(target);
+  }
 });
 
 server.on('error', (err) => {

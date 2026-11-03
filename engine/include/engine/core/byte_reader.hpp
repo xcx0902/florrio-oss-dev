@@ -26,25 +26,35 @@ class ByteReader {
   [[nodiscard]] ParseError error() const { return error_; }
 
   [[nodiscard]] std::optional<std::uint8_t> read_u8() {
-    if (cursor_ + 1 > bytes_.size()) { error_ = ParseError::kOutOfBounds; return std::nullopt; }
+    if (cursor_ + 1 > bytes_.size()) {
+      error_ = ParseError::kOutOfBounds;
+      return std::nullopt;
+    }
     return bytes_[cursor_++];
   }
 
   [[nodiscard]] std::optional<std::uint32_t> read_u32_le() {
-    if (cursor_ + 4 > bytes_.size()) { error_ = ParseError::kOutOfBounds; return std::nullopt; }
+    if (cursor_ + 4 > bytes_.size()) {
+      error_ = ParseError::kOutOfBounds;
+      return std::nullopt;
+    }
     const std::uint32_t value = static_cast<std::uint32_t>(bytes_[cursor_]) |
-      (static_cast<std::uint32_t>(bytes_[cursor_ + 1]) << 8U) |
-      (static_cast<std::uint32_t>(bytes_[cursor_ + 2]) << 16U) |
-      (static_cast<std::uint32_t>(bytes_[cursor_ + 3]) << 24U);
+                                (static_cast<std::uint32_t>(bytes_[cursor_ + 1]) << 8U) |
+                                (static_cast<std::uint32_t>(bytes_[cursor_ + 2]) << 16U) |
+                                (static_cast<std::uint32_t>(bytes_[cursor_ + 3]) << 24U);
     cursor_ += 4;
     return value;
   }
 
   [[nodiscard]] std::optional<std::uint16_t> read_u16_le() {
     const auto low = read_u8();
-    if (!low) return std::nullopt;
+    if (!low) {
+      return std::nullopt;
+    }
     const auto high = read_u8();
-    if (!high) return std::nullopt;
+    if (!high) {
+      return std::nullopt;
+    }
     return static_cast<std::uint16_t>(low.value() | (high.value() << 8U));
   }
 
@@ -52,7 +62,9 @@ class ByteReader {
     std::uint64_t bits = 0;
     for (std::uint32_t index = 0; index < 8; ++index) {
       const auto byte = read_u8();
-      if (!byte) return std::nullopt;
+      if (!byte) {
+        return std::nullopt;
+      }
       bits |= static_cast<std::uint64_t>(byte.value()) << (index * 8U);
     }
     double value;
@@ -62,7 +74,9 @@ class ByteReader {
 
   [[nodiscard]] std::optional<float> read_f32_le() {
     const auto bits = read_u32_le();
-    if (!bits) return std::nullopt;
+    if (!bits) {
+      return std::nullopt;
+    }
     float value;
     std::uint32_t raw = *bits;
     static_assert(sizeof(float) == sizeof(raw));
@@ -75,9 +89,13 @@ class ByteReader {
     std::uint32_t value = 0;
     for (unsigned index = 0; index < 5; ++index) {
       const auto byte = read_u8();
-      if (!byte) return std::nullopt;
+      if (!byte) {
+        return std::nullopt;
+      }
       value |= static_cast<std::uint32_t>(*byte & 0x7FU) << (7U * index);
-      if ((*byte & 0x80U) == 0U) return value;
+      if ((*byte & 0x80U) == 0U) {
+        return value;
+      }
     }
     error_ = ParseError::kVarintOverflow;
     return std::nullopt;
@@ -87,7 +105,9 @@ class ByteReader {
     std::string value;
     while (cursor_ < bytes_.size() && value.size() < limit) {
       const std::uint8_t byte = bytes_[cursor_++];
-      if (byte == 0) return value;
+      if (byte == 0) {
+        return value;
+      }
       value.push_back(static_cast<char>(byte));
     }
     error_ = ParseError::kOutOfBounds;
@@ -95,7 +115,10 @@ class ByteReader {
   }
 
   [[nodiscard]] std::span<const std::uint8_t> read_bytes(std::size_t count) {
-    if (cursor_ + count > bytes_.size()) { error_ = ParseError::kOutOfBounds; return {}; }
+    if (cursor_ + count > bytes_.size()) {
+      error_ = ParseError::kOutOfBounds;
+      return {};
+    }
     const auto view = bytes_.subspan(cursor_, count);
     cursor_ += count;
     return view;
@@ -124,8 +147,9 @@ class ByteWriter {
   void write_f64_le(double value) {
     std::uint64_t bits;
     std::memcpy(&bits, &value, sizeof(bits));
-    for (std::uint32_t index = 0; index < 8; ++index)
+    for (std::uint32_t index = 0; index < 8; ++index) {
       write_u8(static_cast<std::uint8_t>((bits >> (index * 8U)) & 0xFFU));
+    }
   }
   void write_f32_le(float value) {
     std::uint32_t raw;
@@ -136,11 +160,15 @@ class ByteWriter {
     do {
       std::uint8_t byte = static_cast<std::uint8_t>(value & 0x7FU);
       value >>= 7U;
-      if (value != 0U) byte |= 0x80U;
+      if (value != 0U) {
+        byte |= 0x80U;
+      }
       bytes_.push_back(byte);
     } while (value != 0U);
   }
-  void write_bytes(std::span<const std::uint8_t> bytes) { bytes_.insert(bytes_.end(), bytes.begin(), bytes.end()); }
+  void write_bytes(std::span<const std::uint8_t> bytes) {
+    bytes_.insert(bytes_.end(), bytes.begin(), bytes.end());
+  }
   [[nodiscard]] const std::vector<std::uint8_t>& bytes() const { return bytes_; }
   [[nodiscard]] std::vector<std::uint8_t>& bytes() { return bytes_; }
 
@@ -149,8 +177,12 @@ class ByteWriter {
 };
 
 inline void xor_in_place(std::span<std::uint8_t> bytes, std::span<const std::uint8_t> key) {
-  if (key.empty()) return;
-  for (std::size_t index = 0; index < bytes.size(); ++index) bytes[index] ^= key[index % key.size()];
+  if (key.empty()) {
+    return;
+  }
+  for (std::size_t index = 0; index < bytes.size(); ++index) {
+    bytes[index] ^= key[index % key.size()];
+  }
 }
 
-} // namespace engine
+}  // namespace engine

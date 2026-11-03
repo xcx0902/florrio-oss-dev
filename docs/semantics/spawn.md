@@ -28,16 +28,16 @@ total = f32(total + weight)
 
 The per-band totals and counts:
 
-| Band | Total (f32) | Entries |
-| ---: | ---: | ---: |
-| 0 | 0.7942009568214417 | 8 |
-| 1 | 0.8192009329795837 | 9 |
-| 2 | 0.7390009760856628 | 9 |
-| 3 | 0.8190009593963623 | 12 |
-| 4 | 0.48900100588798523 | 10 |
-| 5 | 0.4140009880065918 | 9 |
-| 6 | 0.5140010118484497 | 10 |
-| 7 | 0.4140009880065918 | 9 |
+| Band |         Total (f32) | Entries |
+| ---: | ------------------: | ------: |
+|    0 |  0.7942009568214417 |       8 |
+|    1 |  0.8192009329795837 |       9 |
+|    2 |  0.7390009760856628 |       9 |
+|    3 |  0.8190009593963623 |      12 |
+|    4 | 0.48900100588798523 |      10 |
+|    5 |  0.4140009880065918 |       9 |
+|    6 |  0.5140010118484497 |      10 |
+|    7 |  0.4140009880065918 |       9 |
 
 Band 0 order: `1, 2, 4, 5, 6, 7, 15, 19`.
 
@@ -79,8 +79,7 @@ Entity construction consumes RNG in this order:
    draw, and a second orientation draw when the species settings byte is clear
    (hornet and square).
 
-`consume_component_draws` and `configure_behavior_draws` implement steps 1 and
-3. Native fixtures pin the per-type draw counts (for example type 11 = 57,
+`consume_component_draws` and `configure_behavior_draws` implement steps 1 and 3. Native fixtures pin the per-type draw counts (for example type 11 = 57,
 type 15 = 82, type 16 = 8, type 17 = 62, type 18 = 6).
 `schema/catalogs/entities.json` records the counts; variants 16/18 are runtime
 copies of 15/17 and do not re-run the parent initializer.
@@ -103,15 +102,15 @@ y = f32(4000  * f32(fy + -0.5))
 Band bounds (binary32):
 
 | Band | Lower | Upper |
-| ---: | ---: | ---: |
-| 0 | 0 | 0.15 |
-| 1 | 0.15 | 0.3 |
-| 2 | 0.3 | 0.45 |
-| 3 | 0.45 | 0.6 |
-| 4 | 0.6 | 0.75 |
-| 5 | 0.75 | 0.9 |
-| 6 | 0.9 | 0.95 |
-| 7 | 0.95 | 1.0 |
+| ---: | ----: | ----: |
+|    0 |     0 |  0.15 |
+|    1 |  0.15 |   0.3 |
+|    2 |   0.3 |  0.45 |
+|    3 |  0.45 |   0.6 |
+|    4 |   0.6 |  0.75 |
+|    5 |  0.75 |   0.9 |
+|    6 |   0.9 |  0.95 |
+|    7 |  0.95 |   1.0 |
 
 Band 0 is the special outside case: lower 0, upper 0.15. World width/height
 default to `50000`/`4000`; the sampler uses the current `World` dimensions.
@@ -258,11 +257,11 @@ reused slot cannot release from the old state.
 
 The three rare species are present in the catalogue and in these bands:
 
-| species | bands | weight | expected initial count at 797 parents |
-| --- | --- | ---: | ---: |
-| Massive Ladybug (5) | 0, 1 | 0.000199999995 | 0.0595 |
-| Ant Hole (11) | 3, 4, 5, 6, 7 | 0.00200000009 | 1.70 |
-| Evil Centipede (17) | 3, 4, 5, 6, 7 | 0.00100000005 | 0.85 |
+| species             | bands         |         weight | expected initial count at 797 parents |
+| ------------------- | ------------- | -------------: | ------------------------------------: |
+| Massive Ladybug (5) | 0, 1          | 0.000199999995 |                                0.0595 |
+| Ant Hole (11)       | 3, 4, 5, 6, 7 |  0.00200000009 |                                  1.70 |
+| Evil Centipede (17) | 3, 4, 5, 6, 7 |  0.00100000005 |                                  0.85 |
 
 `SpawnTable::from_catalog` keeps these weights. The deterministic seed
 `285456437` produces an initial world with zero of all three. That is a valid
@@ -283,7 +282,6 @@ and 648 kills. Farming only bands 3-7 raises Ant Hole/Evil Centipede to about
 `1/257` and `1/514` per kill, while Massive Ladybug is only in bands 0-1
 (`1/4033` conditional). A fixed seed additionally fixes the order of these
 draws, so a long gap is possible even when the long-run rate is correct.
-
 
 ## Open
 
@@ -310,4 +308,5 @@ keep auto-population off by default.
 
 At the default arena the parent target is 797. Ant Hole and Centipede children
 are additional entities; the shipped world has 870 active records (797 parents
-+ 73 children).
+
+- 73 children).

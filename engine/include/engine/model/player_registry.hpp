@@ -18,20 +18,29 @@ class PlayerRegistry {
   void unbind_body(EntityHandle body);
   [[nodiscard]] bool at_boundary() const { return iteration_depth_ == 0; }
   [[nodiscard]] std::size_t size() const { return players_.size(); }
-  template<class F> void for_each(F&& visit) {
+  template <class F>
+  void for_each(F&& visit) {
     ++iteration_depth_;
-    for (auto& [id, player] : players_) { (void)id; visit(player); }
+    for (auto& [id, player] : players_) {
+      (void)id;
+      visit(player);
+    }
     --iteration_depth_;
   }
-  template<class F> void for_each(F&& visit) const {
+  template <class F>
+  void for_each(F&& visit) const {
     ++iteration_depth_;
-    for (const auto& [id, player] : players_) { (void)id; visit(player); }
+    for (const auto& [id, player] : players_) {
+      (void)id;
+      visit(player);
+    }
     --iteration_depth_;
   }
+
  private:
   std::map<PlayerId, PlayerState> players_;
   std::map<std::uint32_t, PlayerId> bodies_;
   std::uint64_t next_id_ = 1;
   mutable unsigned iteration_depth_ = 0;
 };
-} // namespace engine
+}  // namespace engine

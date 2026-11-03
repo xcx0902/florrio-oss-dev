@@ -3,11 +3,14 @@
  */
 import { existsSync } from 'node:fs';
 
-export function chromiumExecutable(explicit = process.env.CHROME_PATH, {
-  platform = process.platform, exists = existsSync,
-} = {}) {
+export function chromiumExecutable(
+  explicit = process.env.CHROME_PATH,
+  { platform = process.platform, exists = existsSync } = {},
+) {
   if (explicit) {
-    if (!exists(explicit)) throw new Error(`CHROME_PATH does not exist: ${explicit}`);
+    if (!exists(explicit)) {
+      throw new Error(`CHROME_PATH does not exist: ${explicit}`);
+    }
     return explicit;
   }
   const macChrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';

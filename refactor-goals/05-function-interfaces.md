@@ -18,15 +18,15 @@
 
 ## RF-A2：首批确认入口
 
-| 函数 | 计划 | 同步范围 |
-| --- | --- | --- |
-| `assign_petal_orbit_indices(World&, PlayerState&)` | 删除未使用的 `World&` | `petals.hpp`、实现、生命周期、pets 和测试调用 |
-| `advance_loadout_orbit_phase(World&, PlayerState&, double)` | 删除未使用的 `World&` | 头文件、实现、tick 和测试调用 |
-| `WorldState.renderable(_now)` | 删除时间参数；如本身已无调用，则移除整个死接口 | 当前客户端和测试，包含可能的迭代器消费 |
-| `drawAnt(context,_handle,_radius,...)` | 删除未使用的 handle、radius | art 分发、直接调用、录制 canvas 测试 |
-| `drawCactus(context,radius,_now,flash)` | 删除未使用的时间 | 物种分发及直接测试 |
-| `drawDrop(context,type,_radius,ageMs,visual)` | 删除 radius；保留实际参与动画的 ageMs/visual，另行决定是否有必要简化 fallback | 世界渲染、图鉴/菜单和直接 fixture |
-| `drawPetalShape(context,type,_icon,_now,seed,phase)` | 删除 icon；`_now` 根据默认 phase 的现行行为保留并改名，或在调用层显式计算 phase | 世界花瓣、图标、Peas/Twin/Triplet 分支及测试 |
+| 函数                                                        | 计划                                                                            | 同步范围                                      |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------- |
+| `assign_petal_orbit_indices(World&, PlayerState&)`          | 删除未使用的 `World&`                                                           | `petals.hpp`、实现、生命周期、pets 和测试调用 |
+| `advance_loadout_orbit_phase(World&, PlayerState&, double)` | 删除未使用的 `World&`                                                           | 头文件、实现、tick 和测试调用                 |
+| `WorldState.renderable(_now)`                               | 删除时间参数；如本身已无调用，则移除整个死接口                                  | 当前客户端和测试，包含可能的迭代器消费        |
+| `drawAnt(context,_handle,_radius,...)`                      | 删除未使用的 handle、radius                                                     | art 分发、直接调用、录制 canvas 测试          |
+| `drawCactus(context,radius,_now,flash)`                     | 删除未使用的时间                                                                | 物种分发及直接测试                            |
+| `drawDrop(context,type,_radius,ageMs,visual)`               | 删除 radius；保留实际参与动画的 ageMs/visual，另行决定是否有必要简化 fallback   | 世界渲染、图鉴/菜单和直接 fixture             |
+| `drawPetalShape(context,type,_icon,_now,seed,phase)`        | 删除 icon；`_now` 根据默认 phase 的现行行为保留并改名，或在调用层显式计算 phase | 世界花瓣、图标、Peas/Twin/Triplet 分支及测试  |
 
 这不是仅改函数定义的列表。每个入口都必须搜索整个活动代码、测试和静态入口中的调用，确认参数位置移动后没有把 flash、time、species 等传错。
 

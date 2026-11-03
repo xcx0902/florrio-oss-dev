@@ -4,7 +4,8 @@
 #include <variant>
 namespace engine::net {
 inline constexpr std::uint16_t kProtocolVersion = 2;
-inline constexpr std::string_view kCatalogHash = "9d66e1aff774927d6bc7cdc709f16913bda06e56fb5cdd52f3172aeedbe7f287";
+inline constexpr std::string_view kCatalogHash =
+    "9d66e1aff774927d6bc7cdc709f16913bda06e56fb5cdd52f3172aeedbe7f287";
 inline constexpr std::uint32_t kMaxClientFrameBytes = 4096U;
 inline constexpr std::uint32_t kMaxServerFrameBytes = 1048576U;
 inline constexpr std::uint32_t kMaxSnapshotEntities = 16384U;
@@ -21,17 +22,67 @@ inline constexpr std::uint32_t kCommandResultWindow = 128U;
 inline constexpr std::uint32_t kInputTtlTicks = 5U;
 inline constexpr std::uint32_t kTickMs = 50U;
 inline constexpr std::uint32_t kCounterDrainAt = 4294966271U;
-enum class CommandKind : std::uint8_t { Spawn = 1, Swap = 2, Discard = 3, Suicide = 4, Chat = 5, Leave = 6 };
-inline bool valid(CommandKind v) { return v == CommandKind::Spawn || v == CommandKind::Swap || v == CommandKind::Discard || v == CommandKind::Suicide || v == CommandKind::Chat || v == CommandKind::Leave; }
-enum class ResultCode : std::uint8_t { Ok = 0, StaleLife = 1, InvalidState = 2, Cooldown = 3, Duplicate = 4, InvalidSequence = 5, QueueFull = 6 };
-inline bool valid(ResultCode v) { return v == ResultCode::Ok || v == ResultCode::StaleLife || v == ResultCode::InvalidState || v == ResultCode::Cooldown || v == ResultCode::Duplicate || v == ResultCode::InvalidSequence || v == ResultCode::QueueFull; }
-enum class ErrorCode : std::uint8_t { Protocol = 1, Version = 2, Catalog = 3, RoomFull = 4, SlowConsumer = 5, Stopping = 6, EpochExhausted = 7, SnapshotTooLarge = 8, Session = 9 };
-inline bool valid(ErrorCode v) { return v == ErrorCode::Protocol || v == ErrorCode::Version || v == ErrorCode::Catalog || v == ErrorCode::RoomFull || v == ErrorCode::SlowConsumer || v == ErrorCode::Stopping || v == ErrorCode::EpochExhausted || v == ErrorCode::SnapshotTooLarge || v == ErrorCode::Session; }
-enum class ResyncReason : std::uint8_t { Gap = 1, Baseline = 2, Decode = 3 };
-inline bool valid(ResyncReason v) { return v == ResyncReason::Gap || v == ResyncReason::Baseline || v == ResyncReason::Decode; }
-enum class EventKind : std::uint8_t { Hit = 1, Pickup = 2, Chat = 3 };
-inline bool valid(EventKind v) { return v == EventKind::Hit || v == EventKind::Pickup || v == EventKind::Chat; }
-inline constexpr std::array<std::uint32_t, 20> kPublicFields = {2,4,7,8,9,11,12,22,26,28,31,36,38,49,50,53,54,55,59,62};
+enum class CommandKind : std::uint8_t {
+  Spawn = 1,
+  Swap = 2,
+  Discard = 3,
+  Suicide = 4,
+  Chat = 5,
+  Leave = 6
+};
+inline bool valid(CommandKind v) {
+  return v == CommandKind::Spawn || v == CommandKind::Swap || v == CommandKind::Discard ||
+         v == CommandKind::Suicide || v == CommandKind::Chat || v == CommandKind::Leave;
+}
+enum class ResultCode : std::uint8_t {
+  Ok = 0,
+  StaleLife = 1,
+  InvalidState = 2,
+  Cooldown = 3,
+  Duplicate = 4,
+  InvalidSequence = 5,
+  QueueFull = 6
+};
+inline bool valid(ResultCode v) {
+  return v == ResultCode::Ok || v == ResultCode::StaleLife || v == ResultCode::InvalidState ||
+         v == ResultCode::Cooldown || v == ResultCode::Duplicate ||
+         v == ResultCode::InvalidSequence || v == ResultCode::QueueFull;
+}
+enum class ErrorCode : std::uint8_t {
+  Protocol = 1,
+  Version = 2,
+  Catalog = 3,
+  RoomFull = 4,
+  SlowConsumer = 5,
+  Stopping = 6,
+  EpochExhausted = 7,
+  SnapshotTooLarge = 8,
+  Session = 9
+};
+inline bool valid(ErrorCode v) {
+  return v == ErrorCode::Protocol || v == ErrorCode::Version || v == ErrorCode::Catalog ||
+         v == ErrorCode::RoomFull || v == ErrorCode::SlowConsumer || v == ErrorCode::Stopping ||
+         v == ErrorCode::EpochExhausted || v == ErrorCode::SnapshotTooLarge ||
+         v == ErrorCode::Session;
+}
+enum class ResyncReason : std::uint8_t {
+  Gap = 1,
+  Baseline = 2,
+  Decode = 3
+};
+inline bool valid(ResyncReason v) {
+  return v == ResyncReason::Gap || v == ResyncReason::Baseline || v == ResyncReason::Decode;
+}
+enum class EventKind : std::uint8_t {
+  Hit = 1,
+  Pickup = 2,
+  Chat = 3
+};
+inline bool valid(EventKind v) {
+  return v == EventKind::Hit || v == EventKind::Pickup || v == EventKind::Chat;
+}
+inline constexpr std::array<std::uint32_t, 20> kPublicFields = {
+    2, 4, 7, 8, 9, 11, 12, 22, 26, 28, 31, 36, 38, 49, 50, 53, 54, 55, 59, 62};
 inline constexpr std::uint32_t kPublicComponentMask = 571998208U;
 struct LeaderboardEntry {
   std::uint32_t playerId{};
@@ -42,7 +93,6 @@ inline void writeLeaderboardEntry(WireWriter& w, const LeaderboardEntry& v) {
   w.u32(v.playerId, 1, 4294967295);
   w.text(v.nickname, 128, 32, "nickname");
   w.f32(v.score, 0, INFINITY);
-
 }
 inline LeaderboardEntry readLeaderboardEntry(WireReader& r) {
   LeaderboardEntry v;
@@ -58,16 +108,30 @@ struct Leaderboard {
   std::vector<LeaderboardEntry> entries{};
 };
 inline void writeLeaderboard(WireWriter& w, const Leaderboard& v) {
-  w.bytes(v.roomEpoch, 16, 16); if (std::all_of(v.roomEpoch.begin(),v.roomEpoch.end(),[](auto b){return b==0;})) w.fail();
+  w.bytes(v.roomEpoch, 16, 16);
+  if (std::all_of(v.roomEpoch.begin(), v.roomEpoch.end(), [](auto b) { return b == 0; })) {
+    w.fail();
+  }
   w.u32(v.serverTick, 0, 4294967295);
-  w.length(v.entries.size(), 0, 8, true); for (const auto& item : v.entries) { writeLeaderboardEntry(w, item); }
-
+  w.length(v.entries.size(), 0, 8, true);
+  for (const auto& item : v.entries) {
+    writeLeaderboardEntry(w, item);
+  }
 }
 inline Leaderboard readLeaderboard(WireReader& r) {
   Leaderboard v;
-  r.bytes(v.roomEpoch, 16, 16); if (std::all_of(v.roomEpoch.begin(),v.roomEpoch.end(),[](auto b){return b==0;})) r.fail();
+  r.bytes(v.roomEpoch, 16, 16);
+  if (std::all_of(v.roomEpoch.begin(), v.roomEpoch.end(), [](auto b) { return b == 0; })) {
+    r.fail();
+  }
   v.serverTick = r.u32(0, 4294967295);
-  { const auto count = r.length(0, 8, true); v.entries.resize(count); for (std::size_t i = 0; i < count; ++i) { v.entries[i] = readLeaderboardEntry(r); } }
+  {
+    const auto count = r.length(0, 8, true);
+    v.entries.resize(count);
+    for (std::size_t i = 0; i < count; ++i) {
+      v.entries[i] = readLeaderboardEntry(r);
+    }
+  }
 
   return v;
 }
@@ -130,17 +194,28 @@ inline void writeSelfState(WireWriter& w, const SelfState& v) {
   w.f32(v.experience, 0, INFINITY);
   w.f32(v.score, 0, INFINITY);
   w.u8(v.zoneProgress, 0, 255);
-  w.length(v.inventory.size(), 16, 16, false); for (const auto& item : v.inventory) { w.u16(item, 0, 65535); }
-  w.length(v.recharge.size(), 8, 8, false); for (const auto& item : v.recharge) { w.u16(item, 0, 65535); }
-  w.length(v.backpack.size(), 0, 16, true); for (const auto& item : v.backpack) { w.u16(item, 0, 65535); }
+  w.length(v.inventory.size(), 16, 16, false);
+  for (const auto& item : v.inventory) {
+    w.u16(item, 0, 65535);
+  }
+  w.length(v.recharge.size(), 8, 8, false);
+  for (const auto& item : v.recharge) {
+    w.u16(item, 0, 65535);
+  }
+  w.length(v.backpack.size(), 0, 16, true);
+  for (const auto& item : v.backpack) {
+    w.u16(item, 0, 65535);
+  }
   w.f32(v.deathScore, 0, INFINITY);
   w.u8(v.deathLevel, 0, 99);
-  w.length(v.kept.size(), 0, 10, true); for (const auto& item : v.kept) { w.u16(item, 0, 65535); }
+  w.length(v.kept.size(), 0, 10, true);
+  for (const auto& item : v.kept) {
+    w.u16(item, 0, 65535);
+  }
   w.text(v.killerName, 512, 256, "plain");
   w.f32(v.cameraX, -INFINITY, INFINITY);
   w.f32(v.cameraY, -INFINITY, INFINITY);
   w.f32(v.cameraScale, 0.01, 10);
-
 }
 inline SelfState readSelfState(WireReader& r) {
   SelfState v;
@@ -167,12 +242,34 @@ inline SelfState readSelfState(WireReader& r) {
   v.experience = r.f32(0, INFINITY);
   v.score = r.f32(0, INFINITY);
   v.zoneProgress = r.u8(0, 255);
-  { const auto count = r.length(16, 16, false);  for (std::size_t i = 0; i < count; ++i) { v.inventory[i] = r.u16(0, 65535); } }
-  { const auto count = r.length(8, 8, false);  for (std::size_t i = 0; i < count; ++i) { v.recharge[i] = r.u16(0, 65535); } }
-  { const auto count = r.length(0, 16, true); v.backpack.resize(count); for (std::size_t i = 0; i < count; ++i) { v.backpack[i] = r.u16(0, 65535); } }
+  {
+    const auto count = r.length(16, 16, false);
+    for (std::size_t i = 0; i < count; ++i) {
+      v.inventory[i] = r.u16(0, 65535);
+    }
+  }
+  {
+    const auto count = r.length(8, 8, false);
+    for (std::size_t i = 0; i < count; ++i) {
+      v.recharge[i] = r.u16(0, 65535);
+    }
+  }
+  {
+    const auto count = r.length(0, 16, true);
+    v.backpack.resize(count);
+    for (std::size_t i = 0; i < count; ++i) {
+      v.backpack[i] = r.u16(0, 65535);
+    }
+  }
   v.deathScore = r.f32(0, INFINITY);
   v.deathLevel = r.u8(0, 99);
-  { const auto count = r.length(0, 10, true); v.kept.resize(count); for (std::size_t i = 0; i < count; ++i) { v.kept[i] = r.u16(0, 65535); } }
+  {
+    const auto count = r.length(0, 10, true);
+    v.kept.resize(count);
+    for (std::size_t i = 0; i < count; ++i) {
+      v.kept[i] = r.u16(0, 65535);
+    }
+  }
   v.killerName = r.text(512, 256, "plain");
   v.cameraX = r.f32(-INFINITY, INFINITY);
   v.cameraY = r.f32(-INFINITY, INFINITY);
@@ -195,7 +292,9 @@ inline void writeEntityUpdate(WireWriter& w, const EntityUpdate& v) {
   w.u8(v.slot, 0, 255);
   w.u8(v.instance, 0, 255);
   w.bytes(v.fields, 0, 2048);
-  if (!validate_public_entity(v.fields,v.handle)) w.fail();
+  if (!validate_public_entity(v.fields, v.handle)) {
+    w.fail();
+  }
 }
 inline EntityUpdate readEntityUpdate(WireReader& r) {
   EntityUpdate v;
@@ -205,7 +304,9 @@ inline EntityUpdate readEntityUpdate(WireReader& r) {
   v.slot = r.u8(0, 255);
   v.instance = r.u8(0, 255);
   r.bytes(v.fields, 0, 2048);
-  if (!validate_public_entity(v.fields,v.handle)) r.fail();
+  if (!validate_public_entity(v.fields, v.handle)) {
+    r.fail();
+  }
   return v;
 }
 struct TickEvent {
@@ -222,20 +323,25 @@ struct TickEvent {
 inline void writeTickEvent(WireWriter& w, const TickEvent& v) {
   w.u32(v.tick, 0, 4294967295);
   w.u32(v.ordinal, 1, 4294967295);
-  if (!valid(v.kind)) w.fail(); w.u8(static_cast<std::uint8_t>(v.kind));
+  if (!valid(v.kind)) {
+    w.fail();
+  }
+  w.u8(static_cast<std::uint8_t>(v.kind));
   w.u32(v.target, 0, 4294967295);
   w.u32(v.actorPlayerId, 0, 4294967295);
   w.u32(v.actorHandle, 0, 4294967295);
   w.f32(v.amount, 0, INFINITY);
   w.u8(v.slot, 0, 255);
   w.text(v.text, 512, 256, "plain");
-
 }
 inline TickEvent readTickEvent(WireReader& r) {
   TickEvent v;
   v.tick = r.u32(0, 4294967295);
   v.ordinal = r.u32(1, 4294967295);
-  v.kind = static_cast<EventKind>(r.u8()); if (!valid(v.kind)) r.fail();
+  v.kind = static_cast<EventKind>(r.u8());
+  if (!valid(v.kind)) {
+    r.fail();
+  }
   v.target = r.u32(0, 4294967295);
   v.actorPlayerId = r.u32(0, 4294967295);
   v.actorHandle = r.u32(0, 4294967295);
@@ -257,8 +363,10 @@ inline void writeHello(WireWriter& w, const Hello& v) {
   w.text(v.catalogHash, 64, 64, "hash");
   w.text(v.roomId, 64, 64, "room");
   w.text(v.nickname, 128, 32, "nickname");
-  w.boolean(v.resumeToken.has_value()); if (v.resumeToken) { w.bytes(*v.resumeToken, 32, 32); }
-
+  w.boolean(v.resumeToken.has_value());
+  if (v.resumeToken) {
+    w.bytes(*v.resumeToken, 32, 32);
+  }
 }
 inline Hello readHello(WireReader& r) {
   Hello v;
@@ -266,7 +374,11 @@ inline Hello readHello(WireReader& r) {
   v.catalogHash = r.text(64, 64, "hash");
   v.roomId = r.text(64, 64, "room");
   v.nickname = r.text(128, 32, "nickname");
-  if (r.boolean()) { std::array<std::uint8_t, 32> item{}; r.bytes(item, 32, 32); v.resumeToken = std::move(item); }
+  if (r.boolean()) {
+    std::array<std::uint8_t, 32> item{};
+    r.bytes(item, 32, 32);
+    v.resumeToken = std::move(item);
+  }
 
   return v;
 }
@@ -281,18 +393,23 @@ struct Welcome {
 };
 inline void writeWelcome(WireWriter& w, const Welcome& v) {
   w.text(v.roomId, 64, 64, "room");
-  w.bytes(v.roomEpoch, 16, 16); if (std::all_of(v.roomEpoch.begin(),v.roomEpoch.end(),[](auto b){return b==0;})) w.fail();
+  w.bytes(v.roomEpoch, 16, 16);
+  if (std::all_of(v.roomEpoch.begin(), v.roomEpoch.end(), [](auto b) { return b == 0; })) {
+    w.fail();
+  }
   w.u32(v.playerId, 1, 4294967295);
   w.u32(v.sessionEpoch, 1, 4294967295);
   w.u16(v.tickMs, 50, 50);
   w.u32(v.serverTick, 0, 4294967295);
   w.bytes(v.resumeToken, 32, 32);
-
 }
 inline Welcome readWelcome(WireReader& r) {
   Welcome v;
   v.roomId = r.text(64, 64, "room");
-  r.bytes(v.roomEpoch, 16, 16); if (std::all_of(v.roomEpoch.begin(),v.roomEpoch.end(),[](auto b){return b==0;})) r.fail();
+  r.bytes(v.roomEpoch, 16, 16);
+  if (std::all_of(v.roomEpoch.begin(), v.roomEpoch.end(), [](auto b) { return b == 0; })) {
+    r.fail();
+  }
   v.playerId = r.u32(1, 4294967295);
   v.sessionEpoch = r.u32(1, 4294967295);
   v.tickMs = r.u16(50, 50);
@@ -316,7 +433,6 @@ inline void writeInput(WireWriter& w, const Input& v) {
   w.u32(v.buttons, 0, 3);
   w.f32(v.angle, -INFINITY, INFINITY);
   w.f32(v.strength, 0, 200);
-
 }
 inline Input readInput(WireReader& r) {
   Input v;
@@ -341,19 +457,24 @@ struct Command {
 };
 inline void writeCommand(WireWriter& w, const Command& v) {
   w.u32(v.commandSeq, 1, 4294967295);
-  if (!valid(v.kind)) w.fail(); w.u8(static_cast<std::uint8_t>(v.kind));
+  if (!valid(v.kind)) {
+    w.fail();
+  }
+  w.u8(static_cast<std::uint8_t>(v.kind));
   w.u32(v.lifeEpoch, 0, 4294967295);
   w.u8(v.slotA, 0, 15);
   w.u16(v.typeA, 0, 255);
   w.u8(v.slotB, 0, 15);
   w.u16(v.typeB, 0, 255);
   w.text(v.text, 512, 256, "plain");
-
 }
 inline Command readCommand(WireReader& r) {
   Command v;
   v.commandSeq = r.u32(1, 4294967295);
-  v.kind = static_cast<CommandKind>(r.u8()); if (!valid(v.kind)) r.fail();
+  v.kind = static_cast<CommandKind>(r.u8());
+  if (!valid(v.kind)) {
+    r.fail();
+  }
   v.lifeEpoch = r.u32(0, 4294967295);
   v.slotA = r.u8(0, 15);
   v.typeA = r.u16(0, 255);
@@ -370,15 +491,27 @@ struct CommandResult {
 };
 inline void writeCommandResult(WireWriter& w, const CommandResult& v) {
   w.u32(v.commandSeq, 1, 4294967295);
-  if (!valid(v.code)) w.fail(); w.u8(static_cast<std::uint8_t>(v.code));
-  w.boolean(v.nextSpawnTick.has_value()); if (v.nextSpawnTick) { w.u32(*v.nextSpawnTick, 0, 4294967295); }
-
+  if (!valid(v.code)) {
+    w.fail();
+  }
+  w.u8(static_cast<std::uint8_t>(v.code));
+  w.boolean(v.nextSpawnTick.has_value());
+  if (v.nextSpawnTick) {
+    w.u32(*v.nextSpawnTick, 0, 4294967295);
+  }
 }
 inline CommandResult readCommandResult(WireReader& r) {
   CommandResult v;
   v.commandSeq = r.u32(1, 4294967295);
-  v.code = static_cast<ResultCode>(r.u8()); if (!valid(v.code)) r.fail();
-  if (r.boolean()) { std::uint32_t item{}; item = r.u32(0, 4294967295); v.nextSpawnTick = std::move(item); }
+  v.code = static_cast<ResultCode>(r.u8());
+  if (!valid(v.code)) {
+    r.fail();
+  }
+  if (r.boolean()) {
+    std::uint32_t item{};
+    item = r.u32(0, 4294967295);
+    v.nextSpawnTick = std::move(item);
+  }
 
   return v;
 }
@@ -398,7 +531,10 @@ struct Snapshot {
   std::vector<TickEvent> events{};
 };
 inline void writeSnapshot(WireWriter& w, const Snapshot& v) {
-  w.bytes(v.roomEpoch, 16, 16); if (std::all_of(v.roomEpoch.begin(),v.roomEpoch.end(),[](auto b){return b==0;})) w.fail();
+  w.bytes(v.roomEpoch, 16, 16);
+  if (std::all_of(v.roomEpoch.begin(), v.roomEpoch.end(), [](auto b) { return b == 0; })) {
+    w.fail();
+  }
   w.boolean(v.full);
   w.u32(v.snapshotSeq, 1, 4294967295);
   w.u32(v.baselineId, 1, 4294967295);
@@ -407,15 +543,26 @@ inline void writeSnapshot(WireWriter& w, const Snapshot& v) {
   w.u32(v.lastAppliedInputSeq, 0, 4294967295);
   w.u32(v.inputAppliedTick, 0, 4294967295);
   w.u32(v.controlledHandle, 0, 4294967295);
-  w.length(v.removed.size(), 0, 16384, true); for (const auto& item : v.removed) { w.u32(item, 0, 4294967295); }
-  w.length(v.entities.size(), 0, 16384, true); for (const auto& item : v.entities) { writeEntityUpdate(w, item); }
+  w.length(v.removed.size(), 0, 16384, true);
+  for (const auto& item : v.removed) {
+    w.u32(item, 0, 4294967295);
+  }
+  w.length(v.entities.size(), 0, 16384, true);
+  for (const auto& item : v.entities) {
+    writeEntityUpdate(w, item);
+  }
   writeSelfState(w, v.selfState);
-  w.length(v.events.size(), 0, 4096, true); for (const auto& item : v.events) { writeTickEvent(w, item); }
-
+  w.length(v.events.size(), 0, 4096, true);
+  for (const auto& item : v.events) {
+    writeTickEvent(w, item);
+  }
 }
 inline Snapshot readSnapshot(WireReader& r) {
   Snapshot v;
-  r.bytes(v.roomEpoch, 16, 16); if (std::all_of(v.roomEpoch.begin(),v.roomEpoch.end(),[](auto b){return b==0;})) r.fail();
+  r.bytes(v.roomEpoch, 16, 16);
+  if (std::all_of(v.roomEpoch.begin(), v.roomEpoch.end(), [](auto b) { return b == 0; })) {
+    r.fail();
+  }
   v.full = r.boolean();
   v.snapshotSeq = r.u32(1, 4294967295);
   v.baselineId = r.u32(1, 4294967295);
@@ -424,10 +571,28 @@ inline Snapshot readSnapshot(WireReader& r) {
   v.lastAppliedInputSeq = r.u32(0, 4294967295);
   v.inputAppliedTick = r.u32(0, 4294967295);
   v.controlledHandle = r.u32(0, 4294967295);
-  { const auto count = r.length(0, 16384, true); v.removed.resize(count); for (std::size_t i = 0; i < count; ++i) { v.removed[i] = r.u32(0, 4294967295); } }
-  { const auto count = r.length(0, 16384, true); v.entities.resize(count); for (std::size_t i = 0; i < count; ++i) { v.entities[i] = readEntityUpdate(r); } }
+  {
+    const auto count = r.length(0, 16384, true);
+    v.removed.resize(count);
+    for (std::size_t i = 0; i < count; ++i) {
+      v.removed[i] = r.u32(0, 4294967295);
+    }
+  }
+  {
+    const auto count = r.length(0, 16384, true);
+    v.entities.resize(count);
+    for (std::size_t i = 0; i < count; ++i) {
+      v.entities[i] = readEntityUpdate(r);
+    }
+  }
   v.selfState = readSelfState(r);
-  { const auto count = r.length(0, 4096, true); v.events.resize(count); for (std::size_t i = 0; i < count; ++i) { v.events[i] = readTickEvent(r); } }
+  {
+    const auto count = r.length(0, 4096, true);
+    v.events.resize(count);
+    for (std::size_t i = 0; i < count; ++i) {
+      v.events[i] = readTickEvent(r);
+    }
+  }
 
   return v;
 }
@@ -439,14 +604,19 @@ struct ResyncRequest {
 inline void writeResyncRequest(WireWriter& w, const ResyncRequest& v) {
   w.u32(v.baselineId, 0, 4294967295);
   w.u32(v.snapshotSeq, 0, 4294967295);
-  if (!valid(v.reason)) w.fail(); w.u8(static_cast<std::uint8_t>(v.reason));
-
+  if (!valid(v.reason)) {
+    w.fail();
+  }
+  w.u8(static_cast<std::uint8_t>(v.reason));
 }
 inline ResyncRequest readResyncRequest(WireReader& r) {
   ResyncRequest v;
   v.baselineId = r.u32(0, 4294967295);
   v.snapshotSeq = r.u32(0, 4294967295);
-  v.reason = static_cast<ResyncReason>(r.u8()); if (!valid(v.reason)) r.fail();
+  v.reason = static_cast<ResyncReason>(r.u8());
+  if (!valid(v.reason)) {
+    r.fail();
+  }
 
   return v;
 }
@@ -459,7 +629,6 @@ inline void writePing(WireWriter& w, const Ping& v) {
   w.u32(v.nonce, 1, 4294967295);
   w.u32(v.serverTick, 0, 4294967295);
   w.f64(v.monotonicMs, 0, INFINITY);
-
 }
 inline Ping readPing(WireReader& r) {
   Ping v;
@@ -482,7 +651,6 @@ inline void writePong(WireWriter& w, const Pong& v) {
   w.f64(v.monotonicMs, 0, INFINITY);
   w.f64(v.serverMonotonicMs, 0, INFINITY);
   w.f64(v.serverTimeMs, 0, INFINITY);
-
 }
 inline Pong readPong(WireReader& r) {
   Pong v;
@@ -500,14 +668,19 @@ struct Error {
   bool retryable{};
 };
 inline void writeError(WireWriter& w, const Error& v) {
-  if (!valid(v.code)) w.fail(); w.u8(static_cast<std::uint8_t>(v.code));
+  if (!valid(v.code)) {
+    w.fail();
+  }
+  w.u8(static_cast<std::uint8_t>(v.code));
   w.text(v.message, 512, 256, "plain");
   w.boolean(v.retryable);
-
 }
 inline Error readError(WireReader& r) {
   Error v;
-  v.code = static_cast<ErrorCode>(r.u8()); if (!valid(v.code)) r.fail();
+  v.code = static_cast<ErrorCode>(r.u8());
+  if (!valid(v.code)) {
+    r.fail();
+  }
   v.message = r.text(512, 256, "plain");
   v.retryable = r.boolean();
 
@@ -519,98 +692,267 @@ struct CloseReason {
   bool retryable{};
 };
 inline void writeCloseReason(WireWriter& w, const CloseReason& v) {
-  if (!valid(v.code)) w.fail(); w.u8(static_cast<std::uint8_t>(v.code));
+  if (!valid(v.code)) {
+    w.fail();
+  }
+  w.u8(static_cast<std::uint8_t>(v.code));
   w.text(v.message, 512, 256, "plain");
   w.boolean(v.retryable);
-
 }
 inline CloseReason readCloseReason(WireReader& r) {
   CloseReason v;
-  v.code = static_cast<ErrorCode>(r.u8()); if (!valid(v.code)) r.fail();
+  v.code = static_cast<ErrorCode>(r.u8());
+  if (!valid(v.code)) {
+    r.fail();
+  }
   v.message = r.text(512, 256, "plain");
   v.retryable = r.boolean();
 
   return v;
 }
-using MessageValue = std::variant<Hello, Welcome, Input, Command, CommandResult, Snapshot, ResyncRequest, Ping, Pong, Error, CloseReason, Leaderboard>;
-struct Message { std::uint32_t sessionEpoch; MessageValue value; };
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Hello& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch == 0)) return {};
-  WireWriter w; writeHello(w, value);
+using MessageValue = std::variant<Hello, Welcome, Input, Command, CommandResult, Snapshot,
+                                  ResyncRequest, Ping, Pong, Error, CloseReason, Leaderboard>;
+struct Message {
+  std::uint32_t sessionEpoch;
+  MessageValue value;
+};
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Hello& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch == 0)) {
+    return {};
+  }
+  WireWriter w;
+  writeHello(w, value);
   return w.frame(1, sessionEpoch, kMaxClientFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Welcome& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0) || value.sessionEpoch != sessionEpoch) return {};
-  WireWriter w; writeWelcome(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Welcome& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0) || value.sessionEpoch != sessionEpoch) {
+    return {};
+  }
+  WireWriter w;
+  writeWelcome(w, value);
   return w.frame(2, sessionEpoch, kMaxServerFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Input& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0)) return {};
-  WireWriter w; writeInput(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Input& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) {
+    return {};
+  }
+  WireWriter w;
+  writeInput(w, value);
   return w.frame(3, sessionEpoch, kMaxClientFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Command& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0)) return {};
-  WireWriter w; writeCommand(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Command& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) {
+    return {};
+  }
+  WireWriter w;
+  writeCommand(w, value);
   return w.frame(4, sessionEpoch, kMaxClientFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const CommandResult& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0)) return {};
-  WireWriter w; writeCommandResult(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const CommandResult& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) {
+    return {};
+  }
+  WireWriter w;
+  writeCommandResult(w, value);
   return w.frame(5, sessionEpoch, kMaxServerFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Snapshot& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0)) return {};
-  WireWriter w; writeSnapshot(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Snapshot& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) {
+    return {};
+  }
+  WireWriter w;
+  writeSnapshot(w, value);
   return w.frame(6, sessionEpoch, kMaxServerFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const ResyncRequest& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0)) return {};
-  WireWriter w; writeResyncRequest(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const ResyncRequest& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) {
+    return {};
+  }
+  WireWriter w;
+  writeResyncRequest(w, value);
   return w.frame(7, sessionEpoch, kMaxClientFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Ping& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0)) return {};
-  WireWriter w; writePing(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Ping& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) {
+    return {};
+  }
+  WireWriter w;
+  writePing(w, value);
   return w.frame(8, sessionEpoch, kMaxServerFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Pong& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0)) return {};
-  WireWriter w; writePong(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Pong& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) {
+    return {};
+  }
+  WireWriter w;
+  writePong(w, value);
   return w.frame(9, sessionEpoch, kMaxServerFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Error& value, std::uint32_t sessionEpoch) {
-  if (!(true)) return {};
-  WireWriter w; writeError(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Error& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(true)) {
+    return {};
+  }
+  WireWriter w;
+  writeError(w, value);
   return w.frame(10, sessionEpoch, kMaxServerFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const CloseReason& value, std::uint32_t sessionEpoch) {
-  if (!(true)) return {};
-  WireWriter w; writeCloseReason(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const CloseReason& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(true)) {
+    return {};
+  }
+  WireWriter w;
+  writeCloseReason(w, value);
   return w.frame(11, sessionEpoch, kMaxServerFrameBytes);
 }
-inline std::optional<std::vector<std::uint8_t>> encode_message(const Leaderboard& value, std::uint32_t sessionEpoch) {
-  if (!(sessionEpoch != 0)) return {};
-  WireWriter w; writeLeaderboard(w, value);
+inline std::optional<std::vector<std::uint8_t>> encode_message(const Leaderboard& value,
+                                                               std::uint32_t sessionEpoch) {
+  if (!(sessionEpoch != 0)) {
+    return {};
+  }
+  WireWriter w;
+  writeLeaderboard(w, value);
   return w.frame(12, sessionEpoch, kMaxServerFrameBytes);
 }
 inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes, bool fromClient) {
-  auto h = unframe(bytes, fromClient ? kMaxClientFrameBytes : kMaxServerFrameBytes); if (!h) return {};
+  auto h = unframe(bytes, fromClient ? kMaxClientFrameBytes : kMaxServerFrameBytes);
+  if (!h) {
+    return {};
+  }
   WireReader r(bytes.subspan(16));
-  switch(h->type) {
-    case 1: { if (!(h->sessionEpoch == 0) || !fromClient) return {}; auto v = readHello(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 2: { if (!(h->sessionEpoch != 0) || fromClient) return {}; auto v = readWelcome(r); if (!r.done() || v.sessionEpoch != h->sessionEpoch) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 3: { if (!(h->sessionEpoch != 0) || !fromClient) return {}; auto v = readInput(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 4: { if (!(h->sessionEpoch != 0) || !fromClient) return {}; auto v = readCommand(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 5: { if (!(h->sessionEpoch != 0) || fromClient) return {}; auto v = readCommandResult(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 6: { if (!(h->sessionEpoch != 0) || fromClient) return {}; auto v = readSnapshot(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 7: { if (!(h->sessionEpoch != 0) || !fromClient) return {}; auto v = readResyncRequest(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 8: { if (!(h->sessionEpoch != 0)) return {}; auto v = readPing(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 9: { if (!(h->sessionEpoch != 0)) return {}; auto v = readPong(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 10: { if (!(true) || fromClient) return {}; auto v = readError(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 11: { if (!(true) || fromClient) return {}; auto v = readCloseReason(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    case 12: { if (!(h->sessionEpoch != 0) || fromClient) return {}; auto v = readLeaderboard(r); if (!r.done()) return {}; return Message{h->sessionEpoch, std::move(v)}; }
-    default: return {};
+  switch (h->type) {
+    case 1: {
+      if (!(h->sessionEpoch == 0) || !fromClient) {
+        return {};
+      }
+      auto v = readHello(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 2: {
+      if (!(h->sessionEpoch != 0) || fromClient) {
+        return {};
+      }
+      auto v = readWelcome(r);
+      if (!r.done() || v.sessionEpoch != h->sessionEpoch) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 3: {
+      if (!(h->sessionEpoch != 0) || !fromClient) {
+        return {};
+      }
+      auto v = readInput(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 4: {
+      if (!(h->sessionEpoch != 0) || !fromClient) {
+        return {};
+      }
+      auto v = readCommand(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 5: {
+      if (!(h->sessionEpoch != 0) || fromClient) {
+        return {};
+      }
+      auto v = readCommandResult(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 6: {
+      if (!(h->sessionEpoch != 0) || fromClient) {
+        return {};
+      }
+      auto v = readSnapshot(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 7: {
+      if (!(h->sessionEpoch != 0) || !fromClient) {
+        return {};
+      }
+      auto v = readResyncRequest(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 8: {
+      if (!(h->sessionEpoch != 0)) {
+        return {};
+      }
+      auto v = readPing(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 9: {
+      if (!(h->sessionEpoch != 0)) {
+        return {};
+      }
+      auto v = readPong(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 10: {
+      if (!(true) || fromClient) {
+        return {};
+      }
+      auto v = readError(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 11: {
+      if (!(true) || fromClient) {
+        return {};
+      }
+      auto v = readCloseReason(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    case 12: {
+      if (!(h->sessionEpoch != 0) || fromClient) {
+        return {};
+      }
+      auto v = readLeaderboard(r);
+      if (!r.done()) {
+        return {};
+      }
+      return Message{h->sessionEpoch, std::move(v)};
+    }
+    default:
+      return {};
   }
 }
-} // namespace engine::net
+}  // namespace engine::net

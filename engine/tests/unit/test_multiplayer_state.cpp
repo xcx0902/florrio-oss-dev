@@ -16,9 +16,15 @@ using namespace engine;
 using engine::test::advance_ticks;
 using engine::test::join_player;
 using engine::test::make_world;
-Vec2 at(float x, float y = 0.0F) { return {f32(x), f32(y)}; }
-PlayerState& state(World& world, PlayerId id) { return *world.players().get(id); }
-Entity& body(World& world, PlayerId id) { return *world.entities().get(state(world, id).player()); }
+Vec2 at(float x, float y = 0.0F) {
+  return {f32(x), f32(y)};
+}
+PlayerState& state(World& world, PlayerId id) {
+  return *world.players().get(id);
+}
+Entity& body(World& world, PlayerId id) {
+  return *world.entities().get(state(world, id).player());
+}
 
 void registry_is_stable_ordered_and_generational() {
   static_assert(!std::is_convertible_v<std::uint64_t, PlayerId>);
@@ -28,7 +34,9 @@ void registry_is_stable_ordered_and_generational() {
   CHECK(!world->players().erase({}));
   const auto first = register_player(*world, "first");
   auto* saved = world->players().get(first);
-  for (unsigned i = 0; i < 128; ++i) CHECK(register_player(*world, std::to_string(i)).valid());
+  for (unsigned i = 0; i < 128; ++i) {
+    CHECK(register_player(*world, std::to_string(i)).valid());
+  }
   CHECK(world->players().get(first) == saved);
   std::uint64_t previous = 0;
   world->players().for_each([&](PlayerState& player) {
@@ -44,7 +52,8 @@ void registry_is_stable_ordered_and_generational() {
   CHECK(handle.valid());
   CHECK(!world->players().erase(first));
   CHECK(world->players().by_body(handle) == saved);
-  CHECK(world->players().by_body(EntityHandle::from_parts(handle.index(), handle.generation() + 1)) == nullptr);
+  CHECK(world->players().by_body(
+            EntityHandle::from_parts(handle.index(), handle.generation() + 1)) == nullptr);
   CHECK(world->destroy(handle));
   CHECK(world->players().by_body(handle) == nullptr);
   CHECK(world->players().erase(first));
@@ -61,11 +70,14 @@ void two_players_spawn_in_one_world() {
   CHECK(a.valid() && b.valid() && a != b);
   CHECK(state(*world, a).player() != state(*world, b).player());
   CHECK(world->players().size() == 2);
-  CHECK(world->entities().active_count() == 12); // two bodies, ten Basic petals
+  CHECK(world->entities().active_count() == 12);  // two bodies, ten Basic petals
   CHECK(state(*world, a).life_epoch == 1 && state(*world, b).life_epoch == 1);
   CHECK(state(*world, a).life == PlayerLife::kAlive);
-  for (auto id : {a, b}) for (const auto& orbit : state(*world, id).petals())
-    CHECK(world->entities().get(orbit.handle)->owner == state(*world, id).player().raw);
+  for (auto id : {a, b}) {
+    for (const auto& orbit : state(*world, id).petals()) {
+      CHECK(world->entities().get(orbit.handle)->owner == state(*world, id).player().raw);
+    }
+  }
 }
 
 void controls_are_isolated() {
@@ -94,8 +106,9 @@ void many_inputs_one_tick_one_impulse() {
   const auto a = join_player(*world, "A", at(-1000));
   const auto b = join_player(*world, "B", at(1000));
   const auto rng = world->random().state();
-  for (unsigned input = 0; input < 100; ++input)
+  for (unsigned input = 0; input < 100; ++input) {
     CHECK(engine::test::apply_player_input(*world, a, input & 3, f32(input), f32(200)));
+  }
   CHECK(engine::test::apply_player_input(*world, a, 0, f32(0), f32(200)));
   CHECK(engine::test::apply_player_input(*world, b, 0, f32(0), f32(200)));
   CHECK(world->tick() == 0 && world->time_ms() == 0 && world->random().state() == rng);
@@ -113,8 +126,8 @@ void profiles_are_isolated() {
   auto world = make_world();
   auto high = make_default_profile();
   high.set_level(45);
-  high.set_inventory(0, 13); // Cactus, +20 maximum health
-  high.set_inventory(1, 32); // Leaf, +1/s
+  high.set_inventory(0, 13);  // Cactus, +20 maximum health
+  high.set_inventory(1, 32);  // Leaf, +1/s
   high.set_inventory(7, 2);
   high.set_inventory_count(8);
   const auto a = join_player(*world, "A", at(22000), high);
@@ -139,7 +152,7 @@ void profiles_are_isolated() {
   CHECK(state(*world, b).loadout().slots()[2].type_id == 1);
   const auto b_hp = body(*world, b).health;
   CHECK(apply_effect(*world, state(*world, b).player(), EffectType::kHealBlock, f32(1), 1000,
-      state(*world, a).player()));
+                     state(*world, a).player()));
   regenerate_players(*world, 50);
   // Even a blocked heal retains original145's binary32 health rescale.
   CHECK(body(*world, b).health == (f32(100) * b_hp) / f32(100));
@@ -147,7 +160,8 @@ void profiles_are_isolated() {
 
 void zone_state_is_per_player() {
   auto world = make_world();
-  auto profile = make_default_profile(); profile.set_level(60);
+  auto profile = make_default_profile();
+  profile.set_level(60);
   const auto a = join_player(*world, "A", at(-22000), profile);
   const auto b = join_player(*world, "B", at(22000), profile);
   state(*world, a).set_zone_timer_ms(f32(44950));
@@ -214,7 +228,9 @@ void stale_body_handle_is_rejected() {
   advance_ticks(*world, 50);
   // Fill the remaining FIFO slots so this next real spawn reuses the exact
   // old index with a different generation, rather than merely another index.
-  for (unsigned i = 0; i < kEntitySlotCount - 4; ++i) CHECK(world->entities().allocate().has_value());
+  for (unsigned i = 0; i < kEntitySlotCount - 4; ++i) {
+    CHECK(world->entities().allocate().has_value());
+  }
   const auto fresh = spawn_player(*world, player, "reuse", at(0), {});
   CHECK(fresh.valid() && old.index() == fresh.index() && old.generation() != fresh.generation());
   CHECK(world->entities().get(old) == nullptr && world->players().by_body(old) == nullptr);
@@ -235,13 +251,19 @@ void same_input_sequence_is_independent() {
     unsigned last_received = 0;
     unsigned last_applied = 0;
     bool receive(unsigned sequence) {
-      if (sequence <= last_received) return false;
+      if (sequence <= last_received) {
+        return false;
+      }
       last_received = sequence;
       return true;
     }
     bool adopt(World& world, f32 angle) {
-      if (last_applied == last_received) return false;
-      if (!engine::apply_player_input(world, id, life, 0, angle, f32(200))) return false;
+      if (last_applied == last_received) {
+        return false;
+      }
+      if (!engine::apply_player_input(world, id, life, 0, angle, f32(200))) {
+        return false;
+      }
       last_applied = last_received;
       return true;
     }
@@ -273,7 +295,8 @@ void input_expiry_and_life_guards() {
   CHECK(state(*world, a).input().strength == f32(0));
   CHECK((body(*world, a).player_expression & 3) == 0);
   CHECK(state(*world, b).input().strength == f32(100));
-  CHECK(state(*world, a).last_applied_input_tick == 0 && state(*world, b).last_applied_input_tick == 4);
+  CHECK(state(*world, a).last_applied_input_tick == 0 &&
+        state(*world, b).last_applied_input_tick == 4);
   CHECK(!apply_player_input(*world, {}, 1, 0, f32(0), f32(1)));
   CHECK(!apply_player_input(*world, a, 2, 0, f32(0), f32(1)));
   CHECK(!apply_player_input(*world, a, 1, 0, f32(INFINITY), f32(1)));
@@ -283,7 +306,8 @@ void input_expiry_and_life_guards() {
 
 void corpse_respawn_preserves_identity_and_death() {
   auto world = make_world();
-  auto profile = make_default_profile(); profile.set_level(30);
+  auto profile = make_default_profile();
+  profile.set_level(30);
   const auto a = join_player(*world, "A", at(-1000), profile);
   const auto b = join_player(*world, "B", at(1000));
   const auto old = state(*world, a).player();
@@ -318,7 +342,8 @@ void petal_destruction_and_leave_are_isolated() {
   const auto b_petal = state(*world, b).loadout().handle(0, 0);
   CHECK(world->destroy(a_petal));
   CHECK(state(*world, a).petals().size() == 4 && !state(*world, a).loadout().handle(0, 0).valid());
-  CHECK(state(*world, b).petals().size() == 5 && state(*world, b).loadout().handle(0, 0) == b_petal);
+  CHECK(state(*world, b).petals().size() == 5 &&
+        state(*world, b).loadout().handle(0, 0) == b_petal);
   CHECK(leave_player(*world, a));
   CHECK(world->players().get(a) == nullptr && world->entities().active_count() == 6);
   CHECK(world->players().by_body(state(*world, b).player()) == &state(*world, b));
@@ -335,11 +360,17 @@ void single_player_regression() {
   CHECK(world->tick() == 1 && world->time_ms() == 50 && world->quadtree_updates() == 1);
   CHECK(std::abs(body(*world, a).velocity.x - 0.125 * std::pow(0.992, 50.0)) < 1e-12);
   std::vector<std::string> trace;
-  for (auto phase : world->phase_trace()) trace.emplace_back(phase);
-  CHECK(trace == std::vector<std::string>({"regenerate-players", "drops", "petal-behaviors",
-    "linked-constraints", "population", "ai", "deferred-launches", "effects", "area-effects",
-    "petal-phase", "loadout-petals", "petal-orbits", "player-controls", "movement",
-    "ant-hole-release", "broadphase", "contacts", "reap-dead", "expire-drops", "corpse-sweep", "hit-flush"}));
+  for (auto phase : world->phase_trace()) {
+    trace.emplace_back(phase);
+  }
+  CHECK(trace ==
+        std::vector<std::string>({"regenerate-players", "drops",          "petal-behaviors",
+                                  "linked-constraints", "population",     "ai",
+                                  "deferred-launches",  "effects",        "area-effects",
+                                  "petal-phase",        "loadout-petals", "petal-orbits",
+                                  "player-controls",    "movement",       "ant-hole-release",
+                                  "broadphase",         "contacts",       "reap-dead",
+                                  "expire-drops",       "corpse-sweep",   "hit-flush"}));
 }
 
 void two_worlds_do_not_share_players() {
@@ -352,7 +383,9 @@ void two_worlds_do_not_share_players() {
   CHECK(!spawn_player(*second, state(*first, a), "foreign", at(0), {}).valid());
   CHECK(apply_player_input(*first, a, 1, 0, f32(0), f32(200)));
   for (unsigned i = 0; i < 10; ++i) {
-    advance_ticks(*first, 1); advance_ticks(*second, 1); advance_ticks(*reference, 1);
+    advance_ticks(*first, 1);
+    advance_ticks(*second, 1);
+    advance_ticks(*reference, 1);
   }
   CHECK(body(*second, b).position.x == body(*reference, c).position.x);
   CHECK(body(*second, b).position.y == body(*reference, c).position.y);

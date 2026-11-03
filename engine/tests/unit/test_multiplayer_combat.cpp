@@ -15,19 +15,21 @@ using namespace engine::test;
 using namespace engine::test::gameplay;
 
 void body_contacts_use_both_actual_levels() {
-  for (auto first : {1, 5, 6, 10}) for (auto second : {1, 5, 6, 10}) {
-    auto world = make_world();
-    const auto a = join_player(*world, "A", at(0), profile(0, first));
-    const auto b = join_player(*world, "B", at(30), profile(0, second));
-    body(*world, a).contact_damage = f32(10);
-    body(*world, b).contact_damage = f32(20);
-    contacts(*world);
-    const float scale = std::clamp((std::max(first, second) - 5) * 0.2, 0.0, 1.0);
-    CHECK(body(*world, a).health == f32(100 - 20 * scale));
-    CHECK(body(*world, b).health == f32(100 - 10 * scale));
-    if (scale > 0) {
-      CHECK(body(*world, a).last_damage_source.player == b);
-      CHECK(body(*world, b).last_damage_source.player == a);
+  for (auto first : {1, 5, 6, 10}) {
+    for (auto second : {1, 5, 6, 10}) {
+      auto world = make_world();
+      const auto a = join_player(*world, "A", at(0), profile(0, first));
+      const auto b = join_player(*world, "B", at(30), profile(0, second));
+      body(*world, a).contact_damage = f32(10);
+      body(*world, b).contact_damage = f32(20);
+      contacts(*world);
+      const float scale = std::clamp((std::max(first, second) - 5) * 0.2, 0.0, 1.0);
+      CHECK(body(*world, a).health == f32(100 - 20 * scale));
+      CHECK(body(*world, b).health == f32(100 - 10 * scale));
+      if (scale > 0) {
+        CHECK(body(*world, a).last_damage_source.player == b);
+        CHECK(body(*world, b).last_damage_source.player == a);
+      }
     }
   }
 }
@@ -55,26 +57,34 @@ void opposing_petals_trade_damage_and_own_petals_are_immune() {
   const auto a = join_player(*world, "A", at(-1000), profile(1));
   const auto b = join_player(*world, "B", at(1000), profile(1));
   const auto ha = petal(*world, a), hb = petal(*world, b);
-  auto& pa = *world->entities().get(ha); auto& pb = *world->entities().get(hb);
-  pa.set_position(at(0)); pb.set_position(at(1));
+  auto& pa = *world->entities().get(ha);
+  auto& pb = *world->entities().get(hb);
+  pa.set_position(at(0));
+  pb.set_position(at(1));
   pa.health = pb.health = f32(100);
   contacts(*world);
   CHECK(pa.health == f32(90) && pb.health == f32(90));
   CHECK(pa.last_damage_source.player == b && pb.last_damage_source.player == a);
   CHECK(world->hit_events().size() == 2);
   // With one hit left, both attacks still land before either slot recharges.
-  pa.health = pb.health = f32(10); pa.set_position(at(0)); pb.set_position(at(1));
+  pa.health = pb.health = f32(10);
+  pa.set_position(at(0));
+  pb.set_position(at(1));
   contacts(*world);
   CHECK(!world->entities().get(ha) || world->entities().get(ha)->health == f32(0));
   CHECK(!world->entities().get(hb) || world->entities().get(hb)->health == f32(0));
   CHECK(!petal(*world, a).valid() && !petal(*world, b).valid());
 
-  auto own = profile(1); own.set_inventory(1,1); own.set_inventory_count(2);
+  auto own = profile(1);
+  own.set_inventory(1, 1);
+  own.set_inventory_count(2);
   const auto c = join_player(*world, "C", at(2000), own);
-  const auto hc = petal(*world,c), hd = state(*world,c).loadout().handle(1,0);
-  world->entities().get(hc)->set_position(at(3000)); world->entities().get(hd)->set_position(at(3001));
+  const auto hc = petal(*world, c), hd = state(*world, c).loadout().handle(1, 0);
+  world->entities().get(hc)->set_position(at(3000));
+  world->entities().get(hd)->set_position(at(3001));
   contacts(*world);
-  CHECK(world->entities().get(hc)->health == f32(10) && world->entities().get(hd)->health == f32(10));
+  CHECK(world->entities().get(hc)->health == f32(10) &&
+        world->entities().get(hd)->health == f32(10));
 }
 
 void self_petal_pet_projectile_and_wild_roots() {
@@ -117,7 +127,9 @@ void self_petal_pet_projectile_and_wild_roots() {
 void catalog_equipment_ownership_and_recharge() {
   unsigned covered = 0;
   for (const auto& definition : Catalog::instance().petals()) {
-    if (definition.typeId == 0) continue;
+    if (definition.typeId == 0) {
+      continue;
+    }
     ++covered;
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(definition.typeId));
@@ -127,16 +139,19 @@ void catalog_equipment_ownership_and_recharge() {
     update_petal_orbits(*world, state(*world, b), 50);
     const auto b_handles = state(*world, b).loadout().slots()[0].instances;
     const auto b_phase = state(*world, b).loadout().orbit_phase();
-    for (auto id : {a, b}) for (const auto& orbit : state(*world, id).petals()) {
-      CHECK(owning_player_id(*world, orbit.handle) == id);
-      CHECK(controlling_root(*world, orbit.handle) == state(*world, id).player());
+    for (auto id : {a, b}) {
+      for (const auto& orbit : state(*world, id).petals()) {
+        CHECK(owning_player_id(*world, orbit.handle) == id);
+        CHECK(controlling_root(*world, orbit.handle) == state(*world, id).player());
+      }
     }
     if (!definition.orbitHidden) {
       const auto handle = petal(*world, a);
       CHECK(handle.valid());
       CHECK(damage_entity(*world, handle, f32(10000), state(*world, b).player()).died);
       CHECK(!state(*world, a).loadout().handle(0, 0).valid());
-      const auto recharge = Catalog::instance().petal_combat(definition.typeId)->rechargeMilliseconds;
+      const auto recharge =
+          Catalog::instance().petal_combat(definition.typeId)->rechargeMilliseconds;
       CHECK(state(*world, a).loadout().slots()[0].recharge_remaining_ms == recharge);
       (void)refresh_loadout_petals(*world, state(*world, a), recharge);
       CHECK(petal(*world, a).valid() && petal(*world, a) != handle);
@@ -162,7 +177,8 @@ void roses_heal_only_their_owner() {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(type));
     const auto b = join_player(*world, "B", at(1000), profile(type));
-    body(*world, a).health = f32(50); body(*world, b).health = f32(50);
+    body(*world, a).health = f32(50);
+    body(*world, b).health = f32(50);
     const auto b_handles = state(*world, b).loadout().slots()[0].instances;
     for (unsigned tick = 1; tick <= 29; ++tick) {
       world->set_time_ms(tick * 50);
@@ -180,16 +196,25 @@ void passives_orbit_modifiers_and_bubble_are_isolated() {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(type));
     const auto b = join_player(*world, "B", at(1000), profile(1));
-    body(*world, a).health = f32(50); body(*world, b).health = f32(50);
+    body(*world, a).health = f32(50);
+    body(*world, b).health = f32(50);
     regenerate_players(*world, 50);
-    CHECK(body(*world, a).max_health == f32(type == 33 ? 140 : type == 13 || type == 21 ? 120 : 100));
+    CHECK(body(*world, a).max_health == f32(type == 33                 ? 140
+                                            : type == 13 || type == 21 ? 120
+                                                                       : 100));
     CHECK(body(*world, b).max_health == f32(100));
-    if (type == 32) CHECK(body(*world, a).health.value > body(*world, b).health.value);
+    if (type == 32) {
+      CHECK(body(*world, a).health.value > body(*world, b).health.value);
+    }
     advance_loadout_orbit_phase(*world, state(*world, a), 50);
     advance_loadout_orbit_phase(*world, state(*world, b), 50);
     CHECK(state(*world, b).loadout().orbit_phase() == f32(0.125));
-    if (type == 14) CHECK(state(*world, a).loadout().orbit_phase() == f32(0.165));
-    if (type == 28) CHECK(state(*world, a).loadout().orbit_phase() == f32(-0.125));
+    if (type == 14) {
+      CHECK(state(*world, a).loadout().orbit_phase() == f32(0.165));
+    }
+    if (type == 28) {
+      CHECK(state(*world, a).loadout().orbit_phase() == f32(-0.125));
+    }
     if (type == 18) {
       CHECK(apply_player_input(*world, a, 1, 2, f32(0), f32(0)));
       world->set_time_ms(550);
@@ -219,9 +244,12 @@ void launched_variants_keep_identity_and_independent_charge() {
       CHECK(world->run_deferred_launches(551) == 1 && world->run_deferred_launches(551) == 0);
       for (auto child : children) {
         CHECK(owning_player_id(*world, child) == a);
-        CHECK(world->entities().get(child)->velocity.x != 0 || world->entities().get(child)->velocity.y != 0);
+        CHECK(world->entities().get(child)->velocity.x != 0 ||
+              world->entities().get(child)->velocity.y != 0);
       }
-    } else CHECK(owning_player_id(*world, parent) == a);
+    } else {
+      CHECK(owning_player_id(*world, parent) == a);
+    }
   }
 }
 
@@ -237,7 +265,9 @@ void wing_and_zone_locked_pets_use_their_players_input_and_zone() {
   CHECK(state(*world, b).petals()[0].orbit_radius.value < 45);
   const auto c = join_player(*world, "C", at(22000), profile(22, 60));
   const auto d = join_player(*world, "D", at(18000), profile(22, 60));
-  for (auto id : {c, d}) CHECK(hatch_equipped_egg(*world, petal(*world, id), 9));
+  for (auto id : {c, d}) {
+    CHECK(hatch_equipped_egg(*world, petal(*world, id), 9));
+  }
   const auto c_pet = petal(*world, c), d_pet = petal(*world, d);
   state(*world, c).set_zone_petals_disabled(true);
   damage_zone_locked_petals(*world, state(*world, c), 50);
@@ -272,7 +302,8 @@ void collision_effects_reflection_and_web_source() {
     const auto a = join_player(*world, "A", at(-1000), profile(type));
     const auto b = join_player(*world, "B", at(1000), profile());
     CHECK(apply_player_input(*world, a, 1, 1, f32(0), f32(0)));
-    world->set_time_ms(550); update_petal_orbits(*world, state(*world, a), 0);
+    world->set_time_ms(550);
+    update_petal_orbits(*world, state(*world, a), 0);
     update_petal_behaviors(*world, 650);
     CHECK(!world->area_effects().empty());
     const auto tag = world->area_effects()[0].owner;
@@ -282,8 +313,12 @@ void collision_effects_reflection_and_web_source() {
     (void)world->update_area_effects();
     CHECK(slow_multiplier(body(*world, b)) == f32(type == 29 ? 0.25 : 0.015625));
     std::vector<EntityHandle> tags;
-    for (const auto& area : world->area_effects()) tags.push_back(area.owner);
-    for (auto owner : tags) CHECK(world->destroy(owner));
+    for (const auto& area : world->area_effects()) {
+      tags.push_back(area.owner);
+    }
+    for (auto owner : tags) {
+      CHECK(world->destroy(owner));
+    }
     CHECK(slow_multiplier(body(*world, b)) == f32(1));
   }
 }
@@ -322,7 +357,8 @@ void dot_survives_body_removal_and_actual_slot_reuse() {
   on_petal_hit(*world, old_petal, state(*world, b).player(), old_body);
   const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob, 1, at(5000));
   CHECK(apply_effect(*world, mob, EffectType::kPoison, f32(100000), 1000, old_petal));
-  CHECK(world->destroy(old_petal)); CHECK(world->destroy(old_body));
+  CHECK(world->destroy(old_petal));
+  CHECK(world->destroy(old_body));
   CHECK(leave_player(*world, a));
   // The FIFO allocator must actually reuse both source slots with new generations.
   bool reused_body = false, reused_petal = false;
@@ -331,15 +367,24 @@ void dot_survives_body_removal_and_actual_slot_reuse() {
   CHECK(spawn_player(*world, state(*world, c), "C", at(4000), {}).valid());
   for (unsigned i = 0; i < kEntitySlotCount; ++i) {
     const auto allocated = world->entities().allocate();
-    if (!allocated) break;
-    if (allocated->index() == old_body.index()) { reused_body = true; CHECK(*allocated != old_body); }
-    if (allocated->index() == old_petal.index()) { reused_petal = true; CHECK(*allocated != old_petal); }
+    if (!allocated) {
+      break;
+    }
+    if (allocated->index() == old_body.index()) {
+      reused_body = true;
+      CHECK(*allocated != old_body);
+    }
+    if (allocated->index() == old_petal.index()) {
+      reused_petal = true;
+      CHECK(*allocated != old_petal);
+    }
   }
   CHECK(reused_body && reused_petal);
   body(*world, b).health = f32(0.01);
   CHECK(update_effects(*world, 50) == 2);
   CHECK(state(*world, b).last_killer_name() == "A");
-  CHECK(state(*world, b).death.source.player == a && state(*world, b).death.source.body == old_body);
+  CHECK(state(*world, b).death.source.player == a &&
+        state(*world, b).death.source.body == old_body);
   CHECK(world->entities().get(b_pet)->death_processed);
   CHECK(world->entities().get(b_pet)->killer_name == "A");
   CHECK(world->entities().get(b_pet)->last_damage_source.player == a);
@@ -349,7 +394,9 @@ void dot_survives_body_removal_and_actual_slot_reuse() {
 
 void effect_refresh_keys_and_payload_lifetime_survive_death_callbacks() {
   auto world = make_world();
-  auto items = profile(31); items.set_inventory(1, 31); items.set_inventory_count(2);
+  auto items = profile(31);
+  items.set_inventory(1, 31);
+  items.set_inventory_count(2);
   const auto a = join_player(*world, "A", at(-1000), items);
   const auto b = join_player(*world, "B", at(1000), profile());
   const auto first = petal(*world, a), second = state(*world, a).loadout().handle(1, 0);
@@ -363,7 +410,7 @@ void effect_refresh_keys_and_payload_lifetime_survive_death_callbacks() {
   // destroys this already-dead equipped child during the effects traversal.
   world->entities().get(first)->health = f32(0);
   CHECK(apply_effect(*world, state(*world, a).player(), EffectType::kPoison, f32(10000), 1000,
-    state(*world, b).player()));
+                     state(*world, b).player()));
   CHECK(update_effects(*world, 50) == 1);
   CHECK(world->entities().get(first) == nullptr && payload.expired());
 }
@@ -382,7 +429,8 @@ void delayed_monster_xp_goes_to_persistent_attacker_only() {
   CHECK(state(*world, b).loadout().score() == f32(0));
   CHECK(state(*world, b).profile().level() == 1 && body(*world, b).max_health == b_max);
   kill_entity(*world, mob, state(*world, b).player());
-  CHECK(state(*world, a).loadout().score() == reward && state(*world, b).loadout().score() == f32(0));
+  CHECK(state(*world, a).loadout().score() == reward &&
+        state(*world, b).loadout().score() == f32(0));
 }
 
 void monster_kill_levels_only_the_actual_attacker() {
@@ -391,7 +439,8 @@ void monster_kill_levels_only_the_actual_attacker() {
   const auto b = join_player(*world, "B", at(1000), profile(1));
   const auto reward = f32(Catalog::instance().entity(1)->scale);
   state(*world, a).profile().set_experience(experience_threshold(1) - reward);
-  body(*world, a).health = f32(50); body(*world, b).health = f32(50);
+  body(*world, a).health = f32(50);
+  body(*world, b).health = f32(50);
   const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob, 1, at(4000));
   CHECK(damage_entity(*world, mob, f32(10000), petal(*world, a)).died);
   CHECK(state(*world, a).profile().level() == 2 && state(*world, b).profile().level() == 1);
@@ -407,7 +456,9 @@ void ai_finds_second_player_after_first_dies() {
   const auto b = join_player(*world, "B", at(200), profile());
   const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob, 9, at(0));
   auto& ai = world->entities().get(mob)->ai;
-  ai.aggressive = true; ai.territory = f32(0); ai.radius = f32(1000);
+  ai.aggressive = true;
+  ai.territory = f32(0);
+  ai.radius = f32(1000);
   CHECK(find_target(*world, mob) == state(*world, a).player());
   CHECK(damage_entity(*world, state(*world, a).player(), f32(1000), mob).died);
   update_ai(*world, 50);
@@ -418,18 +469,21 @@ void invalid_cyclic_and_stale_owner_chains_are_bounded() {
   auto world = make_world();
   const auto a = spawn_entity(*world, EntityKind::kProjectile, 1, at(0), f32(1));
   const auto b = spawn_entity(*world, EntityKind::kProjectile, 1, at(0), f32(1));
-  world->entities().get(a)->owner = b.raw; world->entities().get(b)->owner = a.raw;
+  world->entities().get(a)->owner = b.raw;
+  world->entities().get(b)->owner = a.raw;
   CHECK(!owning_player_id(*world, a).valid());
   CHECK(damage_source(*world, a).name.empty());
   CHECK(controlling_root(*world, a) == a);
   CHECK(world->destroy(b));
   CHECK(!owning_player_id(*world, a).valid());
-  CHECK(damage_source(*world, EntityHandle::from_parts(a.index(), a.generation() + 1)).name.empty());
+  CHECK(
+      damage_source(*world, EntityHandle::from_parts(a.index(), a.generation() + 1)).name.empty());
 }
 }
 
 int main() {
-  engine::test::tapOutput = true; std::printf("TAP version 13\n");
+  engine::test::tapOutput = true;
+  std::printf("TAP version 13\n");
 #define RUN(name) engine::test::runTest(#name, name)
   RUN(body_contacts_use_both_actual_levels);
   RUN(opposing_petals_damage_bodies_at_level_one);

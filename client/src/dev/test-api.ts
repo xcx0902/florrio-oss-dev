@@ -1,4 +1,4 @@
-import {worldVisualCounts,worldFrameStats} from '../render/world.js';
+import { worldVisualCounts, worldFrameStats } from '../render/world.js';
 import { CameraState } from '../state/camera.js';
 import { type EntitySnapshot, type SnapshotEvent } from '../state/snapshot.js';
 import { WorldState } from '../state/world.js';
@@ -6,7 +6,12 @@ import type { GameApp } from '../app/game-app.js';
 declare global {
   interface Window {
     __florr?: {
-      performanceState(): {visuals:ReturnType<typeof worldVisualCounts>;pending:number;resources:ReturnType<GameApp['renderer']['resources']['snapshot']>;frame:ReturnType<typeof worldFrameStats>};
+      performanceState(): {
+        visuals: ReturnType<typeof worldVisualCounts>;
+        pending: number;
+        resources: ReturnType<GameApp['renderer']['resources']['snapshot']>;
+        frame: ReturnType<typeof worldFrameStats>;
+      };
       world: WorldState;
       camera: CameraState;
       freeze(): void;
@@ -32,7 +37,13 @@ declare global {
       /** Replay bytes through the production decoder and delta receiver. */
       applyPacketAt(bytes: readonly number[], at: number): boolean;
       /** Select a repeatable performance-workload camera. */
-      setCamera(x: number, y: number, zoom?: number, entityOffsetX?: number, entityOffsetY?: number): void;
+      setCamera(
+        x: number,
+        y: number,
+        zoom?: number,
+        entityOffsetX?: number,
+        entityOffsetY?: number,
+      ): void;
       getCamera(): {
         x: number;
         y: number;
@@ -47,20 +58,51 @@ declare global {
 }
 export function installTestApi(app: GameApp): () => void {
   window.__florr = {
-    performanceState:()=>({visuals:worldVisualCounts(app.world),pending:app.server.pendingCount,resources:app.renderer.resources.snapshot(),frame:{...worldFrameStats(app.world)}}),
+    performanceState: () => ({
+      visuals: worldVisualCounts(app.world),
+      pending: app.server.pendingCount,
+      resources: app.renderer.resources.snapshot(),
+      frame: { ...worldFrameStats(app.world) },
+    }),
     world: app.world,
     camera: app.camera,
-    freeze: () => { app.frozen = true; },
-    resume: () => { app.frozen = false; app.camera.clearOverride(); },
+    freeze: () => {
+      app.frozen = true;
+    },
+    resume: () => {
+      app.frozen = false;
+      app.camera.clearOverride();
+    },
     start: async () => app.session.startGame(),
     get ui() {
-      return { started: app.session.started, inventoryOpen: app.loadout.inventoryOpen, selectedSlot: app.loadout.selectedSlot, dead: app.session.dead, status: app.session.status, menuPanel: app.menuControls.panel, movementDisabled: app.input.movementDisabled, name: app.menuControls.name.value, keyboardSlot: app.loadout.keyboardSlot, keyboardHint: app.renderer.keyboardHint, keyboardHighlightAlpha: app.renderer.keyboardHighlightAlpha, menuScroll: app.menuControls.renderState().scroll };
+      return {
+        started: app.session.started,
+        inventoryOpen: app.loadout.inventoryOpen,
+        selectedSlot: app.loadout.selectedSlot,
+        dead: app.session.dead,
+        status: app.session.status,
+        menuPanel: app.menuControls.panel,
+        movementDisabled: app.input.movementDisabled,
+        name: app.menuControls.name.value,
+        keyboardSlot: app.loadout.keyboardSlot,
+        keyboardHint: app.renderer.keyboardHint,
+        keyboardHighlightAlpha: app.renderer.keyboardHighlightAlpha,
+        menuScroll: app.menuControls.renderState().scroll,
+      };
     },
-    suicide: async () => { await app.server.send(app.inputEncoder.suicide()); },
-    restart: async () => { await app.session.restartGame(); },
-    setCamera: (x, y, zoom, offsetX, offsetY) => { app.camera.setCamera(x, y, zoom, offsetX, offsetY); },
+    suicide: async () => {
+      await app.server.send(app.inputEncoder.suicide());
+    },
+    restart: async () => {
+      await app.session.restartGame();
+    },
+    setCamera: (x, y, zoom, offsetX, offsetY) => {
+      app.camera.setCamera(x, y, zoom, offsetX, offsetY);
+    },
     getCamera: () => app.camera.getCamera(),
-    clearCameraOverride: () => { app.camera.clearOverride(); },
+    clearCameraOverride: () => {
+      app.camera.clearOverride();
+    },
     setSnapshot: (entities, events = []) => {
       app.injectedSequence += 1;
       app.world.reset();
@@ -73,17 +115,31 @@ export function installTestApi(app: GameApp): () => void {
       app.camera.clearOverride();
       // An empty reset is not a received server metadata packet. In particular
       // the menu's preview HUD must wait for the first real snapshot.
-      if (entities.length || events.length)
-        app.world.applyFullSnapshot({ sequence: app.injectedSequence, serverTime: 0, entities, events }, performance.now());
-      app.session.localPlayer() ? app.session.enterPlaying() : app.session.enterMenu();
+      if (entities.length || events.length) {
+        app.world.applyFullSnapshot(
+          { sequence: app.injectedSequence, serverTime: 0, entities, events },
+          performance.now(),
+        );
+      }
+      if (app.session.localPlayer()) {
+        app.session.enterPlaying();
+      } else {
+        app.session.enterMenu();
+      }
     },
     setSnapshotAt: (entities, at) => {
       app.injectedSequence += 1;
-      app.world.applyFullSnapshot({ sequence: app.injectedSequence, serverTime: at, entities, events: [] }, at);
+      app.world.applyFullSnapshot(
+        { sequence: app.injectedSequence, serverTime: at, entities, events: [] },
+        at,
+      );
     },
     applyPacketAt: (bytes, at) => app.session.applyPacket(Uint8Array.from(bytes), at),
   };
   const installed = window.__florr;
-  return () => { if (window.__florr === installed)
-    delete window.__florr; };
+  return () => {
+    if (window.__florr === installed) {
+      delete window.__florr;
+    }
+  };
 }

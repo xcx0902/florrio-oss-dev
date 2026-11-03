@@ -23,20 +23,20 @@ separate network/local session slots.
 
 ## Command layouts
 
-| Opcode | Meaning | Operands |
-| ---: | --- | --- |
-| 3 | suicide | varint argument |
-| 4 | restart | none |
-| 7 | disconnect | varint argument |
-| 8 | discard petal | u8 slot, u8 petal |
-| 10 | swap petals | u8 slotA, u8 valueA, u8 slotB, u8 valueB |
-| 12 | input state | varint buttons, f32 angle, f32 strength |
-| 13 | bench cycle | none |
-| 0 | handshake | u8 prefix, 3 NUL-terminated strings |
-| 2 | handshake | u8 prefix, 2 NUL-terminated strings |
-| 5 | string | one NUL-terminated string |
-| 6 | player spawn/name | one NUL-terminated string |
-| 1, 9, 11 | reserved | opaque remaining bytes |
+|   Opcode | Meaning           | Operands                                 |
+| -------: | ----------------- | ---------------------------------------- |
+|        3 | suicide           | varint argument                          |
+|        4 | restart           | none                                     |
+|        7 | disconnect        | varint argument                          |
+|        8 | discard petal     | u8 slot, u8 petal                        |
+|       10 | swap petals       | u8 slotA, u8 valueA, u8 slotB, u8 valueB |
+|       12 | input state       | varint buttons, f32 angle, f32 strength  |
+|       13 | bench cycle       | none                                     |
+|        0 | handshake         | u8 prefix, 3 NUL-terminated strings      |
+|        2 | handshake         | u8 prefix, 2 NUL-terminated strings      |
+|        5 | string            | one NUL-terminated string                |
+|        6 | player spawn/name | one NUL-terminated string                |
+| 1, 9, 11 | reserved          | opaque remaining bytes                   |
 
 For opcode 12, `readSanitizedFloat` uses the bit test:
 
@@ -165,7 +165,6 @@ No shipped command sets it, so the domain reader does not implement it.
   movement/petal layers interpret attack/defend.
 - Exact 160-byte command frame side effects and output replies.
 - UTF-8 truncation of over-long strings.
-
 
 ## Client encoder
 

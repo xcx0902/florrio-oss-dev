@@ -25,8 +25,20 @@ async function json(root, relative) {
 
 /** Load and parse every input. Validation is a separate, side-effect-free step. */
 export async function loadSchemaInputs(root = '.') {
-  const [protocolSource, multiplayerSource, transport, petals, entities, spawnRules, strings,
-    spawnDefaults, petalCombat, dropRules, galleryOverrides, changelog] = await Promise.all([
+  const [
+    protocolSource,
+    multiplayerSource,
+    transport,
+    petals,
+    entities,
+    spawnRules,
+    strings,
+    spawnDefaults,
+    petalCombat,
+    dropRules,
+    galleryOverrides,
+    changelog,
+  ] = await Promise.all([
     readFile(path.join(root, SCHEMA_INPUTS.protocol), 'utf8'),
     readFile(path.join(root, SCHEMA_INPUTS.multiplayer), 'utf8'),
     json(root, SCHEMA_INPUTS.transport),
@@ -41,8 +53,18 @@ export async function loadSchemaInputs(root = '.') {
     readFile(path.join(root, SCHEMA_INPUTS.changelog), 'utf8'),
   ]);
   return {
-    protocolSource, multiplayerSource, protocolDocument: parseProtocol(protocolSource),
-    transport, petals, entities, spawnRules, strings, spawnDefaults,
-    petalCombat, dropRules, galleryOverrides, changelog,
+    protocolSource,
+    multiplayerSource,
+    protocolDocument: parseProtocol(protocolSource),
+    transport,
+    petals,
+    entities,
+    spawnRules,
+    strings,
+    spawnDefaults,
+    petalCombat,
+    dropRules,
+    galleryOverrides,
+    changelog,
   };
 }

@@ -11,4 +11,4 @@ class World;
 
 /** Original 654 adds one health/second for each ready active Leaf slot. */
 [[nodiscard]] double equipped_leaf_healing(const PlayerState& state, double milliseconds);
-} // namespace engine
+}  // namespace engine

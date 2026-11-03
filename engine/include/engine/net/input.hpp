@@ -26,8 +26,12 @@ struct InputCommand {
 /** Original sequence gate: sequence 0 is always accepted; otherwise the value
  * must be strictly greater than the last accepted sequence. */
 [[nodiscard]] inline bool accept_input_sequence(std::uint32_t& last, std::uint32_t sequence) {
-  if (sequence == 0U) return true;
-  if (sequence <= last) return false;
+  if (sequence == 0U) {
+    return true;
+  }
+  if (sequence <= last) {
+    return false;
+  }
   last = sequence;
   return true;
 }
@@ -46,4 +50,4 @@ struct InputMessage {
                                          std::span<const std::uint8_t> key,
                                          std::vector<InputMessage>& messages);
 
-} // namespace engine
+}  // namespace engine

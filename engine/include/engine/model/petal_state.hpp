@@ -30,4 +30,4 @@ struct PetalOrbitState {
   double behavior_started_at_ms = 0.0;
 };
 
-} // namespace engine
+}  // namespace engine

@@ -5,7 +5,13 @@
 #include <string_view>
 
 namespace florr::server {
-enum class Action { serve, smoke, check_config, help, version };
+enum class Action {
+  serve,
+  smoke,
+  check_config,
+  help,
+  version
+};
 struct Options {
   Action action = Action::serve;
   std::string config_path = "server/config/default.json";
@@ -30,4 +36,4 @@ struct SmokeResult {
 };
 [[nodiscard]] SmokeResult run_smoke(const Options& options);
 [[nodiscard]] std::string_view version();
-} // namespace florr::server
+}  // namespace florr::server

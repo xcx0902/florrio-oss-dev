@@ -57,20 +57,20 @@ A rejected packet leaves the next sparse or dense decode in the prior state.
 
 `domain_snapshot_bytes` writes these ascending field ids:
 
-| Field | Domain meaning |
-| ---: | --- |
-| 2 | player look byte; species id for non-players |
-| 5 | camera-follow x (f32) |
-| 7 | physics collision radius (f32) |
-| 8 | angle, quantized to u16 |
-| 24 | camera-follow y (f32) |
-| 26 | entity kind: 1 player, 2 mob, 3 petal, 4 drop, 5 projectile |
-| 28 | visual world y (f32) |
-| 31 | player expression/action bits; loadout instance for other kinds |
-| 38 | visual death-processed bit (0 alive, 1 death processed) |
-| 49 | visual world x (f32) |
-| 53 | current health (f32) |
-| 55 | maximum health (f32) |
+| Field | Domain meaning                                                  |
+| ----: | --------------------------------------------------------------- |
+|     2 | player look byte; species id for non-players                    |
+|     5 | camera-follow x (f32)                                           |
+|     7 | physics collision radius (f32)                                  |
+|     8 | angle, quantized to u16                                         |
+|    24 | camera-follow y (f32)                                           |
+|    26 | entity kind: 1 player, 2 mob, 3 petal, 4 drop, 5 projectile     |
+|    28 | visual world y (f32)                                            |
+|    31 | player expression/action bits; loadout instance for other kinds |
+|    38 | visual death-processed bit (0 alive, 1 death processed)         |
+|    49 | visual world x (f32)                                            |
+|    53 | current health (f32)                                            |
+|    55 | maximum health (f32)                                            |
 
 Field 7 is the physics collider radius (`Entity::collision_radius`), not the
 catalog draw radius. Field 8 packs the angle as:
@@ -109,15 +109,15 @@ reference and array shapes.
 
 The default derived groups are:
 
-| Group | Fields |
-| ---: | --- |
-| 52 | 22 / 54 |
-| 56 | 36 |
-| 72 | camera |
-| 116 | health / maxHealth |
-| 120 | raw angle + visual y/x |
-| 140 | radius |
-| 152 | look/species, kind, expression/variant (extended by flag 64 with 58–63) |
+| Group | Fields                                                                  |
+| ----: | ----------------------------------------------------------------------- |
+|    52 | 22 / 54                                                                 |
+|    56 | 36                                                                      |
+|    72 | camera                                                                  |
+|   116 | health / maxHealth                                                      |
+|   120 | raw angle + visual y/x                                                  |
+|   140 | radius                                                                  |
+|   152 | look/species, kind, expression/variant (extended by flag 64 with 58–63) |
 
 The dense payload is exactly 63 bytes. Profile records retain the complete
 declaration mask so the next dense record has the same length. The redundant

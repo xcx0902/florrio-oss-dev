@@ -18,21 +18,53 @@ struct f32 {
 
   static constexpr f32 from_double(double input) { return f32(static_cast<float>(input)); }
 
-  constexpr f32& operator+=(f32 other) { value += other.value; return *this; }
-  constexpr f32& operator-=(f32 other) { value -= other.value; return *this; }
-  constexpr f32& operator*=(f32 other) { value *= other.value; return *this; }
-  constexpr f32& operator/=(f32 other) { value /= other.value; return *this; }
+  constexpr f32& operator+=(f32 other) {
+    value += other.value;
+    return *this;
+  }
+  constexpr f32& operator-=(f32 other) {
+    value -= other.value;
+    return *this;
+  }
+  constexpr f32& operator*=(f32 other) {
+    value *= other.value;
+    return *this;
+  }
+  constexpr f32& operator/=(f32 other) {
+    value /= other.value;
+    return *this;
+  }
 };
 
-[[nodiscard]] constexpr f32 operator+(f32 a, f32 b) { return f32(a.value + b.value); }
-[[nodiscard]] constexpr f32 operator-(f32 a, f32 b) { return f32(a.value - b.value); }
-[[nodiscard]] constexpr f32 operator*(f32 a, f32 b) { return f32(a.value * b.value); }
-[[nodiscard]] constexpr f32 operator/(f32 a, f32 b) { return f32(a.value / b.value); }
-[[nodiscard]] constexpr bool operator==(f32 a, f32 b) { return a.value == b.value; }
-[[nodiscard]] constexpr bool operator!=(f32 a, f32 b) { return a.value != b.value; }
-[[nodiscard]] constexpr bool operator<(f32 a, f32 b) { return a.value < b.value; }
-[[nodiscard]] constexpr bool operator<=(f32 a, f32 b) { return a.value <= b.value; }
-[[nodiscard]] constexpr bool operator>(f32 a, f32 b) { return a.value > b.value; }
-[[nodiscard]] constexpr bool operator>=(f32 a, f32 b) { return a.value >= b.value; }
+[[nodiscard]] constexpr f32 operator+(f32 a, f32 b) {
+  return f32(a.value + b.value);
+}
+[[nodiscard]] constexpr f32 operator-(f32 a, f32 b) {
+  return f32(a.value - b.value);
+}
+[[nodiscard]] constexpr f32 operator*(f32 a, f32 b) {
+  return f32(a.value * b.value);
+}
+[[nodiscard]] constexpr f32 operator/(f32 a, f32 b) {
+  return f32(a.value / b.value);
+}
+[[nodiscard]] constexpr bool operator==(f32 a, f32 b) {
+  return a.value == b.value;
+}
+[[nodiscard]] constexpr bool operator!=(f32 a, f32 b) {
+  return a.value != b.value;
+}
+[[nodiscard]] constexpr bool operator<(f32 a, f32 b) {
+  return a.value < b.value;
+}
+[[nodiscard]] constexpr bool operator<=(f32 a, f32 b) {
+  return a.value <= b.value;
+}
+[[nodiscard]] constexpr bool operator>(f32 a, f32 b) {
+  return a.value > b.value;
+}
+[[nodiscard]] constexpr bool operator>=(f32 a, f32 b) {
+  return a.value >= b.value;
+}
 
-} // namespace engine
+}  // namespace engine

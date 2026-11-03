@@ -1,0 +1,21 @@
+# Paths owned by other tools or produced by builds. Prettier is also limited
+# to an explicit file list by tools/format.mjs; this file protects direct CLI
+# use from touching history, dependencies and delivery output.
+archive/
+node_modules/
+build/
+dist-next/
+dist-multiplayer/
+dist-multiplayer.stage-*/
+dist-next.stage-*/
+reports/
+release/
+.emcache/
+.vscode/
+client/public/
+package-lock.json
+*.woff2
+*.png
+*.ico
+*.wasm
+*.gz

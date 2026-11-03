@@ -51,11 +51,11 @@ applied, so a slot can be reused later without stale components.
 
 ## Event opcodes
 
-| Opcode | Payload | Meaning |
-| ---: | --- | --- |
-| 9 | NUL-terminated string | Chat line. Appended to `WorldState.chat` and rendered in the HUD. |
-| 11 | `u32` wire handle | Hit clock. The client stores the receive time for the target. |
-| 14 | `u32` wire handle + `u8` index | Petal-transfer visual: the drop handle and destination slot index. |
+| Opcode | Payload                        | Meaning                                                            |
+| -----: | ------------------------------ | ------------------------------------------------------------------ |
+|      9 | NUL-terminated string          | Chat line. Appended to `WorldState.chat` and rendered in the HUD.  |
+|     11 | `u32` wire handle              | Hit clock. The client stores the receive time for the target.      |
+|     14 | `u32` wire handle + `u8` index | Petal-transfer visual: the drop handle and destination slot index. |
 
 Opcode 11 is synthesized once per coalesced hit in a tick. Opcode 14 is queued
 by pickup/slot assignment, not by damage. The two clocks are independent: event

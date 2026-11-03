@@ -8,7 +8,12 @@ import { PETAL_INFO } from '../schema/petals.js';
 import type { Canvas2DContext } from './canvas2d/context.js';
 import { wrapContext } from './canvas2d/context.js';
 import type { RasterCanvas } from './canvas2d/text-cache.js';
-import { createRasterCanvas,drawLabel,getLabel,getRasterContext } from './canvas2d/text-cache.js';
+import {
+  createRasterCanvas,
+  drawLabel,
+  getLabel,
+  getRasterContext,
+} from './canvas2d/text-cache.js';
 import { drawPetalIcon } from './entity-art.js';
 import { getHudLayout } from './hud.js';
 
@@ -74,7 +79,8 @@ function labelOwner(effect: Event14Effect): string {
   }
   return owner;
 }
-const clamp = (value: number): number => Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
+const clamp = (value: number): number =>
+  Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
 const amount = (base: number, delta: number): number => clamp(1 - Math.pow(base, f(delta) * 0.06));
 const approach = (current: number, target: number, step: number): number =>
   f(Math.abs(current - target) < 1e-7 ? target : current + (target - current) * step);
@@ -90,10 +96,22 @@ export function createEvent14Effect(payload: Event14Payload): Event14Effect {
   if (!Number.isFinite(payload.startScreenX) || !Number.isFinite(payload.startScreenY)) {
     throw new RangeError('Event 14 requires finite projected screen coordinates');
   }
-  return { index: payload.index, type: payload.type, x: f(payload.startScreenX), y: f(payload.startScreenY),
-    size: 0, opacity: 0, recharge: f(clamp(payload.recharge ?? 1)), rechargeFade: 0,
-    targetRecharge: f(clamp(payload.recharge ?? 1)), slotX: undefined, slotY: undefined,
-    phase: 'arriving', lastTime: undefined, retiredFrames: 0 };
+  return {
+    index: payload.index,
+    type: payload.type,
+    x: f(payload.startScreenX),
+    y: f(payload.startScreenY),
+    size: 0,
+    opacity: 0,
+    recharge: f(clamp(payload.recharge ?? 1)),
+    rechargeFade: 0,
+    targetRecharge: f(clamp(payload.recharge ?? 1)),
+    slotX: undefined,
+    slotY: undefined,
+    phase: 'arriving',
+    lastTime: undefined,
+    retiredFrames: 0,
+  };
 }
 
 /** Advance once per frame; return false when native retirement is complete.
@@ -101,41 +119,62 @@ export function createEvent14Effect(payload: Event14Payload): Event14Effect {
  * No recorded positions, sample fractions, elapsed-time TTL or hit pulses.
  */
 export function updateEvent14Effect(effect: Event14Effect, frame: Event14Frame): boolean {
-  if (effect.phase === 'done') return false;
-  const now = Number.isFinite(frame.nowMilliseconds) ? frame.nowMilliseconds : effect.lastTime ?? 0;
-  if (effect.lastTime !== undefined && now <= effect.lastTime) return true;
-  const elapsed = frame.deltaMilliseconds ?? (effect.lastTime === undefined ? 0 : now - effect.lastTime);
+  if (effect.phase === 'done') {
+    return false;
+  }
+  const now = Number.isFinite(frame.nowMilliseconds)
+    ? frame.nowMilliseconds
+    : (effect.lastTime ?? 0);
+  if (effect.lastTime !== undefined && now <= effect.lastTime) {
+    return true;
+  }
+  const elapsed =
+    frame.deltaMilliseconds ?? (effect.lastTime === undefined ? 0 : now - effect.lastTime);
   const delta = f(Number.isFinite(elapsed) ? Math.max(0, elapsed) : 0);
   effect.lastTime = now;
   const layout = getHudLayout(frame.width, frame.height, frame.level, frame.mobile, frame.uiScale);
   const equipped = effect.index < layout.equippedCount;
   const storageIndex = effect.index - layout.equippedCount;
   const validSlot = effect.index < layout.equippedCount + 8;
-  if (frame.active === false || !validSlot) effect.phase = 'departing';
+  if (frame.active === false || !validSlot) {
+    effect.phase = 'departing';
+  }
   const active = effect.phase !== 'departing';
-  const x = f(equipped ? layout.equippedX + effect.index * 90 : layout.storageX + storageIndex * 65);
+  const x = f(
+    equipped ? layout.equippedX + effect.index * 90 : layout.storageX + storageIndex * 65,
+  );
   const y = f(equipped ? layout.equippedY : layout.storageY);
   const step = amount(0.8, delta);
   const before = [effect.x, effect.y, effect.size, effect.opacity];
-  if (active || effect.slotX === undefined) { effect.slotX = x; effect.slotY = y; }
+  if (active || effect.slotX === undefined) {
+    effect.slotX = x;
+    effect.slotY = y;
+  }
   // Retired objects keep their last slot anchor while shrinking out.
   if (validSlot) {
     effect.x = approach(effect.x, effect.slotX, step);
     effect.y = approach(effect.y, effect.slotY!, step);
   }
-  effect.size = approach(effect.size, active ? equipped ? 70 : 50 : 0, step);
+  effect.size = approach(effect.size, active ? (equipped ? 70 : 50) : 0, step);
   effect.opacity = approach(effect.opacity, active ? 1 : 0, step);
-  if (frame.recharge !== undefined) effect.targetRecharge = f(clamp(frame.recharge));
+  if (frame.recharge !== undefined) {
+    effect.targetRecharge = f(clamp(frame.recharge));
+  }
   const recharge = equipped ? effect.targetRecharge : 1;
   // Native func587 resets a falling recharge immediately, then smooths up.
   effect.recharge = approach(Math.min(effect.recharge, recharge), recharge, step);
-  effect.rechargeFade = approach(effect.rechargeFade, equipped ? 0 : 1,
-    clamp(1 - Math.pow(2, -delta * 0.06)));
+  effect.rechargeFade = approach(
+    effect.rechargeFade,
+    equipped ? 0 : 1,
+    clamp(1 - Math.pow(2, -delta * 0.06)),
+  );
   if (!active) {
     effect.retiredFrames++;
     // clientFrame removes retired entries only after two visits and opacity
     // <= 1e-4; drawing at zero delta never skips that ownership boundary.
-    if (effect.retiredFrames > 1 && effect.opacity <= 0.0001) effect.phase = 'done';
+    if (effect.retiredFrames > 1 && effect.opacity <= 0.0001) {
+      effect.phase = 'done';
+    }
   } else if (delta > 0) {
     const after = [effect.x, effect.y, effect.size, effect.opacity];
     // f32 easing can reach a numerical fixed point before exact equality
@@ -145,23 +184,32 @@ export function updateEvent14Effect(effect: Event14Effect, frame: Event14Frame):
   return effect.phase !== 'done';
 }
 
-const RARITY_RGB: readonly (readonly [number, number, number])[] = Array.from({ length: 6 }, (_, rarity) => [
-  Number(245047318478718n >> BigInt(rarity * 8) & 255n),
-  Number(34218529646319n >> BigInt(rarity * 8) & 255n),
-  Number(111187557834093n >> BigInt(rarity * 8) & 255n),
-]);
+const RARITY_RGB: readonly (readonly [number, number, number])[] = Array.from(
+  { length: 6 },
+  (_, rarity) => [
+    Number((245047318478718n >> BigInt(rarity * 8)) & 255n),
+    Number((34218529646319n >> BigInt(rarity * 8)) & 255n),
+    Number((111187557834093n >> BigInt(rarity * 8)) & 255n),
+  ],
+);
 
 const artwork = new Map<string, RasterCanvas>();
 function petalArtwork(type: number, raster: number): RasterCanvas | undefined {
   const key = `${type}:${raster}`;
   const cached = artwork.get(key);
-  if (cached) return cached;
+  if (cached) {
+    return cached;
+  }
   // Antennae, clustered peas and eggs extend beyond a 24px disc.
-  const side = [1,2,6,7,8,14,35].includes(type) ? 24 : 56;
+  const side = [1, 2, 6, 7, 8, 14, 35].includes(type) ? 24 : 56;
   const canvas = createRasterCanvas(Math.ceil(side * raster), Math.ceil(side * raster));
-  if (!canvas) return;
+  if (!canvas) {
+    return;
+  }
   const native = getRasterContext(canvas);
-  if (!native) return;
+  if (!native) {
+    return;
+  }
   native.setTransform(raster, 0, 0, raster, canvas.width / 2, canvas.height / 2);
   drawPetalIcon(wrapContext(native), type);
   artwork.set(key, canvas);
@@ -172,12 +220,26 @@ function petalArtwork(type: number, raster: number): RasterCanvas | undefined {
  * The slot is a rarity card with petal artwork/name and the native recharge
  * sector, rather than a generic expanding hit circle.
  */
-export function drawEvent14Effect(context: Canvas2DContext, effect: Readonly<Event14Effect>,
-                                  viewport: Event14Viewport = {}): void {
-  if (effect.phase === 'done' || effect.size <= 0 || effect.opacity <= 0) return;
-  const layout = getHudLayout(viewport.width, viewport.height, viewport.level, viewport.mobile, viewport.uiScale);
-  const ratio = Number.isFinite(viewport.pixelRatio) && viewport.pixelRatio! > 0 ? viewport.pixelRatio! : 1;
-  const scale = f(layout.scale * ratio), zoom = f(effect.size / 70), projected = f(scale * zoom);
+export function drawEvent14Effect(
+  context: Canvas2DContext,
+  effect: Readonly<Event14Effect>,
+  viewport: Event14Viewport = {},
+): void {
+  if (effect.phase === 'done' || effect.size <= 0 || effect.opacity <= 0) {
+    return;
+  }
+  const layout = getHudLayout(
+    viewport.width,
+    viewport.height,
+    viewport.level,
+    viewport.mobile,
+    viewport.uiScale,
+  );
+  const ratio =
+    Number.isFinite(viewport.pixelRatio) && viewport.pixelRatio! > 0 ? viewport.pixelRatio! : 1;
+  const scale = f(layout.scale * ratio),
+    zoom = f(effect.size / 70),
+    projected = f(scale * zoom);
   const y = f(f(scale * (viewport.offsetY ?? 0)) + f(scale * effect.y));
   const alpha = clamp((context.getGlobalAlpha?.() ?? 1) * effect.opacity);
   const rgb = RARITY_RGB[PETAL_INFO[effect.type].rarity] ?? RARITY_RGB[0];
@@ -185,40 +247,76 @@ export function drawEvent14Effect(context: Canvas2DContext, effect: Readonly<Eve
   context.setGlobalAlpha(alpha);
   context.setTransform(projected, 0, 0, projected, f(scale * effect.x), y);
   context.setLineJoin('round');
-  const line = f(70 * 0.083333), side = f(70 - line);
-  context.setFillRgb(...rgb); context.fillRect(-side / 2, -side / 2, side, side);
+  const line = f(70 * 0.083333),
+    side = f(70 - line);
+  context.setFillRgb(...rgb);
+  context.fillRect(-side / 2, -side / 2, side, side);
   const angle = f(effect.recharge * effect.recharge * 6.283185);
   if (effect.rechargeFade < 0.99999 && angle < 6.283122) {
-    context.save(); context.setGlobalAlpha(alpha * (1 - effect.rechargeFade));
-    context.beginPath(); context.moveTo(0, -5);
+    context.save();
+    context.setGlobalAlpha(alpha * (1 - effect.rechargeFade));
+    context.beginPath();
+    context.moveTo(0, -5);
     context.arc(0, -5, 140, angle * 5.7, angle * 4.7 + 6.283185, false);
     context.clip();
-    context.setFillRgb(...rgb.map(value => Math.round(value * 0.64)) as [number, number, number]);
+    context.setFillRgb(
+      ...(rgb.map((value) => Math.round(value * 0.64)) as [number, number, number]),
+    );
     const inner = f(70 - f(line * 2));
-    context.fillRect(-inner / 2, -inner / 2, inner, inner); context.restore();
+    context.fillRect(-inner / 2, -inner / 2, inner, inner);
+    context.restore();
   }
-  context.beginPath(); context.rect(-side / 2, -side / 2, side, side);
-  context.setStrokeRgb(...rgb.map(value => Math.round(value * 0.81)) as [number, number, number]);
-  context.setLineWidth(line); context.stroke();
+  context.beginPath();
+  context.rect(-side / 2, -side / 2, side, side);
+  context.setStrokeRgb(
+    ...(rgb.map((value) => Math.round(value * 0.81)) as [number, number, number]),
+  );
+  context.setLineWidth(line);
+  context.stroke();
   context.save();
   context.setTransform(projected, 0, 0, projected, f(scale * effect.x), f(y - projected * 5));
-  const raster = f(scale * 2.4), image = petalArtwork(effect.type, raster);
-  if (image) context.drawImage(image, 0, 0, image.width, image.height,
-    -image.width / raster / 2, -image.height / raster / 2, image.width / raster, image.height / raster);
-  else drawPetalIcon(context, effect.type);
+  const raster = f(scale * 2.4),
+    image = petalArtwork(effect.type, raster);
+  if (image) {
+    context.drawImage(
+      image,
+      0,
+      0,
+      image.width,
+      image.height,
+      -image.width / raster / 2,
+      -image.height / raster / 2,
+      image.width / raster,
+      image.height / raster,
+    );
+  } else {
+    drawPetalIcon(context, effect.type);
+  }
   context.restore();
   // Collected petals keep this renderer after settling; match static card labels.
-  const spec = { text: PETAL_INFO[effect.type].name, font: PETAL_INFO[effect.type].labelSize,
-    rasterScale: raster, cacheKey: labelOwner(effect) };
+  const spec = {
+    text: PETAL_INFO[effect.type].name,
+    font: PETAL_INFO[effect.type].labelSize,
+    rasterScale: raster,
+    cacheKey: labelOwner(effect),
+  };
   const label = getLabel(spec);
   if (label) {
     // The shared lazy context intentionally has no native getTransform;
     // compose the cached label through this pass's known logical matrix.
-    const width = f(label.boxWidth), height = f(spec.font * 1.4);
-    context.setTransform(f(projected * width), 0, 0, f(projected * height),
+    const width = f(label.boxWidth),
+      height = f(spec.font * 1.4);
+    context.setTransform(
+      f(projected * width),
+      0,
+      0,
+      f(projected * height),
       f(f(scale * effect.x) + f(projected * f(-width * 0.5))),
-      f(y + f(projected * f(17 - f(height * 0.5)))));
+      f(y + f(projected * f(17 - f(height * 0.5)))),
+    );
     context.drawImage(label.canvas, 0, 0, 1, 1);
-  } else drawLabel(context, spec, 0, 17);
+  } else {
+    drawLabel(context, spec, 0, 17);
+  }
   context.restore();
 }

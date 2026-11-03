@@ -7,7 +7,9 @@ export class InputPacketEncoder {
 
   private nextSequence(): number {
     this.sequence = (this.sequence + 1) >>> 0;
-    if (this.sequence === 0) this.sequence = 1;
+    if (this.sequence === 0) {
+      this.sequence = 1;
+    }
     return this.sequence;
   }
 
@@ -84,7 +86,9 @@ export class InputPacketEncoder {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);
     InputPacketEncoder.varint(6, body);
-    for (const byte of new TextEncoder().encode(name)) body.push(byte);
+    for (const byte of new TextEncoder().encode(name)) {
+      body.push(byte);
+    }
     body.push(0);
     return this.finish(body);
   }

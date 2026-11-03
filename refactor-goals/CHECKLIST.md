@@ -1,27 +1,27 @@
 # 实施清单
 
-**当前状态：计划已编写；以下实施与验证任务均未开始。**
+**当前状态：P0 基线与 P1 格式/工具已完成；P2–P7 未开始。**
 
 日期和基线见 [README](README.md)。实际执行时逐项填写证据；复选框只在对应工作及检查真正完成后勾选。不能因本次提供了计划就把实施项标记完成。
 
 ## P0 — 当前基线
 
-- [ ] 核对当前 HEAD、工作区和适用约定，确认与审阅基线的差异。
-- [ ] 核对工具版本、依赖、浏览器、Emscripten 和前置环境。
-- [ ] 运行当前 schema 和全量验收，记录真实结果及已有失败。
-- [ ] 完成全量字段读写/导出/序列化处置表。
-- [ ] 完成参数、死代码、业务字面量和历史表示清单。
-- [ ] 确认保护字节、精度、RNG、生命周期和跨端行为的现有用例及缺口。
+- [x] 核对当前 HEAD、工作区和适用约定，确认与审阅基线的差异。证据：[p0-baseline](evidence/p0-baseline.md) §1–2。
+- [x] 核对工具版本、依赖、浏览器、Emscripten 和前置环境。证据：[p0-baseline](evidence/p0-baseline.md) §2。
+- [x] 运行当前 schema 和全量验收，记录真实结果及已有失败。证据：`schema:check` 20 outputs；基线 `test:all` 17/17，runId `2026-11-02T23-11-30.963Z-d140d940`，见 [p0-baseline](evidence/p0-baseline.md) §3–5。
+- [x] 完成全量字段读写/导出/序列化处置表。证据：[p0-field-disposition](evidence/p0-field-disposition.md) 与 891 行 [p0-field-inventory](evidence/p0-field-inventory.md)。
+- [x] 完成参数、死代码、业务字面量和历史表示清单。证据：[p0-literals-parameters-deadcode](evidence/p0-literals-parameters-deadcode.md)（A01–A05、D01–D06、L01–L06、H01–H10）。
+- [x] 确认保护字节、精度、RNG、生命周期和跨端行为的现有用例及缺口。证据：[p0-protected-scenarios](evidence/p0-protected-scenarios.md)，缺口 G01–G06。
 
 ## P1 — 格式和工具
 
-- [ ] 新增统一编辑、TS/JS、C++ 及配置格式约定，锁定工具版本。
-- [ ] 建立 `format`、`format:check`、`lint`、`check:refactor`。
-- [ ] 将规范检查接入统一 gate 和适用的轻量入口。
-- [ ] 先格式化生成文本，再计算内容身份和输出清单。
-- [ ] 展开网络、服务端、生成器和测试中的压缩逻辑。
-- [ ] 完成其余手写代码、静态入口和生成输出的格式整改。
-- [ ] 单独审查格式差异并完成对应验证。
+- [x] 新增统一编辑、TS/JS、C++ 及配置格式约定，锁定工具版本。证据：[p1-format-batch](evidence/p1-format-batch.md) §1–2；`.editorconfig`、`.prettierrc.json`、`.clang-format`、`.cmake-format.yaml`、`tools/format-tools.lock.json`。
+- [x] 建立 `format`、`format:check`、`lint`、`check:refactor`。证据：`package.json`、`tools/format.mjs`、`eslint.config.mjs`、`tools/check-refactor.mjs`；[p1-format-batch](evidence/p1-format-batch.md) §5。
+- [x] 将规范检查接入统一 gate 和适用的轻量入口。证据：`tools/verification/gates.mjs` 的 format/lint/refactor rules 三个 gate；`test:light` 与 Linux CI 同步。
+- [x] 先格式化生成文本，再计算内容身份和输出清单。证据：`tools/schema/outputs.mjs`、`tools/schema/format.mjs`、`tools/schema/write.mjs`；`schema:check` 20/20。
+- [x] 展开网络、服务端、生成器和测试中的压缩逻辑。证据：[p1-format-batch](evidence/p1-format-batch.md) §4；重写 `FLORR_SERVER_NUMBERS` 宏为逐项一行。
+- [x] 完成其余手写代码、静态入口和生成输出的格式整改。证据：[p1-format-batch](evidence/p1-format-batch.md) §4；`format` 覆盖 503 个文件、20 个生成输出。
+- [x] 单独审查格式差异并完成对应验证。证据：[p1-format-batch](evidence/p1-format-batch.md) §5–6；最终 `test:all` 20/20 stable，runId `2026-11-03T00-42-22.702Z-88087b63`。
 
 ## P2 — 标识和常量
 
@@ -91,6 +91,9 @@
 
 ## 执行记录模板
 
-| 阶段/任务 | 实际状态 | 变更文件/符号 | 验证命令与结果 | 证据/runId | 日期 |
-| --- | --- | --- | --- | --- | --- |
-| 待执行时填写 | 未开始 | — | 未运行 | — | — |
+| 阶段/任务             | 实际状态 | 变更文件/符号                                                                                                                                                                      | 验证命令与结果                                                                                                                        | 证据/runId                                                                                                                                                                                                                                                   | 日期       |
+| --------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| P0 当前基线           | 完成     | 无产品改动，仅证据                                                                                                                                                                 | `schema:check` 20 outputs；基线 `test:all` 17/17；unit 41、tools 24、client unit 143、integration 9、browser 88、engine 19、server 30 | runId `2026-11-02T23-11-30.963Z-d140d940`；[p0-baseline](evidence/p0-baseline.md)                                                                                                                                                                            | 2026-11-03 |
+| P0 字段/参数/保护清单 | 完成     | 无产品改动，新增证据与生成脚本                                                                                                                                                     | 891 行字段表；A/D/L/H 清单；G01–G06 缺口                                                                                              | [p0-field-disposition](evidence/p0-field-disposition.md)、[p0-field-inventory](evidence/p0-field-inventory.md)、[p0-literals-parameters-deadcode](evidence/p0-literals-parameters-deadcode.md)、[p0-protected-scenarios](evidence/p0-protected-scenarios.md) | 2026-11-03 |
+| P1 格式工具与接入     | 完成     | `.editorconfig`、`.prettierrc.json`、`.clang-format`、`.cmake-format.yaml`、`eslint.config.mjs`、`tools/format.mjs`、`tools/check-refactor.mjs`、`tools/verification/gates.mjs` 等 | `format:check`、`lint`、`check:refactor`、`schema:check` 全通过；`test:all` 20/20 stable                                              | runId `2026-11-03T00-42-22.702Z-88087b63`；[p1-format-batch](evidence/p1-format-batch.md)                                                                                                                                                                    | 2026-11-03 |
+| P1 性能回归修复       | 完成     | `tools/performance/browser.mjs`                                                                                                                                                    | 首次 54.6 FPS 失败；修复 warmup 起点后 60.005 FPS，20/20 通过                                                                         | 同上 runId；[p1-format-batch](evidence/p1-format-batch.md) §4–5                                                                                                                                                                                              | 2026-11-03 |

@@ -92,7 +92,6 @@ FLORR_BOOST_ARCHIVE=/absolute/path/boost_1_86_0.tar.bz2 npm run build:server
 固定测试出生点和装备；真实双浏览器负责移动、战斗、死亡、重生、恢复和隔离验证，
 不增加公开 debug RPC。M08 提供 `build:multiplayer`、`dist-multiplayer` 在线专用交付、`pack:native` 原生部署包、`test:multiplayer` 功能门禁与 `perf:multiplayer` 容量/浸泡证据。Linux x86_64 包由 `.github/workflows/multiplayer-linux.yml` 在 `ubuntu-24.04` 上构建；本地 macOS 包用于同机部署 smoke，不能冒充 Linux 产物。
 
-
 ## M08 部署包与生命周期
 
 ```sh

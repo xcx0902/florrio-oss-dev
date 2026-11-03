@@ -24,8 +24,11 @@ async function walk(directory) {
   const files = [];
   for (const entry of entries) {
     const filename = path.join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...await walk(filename));
-    else if (entry.isFile()) files.push(filename);
+    if (entry.isDirectory()) {
+      files.push(...(await walk(filename)));
+    } else if (entry.isFile()) {
+      files.push(filename);
+    }
   }
   return files;
 }
@@ -43,9 +46,11 @@ async function treeHash(directory) {
 }
 
 async function outputsHash(directory) {
-  const manifest = JSON.parse(await readFile(path.join(directory, 'schema/generated-outputs.json'), 'utf8'));
+  const manifest = JSON.parse(
+    await readFile(path.join(directory, 'schema/generated-outputs.json'), 'utf8'),
+  );
   const hash = createHash('sha256');
-  for (const entry of manifest.outputs.map(entry => entry.path).sort()) {
+  for (const entry of manifest.outputs.map((entry) => entry.path).sort()) {
     hash.update(entry);
     hash.update('\0');
     hash.update(await readFile(path.join(directory, entry)));
@@ -77,16 +82,34 @@ test('product generator check passes and is read-only', async () => {
 });
 
 test('multiplayer schema owns v2 fields, limits and visibility in all generated views', async () => {
-  const inputs=await loadSchemaInputs(root), {contract}=validateInputs(inputs);
-  const outputs=multiplayerOutputs(inputs.multiplayerSource,[],contract);
-  assert.equal(outputs.size,5);
-  const changed=multiplayerOutputs(inputs.multiplayerSource.replace('maxSequenceAdvance: 1024','maxSequenceAdvance: 512'),[],contract);
-  assert.notEqual(changed.get('engine/include/engine/net/generated_multiplayer.hpp'),outputs.get('engine/include/engine/net/generated_multiplayer.hpp'));
-  assert.notEqual(changed.get('client/src/schema/multiplayer.ts'),outputs.get('client/src/schema/multiplayer.ts'));
-  assert.notEqual(changed.get('docs/multiplayer-protocol.md'),outputs.get('docs/multiplayer-protocol.md'));
-  for(const source of [inputs.multiplayerSource.replace('maxClientFrameBytes: 4096','maxClientFrameBytes: 0'),
-    inputs.multiplayerSource.replace('publicFields: [2,','publicFields: [60,2,'),
-    inputs.multiplayerSource.replace('Suicide: 4','Suicide: 3')]) assert.throws(()=>multiplayerOutputs(source,[],contract),/multiplayer schema/);
+  const inputs = await loadSchemaInputs(root),
+    { contract } = validateInputs(inputs);
+  const outputs = multiplayerOutputs(inputs.multiplayerSource, [], contract);
+  assert.equal(outputs.size, 5);
+  const changed = multiplayerOutputs(
+    inputs.multiplayerSource.replace('maxSequenceAdvance: 1024', 'maxSequenceAdvance: 512'),
+    [],
+    contract,
+  );
+  assert.notEqual(
+    changed.get('engine/include/engine/net/generated_multiplayer.hpp'),
+    outputs.get('engine/include/engine/net/generated_multiplayer.hpp'),
+  );
+  assert.notEqual(
+    changed.get('client/src/schema/multiplayer.ts'),
+    outputs.get('client/src/schema/multiplayer.ts'),
+  );
+  assert.notEqual(
+    changed.get('docs/multiplayer-protocol.md'),
+    outputs.get('docs/multiplayer-protocol.md'),
+  );
+  for (const source of [
+    inputs.multiplayerSource.replace('maxClientFrameBytes: 4096', 'maxClientFrameBytes: 0'),
+    inputs.multiplayerSource.replace('publicFields: [2,', 'publicFields: [60,2,'),
+    inputs.multiplayerSource.replace('Suicide: 4', 'Suicide: 3'),
+  ]) {
+    assert.throws(() => multiplayerOutputs(source, [], contract), /multiplayer schema/);
+  }
 });
 
 test('generator produces identical bytes twice and check rejects stale, missing and unregistered outputs', async () => {
@@ -132,7 +155,11 @@ test('generator validates every input before writing and removes only manifest-r
   const failed = run(fixture);
   assert.notEqual(failed.status, 0);
   assert.match(failed.stderr, /duplicate|dense/i);
-  assert.equal(await outputsHash(fixture), beforeFailure, 'failed validation changed no generated file');
+  assert.equal(
+    await outputsHash(fixture),
+    beforeFailure,
+    'failed validation changed no generated file',
+  );
 
   // Restore the input and register one obsolete output, then regenerate.
   await cp(path.join(root, 'schema/catalogs/petals.json'), petalsFile);
@@ -152,12 +179,24 @@ test('transport requires exactly 512 hex characters and generated keys round-tri
   const key = validateTransport(inputs.transport);
   assert.equal(key.length, 256);
   for (const mutate of [
-    value => { value.packetXor.keyHex = value.packetXor.keyHex.slice(1); },
-    value => { value.packetXor.keyHex += '00'; },
-    value => { value.packetXor.keyHex = 'zz' + value.packetXor.keyHex.slice(2); },
-    value => { value.packetXor.bytes = 255; },
-    value => { value.packetXor.algorithm = 'add'; },
-    value => { value.packetXor.encoding = 'base64'; },
+    (value) => {
+      value.packetXor.keyHex = value.packetXor.keyHex.slice(1);
+    },
+    (value) => {
+      value.packetXor.keyHex += '00';
+    },
+    (value) => {
+      value.packetXor.keyHex = 'zz' + value.packetXor.keyHex.slice(2);
+    },
+    (value) => {
+      value.packetXor.bytes = 255;
+    },
+    (value) => {
+      value.packetXor.algorithm = 'add';
+    },
+    (value) => {
+      value.packetXor.encoding = 'base64';
+    },
   ]) {
     const copy = structuredClone(inputs.transport);
     mutate(copy);
@@ -165,8 +204,12 @@ test('transport requires exactly 512 hex characters and generated keys round-tri
   }
   const cpp = await readFile(path.join(root, 'engine/include/engine/net/packet_key.hpp'), 'utf8');
   const ts = await readFile(path.join(root, 'client/src/schema/packet-key.ts'), 'utf8');
-  const cppBytes = [...cpp.matchAll(/0x([0-9a-f]{2})/g)].map(match => Number.parseInt(match[1], 16));
-  const tsBytes = [...ts.matchAll(/0x([0-9a-f]{2})/g)].map(match => Number.parseInt(match[1], 16));
+  const cppBytes = [...cpp.matchAll(/0x([0-9a-f]{2})/g)].map((match) =>
+    Number.parseInt(match[1], 16),
+  );
+  const tsBytes = [...ts.matchAll(/0x([0-9a-f]{2})/g)].map((match) =>
+    Number.parseInt(match[1], 16),
+  );
   assert.deepEqual(cppBytes, [...key]);
   assert.deepEqual(tsBytes, [...key]);
   const payload = Uint8Array.from([1, 2, 3, 4, 255]);
@@ -182,14 +225,19 @@ test('drop derivation is deterministic and keeps the product reference mass and 
     rules: inputs.dropRules,
   });
   assert.equal(derived.constants.referenceMass, 7.031205701793481e-7);
-  assert.deepEqual(derived.entities.find(entity => entity.typeId === 1).drops, [
+  assert.deepEqual(derived.entities.find((entity) => entity.typeId === 1).drops, [
     { petalTypeId: 4, chance: 0.00522140646353364 },
     { petalTypeId: 2, chance: 0.034809377044439316 },
     { petalTypeId: 3, chance: 0.10442813485860825 },
   ]);
-  assert.equal(derived.entities.reduce((sum, entity) => sum + entity.drops.length, 0), 102);
-  assert.deepEqual(derived.entities.find(entity => entity.typeId === 16).drops,
-    derived.entities.find(entity => entity.typeId === 15).drops);
+  assert.equal(
+    derived.entities.reduce((sum, entity) => sum + entity.drops.length, 0),
+    102,
+  );
+  assert.deepEqual(
+    derived.entities.find((entity) => entity.typeId === 16).drops,
+    derived.entities.find((entity) => entity.typeId === 15).drops,
+  );
 });
 
 test('mob gallery shows drops in descending chance order with or without overrides', async () => {
@@ -201,18 +249,30 @@ test('mob gallery shows drops in descending chance order with or without overrid
     rules: inputs.dropRules,
   });
   const before = structuredClone(derived);
-  for (const overrides of [[], [{ typeId: 1, replaceDrops: [
-    { petalTypeId: 4, chance: .1 },
-    { petalTypeId: 2, chance: .8 },
-    { petalTypeId: 3, chance: .8 },
-  ] }]]) {
+  for (const overrides of [
+    [],
+    [
+      {
+        typeId: 1,
+        replaceDrops: [
+          { petalTypeId: 4, chance: 0.1 },
+          { petalTypeId: 2, chance: 0.8 },
+          { petalTypeId: 3, chance: 0.8 },
+        ],
+      },
+    ],
+  ]) {
     const gallery = applyGalleryOverrides(derived, overrides, inputs.entities.entities);
-    assert.deepEqual(gallery.find(entity => entity.typeId === 1).drops.map(drop => drop.petalTypeId),
-      overrides.length ? [2, 3, 4] : [3, 2, 4]);
+    assert.deepEqual(
+      gallery.find((entity) => entity.typeId === 1).drops.map((drop) => drop.petalTypeId),
+      overrides.length ? [2, 3, 4] : [3, 2, 4],
+    );
     for (const entity of gallery) {
       for (let index = 1; index < entity.drops.length; index++) {
-        assert.ok(entity.drops[index - 1].chance >= entity.drops[index].chance,
-          `entity ${entity.typeId} gallery drops must be ordered from highest to lowest chance`);
+        assert.ok(
+          entity.drops[index - 1].chance >= entity.drops[index].chance,
+          `entity ${entity.typeId} gallery drops must be ordered from highest to lowest chance`,
+        );
       }
     }
   }
@@ -222,7 +282,7 @@ test('mob gallery shows drops in descending chance order with or without overrid
 test('drop aliases resolve through a chain regardless of input order', async () => {
   const inputs = await loadSchemaInputs(root);
   const entities = structuredClone(inputs.entities.entities);
-  const byId = id => entities.find(entity => entity.typeId === id);
+  const byId = (id) => entities.find((entity) => entity.typeId === id);
   byId(16).dropAliasOf = 18;
   byId(18).dropAliasOf = 17;
   const derived = deriveDropChances({
@@ -231,7 +291,7 @@ test('drop aliases resolve through a chain regardless of input order', async () 
     petals: inputs.petals.petals,
     rules: inputs.dropRules,
   });
-  const drops = id => derived.entities.find(entity => entity.typeId === id).drops;
+  const drops = (id) => derived.entities.find((entity) => entity.typeId === id).drops;
   assert.ok(drops(17).length > 0);
   assert.deepEqual(drops(16), drops(17));
   assert.deepEqual(drops(18), drops(17));
@@ -246,11 +306,22 @@ test('drop rules reject missing ids, alias cycles, illegal floats and zero denom
     rules: structuredClone(inputs.dropRules),
   };
   const cases = [
-    value => { value.entities[1].petalTypeIds.push(999); },
-    value => { value.entities[1].dropAliasOf = 2; value.entities[2].dropAliasOf = 1; },
-    value => { value.entities[1].dropWeight = Number.NaN; },
-    value => { value.rules.areaMix.fill(0); },
-    value => { value.rules.children['1'] = [[999, 1]]; },
+    (value) => {
+      value.entities[1].petalTypeIds.push(999);
+    },
+    (value) => {
+      value.entities[1].dropAliasOf = 2;
+      value.entities[2].dropAliasOf = 1;
+    },
+    (value) => {
+      value.entities[1].dropWeight = Number.NaN;
+    },
+    (value) => {
+      value.rules.areaMix.fill(0);
+    },
+    (value) => {
+      value.rules.children['1'] = [[999, 1]];
+    },
   ];
   for (const mutate of cases) {
     const copy = structuredClone(base);
@@ -277,13 +348,22 @@ test('menu content requires release notes and preserves multi-line notes and dat
   const markdown = `# Changelog\n\n## [1.2.0] - 2026-10-01\n\n### Added\n\n- First line\n  continues here\n- Second note\n\n## [Unreleased]\n\n- Pending note\n`;
   const entries = parseChangelog(markdown);
   assert.deepEqual(entries, [
-    { date: '1.2.0 - 2026-10-01', notes: ['Added: First line continues here', 'Added: Second note'] },
+    {
+      date: '1.2.0 - 2026-10-01',
+      notes: ['Added: First line continues here', 'Added: Second note'],
+    },
     { date: 'Unreleased', notes: ['Pending note'] },
   ]);
   assert.match(generateMenuContent(markdown), /1\.2\.0 - 2026-10-01/);
-  assert.throws(() => parseChangelog('# Changelog\n\n## [Empty]\n\n## [1.0.0]\n\n- note\n'), /no notes/);
+  assert.throws(
+    () => parseChangelog('# Changelog\n\n## [Empty]\n\n## [1.0.0]\n\n- note\n'),
+    /no notes/,
+  );
   assert.throws(() => parseChangelog(''), /empty/);
-  assert.throws(() => parseChangelog('## [1.0.0]\n\n  orphan continuation\n- note\n'), /continuation/);
+  assert.throws(
+    () => parseChangelog('## [1.0.0]\n\n  orphan continuation\n- note\n'),
+    /continuation/,
+  );
 });
 
 test('one owning input propagates a petal field to both generated views and label size stays independent', async () => {
@@ -294,10 +374,16 @@ test('one owning input propagates a petal field to both generated views and labe
   petals.petals[1].rechargeMilliseconds = 4321;
   await writeFile(petalsFile, JSON.stringify(petals));
   assert.equal(run(fixture).status, 0);
-  const cpp = await readFile(path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'), 'utf8');
+  const cpp = await readFile(
+    path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'),
+    'utf8',
+  );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(cpp, /\{1, "Basic",[^\n]*, 4321\.0F, 1, 14\.0F,/);
-  assert.match(ts, /1: \{ name: "Basic", rarity: 0, recharge: 4321, radius: 10, labelSize: 14,/);
+  assert.match(
+    ts,
+    /1: \{\s*name: 'Basic',\s*rarity: 0,\s*recharge: 4321,\s*radius: 10,\s*labelSize: 14,/,
+  );
 
   const combatFile = path.join(fixture, 'schema/catalogs/petal-combat.json');
   const combat = JSON.parse(await readFile(combatFile, 'utf8'));
@@ -305,8 +391,11 @@ test('one owning input propagates a petal field to both generated views and labe
   await writeFile(combatFile, JSON.stringify(combat));
   assert.equal(run(fixture).status, 0);
   const nextTs = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
-  assert.match(nextTs, /1: \{ name: "Basic", rarity: 0, recharge: 4321, radius: 10, labelSize: 14,/,
-    'draw radius must not change collision radius or label size');
+  assert.match(
+    nextTs,
+    /1: \{\s*name: 'Basic',\s*rarity: 0,\s*recharge: 4321,\s*radius: 10,\s*labelSize: 14,/,
+    'draw radius must not change collision radius or label size',
+  );
 });
 
 test('adding an existing-behavior petal needs schema owner inputs, not generator edits', async () => {
@@ -329,11 +418,14 @@ test('adding an existing-behavior petal needs schema owner inputs, not generator
   await writeFile(combatFile, JSON.stringify(combat));
   const result = run(fixture);
   assert.equal(result.status, 0, result.stderr);
-  const cpp = await readFile(path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'), 'utf8');
+  const cpp = await readFile(
+    path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'),
+    'utf8',
+  );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(cpp, /kPetalCount = 40/);
   assert.match(cpp, /\{39, "Basic Plus",/);
-  assert.match(ts, /39: \{ name: "Basic Plus",/);
+  assert.match(ts, /39: \{\s*name: 'Basic Plus',/);
 });
 
 test('sparse uint16 type ids remain valid inputs and generated keys', async () => {
@@ -348,15 +440,19 @@ test('sparse uint16 type ids remain valid inputs and generated keys', async () =
   await writeFile(combatFile, JSON.stringify(combat));
   const entitiesFile = path.join(fixture, 'schema/catalogs/entities.json');
   const entities = JSON.parse(await readFile(entitiesFile, 'utf8'));
-  for (const entity of entities.entities)
-    entity.petalTypeIds = entity.petalTypeIds.map(id => id === 1 ? 100 : id);
+  for (const entity of entities.entities) {
+    entity.petalTypeIds = entity.petalTypeIds.map((id) => (id === 1 ? 100 : id));
+  }
   await writeFile(entitiesFile, JSON.stringify(entities));
   const result = run(fixture);
   assert.equal(result.status, 0, result.stderr);
-  const cpp = await readFile(path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'), 'utf8');
+  const cpp = await readFile(
+    path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'),
+    'utf8',
+  );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(cpp, /\{100, "Basic",/);
-  assert.match(ts, /100: \{ name: "Basic",/);
+  assert.match(ts, /100: \{\s*name: 'Basic',/);
 });
 
 test('publishable ids accept 255 and reject 256 at the uint8 wire boundary', async () => {
@@ -367,22 +463,29 @@ test('publishable ids accept 255 and reject 256 at the uint8 wire boundary', asy
   const galleryFile = path.join(fixture, 'schema/catalogs/gallery-overrides.json');
   const replacePetal = async (from, to) => {
     const petals = JSON.parse(await readFile(petalsFile, 'utf8'));
-    petals.petals.find(petal => petal.typeId === from).typeId = to;
+    petals.petals.find((petal) => petal.typeId === from).typeId = to;
     await writeFile(petalsFile, JSON.stringify(petals));
     const combat = JSON.parse(await readFile(combatFile, 'utf8'));
-    combat.petals.find(petal => petal.typeId === from).typeId = to;
+    combat.petals.find((petal) => petal.typeId === from).typeId = to;
     await writeFile(combatFile, JSON.stringify(combat));
     const entities = JSON.parse(await readFile(entitiesFile, 'utf8'));
-    for (const entity of entities.entities)
-      entity.petalTypeIds = entity.petalTypeIds.map(id => id === from ? to : id);
+    for (const entity of entities.entities) {
+      entity.petalTypeIds = entity.petalTypeIds.map((id) => (id === from ? to : id));
+    }
     await writeFile(entitiesFile, JSON.stringify(entities));
     const gallery = JSON.parse(await readFile(galleryFile, 'utf8'));
     for (const override of gallery.overrides) {
       for (const field of ['addDrops', 'removeDrops', 'replaceDrops']) {
-        if (!Array.isArray(override[field])) continue;
-        override[field] = override[field].map(drop =>
-          typeof drop === 'number' ? (drop === from ? to : drop)
-            : { ...drop, petalTypeId: drop.petalTypeId === from ? to : drop.petalTypeId });
+        if (!Array.isArray(override[field])) {
+          continue;
+        }
+        override[field] = override[field].map((drop) =>
+          typeof drop === 'number'
+            ? drop === from
+              ? to
+              : drop
+            : { ...drop, petalTypeId: drop.petalTypeId === from ? to : drop.petalTypeId },
+        );
       }
     }
     await writeFile(galleryFile, JSON.stringify(gallery));
@@ -391,10 +494,13 @@ test('publishable ids accept 255 and reject 256 at the uint8 wire boundary', asy
   await replacePetal(1, 255);
   const boundary = run(fixture);
   assert.equal(boundary.status, 0, boundary.stderr);
-  const cpp = await readFile(path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'), 'utf8');
+  const cpp = await readFile(
+    path.join(fixture, 'engine/include/engine/catalog/generated_catalog_data.hpp'),
+    'utf8',
+  );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(cpp, /\{255, "Basic",/);
-  assert.match(ts, /255: \{ name: "Basic",/);
+  assert.match(ts, /255: \{\s*name: 'Basic',/);
 
   await replacePetal(255, 256);
   const rejected = run(fixture);
@@ -409,7 +515,7 @@ test('publishable ids accept 255 and reject 256 at the uint8 wire boundary', asy
 
 test('every publishable entity and reference id is capped at 255', async () => {
   const inputs = await loadSchemaInputs(root);
-  const withEntity = id => {
+  const withEntity = (id) => {
     const copy = structuredClone(inputs);
     const row = structuredClone(copy.entities.entities[1]);
     row.typeId = id;
@@ -425,11 +531,21 @@ test('every publishable entity and reference id is capped at 255', async () => {
   assert.throws(() => validateInputs(withEntity(300)), /0\.\.255/);
 
   const mutations = [
-    value => { value.entities.entities[1].petalTypeIds[0] = 256; },
-    value => { value.entities.entities[1].dropAliasOf = 256; },
-    value => { value.spawnRules.rules[0].entityTypeId = 256; },
-    value => { value.spawnDefaults.defaults[0].typeId = 256; },
-    value => { value.petalCombat.petals[0].typeId = 256; },
+    (value) => {
+      value.entities.entities[1].petalTypeIds[0] = 256;
+    },
+    (value) => {
+      value.entities.entities[1].dropAliasOf = 256;
+    },
+    (value) => {
+      value.spawnRules.rules[0].entityTypeId = 256;
+    },
+    (value) => {
+      value.spawnDefaults.defaults[0].typeId = 256;
+    },
+    (value) => {
+      value.petalCombat.petals[0].typeId = 256;
+    },
   ];
   for (const mutate of mutations) {
     const copy = structuredClone(inputs);

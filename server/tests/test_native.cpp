@@ -7,8 +7,8 @@ int main() {
   using florr::server::parse_options;
   CHECK(parse_options({}).ok());
   CHECK(parse_options({}).options.action == florr::server::Action::serve);
-  for (const auto value : {""sv, "0"sv, "-1"sv, "+1"sv, "1x"sv, "1.5"sv,
-      "4294967296"sv, "1000001"sv, " 20"sv}) {
+  for (const auto value :
+       {""sv, "0"sv, "-1"sv, "+1"sv, "1x"sv, "1.5"sv, "4294967296"sv, "1000001"sv, " 20"sv}) {
     const std::array args{"--smoke-ticks"sv, value};
     CHECK(!parse_options(args).ok());
   }
@@ -17,8 +17,10 @@ int main() {
   const std::array duplicate{"--smoke-ticks"sv, "1"sv, "--smoke-ticks"sv, "2"sv};
   const std::array invalid_seed{"--smoke-ticks"sv, "1"sv, "--seed"sv, "2147483647"sv};
   const std::array duplicate_seed{"--seed"sv, "1"sv, "--seed"sv, "2"sv, "--smoke-ticks"sv, "1"sv};
-  CHECK(!parse_options(missing).ok()); CHECK(!parse_options(unknown).ok());
-  CHECK(!parse_options(duplicate).ok()); CHECK(!parse_options(invalid_seed).ok());
+  CHECK(!parse_options(missing).ok());
+  CHECK(!parse_options(unknown).ok());
+  CHECK(!parse_options(duplicate).ok());
+  CHECK(!parse_options(invalid_seed).ok());
   CHECK(!parse_options(duplicate_seed).ok());
   const std::array help{"--help"sv}, version{"--version"sv};
   CHECK(parse_options(help).options.action == florr::server::Action::help);
@@ -30,8 +32,8 @@ int main() {
   const auto repeat = florr::server::run_smoke(parsed.options);
   CHECK(smoke.tick == 20 && smoke.time_ms == 1000.0 && smoke.entities > 0);
   CHECK(smoke.seed == 285456437U && smoke.rng_draws > 120U);
-  CHECK(smoke.entities == repeat.entities && smoke.rng_state == repeat.rng_state
-      && smoke.rng_draws == repeat.rng_draws && smoke.handle_rng_state == repeat.handle_rng_state);
+  CHECK(smoke.entities == repeat.entities && smoke.rng_state == repeat.rng_state &&
+        smoke.rng_draws == repeat.rng_draws && smoke.handle_rng_state == repeat.handle_rng_state);
   const std::array seeded{"--smoke-ticks"sv, "20"sv, "--seed"sv, "37"sv};
   const auto other = florr::server::run_smoke(parse_options(seeded).options);
   CHECK(other.seed == 37U && smoke.rng_state != other.rng_state);

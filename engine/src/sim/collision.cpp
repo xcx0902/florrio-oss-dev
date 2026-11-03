@@ -7,4 +7,4 @@ bool circles_overlap(Vec2 a, f32 radius_a, Vec2 b, f32 radius_b) {
   return (b - a).length_squared() <= combined * combined;
 }
 
-} // namespace engine
+}  // namespace engine

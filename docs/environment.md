@@ -2,14 +2,15 @@
 
 ## Requirements
 
-| Component | Requirement |
-| --- | --- |
-| Node.js | 24+ (`node:test`, ESM, `WebAssembly`) |
-| npm | 11+ |
-| CMake | 3.24+ |
-| C++ compiler | C++20, tested with Apple Clang |
-| Emscripten | version from [`.emscripten-version`](../.emscripten-version) (6.0.10) |
-| Chromium | version from [`.chromium-version`](../.chromium-version) (156.0.8078.47) for acceptance |
+| Component    | Requirement                                                                                                                                                            |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js      | 24+ (`node:test`, ESM, `WebAssembly`)                                                                                                                                  |
+| npm          | 11+                                                                                                                                                                    |
+| CMake        | 3.24+                                                                                                                                                                  |
+| C++ compiler | C++20, tested with Apple Clang                                                                                                                                         |
+| Emscripten   | version from [`.emscripten-version`](../.emscripten-version) (6.0.10)                                                                                                  |
+| Chromium     | version from [`.chromium-version`](../.chromium-version) (156.0.8078.47) for acceptance                                                                                |
+| Formatting   | clang-format 21.1.8, cmakelang 0.6.13, Prettier 3.9.10, ESLint 10.14.0; pinned in [`tools/format-tools.lock.json`](../tools/format-tools.lock.json) and `package.json` |
 
 Firefox, WebKit and physical mobile devices are not supported targets. The
 browser runner uses Chromium desktop plus a 390×844/DPR3 emulated touch profile.
@@ -20,6 +21,7 @@ The M08 Linux x86_64 package is built by `.github/workflows/multiplayer-linux.ym
 
 ```sh
 npm ci
+npm run setup:format   # clang-format/cmake-format in .emcache/tools/format
 ```
 
 Emscripten must be on `PATH` and `emcc --version` must satisfy the pin. If it is
@@ -63,10 +65,13 @@ npm run pack:native         # platform package; use --target linux-x86_64 in CI
 ## Test
 
 ```sh
+npm run format:check        # all tracked text is formatter-clean
+npm run lint                # ESLint structural/unused rules
+npm run check:refactor      # legacy representation ledger
 npm run test:unit           # protocol/wire unit tests
 npm run test:tools          # delivery and verification tool tests
-npm run test:engine         # native build + 18 CTest targets
-npm run test:server:native  # root native build + 29 CTest targets (M05 network included)
+npm run test:engine         # native build + 19 CTest targets
+npm run test:server:native  # root native build + 30 CTest targets (M05 network included)
 npm run test:client         # typecheck + client unit/integration suites
 npm run test:integration    # native WorkerApi fixture -> TS decoder
 npm run build:dist-next     # packaged delivery tree
@@ -87,11 +92,14 @@ via `CLIENT_ROOT`. They do not read `archive/`.
 npm run test:all
 ```
 
-The sole definition is `tools/verification/gates.mjs`: schema check, native
-build/complete CTest, wasm, TS, package once, unit/tools/client unit, cross-end
-integration, ABI, delivery integrity, browser scenarios/entrypoint smoke/render
-performance in one pinned Chromium process, engine performance and integration
-performance, plus the M01 native host build/CTest (17 gates). Each gate binds the same run and delivery identity.
+The sole definition is `tools/verification/gates.mjs`: format check, lint,
+refactor ledger, schema check, native build/complete CTest, wasm, TS, package
+once, unit/tools/client unit, cross-end integration, ABI, delivery integrity,
+browser scenarios/entrypoint smoke/render performance in one pinned Chromium
+process, engine performance and integration performance, plus the M01 native
+host build/CTest (20 gates). Each gate binds the same run and delivery identity.
+The format gate is read-only; generated outputs are formatted before hashing and
+must be refreshed with `npm run schema:generate`, never hand-edited.
 
 The M08 multiplayer profile is `tools/run-multiplayer-verification.mjs`; it consumes
 the passing offline ledger and writes `reports/multiplayer/current-verification.json`.
@@ -104,7 +112,8 @@ entrypoint screenshots when a result needs to be shared.
 ## Clean-checkout check
 
 The archive is not an input. To prove it, copy the source tree without
-`archive/` (and without generated output), then run the same commands:
+`archive/` (and without generated output), then run the same commands. The
+formatting tools are installed into the ignored `.emcache/` directory:
 
 ```sh
 rsync -a --exclude archive --exclude build --exclude 'dist*' \
@@ -112,6 +121,7 @@ rsync -a --exclude archive --exclude build --exclude 'dist*' \
   ./ /tmp/florrio-product/
 cd /tmp/florrio-product
 npm ci
+npm run setup:format
 npm run test:all
 ```
 

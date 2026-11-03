@@ -24,24 +24,24 @@ CHROME_PATH=/private/tmp/florr-m3-chromium/chrome-headless-shell-mac-arm64/chrom
 
 最终完整 runId 为 `2026-10-31T15-09-18.267Z-4432f606`，于 2026-10-31 23:24:53 +08:00 完成，**15/15 gate 通过，passed=true、stable=true**。该次从构建、打包到全部性能验收使用同一份源码、校验输入和交付物；完成后的文档收尾不改变这些输入身份。实现提交为 `2bb33bf`，架构契约提交为 `07b36d9`。
 
-| 测试集合 | 实际通过 / 总数 | 失败 / 跳过 |
-| --- | ---: | ---: |
-| native CTest 目标 | 12 / 12 | 0 / 0 |
-| schema / protocol 单元测试 | 40 / 40 | 0 / 0 |
-| 工具测试 | 22 / 22 | 0 / 0 |
-| 客户端单元测试 | 102 / 102 | 0 / 0 |
-| 跨端集成测试 | 4 / 4 | 0 / 0 |
-| 浏览器场景测试 | 81 / 81 | 0 / 0 |
+| 测试集合                   | 实际通过 / 总数 | 失败 / 跳过 |
+| -------------------------- | --------------: | ----------: |
+| native CTest 目标          |         12 / 12 |       0 / 0 |
+| schema / protocol 单元测试 |         40 / 40 |       0 / 0 |
+| 工具测试                   |         22 / 22 |       0 / 0 |
+| 客户端单元测试             |       102 / 102 |       0 / 0 |
+| 跨端集成测试               |           4 / 4 |       0 / 0 |
+| 浏览器场景测试             |         81 / 81 |       0 / 0 |
 
 Node/浏览器测试合计 **249/249**；native 数量是 CTest 目标数，不与目标内部断言数混算。浏览器性能保留 12 个场景组合、600 帧 × 5 次重复；引擎性能与实战生命周期性能均通过。最终 5 次实战采样均完成装备、死亡和重生，实际排空后 `pending=0`，未放宽预算或完整性要求。
 
-| 身份 | SHA-256 |
-| --- | --- |
-| source | `e4cbf0db8ad7a772573f79f6b29b4a1e58a890b6fa02774aac34a05d16cc179b` |
-| verification | `13aa984b7907ba441a6e62836f7901e314b2eede33136c80e5343c497c36fc2a` |
-| client | `22991fe6843f62bec81145e6b2a2ef2ae9fe0b081fc336481549c04cc6992d99` |
-| 交付目录 | `852dce0b119d114d4897993b8983f1c4ded6b044c2c91e194a876340453b18d0` |
-| WASM | `39e22812dc79b79e1bf32ea91e65e64729b3e511c2b2979ff8070c93a3040cb4` |
+| 身份                  | SHA-256                                                            |
+| --------------------- | ------------------------------------------------------------------ |
+| source                | `e4cbf0db8ad7a772573f79f6b29b4a1e58a890b6fa02774aac34a05d16cc179b` |
+| verification          | `13aa984b7907ba441a6e62836f7901e314b2eede33136c80e5343c497c36fc2a` |
+| client                | `22991fe6843f62bec81145e6b2a2ef2ae9fe0b081fc336481549c04cc6992d99` |
+| 交付目录              | `852dce0b119d114d4897993b8983f1c4ded6b044c2c91e194a876340453b18d0` |
+| WASM                  | `39e22812dc79b79e1bf32ea91e65e64729b3e511c2b2979ff8070c93a3040cb4` |
 | native 场景可执行文件 | `6548015174b9a7a6c2fa86215ac6fc7456d9cb05daba417ac47f255b3d1e35bc` |
 
 最终 ledger 保存在 `reports/multiplayer/baseline/accepted-run.json`；它引用的 TAP、入口 smoke 和三类性能报告另存到 `accepted/2026-10-31T15-09-18.267Z-4432f606/`。该目录 `index.json` 保存原路径、SHA-256 与各 gate 的日志哈希，避免后续运行覆盖顶层性能报告而丢失证据。阶段 `summary.json` 已标记 complete/passed，并关联全部三次失败/中断记录，未用成功覆盖历史。
@@ -52,15 +52,15 @@ M00 在扩展测试清单前，用当前 native Release `engine_core` 库录下�
 
 句柄初始化 LCG seed=0，game seed=285456437；进入死亡分支前显式改 game seed=47、death shuffle seed=1，关闭自动补怪以隔离场景。真实 Worker opcode6 出生、opcode12 移动、领域 `damage_entity` 处理怪物/玩家伤害与 XP、opcode3 自杀，再按 50ms think 推进尸体/出生冷却，以 opcode6 重生。战斗步骤直接调用共用领域 API，不声称覆盖双玩家接触或网络。
 
-| 检查点 | tick / ms | 等级 | 活跃实体 | game RNG / draws | 死亡掉落 typeId（登记顺序） |
-| --- | --- | ---: | ---: | --- | --- |
-| spawn | 0 / 0 | 1 | 6 | 203103298 / 3 | — |
-| movement | 10 / 500 | 1 | 6 | 823971322 / 63 | — |
-| combat | 10 / 500 | 1 | 7 | 1368621272 / 70 | — |
-| death | 10 / 500 | 30 | 10 | 433348016 / 17 | 34, 15, 19 |
-| corpse-removed | 30 / 1500 | 30 | 8 | 1641471394 / 137 | 34, 15, 19 |
-| cooldown-blocked | 49 / 2450 | 30 | 8 | 1975982756 / 251 | 34, 15, 19 |
-| respawn | 50 / 2500 | 22 | 15 | 807195693 / 260 | 34, 15, 19 |
+| 检查点           | tick / ms | 等级 | 活跃实体 | game RNG / draws | 死亡掉落 typeId（登记顺序） |
+| ---------------- | --------- | ---: | -------: | ---------------- | --------------------------- |
+| spawn            | 0 / 0     |    1 |        6 | 203103298 / 3    | —                           |
+| movement         | 10 / 500  |    1 |        6 | 823971322 / 63   | —                           |
+| combat           | 10 / 500  |    1 |        7 | 1368621272 / 70  | —                           |
+| death            | 10 / 500  |   30 |       10 | 433348016 / 17   | 34, 15, 19                  |
+| corpse-removed   | 30 / 1500 |   30 |        8 | 1641471394 / 137 | 34, 15, 19                  |
+| cooldown-blocked | 49 / 2450 |   30 |        8 | 1975982756 / 251 | 34, 15, 19                  |
+| respawn          | 50 / 2500 |   22 |       15 | 807195693 / 260  | 34, 15, 19                  |
 
 死亡阶段设置 level=30、16 件固定携带物、score=1234.5 与 XP=2.5，以覆盖既有死亡保留/降级规则；这些是测试注入，不是产品数值修改。夹具记录每个活跃实体的 handle/kind/type/owner/坐标 f32 bits/health bits/maxHealth bits/death 状态，以及 profile/loadout、死亡保留物、RNG 各流。比较显式领域值，不比较对象地址、struct 字节或 padding；u64 RNG 状态存十进制字符串避免 JS 精度损失。
 
@@ -80,16 +80,16 @@ M00 增加测试/CMake/npm 编排后 source/verification identity 已改变；�
 
 ## 证据文件归属
 
-| 文件 | 含义 |
-| --- | --- |
-| `reports/multiplayer/baseline/environment.json` | 开始时的提交/空工作区 diff、工具版本、源码/校验身份与平台 |
-| `reports/multiplayer/baseline/retry-environment.json` | 固定浏览器重跑的真实 executable/版本及初始环境关联 |
-| `reports/multiplayer/baseline/initial-failed-run.json` | 首次失败的完整 ledger；原始日志保留在 run 目录 |
-| `reports/multiplayer/baseline/pinned-failed-run.json`、`failed/<runId>/` | 固定浏览器下发现的原有采样收尾失败及完整原始性能数据 |
-| `reports/multiplayer/baseline/guard-interrupted-run.json` | 主动中断以补错误完成保护的运行，未宣称通过 |
-| `reports/multiplayer/baseline/accepted-run.json`、`accepted/<runId>/index.json` | 本次完整验收成功的 ledger 与不可覆盖的报告副本/哈希索引 |
-| `reports/multiplayer/baseline/original-single-player.json` | 改测试清单前的原库两次确定性观测 |
-| `reports/multiplayer/baseline/<m00-runId>/{environment,single-player}.json` | 新回归接入后可重跑的完整证据 |
-| `reports/multiplayer/baseline/summary.json` | 本阶段结果、实际 runId、源码身份与报告 hash 索引 |
+| 文件                                                                            | 含义                                                      |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `reports/multiplayer/baseline/environment.json`                                 | 开始时的提交/空工作区 diff、工具版本、源码/校验身份与平台 |
+| `reports/multiplayer/baseline/retry-environment.json`                           | 固定浏览器重跑的真实 executable/版本及初始环境关联        |
+| `reports/multiplayer/baseline/initial-failed-run.json`                          | 首次失败的完整 ledger；原始日志保留在 run 目录            |
+| `reports/multiplayer/baseline/pinned-failed-run.json`、`failed/<runId>/`        | 固定浏览器下发现的原有采样收尾失败及完整原始性能数据      |
+| `reports/multiplayer/baseline/guard-interrupted-run.json`                       | 主动中断以补错误完成保护的运行，未宣称通过                |
+| `reports/multiplayer/baseline/accepted-run.json`、`accepted/<runId>/index.json` | 本次完整验收成功的 ledger 与不可覆盖的报告副本/哈希索引   |
+| `reports/multiplayer/baseline/original-single-player.json`                      | 改测试清单前的原库两次确定性观测                          |
+| `reports/multiplayer/baseline/<m00-runId>/{environment,single-player}.json`     | 新回归接入后可重跑的完整证据                              |
+| `reports/multiplayer/baseline/summary.json`                                     | 本阶段结果、实际 runId、源码身份与报告 hash 索引          |
 
 `reports/` 按仓库既有策略 gitignore，不强制提交本机生成物；可审查的场景源码/冻结领域值/命令/结果摘要进入版本管理。三项多人限制是 [测试交接](testing.md) 的 MP-REG-001—003，分别在 M02/M04/M05 引入实际回归；M00 不能标成多人通过。

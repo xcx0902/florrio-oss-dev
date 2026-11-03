@@ -57,19 +57,13 @@
       "functions": [
         {
           "name": "sp_server_init",
-          "args": [
-            0,
-            0
-          ],
+          "args": [0, 0],
           "confidence": "high",
           "behavior": "initialize world and catalogs, schedule the 50 ms tick, flush initial output"
         },
         {
           "name": "sp_server_send",
-          "args": [
-            "pointer",
-            "length"
-          ],
+          "args": ["pointer", "length"],
           "confidence": "high",
           "behavior": "decode one client input packet and apply its commands"
         },
@@ -81,10 +75,7 @@
         },
         {
           "name": "sp_server_flush",
-          "args": [
-            0,
-            0
-          ],
+          "args": [0, 0],
           "confidence": "high",
           "behavior": "drain the output queue, send one final empty response, free packets"
         }
@@ -138,10 +129,7 @@
           "opcode": 6,
           "name": "player-spawn-and-name",
           "confidence": "high",
-          "fields": [
-            "name-string",
-            "level"
-          ]
+          "fields": ["name-string", "level"]
         },
         {
           "opcode": 7,
@@ -152,28 +140,19 @@
           "opcode": 8,
           "name": "discard-petal",
           "confidence": "high",
-          "fields": [
-            "slot"
-          ]
+          "fields": ["slot"]
         },
         {
           "opcode": 10,
           "name": "swap-petals",
           "confidence": "high",
-          "fields": [
-            "slotA",
-            "slotB"
-          ]
+          "fields": ["slotA", "slotB"]
         },
         {
           "opcode": 12,
           "name": "input-buttons-angle-strength",
           "confidence": "high",
-          "fields": [
-            "buttons",
-            "angle",
-            "strength"
-          ]
+          "fields": ["buttons", "angle", "strength"]
         },
         {
           "opcode": 13,
@@ -252,15 +231,7 @@
             "packetFormat": "domain-counted",
             "fieldDeltaXor": 0,
             "indexDeltaXor": 0,
-            "indexedFields": [
-              3,
-              10,
-              16,
-              25,
-              39,
-              60,
-              61
-            ],
+            "indexedFields": [3, 10, 16, 25, 39, 60, 61],
             "field26Role": "entity-kind",
             "note": "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md."
           }
@@ -613,99 +584,21 @@
           }
         },
         "fieldTypes": {
-          "byte": [
-            1,
-            2,
-            9,
-            11,
-            12,
-            14,
-            17,
-            20,
-            22,
-            26,
-            31,
-            34,
-            36,
-            38,
-            43,
-            46,
-            47,
-            50,
-            54,
-            62,
-            63
-          ],
-          "float": [
-            19,
-            21,
-            32,
-            42,
-            53,
-            55
-          ],
-          "interpolatedFloat": [
-            5,
-            7,
-            13,
-            24,
-            28,
-            49,
-            59
-          ],
-          "string": [
-            4,
-            6,
-            48
-          ],
-          "varint": [
-            15,
-            30,
-            41,
-            44,
-            51,
-            52,
-            58
-          ],
-          "reference": [
-            23,
-            56,
-            57
-          ],
-          "bit": [
-            29,
-            33,
-            37,
-            40
-          ],
-          "angleRaw16": [
-            8
-          ],
-          "double": [
-            18,
-            35
-          ],
-          "specialFloat": [
-            27,
-            45
-          ],
-          "stringArray": [
-            10,
-            25
-          ],
-          "byteArray": [
-            16,
-            60
-          ],
-          "handleArray": [
-            3
-          ],
-          "varintArray": [
-            39
-          ],
-          "shortArray": [
-            61
-          ],
+          "byte": [1, 2, 9, 11, 12, 14, 17, 20, 22, 26, 31, 34, 36, 38, 43, 46, 47, 50, 54, 62, 63],
+          "float": [19, 21, 32, 42, 53, 55],
+          "interpolatedFloat": [5, 7, 13, 24, 28, 49, 59],
+          "string": [4, 6, 48],
+          "varint": [15, 30, 41, 44, 51, 52, 58],
+          "reference": [23, 56, 57],
+          "bit": [29, 33, 37, 40],
+          "angleRaw16": [8],
+          "double": [18, 35],
+          "specialFloat": [27, 45],
+          "stringArray": [10, 25],
+          "byteArray": [16, 60],
+          "handleArray": [3],
+          "varintArray": [39],
+          "shortArray": [61],
           "confidence": "high",
           "note": "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing."
         },
@@ -713,181 +606,98 @@
           {
             "offset": 52,
             "component": 1,
-            "fields": [
-              22,
-              54
-            ]
+            "fields": [22, 54]
           },
           {
             "offset": 56,
             "component": 2,
-            "fields": [
-              36
-            ]
+            "fields": [36]
           },
           {
             "offset": 68,
             "component": 5,
-            "fields": [
-              9
-            ]
+            "fields": [9]
           },
           {
             "offset": 72,
             "component": 6,
-            "fields": [
-              1,
-              5,
-              6,
-              16,
-              20,
-              21,
-              24,
-              32,
-              34,
-              47,
-              56
-            ]
+            "fields": [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56]
           },
           {
             "offset": 76,
             "component": 7,
-            "fields": [
-              50
-            ]
+            "fields": [50]
           },
           {
             "offset": -8,
             "component": 8,
-            "fields": [
-              13,
-              37
-            ]
+            "fields": [13, 37]
           },
           {
             "offset": 84,
             "component": 10,
-            "fields": [
-              17
-            ]
+            "fields": [17]
           },
           {
             "offset": 100,
             "component": 14,
-            "fields": [
-              43
-            ]
+            "fields": [43]
           },
           {
             "offset": -15,
             "component": 15,
-            "fields": [
-              23,
-              57
-            ]
+            "fields": [23, 57]
           },
           {
             "offset": -16,
             "component": 16,
-            "fields": [
-              3,
-              10,
-              11,
-              12,
-              19,
-              30,
-              39,
-              42,
-              45,
-              46,
-              52
-            ]
+            "fields": [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52]
           },
           {
             "offset": 112,
             "component": 19,
-            "fields": [
-              48
-            ]
+            "fields": [48]
           },
           {
             "offset": 116,
             "component": 20,
-            "fields": [
-              53,
-              55
-            ]
+            "fields": [53, 55]
           },
           {
             "offset": 120,
             "component": 21,
-            "fields": [
-              8,
-              28,
-              49
-            ]
+            "fields": [8, 28, 49]
           },
           {
             "offset": 124,
             "component": 22,
-            "fields": [
-              29,
-              40
-            ]
+            "fields": [29, 40]
           },
           {
             "offset": 136,
             "component": 25,
-            "fields": [
-              38
-            ]
+            "fields": [38]
           },
           {
             "offset": 140,
             "component": 26,
-            "fields": [
-              7
-            ]
+            "fields": [7]
           },
           {
             "offset": -27,
             "component": 27,
-            "fields": [
-              4,
-              15,
-              18,
-              25,
-              27,
-              33,
-              35,
-              41,
-              44,
-              51
-            ]
+            "fields": [4, 15, 18, 25, 27, 33, 35, 41, 44, 51]
           },
           {
             "offset": 144,
             "component": 28,
-            "fields": [
-              14
-            ]
+            "fields": [14]
           },
           {
             "offset": 152,
             "component": 30,
-            "fields": [
-              2,
-              26,
-              31
-            ],
-            "extendedFields": [
-              58,
-              59,
-              60,
-              61,
-              62,
-              63
-            ]
+            "fields": [2, 26, 31],
+            "extendedFields": [58, 59, 60, 61, 62, 63]
           }
         ],
         "events": [
@@ -905,10 +715,7 @@
             "opcode": 14,
             "name": "visual",
             "confidence": "high",
-            "fields": [
-              "entity-handle",
-              "visual-index"
-            ]
+            "fields": ["entity-handle", "visual-index"]
           },
           {
             "opcode": 2,
@@ -1599,10 +1406,7 @@
       {
         "offset": 52,
         "component": 1,
-        "fields": [
-          22,
-          54
-        ],
+        "fields": [22, 54],
         "extendedFields": [],
         "specs": [
           {
@@ -1618,9 +1422,7 @@
       {
         "offset": 56,
         "component": 2,
-        "fields": [
-          36
-        ],
+        "fields": [36],
         "extendedFields": [],
         "specs": [
           {
@@ -1632,9 +1434,7 @@
       {
         "offset": 68,
         "component": 5,
-        "fields": [
-          9
-        ],
+        "fields": [9],
         "extendedFields": [],
         "specs": [
           {
@@ -1646,19 +1446,7 @@
       {
         "offset": 72,
         "component": 6,
-        "fields": [
-          1,
-          5,
-          6,
-          16,
-          20,
-          21,
-          24,
-          32,
-          34,
-          47,
-          56
-        ],
+        "fields": [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56],
         "extendedFields": [],
         "specs": [
           {
@@ -1710,9 +1498,7 @@
       {
         "offset": 76,
         "component": 7,
-        "fields": [
-          50
-        ],
+        "fields": [50],
         "extendedFields": [],
         "specs": [
           {
@@ -1724,10 +1510,7 @@
       {
         "offset": -8,
         "component": 8,
-        "fields": [
-          13,
-          37
-        ],
+        "fields": [13, 37],
         "extendedFields": [],
         "specs": [
           {
@@ -1743,9 +1526,7 @@
       {
         "offset": 84,
         "component": 10,
-        "fields": [
-          17
-        ],
+        "fields": [17],
         "extendedFields": [],
         "specs": [
           {
@@ -1757,9 +1538,7 @@
       {
         "offset": 100,
         "component": 14,
-        "fields": [
-          43
-        ],
+        "fields": [43],
         "extendedFields": [],
         "specs": [
           {
@@ -1771,10 +1550,7 @@
       {
         "offset": -15,
         "component": 15,
-        "fields": [
-          23,
-          57
-        ],
+        "fields": [23, 57],
         "extendedFields": [],
         "specs": [
           {
@@ -1790,19 +1566,7 @@
       {
         "offset": -16,
         "component": 16,
-        "fields": [
-          3,
-          10,
-          11,
-          12,
-          19,
-          30,
-          39,
-          42,
-          45,
-          46,
-          52
-        ],
+        "fields": [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52],
         "extendedFields": [],
         "specs": [
           {
@@ -1854,9 +1618,7 @@
       {
         "offset": 112,
         "component": 19,
-        "fields": [
-          48
-        ],
+        "fields": [48],
         "extendedFields": [],
         "specs": [
           {
@@ -1868,10 +1630,7 @@
       {
         "offset": 116,
         "component": 20,
-        "fields": [
-          53,
-          55
-        ],
+        "fields": [53, 55],
         "extendedFields": [],
         "specs": [
           {
@@ -1887,11 +1646,7 @@
       {
         "offset": 120,
         "component": 21,
-        "fields": [
-          8,
-          28,
-          49
-        ],
+        "fields": [8, 28, 49],
         "extendedFields": [],
         "specs": [
           {
@@ -1911,10 +1666,7 @@
       {
         "offset": 124,
         "component": 22,
-        "fields": [
-          29,
-          40
-        ],
+        "fields": [29, 40],
         "extendedFields": [],
         "specs": [
           {
@@ -1930,9 +1682,7 @@
       {
         "offset": 136,
         "component": 25,
-        "fields": [
-          38
-        ],
+        "fields": [38],
         "extendedFields": [],
         "specs": [
           {
@@ -1944,9 +1694,7 @@
       {
         "offset": 140,
         "component": 26,
-        "fields": [
-          7
-        ],
+        "fields": [7],
         "extendedFields": [],
         "specs": [
           {
@@ -1958,18 +1706,7 @@
       {
         "offset": -27,
         "component": 27,
-        "fields": [
-          4,
-          15,
-          18,
-          25,
-          27,
-          33,
-          35,
-          41,
-          44,
-          51
-        ],
+        "fields": [4, 15, 18, 25, 27, 33, 35, 41, 44, 51],
         "extendedFields": [],
         "specs": [
           {
@@ -2017,9 +1754,7 @@
       {
         "offset": 144,
         "component": 28,
-        "fields": [
-          14
-        ],
+        "fields": [14],
         "extendedFields": [],
         "specs": [
           {
@@ -2031,19 +1766,8 @@
       {
         "offset": 152,
         "component": 30,
-        "fields": [
-          2,
-          26,
-          31
-        ],
-        "extendedFields": [
-          58,
-          59,
-          60,
-          61,
-          62,
-          63
-        ],
+        "fields": [2, 26, 31],
+        "extendedFields": [58, 59, 60, 61, 62, 63],
         "specs": [
           {
             "field": 2,

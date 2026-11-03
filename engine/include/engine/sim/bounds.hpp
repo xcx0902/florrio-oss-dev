@@ -19,4 +19,4 @@ void invalidate_bounds(World& world, EntityHandle handle);
  * The returned rectangle is expressed as min/max and stays binary32. */
 [[nodiscard]] EntityBounds collision_bounds(World& world, EntityHandle handle);
 
-} // namespace engine
+}  // namespace engine

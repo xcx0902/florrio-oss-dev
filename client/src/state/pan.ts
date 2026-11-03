@@ -35,7 +35,9 @@ export interface PanInput extends PointerMovementInput {
   readonly enabled?: boolean;
 }
 
-export function createPanState(): PanState { return { x: 0, y: 0 }; }
+export function createPanState(): PanState {
+  return { x: 0, y: 0 };
+}
 
 const f = Math.fround;
 const bitsView = new DataView(new ArrayBuffer(4));
@@ -44,47 +46,78 @@ function floatBits(value: number): number {
   return bitsView.getUint32(0, true);
 }
 const atanHigh = [0.46364760398864746, 0.7853981256484985, 0.9827936887741089, 1.570796251296997];
-const atanLow = [5.01215824399992e-9, 3.774894707930798e-8, 3.447321716976148e-8, 7.549789415861596e-8];
+const atanLow = [
+  5.01215824399992e-9, 3.774894707930798e-8, 3.447321716976148e-8, 7.549789415861596e-8,
+];
 
 /** Native atan2 approximation. The polynomial keeps the browser and wasm
  * divides in f32 before this polynomial; rounding Math.atan2 differs by ULPs. */
 function atanFloat(value: number): number {
   const absolute = floatBits(value) & 0x7fffffff;
-  if (absolute > 0x4c7fffff) return value < 0 ? -atanHigh[3] : atanHigh[3];
-  let x = value, index = -1;
+  if (absolute > 0x4c7fffff) {
+    return value < 0 ? -atanHigh[3] : atanHigh[3];
+  }
+  let x = value,
+    index = -1;
   if (absolute <= 0x3edfffff) {
-    if (absolute < 0x39800000) return value;
+    if (absolute < 0x39800000) {
+      return value;
+    }
   } else {
     x = Math.abs(value);
     if (absolute <= 0x3f2fffff) {
-      x = f(f(f(2 * x) - 1) / f(x + 2)); index = 0;
+      x = f(f(f(2 * x) - 1) / f(x + 2));
+      index = 0;
     } else if (absolute <= 0x3f97ffff) {
-      x = f(f(x - 1) / f(x + 1)); index = 1;
+      x = f(f(x - 1) / f(x + 1));
+      index = 1;
     } else if (absolute <= 0x401bffff) {
-      x = f(f(x - 1.5) / f(f(1.5 * x) + 1)); index = 2;
-    } else { x = f(-1 / x); index = 3; }
+      x = f(f(x - 1.5) / f(f(1.5 * x) + 1));
+      index = 2;
+    } else {
+      x = f(-1 / x);
+      index = 3;
+    }
   }
-  const square = f(x * x), fourth = f(square * square);
+  const square = f(x * x),
+    fourth = f(square * square);
   const high = f(fourth * f(f(fourth * -0.106480173766613) - 0.19999158382415771));
-  const low = f(square * f(f(fourth * f(f(fourth * 0.06168760731816292) + 0.14253635704517365)) + 0.333333283662796));
+  const low = f(
+    square *
+      f(f(fourth * f(f(fourth * 0.06168760731816292) + 0.14253635704517365)) + 0.333333283662796),
+  );
   const sum = f(high + low);
-  if (index < 0) return f(x - f(x * sum));
+  if (index < 0) {
+    return f(x - f(x * sum));
+  }
   const result = f(atanHigh[index] - f(f(f(x * sum) - atanLow[index]) - x));
   return value < 0 ? -result : result;
 }
 
 /** Original802: f32 ratio, signed quadrants and split-pi correction. */
 function atan2Float(y: number, x: number): number {
-  const rawX = floatBits(x), rawY = floatBits(y);
-  const absX = rawX & 0x7fffffff, absY = rawY & 0x7fffffff;
-  if (absX >= 0x7f800000 || absY >= 0x7f800000 || absY === 0 || absX === 0)
+  const rawX = floatBits(x),
+    rawY = floatBits(y);
+  const absX = rawX & 0x7fffffff,
+    absY = rawY & 0x7fffffff;
+  if (absX >= 0x7f800000 || absY >= 0x7f800000 || absY === 0 || absX === 0) {
     return f(Math.atan2(y, x));
-  if (x === 1) return atanFloat(y);
+  }
+  if (x === 1) {
+    return atanFloat(y);
+  }
   const quadrant = ((rawX >>> 30) & 2) | (rawY >>> 31);
-  if (((absX + 0x0d000000) >>> 0) < absY) return y < 0 ? -f(Math.PI / 2) : f(Math.PI / 2);
-  const angle = quadrant & 2 && ((absY + 0x0d000000) >>> 0) < absX ? 0 : atanFloat(Math.abs(f(y / x)));
-  if (quadrant === 0) return angle;
-  if (quadrant === 1) return -angle;
+  if ((absX + 0x0d000000) >>> 0 < absY) {
+    return y < 0 ? -f(Math.PI / 2) : f(Math.PI / 2);
+  }
+  const angle =
+    quadrant & 2 && (absY + 0x0d000000) >>> 0 < absX ? 0 : atanFloat(Math.abs(f(y / x)));
+  if (quadrant === 0) {
+    return angle;
+  }
+  if (quadrant === 1) {
+    return -angle;
+  }
   const corrected = f(angle + 8.742277657347586e-8);
   return quadrant === 2 ? f(f(Math.PI) - corrected) : f(corrected - f(Math.PI));
 }
@@ -94,23 +127,31 @@ function atan2Float(y: number, x: number): number {
  * does not affect movement; keyboard/touch inputs use their separate rules. */
 export function getPointerMovement(input: PointerMovementInput): PointerMovement {
   const zoom = f(input.zoom);
-  const pointerX = f(f(input.cameraX)
-    + f(f(f(input.mouseX | 0) - (input.viewportWidth | 0) * 0.5) / zoom));
-  const pointerY = f(f(input.cameraY)
-    + f(f(f(input.mouseY | 0) - (input.viewportHeight | 0) * 0.5) / zoom));
-  const x = f(input.displayedX), y = f(input.displayedY);
-  const dx = pointerX - x, dy = pointerY - y;
+  const pointerX = f(
+    f(input.cameraX) + f(f(f(input.mouseX | 0) - (input.viewportWidth | 0) * 0.5) / zoom),
+  );
+  const pointerY = f(
+    f(input.cameraY) + f(f(f(input.mouseY | 0) - (input.viewportHeight | 0) * 0.5) / zoom),
+  );
+  const x = f(input.displayedX),
+    y = f(input.displayedY);
+  const dx = pointerX - x,
+    dy = pointerY - y;
   return { strength: f(Math.sqrt(dx * dx + dy * dy)), angle: atan2Float(f(dy), f(dx)) };
 }
 
 /** Native pan derives from mouse movement with separate f32 narrowings.
  * A direct normalized dx/dy changes these results. */
 export function getPanTarget(input: PanInput): PanState {
-  if (input.enabled === false) return createPanState();
+  if (input.enabled === false) {
+    return createPanState();
+  }
   const movement = getPointerMovement(input);
   const strength = Math.min(f(movement.strength * 0.009999999776482582), 1);
-  return { x: f(f(strength * f(Math.cos(movement.angle))) * 5),
-    y: f(f(strength * f(Math.sin(movement.angle))) * 5) };
+  return {
+    x: f(f(strength * f(Math.cos(movement.angle))) * 5),
+    y: f(f(strength * f(Math.sin(movement.angle))) * 5),
+  };
 }
 
 /** Pure update: retain this result per local player and pass x/y as world

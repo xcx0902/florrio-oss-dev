@@ -1,0 +1,39 @@
+# C++ style for the engine, native server, tools and their tests.
+# Pinned tool: clang-format 21.1.8 (see tools/format-tools.lock.json).
+# Only layout is decided here: includes are never reordered and string
+# literals are never split, so formatting cannot change behaviour.
+---
+Language: Cpp
+BasedOnStyle: LLVM
+Standard: c++20
+IndentWidth: 2
+ContinuationIndentWidth: 4
+ColumnLimit: 100
+UseTab: Never
+BreakBeforeBraces: Attach
+IndentCaseLabels: true
+NamespaceIndentation: None
+AccessModifierOffset: -1
+InsertBraces: true
+RemoveBracesLLVM: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: true
+BinPackParameters: true
+BreakStringLiterals: false
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+SortIncludes: Never
+IncludeBlocks: Preserve
+FixNamespaceComments: false
+SpacesBeforeTrailingComments: 2
+AlignEscapedNewlines: Left
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+...

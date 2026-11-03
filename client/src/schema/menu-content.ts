@@ -7,38 +7,38 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
-    "date": "2.0.0 - 2026-11-02",
-    "notes": [
-      "Added: Native authoritative multiplayer server with a real binary WebSocket v2 transport, room admission, reconnect tokens, bounded queues, heartbeats, graceful drain and fixed-label internal metrics.",
-      "Added: Online-capable client transport, input pump, authoritative lifecycle, snapshot decoding/resync, network clock, interpolation and bounded local motion prediction.",
-      "Added: Online-only dist-multiplayer delivery and tools/dev-multiplayer.mjs local launcher; it contains no `server.wasm`, Worker, test API or cheat assets.",
-      "Added: Native deployment package with Linux x86_64 CI target, nginx/Caddy examples, systemd unit, SHA-256 inventory and a start/drain/proxy-switch/rollback smoke.",
-      "Added: M08 multiplayer verification profile: real dual-browser acceptance, 2 rooms x 8 players capacity repetitions, 100 lifecycle cycles, slow-consumer isolation and a 30-minute RSS/entity soak.",
-      "Added: Source-bound release evidence now binds the offline ledger, multiplayer ledger and native package to the same source identity.",
-      "Changed: The default browser entry is online and constructs only NetworkTransport; the explicit local profile remains available in the offline delivery for tests.",
-      "Changed: New packaging and capacity tools are part of the verification/source identity.",
-      "Changed: Deployment requires paired client/server protocol and catalog hashes; sessions are memory-only and are interrupted by upgrades.",
-      "Fixed: Slow readers are closed at the 1 MiB per-connection queue bound while healthy peers continue receiving snapshots.",
-      "Fixed: Capacity measurements exclude warmup and use the same generated protocol codec, native server and fixed 50 ms tick as production."
-    ]
+    date: '2.0.0 - 2026-11-02',
+    notes: [
+      'Added: Native authoritative multiplayer server with a real binary WebSocket v2 transport, room admission, reconnect tokens, bounded queues, heartbeats, graceful drain and fixed-label internal metrics.',
+      'Added: Online-capable client transport, input pump, authoritative lifecycle, snapshot decoding/resync, network clock, interpolation and bounded local motion prediction.',
+      'Added: Online-only dist-multiplayer delivery and tools/dev-multiplayer.mjs local launcher; it contains no `server.wasm`, Worker, test API or cheat assets.',
+      'Added: Native deployment package with Linux x86_64 CI target, nginx/Caddy examples, systemd unit, SHA-256 inventory and a start/drain/proxy-switch/rollback smoke.',
+      'Added: M08 multiplayer verification profile: real dual-browser acceptance, 2 rooms x 8 players capacity repetitions, 100 lifecycle cycles, slow-consumer isolation and a 30-minute RSS/entity soak.',
+      'Added: Source-bound release evidence now binds the offline ledger, multiplayer ledger and native package to the same source identity.',
+      'Changed: The default browser entry is online and constructs only NetworkTransport; the explicit local profile remains available in the offline delivery for tests.',
+      'Changed: New packaging and capacity tools are part of the verification/source identity.',
+      'Changed: Deployment requires paired client/server protocol and catalog hashes; sessions are memory-only and are interrupted by upgrades.',
+      'Fixed: Slow readers are closed at the 1 MiB per-connection queue bound while healthy peers continue receiving snapshots.',
+      'Fixed: Capacity measurements exclude warmup and use the same generated protocol codec, native server and fixed 50 ms tick as production.',
+    ],
   },
   {
-    "date": "1.0.0 - 2026-10-31",
-    "notes": [
-      "Added: C++20 server engine compiled to WebAssembly, with a deterministic fixed-step simulation and a native test suite.",
-      "Added: TypeScript Canvas2D client with the worker envelope, sparse snapshot decoding, interpolation, rendering, menu, HUD, inventory and chat.",
-      "Added: Schema-driven protocol, layout and catalog generation under schema/.",
-      "Added: A repeatable product acceptance flow that builds, packages and verifies the independent `dist-next/` delivery tree.",
-      "Added: Local release archives with a verification-bound manifest and SHA-256 checksums.",
-      "Added: The Ubuntu font copyright notice and licence are included in the static delivery and release archive.",
-      "Changed: The product build, tests, runtime and delivery no longer read the original-client oracle or recovered source. Historical evidence is preserved under `archive/` for manual consultation only.",
-      "Changed: The menu Changelog panel now describes this project instead of the upstream 2020 client.",
-      "Changed: Engine spatial queries, active-entity iteration and snapshot publication reuse bounded data structures to reduce repeated work.",
-      "Changed: Rendering reuses bounded text, geometry and layout caches; each simulation step sends one ordered worker request.",
-      "Fixed: Mob Gallery drop probabilities are displayed in descending order.",
+    date: '1.0.0 - 2026-10-31',
+    notes: [
+      'Added: C++20 server engine compiled to WebAssembly, with a deterministic fixed-step simulation and a native test suite.',
+      'Added: TypeScript Canvas2D client with the worker envelope, sparse snapshot decoding, interpolation, rendering, menu, HUD, inventory and chat.',
+      'Added: Schema-driven protocol, layout and catalog generation under schema/.',
+      'Added: A repeatable product acceptance flow that builds, packages and verifies the independent `dist-next/` delivery tree.',
+      'Added: Local release archives with a verification-bound manifest and SHA-256 checksums.',
+      'Added: The Ubuntu font copyright notice and licence are included in the static delivery and release archive.',
+      'Changed: The product build, tests, runtime and delivery no longer read the original-client oracle or recovered source. Historical evidence is preserved under `archive/` for manual consultation only.',
+      'Changed: The menu Changelog panel now describes this project instead of the upstream 2020 client.',
+      'Changed: Engine spatial queries, active-entity iteration and snapshot publication reuse bounded data structures to reduce repeated work.',
+      'Changed: Rendering reuses bounded text, geometry and layout caches; each simulation step sends one ordered worker request.',
+      'Fixed: Mob Gallery drop probabilities are displayed in descending order.',
       "Fixed: Long petal names such as Dandelion use the catalog's label size consistently on static cards and throughout pickup arrival, settlement and retirement.",
-      "Removed: Original-client snapshot writers, the skeleton snapshot fallback and the `original_client_*` worker ABI.",
-      "Removed: Reference, recovery, parity and frozen-oracle tooling from the active tree."
-    ]
-  }
+      'Removed: Original-client snapshot writers, the skeleton snapshot fallback and the `original_client_*` worker ABI.',
+      'Removed: Reference, recovery, parity and frozen-oracle tooling from the active tree.',
+    ],
+  },
 ];

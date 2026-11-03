@@ -44,18 +44,24 @@ export interface EntitySnapshot {
   readonly stringField4?: string;
   readonly byteFields?: Readonly<Record<number, number>>;
   readonly byteArrayFields?: Readonly<Record<number, readonly { index: number; value: number }[]>>;
-  readonly varintArrayFields?: Readonly<Record<number, readonly { index: number; value: number }[]>>;
+  readonly varintArrayFields?: Readonly<
+    Record<number, readonly { index: number; value: number }[]>
+  >;
   readonly shortArrayFields?: Readonly<Record<number, readonly { index: number; value: number }[]>>;
   readonly byteArrayField60?: readonly { index: number; value: number }[];
   readonly varintFields?: Readonly<Record<number, number>>;
   readonly referenceFields?: Readonly<Record<number, number>>;
   readonly stringFields?: Readonly<Record<number, string>>;
-  readonly stringArrayFields?: Readonly<Record<number, readonly { index: number; value: string }[]>>;
+  readonly stringArrayFields?: Readonly<
+    Record<number, readonly { index: number; value: string }[]>
+  >;
   readonly floatField45?: number;
   readonly componentOrdinals?: readonly number[];
   readonly bitFields?: Readonly<Record<number, number>>;
   readonly angleField8?: number;
-  readonly handleArrayFields?: Readonly<Record<number, readonly { index: number; handle: number }[]>>;
+  readonly handleArrayFields?: Readonly<
+    Record<number, readonly { index: number; handle: number }[]>
+  >;
   readonly denseByteFields?: Readonly<Record<number, number>>;
   readonly denseFields?: Readonly<Record<number, DenseValue>>;
   readonly components?: Readonly<Record<number, Readonly<Record<number, unknown>>>>;
@@ -76,7 +82,6 @@ export interface DenseGroupPlan {
   readonly specs: readonly DenseFieldSpec[];
 }
 
-
 /** Fields of the native controller record (component 478) that survive the
  * player's death and drive the death/menu HUD. */
 export interface DeathMetadata {
@@ -88,4 +93,3 @@ export interface DeathMetadata {
   readonly respawnLevel: number;
   readonly viewerHandle?: number;
 }
-

@@ -15,9 +15,13 @@ class FixedStepClock {
   /** Advance to `now_milliseconds`, returning the number of whole ticks due.
    * Deltas are clamped to kMaxStepMilliseconds, matching the original server. */
   [[nodiscard]] std::uint32_t advance(double now_milliseconds) {
-    if (now_milliseconds < now_) now_ = now_milliseconds;
+    if (now_milliseconds < now_) {
+      now_ = now_milliseconds;
+    }
     double delta = now_milliseconds - now_;
-    if (delta > kMaxStepMilliseconds) delta = kMaxStepMilliseconds;
+    if (delta > kMaxStepMilliseconds) {
+      delta = kMaxStepMilliseconds;
+    }
     now_ += delta;
     accumulator_ += delta;
     std::uint32_t steps = 0;
@@ -36,4 +40,4 @@ class FixedStepClock {
   double accumulator_ = 0.0;
 };
 
-} // namespace engine
+}  // namespace engine

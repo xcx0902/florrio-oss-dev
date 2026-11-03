@@ -3,8 +3,19 @@
  * speed is 100*scale units/s, and y bobs by 20*sin(seconds+phase). The fixed
  * 16 ms animation step preserves f32 integration independently of display Hz.
  */
-export interface MenuFlower { readonly x: number; readonly y: number; readonly scale: number; readonly type: number; }
-interface Particle { x: number; y: number; scale: number; phase: number; type: number; }
+export interface MenuFlower {
+  readonly x: number;
+  readonly y: number;
+  readonly scale: number;
+  readonly type: number;
+}
+interface Particle {
+  x: number;
+  y: number;
+  scale: number;
+  phase: number;
+  type: number;
+}
 const f = Math.fround;
 const UI = f(0.7);
 
@@ -25,20 +36,30 @@ export class MenuInputAnimation {
   private overlay = 0;
 
   /** client1095 commits the spawn request after drawing the current input. */
-  requestSpawn(): void { this.spawnRequested = true; }
+  requestSpawn(): void {
+    this.spawnRequested = true;
+  }
 
-  advance(now: number, delta: number, ready: boolean, menu: boolean,
-          logicalHeight: number, mobile = false): MenuInputPresentation {
+  advance(
+    now: number,
+    delta: number,
+    ready: boolean,
+    menu: boolean,
+    logicalHeight: number,
+    mobile = false,
+  ): MenuInputPresentation {
     const step = Math.max(0, Math.min(1, 1 - Math.pow(0.9, f(delta) * 0.06)));
-    const approach = (value: number, target: number): number => Math.abs(value - target) < 1e-7
-      ? target : f(value + step * (target - value));
+    const approach = (value: number, target: number): number =>
+      Math.abs(value - target) < 1e-7 ? target : f(value + step * (target - value));
     // The menu gate covers the entire menu pass. Once the one-second iris
     // reaches 0.9999, these input states and their deadline stop advancing.
     this.overlay = f(Math.max(0, Math.min(1, this.overlay + (menu ? -1 : 1) * f(delta) * 0.001)));
     const active = this.overlay < 0.9999;
     if (active) {
       this.connecting = approach(this.connecting, +!ready);
-      if (!menu) this.hideUntil = Math.max(this.hideUntil, now + 200);
+      if (!menu) {
+        this.hideUntil = Math.max(this.hideUntil, now + 200);
+      }
       const target = +(!menu || now < this.hideUntil);
       this.withdrawn = approach(this.withdrawn, target);
       if (this.spawnRequested) {
@@ -53,7 +74,9 @@ export class MenuInputAnimation {
 }
 
 export function menuSeed(): number {
-  if (typeof window === 'undefined') return 1;
+  if (typeof window === 'undefined') {
+    return 1;
+  }
   const bytes = crypto.getRandomValues(new Uint8Array(4));
   return new DataView(bytes.buffer).getUint32(0, true);
 }
@@ -67,7 +90,9 @@ export class MenuAnimation {
   private types: readonly number[] = [1];
   private typesKey = '1';
 
-  constructor(readonly seed: number) { this.reset(); }
+  constructor(readonly seed: number) {
+    this.reset();
+  }
 
   private reset(): void {
     this.state = (this.seed >>> 0) % 2147483647 || 1;
@@ -77,22 +102,29 @@ export class MenuAnimation {
   }
 
   private next(): number {
-    this.state = this.state * 48271 % 2147483647;
+    this.state = (this.state * 48271) % 2147483647;
     return this.state;
   }
 
   /** Use only petal types the player has discovered. Empty falls back to Basic. */
   setPetals(types: readonly number[]): void {
-    const valid = types.filter(type => Number.isInteger(type) && type > 0);
-    const key = (valid.length ? valid : [1]).slice().sort((a, b) => a - b).join(',');
-    if (key === this.typesKey) return;
+    const valid = types.filter((type) => Number.isInteger(type) && type > 0);
+    const key = (valid.length ? valid : [1])
+      .slice()
+      .sort((a, b) => a - b)
+      .join(',');
+    if (key === this.typesKey) {
+      return;
+    }
     this.typesKey = key;
     this.types = key.split(',').map(Number);
   }
 
   sample(now: number, width: number, height: number): readonly MenuFlower[] {
     const dimensions = `${width}|${height}`;
-    if (now < this.at || dimensions !== this.dimensions) this.reset();
+    if (now < this.at || dimensions !== this.dimensions) {
+      this.reset();
+    }
     this.dimensions = dimensions;
     const target = Math.floor(Math.max(0, now) / 16) * 16;
     const uiHeight = Math.ceil(height / UI);
@@ -112,14 +144,17 @@ export class MenuAnimation {
       for (const particle of this.particles) {
         particle.x = f(f(f(particle.scale * 100) * 16) * 0.001 + particle.x);
       }
-      this.particles = this.particles.filter(particle => particle.x < width / UI + 50);
+      this.particles = this.particles.filter((particle) => particle.x < width / UI + 50);
     }
-    return this.particles.slice().sort((a, b) => a.scale - b.scale).map(particle => ({
-      x: f(particle.x * UI),
-      y: f(f(particle.y + f(Math.sin(now * 0.001 + particle.phase) * 20)) * UI),
-      scale: f(particle.scale * UI),
-      type: particle.type,
-    }));
+    return this.particles
+      .slice()
+      .sort((a, b) => a.scale - b.scale)
+      .map((particle) => ({
+        x: f(particle.x * UI),
+        y: f(f(particle.y + f(Math.sin(now * 0.001 + particle.phase) * 20)) * UI),
+        scale: f(particle.scale * UI),
+        type: particle.type,
+      }));
   }
 }
 

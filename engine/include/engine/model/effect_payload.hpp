@@ -23,4 +23,4 @@ struct EffectPayload {
   [[nodiscard]] bool expired() const { return !active || remaining_ms < 0.0; }
 };
 
-} // namespace engine
+}  // namespace engine

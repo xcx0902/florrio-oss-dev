@@ -2,15 +2,13 @@
   "schema": 1,
   "description": "Explicit product test inventory. Every entry is a real file; no archive path and no blacklist may appear here.",
   "suites": {
-    "unit": [
-      "tests/unit/protocol-contracts.test.mjs",
-      "tests/unit/schema-generation.test.mjs"
-    ],
+    "unit": ["tests/unit/protocol-contracts.test.mjs", "tests/unit/schema-generation.test.mjs"],
     "tools": [
       "tests/tools/delivery.test.mjs",
       "tests/tools/verification.test.mjs",
       "tests/tools/test-runner.test.mjs",
-      "tests/tools/structure.test.mjs"
+      "tests/tools/structure.test.mjs",
+      "tests/tools/refactor-rules.test.mjs"
     ],
     "client-unit": [
       "client/tests/unit/canvas-context.test.mjs",
@@ -58,12 +56,7 @@
     ],
     "engine": {
       "runner": "ctest",
-      "argv": [
-        "--test-dir",
-        "build/engine",
-        "--output-on-failure",
-        "--no-tests=error"
-      ],
+      "argv": ["--test-dir", "build/engine", "--output-on-failure", "--no-tests=error"],
       "expected": [
         "engine_tests",
         "engine_centipede_tests",
@@ -88,12 +81,7 @@
     },
     "server-native": {
       "runner": "ctest",
-      "argv": [
-        "--test-dir",
-        "build/native",
-        "--output-on-failure",
-        "--no-tests=error"
-      ],
+      "argv": ["--test-dir", "build/native", "--output-on-failure", "--no-tests=error"],
       "expected": [
         "engine_tests",
         "engine_centipede_tests",

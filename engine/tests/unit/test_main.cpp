@@ -65,7 +65,9 @@ namespace {
 
 int main(int argc, char** argv) {
   engine::test::tapOutput = argc > 1 && std::strcmp(argv[1], "--tap") == 0;
-  if (engine::test::tapOutput) std::printf("TAP version 13\n");
+  if (engine::test::tapOutput) {
+    std::printf("TAP version 13\n");
+  }
   engine::test::runTest("test_f32", test_f32);
   engine::test::runTest("test_vec2", test_vec2);
   engine::test::runTest("test_rng", test_rng);
@@ -106,10 +108,12 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_multi_instance_orbit_spacing", test_multi_instance_orbit_spacing);
   engine::test::runTest("test_twin_widens_orbit_spacing", test_twin_widens_orbit_spacing);
   engine::test::runTest("test_orbit_reindex_after_removal", test_orbit_reindex_after_removal);
-  engine::test::runTest("test_flag41_slot_without_component_keeps_shared_position", test_flag41_slot_without_component_keeps_shared_position);
+  engine::test::runTest("test_flag41_slot_without_component_keeps_shared_position",
+                        test_flag41_slot_without_component_keeps_shared_position);
   engine::test::runTest("test_peas_attack_consumes_petal", test_peas_attack_consumes_petal);
   engine::test::runTest("test_rose_healing", test_rose_healing);
-  engine::test::runTest("test_rose_contracts_orbit_and_heals_promptly", test_rose_contracts_orbit_and_heals_promptly);
+  engine::test::runTest("test_rose_contracts_orbit_and_heals_promptly",
+                        test_rose_contracts_orbit_and_heals_promptly);
   engine::test::runTest("test_rose_timer_arms_at_full_health", test_rose_timer_arms_at_full_health);
   engine::test::runTest("test_petal_recharge", test_petal_recharge);
   engine::test::runTest("test_auto_population", test_auto_population);
@@ -119,8 +123,10 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_ai_target_selection", test_ai_target_selection);
   engine::test::runTest("test_collision_layer_filter", test_collision_layer_filter);
   engine::test::runTest("test_status_effects_and_slow", test_status_effects_and_slow);
-  engine::test::runTest("test_slow_scales_player_control_impulse", test_slow_scales_player_control_impulse);
-  engine::test::runTest("test_slow_does_not_scale_integrate_movement", test_slow_does_not_scale_integrate_movement);
+  engine::test::runTest("test_slow_scales_player_control_impulse",
+                        test_slow_scales_player_control_impulse);
+  engine::test::runTest("test_slow_does_not_scale_integrate_movement",
+                        test_slow_does_not_scale_integrate_movement);
   engine::test::runTest("test_attribution_and_legendary", test_attribution_and_legendary);
   engine::test::runTest("test_loadout_restore_and_backpack", test_loadout_restore_and_backpack);
   engine::test::runTest("test_petal_special_effects", test_petal_special_effects);
@@ -133,16 +139,21 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_domain_boot_visibility", test_domain_boot_visibility);
   engine::test::runTest("test_full_field_framing", test_full_field_framing);
   engine::test::runTest("test_full_field_effect_flags", test_full_field_effect_flags);
-  engine::test::runTest("test_input_discard_deletion_then_swap", test_input_discard_deletion_then_swap);
+  engine::test::runTest("test_input_discard_deletion_then_swap",
+                        test_input_discard_deletion_then_swap);
   engine::test::runTest("test_domain_dense_live_values", test_domain_dense_live_values);
   engine::test::runTest("test_default_dense_groups", test_default_dense_groups);
-  engine::test::runTest("test_domain_dense_player_wire_boundaries", test_domain_dense_player_wire_boundaries);
+  engine::test::runTest("test_domain_dense_player_wire_boundaries",
+                        test_domain_dense_player_wire_boundaries);
   engine::test::runTest("test_player_input_appearance", test_player_input_appearance);
   engine::test::runTest("test_ai_family_profiles", test_ai_family_profiles);
-  engine::test::runTest("test_quadtree_order_and_collision_bounds", test_quadtree_order_and_collision_bounds);
-  engine::test::runTest("test_area_effects_and_deferred_launch", test_area_effects_and_deferred_launch);
+  engine::test::runTest("test_quadtree_order_and_collision_bounds",
+                        test_quadtree_order_and_collision_bounds);
+  engine::test::runTest("test_area_effects_and_deferred_launch",
+                        test_area_effects_and_deferred_launch);
   engine::test::runTest("test_attribution_death_and_pickups", test_attribution_death_and_pickups);
-  engine::test::runTest("test_killer_name_uses_attacker_identity", test_killer_name_uses_attacker_identity);
+  engine::test::runTest("test_killer_name_uses_attacker_identity",
+                        test_killer_name_uses_attacker_identity);
   engine::test::runTest("test_loadout_exact_layout", test_loadout_exact_layout);
   engine::test::runTest("test_alert_to_attacker_is_local", test_alert_to_attacker_is_local);
   engine::test::runTest("test_ai_recovered_species_profiles", test_ai_recovered_species_profiles);
@@ -157,7 +168,8 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_ant_hole_release", test_ant_hole_release);
   engine::test::runTest("test_web_tag_domain_side_effects", test_web_tag_domain_side_effects);
   engine::test::runTest("test_world_clock_tracks_tick", test_world_clock_tracks_tick);
-  engine::test::runTest("test_loadout_reserve_cycle_and_packet_cache", test_loadout_reserve_cycle_and_packet_cache);
+  engine::test::runTest("test_loadout_reserve_cycle_and_packet_cache",
+                        test_loadout_reserve_cycle_and_packet_cache);
   engine::test::runTest("test_quadtree", test_quadtree);
   engine::test::runTest("test_quadtree_compaction_order", test_quadtree_compaction_order);
   engine::test::runTest("test_catalog", test_catalog);
@@ -166,16 +178,21 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_spatial_query", test_spatial_query);
 
   engine::test::runTest("test_entity_domain_state", test_entity_domain_state);
-  engine::test::runTest("test_contact_nearest_candidate_first", test_contact_nearest_candidate_first);
-  engine::test::runTest("test_chain_constraint_clamps_segments", test_chain_constraint_clamps_segments);
+  engine::test::runTest("test_contact_nearest_candidate_first",
+                        test_contact_nearest_candidate_first);
+  engine::test::runTest("test_chain_constraint_clamps_segments",
+                        test_chain_constraint_clamps_segments);
   engine::test::runTest("test_worker_api", test_worker_api);
   engine::test::runTest("test_world_initialize", test_world_initialize);
   engine::test::runTest("test_protocol_constants", test_protocol_constants);
-  engine::test::runTest("test_collision_bounds_cache_rebuild_counter", test_collision_bounds_cache_rebuild_counter);
+  engine::test::runTest("test_collision_bounds_cache_rebuild_counter",
+                        test_collision_bounds_cache_rebuild_counter);
   engine::test::runTest("test_loadout_flag41_pending_cache", test_loadout_flag41_pending_cache);
-  engine::test::runTest("test_loadout_slot_epochs_bump_on_change", test_loadout_slot_epochs_bump_on_change);
+  engine::test::runTest("test_loadout_slot_epochs_bump_on_change",
+                        test_loadout_slot_epochs_bump_on_change);
   engine::test::runTest("test_loadout_pending_cache_order", test_loadout_pending_cache_order);
-  engine::test::runTest("test_effect_payload_released_on_destroy", test_effect_payload_released_on_destroy);
+  engine::test::runTest("test_effect_payload_released_on_destroy",
+                        test_effect_payload_released_on_destroy);
   engine::test::runTest("test_tick_phase_trace", test_tick_phase_trace);
   engine::test::runTest("test_quadtree_update_counter", test_quadtree_update_counter);
   engine::test::runTest("test_deferred_launch_due_order", test_deferred_launch_due_order);
@@ -188,6 +205,8 @@ int main(int argc, char** argv) {
     std::fprintf(stderr, "%d test(s) failed\n", engine::test::failures);
     return 1;
   }
-  if (!engine::test::tapOutput) std::printf("all engine unit tests passed\n");
+  if (!engine::test::tapOutput) {
+    std::printf("all engine unit tests passed\n");
+  }
   return 0;
 }

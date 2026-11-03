@@ -13,48 +13,48 @@ multipliers are covered by tests.
 The 92-byte settings struct lives at AI+60. The domain `AiState` keeps the same
 values under names:
 
-| Offset | Domain field | Meaning |
-| --- | --- | --- |
-| +8 | `enabled` | AI record is live |
-| +9 | `aggressive` | acquire targets |
-| +10 | `worker` | worker-ant caste byte |
-| +12 | `drift_rate` | idle angle drift per second |
-| +16 | `clock_valid` | cached-clock flag |
-| +24 | `clock_ms` | cached server clock (double) |
-| +32 | `timer_active` | random-angle timer armed |
-| +40 | `timer_deadline_ms` | next timer deadline (double) |
-| +48 | — | sign draw; shipped value is always 0, so idle turn is `-turn_rate` |
-| +52 | `current_angle` | timer/drift angle |
-| +56 | `attack_cooldown_ms` | attack cooldown |
-| +60 | `turn_rate` | idle turn rate |
-| +64 | `angle_locked` | face the computed direction directly |
-| +68 | `drift_rate` | idle drift rate |
-| +72 | `idle_speed` | idle/guard movement speed |
-| +76 | `wave_amplitude` | wave envelope amplitude (observed 2.0 on Bee/Ladybug) |
-| +80 | `wave_frequency` | wave frequency |
-| +84 | `wave_power` | wave exponent (Bee 0.5) |
-| +88 | `sine_enabled` | sine wobble |
-| +92 | `sine_frequency` | sine frequency |
-| +96 | `sine_amplitude` | sine amplitude |
-| +100 | `timer_interval_ms` | random-angle timer interval |
-| +104 | `territory` | arena threshold fraction |
-| +108 | `aggressive` | duplicate aggressive gate |
-| +109 | `can_alert` | accept attacker aggro |
-| +110 | `chase` | lead-prediction movement |
-| +112 | `lead_divisor` | lead divisor |
-| +116 | `chase_speed` | chase speed |
-| +120 | `radius` | acquisition radius |
-| +124 | `range_multiplier` | acquisition range multiplier |
-| +128 | `attack_range` | strafe/attack distance |
-| +132 | `attack_speed` | speed inside attack range |
-| +136 | `guard_radius` | guard-point radius |
-| +140 | `leash` | owner leash |
-| +144 | `attack_callback` | species attack callback id |
-| +148 | `attack_cooldown_gain` | cooldown gain |
-| +152 | `target` | intrusive target handle |
-| +164 | `owner` | owner handle |
-| +176/+180 | `guard_point` | guard point |
-| +184 | `guard_active` | moving to the guard point |
+| Offset    | Domain field           | Meaning                                                            |
+| --------- | ---------------------- | ------------------------------------------------------------------ |
+| +8        | `enabled`              | AI record is live                                                  |
+| +9        | `aggressive`           | acquire targets                                                    |
+| +10       | `worker`               | worker-ant caste byte                                              |
+| +12       | `drift_rate`           | idle angle drift per second                                        |
+| +16       | `clock_valid`          | cached-clock flag                                                  |
+| +24       | `clock_ms`             | cached server clock (double)                                       |
+| +32       | `timer_active`         | random-angle timer armed                                           |
+| +40       | `timer_deadline_ms`    | next timer deadline (double)                                       |
+| +48       | —                      | sign draw; shipped value is always 0, so idle turn is `-turn_rate` |
+| +52       | `current_angle`        | timer/drift angle                                                  |
+| +56       | `attack_cooldown_ms`   | attack cooldown                                                    |
+| +60       | `turn_rate`            | idle turn rate                                                     |
+| +64       | `angle_locked`         | face the computed direction directly                               |
+| +68       | `drift_rate`           | idle drift rate                                                    |
+| +72       | `idle_speed`           | idle/guard movement speed                                          |
+| +76       | `wave_amplitude`       | wave envelope amplitude (observed 2.0 on Bee/Ladybug)              |
+| +80       | `wave_frequency`       | wave frequency                                                     |
+| +84       | `wave_power`           | wave exponent (Bee 0.5)                                            |
+| +88       | `sine_enabled`         | sine wobble                                                        |
+| +92       | `sine_frequency`       | sine frequency                                                     |
+| +96       | `sine_amplitude`       | sine amplitude                                                     |
+| +100      | `timer_interval_ms`    | random-angle timer interval                                        |
+| +104      | `territory`            | arena threshold fraction                                           |
+| +108      | `aggressive`           | duplicate aggressive gate                                          |
+| +109      | `can_alert`            | accept attacker aggro                                              |
+| +110      | `chase`                | lead-prediction movement                                           |
+| +112      | `lead_divisor`         | lead divisor                                                       |
+| +116      | `chase_speed`          | chase speed                                                        |
+| +120      | `radius`               | acquisition radius                                                 |
+| +124      | `range_multiplier`     | acquisition range multiplier                                       |
+| +128      | `attack_range`         | strafe/attack distance                                             |
+| +132      | `attack_speed`         | speed inside attack range                                          |
+| +136      | `guard_radius`         | guard-point radius                                                 |
+| +140      | `leash`                | owner leash                                                        |
+| +144      | `attack_callback`      | species attack callback id                                         |
+| +148      | `attack_cooldown_gain` | cooldown gain                                                      |
+| +152      | `target`               | intrusive target handle                                            |
+| +164      | `owner`                | owner handle                                                       |
+| +176/+180 | `guard_point`          | guard point                                                        |
+| +184      | `guard_active`         | moving to the guard point                                          |
 
 The domain also keeps `predecessor` for entity links
 component. Only a segment with a live predecessor AI adopts its target; a plain
@@ -132,17 +132,17 @@ motion.
 
 `spawn_entity_from_defaults` dispatches the family initializers:
 
-| Type ids | Initializer | Key values |
-| --- | --- | --- |
-| 4, 5, 20, 21 | `configure_ladybug` | health 25/1000/25/25, radius 30/120/30/30, contact 15/50, speed 0.002 (massive 0.001), turn scale 1.0 (massive 0.2), range 600, radius 1000, territory 0.3 |
-| 7, 8, 9, 10 | `configure_ant` | health 10/25/40/200, radius 14/20/20/40, contact 10/15/20/30, speed `(0.9 + random * 9.313225746154786e-11) * 0.002`, worker/soldier flags, soldier range 300/400 and turn scale 0.3, radius 1000, territory 0.3 |
-| 12, 13 | `configure_beetle` | health 40/300, radius 40/80, contact 30/20, speed 0.002, range 600, turn scale 1.0/1.1, radius 1000, territory 0.3 |
+| Type ids       | Initializer           | Key values                                                                                                                                                                                                                                     |
+| -------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 4, 5, 20, 21   | `configure_ladybug`   | health 25/1000/25/25, radius 30/120/30/30, contact 15/50, speed 0.002 (massive 0.001), turn scale 1.0 (massive 0.2), range 600, radius 1000, territory 0.3                                                                                     |
+| 7, 8, 9, 10    | `configure_ant`       | health 10/25/40/200, radius 14/20/20/40, contact 10/15/20/30, speed `(0.9 + random * 9.313225746154786e-11) * 0.002`, worker/soldier flags, soldier range 300/400 and turn scale 0.3, radius 1000, territory 0.3                               |
+| 12, 13         | `configure_beetle`    | health 40/300, radius 40/80, contact 30/20, speed 0.002, range 600, turn scale 1.0/1.1, radius 1000, territory 0.3                                                                                                                             |
 | 15, 16, 17, 18 | `configure_centipede` | health 50, radius 35, contact 20, speed 0.006, range 1000 (evil 600), turn scale 0.2 (evil 0.16), radius 1000, territory 0.35; heads spawn a 9-segment chain (49 at the 1% rare roll) at 70-unit spacing with `angle += 2π/20` (`2π/100` rare) |
-| 22 | `configure_spider` | health 20, radius 25, contact 25, speed 0.002, aggressive, chase, range 600, radius 600, territory 0.45, chase speed 2.88, lead divisor 3.4 |
-| 6 | `configure_bee` | health 15, radius 25, contact 50, speed 0.002, range 600, radius 1000, territory 0.3, timer 5000..10000 ms, wave enabled, wave frequency 0.002856924, wave power 0.5, sine 0.002/0.5 |
-| 14 | `configure_hornet` | health 40, radius 25, contact 50, speed 0.002, range 600, radius 600, territory 0.6, timer 5000..10000 ms, attack range 500, attack speed -0.4, callback 74, cooldown gain 2000 |
-| 19 | `configure_square` | health 15, radius 30, contact 10, speed 0.002, turn rate 0.12321318, radius 1000, territory 0.3, angle-locked false, idle speed 0.2 |
-| 11 | Ant Hole | stationary; six owned children in the caste order 7,7,7,8,8,9, each with a 0.25-unit velocity scatter from one RNG draw |
+| 22             | `configure_spider`    | health 20, radius 25, contact 25, speed 0.002, aggressive, chase, range 600, radius 600, territory 0.45, chase speed 2.88, lead divisor 3.4                                                                                                    |
+| 6              | `configure_bee`       | health 15, radius 25, contact 50, speed 0.002, range 600, radius 1000, territory 0.3, timer 5000..10000 ms, wave enabled, wave frequency 0.002856924, wave power 0.5, sine 0.002/0.5                                                           |
+| 14             | `configure_hornet`    | health 40, radius 25, contact 50, speed 0.002, range 600, radius 600, territory 0.6, timer 5000..10000 ms, attack range 500, attack speed -0.4, callback 74, cooldown gain 2000                                                                |
+| 19             | `configure_square`    | health 15, radius 30, contact 10, speed 0.002, turn rate 0.12321318, radius 1000, territory 0.3, angle-locked false, idle speed 0.2                                                                                                            |
+| 11             | Ant Hole              | stationary; six owned children in the caste order 7,7,7,8,8,9, each with a 0.25-unit velocity scatter from one RNG draw                                                                                                                        |
 
 The generic `configure_mob_ai` profile (radius 600, speed 0.0025) is retained
 for any future species without a dedicated initializer. Queen Ant (10) and the
@@ -187,7 +187,7 @@ For every registered AI entity in spawn order:
      facing angle is `current_angle` (plus the sine wobble), and `angle_locked`
      entities face that integrated angle instead of the raw steering value.
 7. `velocity += (cos, sin)(move_angle) * move_speed * dt * 0.001 *
-   behavior_speed_multiplier * slow_multiplier`.
+behavior_speed_multiplier * slow_multiplier`.
 8. With an eligible retained target and expired cooldown, the domain records
    the cooldown gain and dispatches Hornet callback 74 after the steering walk.
    Unknown callback ids are counted rather than guessed.

@@ -8,4 +8,4 @@ namespace engine {
  * petals, damage, effects) will be split into engine/src/sim/. */
 void tick(World& world, double delta_milliseconds);
 
-} // namespace engine
+}  // namespace engine

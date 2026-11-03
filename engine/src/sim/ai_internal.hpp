@@ -3,7 +3,6 @@
 #include <cmath>
 namespace engine::ai_detail {
 
-
 constexpr double kTau = 6.283185307179586476925286766559;
 constexpr double kHalfPi = 1.5707963267948966192313216916398;
 // Exact shipped f32 0x1.9999ap-34. Its low bits differ from f32(0.2 / 2^31),
@@ -30,8 +29,12 @@ inline double distance_squared_d(const Vec2& first, const Vec2& second) {
 
 inline double wrap_pi(double value) {
   double wrapped = std::fmod(value, kTau);
-  if (wrapped < -3.141592653589793) wrapped += kTau;
-  if (wrapped > 3.141592653589793) wrapped -= kTau;
+  if (wrapped < -3.141592653589793) {
+    wrapped += kTau;
+  }
+  if (wrapped > 3.141592653589793) {
+    wrapped -= kTau;
+  }
   return wrapped;
 }
 
@@ -100,6 +103,5 @@ inline void configure_behavior_draws(ServerRng& rng, AiState& ai, bool same_angl
   ai.behavior_choice = static_cast<std::uint8_t>((rng.next() - 1U) & 1U);
   ai.current_angle = same_angle ? first : orientation();
 }
-
 
 }

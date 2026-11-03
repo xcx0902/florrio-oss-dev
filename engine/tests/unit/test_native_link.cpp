@@ -19,30 +19,47 @@ struct State {
 State observe(engine::World& world, engine::SnapshotPublisher& publisher) {
   State state;
   auto& out = state.domain;
-  out = {world.tick(), std::bit_cast<std::uint64_t>(world.time_ms()),
-      world.random().state(), world.rng_draws(), world.rng().state(),
-      world.death_shuffle_random().state(), world.bounds_rebuilds(), world.quadtree_updates(),
-      world.collision().tick, world.collision().bodies.size(), world.collision().candidate_pool.size()};
-  for (auto value : world.phase_draws()) out.push_back(value);
-  for (const auto& hit : world.hit_events()) {
-    out.insert(out.end(), {hit.target.raw, hit.attacker.raw, std::bit_cast<std::uint32_t>(hit.amount.value),
-        std::bit_cast<std::uint32_t>(hit.health_after.value), hit.tick, hit.count});
+  out = {world.tick(),
+         std::bit_cast<std::uint64_t>(world.time_ms()),
+         world.random().state(),
+         world.rng_draws(),
+         world.rng().state(),
+         world.death_shuffle_random().state(),
+         world.bounds_rebuilds(),
+         world.quadtree_updates(),
+         world.collision().tick,
+         world.collision().bodies.size(),
+         world.collision().candidate_pool.size()};
+  for (auto value : world.phase_draws()) {
+    out.push_back(value);
   }
-  for (auto handle : world.destroyed()) out.push_back(handle.raw);
+  for (const auto& hit : world.hit_events()) {
+    out.insert(out.end(),
+               {hit.target.raw, hit.attacker.raw, std::bit_cast<std::uint32_t>(hit.amount.value),
+                std::bit_cast<std::uint32_t>(hit.health_after.value), hit.tick, hit.count});
+  }
+  for (auto handle : world.destroyed()) {
+    out.push_back(handle.raw);
+  }
   for (const auto& entity : world.entities().active_entities()) {
     out.insert(out.end(), {entity.handle.raw, entity.type_id,
-        std::bit_cast<std::uint32_t>(entity.position.x.value),
-        std::bit_cast<std::uint32_t>(entity.position.y.value),
-        std::bit_cast<std::uint64_t>(entity.velocity.x), std::bit_cast<std::uint64_t>(entity.velocity.y),
-        std::bit_cast<std::uint32_t>(entity.health.value), entity.owner,
-        entity.ai.target.raw, entity.death_processed, std::bit_cast<std::uint64_t>(entity.death_time_ms)});
+                           std::bit_cast<std::uint32_t>(entity.position.x.value),
+                           std::bit_cast<std::uint32_t>(entity.position.y.value),
+                           std::bit_cast<std::uint64_t>(entity.velocity.x),
+                           std::bit_cast<std::uint64_t>(entity.velocity.y),
+                           std::bit_cast<std::uint32_t>(entity.health.value), entity.owner,
+                           entity.ai.target.raw, entity.death_processed,
+                           std::bit_cast<std::uint64_t>(entity.death_time_ms)});
   }
-  state.snapshot = publisher.publish(world, engine::test::player(world).id(), static_cast<std::uint32_t>(world.tick() + 1U));
+  state.snapshot = publisher.publish(world, engine::test::player(world).id(),
+                                     static_cast<std::uint32_t>(world.tick() + 1U));
   return state;
 }
 void setup(engine::World& world, const engine::WorldConfig& config) {
   engine::initialize_world(world, config);
-  CHECK(engine::spawn_player_default(world, engine::test::player(world), "native", engine::make_default_profile()).valid());
+  CHECK(engine::spawn_player_default(world, engine::test::player(world), "native",
+                                     engine::make_default_profile())
+            .valid());
   (void)engine::spawn_loadout_petals(world, engine::test::player(world));
   const auto mob = engine::diagnostics::spawn_mob(world, 4U, {});
   CHECK(mob.valid());
@@ -52,7 +69,8 @@ void setup(engine::World& world, const engine::WorldConfig& config) {
 }
 State step(engine::World& world, engine::SnapshotPublisher& publisher, unsigned index) {
   if (index == 2U) {
-    world.record_hit(engine::test::player(world).player(), {}, engine::f32(1.0F), engine::f32(99.0F));
+    world.record_hit(engine::test::player(world).player(), {}, engine::f32(1.0F),
+                     engine::f32(99.0F));
     (void)world.death_shuffle_random().next();
   }
   if (index == 3U) {
@@ -68,20 +86,24 @@ std::vector<State> isolated(const engine::WorldConfig& config) {
   publisher.reset(true);
   setup(*world, config);
   std::vector<State> result{observe(*world, publisher)};
-  for (unsigned index = 0; index < 20U; ++index) result.push_back(step(*world, publisher, index));
+  for (unsigned index = 0; index < 20U; ++index) {
+    result.push_back(step(*world, publisher, index));
+  }
   return result;
 }
 }
 int main() {
   const engine::WorldConfig a{.populate = true};
-  const engine::WorldConfig b{.populate = true, .handle_seed = 17, .game_seed = 1234567U,
-      .death_shuffle_seed = 37U};
+  const engine::WorldConfig b{
+      .populate = true, .handle_seed = 17, .game_seed = 1234567U, .death_shuffle_seed = 37U};
   const auto expected_a = isolated(a), expected_b = isolated(b);
   CHECK(expected_a.front() != expected_b.front());
   auto first = std::make_unique<engine::World>(), second = std::make_unique<engine::World>();
   engine::SnapshotPublisher publisher_a, publisher_b;
-  publisher_a.reset(true); publisher_b.reset(true);
-  setup(*first, a); setup(*second, b);
+  publisher_a.reset(true);
+  publisher_b.reset(true);
+  setup(*first, a);
+  setup(*second, b);
   CHECK(observe(*first, publisher_a) == expected_a[0]);
   CHECK(observe(*second, publisher_b) == expected_b[0]);
   for (unsigned index = 0; index < 20U; ++index) {
@@ -110,6 +132,6 @@ int main() {
   engine::advance_world(*empty);
   CHECK(empty->tick() == 1 && empty->rng_draws() == 6);
   std::printf("core-only two-world initialization/RNG/events/collision/snapshot: %s\n",
-      engine::test::failures ? "FAIL" : "PASS");
+              engine::test::failures ? "FAIL" : "PASS");
   return engine::test::failures ? 1 : 0;
 }

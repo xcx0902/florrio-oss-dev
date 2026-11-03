@@ -8,16 +8,16 @@
 
 ## RF-H1：区分协议标识和旧实现细节
 
-| 内容 | 处理规则 |
-| --- | --- |
-| `orbitFunctionIndex`、`orbit_function`、旧攻击 callback 数字 | 依照 [01](01-fields.md) 改为当前行为与参数 |
-| `func587`、`original 43/85/394` 等注释、测试名和断言文字 | 删除编号依赖，重写为当前行为、顺序和边界条件 |
-| `AI+144`、`entity+212`、`loadout+292`、旧记录大小和地址 | 移除；必要信息改写为当前字段含义、所有权或单位 |
-| `constructor: 478`、历史 `offset`、`kDenseFieldsMinus16` | 移除旧模型，建立当前协议字段与组件表示 |
-| 真实 wire 字段号、协议组件序号、包头内的实际字节位置 | 保留数值契约，用 schema 和具名常量描述 |
-| JavaScript/TypeScript 的类 `constructor`、字节 reader 的 `offset` | 属于当前编程或解析概念，不做关键词误删 |
-| `const original = structuredClone(...)` 等备份变量 | 与历史实现无关；按普通可读性要求处理 |
-| 工具对 `archive/` 的构建输入隔离或输出路径保护 | 属于当前工程约束，保留；说明采用当前职责语言 |
+| 内容                                                              | 处理规则                                       |
+| ----------------------------------------------------------------- | ---------------------------------------------- |
+| `orbitFunctionIndex`、`orbit_function`、旧攻击 callback 数字      | 依照 [01](01-fields.md) 改为当前行为与参数     |
+| `func587`、`original 43/85/394` 等注释、测试名和断言文字          | 删除编号依赖，重写为当前行为、顺序和边界条件   |
+| `AI+144`、`entity+212`、`loadout+292`、旧记录大小和地址           | 移除；必要信息改写为当前字段含义、所有权或单位 |
+| `constructor: 478`、历史 `offset`、`kDenseFieldsMinus16`          | 移除旧模型，建立当前协议字段与组件表示         |
+| 真实 wire 字段号、协议组件序号、包头内的实际字节位置              | 保留数值契约，用 schema 和具名常量描述         |
+| JavaScript/TypeScript 的类 `constructor`、字节 reader 的 `offset` | 属于当前编程或解析概念，不做关键词误删         |
+| `const original = structuredClone(...)` 等备份变量                | 与历史实现无关；按普通可读性要求处理           |
+| 工具对 `archive/` 的构建输入隔离或输出路径保护                    | 属于当前工程约束，保留；说明采用当前职责语言   |
 
 ## RF-H2：替换协议中的构造函数和布局映射
 

@@ -12,4 +12,4 @@ enum class Status : std::uint8_t {
   kUnsupported = 5,
 };
 
-} // namespace engine
+}  // namespace engine

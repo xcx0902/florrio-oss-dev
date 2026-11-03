@@ -10,7 +10,7 @@ recursive child-handle damage and an intrusive pickup list.
 damage to the same target within one tick:
 
 - the first hit appends `{target, attacker, amount, health_after, tick, epoch,
-  count=1, refcount=1, known}`;
+count=1, refcount=1, known}`;
 - later hits to the same target/epoch in the same tick add `amount`, replace
   `health_after`/attacker, and increment both `count` and `refcount`.
 

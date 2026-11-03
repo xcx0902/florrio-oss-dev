@@ -24,7 +24,8 @@ inline constexpr std::uint32_t kEntitySlotCount = 16384;
 struct EntityHandle {
   std::uint32_t raw = 0;
 
-  [[nodiscard]] static constexpr EntityHandle from_parts(std::uint32_t index, std::uint32_t generation) {
+  [[nodiscard]] static constexpr EntityHandle from_parts(std::uint32_t index,
+                                                         std::uint32_t generation) {
     return EntityHandle{(index & kEntityIndexMask) | (generation << kEntityGenerationShift)};
   }
   [[nodiscard]] static constexpr EntityHandle from_wire(std::uint32_t wire) {
@@ -114,55 +115,55 @@ struct AiModifiers {
 };
 
 struct AiState {
-  std::uint8_t activity_flags = 0; // Original AI+8 / snapshot36, latched in AI.
+  std::uint8_t activity_flags = 0;  // Original AI+8 / snapshot36, latched in AI.
   bool enabled = false;
-  bool aggressive = false;      // AI+108: seek targets
-  bool can_alert = false;       // AI+109: accept attacker aggro
-  bool chase = false;           // AI+110: lead-prediction movement
-  bool angle_locked = true;     // AI+64: face the computed direction directly
-  bool wave_enabled = false;    // AI+76: idle wave speed/turn modulation
-  bool sine_enabled = false;    // AI+88: idle sine angle wobble
-  bool guard_active = false;    // AI+184: moving to the guard point
-  bool clock_valid = true;      // AI+16: server clock is available
-  bool timer_active = false;    // AI+32: random-angle timer armed
-  f32 turn_rate = f32(0.0F);        // AI+60
-  f32 drift_rate = f32(0.2F);       // AI+68
-  f32 idle_speed = f32(1.0F);       // AI+72
-  f32 wave_frequency = f32(0.0F);   // AI+80
-  f32 wave_power = f32(2.0F);       // AI+84
-  f32 wave_amplitude = f32(1.0F);   // AI+76
-  f32 sine_frequency = f32(0.0F);   // AI+92
-  f32 sine_amplitude = f32(0.0F);   // AI+96
-  double timer_interval_ms = 0.0;   // AI+100
-  f32 territory = f32(0.0F);        // AI+104: arena threshold fraction
-  f32 lead_divisor = f32(1.0F);     // AI+112
-  f32 chase_speed = f32(2.4F);      // AI+116
-  f32 radius = f32(0.0F);           // AI+120: acquisition radius
-  f32 range_multiplier = f32(1.5F); // AI+124
-  f32 attack_range = f32(0.0F);     // AI+128: strafe/attack distance
-  f32 attack_speed = f32(0.0F);     // AI+132: speed inside attack range
-  f32 guard_radius = f32(500.0F);   // AI+136
-  f32 leash = f32(1000.0F);         // AI+140
-  std::uint32_t attack_callback = 0; // AI+144: original indirect callback id
-  f32 attack_cooldown_gain = f32(1000.0F); // AI+148
-  f32 attack_cooldown_ms = f32(0.0F);      // AI+56
-  f32 current_angle = f32(0.0F);    // AI+52: generic-AI drift angle
-  std::uint8_t behavior_choice = 0; // AI+48: configureBehavior(0,1) draw
-  double timer_deadline_ms = 0.0;   // AI+40
-  double clock_ms = 0.0;            // AI+24
-  EntityHandle owner{};             // AI+164
+  bool aggressive = false;                  // AI+108: seek targets
+  bool can_alert = false;                   // AI+109: accept attacker aggro
+  bool chase = false;                       // AI+110: lead-prediction movement
+  bool angle_locked = true;                 // AI+64: face the computed direction directly
+  bool wave_enabled = false;                // AI+76: idle wave speed/turn modulation
+  bool sine_enabled = false;                // AI+88: idle sine angle wobble
+  bool guard_active = false;                // AI+184: moving to the guard point
+  bool clock_valid = true;                  // AI+16: server clock is available
+  bool timer_active = false;                // AI+32: random-angle timer armed
+  f32 turn_rate = f32(0.0F);                // AI+60
+  f32 drift_rate = f32(0.2F);               // AI+68
+  f32 idle_speed = f32(1.0F);               // AI+72
+  f32 wave_frequency = f32(0.0F);           // AI+80
+  f32 wave_power = f32(2.0F);               // AI+84
+  f32 wave_amplitude = f32(1.0F);           // AI+76
+  f32 sine_frequency = f32(0.0F);           // AI+92
+  f32 sine_amplitude = f32(0.0F);           // AI+96
+  double timer_interval_ms = 0.0;           // AI+100
+  f32 territory = f32(0.0F);                // AI+104: arena threshold fraction
+  f32 lead_divisor = f32(1.0F);             // AI+112
+  f32 chase_speed = f32(2.4F);              // AI+116
+  f32 radius = f32(0.0F);                   // AI+120: acquisition radius
+  f32 range_multiplier = f32(1.5F);         // AI+124
+  f32 attack_range = f32(0.0F);             // AI+128: strafe/attack distance
+  f32 attack_speed = f32(0.0F);             // AI+132: speed inside attack range
+  f32 guard_radius = f32(500.0F);           // AI+136
+  f32 leash = f32(1000.0F);                 // AI+140
+  std::uint32_t attack_callback = 0;        // AI+144: original indirect callback id
+  f32 attack_cooldown_gain = f32(1000.0F);  // AI+148
+  f32 attack_cooldown_ms = f32(0.0F);       // AI+56
+  f32 current_angle = f32(0.0F);            // AI+52: generic-AI drift angle
+  std::uint8_t behavior_choice = 0;         // AI+48: configureBehavior(0,1) draw
+  double timer_deadline_ms = 0.0;           // AI+40
+  double clock_ms = 0.0;                    // AI+24
+  EntityHandle owner{};                     // AI+164
   /** Linked-segment predecessor (original entity+212 links). Only segments
    * with a live predecessor AI adopt its target; a plain owner does not gate
    * the AI update. */
   EntityHandle predecessor{};
   EntityHandle target{};
-  Vec2 guard_point;                 // AI+176/+180
+  Vec2 guard_point;  // AI+176/+180
   Vec2 home;
   bool returning = false;
   double retarget_ms = 0.0;
   AiFamily family = AiFamily::kNone;
   AiModifiers modifiers;
-  std::uint8_t variant = 0;        // ladybug variant / ant caste / centipede head
+  std::uint8_t variant = 0;  // ladybug variant / ant caste / centipede head
   bool worker = false;
   bool soldier = false;
   bool evil = false;
@@ -211,12 +212,12 @@ struct Entity {
     set_position_x(value.x);
     set_position_y(value.y);
   }
-  Vec2d velocity;          // original transform +40/+48 (f64, px per ms)
-  Vec2d acceleration;      // original transform +56/+64 (f64 per-tick impulse)
+  Vec2d velocity;      // original transform +40/+48 (f64, px per ms)
+  Vec2d acceleration;  // original transform +56/+64 (f64 per-tick impulse)
   f32 angle;
-  f32 angular_velocity = f32(0.0F); // original transform +72 (radians per ms)
-  f32 radius;              // draw radius from the catalog record
-  f32 collision_radius;    // physics +8
+  f32 angular_velocity = f32(0.0F);  // original transform +72 (radians per ms)
+  f32 radius;                        // draw radius from the catalog record
+  f32 collision_radius;              // physics +8
   /** Product of the entity's behavior modifier callbacks (original entity+192).
    * The native vtable is not reconstructed; this retains the multiplicative
    * effect on AI speed. */
@@ -241,7 +242,7 @@ struct Entity {
   std::uint32_t packet_epoch_b = 0;
   f32 health = f32(1.0F);
   f32 max_health = f32(1.0F);
-  f32 contact_damage;      // physics +44
+  f32 contact_damage;                  // physics +44
   double lifetime_remaining_ms = 0.0;  // pickup +32 countdown
   std::uint32_t owner = std::numeric_limits<std::uint32_t>::max();
   /** Creation-time control identity for attacks whose physical parent can
@@ -308,4 +309,4 @@ struct Entity {
   std::uint32_t effect_epoch = 0;
 };
 
-} // namespace engine
+}  // namespace engine

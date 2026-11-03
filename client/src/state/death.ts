@@ -1,5 +1,5 @@
 import { playerLoadoutSlots } from './loadout.js';
-import type { DeathMetadata,WorldState } from './world.js';
+import type { DeathMetadata, WorldState } from './world.js';
 
 export interface DeathSnapshot {
   readonly slots: readonly number[];
@@ -17,13 +17,21 @@ export class DeathLifecycle {
 
   observe(world: WorldState): void {
     const body = world.playerEntity();
-    if (world.selfState?.life === 1 && !body) return;
+    if (world.selfState?.life === 1 && !body) {
+      return;
+    }
     if (world.selfState && world.selfState.life >= 2 && !this.latest) {
       this.bodyHandle = body?.handle ?? 0;
-      this.latest = { slots: world.playerLoadout(), level: world.selfState.deathLevel || world.selfState.level || 1, metadata: world.deathMetadata() };
+      this.latest = {
+        slots: world.playerLoadout(),
+        level: world.selfState.deathLevel || world.selfState.level || 1,
+        metadata: world.deathMetadata(),
+      };
     }
     if (body && body.health > 0) {
-      if (body.handle !== this.bodyHandle) this.reset();
+      if (body.handle !== this.bodyHandle) {
+        this.reset();
+      }
       this.bodyHandle = body.handle;
       this.latest = {
         slots: world.playerLoadout(),
@@ -32,11 +40,16 @@ export class DeathLifecycle {
       };
       return;
     }
-    if (this.destroyed || this.bodyHandle === undefined || !this.latest) return;
-    if (world.selfState && world.selfState.life < 2) return;
-    const metadata = world.selfState || world.controller() ? world.deathMetadata() : this.latest.metadata;
+    if (this.destroyed || this.bodyHandle === undefined || !this.latest) {
+      return;
+    }
+    if (world.selfState && world.selfState.life < 2) {
+      return;
+    }
+    const metadata =
+      world.selfState || world.controller() ? world.deathMetadata() : this.latest.metadata;
     this.latest = {
-      slots: body ? playerLoadoutSlots(body) ?? this.latest.slots : this.latest.slots,
+      slots: body ? (playerLoadoutSlots(body) ?? this.latest.slots) : this.latest.slots,
       level: metadata.deathLevel || body?.level || this.latest.level,
       metadata,
     };
@@ -45,10 +58,14 @@ export class DeathLifecycle {
 
   advance(deltaMilliseconds: number): number {
     if (this.destroyed) {
-      const delta = Math.fround(Number.isFinite(deltaMilliseconds) ? Math.max(0, deltaMilliseconds) : 0);
+      const delta = Math.fround(
+        Number.isFinite(deltaMilliseconds) ? Math.max(0, deltaMilliseconds) : 0,
+      );
       // Native clientFrame1095 stores binary32 after every rendered frame.
-      this.progress = Math.fround(this.progress + (1 - this.progress)
-        * Math.max(0, Math.min(1, 1 - Math.pow(0.95, delta * 0.06))));
+      this.progress = Math.fround(
+        this.progress +
+          (1 - this.progress) * Math.max(0, Math.min(1, 1 - Math.pow(0.95, delta * 0.06))),
+      );
     }
     return this.progress;
   }
@@ -60,6 +77,10 @@ export class DeathLifecycle {
     this.progress = 0;
   }
 
-  get snapshot(): DeathSnapshot | undefined { return this.latest; }
-  get dead(): boolean { return this.destroyed; }
+  get snapshot(): DeathSnapshot | undefined {
+    return this.latest;
+  }
+  get dead(): boolean {
+    return this.destroyed;
+  }
 }

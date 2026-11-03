@@ -10,15 +10,8 @@
       "upstreamCommit": "65c1319bb92fe7a9a4abd588eff5818d9c2bccf9",
       "license": "BSL-1.0",
       "licenseFile": "LICENSE_1_0.txt",
-      "components": [
-        "asio",
-        "beast",
-        "system"
-      ],
-      "linkTargets": [
-        "florr_boost_headers",
-        "Threads::Threads"
-      ],
+      "components": ["asio", "beast", "system"],
+      "linkTargets": ["florr_boost_headers", "Threads::Threads"],
       "acquisition": "CMake URL with URL_HASH SHA256; optionally preseed the identical archive for offline builds; never latest or system-version fallback",
       "usage": "header-only Asio/Beast/System; project-owned INTERFACE headers target; official archive is not a Boost CMake source tree",
       "expectedBoostVersion": 108600

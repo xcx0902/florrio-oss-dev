@@ -12,4 +12,4 @@ bool hatch_equipped_egg(World& world, EntityHandle egg, std::uint16_t hatchling_
 /** Original equipped-slot sweep: a pet's death releases its Egg slot and
  * starts recharge in that sweep, while a living pet continues to occupy it. */
 void refresh_egg_pet_slots(World& world, PlayerState& state);
-} // namespace engine
+}  // namespace engine

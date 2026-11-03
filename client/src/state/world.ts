@@ -3,10 +3,16 @@ import { LocalPrediction } from './local-prediction.js';
 import type { NetworkClock } from './network-clock.js';
 import { mergeScalar } from './scalar.js';
 import type { DeathMetadata } from './snapshot-types.js';
-import { playerLoadoutSlots,loadoutSlots, projectDeathMetadata, isController, hasDeathMetadata } from './snapshot-projection.js';
-import { BYTE_FIELDS,FLOAT_FIELDS } from './field-types.js';
-import { interpolateCameraTarget,interpolateEntity } from './interpolation.js';
-import type { Snapshot,SnapshotEvent } from './snapshot.js';
+import {
+  playerLoadoutSlots,
+  loadoutSlots,
+  projectDeathMetadata,
+  isController,
+  hasDeathMetadata,
+} from './snapshot-projection.js';
+import { BYTE_FIELDS, FLOAT_FIELDS } from './field-types.js';
+import { interpolateCameraTarget, interpolateEntity } from './interpolation.js';
+import type { Snapshot, SnapshotEvent } from './snapshot.js';
 
 import type { EntityState } from './entity-state.js';
 import type { Leaderboard, LeaderboardEntry, SelfState } from '../schema/multiplayer.js';
@@ -25,7 +31,9 @@ export class WorldState {
   readonly snapshotBuffer = new SnapshotBuffer();
   prediction = new LocalPrediction();
   configureNetwork(clock: NetworkClock, enabled: boolean, resync: () => void): void {
-    this.networkClock = clock; this.prediction = new LocalPrediction(resync); this.prediction.enabled = enabled;
+    this.networkClock = clock;
+    this.prediction = new LocalPrediction(resync);
+    this.prediction.enabled = enabled;
   }
   private readonly entities = new Map<number, EntityState>();
   private sequence = 0;
@@ -36,9 +44,13 @@ export class WorldState {
   leaderboard: readonly LeaderboardEntry[] | undefined;
   private leaderboardTick = -1;
   applyLeaderboard(value: Leaderboard): void {
-    if (value.serverTick < this.leaderboardTick
-        || new Set(value.entries.map(entry => entry.playerId)).size !== value.entries.length) return;
-    this.leaderboard = value.entries.map(entry => ({ ...entry }));
+    if (
+      value.serverTick < this.leaderboardTick ||
+      new Set(value.entries.map((entry) => entry.playerId)).size !== value.entries.length
+    ) {
+      return;
+    }
+    this.leaderboard = value.entries.map((entry) => ({ ...entry }));
     this.leaderboardTick = value.serverTick;
   }
   setControlledPlayer(playerId: number, handle: number): void {
@@ -46,55 +58,132 @@ export class WorldState {
     this.controlledPlayerId = playerId;
     this.playerHandle = handle || undefined;
   }
-  private controllerHandle:number|undefined;
-  private loadoutCache:{key:unknown;player:number;revision:number;slots:number[]}|undefined;
-  playerLoadout():number[] {
-    if (this.explicitControl) return this.selfState?.inventory ?? [];
-    const player=this.playerEntity();if(!player)return [];
-    const key=player.byteArrayFields?.[60]??player.byteArrayField60??player.denseFields?.[60];
-    if(!this.loadoutCache||this.loadoutCache.player!==player.handle||this.loadoutCache.key!==key||this.loadoutCache.revision!==this.membershipRevision)
-      this.loadoutCache={key,player:player.handle,revision:this.membershipRevision,slots:playerLoadoutSlots(player)??loadoutSlots(this.all(),16)};
+  private controllerHandle: number | undefined;
+  private loadoutCache:
+    { key: unknown; player: number; revision: number; slots: number[] } | undefined;
+  playerLoadout(): number[] {
+    if (this.explicitControl) {
+      return this.selfState?.inventory ?? [];
+    }
+    const player = this.playerEntity();
+    if (!player) {
+      return [];
+    }
+    const key = player.byteArrayFields?.[60] ?? player.byteArrayField60 ?? player.denseFields?.[60];
+    if (
+      !this.loadoutCache ||
+      this.loadoutCache.player !== player.handle ||
+      this.loadoutCache.key !== key ||
+      this.loadoutCache.revision !== this.membershipRevision
+    ) {
+      this.loadoutCache = {
+        key,
+        player: player.handle,
+        revision: this.membershipRevision,
+        slots: playerLoadoutSlots(player) ?? loadoutSlots(this.all(), 16),
+      };
+    }
     return this.loadoutCache.slots;
   }
   private readonly byKind = new Map<number, Set<number>>();
   membershipRevision = 0;
-  lifetimeRevision=0;
-  renderOrderRevision=0;
-  discoveryRevision=0;
-  private membershipDirty=false;
-  private noteEntity(entity:import('./snapshot.js').EntitySnapshot,previous:EntityState|undefined):void {
-    if(!previous || entity.kind!==previous.kind || entity.typeId!==previous.typeId || isController(entity)!==isController(previous)) this.membershipDirty=true;
-    if(!previous || entity.kind!==previous.kind || entity.typeId!==previous.typeId || entity.speciesId!==previous.speciesId || entity.componentMask!==previous.componentMask) {
-      this.renderOrderRevision++;this.discoveryRevision++;
+  lifetimeRevision = 0;
+  renderOrderRevision = 0;
+  discoveryRevision = 0;
+  private membershipDirty = false;
+  private noteEntity(
+    entity: import('./snapshot.js').EntitySnapshot,
+    previous: EntityState | undefined,
+  ): void {
+    if (
+      !previous ||
+      entity.kind !== previous.kind ||
+      entity.typeId !== previous.typeId ||
+      isController(entity) !== isController(previous)
+    ) {
+      this.membershipDirty = true;
+    }
+    if (
+      !previous ||
+      entity.kind !== previous.kind ||
+      entity.typeId !== previous.typeId ||
+      entity.speciesId !== previous.speciesId ||
+      entity.componentMask !== previous.componentMask
+    ) {
+      this.renderOrderRevision++;
+      this.discoveryRevision++;
     }
   }
   private remove(handle: number): void {
     const entity = this.entities.get(handle);
-    if (!entity) return;
-    this.entities.delete(handle); this.byKind.get(entity.kind ?? entity.typeId)?.delete(handle);
-    if (this.playerHandle === handle) this.playerHandle = undefined;
-    this.hitTimes.delete(handle); this.visualEvents.delete(handle); this.collected.delete(handle);
-    this.membershipRevision++;this.renderOrderRevision++;this.discoveryRevision++;
-    this.membershipDirty=true;
+    if (!entity) {
+      return;
+    }
+    this.entities.delete(handle);
+    this.byKind.get(entity.kind ?? entity.typeId)?.delete(handle);
+    if (this.playerHandle === handle) {
+      this.playerHandle = undefined;
+    }
+    this.hitTimes.delete(handle);
+    this.visualEvents.delete(handle);
+    this.collected.delete(handle);
+    this.membershipRevision++;
+    this.renderOrderRevision++;
+    this.discoveryRevision++;
+    this.membershipDirty = true;
   }
   private indexMembership(): void {
-    if(!this.membershipDirty)return;
-    this.membershipDirty=false;
+    if (!this.membershipDirty) {
+      return;
+    }
+    this.membershipDirty = false;
     const current = new Map<number, Set<number>>();
     let player: number | undefined;
-    this.controllerHandle=undefined;
+    this.controllerHandle = undefined;
     for (const entity of this.entities.values()) {
       const kind = entity.kind ?? entity.typeId;
-      if(this.controllerHandle===undefined&&isController(entity))this.controllerHandle=entity.handle;
-      let set = current.get(kind); if (!set) current.set(kind, set = new Set()); set.add(entity.handle);
-      if (kind === 1 && player === undefined) player = entity.handle;
+      if (this.controllerHandle === undefined && isController(entity)) {
+        this.controllerHandle = entity.handle;
+      }
+      let set = current.get(kind);
+      if (!set) {
+        current.set(kind, (set = new Set()));
+      }
+      set.add(entity.handle);
+      if (kind === 1 && player === undefined) {
+        player = entity.handle;
+      }
     }
-    if ([...current].some(([kind, handles]) => handles.size !== this.byKind.get(kind)?.size || [...handles].some(h => !this.byKind.get(kind)?.has(h))) || [...this.byKind.keys()].some(k => !current.has(k))) this.membershipRevision++;
-    this.byKind.clear(); for (const [kind, handles] of current) this.byKind.set(kind, handles);
-    if (!this.explicitControl) this.playerHandle = player;
+    if (
+      [...current].some(
+        ([kind, handles]) =>
+          handles.size !== this.byKind.get(kind)?.size ||
+          [...handles].some((h) => !this.byKind.get(kind)?.has(h)),
+      ) ||
+      [...this.byKind.keys()].some((k) => !current.has(k))
+    ) {
+      this.membershipRevision++;
+    }
+    this.byKind.clear();
+    for (const [kind, handles] of current) {
+      this.byKind.set(kind, handles);
+    }
+    if (!this.explicitControl) {
+      this.playerHandle = player;
+    }
   }
-  *entitiesOfKind(kind: number): IterableIterator<EntityState> { for (const handle of this.byKind.get(kind) ?? []) { const entity = this.entities.get(handle); if (entity) yield entity; } }
-  healthyPlayer(): EntityState | undefined { const player = this.playerEntity(); return player && player.health > 0 ? player : undefined; }
+  *entitiesOfKind(kind: number): IterableIterator<EntityState> {
+    for (const handle of this.byKind.get(kind) ?? []) {
+      const entity = this.entities.get(handle);
+      if (entity) {
+        yield entity;
+      }
+    }
+  }
+  healthyPlayer(): EntityState | undefined {
+    const player = this.playerEntity();
+    return player && player.health > 0 ? player : undefined;
+  }
 
   private serverTime = 0;
   private events: readonly SnapshotEvent[] = [];
@@ -113,13 +202,13 @@ export class WorldState {
     for (const entity of snapshot.entities) {
       seen.add(entity.handle);
       const previous = this.entities.get(entity.handle);
-      this.noteEntity(entity,previous);
+      this.noteEntity(entity, previous);
       this.entities.set(entity.handle, {
         ...entity,
         // Synthetic traces apply at clock 0; treat those as already settled so
         // the archived first frame keeps the native full-size drop card.
         firstSeenAt: previous?.firstSeenAt ?? (now > 0 ? now : Number.NEGATIVE_INFINITY),
-        arrivalMarked: previous?.arrivalMarked ?? ((entity.flags & 128) !== 0),
+        arrivalMarked: previous?.arrivalMarked ?? (entity.flags & 128) !== 0,
         previousX: previous?.x ?? entity.x,
         previousY: previous?.y ?? entity.y,
         previousAngle: previous?.angle ?? entity.angle,
@@ -127,7 +216,11 @@ export class WorldState {
         receivedAt: now,
       });
     }
-    for (const handle of this.entities.keys()) if (!seen.has(handle)) this.remove(handle);
+    for (const handle of this.entities.keys()) {
+      if (!seen.has(handle)) {
+        this.remove(handle);
+      }
+    }
     this.indexMembership();
   }
 
@@ -151,37 +244,83 @@ export class WorldState {
       // The native control component already exists at the menu with a zero
       // camera target. Joining attaches the player to that component; its
       // first follow coordinates therefore interpolate from the origin.
-      const displayedCamera = previous ? interpolateCameraTarget(previous, now)
-        : entity.kind === 1 ? this.controlledCamera
-          ? interpolateCameraTarget(this.controlledCamera, now) : { x: 0, y: 0 }
-        : { x: entity.cameraX ?? entity.x, y: entity.cameraY ?? entity.y };
-      const hasFloat = (field: number): boolean =>
-        entity.floatFields?.[field] !== undefined;
+      const displayedCamera = previous
+        ? interpolateCameraTarget(previous, now)
+        : entity.kind === 1
+          ? this.controlledCamera
+            ? interpolateCameraTarget(this.controlledCamera, now)
+            : { x: 0, y: 0 }
+          : { x: entity.cameraX ?? entity.x, y: entity.cameraY ?? entity.y };
+      const hasFloat = (field: number): boolean => entity.floatFields?.[field] !== undefined;
       const hasDense = (field: number): boolean =>
-        entity.denseFields !== undefined && Object.prototype.hasOwnProperty.call(entity.denseFields, field);
+        entity.denseFields !== undefined &&
+        Object.prototype.hasOwnProperty.call(entity.denseFields, field);
       const hasVisualX = hasFloat(49) || hasDense(49);
       const hasVisualY = hasFloat(28) || hasDense(28);
       const hasCameraX = hasFloat(5) || hasDense(5);
       const hasCameraY = hasFloat(24) || hasDense(24);
-      const hasX = hasVisualX || hasCameraX && previous?.floatFields?.[49] === undefined && previous?.denseFields?.[49] === undefined;
-      const hasY = hasVisualY || hasCameraY && previous?.floatFields?.[28] === undefined && previous?.denseFields?.[28] === undefined;
-      const x = mergeScalar(previous ? { value: previous.x, from: previous.previousX, receivedAt: previous.receivedXAt ?? previous.receivedAt, known: true } : undefined, hasX ? entity.x : undefined, displayed.x, now);
-      const y = mergeScalar(previous ? { value: previous.y, from: previous.previousY, receivedAt: previous.receivedYAt ?? previous.receivedAt, known: true } : undefined, hasY ? entity.y : undefined, displayed.y, now);
+      const hasX =
+        hasVisualX ||
+        (hasCameraX &&
+          previous?.floatFields?.[49] === undefined &&
+          previous?.denseFields?.[49] === undefined);
+      const hasY =
+        hasVisualY ||
+        (hasCameraY &&
+          previous?.floatFields?.[28] === undefined &&
+          previous?.denseFields?.[28] === undefined);
+      const x = mergeScalar(
+        previous
+          ? {
+              value: previous.x,
+              from: previous.previousX,
+              receivedAt: previous.receivedXAt ?? previous.receivedAt,
+              known: true,
+            }
+          : undefined,
+        hasX ? entity.x : undefined,
+        displayed.x,
+        now,
+      );
+      const y = mergeScalar(
+        previous
+          ? {
+              value: previous.y,
+              from: previous.previousY,
+              receivedAt: previous.receivedYAt ?? previous.receivedAt,
+              known: true,
+            }
+          : undefined,
+        hasY ? entity.y : undefined,
+        displayed.y,
+        now,
+      );
       const hasAngle = entity.angleField8 !== undefined || hasDense(8);
       const hasRadius = hasFloat(7) || hasDense(7);
       const hasScore = hasFloat(59) || hasDense(59);
-      const displayedScore = previous?.score === undefined ? entity.score
-        : Math.fround((previous.previousScore ?? previous.score)
-          + Math.fround(previous.score - (previous.previousScore ?? previous.score))
-          * Math.max(0, Math.min(1, (now - (previous.receivedScoreAt ?? previous.receivedAt)) / 120)));
-      const rawVisualFlags = entity.byteFields?.[38] ?? entity.denseByteFields?.[38] ?? entity.denseFields?.[38];
-      const visualFlags = typeof rawVisualFlags === 'number' ? rawVisualFlags : previous?.visualFlags;
-      const mergedDenseFields = previous?.denseFields !== undefined && entity.denseFields !== undefined
-        ? { ...previous.denseFields, ...entity.denseFields }
-        : (entity.denseFields ?? previous?.denseFields);
-      const mergeRecord = <T>(a: Readonly<Record<number, T>> | undefined,
-                             b: Readonly<Record<number, T>> | undefined):
-        Readonly<Record<number, T>> | undefined =>
+      const displayedScore =
+        previous?.score === undefined
+          ? entity.score
+          : Math.fround(
+              (previous.previousScore ?? previous.score) +
+                Math.fround(previous.score - (previous.previousScore ?? previous.score)) *
+                  Math.max(
+                    0,
+                    Math.min(1, (now - (previous.receivedScoreAt ?? previous.receivedAt)) / 120),
+                  ),
+            );
+      const rawVisualFlags =
+        entity.byteFields?.[38] ?? entity.denseByteFields?.[38] ?? entity.denseFields?.[38];
+      const visualFlags =
+        typeof rawVisualFlags === 'number' ? rawVisualFlags : previous?.visualFlags;
+      const mergedDenseFields =
+        previous?.denseFields !== undefined && entity.denseFields !== undefined
+          ? { ...previous.denseFields, ...entity.denseFields }
+          : (entity.denseFields ?? previous?.denseFields);
+      const mergeRecord = <T>(
+        a: Readonly<Record<number, T>> | undefined,
+        b: Readonly<Record<number, T>> | undefined,
+      ): Readonly<Record<number, T>> | undefined =>
         a !== undefined && b !== undefined ? { ...a, ...b } : (b ?? a);
       let mergedFloatFields = mergeRecord(previous?.floatFields, entity.floatFields);
       let mergedByteFields = mergeRecord(previous?.byteFields, entity.byteFields);
@@ -189,10 +328,15 @@ export class WorldState {
       // Keep the current field view coherent when the encoding changes, so
       // an older sparse flag cannot hide a newer dense activity/effect byte.
       for (const [fieldText, value] of Object.entries(entity.denseFields ?? {})) {
-        if (typeof value !== 'number') continue;
+        if (typeof value !== 'number') {
+          continue;
+        }
         const field = Number(fieldText);
-        if (BYTE_FIELDS.has(field)) mergedByteFields = { ...mergedByteFields, [field]: value };
-        else if (FLOAT_FIELDS.has(field)) mergedFloatFields = { ...mergedFloatFields, [field]: value };
+        if (BYTE_FIELDS.has(field)) {
+          mergedByteFields = { ...mergedByteFields, [field]: value };
+        } else if (FLOAT_FIELDS.has(field)) {
+          mergedFloatFields = { ...mergedFloatFields, [field]: value };
+        }
       }
       const mergedVarintFields = mergeRecord(previous?.varintFields, entity.varintFields);
       const mergedReferenceFields = mergeRecord(previous?.referenceFields, entity.referenceFields);
@@ -201,13 +345,20 @@ export class WorldState {
       const mergedDenseByteFields = mergeRecord(previous?.denseByteFields, entity.denseByteFields);
       const mergeIndexed = <T extends { readonly index: number }>(
         a: Readonly<Record<number, readonly T[]>> | undefined,
-        b: Readonly<Record<number, readonly T[]>> | undefined): Readonly<Record<number, readonly T[]>> | undefined => {
-        if (!b) return a;
+        b: Readonly<Record<number, readonly T[]>> | undefined,
+      ): Readonly<Record<number, readonly T[]>> | undefined => {
+        if (!b) {
+          return a;
+        }
         const result = { ...a };
         for (const [field, items] of Object.entries(b)) {
-          const entries = new Map((result[Number(field)] ?? []).map(item => [item.index, item]));
-          for (const item of items) entries.set(item.index, item);
-          result[Number(field)] = [...entries.values()].sort((left, right) => left.index - right.index);
+          const entries = new Map((result[Number(field)] ?? []).map((item) => [item.index, item]));
+          for (const item of items) {
+            entries.set(item.index, item);
+          }
+          result[Number(field)] = [...entries.values()].sort(
+            (left, right) => left.index - right.index,
+          );
         }
         return result;
       };
@@ -215,11 +366,20 @@ export class WorldState {
       let mergedShortArrays = mergeIndexed(previous?.shortArrayFields, entity.shortArrayFields);
       // A dense group replaces its complete array; sparse element deltas
       // retain all other indices, including when a value becomes zero.
-      const denseInventory = entity.denseFields?.[60], denseRecharge = entity.denseFields?.[61];
-      if (Array.isArray(denseInventory)) mergedByteArrays = { ...mergedByteArrays,
-        60: denseInventory.map((value, index) => ({ index, value: Number(value) })) };
-      if (Array.isArray(denseRecharge)) mergedShortArrays = { ...mergedShortArrays,
-        61: denseRecharge.map((value, index) => ({ index, value: Number(value) })) };
+      const denseInventory = entity.denseFields?.[60],
+        denseRecharge = entity.denseFields?.[61];
+      if (Array.isArray(denseInventory)) {
+        mergedByteArrays = {
+          ...mergedByteArrays,
+          60: denseInventory.map((value, index) => ({ index, value: Number(value) })),
+        };
+      }
+      if (Array.isArray(denseRecharge)) {
+        mergedShortArrays = {
+          ...mergedShortArrays,
+          61: denseRecharge.map((value, index) => ({ index, value: Number(value) })),
+        };
+      }
       let mergedComponents = previous?.components;
       if (entity.components !== undefined) {
         const components: Record<number, Record<number, unknown>> = {};
@@ -236,18 +396,23 @@ export class WorldState {
       // an earlier packet must not override a subsequent sparse field 8.
       const dense8 = entity.denseFields?.[8];
       const angle = hasAngle
-        ? (typeof dense8 === 'number' ? dense8 * (2 * Math.PI / 65535) : entity.angle)
+        ? typeof dense8 === 'number'
+          ? dense8 * ((2 * Math.PI) / 65535)
+          : entity.angle
         : (previous?.angle ?? entity.angle);
       const health = entity.healthKnown ? entity.health : (previous?.health ?? entity.health);
-      const maxHealth = entity.maxHealthKnown ? entity.maxHealth : (previous?.maxHealth ?? entity.maxHealth);
+      const maxHealth = entity.maxHealthKnown
+        ? entity.maxHealth
+        : (previous?.maxHealth ?? entity.maxHealth);
       const kind = entity.kind ?? previous?.kind;
       const radius = entity.radius ?? previous?.radius;
       const speciesId = entity.speciesId ?? previous?.speciesId;
-      const typeId = kind ?? (entity.typeId !== 0 ? entity.typeId : (previous?.typeId ?? entity.typeId));
-      const merged:EntityState = {
+      const typeId =
+        kind ?? (entity.typeId !== 0 ? entity.typeId : (previous?.typeId ?? entity.typeId));
+      const merged: EntityState = {
         ...entity,
         firstSeenAt: previous?.firstSeenAt ?? (now > 0 ? now : Number.NEGATIVE_INFINITY),
-        arrivalMarked: previous?.arrivalMarked ?? ((entity.flags & 128) !== 0),
+        arrivalMarked: previous?.arrivalMarked ?? (entity.flags & 128) !== 0,
         typeId,
         kind,
         speciesId,
@@ -257,8 +422,8 @@ export class WorldState {
         maxHealthKnown: entity.maxHealthKnown === true || previous?.maxHealthKnown === true,
         x: x.value,
         y: y.value,
-        cameraX: hasCameraX ? entity.cameraX ?? entity.x : previous?.cameraX,
-        cameraY: hasCameraY ? entity.cameraY ?? entity.y : previous?.cameraY,
+        cameraX: hasCameraX ? (entity.cameraX ?? entity.x) : previous?.cameraX,
+        cameraY: hasCameraY ? (entity.cameraY ?? entity.y) : previous?.cameraY,
         angle,
         radius,
         health,
@@ -269,8 +434,10 @@ export class WorldState {
         previousScore: hasScore ? displayedScore : previous?.previousScore,
         receivedScoreAt: hasScore ? now : previous?.receivedScoreAt,
         visualFlags,
-        fadingAt: visualFlags !== undefined && (visualFlags & 1) !== 0
-          ? previous?.fadingAt ?? (previous ? now : now - 150) : previous?.fadingAt,
+        fadingAt:
+          visualFlags !== undefined && (visualFlags & 1) !== 0
+            ? (previous?.fadingAt ?? (previous ? now : now - 150))
+            : previous?.fadingAt,
         flags: entity.flags !== 0 ? entity.flags : (previous?.flags ?? 0),
         componentMask: entity.componentMask ?? previous?.componentMask,
         denseFields: mergedDenseFields,
@@ -298,13 +465,19 @@ export class WorldState {
         receivedCameraYAt: hasCameraY ? now : previous?.receivedCameraYAt,
         receivedXAt: x.receivedAt,
         receivedYAt: y.receivedAt,
-        receivedAngleAt: hasAngle ? now : (previous?.receivedAngleAt ?? previous?.receivedAt ?? now),
-        receivedRadiusAt: hasRadius ? now : (previous?.receivedRadiusAt ?? previous?.receivedAt ?? now),
+        receivedAngleAt: hasAngle
+          ? now
+          : (previous?.receivedAngleAt ?? previous?.receivedAt ?? now),
+        receivedRadiusAt: hasRadius
+          ? now
+          : (previous?.receivedRadiusAt ?? previous?.receivedAt ?? now),
         receivedAt: now,
       };
-      this.noteEntity(merged,previous);
-      this.entities.set(entity.handle,merged);
-      if (kind === 1 && (!this.explicitControl || entity.handle === this.playerHandle)) this.controlledCamera = this.entities.get(entity.handle);
+      this.noteEntity(merged, previous);
+      this.entities.set(entity.handle, merged);
+      if (kind === 1 && (!this.explicitControl || entity.handle === this.playerHandle)) {
+        this.controlledCamera = this.entities.get(entity.handle);
+      }
     }
     this.indexMembership();
   }
@@ -314,28 +487,47 @@ export class WorldState {
     for (const event of this.events) {
       if (event.opcode === 9) {
         this.chatLines.push(event.text);
-        if (this.chatLines.length > 8) this.chatLines.shift();
+        if (this.chatLines.length > 8) {
+          this.chatLines.shift();
+        }
       } else if (event.opcode === 14) {
-        this.visualEvents.set(event.handle, { handle: event.handle, index: event.index, receivedAt: now });
+        this.visualEvents.set(event.handle, {
+          handle: event.handle,
+          index: event.index,
+          receivedAt: now,
+        });
       } else if (event.opcode === 11) {
         // Opcode 11 stamps the hit clock; opcode 14 has its own indexed
         // presentation object and must not overwrite the hit timestamp.
         this.hitTimes.set(event.handle, now);
       }
     }
-    for (const [handle, visual] of this.visualEvents)
-      if (now - visual.receivedAt > 1000) this.visualEvents.delete(handle);
-    for (const [handle, at] of this.hitTimes)
-      if (now - at > 1000) this.hitTimes.delete(handle);
+    for (const [handle, visual] of this.visualEvents) {
+      if (now - visual.receivedAt > 1000) {
+        this.visualEvents.delete(handle);
+      }
+    }
+    for (const [handle, at] of this.hitTimes) {
+      if (now - at > 1000) {
+        this.hitTimes.delete(handle);
+      }
+    }
   }
 
   /** Clear all client-side state (used when replacing a product fixture or session). */
   reset(): void {
     this.lifetimeRevision++;
-    this.snapshotBuffer.reset(); this.prediction.reset();
+    this.snapshotBuffer.reset();
+    this.prediction.reset();
     this.entities.clear();
-    this.byKind.clear(); this.playerHandle = undefined; this.membershipRevision++;
-    this.membershipDirty=false;this.controllerHandle=undefined;this.loadoutCache=undefined;this.renderOrderRevision++;this.discoveryRevision++;
+    this.byKind.clear();
+    this.playerHandle = undefined;
+    this.membershipRevision++;
+    this.membershipDirty = false;
+    this.controllerHandle = undefined;
+    this.loadoutCache = undefined;
+    this.renderOrderRevision++;
+    this.discoveryRevision++;
     this.chatLines.length = 0;
     this.visualEvents.clear();
     this.hitTimes.clear();
@@ -344,86 +536,153 @@ export class WorldState {
     this.events = [];
     this.sequence = 0;
     this.serverTime = 0;
-    this.explicitControl = false; this.controlledPlayerId = 0; this.selfState = undefined;
-    this.leaderboard = undefined; this.leaderboardTick = -1;
+    this.explicitControl = false;
+    this.controlledPlayerId = 0;
+    this.selfState = undefined;
+    this.leaderboard = undefined;
+    this.leaderboardTick = -1;
   }
 
   /** All records have already been validated before this atomic receipt step. */
   applyNetworkSnapshot(value: AppliedNetworkSnapshot, playerId: number, now: number): void {
     const { snapshot: s } = value;
-    if (s.full) this.reset();
+    if (s.full) {
+      this.reset();
+    }
     this.setControlledPlayer(playerId, s.controlledHandle);
     this.selfState = s.selfState;
-    const handles = new Set(s.entities.map(entity => entity.handle));
+    const handles = new Set(s.entities.map((entity) => entity.handle));
     // Private HUD/camera data can change while the public entity block is unchanged.
-    if (s.controlledHandle) handles.add(s.controlledHandle);
-    const entities = [...handles].flatMap(handle => {
+    if (s.controlledHandle) {
+      handles.add(s.controlledHandle);
+    }
+    const entities = [...handles].flatMap((handle) => {
       const entry = value.entities.get(handle);
-      if (!entry) return [];
-      const nickname = entry.records.find(record => record.stringField4)?.stringField4;
-      return entry.records.map(record => {
-        const entity = { ...record, ...entry.ownership, nickname,
-          networkTransform: this.networkClock ? (at: number, result: import('./interpolation.js').MutableTransform) => this.networkTransform(handle, at, result) : undefined };
-        if (handle !== s.controlledHandle) return entity;
+      if (!entry) {
+        return [];
+      }
+      const nickname = entry.records.find((record) => record.stringField4)?.stringField4;
+      return entry.records.map((record) => {
+        const entity = {
+          ...record,
+          ...entry.ownership,
+          nickname,
+          networkTransform: this.networkClock
+            ? (at: number, result: import('./interpolation.js').MutableTransform) =>
+                this.networkTransform(handle, at, result)
+            : undefined,
+        };
+        if (handle !== s.controlledHandle) {
+          return entity;
+        }
         const self = s.selfState;
         const threshold = Math.fround(Math.floor(self.level * 1.06 ** (self.level - 1)) + 3);
-        return { ...entity, level: self.level, score: self.score, levelProgress: Math.max(0, Math.min(1, self.experience / threshold)),
-          cameraX: self.cameraX, cameraY: self.cameraY,
+        return {
+          ...entity,
+          level: self.level,
+          score: self.score,
+          levelProgress: Math.max(0, Math.min(1, self.experience / threshold)),
+          cameraX: self.cameraX,
+          cameraY: self.cameraY,
           floatFields: { ...entity.floatFields, 5: self.cameraX, 24: self.cameraY, 59: self.score },
           byteFields: { ...entity.byteFields, 63: self.zoneProgress },
           byteArrayFields: { 60: self.inventory.map((value, index) => ({ value, index })) },
-          shortArrayFields: { 61: self.recharge.map((value, index) => ({ value, index })) } };
+          shortArrayFields: { 61: self.recharge.map((value, index) => ({ value, index })) },
+        };
       });
     });
     const events: SnapshotEvent[] = value.events.flatMap((event): SnapshotEvent[] => {
-      if (event.kind === 1) return [{ opcode: 11, handle: event.target }];
-      if (event.kind === 2 && event.actorPlayerId === playerId) return [{ opcode: 14, handle: event.target, index: event.slot }];
-      if (event.kind === 3) return [{ opcode: 9, text: event.text }];
+      if (event.kind === 1) {
+        return [{ opcode: 11, handle: event.target }];
+      }
+      if (event.kind === 2 && event.actorPlayerId === playerId) {
+        return [{ opcode: 14, handle: event.target, index: event.slot }];
+      }
+      if (event.kind === 3) {
+        return [{ opcode: 9, text: event.text }];
+      }
       return [];
     });
-    this.applyDeltaSnapshot({ sequence: s.snapshotSeq, serverTime: s.serverTick * 50, entities, deletedHandles: s.removed, events }, now);
+    this.applyDeltaSnapshot(
+      {
+        sequence: s.snapshotSeq,
+        serverTime: s.serverTick * 50,
+        entities,
+        deletedHandles: s.removed,
+        events,
+      },
+      now,
+    );
     // Removal never changes the explicit binding or selects another player.
     this.setControlledPlayer(playerId, s.controlledHandle);
     this.snapshotBuffer.push(s.serverTick, this.entities.values());
-    if (this.networkClock) this.prediction.reconcile(s, now, this.networkClock);
+    if (this.networkClock) {
+      this.prediction.reconcile(s, now, this.networkClock);
+    }
   }
 
-  private networkTransform(handle: number, now: number, result: import('./interpolation.js').MutableTransform): import('./interpolation.js').MutableTransform {
+  private networkTransform(
+    handle: number,
+    now: number,
+    result: import('./interpolation.js').MutableTransform,
+  ): import('./interpolation.js').MutableTransform {
     const entity = this.entities.get(handle);
     // A retained death/camera transform can outlive its authoritative handle.
-    if (!entity) return result;
-    result.x = entity.x; result.y = entity.y; result.angle = entity.angle; result.radius = entity.radius;
-    if (!this.networkClock) return result;
+    if (!entity) {
+      return result;
+    }
+    result.x = entity.x;
+    result.y = entity.y;
+    result.angle = entity.angle;
+    result.radius = entity.radius;
+    if (!this.networkClock) {
+      return result;
+    }
     if (handle === this.playerHandle && this.prediction.active) {
       const position = this.prediction.display(now, this.networkClock);
-      if (position) { result.x = position.x; result.y = position.y; return result; }
+      if (position) {
+        result.x = position.x;
+        result.y = position.y;
+        return result;
+      }
     }
     const renderTime = this.networkClock.estimate(now) - this.networkClock.delayMs;
     this.snapshotBuffer.sample(handle, renderTime, result);
     // Attached petals follow a bounded translation of their own authoritative
     // trajectory. Ownership, launch, cooldown and damage stay authoritative.
     if (entity.ownerHandle === this.playerHandle && entity.kind === 3 && this.prediction.active) {
-      const body = this.playerEntity(), display = this.prediction.display(now, this.networkClock);
+      const body = this.playerEntity(),
+        display = this.prediction.display(now, this.networkClock);
       if (body && display) {
         // Body and petal must share the same buffered time before translation.
         // Subtracting the newest raw body made petals jump on every receipt.
         const origin = { x: body.x, y: body.y, angle: body.angle };
         this.snapshotBuffer.sample(body.handle, renderTime, origin);
-        const dx = display.x - origin.x, dy = display.y - origin.y, distance = Math.hypot(dx, dy);
+        const dx = display.x - origin.x,
+          dy = display.y - origin.y,
+          distance = Math.hypot(dx, dy);
         const scale = distance ? Math.min(1, (body.radius ?? 25) / distance) : 0;
-        result.x += dx * scale; result.y += dy * scale;
+        result.x += dx * scale;
+        result.y += dy * scale;
       }
     }
     return result;
   }
 
-  get(handle: number): EntityState | undefined { return this.entities.get(handle); }
-  all(): IterableIterator<EntityState> { return this.entities.values(); }
+  get(handle: number): EntityState | undefined {
+    return this.entities.get(handle);
+  }
+  all(): IterableIterator<EntityState> {
+    return this.entities.values();
+  }
   /** The controller record is the only entity carrying field 56 (viewer
    * handle); its death fields remain after the controlled body is removed. */
   controller(): EntityState | undefined {
-    if(this.controllerHandle!==undefined) {
-      const controller=this.entities.get(this.controllerHandle);if(controller)return controller;
+    if (this.controllerHandle !== undefined) {
+      const controller = this.entities.get(this.controllerHandle);
+      if (controller) {
+        return controller;
+      }
     }
     // The original controller storage record is not a gameplay entity. A
     // few snapshots merge its profile fields onto the controlled body when
@@ -435,8 +694,15 @@ export class WorldState {
   deathMetadata(): DeathMetadata {
     if (this.selfState) {
       const self = this.selfState;
-      return { killerName: self.killerName, keptCount: self.kept.length, keptItems: self.kept, score: self.deathScore,
-        deathLevel: self.deathLevel, respawnLevel: Math.max(1, Math.floor(self.deathLevel * 3 / 4)), viewerHandle: this.playerHandle };
+      return {
+        killerName: self.killerName,
+        keptCount: self.kept.length,
+        keptItems: self.kept,
+        score: self.deathScore,
+        deathLevel: self.deathLevel,
+        respawnLevel: Math.max(1, Math.floor((self.deathLevel * 3) / 4)),
+        viewerHandle: this.playerHandle,
+      };
     }
     return projectDeathMetadata(this.controller());
   }
@@ -447,24 +713,45 @@ export class WorldState {
   /** Authoritative deletion is immediate: the old 150 ms retiring window made
    * killed mobs/petals flash back into view before disappearing. */
   *renderable(_now: number): IterableIterator<EntityState> {
-    for (const entity of this.entities.values())
-      if (!this.collected.has(entity.handle)) yield entity;
+    for (const entity of this.entities.values()) {
+      if (!this.collected.has(entity.handle)) {
+        yield entity;
+      }
+    }
   }
-  isRenderable(handle:number):boolean {return this.entities.has(handle)&&!this.collected.has(handle);}
-  get count(): number { return this.entities.size; }
+  isRenderable(handle: number): boolean {
+    return this.entities.has(handle) && !this.collected.has(handle);
+  }
+  get count(): number {
+    return this.entities.size;
+  }
   /** Original event14 marks the pickup visual as owned by its HUD transfer. */
-  markCollected(handle: number): void { this.collected.add(handle); }
-  get lastSequence(): number { return this.sequence; }
-  get lastServerTime(): number { return this.serverTime; }
-  get lastEvents(): readonly SnapshotEvent[] { return this.events; }
-  get chat(): readonly string[] { return this.chatLines; }
+  markCollected(handle: number): void {
+    this.collected.add(handle);
+  }
+  get lastSequence(): number {
+    return this.sequence;
+  }
+  get lastServerTime(): number {
+    return this.serverTime;
+  }
+  get lastEvents(): readonly SnapshotEvent[] {
+    return this.events;
+  }
+  get chat(): readonly string[] {
+    return this.chatLines;
+  }
   /** Visual hit index (1..4) for the last 180 ms, or 0 when idle. */
   visualIndex(handle: number, now: number): number {
     const visual = this.visualEvents.get(handle);
-    if (visual === undefined || now - visual.receivedAt > 180) return 0;
+    if (visual === undefined || now - visual.receivedAt > 180) {
+      return 0;
+    }
     return visual.index;
   }
-  hitTime(handle: number): number | undefined { return this.hitTimes.get(handle); }
+  hitTime(handle: number): number | undefined {
+    return this.hitTimes.get(handle);
+  }
   hitFlash(handle: number, now: number): number {
     const at = this.hitTime(handle);
     return at === undefined ? 0 : Math.max(0, Math.min(1, 1 - (now - at) / 150));

@@ -12,15 +12,15 @@
 
 ## 身份契约
 
-| 名称 | 范围与表示 | 生命周期 |
-| --- | --- | --- |
-| RoomId | 配置/握手中的房间名，不是安全凭据 | 同名房间可销毁重建 |
-| RoomEpoch | 房间实例的随机 128-bit 值 | 新建房间重新生成；旧实例消息无效 |
-| PlayerId | 房间内非零 u32，递增分配、不复用 | 死亡、重生、grace 内重连保持；最终离场后失效 |
-| EntityHandle | 现有 u32：14-bit slot + 18-bit generation，0 无实体 | 每次重生换 handle；不得充当持久玩家身份 |
-| LifeEpoch | PlayerState 的 u32，未出生为 0 | 每次成功出生递增；死亡时保留；旧生命命令不得操作新身体 |
-| ConnectionId | 进程内非零 u64，递增、不复用；宿主内部使用 | 每次 transport 连接新建；不得由客户端选取 |
-| SessionEpoch | 非零 u32，进程内递增分配、不复用 | 初次入房、重连换连接时分配；旧回调/包不能更新新会话 |
+| 名称         | 范围与表示                                          | 生命周期                                               |
+| ------------ | --------------------------------------------------- | ------------------------------------------------------ |
+| RoomId       | 配置/握手中的房间名，不是安全凭据                   | 同名房间可销毁重建                                     |
+| RoomEpoch    | 房间实例的随机 128-bit 值                           | 新建房间重新生成；旧实例消息无效                       |
+| PlayerId     | 房间内非零 u32，递增分配、不复用                    | 死亡、重生、grace 内重连保持；最终离场后失效           |
+| EntityHandle | 现有 u32：14-bit slot + 18-bit generation，0 无实体 | 每次重生换 handle；不得充当持久玩家身份                |
+| LifeEpoch    | PlayerState 的 u32，未出生为 0                      | 每次成功出生递增；死亡时保留；旧生命命令不得操作新身体 |
+| ConnectionId | 进程内非零 u64，递增、不复用；宿主内部使用          | 每次 transport 连接新建；不得由客户端选取              |
+| SessionEpoch | 非零 u32，进程内递增分配、不复用                    | 初次入房、重连换连接时分配；旧回调/包不能更新新会话    |
 
 所有身份判断包含房间实例与当前连接绑定。客户端发送 LifeEpoch 是声明期望生命，不能选择 PlayerId/handle。inputSeq、commandSeq、snapshotSeq、baselineId 均为非零 u32；序号不回绕。计数接近上限时有界排空并换会话/房间，LifeEpoch/PlayerId 耗尽则结束该身份，ConnectionId 耗尽则排空进程。serverTick 内部 u64、v2 线格式 u32；到线格式上限前排空房间。禁止用浮点 number 保存 u64 身份。
 
@@ -36,16 +36,16 @@ M01 提取共用初始化与 tick RNG 约定：当前 `WorkerApi::init(true)` �
 
 ## 生命、断线与重置
 
-| 操作 | 行为 |
-| --- | --- |
-| 加入 | Hello 验证后创建 PlayerState/绑定；出生命令成功才创建 body、递增 LifeEpoch |
-| 死亡 | 一次性结算归因/掉落/保留物，body 留 20 tick 尸体；PlayerId/profile 死亡资料保留 |
-| 重生 | 按既有 profile 保留规则、出生门槛创建新 handle，递增 LifeEpoch；清除旧生命输入和命令 |
-| 断线 | 立即使旧连接/SessionEpoch 失效；PlayerState 保留 200 tick；身体继续受伤，输入按 TTL 中立 |
-| 显式 Leave | 停止新输入、撤销 resume token，仍保留 200 tick 可受伤身体，不能用退出避伤 |
+| 操作         | 行为                                                                                                 |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| 加入         | Hello 验证后创建 PlayerState/绑定；出生命令成功才创建 body、递增 LifeEpoch                           |
+| 死亡         | 一次性结算归因/掉落/保留物，body 留 20 tick 尸体；PlayerId/profile 死亡资料保留                      |
+| 重生         | 按既有 profile 保留规则、出生门槛创建新 handle，递增 LifeEpoch；清除旧生命输入和命令                 |
+| 断线         | 立即使旧连接/SessionEpoch 失效；PlayerState 保留 200 tick；身体继续受伤，输入按 TTL 中立             |
+| 显式 Leave   | 停止新输入、撤销 resume token，仍保留 200 tick 可受伤身体，不能用退出避伤                            |
 | grace 内恢复 | token 验证并原子轮换，恢复同 PlayerId、当前真实死活/LifeEpoch，新 ConnectionId/SessionEpoch/全量基线 |
-| grace 到期 | 统一清理该玩家的关联实体/效果/队列/缓存；不伪造击杀、XP 或第二次死亡掉落 |
-| 房间销毁 | 无活跃或保留玩家后再计空房 TTL；取消房间全部任务；同名重建换 RoomEpoch |
+| grace 到期   | 统一清理该玩家的关联实体/效果/队列/缓存；不伪造击杀、XP 或第二次死亡掉落                             |
+| 房间销毁     | 无活跃或保留玩家后再计空房 TTL；取消房间全部任务；同名重建换 RoomEpoch                               |
 
 出生门槛从上次**成功出生**起算 50 tick，不从死亡重新起算。断线保留从检测到断线的 tick 起算，不能被旧输入续期。只有整体房间初始化/销毁可以 reset World；死亡、重生、离场、重连均不可 reset。
 

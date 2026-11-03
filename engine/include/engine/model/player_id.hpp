@@ -10,4 +10,4 @@ struct PlayerId {
   constexpr auto operator<=>(const PlayerId&) const = default;
 };
 using LifeEpoch = std::uint64_t;
-} // namespace engine
+}  // namespace engine

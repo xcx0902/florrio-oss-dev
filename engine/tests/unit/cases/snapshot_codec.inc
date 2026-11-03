@@ -50,12 +50,13 @@ void test_input_decoder() {
   sanitized.write_varint32(8);
   sanitized.write_varint32(12);
   sanitized.write_varint32(0);
-  sanitized.write_u32_le(0x00000001U); // subnormal
-  sanitized.write_u32_le(0x7FC00000U); // NaN
+  sanitized.write_u32_le(0x00000001U);  // subnormal
+  sanitized.write_u32_le(0x7FC00000U);  // NaN
   std::vector<std::uint8_t> sanitized_packet = sanitized.bytes();
   engine::apply_packet_xor(sanitized_packet, key);
   std::vector<engine::InputMessage> sanitized_messages;
-  CHECK(engine::decode_input_packet(sanitized_packet, key, sanitized_messages) == engine::Status::kOk);
+  CHECK(engine::decode_input_packet(sanitized_packet, key, sanitized_messages) ==
+        engine::Status::kOk);
   CHECK(sanitized_messages.size() == 1);
   CHECK(sanitized_messages[0].sequence == 8);
   CHECK(sanitized_messages[0].command.angle == 0.0F);
@@ -71,20 +72,30 @@ void test_input_decoder() {
   engine::ByteWriter strings;
   strings.write_varint32(9);
   strings.write_varint32(5);
-  for (const char byte : std::string("hello")) strings.write_u8(static_cast<std::uint8_t>(byte));
+  for (const char byte : std::string("hello")) {
+    strings.write_u8(static_cast<std::uint8_t>(byte));
+  }
   strings.write_u8(0);
   strings.write_varint32(6);
   strings.write_varint32(6);
-  for (const char byte : std::string("player")) strings.write_u8(static_cast<std::uint8_t>(byte));
+  for (const char byte : std::string("player")) {
+    strings.write_u8(static_cast<std::uint8_t>(byte));
+  }
   strings.write_u8(0);
   strings.write_varint32(0);
   strings.write_varint32(0);
   strings.write_u8(7);
-  for (const char byte : std::string("a")) strings.write_u8(static_cast<std::uint8_t>(byte));
+  for (const char byte : std::string("a")) {
+    strings.write_u8(static_cast<std::uint8_t>(byte));
+  }
   strings.write_u8(0);
-  for (const char byte : std::string("b")) strings.write_u8(static_cast<std::uint8_t>(byte));
+  for (const char byte : std::string("b")) {
+    strings.write_u8(static_cast<std::uint8_t>(byte));
+  }
   strings.write_u8(0);
-  for (const char byte : std::string("c")) strings.write_u8(static_cast<std::uint8_t>(byte));
+  for (const char byte : std::string("c")) {
+    strings.write_u8(static_cast<std::uint8_t>(byte));
+  }
   strings.write_u8(0);
   std::vector<std::uint8_t> string_packet = strings.bytes();
   engine::apply_packet_xor(string_packet, key);
@@ -107,13 +118,13 @@ void test_input_decoder() {
   // and varint reads return zero, and the command still dispatches.
   {
     std::vector<engine::InputMessage> empty_messages;
-    CHECK(engine::decode_input_packet(std::span<const std::uint8_t>{}, key, empty_messages)
-          == engine::Status::kOk);
+    CHECK(engine::decode_input_packet(std::span<const std::uint8_t>{}, key, empty_messages) ==
+          engine::Status::kOk);
     CHECK(empty_messages.empty());
   }
   {
     engine::ByteWriter truncated;
-    truncated.write_varint32(12); // sequence only, no opcode
+    truncated.write_varint32(12);  // sequence only, no opcode
     std::vector<std::uint8_t> bytes = truncated.bytes();
     engine::apply_packet_xor(bytes, key);
     std::vector<engine::InputMessage> decoded;
@@ -127,7 +138,7 @@ void test_input_decoder() {
     engine::ByteWriter truncated;
     truncated.write_varint32(13);
     truncated.write_varint32(12);
-    truncated.write_varint32(5); // buttons only; both floats are missing
+    truncated.write_varint32(5);  // buttons only; both floats are missing
     std::vector<std::uint8_t> bytes = truncated.bytes();
     engine::apply_packet_xor(bytes, key);
     std::vector<engine::InputMessage> decoded;
@@ -142,7 +153,7 @@ void test_input_decoder() {
     engine::ByteWriter truncated;
     truncated.write_varint32(14);
     truncated.write_varint32(8);
-    truncated.write_u8(9); // slot only; the petal byte is missing
+    truncated.write_u8(9);  // slot only; the petal byte is missing
     std::vector<std::uint8_t> bytes = truncated.bytes();
     engine::apply_packet_xor(bytes, key);
     std::vector<engine::InputMessage> decoded;
@@ -154,7 +165,7 @@ void test_input_decoder() {
   {
     engine::ByteWriter overflow;
     overflow.write_varint32(15);
-    overflow.write_varint32(1); // reserved opcode keeps the rest opaque
+    overflow.write_varint32(1);  // reserved opcode keeps the rest opaque
     overflow.write_u8(0xAA);
     overflow.write_u8(0xBB);
     std::vector<std::uint8_t> bytes = overflow.bytes();
@@ -212,12 +223,12 @@ void test_snapshot_writer_fields() {
   CHECK(reader.read_u8().value() == 1);
   CHECK(reader.read_varint32().value() == 12);
   CHECK(reader.read_varint32().value() == 4);
-  CHECK(reader.read_varint32().value() == 0); // deletes
-  CHECK(reader.read_varint32().value() == 1); // updates
-  CHECK(reader.read_varint32().value() == 0); // events
+  CHECK(reader.read_varint32().value() == 0);  // deletes
+  CHECK(reader.read_varint32().value() == 1);  // updates
+  CHECK(reader.read_varint32().value() == 0);  // events
   CHECK(reader.read_u32_le().value() == handle.to_wire());
-  CHECK(reader.read_u8().value() == 52); // flags=2 XOR 54
-  CHECK(reader.read_u8().value() == 0); // sparse field terminator
+  CHECK(reader.read_u8().value() == 52);  // flags=2 XOR 54
+  CHECK(reader.read_u8().value() == 0);   // sparse field terminator
   CHECK(reader.eof());
 
   engine::SnapshotEncoder mask_writer;
@@ -232,7 +243,7 @@ void test_snapshot_writer_fields() {
   CHECK(mask_reader.read_varint32().value() == 1);
   CHECK(mask_reader.read_varint32().value() == 0);
   CHECK(mask_reader.read_u32_le().value() == handle.to_wire());
-  CHECK(mask_reader.read_u8().value() == 55); // flags=1 XOR 54
+  CHECK(mask_reader.read_u8().value() == 55);  // flags=1 XOR 54
   CHECK(mask_reader.read_u32_le().value() == 5);
   CHECK(mask_reader.read_u8().value() == 0);
   CHECK(mask_reader.eof());
@@ -408,8 +419,8 @@ void test_snapshot_writer_fields() {
   CHECK(array_reader.read_varint32().value() == 60);
   CHECK(array_reader.read_varint32().value() == 3);
   CHECK(array_reader.read_u8().value() == 0xCD);
-  CHECK(array_reader.read_u8().value() == 0); // array terminator
-  CHECK(array_reader.read_u8().value() == 0); // field terminator
+  CHECK(array_reader.read_u8().value() == 0);  // array terminator
+  CHECK(array_reader.read_u8().value() == 0);  // field terminator
   CHECK(array_reader.eof());
 
   engine::SnapshotEncoder varint_array_writer;
@@ -457,7 +468,8 @@ void test_snapshot_writer_fields() {
   engine::SnapshotEncoder multi_writer;
   multi_writer.begin(26, 4);
   const std::array<engine::SnapshotEncoder::FloatField, 2> multi_fields{{
-    {5, 1.5F}, {7, 2.5F},
+      {5, 1.5F},
+      {7, 2.5F},
   }};
   multi_writer.write_mask_float_fields(handle, 5, multi_fields);
   const auto multi_bytes = multi_writer.finish();
@@ -594,9 +606,9 @@ void test_snapshot_writer_fields() {
   CHECK(sparse_reader.read_varint32().value() == 0);
   CHECK(sparse_reader.read_u32_le().value() == handle.to_wire());
   CHECK(sparse_reader.read_u8().value() == 54);
-  CHECK(sparse_reader.read_varint32().value() == 0); // ordinal 1
-  CHECK(sparse_reader.read_varint32().value() == 3); // delta 2
-  CHECK(sparse_reader.read_varint32().value() == 1); // terminator
+  CHECK(sparse_reader.read_varint32().value() == 0);  // ordinal 1
+  CHECK(sparse_reader.read_varint32().value() == 3);  // delta 2
+  CHECK(sparse_reader.read_varint32().value() == 1);  // terminator
   CHECK(sparse_reader.read_u8().value() == 0);
   CHECK(sparse_reader.eof());
 
@@ -622,7 +634,8 @@ void test_snapshot_writer_fields() {
   engine::SnapshotEncoder bits_writer;
   bits_writer.begin(38, 4);
   const std::array<engine::SnapshotEncoder::BitField, 2> bit_fields{{
-    {33, true}, {40, false},
+      {33, true},
+      {40, false},
   }};
   bits_writer.write_mask_bit_fields(handle, 5, bit_fields);
   const auto bits_bytes = bits_writer.finish();
@@ -818,11 +831,15 @@ void test_snapshot_writer_fields() {
   engine::SnapshotEncoder dense152x_writer;
   dense152x_writer.begin(47, 4);
   std::array<std::uint8_t, 16> bytes60{};
-  for (std::uint8_t index = 0; index < 16; ++index) bytes60[index] = index;
+  for (std::uint8_t index = 0; index < 16; ++index) {
+    bytes60[index] = index;
+  }
   std::array<std::uint16_t, 8> shorts61{};
-  for (std::uint16_t index = 0; index < 8; ++index) shorts61[index] = static_cast<std::uint16_t>(100 + index);
-  dense152x_writer.write_dense_group152_extended(handle, 1, 2, 3, 300, 1.5F,
-                                                  bytes60, shorts61, 7, 8);
+  for (std::uint16_t index = 0; index < 8; ++index) {
+    shorts61[index] = static_cast<std::uint16_t>(100 + index);
+  }
+  dense152x_writer.write_dense_group152_extended(handle, 1, 2, 3, 300, 1.5F, bytes60, shorts61, 7,
+                                                 8);
   const auto dense152x_bytes = dense152x_writer.finish();
   engine::ByteReader dense152x_reader(dense152x_bytes);
   CHECK(dense152x_reader.read_u8().value() == 1);
@@ -838,10 +855,12 @@ void test_snapshot_writer_fields() {
   CHECK(dense152x_reader.read_u8().value() == 3);
   CHECK(dense152x_reader.read_varint32().value() == 300);
   CHECK(dense152x_reader.read_f32_le().value() == 1.5F);
-  for (std::uint8_t index = 0; index < 16; ++index)
+  for (std::uint8_t index = 0; index < 16; ++index) {
     CHECK(dense152x_reader.read_u8().value() == index);
-  for (std::uint16_t index = 0; index < 8; ++index)
+  }
+  for (std::uint16_t index = 0; index < 8; ++index) {
     CHECK(dense152x_reader.read_varint32().value() == 100u + index);
+  }
   CHECK(dense152x_reader.read_u8().value() == 7);
   CHECK(dense152x_reader.read_u8().value() == 8);
   CHECK(dense152x_reader.eof());
@@ -900,8 +919,11 @@ void test_snapshot_writer_fields() {
   engine::SnapshotEncoder dense72_writer;
   dense72_writer.begin(51, 4);
   std::array<std::uint8_t, 10> bytes16{};
-  for (std::uint8_t index = 0; index < 10; ++index) bytes16[index] = index;
-  dense72_writer.write_dense_group72(handle, 9, 1.25F, "n", bytes16, 20, 2.5F, 3.5F, 4.5F, 34, 47, 0xABCD);
+  for (std::uint8_t index = 0; index < 10; ++index) {
+    bytes16[index] = index;
+  }
+  dense72_writer.write_dense_group72(handle, 9, 1.25F, "n", bytes16, 20, 2.5F, 3.5F, 4.5F, 34, 47,
+                                     0xABCD);
   const auto dense72_bytes = dense72_writer.finish();
   engine::ByteReader dense72_reader(dense72_bytes);
   CHECK(dense72_reader.read_u8().value() == 1);
@@ -916,8 +938,9 @@ void test_snapshot_writer_fields() {
   CHECK(dense72_reader.read_f32_le().value() == 1.25F);
   CHECK(dense72_reader.read_u8().value() == 'n');
   CHECK(dense72_reader.read_u8().value() == 0);
-  for (std::uint8_t index = 0; index < 10; ++index)
+  for (std::uint8_t index = 0; index < 10; ++index) {
     CHECK(dense72_reader.read_u8().value() == index);
+  }
   CHECK(dense72_reader.read_u8().value() == 20);
   CHECK(dense72_reader.read_f32_le().value() == 2.5F);
   CHECK(dense72_reader.read_f32_le().value() == 3.5F);
@@ -929,7 +952,8 @@ void test_snapshot_writer_fields() {
 
   engine::SnapshotEncoder denseM27_writer;
   denseM27_writer.begin(52, 4);
-  denseM27_writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
+  denseM27_writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385,
+                                            268435457);
   const auto denseM27_bytes = denseM27_writer.finish();
   engine::ByteReader denseM27_reader(denseM27_bytes);
   CHECK(denseM27_reader.read_u8().value() == 1);
@@ -957,14 +981,27 @@ void test_snapshot_writer_fields() {
   engine::SnapshotEncoder denseM16_writer;
   denseM16_writer.begin(53, 4);
   std::array<std::uint32_t, 10> handles3{};
-  for (std::uint32_t index = 0; index < 10; ++index) handles3[index] = 0x100 + index;
+  for (std::uint32_t index = 0; index < 10; ++index) {
+    handles3[index] = 0x100 + index;
+  }
   const std::array<std::string_view, 10> strings10{{
-    "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9",
+      "s0",
+      "s1",
+      "s2",
+      "s3",
+      "s4",
+      "s5",
+      "s6",
+      "s7",
+      "s8",
+      "s9",
   }};
   std::array<std::uint32_t, 10> varints39{};
-  for (std::uint32_t index = 0; index < 10; ++index) varints39[index] = 400 + index;
-  denseM16_writer.write_dense_group_minus16(handle, handles3, strings10, 1, 2, 1.5F, 300,
-                                            varints39, 2.5F, 3.5F, 46, 500);
+  for (std::uint32_t index = 0; index < 10; ++index) {
+    varints39[index] = 400 + index;
+  }
+  denseM16_writer.write_dense_group_minus16(handle, handles3, strings10, 1, 2, 1.5F, 300, varints39,
+                                            2.5F, 3.5F, 46, 500);
   const auto denseM16_bytes = denseM16_writer.finish();
   engine::ByteReader denseM16_reader(denseM16_bytes);
   CHECK(denseM16_reader.read_u8().value() == 1);
@@ -975,8 +1012,9 @@ void test_snapshot_writer_fields() {
   CHECK(denseM16_reader.read_varint32().value() == 0);
   CHECK(denseM16_reader.read_u32_le().value() == handle.to_wire());
   CHECK(denseM16_reader.read_u8().value() == 62);
-  for (std::uint32_t index = 0; index < 10; ++index)
+  for (std::uint32_t index = 0; index < 10; ++index) {
     CHECK(denseM16_reader.read_u32_le().value() == 0x100 + index);
+  }
   for (std::uint32_t index = 0; index < 10; ++index) {
     CHECK(denseM16_reader.read_u8().value() == 's');
     CHECK(denseM16_reader.read_u8().value() == static_cast<std::uint8_t>('0' + index));
@@ -986,8 +1024,9 @@ void test_snapshot_writer_fields() {
   CHECK(denseM16_reader.read_u8().value() == 2);
   CHECK(denseM16_reader.read_f32_le().value() == 1.5F);
   CHECK(denseM16_reader.read_varint32().value() == 300);
-  for (std::uint32_t index = 0; index < 10; ++index)
+  for (std::uint32_t index = 0; index < 10; ++index) {
     CHECK(denseM16_reader.read_varint32().value() == 400 + index);
+  }
   CHECK(denseM16_reader.read_f32_le().value() == 2.5F);
   CHECK(denseM16_reader.read_f32_le().value() == 3.5F);
   CHECK(denseM16_reader.read_u8().value() == 46);

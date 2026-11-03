@@ -13,7 +13,11 @@ import { checkOutputs, writeOutputs } from './schema/write.mjs';
 
 const args = process.argv.slice(2);
 const known = new Set(['--check']);
-for (const arg of args) if (!known.has(arg)) throw new Error(`unknown option ${arg}`);
+for (const arg of args) {
+  if (!known.has(arg)) {
+    throw new Error(`unknown option ${arg}`);
+  }
+}
 const root = path.resolve('.');
 const { outputs, summary } = await buildOutputs(root);
 if (args.includes('--check')) {
@@ -21,5 +25,12 @@ if (args.includes('--check')) {
   console.log(JSON.stringify({ mode: 'check', ...summary, verified: count }));
 } else {
   const result = await writeOutputs(root, outputs);
-  console.log(JSON.stringify({ mode: 'generate', ...summary, written: result.written, manifest: result.manifest }));
+  console.log(
+    JSON.stringify({
+      mode: 'generate',
+      ...summary,
+      written: result.written,
+      manifest: result.manifest,
+    }),
+  );
 }

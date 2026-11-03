@@ -4,23 +4,23 @@
 
 ## 实现映射
 
-| 目标 | 落点与行为约束 | 验证 |
-| --- | --- | --- |
-| P01 | `engine_perf_core` / `engine_benchmark` 为独立、默认不编译的 instrumented target；生产宏全部消除。native、Node WASM 使用同一驱动；输出原始样本、分位数、阶段累计时间及逐 tick 阶段样本、实体访问、索引操作、候选/接触、边界/字段、分配/保留字节。 | `perf:engine`：9 个场景 × 2 个 runtime × 5 次，固定 seed `285456437`。 |
-| P02 | `SpawnQueryContext` 每批建树一次，每次工厂结束同步全部新增实体，包含蚁穴子体与蜈蚣段。保留选择、尝试次数、失败、位置与 RNG 顺序。缺额为零不建树。 | 旧式逐次建树的产品 reference 测试；boot/refill 摘要、RNG、包字节摘要。 |
-| P03 | AI steering 阶段惰性建一份 query；攻击出生仍在 deferred 同步点执行。area 阶段无有效 owner/payload 不建树，有效时共享一份几何视图；目标按原顺序 detach/attach，复用 scratch 并用线性差分。 | 1/10/50 area 同负载对比；目标进入/离开、owner 删除、过期、战斗回归。 |
-| P04 | `CollisionContext` 持有 bodies、present/touched、generation stamps、连续候选池和 offsets；同阶段收集一次，先冻结全部候选再解算。树遍历、`second > first`、即时 active/health 检查与窄相顺序保持。 | 聚集场景、边界/双 World 回归；stamp wrap/reset 与 scratch 容量测试。 |
-| P05 | `active_entities()` 为升序实时迭代。热系统通过 `with_ordered_slots` 在阶段开始选择：≤2048 活跃时用位图，密集时直接用原数组循环与 active 检查。稀疏 allocate/release 同步维护位图，密集 mutation 标记 dirty；下一次位图读取（含实时迭代的 ++）先同步，const 迭代亦然。reset 清零，两种路径保留相同 FIFO/generation 语义。 | 低活跃、半满、近满池与 churn，native/WASM 各 5 次、每次 1000 对相邻遍历；两条密集路径调用同一个数组求和内核，避免编译器为相同遍历选择不同归约代码。高槽位出生/未来槽位删除、密集 mutation、池满、保留槽/reset/generation 回归。 |
-| P06 | `PublicationBounds` 只在本次发布内复用，按既有 children 顺序做 f32 union；一次发布只有一个视口，以有序线性过滤取代临时发布树，保留 arena-root 拒绝、inclusive AABB 与 controlled-body 独立引入语义。contact 树不共享。复用 encoder 三个 writer 的容量，完成包预留后 move。沿用 M3 的一次 PublishedEntity 查找和 World destruction 通知。 | 441 个含 arena 外部边界的 box × 441 个 view 的线性过滤/旧树查询成员等价测试；首次/delta/重入、死亡、拾取、wire 向量与跨端测试；moving-combat 的完整包字节纳入摘要。 |
-| P07 | 固定 workload 的 gameplay/RNG/事件和每个输出包字节纳入 FNV64 摘要，另比 seed、draws、包数、字节数、实体数与重生数；只在相同 runtime 内比较。 | 10000 tick 生命周期各跑 5 次；正常 flush 后 queue=0，析构后剩余测量驱动缓冲单独报告。 |
-| F01 | 合成 renderer 与真实 Worker 链路分别报告，包含源码、交付树、机器、浏览器、视口/DPR、总数、可见/绘制数、Canvas ops、CPU/rAF、缓存、heap、消息与解码。 | 四个 renderer 场景 × desktop/retina/touch × 5 次；60 帧预热、600 帧采样。真实链路有 HUD 拖动/数字键装备、移动攻击、死亡与重生。 |
-| F02 | `FrameContext` 复用 draw membership、可见缓冲及插值存储；字段时钟保留，未更新且完成插值的 EntityState 复用结果，时间倒退或快照替换重新计算。player/loadout/discovery 走索引和 revision。视口的 camera-only f32 边界每帧计算一次，剔除后才做屏幕投影。 | 位置/角度/半径独立时钟与相机回归；插值缓存更新、倒退、删除测试；多分辨率/zoom/正负大坐标及 inclusive edges 的新旧剔除表达式对比。完整 culling 与保留 membership 清理仍计入 scan，未隐藏到 helper。 |
-| F03 | layer/handle 排序只在 kind/species/type/component/membership 变化时更新；逐帧插值和剔除保留，复用 visible records。 | draw order、遮挡、位置 delta 不触发排序与 browser Canvas 合约。 |
-| F04 | 视觉状态按 authoritative handle 生命周期持有，离屏不反复创建 phase/trail；删除、session reset 与 dispose 释放 owner，拾取由 transfer 接管。 | 相机离开/重入、删除后同 slot 新 generation、dispose 集成测试。 |
-| F05 | `ResourceCache` 提供 LRU 与共享文本像素预算；超大文本直接绘制；释放/淘汰将 canvas 归零。路径 geometry、菜单布局、panel surface 都有 owner 与失效边界。 | 10000 owner 单元压力与 30 个真实分钟的资源浸泡；预算及限制见下。 |
-| F06 | 缓存换行、物种行前缀几何、changelog 和 scroll max；图鉴发现列表只随发现变化更新。排行榜逐显示字段比较，替代 JSON 序列化，过期 surface 释放。Canvas 桥保存已提交矩阵，去掉逐坐标 DOMMatrix 分配；HUD 共用 RGB 查表，避免逐 setter 数组/十六进制构造，矩阵比较不创建回调。owner 标签直接比较内容/样式字段，LRU 用链表维护访问顺序，掉落稀有度颜色仅生成一次。 | 预热后布局不再重新测量、发现/字体失效；真实图鉴滚动/命中、DPR、HUD 回归；未 flush 的嵌套 save/restore、原生画布重置、RGB byte 转换与共享像素预算测试。 |
-| F07 | 唯一主线程 50ms 时钟；`step(inputs)` 串行 send 全部输入→think 一次→flush，全部包发送后 final。一个 pending 记录统一清理，10s deadline；队列≤254，单 step 背压，spawn/cooldown 只由成功 tick 推进。 | 顺序/sequence/冷却/装备真实输入；异常 callback、postMessage、timeout、crash、messageerror、terminate 后 promise 与 pending 收敛。 |
-| F08 | 保留分辨率、DPR、人口、AI、50ms 步长、绘制与发布频率及动态 art；以 CPU 和计数判断收益，60Hz FPS 只作为绝对预算之一。 | 同配置 before/after；收益目标单列，未把计数改善或未达标目标写成耗时收益。 |
+| 目标 | 落点与行为约束                                                                                                                                                                                                                                                                                                                                              | 验证                                                                                                                                                                                                                            |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P01  | `engine_perf_core` / `engine_benchmark` 为独立、默认不编译的 instrumented target；生产宏全部消除。native、Node WASM 使用同一驱动；输出原始样本、分位数、阶段累计时间及逐 tick 阶段样本、实体访问、索引操作、候选/接触、边界/字段、分配/保留字节。                                                                                                           | `perf:engine`：9 个场景 × 2 个 runtime × 5 次，固定 seed `285456437`。                                                                                                                                                          |
+| P02  | `SpawnQueryContext` 每批建树一次，每次工厂结束同步全部新增实体，包含蚁穴子体与蜈蚣段。保留选择、尝试次数、失败、位置与 RNG 顺序。缺额为零不建树。                                                                                                                                                                                                           | 旧式逐次建树的产品 reference 测试；boot/refill 摘要、RNG、包字节摘要。                                                                                                                                                          |
+| P03  | AI steering 阶段惰性建一份 query；攻击出生仍在 deferred 同步点执行。area 阶段无有效 owner/payload 不建树，有效时共享一份几何视图；目标按原顺序 detach/attach，复用 scratch 并用线性差分。                                                                                                                                                                   | 1/10/50 area 同负载对比；目标进入/离开、owner 删除、过期、战斗回归。                                                                                                                                                            |
+| P04  | `CollisionContext` 持有 bodies、present/touched、generation stamps、连续候选池和 offsets；同阶段收集一次，先冻结全部候选再解算。树遍历、`second > first`、即时 active/health 检查与窄相顺序保持。                                                                                                                                                           | 聚集场景、边界/双 World 回归；stamp wrap/reset 与 scratch 容量测试。                                                                                                                                                            |
+| P05  | `active_entities()` 为升序实时迭代。热系统通过 `with_ordered_slots` 在阶段开始选择：≤2048 活跃时用位图，密集时直接用原数组循环与 active 检查。稀疏 allocate/release 同步维护位图，密集 mutation 标记 dirty；下一次位图读取（含实时迭代的 ++）先同步，const 迭代亦然。reset 清零，两种路径保留相同 FIFO/generation 语义。                                    | 低活跃、半满、近满池与 churn，native/WASM 各 5 次、每次 1000 对相邻遍历；两条密集路径调用同一个数组求和内核，避免编译器为相同遍历选择不同归约代码。高槽位出生/未来槽位删除、密集 mutation、池满、保留槽/reset/generation 回归。 |
+| P06  | `PublicationBounds` 只在本次发布内复用，按既有 children 顺序做 f32 union；一次发布只有一个视口，以有序线性过滤取代临时发布树，保留 arena-root 拒绝、inclusive AABB 与 controlled-body 独立引入语义。contact 树不共享。复用 encoder 三个 writer 的容量，完成包预留后 move。沿用 M3 的一次 PublishedEntity 查找和 World destruction 通知。                    | 441 个含 arena 外部边界的 box × 441 个 view 的线性过滤/旧树查询成员等价测试；首次/delta/重入、死亡、拾取、wire 向量与跨端测试；moving-combat 的完整包字节纳入摘要。                                                             |
+| P07  | 固定 workload 的 gameplay/RNG/事件和每个输出包字节纳入 FNV64 摘要，另比 seed、draws、包数、字节数、实体数与重生数；只在相同 runtime 内比较。                                                                                                                                                                                                                | 10000 tick 生命周期各跑 5 次；正常 flush 后 queue=0，析构后剩余测量驱动缓冲单独报告。                                                                                                                                           |
+| F01  | 合成 renderer 与真实 Worker 链路分别报告，包含源码、交付树、机器、浏览器、视口/DPR、总数、可见/绘制数、Canvas ops、CPU/rAF、缓存、heap、消息与解码。                                                                                                                                                                                                        | 四个 renderer 场景 × desktop/retina/touch × 5 次；60 帧预热、600 帧采样。真实链路有 HUD 拖动/数字键装备、移动攻击、死亡与重生。                                                                                                 |
+| F02  | `FrameContext` 复用 draw membership、可见缓冲及插值存储；字段时钟保留，未更新且完成插值的 EntityState 复用结果，时间倒退或快照替换重新计算。player/loadout/discovery 走索引和 revision。视口的 camera-only f32 边界每帧计算一次，剔除后才做屏幕投影。                                                                                                       | 位置/角度/半径独立时钟与相机回归；插值缓存更新、倒退、删除测试；多分辨率/zoom/正负大坐标及 inclusive edges 的新旧剔除表达式对比。完整 culling 与保留 membership 清理仍计入 scan，未隐藏到 helper。                              |
+| F03  | layer/handle 排序只在 kind/species/type/component/membership 变化时更新；逐帧插值和剔除保留，复用 visible records。                                                                                                                                                                                                                                         | draw order、遮挡、位置 delta 不触发排序与 browser Canvas 合约。                                                                                                                                                                 |
+| F04  | 视觉状态按 authoritative handle 生命周期持有，离屏不反复创建 phase/trail；删除、session reset 与 dispose 释放 owner，拾取由 transfer 接管。                                                                                                                                                                                                                 | 相机离开/重入、删除后同 slot 新 generation、dispose 集成测试。                                                                                                                                                                  |
+| F05  | `ResourceCache` 提供 LRU 与共享文本像素预算；超大文本直接绘制；释放/淘汰将 canvas 归零。路径 geometry、菜单布局、panel surface 都有 owner 与失效边界。                                                                                                                                                                                                      | 10000 owner 单元压力与 30 个真实分钟的资源浸泡；预算及限制见下。                                                                                                                                                                |
+| F06  | 缓存换行、物种行前缀几何、changelog 和 scroll max；图鉴发现列表只随发现变化更新。排行榜逐显示字段比较，替代 JSON 序列化，过期 surface 释放。Canvas 桥保存已提交矩阵，去掉逐坐标 DOMMatrix 分配；HUD 共用 RGB 查表，避免逐 setter 数组/十六进制构造，矩阵比较不创建回调。owner 标签直接比较内容/样式字段，LRU 用链表维护访问顺序，掉落稀有度颜色仅生成一次。 | 预热后布局不再重新测量、发现/字体失效；真实图鉴滚动/命中、DPR、HUD 回归；未 flush 的嵌套 save/restore、原生画布重置、RGB byte 转换与共享像素预算测试。                                                                          |
+| F07  | 唯一主线程 50ms 时钟；`step(inputs)` 串行 send 全部输入→think 一次→flush，全部包发送后 final。一个 pending 记录统一清理，10s deadline；队列≤254，单 step 背压，spawn/cooldown 只由成功 tick 推进。                                                                                                                                                          | 顺序/sequence/冷却/装备真实输入；异常 callback、postMessage、timeout、crash、messageerror、terminate 后 promise 与 pending 收敛。                                                                                               |
+| F08  | 保留分辨率、DPR、人口、AI、50ms 步长、绘制与发布频率及动态 art；以 CPU 和计数判断收益，60Hz FPS 只作为绝对预算之一。                                                                                                                                                                                                                                        | 同配置 before/after；收益目标单列，未把计数改善或未达标目标写成耗时收益。                                                                                                                                                       |
 
 ## 可复现命令
 
@@ -83,14 +83,14 @@ node tools/performance/compare.mjs \
 
 下表单位为 ms，箭头为 before → after；boot 使用 5 次中位耗时，其余使用 5 次 p95 的中位数，publish 使用逐 tick 发布阶段 p95。
 
-| 指标 | Native | Node WASM | 门槛 |
-| --- | --- | --- | --- |
+| 指标             | Native                          | Node WASM                       | 门槛              |
+| ---------------- | ------------------------------- | ------------------------------- | ----------------- |
 | P02 默认初始填充 | 56.759833 → 2.929584（−94.84%） | 82.664667 → 5.963459（−92.79%） | 中位耗时至少 −30% |
-| P03 50 area | 2.260041 → 0.249500（−88.96%） | 3.150459 → 0.392167（−87.55%） | p95 至少 −30% |
-| P04 聚集接触 | 0.534916 → 0.248500（−53.54%） | 0.487292 → 0.342667（−29.68%） | p95 至少 −20% |
-| P06 发布阶段 | 0.195958 → 0.025750（−86.86%） | 0.310791 → 0.042625（−86.29%） | p95 至少 −20% |
-| 默认 idle tick | 35.842708 → 0.672333 | 44.955625 → 0.851625 | WASM p95 ≤10ms |
-| 默认 moving tick | 32.801417 → 0.705417 | 46.896750 → 0.909125 | WASM p95 ≤10ms |
+| P03 50 area      | 2.260041 → 0.249500（−88.96%）  | 3.150459 → 0.392167（−87.55%）  | p95 至少 −30%     |
+| P04 聚集接触     | 0.534916 → 0.248500（−53.54%）  | 0.487292 → 0.342667（−29.68%）  | p95 至少 −20%     |
+| P06 发布阶段     | 0.195958 → 0.025750（−86.86%）  | 0.310791 → 0.042625（−86.29%）  | p95 至少 −20%     |
+| 默认 idle tick   | 35.842708 → 0.672333            | 44.955625 → 0.851625            | WASM p95 ≤10ms    |
+| 默认 moving tick | 32.801417 → 0.705417            | 46.896750 → 0.909125            | WASM p95 ≤10ms    |
 
 WASM idle/moving 的 5 轮最大 p99 分别为 1.830792 / 1.970375ms，均低于 20ms。boot/refill 的每批全树构建分别为 797 → 1、266 → 1；area 1/10/50 的 500 次更新由 500/5000/25000 次建树统一为 500 次。AI 查询阶段的复用包含在默认 tick 的实测中。
 
@@ -100,12 +100,12 @@ P05 的 native/WASM × 64/8192/16380 活跃 × churn 开/关，共 12 组均通�
 
 每格为 `CPU p95 / rAF p95`（ms），均为 600 帧 × 5 次的中位结果，完整原始分布与 max 保存在报告。
 
-| 场景 | Desktop | Retina DPR2 | Touch |
-| --- | --- | --- | --- |
-| moving-camera | 1.30 / 17.60 | 1.30 / 17.50 | 1.70 / 17.40 |
+| 场景               | Desktop      | Retina DPR2  | Touch        |
+| ------------------ | ------------ | ------------ | ------------ |
+| moving-camera      | 1.30 / 17.60 | 1.30 / 17.50 | 1.70 / 17.40 |
 | visible-text-drops | 3.60 / 18.50 | 4.70 / 25.30 | 4.50 / 26.40 |
-| gallery | 1.90 / 17.90 | 1.10 / 17.60 | 0.90 / 17.50 |
-| death-transition | 1.00 / 17.50 | 0.90 / 17.50 | 1.10 / 18.30 |
+| gallery            | 1.90 / 17.90 | 1.10 / 17.60 | 0.90 / 17.50 |
+| death-transition   | 1.00 / 17.50 | 0.90 / 17.50 | 1.10 / 18.30 |
 
 文本 CPU p95 分别由 6.1/6.5/6.1ms 降到 3.6/4.7/4.5ms（−40.98% / −27.69% / −26.23%），三种配置均达到至少 20% 的目标；其余 9 组均无超过 5% 的回退。所有 60 轮 CPU p95 ≤8ms。desktop/moving 的每轮 FPS≥55、rAF p95≤20ms。DPR2/触控文本的 rAF 尾延迟仍高于 20ms，单独保留，不能据 CPU 提速宣称这些配置已稳定 60 FPS。
 

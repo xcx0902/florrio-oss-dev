@@ -16,8 +16,12 @@ void initialize_world(World& world, const WorldConfig& config) {
   }
 }
 void advance_world(World& world) {
-  if (!world.initialized()) return;
+  if (!world.initialized()) {
+    return;
+  }
   tick(world, static_cast<double>(kTickMilliseconds));
-  for (int index = 0; index < 6; ++index) (void)world.random().next();
+  for (int index = 0; index < 6; ++index) {
+    (void)world.random().next();
+  }
 }
-} // namespace engine
+}  // namespace engine

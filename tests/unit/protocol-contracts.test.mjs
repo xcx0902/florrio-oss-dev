@@ -6,7 +6,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readFile, writeFile, mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import ts from 'typescript';
-import { parseProtocol, compileProtocol, generateProtocolCpp, generateProtocolTs } from '../../tools/schema/protocol.mjs';
+import { formatGeneratedText } from '../../tools/lib/format-tools.mjs';
+import {
+  parseProtocol,
+  compileProtocol,
+  generateProtocolCpp,
+  generateProtocolTs,
+} from '../../tools/schema/protocol.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const source = await readFile(path.join(root, 'schema/protocol.yaml'), 'utf8');
@@ -14,21 +20,40 @@ const document = parseProtocol(source);
 const contract = compileProtocol(document);
 const temporary = await mkdtemp(path.join(os.tmpdir(), 'florr-protocol-contracts-'));
 after(() => rm(temporary, { recursive: true, force: true }));
-const read = relative => readFile(path.join(root, relative), 'utf8');
+const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
 test('generated C++/TS and saved protocol exactly match YAML, covering 63 fields and 19 groups', async () => {
-  assert.equal(await read('engine/include/engine/net/generated_protocol.hpp'), generateProtocolCpp(contract));
-  assert.equal(await read('client/src/schema/protocol.ts'), generateProtocolTs(contract));
-  assert.deepEqual(JSON.parse(await read('schema/generated/protocol-contracts.json')).protocol, contract);
+  assert.equal(
+    await read('engine/include/engine/net/generated_protocol.hpp'),
+    await formatGeneratedText(
+      'engine/include/engine/net/generated_protocol.hpp',
+      generateProtocolCpp(contract),
+    ),
+  );
+  assert.equal(
+    await read('client/src/schema/protocol.ts'),
+    await formatGeneratedText('client/src/schema/protocol.ts', generateProtocolTs(contract)),
+  );
+  assert.deepEqual(
+    JSON.parse(await read('schema/generated/protocol-contracts.json')).protocol,
+    contract,
+  );
   assert.equal(contract.fields.length, 63);
   assert.equal(contract.denseGroups.length, 19);
-  assert.deepEqual(contract.denseGroups.find(group => group.offset === -16).fields,
-    [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52]);
-  assert.deepEqual(contract.denseGroups.find(group => group.offset === -27).fields,
-    [4, 15, 18, 25, 27, 33, 35, 41, 44, 51]);
+  assert.deepEqual(
+    contract.denseGroups.find((group) => group.offset === -16).fields,
+    [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52],
+  );
+  assert.deepEqual(
+    contract.denseGroups.find((group) => group.offset === -27).fields,
+    [4, 15, 18, 25, 27, 33, 35, 41, 44, 51],
+  );
   assert.deepEqual(contract.denseGroups.at(-1).extendedFields, [58, 59, 60, 61, 62, 63]);
   assert.equal(contract.constants.domainKindField, 26);
-  assert.equal(contract.output.snapshot.domainExtensions.find(entry => entry.field === 26).permanent, true);
+  assert.equal(
+    contract.output.snapshot.domainExtensions.find((entry) => entry.field === 26).permanent,
+    true,
+  );
 });
 
 test('sparse contract describes one direct domain packet', () => {
@@ -49,41 +74,168 @@ test('sparse contract describes one direct domain packet', () => {
 });
 
 for (const [name, change, expected] of [
-  ['missing wire type', s => { s.fieldTypes.byte = s.fieldTypes.byte.filter(id => id !== 1); }, /missing wire type/],
-  ['duplicate wire type', s => { s.fieldTypes.varint.push(1); }, /duplicate wire type/],
-  ['unknown wire type', s => { s.fieldTypes.uint24 = [1]; }, /unknown wire type/],
-  ['missing component', s => { delete s.fieldComponents[63]; }, /missing component/],
-  ['invalid constructor', s => { s.fieldComponents[2].constructor = '491'; }, /constructor/],
-  ['invalid offset', s => { s.fieldComponents[2].offset = -1; }, /offset/],
-  ['unknown component field', s => { s.fieldComponents[64] = { constructor: 0, offset: 0 }; }, /unknown field metadata/],
-  ['missing indexed metadata', s => { delete s.indexedFields[60]; }, /missing indexed/],
-  ['wrong indexed type', s => { s.indexedFields[61].element = 'byte'; }, /disagrees/],
-  ['unsupported indexed count', s => { s.indexedFields[60].count = 15; }, /unsupported dense type/],
-  ['duplicate dense field', s => { s.denseGroups[0].fields.push(54); }, /duplicate dense field/],
-  ['implicit zero in dense -16', s => { s.denseGroups.find(g => g.offset === -16).fields.push(0); }, /expected integer/],
-  ['duplicate dense group', s => { s.denseGroups[1].offset = 52; }, /duplicate offset/],
-  ['missing dense field', s => { s.denseGroups.find(g => g.offset === -27).fields.pop(); }, /missing dense group/],
-  ['wrong dense ordering', s => { s.denseGroups[0].fields.reverse(); }, /strictly ordered/],
-  ['unknown sparse mode', s => { s.sparseModes.other = {}; }, /unknown sparse mode/],
-  ['wrong domain XOR', s => { s.sparseModes.domainSparse.indexDeltaXor = 1; }, /established sparse framing/],
-  ['invented domain indexed scalar', s => { s.sparseModes.domainSparse.indexedFields.push(33); }, /indexed\/scalar/],
-  ['wrong domain field26 role', s => { s.sparseModes.domainSparse.field26Role = 'legacy-model'; }, /field26 role/],
-  ['removed permanent kind', s => { s.domainExtensions[0].permanent = false; }, /permanent byte kind/],
-]) test(`protocol compilation rejects ${name}`, () => {
-  const value = structuredClone(document);
-  change(value.output.snapshot);
-  assert.throws(() => compileProtocol(value), expected);
-});
+  [
+    'missing wire type',
+    (s) => {
+      s.fieldTypes.byte = s.fieldTypes.byte.filter((id) => id !== 1);
+    },
+    /missing wire type/,
+  ],
+  [
+    'duplicate wire type',
+    (s) => {
+      s.fieldTypes.varint.push(1);
+    },
+    /duplicate wire type/,
+  ],
+  [
+    'unknown wire type',
+    (s) => {
+      s.fieldTypes.uint24 = [1];
+    },
+    /unknown wire type/,
+  ],
+  [
+    'missing component',
+    (s) => {
+      delete s.fieldComponents[63];
+    },
+    /missing component/,
+  ],
+  [
+    'invalid constructor',
+    (s) => {
+      s.fieldComponents[2].constructor = '491';
+    },
+    /constructor/,
+  ],
+  [
+    'invalid offset',
+    (s) => {
+      s.fieldComponents[2].offset = -1;
+    },
+    /offset/,
+  ],
+  [
+    'unknown component field',
+    (s) => {
+      s.fieldComponents[64] = { constructor: 0, offset: 0 };
+    },
+    /unknown field metadata/,
+  ],
+  [
+    'missing indexed metadata',
+    (s) => {
+      delete s.indexedFields[60];
+    },
+    /missing indexed/,
+  ],
+  [
+    'wrong indexed type',
+    (s) => {
+      s.indexedFields[61].element = 'byte';
+    },
+    /disagrees/,
+  ],
+  [
+    'unsupported indexed count',
+    (s) => {
+      s.indexedFields[60].count = 15;
+    },
+    /unsupported dense type/,
+  ],
+  [
+    'duplicate dense field',
+    (s) => {
+      s.denseGroups[0].fields.push(54);
+    },
+    /duplicate dense field/,
+  ],
+  [
+    'implicit zero in dense -16',
+    (s) => {
+      s.denseGroups.find((g) => g.offset === -16).fields.push(0);
+    },
+    /expected integer/,
+  ],
+  [
+    'duplicate dense group',
+    (s) => {
+      s.denseGroups[1].offset = 52;
+    },
+    /duplicate offset/,
+  ],
+  [
+    'missing dense field',
+    (s) => {
+      s.denseGroups.find((g) => g.offset === -27).fields.pop();
+    },
+    /missing dense group/,
+  ],
+  [
+    'wrong dense ordering',
+    (s) => {
+      s.denseGroups[0].fields.reverse();
+    },
+    /strictly ordered/,
+  ],
+  [
+    'unknown sparse mode',
+    (s) => {
+      s.sparseModes.other = {};
+    },
+    /unknown sparse mode/,
+  ],
+  [
+    'wrong domain XOR',
+    (s) => {
+      s.sparseModes.domainSparse.indexDeltaXor = 1;
+    },
+    /established sparse framing/,
+  ],
+  [
+    'invented domain indexed scalar',
+    (s) => {
+      s.sparseModes.domainSparse.indexedFields.push(33);
+    },
+    /indexed\/scalar/,
+  ],
+  [
+    'wrong domain field26 role',
+    (s) => {
+      s.sparseModes.domainSparse.field26Role = 'legacy-model';
+    },
+    /field26 role/,
+  ],
+  [
+    'removed permanent kind',
+    (s) => {
+      s.domainExtensions[0].permanent = false;
+    },
+    /permanent byte kind/,
+  ],
+]) {
+  test(`protocol compilation rejects ${name}`, () => {
+    const value = structuredClone(document);
+    change(value.output.snapshot);
+    assert.throws(() => compileProtocol(value), expected);
+  });
+}
 
 test('duplicate YAML keys are rejected rather than silently replacing protocol fields', () => {
-  assert.throws(() => parseProtocol('output:\n  snapshot: {}\n  snapshot: {}\n'), /unique|duplicate/i);
+  assert.throws(
+    () => parseProtocol('output:\n  snapshot: {}\n  snapshot: {}\n'),
+    /unique|duplicate/i,
+  );
 });
 
 let fixturePromise;
 function wireFixture() {
-  return fixturePromise ??= (async () => {
+  return (fixturePromise ??= (async () => {
     const native = path.join(temporary, 'wire.cpp');
-    await writeFile(native, `#include "engine/net/snapshot_codec.hpp"
+    await writeFile(
+      native,
+      `#include "engine/net/snapshot_codec.hpp"
 #include "engine/net/dense_fields.hpp"
 #include <cstdio>
 #include <stdexcept>
@@ -120,29 +272,63 @@ int main() {
   writer.write_mask_double_field(handle, 0, 35, 3.5);
   print(writer.finish());
 }
-`);
+`,
+    );
     const executable = path.join(temporary, 'wire');
-    const compile = spawnSync(process.env.CXX || 'c++', ['-std=c++20', '-O0', '-ffp-contract=off', '-I', path.join(root, 'engine/include'), native, path.join(root, 'engine/src/net/snapshot_codec.cpp'), '-o', executable], { encoding: 'utf8' });
+    const compile = spawnSync(
+      process.env.CXX || 'c++',
+      [
+        '-std=c++20',
+        '-O0',
+        '-ffp-contract=off',
+        '-I',
+        path.join(root, 'engine/include'),
+        native,
+        path.join(root, 'engine/src/net/snapshot_codec.cpp'),
+        '-o',
+        executable,
+      ],
+      { encoding: 'utf8' },
+    );
     assert.equal(compile.status, 0, compile.stderr);
     const output = spawnSync(executable, [], { encoding: 'utf8' });
     assert.equal(output.status, 0, output.stderr);
-    for (const relative of ['state/snapshot.ts', 'state/field-types.ts', 'schema/protocol.ts', 'state/snapshot-projection.ts', 'net/snapshot-decoder.ts', 'net/binary-reader.ts']) {
+    for (const relative of [
+      'state/snapshot.ts',
+      'state/field-types.ts',
+      'schema/protocol.ts',
+      'state/snapshot-projection.ts',
+      'net/snapshot-decoder.ts',
+      'net/binary-reader.ts',
+    ]) {
       const target = path.join(temporary, relative.replace(/\.ts$/, '.mjs'));
       await mkdir(path.dirname(target), { recursive: true });
-      const js = ts.transpileModule(await read(`client/src/${relative}`), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText;
+      const js = ts.transpileModule(await read(`client/src/${relative}`), {
+        compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 },
+      }).outputText;
       await writeFile(target, js.replaceAll(".js'", ".mjs'"));
     }
     const decoded = await import(pathToFileURL(path.join(temporary, 'state/snapshot.mjs')).href);
     const fields = await import(pathToFileURL(path.join(temporary, 'state/field-types.mjs')).href);
-    return { packets: output.stdout.trim().split('\n').map(hex => Uint8Array.from(Buffer.from(hex, 'hex'))), decoded, fields };
-  })();
+    return {
+      packets: output.stdout
+        .trim()
+        .split('\n')
+        .map((hex) => Uint8Array.from(Buffer.from(hex, 'hex'))),
+      decoded,
+      fields,
+    };
+  })());
 }
 
 test('native writer/byte-reader covers all ten -27 fields; actual bytes roundtrip through generated TS specs', async () => {
   const { packets, decoded, fields } = await wireFixture();
   // Independent literal bytes include multibyte44/51; a matching writer/reader
   // bug cannot pass by agreeing only with each other or generated field specs.
-  const expected = Buffer.from('01800104000100785634123e6100ac02000000000000f83f620000002040010000000000000c4090038180018180808001', 'hex');
+  const expected = Buffer.from(
+    '01800104000100785634123e6100ac02000000000000f83f620000002040010000000000000c4090038180018180808001',
+    'hex',
+  );
   assert.deepEqual(Buffer.from(packets[0]), expected);
   const plan = [{ offset: -27, specs: fields.DENSE_GROUP_SPECS[-27] }];
   const decoder = new decoded.SnapshotDecoder(plan);
@@ -150,8 +336,18 @@ test('native writer/byte-reader covers all ten -27 fields; actual bytes roundtri
   assert.ok(snapshot);
   assert.equal(snapshot.sequence, 129);
   assert.equal(snapshot.entities.length, 2);
-  assert.deepEqual(snapshot.entities[1].denseFields,
-    { 4: 'a', 15: 300, 18: 1.5, 25: 'b', 27: 2.5, 33: 1, 35: 3.5, 41: 400, 44: 16385, 51: 268435457 });
+  assert.deepEqual(snapshot.entities[1].denseFields, {
+    4: 'a',
+    15: 300,
+    18: 1.5,
+    25: 'b',
+    27: 2.5,
+    33: 1,
+    35: 3.5,
+    41: 400,
+    44: 16385,
+    51: 268435457,
+  });
   assert.equal(decoder.decode(packets[1].slice(0, -1)), null);
   assert.equal(decoder.decode(Uint8Array.from([...packets[1], 0])), null);
 });

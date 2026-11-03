@@ -32,7 +32,11 @@ export const SNAPSHOT_TYPE = 1;
 export const EVENT_TYPE = 5;
 
 export function asBytes(data: ArrayBuffer | Uint8Array | undefined): Uint8Array | null {
-  if (!data) return null;
-  if (data instanceof Uint8Array) return data;
+  if (!data) {
+    return null;
+  }
+  if (data instanceof Uint8Array) {
+    return data;
+  }
   return new Uint8Array(data);
 }

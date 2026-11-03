@@ -15,7 +15,7 @@ export interface FlowerEntry {
   readonly displayedScore?: number;
 }
 /** Snapshot of the death notification; elapsed time is supplied by the caller,
-* so rendering a frame twice never advances or replays an event. */
+ * so rendering a frame twice never advances or replays an event. */
 export interface HudDeathState {
   readonly elapsedMilliseconds: number;
   /** Native binary32 animation state, advanced once per render frame. */
@@ -38,7 +38,7 @@ export interface HudState {
   /** Native zone timer byte (field 63), 0..255. */
   readonly zoneProgress?: number;
   /** Retained native warning visibility and radial countdown, advanced once
-  * per rendered frame by createHudState. */
+   * per rendered frame by createHudState. */
   readonly zoneWarningAlpha?: number;
   readonly zoneCountdownProgress?: number;
   /** Death transition: level bar/hotbar recede from 0 to 400 logical units. */
@@ -54,12 +54,12 @@ export interface HudState {
   readonly slots?: readonly number[];
   readonly storageSlots?: readonly number[];
   /** Normalized field61 targets (0..1) supplied to createHudState, which
-  * returns retained displayed fractions. drawHud squares those fractions
-  * for the source func587 radial wipe. */
+   * returns retained displayed fractions. drawHud squares those fractions
+   * for the source func587 radial wipe. */
   readonly slotProgress?: readonly number[];
   /** Caller owns receipt/update/retirement. Active visuals replace their
-  * static slot content; departing visuals draw alongside current contents.
-  * drawHud never advances these states or draws a second world overlay. */
+   * static slot content; departing visuals draw alongside current contents.
+   * drawHud never advances these states or draws a second world overlay. */
   readonly slotEffects?: readonly Event14Effect[];
   readonly slotMotions?: readonly Readonly<PetalMotion>[];
   readonly selectedSlot?: number;
@@ -84,7 +84,7 @@ export interface HudState {
   readonly dragAngle?: number;
   readonly dragSize?: number;
   /** Slot currently under the dragged petal; suppresses the ghost so the
-  * petal visibly snaps into that slot. */
+   * petal visibly snaps into that slot. */
   readonly dragTargetSlot?: number | 'discard';
   /** 0..1 expansion of the movement-safe-area hint. */
   readonly hintExpand?: number;
@@ -119,7 +119,7 @@ export interface HudState {
   readonly playerName?: string;
   readonly score?: number;
   /** Optional native score field transition (120 ms), supplied by the
-  * receiver. receivedAt must be the score field's clock, not any packet. */
+   * receiver. receivedAt must be the score field's clock, not any packet. */
   readonly scoreTransition?: {
     readonly previous: number;
     readonly receivedAt: number;
@@ -131,19 +131,20 @@ export interface HudState {
 }
 export interface HudFrameState {
   /** Advance presentation once for this frame, then pass the returned state
-  * to drawHud. Supply the actual frame delta on the first call; subsequent
-  * calls can derive it from nowMilliseconds. Repeated timestamps do not tick. */
+   * to drawHud. Supply the actual frame delta on the first call; subsequent
+   * calls can derive it from nowMilliseconds. Repeated timestamps do not tick. */
   update(target: HudState, nowMilliseconds: number, deltaMilliseconds?: number): HudState;
   reset(): void;
 }
 /** Per-HUD presentation memory. XP and scores are stored by leaderboard
-* rank. Both start at zero, use a double-precision
-* exponential with an f32 frame delta, snap within 1e-7, then store f32.
-* Drawing stays pure: callers explicitly advance this state once per frame.
-*/
+ * rank. Both start at zero, use a double-precision
+ * exponential with an f32 frame delta, snap within 1e-7, then store f32.
+ * Drawing stays pure: callers explicitly advance this state once per frame.
+ */
 export function createHudState(): HudFrameState {
   let progress = 0;
-  let zoneAlpha = 0, zoneCountdown = 0;
+  let zoneAlpha = 0,
+    zoneCountdown = 0;
   let hudSlide = 0;
   const deathTooltip: number[] = Array(16).fill(0);
   const scores: number[] = [];
@@ -151,16 +152,29 @@ export function createHudState(): HudFrameState {
   const rechargeTypes: (number | undefined)[] = [];
   let lastTime: number | undefined;
   return {
-    reset() { progress = 0; zoneAlpha = 0; zoneCountdown = 0; hudSlide = 0; deathTooltip.fill(0); scores.length = 0; recharges.length = 0; rechargeTypes.length = 0; lastTime = undefined; },
+    reset() {
+      progress = 0;
+      zoneAlpha = 0;
+      zoneCountdown = 0;
+      hudSlide = 0;
+      deathTooltip.fill(0);
+      scores.length = 0;
+      recharges.length = 0;
+      rechargeTypes.length = 0;
+      lastTime = undefined;
+    },
     update(target, nowMilliseconds, deltaMilliseconds) {
-      const now = Number.isFinite(nowMilliseconds) ? nowMilliseconds : lastTime ?? 0;
+      const now = Number.isFinite(nowMilliseconds) ? nowMilliseconds : (lastTime ?? 0);
       const repeated = lastTime !== undefined && now <= lastTime;
-      const elapsed = repeated ? 0 : deltaMilliseconds ?? (lastTime === undefined ? 0 : now - lastTime);
+      const elapsed = repeated
+        ? 0
+        : (deltaMilliseconds ?? (lastTime === undefined ? 0 : now - lastTime));
       const delta = f(Number.isFinite(elapsed) ? Math.max(0, elapsed) : 0);
       const amount = clamp(1 - Math.pow(0.8, delta * 0.06));
       lastTime = Math.max(lastTime ?? now, now);
-      if (target.menu)
+      if (target.menu) {
         return target;
+      }
       if (!repeated) {
         if (target.death) {
           // Native1095 retreats the level bar/hotbar by 400 logical units
@@ -170,11 +184,11 @@ export function createHudState(): HudFrameState {
           const tooltipStep = clamp(1 - Math.pow(0.7, delta * 0.06));
           for (let index = 0; index < deathTooltip.length; index += 1) {
             const goal = target.deathState?.hoveredSlot === index ? 1 : 0;
-            deathTooltip[index] = f(deathTooltip[index]
-              + tooltipStep * (goal - deathTooltip[index]));
+            deathTooltip[index] = f(
+              deathTooltip[index] + tooltipStep * (goal - deathTooltip[index]),
+            );
           }
-        }
-        else {
+        } else {
           hudSlide = 0;
           deathTooltip.fill(0);
           const warning = +zoneWarningVisible(target);
@@ -184,20 +198,28 @@ export function createHudState(): HudFrameState {
           zoneCountdown = f(zoneCountdown + amount * (countdown - zoneCountdown));
         }
       }
-      const approach = (current: number, value: number): number => repeated ? current : f(Math.abs(current - value) < 1e-7 ? value : current + amount * (value - current));
-      if (target.levelProgress !== undefined)
+      const approach = (current: number, value: number): number =>
+        repeated
+          ? current
+          : f(Math.abs(current - value) < 1e-7 ? value : current + amount * (value - current));
+      if (target.levelProgress !== undefined) {
         progress = approach(progress, f(clamp(target.levelProgress)));
+      }
       let score = target.score ?? 0;
       if (target.scoreTransition) {
         const previous = f(target.scoreTransition.previous);
         // clientFrame samples the receiver's local score transition before
         // casting it to uint32 for the leaderboard's second smoothing pass.
-        score = f(previous + f(f(score) - previous)
-          * clamp((now - target.scoreTransition.receivedAt) / 120));
+        score = f(
+          previous +
+            f(f(score) - previous) * clamp((now - target.scoreTransition.receivedAt) / 120),
+        );
       }
       const sampled = { ...target, score };
       const entries = flowerEntries(sampled).map((entry, index) => {
-        const value = Number.isFinite(entry.score) ? Math.max(0, Math.min(0xffffffff, Math.trunc(entry.score))) : 0;
+        const value = Number.isFinite(entry.score)
+          ? Math.max(0, Math.min(0xffffffff, Math.trunc(entry.score)))
+          : 0;
         const displayedScore = approach(scores[index] ?? 0, value);
         scores[index] = displayedScore;
         return { ...entry, displayedScore };
@@ -213,9 +235,16 @@ export function createHudState(): HudFrameState {
         }
         return recharges[index] ?? 1;
       });
-      return { ...target, levelProgress: progress, flowerEntries: entries, slotProgress,
-        zoneWarningAlpha: zoneAlpha, zoneCountdownProgress: zoneCountdown, hudSlide,
-        deathState: target.deathState && { ...target.deathState, tooltipAlpha: deathTooltip } };
+      return {
+        ...target,
+        levelProgress: progress,
+        flowerEntries: entries,
+        slotProgress,
+        zoneWarningAlpha: zoneAlpha,
+        zoneCountdownProgress: zoneCountdown,
+        hudSlide,
+        deathState: target.deathState && { ...target.deathState, tooltipAlpha: deathTooltip },
+      };
     },
   };
 }

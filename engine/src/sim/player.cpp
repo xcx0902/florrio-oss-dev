@@ -30,7 +30,9 @@ void PlayerProfile::add_experience(f32 amount) {
   experience_ += amount;
   while (level_ < 99) {
     const f32 threshold = experience_threshold(level_);
-    if (experience_ < threshold) break;
+    if (experience_ < threshold) {
+      break;
+    }
     experience_ -= threshold;
     ++level_;
   }
@@ -45,21 +47,27 @@ f32 player_level_max_health(std::uint8_t level) {
 
 void award_player_experience(World& world, PlayerId id, f32 amount) {
   auto* recipient = world.players().get(id);
-  if (recipient == nullptr) return;
+  if (recipient == nullptr) {
+    return;
+  }
   auto& state = *recipient;
   const f32 reward(amount.value * (world.compact() ? 3.0F : 1.0F));
   const std::uint8_t previous_level = state.profile().level();
   state.profile().add_experience(reward);
   state.loadout().set_score(state.loadout().score() + reward);
   Entity* player = world.entities().get(state.player());
-  if (player == nullptr || player->health.value <= 0.0F) return;
+  if (player == nullptr || player->health.value <= 0.0F) {
+    return;
+  }
   for (unsigned level = previous_level + 1U; level <= state.profile().level(); ++level) {
-    const f32 maximum = player_level_max_health(static_cast<std::uint8_t>(level))
-      + equipped_max_health_bonus(state, static_cast<std::uint8_t>(level));
+    const f32 maximum = player_level_max_health(static_cast<std::uint8_t>(level)) +
+                        equipped_max_health_bonus(state, static_cast<std::uint8_t>(level));
     // 145 uses f32(maximum * currentHealth) / previousMaximum, once per
     // level; collapsing several gains into a single ratio loses rounding.
-    player->health = player->max_health.value <= 0.0F ? maximum
-      : f32(f32(maximum.value * player->health.value).value / player->max_health.value);
+    player->health =
+        player->max_health.value <= 0.0F
+            ? maximum
+            : f32(f32(maximum.value * player->health.value).value / player->max_health.value);
     player->max_health = maximum;
   }
   state.loadout().set_active_slots(state.profile().active_slots());
@@ -67,12 +75,16 @@ void award_player_experience(World& world, PlayerId id, f32 amount) {
 
 EntityHandle spawn_player(World& world, PlayerState& state, std::string_view name, Vec2 position,
                           const PlayerConfig& config) {
-  if (!can_spawn_player(world, state)) return {};
+  if (!can_spawn_player(world, state)) {
+    return {};
+  }
   // Recovered player record: world flags 0x6b (bit 32 marks a player for spawn
   // clearance and the 390 knockback) and entity flags 0x40 (attachment owner).
-  const EntityHandle handle = spawn_entity(world, EntityKind::kPlayer, 0, position,
-                                           config.radius, 0x6BU, 0x40U);
-  if (!handle.valid()) return EntityHandle{};
+  const EntityHandle handle =
+      spawn_entity(world, EntityKind::kPlayer, 0, position, config.radius, 0x6BU, 0x40U);
+  if (!handle.valid()) {
+    return EntityHandle{};
+  }
   Entity* entity = world.entities().get(handle);
   entity->collision_radius = config.radius;
   entity->health = config.health;
@@ -98,62 +110,84 @@ PlayerProfile make_default_profile() {
   profile.set_level(1);
   profile.set_experience(f32(0.0F));
   const std::uint8_t active = profile.active_slots();
-  for (std::uint8_t slot = 0; slot < active; ++slot) profile.set_inventory(slot, 1);
+  for (std::uint8_t slot = 0; slot < active; ++slot) {
+    profile.set_inventory(slot, 1);
+  }
   profile.set_inventory_count(active);
   return profile;
 }
 
 PlayerProfile make_respawn_profile(const PlayerState& state) {
   PlayerProfile profile;
-  profile.set_level(std::max<std::uint8_t>(1U,
-    static_cast<std::uint8_t>((state.last_death_level() * 3U) / 4U)));
+  profile.set_level(
+      std::max<std::uint8_t>(1U, static_cast<std::uint8_t>((state.last_death_level() * 3U) / 4U)));
   std::uint8_t count = state.last_death_kept_count();
-  for (std::uint8_t index = 0; index < count; ++index)
+  for (std::uint8_t index = 0; index < count; ++index) {
     profile.set_inventory(index, state.last_death_kept()[index]);
-  while (count < profile.active_slots()) profile.set_inventory(count++, 1U);
+  }
+  while (count < profile.active_slots()) {
+    profile.set_inventory(count++, 1U);
+  }
   profile.set_inventory_count(count);
   return profile;
 }
 
 void apply_player_controls(World& world, PlayerState& state, double delta_milliseconds) {
   Entity* player = world.entities().get(state.player());
-  if (player == nullptr || player->health.value <= 0.0F) return;
-  if (!(delta_milliseconds > 0.0) || state.last_control_tick == world.tick()) return;
+  if (player == nullptr || player->health.value <= 0.0F) {
+    return;
+  }
+  if (!(delta_milliseconds > 0.0) || state.last_control_tick == world.tick()) {
+    return;
+  }
   state.last_control_tick = world.tick();
-  if (state.input_sequence != 0) state.last_applied_input_sequence = state.input_sequence;
+  if (state.input_sequence != 0) {
+    state.last_applied_input_sequence = state.input_sequence;
+  }
   const auto& input = state.input();
-  MotionState motion{player->position.x.value, player->position.y.value, player->velocity.x, player->velocity.y};
-  add_motion_control(motion, input.angle.value, input.strength.value, slow_multiplier(*player).value, delta_milliseconds);
-  player->velocity.x = motion.vx; player->velocity.y = motion.vy;
+  MotionState motion{player->position.x.value, player->position.y.value, player->velocity.x,
+                     player->velocity.y};
+  add_motion_control(motion, input.angle.value, input.strength.value,
+                     slow_multiplier(*player).value, delta_milliseconds);
+  player->velocity.x = motion.vx;
+  player->velocity.y = motion.vy;
 }
 
 void regenerate_players(World& world, double delta_milliseconds) {
-  if (!(delta_milliseconds > 0.0)) return;
+  if (!(delta_milliseconds > 0.0)) {
+    return;
+  }
   world.players().for_each([&](const PlayerState& state) {
     Entity* player = world.entities().get(state.player());
-    if (player == nullptr || player->health.value <= 0.0F) return;
+    if (player == nullptr || player->health.value <= 0.0F) {
+      return;
+    }
     PERF_ADD(visits, 1);
     auto& entity = *player;
-    const f32 maximum = player_level_max_health(state.profile().level())
-      + equipped_max_health_bonus(state, state.profile().level());
+    const f32 maximum = player_level_max_health(state.profile().level()) +
+                        equipped_max_health_bonus(state, state.profile().level());
     // Original tick calls 145 even with an unchanged maximum: the f32
     // multiply/divide can change health by one ULP before regeneration.
-    entity.health = entity.max_health.value > 0.0F
-      ? (maximum * entity.health) / entity.max_health : maximum;
+    entity.health =
+        entity.max_health.value > 0.0F ? (maximum * entity.health) / entity.max_health : maximum;
     entity.max_health = maximum;
     // Original 216 receives an f32 healing amount, then adds it in f32.
-    if (blocks_healing(entity)) return;
-    const f32 amount = f32::from_double(delta_milliseconds
-      * static_cast<double>(maximum.value) * 4.166666666666667e-06
-      + equipped_leaf_healing(state, delta_milliseconds));
+    if (blocks_healing(entity)) {
+      return;
+    }
+    const f32 amount = f32::from_double(delta_milliseconds * static_cast<double>(maximum.value) *
+                                            4.166666666666667e-06 +
+                                        equipped_leaf_healing(state, delta_milliseconds));
     const f32 next = entity.health + amount;
     entity.health = next < maximum ? next : maximum;
   });
 }
 
-EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_view name, PlayerProfile profile,
-                                 bool allow_rare_starter) {
-  if (!can_spawn_player(world, state)) return {};
+EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_view name,
+                                  PlayerProfile profile, bool allow_rare_starter) {
+  if (!can_spawn_player(world, state)) {
+    return {};
+  }
   const f32 width = world.width();
   const f32 half = f32(width.value * 0.5F);
   const f32 negative_half = f32(width.value * -0.5F);
@@ -184,28 +218,40 @@ EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_
     position.x = f32(range.value * biased.value + minimum.value);
     position.y = f32(world.height().value * (vertical.value - 0.5F));
     const f32 clearance(world.compact() ? 100.0F : 800.0F);
-    if (!query.occupied({position.x, position.y}, clearance)) { safe = true; break; }
+    if (!query.occupied({position.x, position.y}, clearance)) {
+      safe = true;
+      break;
+    }
   }
-  if (!safe) return {};
+  if (!safe) {
+    return {};
+  }
   const bool rare = allow_rare_starter && world.random().next_fraction() < f32(0.00005F);
   if (rare) {
     // Original spawn restores survivors first, then fills the active row. The
     // rare starter can replace the first filler, never a surviving petal.
     for (std::uint8_t slot = 0; slot < profile.active_slots(); ++slot) {
-      if (profile.inventory(slot) != 1U) continue;
-      if (!legendary_exists(world, EntityHandle{}, 35U)) profile.set_inventory(slot, 35U);
+      if (profile.inventory(slot) != 1U) {
+        continue;
+      }
+      if (!legendary_exists(world, EntityHandle{}, 35U)) {
+        profile.set_inventory(slot, 35U);
+      }
       break;
     }
   }
   const EntityHandle handle = spawn_player(world, state, name, position, PlayerConfig{});
-  if (!handle.valid()) return handle;
+  if (!handle.valid()) {
+    return handle;
+  }
   state.profile() = profile;
   state.loadout().restore_from_profile(profile);
   // Original spawn repeatedly awards exactly the XP missing to reach the
   // remembered level. It recreates cumulative points, with zero partial XP.
   f32 score(0.0F);
-  for (std::uint8_t level = 1; level < profile.level(); ++level)
+  for (std::uint8_t level = 1; level < profile.level(); ++level) {
     score += experience_threshold(level);
+  }
   state.loadout().set_score(score);
   state.loadout().set_active_slots(profile.active_slots());
   state.set_last_death_kept({});
@@ -216,4 +262,4 @@ EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_
   return handle;
 }
 
-} // namespace engine
+}  // namespace engine

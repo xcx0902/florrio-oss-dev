@@ -30,7 +30,14 @@ jobs:
           sudo apt-get install -y --no-install-recommends cmake g++ make curl ca-certificates
           cmake --version
           g++ --version
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - run: npm ci
+      - run: npm run setup:format
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run check:refactor
       - run: node tools/generate.mjs --check
       - name: Build online delivery and native server
         run: npm run build:multiplayer

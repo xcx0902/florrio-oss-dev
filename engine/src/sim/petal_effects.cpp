@@ -34,38 +34,59 @@ struct PetalEffectSpec {
 //   29/30 WebR2/R4 slot6   ground area with permanent 0.25 speed multiplier
 constexpr bool effect_for_type(std::uint16_t type, PetalEffectSpec& spec) {
   switch (type) {
-    case 8: spec = {EffectType::kPoison, 20000.0 / 3.0, false}; return true;
-    case 12: spec = {EffectType::kPoison, 8000.0 / 9.0, false}; return true;
-    case 20: spec = {EffectType::kHealBlock, 10000.0, false}; return true;
-    case 21: spec = {EffectType::kPoison, 20000.0 / 3.0, false}; return true;
-    case 31: spec = {EffectType::kSlow, 4000.0, false}; return true;
-    case 34: spec = {EffectType::kPoison, 16000.0 / 9.0, false}; return true;
-    default: return false;
+    case 8:
+      spec = {EffectType::kPoison, 20000.0 / 3.0, false};
+      return true;
+    case 12:
+      spec = {EffectType::kPoison, 8000.0 / 9.0, false};
+      return true;
+    case 20:
+      spec = {EffectType::kHealBlock, 10000.0, false};
+      return true;
+    case 21:
+      spec = {EffectType::kPoison, 20000.0 / 3.0, false};
+      return true;
+    case 31:
+      spec = {EffectType::kSlow, 4000.0, false};
+      return true;
+    case 34:
+      spec = {EffectType::kPoison, 16000.0 / 9.0, false};
+      return true;
+    default:
+      return false;
   }
 }
 
 f32 poison_intensity(std::uint16_t type) {
   const auto* combat = Catalog::instance().petal_combat(type);
-  if (combat == nullptr || !(combat->damage > 0.0F)) return f32(1.0F);
+  if (combat == nullptr || !(combat->damage > 0.0F)) {
+    return f32(1.0F);
+  }
   return f32(combat->damage);
 }
 
 void split_peas(World& world, EntityHandle petal_handle) {
   Entity* petal = world.entities().get(petal_handle);
-  if (petal == nullptr) return;
+  if (petal == nullptr) {
+    return;
+  }
   const std::uint16_t type = petal->type_id;
   const Vec2 position = petal->position;
   const auto* combat = Catalog::instance().petal_combat(type);
-  if (combat == nullptr) return;
+  if (combat == nullptr) {
+    return;
+  }
   // Original 676/681/431: every child starts on the parent, receives its petal
   // component, and is then displaced around a random-phase cross at sqrt(72).
   // The radial launch is a separate callback one millisecond later.
   std::vector<EntityHandle> children;
   children.reserve(4);
   for (std::uint32_t index = 0; index < 4U; ++index) {
-    const EntityHandle child = spawn_entity(world, EntityKind::kPetal, type, position,
-                                            f32(combat->drawRadius));
-    if (!child.valid()) break;
+    const EntityHandle child =
+        spawn_entity(world, EntityKind::kPetal, type, position, f32(combat->drawRadius));
+    if (!child.valid()) {
+      break;
+    }
     Entity* entity = world.entities().get(child);
     entity->collision_radius = f32(combat->collisionRadius);
     entity->contact_damage = f32(combat->damage);
@@ -89,7 +110,9 @@ void split_peas(World& world, EntityHandle petal_handle) {
     for (const EntityHandle handle : children) {
       angle = f32(step + static_cast<double>(angle.value));
       Entity* child = world.entities().get(handle);
-      if (child == nullptr) continue;
+      if (child == nullptr) {
+        continue;
+      }
       const f32 offset_x = f32(projectile_math::peas_cos(angle.value) * spawn_radius.value);
       const f32 offset_y = f32(projectile_math::peas_sin(angle.value) * spawn_radius.value);
       child->set_position_x(f32(offset_x.value + position.x.value));
@@ -105,14 +128,21 @@ void split_peas(World& world, EntityHandle petal_handle) {
 
 void spawn_web_tag(World& world, EntityHandle petal_handle, Vec2 position) {
   const Entity* petal = world.entities().get(petal_handle);
-  if (petal == nullptr) return;
+  if (petal == nullptr) {
+    return;
+  }
   const EntityHandle owner = petal->owner == std::numeric_limits<std::uint32_t>::max()
-    ? EntityHandle{} : EntityHandle{petal->owner};
-  const EntityHandle tag = spawn_entity(world, EntityKind::kProjectile, petal->type_id,
-                                        position, f32(50.0F));
-  if (!tag.valid()) return;
+                                 ? EntityHandle{}
+                                 : EntityHandle{petal->owner};
+  const EntityHandle tag =
+      spawn_entity(world, EntityKind::kProjectile, petal->type_id, position, f32(50.0F));
+  if (!tag.valid()) {
+    return;
+  }
   Entity* entity = world.entities().get(tag);
-  if (entity == nullptr) return;
+  if (entity == nullptr) {
+    return;
+  }
   entity->owner = owner.valid() ? owner.raw : std::numeric_limits<std::uint32_t>::max();
   inherit_entity_owner(world, tag, petal_handle);
   entity->owner = owner.valid() ? owner.raw : kInvalidEntity;
@@ -136,20 +166,23 @@ void spawn_web_tag(World& world, EntityHandle petal_handle, Vec2 position) {
                         std::numeric_limits<double>::infinity(), tag);
 }
 
-} // namespace
+}  // namespace
 
-bool update_projectile_petal_orbit(World& world, PetalOrbitState& state,
-                                    std::uint8_t buttons) {
+bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::uint8_t buttons) {
   const auto type = state.type_id;
   const bool peas = type == 11U || type == 12U || type == 34U;
   const bool aimed = type == 10U || type == 20U;
   const bool web = type == 29U || type == 30U;
   const bool pollen = type == 19U;
-  if (!peas && !aimed && !web && !pollen) return false;
+  if (!peas && !aimed && !web && !pollen) {
+    return false;
+  }
   state.orbit_radius = !pollen && (buttons & 2U) != 0U ? f32(40.0F) : f32(65.0F);
   Entity* petal = world.entities().get(state.handle);
   Entity* owner = petal != nullptr ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
-  if (petal == nullptr || owner == nullptr || petal->health.value <= 0.0F) return false;
+  if (petal == nullptr || owner == nullptr || petal->health.value <= 0.0F) {
+    return false;
+  }
   const double dx = static_cast<double>(petal->position.x.value) - owner->position.x.value;
   const double dy = static_cast<double>(petal->position.y.value) - owner->position.y.value;
   if (aimed) {
@@ -157,8 +190,10 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state,
     petal->angle = f32(std::fmod(static_cast<double>(f32(std::atan2(dy, dx)).value), kTau));
     petal->bounds_dirty = true;
   }
-  if (state.behavior_state != 0U || (buttons & (pollen ? 3U : 1U)) == 0U
-      || !(world.time_ms() - state.behavior_started_at_ms > 500.0)) return false;
+  if (state.behavior_state != 0U || (buttons & (pollen ? 3U : 1U)) == 0U ||
+      !(world.time_ms() - state.behavior_started_at_ms > 500.0)) {
+    return false;
+  }
   state.behavior_state = 1U;
   const EntityHandle handle = state.handle;
   if (peas) {
@@ -167,17 +202,23 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state,
   }
   const double length = std::sqrt(dx * dx + dy * dy);
   double ux = 1.0, uy = 0.0;
-  if (!(length < 2.220446049250313e-16)) { ux = dx / length; uy = dy / length; }
+  if (!(length < 2.220446049250313e-16)) {
+    ux = dx / length;
+    uy = dy / length;
+  }
   if (pollen) {
     const double direction = (buttons & 1U) != 0U ? 1.0 : -1.0;
     petal->velocity.x += direction * (length < 2.220446049250313e-16 ? 0.5 : dx * 0.5 / length);
     petal->velocity.y += direction * (length < 2.220446049250313e-16 ? 0.0 : dy * 0.5 / length);
     const f32 draw = f32(static_cast<float>(world.random().next() - 1U));
-    petal->lifetime_remaining_ms = f32(f32(draw.value * f32(1000.0 / 2147483648.0).value).value
-                                       + 4500.0F).value;
+    petal->lifetime_remaining_ms =
+        f32(f32(draw.value * f32(1000.0 / 2147483648.0).value).value + 4500.0F).value;
   } else {
     const bool round = web || type == 20U;
-    if (round) { ux = f32(ux).value; uy = f32(uy).value; }
+    if (round) {
+      ux = f32(ux).value;
+      uy = f32(uy).value;
+    }
     const double speed = web ? 2.2 : 1.4;
     petal->velocity.x += round ? static_cast<double>(f32(ux * speed).value) : ux * speed;
     petal->velocity.y += round ? static_cast<double>(f32(uy * speed).value) : uy * speed;
@@ -196,17 +237,25 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state,
 
 void on_petal_death(World& world, EntityHandle handle) {
   Entity* petal = world.entities().get(handle);
-  if (petal == nullptr || !petal->petal_launched
-      || (petal->type_id != 29U && petal->type_id != 30U)) return;
+  if (petal == nullptr || !petal->petal_launched ||
+      (petal->type_id != 29U && petal->type_id != 30U)) {
+    return;
+  }
   petal->petal_launched = false;
   spawn_web_tag(world, handle, petal->position);
 }
 
 bool consume_peas_attack(World& world, EntityHandle petal_handle, EntityHandle owner) {
   Entity* petal = world.entities().get(petal_handle);
-  if (petal == nullptr) return false;
-  if (petal->type_id != 11U && petal->type_id != 12U && petal->type_id != 34U) return false;
-  if (EntityHandle{petal->owner} != owner) return false;
+  if (petal == nullptr) {
+    return false;
+  }
+  if (petal->type_id != 11U && petal->type_id != 12U && petal->type_id != 34U) {
+    return false;
+  }
+  if (EntityHandle{petal->owner} != owner) {
+    return false;
+  }
   split_peas(world, petal_handle);
   return true;
 }
@@ -215,41 +264,59 @@ void on_petal_hit(World& world, EntityHandle petal_handle, EntityHandle target_h
                   EntityHandle /*attacker*/) {
   Entity* petal = world.entities().get(petal_handle);
   Entity* target = world.entities().get(target_handle);
-  if (petal == nullptr || target == nullptr) return;
-  if (petal->behavior_cooldown_ms > 0.0) return;
-  if (target->health.value <= 0.0F) return;
+  if (petal == nullptr || target == nullptr) {
+    return;
+  }
+  if (petal->behavior_cooldown_ms > 0.0) {
+    return;
+  }
+  if (target->health.value <= 0.0F) {
+    return;
+  }
   const std::uint16_t type = petal->type_id;
   PetalEffectSpec spec{};
   if (effect_for_type(type, spec)) {
     const f32 intensity = spec.type == EffectType::kPoison ? poison_intensity(type)
-      : spec.type == EffectType::kSlow ? f32(0.5F) : f32(1.0F);
+                          : spec.type == EffectType::kSlow ? f32(0.5F)
+                                                           : f32(1.0F);
     const auto source = damage_source(world, petal_handle);
     const auto key = petal->owner == kInvalidEntity ? EntityHandle{} : EntityHandle{petal->owner};
     (void)apply_effect(world, target_handle, spec.type, intensity, spec.duration_ms, key, &source);
     petal->behavior_cooldown_ms = 500.0;
   }
-
 }
 
 void on_petal_incoming_hit(World& world, EntityHandle petal_handle, EntityHandle attacker) {
   Entity* petal = world.entities().get(petal_handle);
-  if (petal == nullptr || petal->type_id != 21U) return;
-  if (!attacker.valid() || same_controlling_root(world, petal_handle, attacker)) return;
+  if (petal == nullptr || petal->type_id != 21U) {
+    return;
+  }
+  if (!attacker.valid() || same_controlling_root(world, petal_handle, attacker)) {
+    return;
+  }
   const auto source = damage_source(world, petal_handle);
   (void)apply_effect(world, attacker, EffectType::kPoison, f32(10.0F), 4444.444444444444,
                      EntityHandle{petal->owner}, &source);
 }
 
 void update_petal_behaviors(World& world, double delta_milliseconds) {
-  if (!(delta_milliseconds > 0.0)) return;
+  if (!(delta_milliseconds > 0.0)) {
+    return;
+  }
   auto& entities = world.entities().entities();
   for (auto& entity : entities) {
-    if (!entity.active || entity.kind != EntityKind::kPetal) continue;
+    if (!entity.active || entity.kind != EntityKind::kPetal) {
+      continue;
+    }
     if (entity.behavior_cooldown_ms > 0.0) {
       entity.behavior_cooldown_ms -= delta_milliseconds;
-      if (entity.behavior_cooldown_ms < 0.0) entity.behavior_cooldown_ms = 0.0;
+      if (entity.behavior_cooldown_ms < 0.0) {
+        entity.behavior_cooldown_ms = 0.0;
+      }
     }
-    if (entity.health.value <= 0.0F) continue;
+    if (entity.health.value <= 0.0F) {
+      continue;
+    }
     if (entity.lifetime_remaining_ms > 0.0) {
       entity.lifetime_remaining_ms = f32(entity.lifetime_remaining_ms - delta_milliseconds).value;
       if (entity.lifetime_remaining_ms <= 0.0) {
@@ -261,4 +328,4 @@ void update_petal_behaviors(World& world, double delta_milliseconds) {
   }
 }
 
-} // namespace engine
+}  // namespace engine

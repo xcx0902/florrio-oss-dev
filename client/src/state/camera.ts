@@ -58,8 +58,10 @@ export class CameraState {
 
   /** Native selectValue(height, width, width < height) selects the maximum. */
   get viewportFactor(): number {
-    return Math.max(Math.fround(this.viewportHeight * Math.fround(1 / 1080)),
-      Math.fround(this.viewportWidth * Math.fround(1 / 1920)));
+    return Math.max(
+      Math.fround(this.viewportHeight * Math.fround(1 / 1080)),
+      Math.fround(this.viewportWidth * Math.fround(1 / 1920)),
+    );
   }
 
   /** Screen pixels per world unit (the archived `pixelsPerWorld`). */
@@ -97,16 +99,31 @@ export class CameraState {
   }
 
   /** Follow the already-interpolated player target and pan offset. */
-  markHit(at: number): void { if (Number.isFinite(at)) this.hitAt = Math.max(this.hitAt, at); }
+  markHit(at: number): void {
+    if (Number.isFinite(at)) {
+      this.hitAt = Math.max(this.hitAt, at);
+    }
+  }
 
-  follow(targetX: number, targetY: number, deltaMs: number, panX = 0, panY = 0, at?: number,
-         targetScale = PLAYER_SCALE): void {
-    if (this.manual) return;
+  follow(
+    targetX: number,
+    targetY: number,
+    deltaMs: number,
+    panX = 0,
+    panY = 0,
+    at?: number,
+    targetScale = PLAYER_SCALE,
+  ): void {
+    if (this.manual) {
+      return;
+    }
     const elapsed = Math.max(0, deltaMs);
     this.clock = at ?? this.clock + elapsed;
     const shakeTarget = this.clock - this.hitAt < 200 ? 1 : 0;
-    this.shake = Math.fround(this.shake + (shakeTarget - this.shake)
-      * (1 - Math.pow(ZOOM_SMOOTHING, Math.fround(elapsed) * 0.06)));
+    this.shake = Math.fround(
+      this.shake +
+        (shakeTarget - this.shake) * (1 - Math.pow(ZOOM_SMOOTHING, Math.fround(elapsed) * 0.06)),
+    );
     const amplitude = Math.fround(Math.sin(this.clock * 0.05) * 5 * this.shake);
     const phase = Math.fround(this.clock * 0.01);
     const shakeX = Math.fround(Math.fround(Math.cos(phase)) * amplitude);
@@ -124,8 +141,12 @@ export class CameraState {
     const ramp = 1 - Math.pow(FOLLOW_RAMP, elapsed * 0.06);
     this.smoothing = Math.min(1, ramp * (1 - this.smoothing) + this.smoothing);
     const alpha = 1 - Math.pow(1 - this.smoothing, elapsed * 0.06);
-    this.x = Math.fround(this.x + (Math.fround(Math.fround(targetX + panX) + shakeX) - this.x) * alpha);
-    this.y = Math.fround(this.y + (Math.fround(Math.fround(targetY + panY) + shakeY) - this.y) * alpha);
+    this.x = Math.fround(
+      this.x + (Math.fround(Math.fround(targetX + panX) + shakeX) - this.x) * alpha,
+    );
+    this.y = Math.fround(
+      this.y + (Math.fround(Math.fround(targetY + panY) + shakeY) - this.y) * alpha,
+    );
     // The scale relaxes independently; 0.8 is the archived constant.
     const zoomAlpha = 1 - Math.pow(ZOOM_SMOOTHING, elapsed * 0.06);
     if (elapsed > 0) {
@@ -140,7 +161,9 @@ export class CameraState {
     this.y = y;
     this.entityOffsetX = entityOffsetX;
     this.entityOffsetY = entityOffsetY;
-    if (zoom !== undefined) this.zoom = zoom;
+    if (zoom !== undefined) {
+      this.zoom = zoom;
+    }
     this.initialized = true;
     this.smoothing = 1;
     this.manual = true;
@@ -155,8 +178,12 @@ export class CameraState {
   }
 
   /** Screen origin in world units for the current viewport. */
-  get originX(): number { return this.x - this.viewportWidth / (2 * this.zoom); }
-  get originY(): number { return this.y - this.viewportHeight / (2 * this.zoom); }
+  get originX(): number {
+    return this.x - this.viewportWidth / (2 * this.zoom);
+  }
+  get originY(): number {
+    return this.y - this.viewportHeight / (2 * this.zoom);
+  }
 
   screenToWorld(screenX: number, screenY: number): { x: number; y: number } {
     return { x: this.originX + screenX / this.zoom, y: this.originY + screenY / this.zoom };

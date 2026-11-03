@@ -2,12 +2,12 @@
 
 ## Supported
 
-| Target | How it is exercised | Gate |
-| --- | --- | --- |
-| Chromium desktop (1280×720, DPR 1) | `tools/browser-matrix.mjs` with the packaged `dist-next` | full client suite |
-| Chromium Retina (DPR 2) | `canvas-context` / `worker-browser` resize and backing-store checks | full client suite |
-| Chromium touch (390×844, DPR 3, `hasTouch`, `isMobile`) | CDP touch events through the worker shim | menu → garden, joystick drag moves the player |
-| Chromium headless entrypoint | `tools/smoke-entrypoints.mjs` with a real Worker, keyboard and mouse | live packets, rendered transition, no page/worker errors |
+| Target                                                  | How it is exercised                                                  | Gate                                                     |
+| ------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------- |
+| Chromium desktop (1280×720, DPR 1)                      | `tools/browser-matrix.mjs` with the packaged `dist-next`             | full client suite                                        |
+| Chromium Retina (DPR 2)                                 | `canvas-context` / `worker-browser` resize and backing-store checks  | full client suite                                        |
+| Chromium touch (390×844, DPR 3, `hasTouch`, `isMobile`) | CDP touch events through the worker shim                             | menu → garden, joystick drag moves the player            |
+| Chromium headless entrypoint                            | `tools/smoke-entrypoints.mjs` with a real Worker, keyboard and mouse | live packets, rendered transition, no page/worker errors |
 
 The acceptance browser is pinned by [`.chromium-version`](../.chromium-version).
 `tools/check-browser-version.mjs` rejects any other version. `CHROME_PATH`

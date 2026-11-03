@@ -17,11 +17,11 @@ shared area effect is not kept alive by a corpse waiting for slot reuse;
 `test_effect_payload_released_on_destroy` asserts the refcount drop. The tick
 publishes three effect flags:
 
-| Bit | Meaning | Source family |
-| --- | --- | --- |
-| 1 | damage over time | poison |
-| 2 | healing suppression | Dandelion |
-| 4 | movement slow | Honey / Web |
+| Bit | Meaning             | Source family |
+| --- | ------------------- | ------------- |
+| 1   | damage over time    | poison        |
+| 2   | healing suppression | Dandelion     |
+| 4   | movement slow       | Honey / Web   |
 
 `update_effects` applies only the strongest poison once per entity:
 
@@ -37,16 +37,16 @@ amount)` refuses to heal while a heal-block effect is active.
 
 ## Petal callbacks
 
-| Petal type | Callback | Effect |
-| ---: | --- | --- |
-| 8 Iris | slot 4 | poison `20000/3` ms |
-| 12 Peas R3 | slot 4 | poison `8000/9` ms |
-| 20 Dandelion | slot 4 | heal block 10000 ms |
-| 21 Cactus R3 | slot 4 | poison `20000/3` ms |
-| 21 Cactus R3 | slot 5 (incoming) | poison `4444.444444444444` ms |
-| 29/30 Web | slot 6 | slow 0.25 while the web area is attached |
-| 31 Honey | slot 4 | slow 0.5 for 4000 ms |
-| 34 Peas R4 | slot 4 | poison `16000/9` ms |
+|   Petal type | Callback          | Effect                                   |
+| -----------: | ----------------- | ---------------------------------------- |
+|       8 Iris | slot 4            | poison `20000/3` ms                      |
+|   12 Peas R3 | slot 4            | poison `8000/9` ms                       |
+| 20 Dandelion | slot 4            | heal block 10000 ms                      |
+| 21 Cactus R3 | slot 4            | poison `20000/3` ms                      |
+| 21 Cactus R3 | slot 5 (incoming) | poison `4444.444444444444` ms            |
+|    29/30 Web | slot 6            | slow 0.25 while the web area is attached |
+|     31 Honey | slot 4            | slow 0.5 for 4000 ms                     |
+|   34 Peas R4 | slot 4            | poison `16000/9` ms                      |
 
 Poison intensity is the petal's contact damage, so the duration is the
 distinguishing parameter. The `500 ms` `behavior_cooldown_ms` gate prevents

@@ -5,9 +5,7 @@
     {
       "typeId": 0,
       "name": "None",
-      "descriptions": [
-        ""
-      ],
+      "descriptions": [""],
       "rarityIndex": 0,
       "rechargeMilliseconds": 0,
       "instancesPerSlot": 1,
@@ -19,9 +17,7 @@
     {
       "typeId": 1,
       "name": "Basic",
-      "descriptions": [
-        "A nice petal, not too strong but not too weak"
-      ],
+      "descriptions": ["A nice petal, not too strong but not too weak"],
       "rarityIndex": 0,
       "rechargeMilliseconds": 2500,
       "instancesPerSlot": 1,
@@ -33,9 +29,7 @@
     {
       "typeId": 2,
       "name": "Fast",
-      "descriptions": [
-        "Weaker than most petals, but recharges very quickly"
-      ],
+      "descriptions": ["Weaker than most petals, but recharges very quickly"],
       "rarityIndex": 0,
       "rechargeMilliseconds": 500,
       "instancesPerSlot": 1,
@@ -47,9 +41,7 @@
     {
       "typeId": 3,
       "name": "Heavy",
-      "descriptions": [
-        "Very resilient and deals more damage, but recharges very slowly"
-      ],
+      "descriptions": ["Very resilient and deals more damage, but recharges very slowly"],
       "rarityIndex": 0,
       "rechargeMilliseconds": 5500,
       "instancesPerSlot": 1,
@@ -61,9 +53,7 @@
     {
       "typeId": 4,
       "name": "Rock",
-      "descriptions": [
-        "Extremely durable, but takes a long time to recharge"
-      ],
+      "descriptions": ["Extremely durable, but takes a long time to recharge"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 10000,
       "instancesPerSlot": 1,
@@ -75,9 +65,7 @@
     {
       "typeId": 5,
       "name": "Square",
-      "descriptions": [
-        "This shape... it looks familiar..."
-      ],
+      "descriptions": ["This shape... it looks familiar..."],
       "rarityIndex": 5,
       "rechargeMilliseconds": 2500,
       "instancesPerSlot": 1,
@@ -89,9 +77,7 @@
     {
       "typeId": 6,
       "name": "Rose",
-      "descriptions": [
-        "Its healing properties are amazing. Not so good at combat though"
-      ],
+      "descriptions": ["Its healing properties are amazing. Not so good at combat though"],
       "rarityIndex": 1,
       "rechargeMilliseconds": 3500,
       "instancesPerSlot": 1,
@@ -103,9 +89,7 @@
     {
       "typeId": 7,
       "name": "Stinger",
-      "descriptions": [
-        "It really hurts, but it's very fragile"
-      ],
+      "descriptions": ["It really hurts, but it's very fragile"],
       "rarityIndex": 1,
       "rechargeMilliseconds": 4000,
       "instancesPerSlot": 1,
@@ -117,9 +101,7 @@
     {
       "typeId": 8,
       "name": "Iris",
-      "descriptions": [
-        "Very poisonous, but takes a little while to do its work"
-      ],
+      "descriptions": ["Very poisonous, but takes a little while to do its work"],
       "rarityIndex": 1,
       "rechargeMilliseconds": 6000,
       "instancesPerSlot": 1,
@@ -131,9 +113,7 @@
     {
       "typeId": 9,
       "name": "Wing",
-      "descriptions": [
-        "It comes and goes"
-      ],
+      "descriptions": ["It comes and goes"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 1250,
       "instancesPerSlot": 1,
@@ -145,9 +125,7 @@
     {
       "typeId": 10,
       "name": "Missile",
-      "descriptions": [
-        "You can actually shoot this one"
-      ],
+      "descriptions": ["You can actually shoot this one"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 3000,
       "instancesPerSlot": 1,
@@ -159,9 +137,7 @@
     {
       "typeId": 11,
       "name": "Peas",
-      "descriptions": [
-        "4 in 1 deal"
-      ],
+      "descriptions": ["4 in 1 deal"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
@@ -173,9 +149,7 @@
     {
       "typeId": 12,
       "name": "Peas",
-      "descriptions": [
-        "4 in 1 deal, now with a secret ingredient: poison"
-      ],
+      "descriptions": ["4 in 1 deal, now with a secret ingredient: poison"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
@@ -187,9 +161,7 @@
     {
       "typeId": 13,
       "name": "Cactus",
-      "descriptions": [
-        "Not very strong, but somehow increases your maximum health"
-      ],
+      "descriptions": ["Not very strong, but somehow increases your maximum health"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
@@ -201,9 +173,7 @@
     {
       "typeId": 14,
       "name": "Faster",
-      "descriptions": [
-        "It's so light it makes your other petals spin faster"
-      ],
+      "descriptions": ["It's so light it makes your other petals spin faster"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 500,
       "instancesPerSlot": 1,
@@ -215,9 +185,7 @@
     {
       "typeId": 15,
       "name": "Rose",
-      "descriptions": [
-        "Extremely powerful rose, almost unheard of"
-      ],
+      "descriptions": ["Extremely powerful rose, almost unheard of"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 3500,
       "instancesPerSlot": 1,
@@ -229,9 +197,7 @@
     {
       "typeId": 16,
       "name": "Twin",
-      "descriptions": [
-        "Why stop at one? Why not TWO?!"
-      ],
+      "descriptions": ["Why stop at one? Why not TWO?!"],
       "rarityIndex": 1,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 2,
@@ -243,9 +209,7 @@
     {
       "typeId": 17,
       "name": "Triplet",
-      "descriptions": [
-        "How about THREE?!"
-      ],
+      "descriptions": ["How about THREE?!"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 3,
@@ -257,9 +221,7 @@
     {
       "typeId": 18,
       "name": "Bubble",
-      "descriptions": [
-        "You can right click to pop it and propel your flower"
-      ],
+      "descriptions": ["You can right click to pop it and propel your flower"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 3500,
       "instancesPerSlot": 1,
@@ -271,9 +233,7 @@
     {
       "typeId": 19,
       "name": "Pollen",
-      "descriptions": [
-        "Asthmatics beware"
-      ],
+      "descriptions": ["Asthmatics beware"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 3,
@@ -285,9 +245,7 @@
     {
       "typeId": 20,
       "name": "Dandelion",
-      "descriptions": [
-        "Its interesting properties prevent healing effects on affected units"
-      ],
+      "descriptions": ["Its interesting properties prevent healing effects on affected units"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 2000,
       "instancesPerSlot": 1,
@@ -314,9 +272,7 @@
     {
       "typeId": 22,
       "name": "Egg",
-      "descriptions": [
-        "Something interesting might pop out of this"
-      ],
+      "descriptions": ["Something interesting might pop out of this"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
@@ -328,9 +284,7 @@
     {
       "typeId": 23,
       "name": "Egg",
-      "descriptions": [
-        "Something interesting might pop out of this"
-      ],
+      "descriptions": ["Something interesting might pop out of this"],
       "rarityIndex": 4,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
@@ -342,9 +296,7 @@
     {
       "typeId": 24,
       "name": "Rose",
-      "descriptions": [
-        "Its healing properties are amazing. Not so good at combat though"
-      ],
+      "descriptions": ["Its healing properties are amazing. Not so good at combat though"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 3500,
       "instancesPerSlot": 3,
@@ -356,9 +308,7 @@
     {
       "typeId": 25,
       "name": "Antennae",
-      "descriptions": [
-        "Allows your flower to sense foes farther away"
-      ],
+      "descriptions": ["Allows your flower to sense foes farther away"],
       "rarityIndex": 4,
       "rechargeMilliseconds": 0,
       "instancesPerSlot": 1,
@@ -370,9 +320,7 @@
     {
       "typeId": 26,
       "name": "Heaviest",
-      "descriptions": [
-        "This thing is so heavy that nothing gets in the way"
-      ],
+      "descriptions": ["This thing is so heavy that nothing gets in the way"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 20000,
       "instancesPerSlot": 1,
@@ -384,9 +332,7 @@
     {
       "typeId": 27,
       "name": "Stinger",
-      "descriptions": [
-        "It really hurts, but it's very fragile"
-      ],
+      "descriptions": ["It really hurts, but it's very fragile"],
       "rarityIndex": 4,
       "rechargeMilliseconds": 4000,
       "instancesPerSlot": 3,
@@ -398,9 +344,7 @@
     {
       "typeId": 28,
       "name": "Yin Yang",
-      "descriptions": [
-        "This mysterious petal reverses the rotation direction of your petals"
-      ],
+      "descriptions": ["This mysterious petal reverses the rotation direction of your petals"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
@@ -412,9 +356,7 @@
     {
       "typeId": 29,
       "name": "Web",
-      "descriptions": [
-        "It's really sticky"
-      ],
+      "descriptions": ["It's really sticky"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 3000,
       "instancesPerSlot": 1,
@@ -426,9 +368,7 @@
     {
       "typeId": 30,
       "name": "Web",
-      "descriptions": [
-        "It's really sticky"
-      ],
+      "descriptions": ["It's really sticky"],
       "rarityIndex": 4,
       "rechargeMilliseconds": 3000,
       "instancesPerSlot": 3,
@@ -440,9 +380,7 @@
     {
       "typeId": 31,
       "name": "Honey",
-      "descriptions": [
-        "This is so sticky it slows down whatever it hits"
-      ],
+      "descriptions": ["This is so sticky it slows down whatever it hits"],
       "rarityIndex": 2,
       "rechargeMilliseconds": 1700,
       "instancesPerSlot": 1,
@@ -454,9 +392,7 @@
     {
       "typeId": 32,
       "name": "Leaf",
-      "descriptions": [
-        "Gathers energy from the sun to heal your flower passively"
-      ],
+      "descriptions": ["Gathers energy from the sun to heal your flower passively"],
       "rarityIndex": 1,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
@@ -468,9 +404,7 @@
     {
       "typeId": 33,
       "name": "Cactus",
-      "descriptions": [
-        "Not very strong, but somehow increases your maximum health"
-      ],
+      "descriptions": ["Not very strong, but somehow increases your maximum health"],
       "rarityIndex": 4,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 3,
@@ -482,9 +416,7 @@
     {
       "typeId": 34,
       "name": "Peas",
-      "descriptions": [
-        "4 in 1 deal, now with a secret ingredient: poison"
-      ],
+      "descriptions": ["4 in 1 deal, now with a secret ingredient: poison"],
       "rarityIndex": 4,
       "rechargeMilliseconds": 1000,
       "instancesPerSlot": 1,
@@ -496,9 +428,7 @@
     {
       "typeId": 35,
       "name": "Basic",
-      "descriptions": [
-        "Something incredibly rare and useless"
-      ],
+      "descriptions": ["Something incredibly rare and useless"],
       "rarityIndex": 5,
       "rechargeMilliseconds": 2500,
       "instancesPerSlot": 1,
@@ -525,9 +455,7 @@
     {
       "typeId": 37,
       "name": "Rice",
-      "descriptions": [
-        "Spawns instantly, but not very strong"
-      ],
+      "descriptions": ["Spawns instantly, but not very strong"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 0,
       "instancesPerSlot": 1,
@@ -539,9 +467,7 @@
     {
       "typeId": 38,
       "name": "Corn",
-      "descriptions": [
-        "Takes a long time to spawn, but has a lot of health"
-      ],
+      "descriptions": ["Takes a long time to spawn, but has a lot of health"],
       "rarityIndex": 3,
       "rechargeMilliseconds": 45000,
       "instancesPerSlot": 1,

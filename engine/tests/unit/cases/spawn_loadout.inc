@@ -4,7 +4,8 @@ void test_petals() {
   CHECK(engine::petal_radius(1).to_float() == 14.0F);
   CHECK(engine::petal_radius(999).to_float() == 0.0F);
   const auto handle = engine::spawn_petal(world, engine::test::player(world), 1,
-    engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::f32(10.0F), engine::f32(0.0F));
+                                          engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)),
+                                          engine::f32(10.0F), engine::f32(0.0F));
   CHECK(handle.valid());
   engine::Entity* entity = world.entities().get(handle);
   CHECK(entity != nullptr);
@@ -29,7 +30,8 @@ void test_petals() {
   CHECK(engine::test::player(world).petals().empty());
   world.reset();
   CHECK(engine::test::player(world).petals().empty());
-  const auto drop = engine::spawn_drop(world, 1, engine::Vec2(engine::f32(3.0F), engine::f32(4.0F)));
+  const auto drop =
+      engine::spawn_drop(world, 1, engine::Vec2(engine::f32(3.0F), engine::f32(4.0F)));
   CHECK(drop.valid());
   const engine::Entity* drop_entity = world.entities().get(drop);
   CHECK(drop_entity != nullptr);
@@ -56,7 +58,9 @@ void test_populate_world() {
   const auto spawned = engine::populate_world(world, table, counts);
   CHECK(!spawned.empty());
   CHECK(world.entities().active_count() >= spawned.size());
-  for (const auto handle : spawned) CHECK(world.entities().get(handle) != nullptr);
+  for (const auto handle : spawned) {
+    CHECK(world.entities().get(handle) != nullptr);
+  }
 }
 
 void test_player_loadout() {
@@ -95,7 +99,9 @@ void test_profile_discard_and_swap() {
   CHECK(loadout.slots()[1].count == 0);
 
   engine::PlayerProfile fifo;
-  for (std::uint16_t item = 1; item <= 16; ++item) fifo.push_backpack(item);
+  for (std::uint16_t item = 1; item <= 16; ++item) {
+    fifo.push_backpack(item);
+  }
   fifo.push_backpack(17);
   CHECK(fifo.backpack_count() == 16);
   CHECK(fifo.backpack()[0] == 2);
@@ -105,7 +111,9 @@ void test_profile_discard_and_swap() {
 void test_discard_removes_petals() {
   engine::World world;
   world.initialize();
-  CHECK(engine::spawn_player_default(world, engine::test::player(world), "discard", engine::make_default_profile()).valid());
+  CHECK(engine::spawn_player_default(world, engine::test::player(world), "discard",
+                                     engine::make_default_profile())
+            .valid());
   engine::test::player(world).profile().set_inventory(0, 1);
   engine::test::player(world).profile().set_inventory_count(1);
   engine::test::player(world).loadout().clear();
@@ -127,8 +135,8 @@ void test_cactus_construction() {
   engine::World world;
   world.initialize();
   engine::ServerRng spawn_rng(1383144482U);
-  const auto handle = engine::spawn_cactus_with_component_draws(world,
-    engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)), spawn_rng);
+  const auto handle = engine::spawn_cactus_with_component_draws(
+      world, engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)), spawn_rng);
   CHECK(handle.valid());
   const auto* entity = world.entities().get(handle);
   CHECK(entity != nullptr);
@@ -143,9 +151,11 @@ void test_cactus_construction() {
 void test_player_spawn() {
   engine::World world;
   world.set_initialized(true);
-  const engine::PlayerConfig config{engine::f32(25.0F), engine::f32(100.0F), engine::f32(100.0F), engine::f32(0.0F)};
-  const auto player = engine::spawn_player(world, engine::test::player(world), "tester",
-    engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)), config);
+  const engine::PlayerConfig config{engine::f32(25.0F), engine::f32(100.0F), engine::f32(100.0F),
+                                    engine::f32(0.0F)};
+  const auto player =
+      engine::spawn_player(world, engine::test::player(world), "tester",
+                           engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)), config);
   CHECK(player.valid());
   CHECK(engine::test::player(world).player() == player);
   CHECK(engine::test::player(world).player_name() == "tester");
@@ -156,7 +166,8 @@ void test_player_spawn() {
   CHECK(entity->health.to_float() == 100.0F);
   CHECK(entity->max_health.to_float() == 100.0F);
   CHECK(!engine::spawn_player(world, engine::test::player(world), "again",
-    engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), config).valid());
+                              engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), config)
+             .valid());
   engine::test::input(world, 0, engine::f32(0.0F), engine::f32(23913.0F));
   engine::tick(world, 50.0);
   CHECK(entity->position.x.to_float() > 5.0F);
@@ -167,9 +178,13 @@ void test_player_spawn() {
 void test_drop_pickup() {
   engine::World world;
   world.set_initialized(true);
-  const engine::PlayerConfig config{engine::f32(25.0F), engine::f32(100.0F), engine::f32(100.0F), engine::f32(0.0F)};
-  CHECK(engine::spawn_player(world, engine::test::player(world), "p", engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), config).valid());
-  const auto drop = engine::spawn_drop(world, 1, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+  const engine::PlayerConfig config{engine::f32(25.0F), engine::f32(100.0F), engine::f32(100.0F),
+                                    engine::f32(0.0F)};
+  CHECK(engine::spawn_player(world, engine::test::player(world), "p",
+                             engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), config)
+            .valid());
+  const auto drop =
+      engine::spawn_drop(world, 1, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(drop.valid());
   // Original pickup+48 stores spawn time; collection is gated until +500ms.
   // Keep the transfer assertions, and also reject any premature publication.
@@ -182,7 +197,9 @@ void test_drop_pickup() {
   CHECK(world.entities().get(drop) != nullptr);
   CHECK(world.entities().get(drop)->pickup_collected);
   CHECK(engine::test::player(world).loadout().pickup_transfers().size() == 1U);
-  if (engine::test::player(world).loadout().pickup_transfers().size() != 1U) return;
+  if (engine::test::player(world).loadout().pickup_transfers().size() != 1U) {
+    return;
+  }
   CHECK(engine::test::player(world).loadout().pickup_transfers()[0].drop == drop);
   CHECK(engine::test::player(world).loadout().pickup_transfers()[0].slot == 0U);
   CHECK(engine::test::player(world).loadout().slots()[0].type_id == 1);
@@ -196,8 +213,8 @@ void test_drop_pickup() {
 void test_spawn_table() {
   const engine::SpawnTable table = engine::SpawnTable::from_catalog();
   const float expected_totals[8] = {
-    0.7942009568214417F, 0.8192009329795837F, 0.7390009760856628F, 0.8190009593963623F,
-    0.48900100588798523F, 0.4140009880065918F, 0.5140010118484497F, 0.4140009880065918F,
+      0.7942009568214417F,  0.8192009329795837F, 0.7390009760856628F, 0.8190009593963623F,
+      0.48900100588798523F, 0.4140009880065918F, 0.5140010118484497F, 0.4140009880065918F,
   };
   const std::uint8_t expected_counts[8] = {8, 9, 9, 12, 10, 9, 10, 9};
   for (std::uint8_t band = 0; band < 8; ++band) {
@@ -212,8 +229,11 @@ void test_spawn_table() {
   // weights. This is the direct check that the spawn table did not drop
   // low-weight rules while grouping regions.
   const auto has_entry = [&table](std::uint8_t band, std::uint16_t type) {
-    for (const auto& entry : table.band(band).entries)
-      if (entry.entity_type == type) return true;
+    for (const auto& entry : table.band(band).entries) {
+      if (entry.entity_type == type) {
+        return true;
+      }
+    }
     return false;
   };
   CHECK(has_entry(0, 5) && has_entry(1, 5));
@@ -222,11 +242,18 @@ void test_spawn_table() {
     CHECK(has_entry(band, 11));
     CHECK(has_entry(band, 17));
   }
-  for (const auto& entry : table.band(0).entries)
-    if (entry.entity_type == 5) CHECK(entry.weight.value == 0.000199999995F);
+  for (const auto& entry : table.band(0).entries) {
+    if (entry.entity_type == 5) {
+      CHECK(entry.weight.value == 0.000199999995F);
+    }
+  }
   for (const auto& entry : table.band(3).entries) {
-    if (entry.entity_type == 11) CHECK(entry.weight.value == 0.00200000009F);
-    if (entry.entity_type == 17) CHECK(entry.weight.value == 0.00100000005F);
+    if (entry.entity_type == 11) {
+      CHECK(entry.weight.value == 0.00200000009F);
+    }
+    if (entry.entity_type == 17) {
+      CHECK(entry.weight.value == 0.00100000005F);
+    }
   }
   engine::ServerRng sequence(1);
   CHECK(sequence.next() == 48271U);
@@ -241,7 +268,7 @@ void test_spawn_table() {
   const auto* last = table.choose(0, rng);
   CHECK(last != nullptr);
   CHECK(last->entity_type == 15);
-  rng.seed(787621659U); // original sp_server_init RNG state
+  rng.seed(787621659U);  // original sp_server_init RNG state
   const auto* initial = table.choose(0, rng);
   CHECK(initial != nullptr);
   CHECK(initial->entity_type == 1);
@@ -275,8 +302,9 @@ void test_spawn_table() {
   CHECK(*found == expected);
   CHECK(retry_rng.state() == expected_rng.state());
   engine::ServerRng full_rng(787621659U);
-  const auto none = table.find_clear_position(0, full_rng, [](const engine::SpawnPosition&) { return true; },
-    engine::f32(50000.0F), engine::f32(4000.0F), 2);
+  const auto none = table.find_clear_position(
+      0, full_rng, [](const engine::SpawnPosition&) { return true; }, engine::f32(50000.0F),
+      engine::f32(4000.0F), 2);
   CHECK(!none.has_value());
   engine::ServerRng two_trials(787621659U);
   (void)table.sample_position(0, two_trials);
@@ -285,14 +313,14 @@ void test_spawn_table() {
 
   engine::World world;
   world.initialize();
-  world.random().seed(787621659U); // observed original post-population state
+  world.random().seed(787621659U);  // observed original post-population state
   int occupancy_calls = 0;
-  const engine::EntityHandle spawned = table.spawn_from_band(world, 0,
-    [&](const engine::SpawnPosition&) { return ++occupancy_calls <= 2; },
-    [&](const engine::SpawnBandEntry& entry, const engine::SpawnPosition& position) {
-      return engine::spawn_entity(world, engine::EntityKind::kMob, entry.entity_type,
-        engine::Vec2(position.x, position.y), engine::f32(14.0F));
-    });
+  const engine::EntityHandle spawned = table.spawn_from_band(
+      world, 0, [&](const engine::SpawnPosition&) { return ++occupancy_calls <= 2; },
+      [&](const engine::SpawnBandEntry& entry, const engine::SpawnPosition& position) {
+        return engine::spawn_entity(world, engine::EntityKind::kMob, entry.entity_type,
+                                    engine::Vec2(position.x, position.y), engine::f32(14.0F));
+      });
   CHECK(spawned.valid());
   CHECK(occupancy_calls == 3);
   const auto* spawned_entity = world.entities().get(spawned);
@@ -311,8 +339,9 @@ void test_spawn_table() {
 void test_spawn_and_movement() {
   engine::World world;
   world.set_initialized(true);
-  const engine::EntityHandle handle = engine::spawn_entity(world, engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(10.0F), engine::f32(20.0F)), engine::f32(3.0F));
+  const engine::EntityHandle handle =
+      engine::spawn_entity(world, engine::EntityKind::kMob, 4,
+                           engine::Vec2(engine::f32(10.0F), engine::f32(20.0F)), engine::f32(3.0F));
   CHECK(handle.valid());
   engine::Entity* entity = world.entities().get(handle);
   CHECK(entity != nullptr);

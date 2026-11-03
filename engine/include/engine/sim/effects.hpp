@@ -25,15 +25,15 @@ bool apply_effect(World& world, EntityHandle target, EffectType type, f32 intens
                   const DamageSource* attribution = nullptr);
 
 /** Create a shared payload (original effect object) for an area or callback. */
-[[nodiscard]] std::shared_ptr<EffectPayload> make_effect_payload(
-    World&, EffectType type, f32 intensity, double duration_ms, EntityHandle source);
+[[nodiscard]] std::shared_ptr<EffectPayload> make_effect_payload(World&, EffectType type,
+                                                                 f32 intensity, double duration_ms,
+                                                                 EntityHandle source);
 
 /** Create/replace an area effect owned by `owner`. The payload is transferred
  * into the area and appended to every current target's effect vector. Passing
  * a null payload clears the area and unlinks all targets. */
 std::shared_ptr<EffectPayload> add_area_effect(World& world, EntityHandle owner, f32 scale,
-                                               EffectType type, f32 intensity,
-                                               double duration_ms,
+                                               EffectType type, f32 intensity, double duration_ms,
                                                EntityHandle source = EntityHandle{});
 
 /** Attach/detach one shared payload to/from an entity's eight effect slots. */
@@ -52,4 +52,4 @@ std::size_t update_effects(World& world, double delta_milliseconds);
 [[nodiscard]] std::uint8_t effect_flags(const Entity& entity);
 void clear_effects(Entity& entity);
 
-} // namespace engine
+}  // namespace engine

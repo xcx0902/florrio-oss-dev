@@ -15,24 +15,31 @@ import { playerLoadoutSlots } from '../../build/client/state/loadout.js';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const temporary = await mkdtemp(path.join(os.tmpdir(), 'florr-native-integration-'));
 after(() => rm(temporary, { recursive: true, force: true }));
-const plans = DENSE_GROUPS.map(group => ({ offset: group.offset, specs: DENSE_GROUP_SPECS[group.offset] ?? [] }));
+const plans = DENSE_GROUPS.map((group) => ({
+  offset: group.offset,
+  specs: DENSE_GROUP_SPECS[group.offset] ?? [],
+}));
 
 function parseFixture(bytes) {
   assert.equal(bytes.subarray(0, 4).toString('ascii'), 'FLRR');
   assert.equal(bytes[4], 1);
-  const count = bytes[5], packets = [];
+  const count = bytes[5],
+    packets = [];
   let offset = 6;
   for (let index = 0; index < count; ++index) {
-    const length = bytes.readUInt32LE(offset); offset += 4;
-    packets.push(bytes.subarray(offset, offset + length)); offset += length;
+    const length = bytes.readUInt32LE(offset);
+    offset += 4;
+    packets.push(bytes.subarray(offset, offset + length));
+    offset += length;
   }
   assert.equal(offset, bytes.length);
   return packets;
 }
 
 test('hand-authored protocol vectors decode without a generator-derived expectation', async () => {
-  const document = JSON.parse(await readFile(
-    path.join(root, 'tests/fixtures/product/protocol/manual_vectors.json'), 'utf8'));
+  const document = JSON.parse(
+    await readFile(path.join(root, 'tests/fixtures/product/protocol/manual_vectors.json'), 'utf8'),
+  );
   const decoder = new SnapshotDecoder();
   for (const vector of document.vectors) {
     const packet = Uint8Array.from(Buffer.from(vector.hex, 'hex'));
@@ -64,28 +71,40 @@ test('native WorkerApi fixture drives input, think and publish through player, m
   const baseline = decoder.decode(packets[0]);
   assert.ok(baseline, 'post-spawn baseline decodes');
   assert.equal(baseline.sequence, 6);
-  const baselinePlayer = baseline.entities.find(entity => entity.kind === 1);
+  const baselinePlayer = baseline.entities.find((entity) => entity.kind === 1);
   assert.ok(baselinePlayer, 'opcode 6 created a player through WorkerApi input');
   assert.equal(baselinePlayer.health, 100);
   const loadoutWorld = new WorldState();
   loadoutWorld.applyDeltaSnapshot(baseline, 0);
   const spawnedPlayer = loadoutWorld.get(baselinePlayer.handle);
-  assert.deepEqual(playerLoadoutSlots(spawnedPlayer)?.slice(0, 5), [1, 1, 1, 1, 1],
-    'spawn_loadout_petals created the real default inventory');
+  assert.deepEqual(
+    playerLoadoutSlots(spawnedPlayer)?.slice(0, 5),
+    [1, 1, 1, 1, 1],
+    'spawn_loadout_petals created the real default inventory',
+  );
 
   const moved = decoder.decode(packets[1]);
   assert.ok(moved, 'input/think snapshot decodes');
   assert.equal(moved.sequence, 7);
-  assert.deepEqual(moved.events.find(event => event.opcode === 9), { opcode: 9, text: 'fixture' });
+  assert.deepEqual(
+    moved.events.find((event) => event.opcode === 9),
+    { opcode: 9, text: 'fixture' },
+  );
   assert.equal(moved.deletedHandles.length, 0);
-  const playerRecord = moved.entities.find(entity => entity.handle === baselinePlayer.handle);
-  const mobRecord = moved.entities.find(entity => entity.kind === 2);
+  const playerRecord = moved.entities.find((entity) => entity.handle === baselinePlayer.handle);
+  const mobRecord = moved.entities.find((entity) => entity.kind === 2);
   assert.ok(playerRecord, 'player record is present after real ticks');
-  assert.ok(playerRecord.x > baselinePlayer.x + 0.5, 'opcode 12 input moved the player through tick()');
+  assert.ok(
+    playerRecord.x > baselinePlayer.x + 0.5,
+    'opcode 12 input moved the player through tick()',
+  );
   assert.ok(playerRecord.health > 0 && playerRecord.maxHealth >= playerRecord.health);
   assert.ok(mobRecord, 'mob record is present');
   assert.equal(mobRecord.speciesId, 1);
-  assert.ok(mobRecord.x > playerRecord.x, 'mob was spawned by WorkerApi ahead of the moving player');
+  assert.ok(
+    mobRecord.x > playerRecord.x,
+    'mob was spawned by WorkerApi ahead of the moving player',
+  );
   assert.ok(mobRecord.health > 0 && mobRecord.maxHealth >= mobRecord.health);
 
   const world = new WorldState();
@@ -94,12 +113,15 @@ test('native WorkerApi fixture drives input, think and publish through player, m
   const player = world.get(baselinePlayer.handle);
   assert.ok(player);
   assert.deepEqual(playerLoadoutSlots(player)?.slice(0, 5), [1, 1, 1, 1, 1]);
-  const mobHandle = [...world.all()].find(entity => entity.kind === 2)?.handle;
+  const mobHandle = [...world.all()].find((entity) => entity.kind === 2)?.handle;
   assert.ok(mobHandle !== undefined);
 
   // A truncated packet fails without poisoning the decoder's component table.
   assert.equal(decoder.decode(packets[1].subarray(0, -1)), null);
-  assert.ok(decoder.decode(packets[1]), 'decoder state is restored after a failed speculative decode');
+  assert.ok(
+    decoder.decode(packets[1]),
+    'decoder state is restored after a failed speculative decode',
+  );
 
   const deleted = decoder.decode(packets[2]);
   assert.ok(deleted, 'deletion snapshot decodes');
@@ -124,8 +146,8 @@ test('native snapshot preserves the uint8 publishable id boundary', async () => 
   assert.ok(boundary, 'boundary packet decodes');
   assert.equal(boundary.sequence, 9);
   assert.equal(boundary.entities.length, 2);
-  const species = boundary.entities.find(entity => entity.typeId === 255);
-  const loadout = boundary.entities.find(entity => entity.byteArrayField60?.[0]?.value === 255);
+  const species = boundary.entities.find((entity) => entity.typeId === 255);
+  const loadout = boundary.entities.find((entity) => entity.byteArrayField60?.[0]?.value === 255);
   assert.ok(species, 'species field 2 preserves 255');
   assert.equal(species.speciesId, 255);
   assert.ok(loadout, 'loadout field 60 preserves the same one-byte id');

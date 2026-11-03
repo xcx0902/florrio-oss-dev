@@ -12,10 +12,9 @@ struct DamageResult {
  * domain runs once: petals start slot recharge, mobs roll loot and award
  * experience to the attacker's owner, and players retain loot. */
 DamageResult damage_entity(World& world, EntityHandle target, f32 amount,
-                           EntityHandle attacker = EntityHandle{},
-                           std::uint16_t options = 0U);
-DamageResult damage_entity_from_source(World&, EntityHandle target, f32 amount,
-                                      const DamageSource&, std::uint16_t options = 0U);
+                           EntityHandle attacker = EntityHandle{}, std::uint16_t options = 0U);
+DamageResult damage_entity_from_source(World&, EntityHandle target, f32 amount, const DamageSource&,
+                                       std::uint16_t options = 0U);
 
 /** Contact pass: overlapping non-allied bodies push apart and exchange their
  * physics +44 contact damage. The original collision resolver applies damage
@@ -38,4 +37,4 @@ f32 heal_entity(World& world, EntityHandle target, f32 amount);
 /** Original attacker propagation: nearby untargeted AI acquire the attacker. */
 std::size_t alert_to_attacker(World& world, EntityHandle target, EntityHandle attacker);
 
-} // namespace engine
+}  // namespace engine

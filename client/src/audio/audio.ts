@@ -7,7 +7,13 @@ export interface AudioBus {
 
 export class SilentAudioBus implements AudioBus {
   private muted = false;
-  play(): void { /* intentionally silent */ }
-  setMuted(muted: boolean): void { this.muted = muted; }
-  get isMuted(): boolean { return this.muted; }
+  play(): void {
+    /* intentionally silent */
+  }
+  setMuted(muted: boolean): void {
+    this.muted = muted;
+  }
+  get isMuted(): boolean {
+    return this.muted;
+  }
 }

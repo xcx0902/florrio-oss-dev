@@ -13,15 +13,15 @@
 [Release notes](docs/releases/v2.0.0.md)；发布包准备与校验见
 [发布流程](docs/release.md)。
 
-| 项目 | 状态 |
-| --- | --- |
-| 运行方式 | 默认原生 WebSocket 联机；每房默认两人；离线诊断显式选择 |
-| 服务端 | 原生 C++20 / engine_core；Worker/WASM 仅用于离线回归 |
-| 客户端 | TypeScript + Canvas2D |
-| 协议/布局/目录 | [`schema/`](schema/README.md) 为单一事实来源 |
-| 交付 | 在线 `dist-multiplayer/`（无 WASM/Worker）；离线诊断 `dist-next/`，均由源码重新构建并校验 |
-| 浏览器 | Chromium 桌面 + 模拟触控；Firefox / WebKit / 真机非目标 |
-| CI | Linux x86_64 原生包由 GitHub Actions `.github/workflows/multiplayer-linux.yml` 构建；完整验收仍以本地 `npm run test:all` + `test:multiplayer:all` 为准 |
+| 项目           | 状态                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 运行方式       | 默认原生 WebSocket 联机；每房默认两人；离线诊断显式选择                                                                                                |
+| 服务端         | 原生 C++20 / engine_core；Worker/WASM 仅用于离线回归                                                                                                   |
+| 客户端         | TypeScript + Canvas2D                                                                                                                                  |
+| 协议/布局/目录 | [`schema/`](schema/README.md) 为单一事实来源                                                                                                           |
+| 交付           | 在线 `dist-multiplayer/`（无 WASM/Worker）；离线诊断 `dist-next/`，均由源码重新构建并校验                                                              |
+| 浏览器         | Chromium 桌面 + 模拟触控；Firefox / WebKit / 真机非目标                                                                                                |
+| CI             | Linux x86_64 原生包由 GitHub Actions `.github/workflows/multiplayer-linux.yml` 构建；完整验收仍以本地 `npm run test:all` + `test:multiplayer:all` 为准 |
 
 历史逆向与 parity 结论不构成当前通过证明。当前源码是否通过，重新执行完整验收后生成的
 `reports/current-verification.json` 是唯一依据。
@@ -94,14 +94,14 @@ node serve.mjs --root dist-next # 指定其他构建输出目录
 
 C ABI：
 
-| 导出 | 作用 |
-| --- | --- |
-| `sp_server_init` | 重置世界，初始化实体池 |
-| `sp_server_send(ptr, len)` | 解码一个输入包 |
-| `sp_server_think` | 推进一个固定 tick |
-| `sp_server_flush` | 取走输出包 |
-| `sp_server_output_count/data/size` | Worker shim 读取输出队列 |
-| `sp_server_entity_count` | 当前实体数 |
+| 导出                                                                                           | 作用                        |
+| ---------------------------------------------------------------------------------------------- | --------------------------- |
+| `sp_server_init`                                                                               | 重置世界，初始化实体池      |
+| `sp_server_send(ptr, len)`                                                                     | 解码一个输入包              |
+| `sp_server_think`                                                                              | 推进一个固定 tick           |
+| `sp_server_flush`                                                                              | 取走输出包                  |
+| `sp_server_output_count/data/size`                                                             | Worker shim 读取输出队列    |
+| `sp_server_entity_count`                                                                       | 当前实体数                  |
 | `sp_server_player_handle/valid`、`sp_server_debug_set_entity_field/spawn_mob/set_loadout_slot` | 5 个真实 cheat/产品诊断导出 |
 
 细节见 [`engine/README.md`](engine/README.md)。
@@ -128,7 +128,7 @@ src/schema/     生成的协议/目录类型（勿手改）
 
 `schema/protocol.yaml`、`schema/transport.json` 和 `schema/catalogs/*.json`
 由 `tools/generate.mjs` 校验并生成 C++/TS 视图与文档。修改后运行
-`npm run schema:generate`；`npm run schema:check` 做只读一致性检查。
+`npm run schema:generate`（生成文本先格式化，再计算哈希并写入）；`npm run schema:check` 做只读一致性检查。
 原始布局探针、旧生成器和证据表已归档，不再是生成输入。
 
 ### `server/` — M05 原生 WebSocket 服务
@@ -166,10 +166,14 @@ serve.mjs     静态服务器
 ## 构建、测试与验收
 
 ```bash
+npm run setup:format        # 安装锁定的 clang-format/cmake-format（.emcache）
+npm run format:check        # 全部受版本控制文本的只读格式检查
+npm run lint                # ESLint 结构与未使用符号检查
+npm run check:refactor      # 历史表示/编号规则台账
 npm run build:engine        # 原生 Release 构建
-npm run test:engine         # 构建 + 18 项 engine CTest（含 M02—M04）
+npm run test:engine         # 构建 + 19 项 engine CTest（含 M02—M04）
 npm run build:server        # 原生 WebSocket 服务 + 锁定依赖 + native identity
-npm run test:server:native  # 根构建 + 29 项封闭 CTest（含 engine/真实网络/信号）
+npm run test:server:native  # 根构建 + 30 项封闭 CTest（含 engine/真实网络/信号）
 npm run build:engine:wasm   # Emscripten CMake -> build/wasm/server.wasm
 npm run build:client        # tsc -> fresh build/client
 npm run test:unit           # 协议/线格式单元测试
@@ -184,7 +188,7 @@ npm run test:multiplayer:all # M08 完整联机验收（需先通过 test:all）
 npm run test:m4             # 校验冻结基线 + 全流程 + 性能对比 + 30 分钟资源浸泡
 ```
 
-`test:all` 由唯一 gate 表执行 17 步验收，wasm/TS/交付各构建一次，所有后续检查绑定同一份
+`test:all` 由唯一 gate 表执行 20 步验收，wasm/TS/交付各构建一次，所有后续检查绑定同一份
 交付；包含完整 CTest、跨端、ABI、共享固定 Chrome 的浏览器/真实入口/绘制性能、
 原生与跨端工作负载。失败、中断或输入变化不会写出通过报告。
 `npm run release:multiplayer` 只为本次通过的 ledger 生成在线原生包、tar.gz、manifest 与 SHA256SUMS。

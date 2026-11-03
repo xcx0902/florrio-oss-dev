@@ -19,8 +19,7 @@ static_assert(sizeof(float) == 4 && std::numeric_limits<float>::is_iec559,
               "product f32 requires IEEE-754 binary32");
 static_assert(sizeof(double) == 8 && std::numeric_limits<double>::is_iec559,
               "product f64 requires IEEE-754 binary64");
-static_assert(sizeof(engine::f32) == sizeof(float),
-              "domain scalar stores exactly one product f32");
+static_assert(sizeof(engine::f32) == sizeof(float), "domain scalar stores exactly one product f32");
 static_assert(std::is_trivially_copyable_v<engine::f32>);
 
 static_assert(sizeof(engine::EntityHandle) == sizeof(std::uint32_t),
@@ -39,7 +38,7 @@ static_assert((1U << (32U - engine::kEntityGenerationShift)) - 1U == 0x3FFFFU,
               "generation field leaves 18 bits in the 32-bit handle");
 
 constexpr engine::EntityHandle kWireHandleCheck =
-  engine::EntityHandle::from_parts(0x1234U, 0x2ABCU);
+    engine::EntityHandle::from_parts(0x1234U, 0x2ABCU);
 static_assert(kWireHandleCheck.index() == 0x1234U);
 static_assert(kWireHandleCheck.generation() == 0x2ABCU);
 static_assert(engine::EntityHandle::from_wire(kWireHandleCheck.to_wire()) == kWireHandleCheck,
@@ -49,4 +48,4 @@ static_assert(engine::protocol::kSparseFieldCount == 63U,
 static_assert(engine::protocol::kComponentCount == 30U,
               "the product domain packet declares 30 components");
 
-} // namespace engine
+}  // namespace engine

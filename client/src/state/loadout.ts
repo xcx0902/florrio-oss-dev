@@ -1,4 +1,3 @@
-
 export { playerLoadoutSlots, playerSlotProgress, loadoutSlots } from './snapshot-projection.js';
 
 /** Native func587, slot visual +24: field61 is an immediate u16 target,
@@ -7,7 +6,11 @@ export { playerLoadoutSlots, playerSlotProgress, loadoutSlots } from './snapshot
  * The original WASM snaps within 1e-7, then stores f32. delta is the actual
  * render-frame delta.
  */
-export function advanceSlotRecharge(current: number, target: number, deltaMilliseconds: number): number {
+export function advanceSlotRecharge(
+  current: number,
+  target: number,
+  deltaMilliseconds: number,
+): number {
   const f = Math.fround;
   const value = f(Number.isFinite(target) ? Math.max(0, Math.min(1, target)) : 0);
   const start = Math.min(value, f(current));

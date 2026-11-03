@@ -15,11 +15,13 @@ void test_world_initialize() {
   engine::MinstdRng expected(0);
   for (std::uint32_t index = 0; index < engine::kEntitySlotCount; ++index) {
     std::uint32_t generation = 0;
-    do { generation = expected.next_generation(); } while ((generation & 262143U) == 0U);
+    do {
+      generation = expected.next_generation();
+    } while ((generation & 262143U) == 0U);
   }
   CHECK(world.rng().state() == expected.state());
-  CHECK(world.rng().state() == 11065635568950165505ULL); // frozen initial RNG state
-  CHECK(world.random().state() == 285456437U); // post-constructor RNG state
+  CHECK(world.rng().state() == 11065635568950165505ULL);  // frozen initial RNG state
+  CHECK(world.random().state() == 285456437U);            // post-constructor RNG state
   engine::test::input(world, 3, engine::f32(7000.0F), engine::f32(-2.0F));
   CHECK(engine::test::player(world).input().buttons == 3);
   CHECK(std::fabs(engine::test::player(world).input().normalized_angle.value - 0.5315678F) < 1e-6F);
@@ -37,7 +39,7 @@ void test_player_input_appearance() {
   world.set_auto_populate(false);
   engine::test::input(world, 3U, engine::f32(1.0F), engine::f32(0.0F));
   const auto player = engine::spawn_player_default(world, engine::test::player(world), "appearance",
-    engine::make_default_profile(), false);
+                                                   engine::make_default_profile(), false);
   auto* entity = world.entities().get(player);
   CHECK(entity != nullptr);
   CHECK(entity->player_look == 0U);
@@ -53,9 +55,11 @@ void test_player_input_appearance() {
   CHECK(entity->player_look == 214U);
   CHECK(entity->player_expression == 0xA2U);
   CHECK(world.destroy(player));
-  for (unsigned step = 0; step < engine::kSpawnCooldownTicks; ++step) engine::tick(world, 50.0);
-  const auto respawned = engine::spawn_player_default(world, engine::test::player(world), "appearance",
-    engine::make_default_profile(), false);
+  for (unsigned step = 0; step < engine::kSpawnCooldownTicks; ++step) {
+    engine::tick(world, 50.0);
+  }
+  const auto respawned = engine::spawn_player_default(
+      world, engine::test::player(world), "appearance", engine::make_default_profile(), false);
   entity = world.entities().get(respawned);
   CHECK(entity != nullptr);
   CHECK(entity->player_look == 0U);
@@ -65,8 +69,8 @@ void test_player_input_appearance() {
 void test_entity_domain_state() {
   engine::WorkerApi api;
   api.init();
-  const auto handle = api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(12.5F), engine::f32(-3.25F)));
+  const auto handle =
+      api.spawn(engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(12.5F), engine::f32(-3.25F)));
   const auto* entity = api.world().entities().get(handle);
   CHECK(entity != nullptr);
   CHECK(entity->handle == handle && entity->type_id == 4U);
@@ -102,18 +106,22 @@ void test_worker_api() {
   CHECK(engine::test::player(api.world()).input().strength.value == 1.0F);
   CHECK(engine::test::player(api.world()).input().direction == 0U);
   CHECK(api.last_sequence() == 1);
-  CHECK(api.send(packet, key)); // duplicate sequence is ignored, not a decode failure
+  CHECK(api.send(packet, key));  // duplicate sequence is ignored, not a decode failure
 
-  for (int tick = 0; tick < 1000; ++tick) api.think();
+  for (int tick = 0; tick < 1000; ++tick) {
+    api.think();
+  }
   CHECK(api.world().initialized());
   CHECK(api.world().entities().active_count() == 0);
 
-  const auto spawned = api.spawn(engine::EntityKind::kMob, 4,
-    engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+  const auto spawned =
+      api.spawn(engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(spawned.valid());
   CHECK(api.occupied(engine::Vec2(engine::f32(100.0F), engine::f32(0.0F))));
   CHECK(!api.occupied(engine::Vec2(engine::f32(2000.0F), engine::f32(0.0F))));
-  CHECK(!api.spawn(engine::EntityKind::kMob, 0, engine::Vec2(engine::f32(5000.0F), engine::f32(0.0F))).valid());
+  CHECK(
+      !api.spawn(engine::EntityKind::kMob, 0, engine::Vec2(engine::f32(5000.0F), engine::f32(0.0F)))
+           .valid());
   const auto bytes = api.domain_snapshot_bytes(7, 0);
   CHECK(bytes.size() > 2);
   engine::ByteReader domain_reader(bytes);
@@ -126,7 +134,7 @@ void test_worker_api() {
 
 void test_rock_construction() {
   engine::ServerRng rng(1383144482U);
-  (void)rng.next(); // function 144's three pre-configure draws
+  (void)rng.next();  // function 144's three pre-configure draws
   (void)rng.next();
   (void)rng.next();
   const engine::RockBody body = engine::configure_rock(rng, false);
@@ -140,7 +148,8 @@ void test_rock_construction() {
   (void)spawn_rng.next();
   (void)spawn_rng.next();
   (void)spawn_rng.next();
-  const auto handle = engine::spawn_rock(world, engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)), false, spawn_rng);
+  const auto handle = engine::spawn_rock(world, engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)),
+                                         false, spawn_rng);
   CHECK(handle.valid());
   const auto* entity = world.entities().get(handle);
   CHECK(entity != nullptr);
@@ -156,8 +165,8 @@ void test_rock_construction() {
   band_world.initialize();
   band_world.random().seed(787621659U);
   const engine::SpawnTable table = engine::SpawnTable::from_catalog();
-  const auto band_handle = engine::spawn_from_band_with_component_draws(band_world, table, 0,
-    [](const engine::SpawnPosition&) { return false; });
+  const auto band_handle = engine::spawn_from_band_with_component_draws(
+      band_world, table, 0, [](const engine::SpawnPosition&) { return false; });
   CHECK(band_handle.valid());
   const auto* band_entity = band_world.entities().get(band_handle);
   CHECK(band_entity != nullptr);
@@ -178,9 +187,11 @@ void test_entity_spawn_defaults() {
   engine::World world;
   world.initialize();
   CHECK(engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 3,
-    engine::Vec2(engine::f32(10.0F), engine::f32(20.0F))).valid());
+                                           engine::Vec2(engine::f32(10.0F), engine::f32(20.0F)))
+            .valid());
   CHECK(engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 1,
-    engine::Vec2(engine::f32(0.0F), engine::f32(0.0F))).valid());
+                                           engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)))
+            .valid());
 }
 
 void test_spatial_query() {
@@ -204,8 +215,8 @@ void test_spatial_query() {
   CHECK(far.occupied({engine::f32(20000.0F), engine::f32(1000.0F)}));
   CHECK(!far.occupied(origin));
   std::vector<engine::EntityHandle> circle_hits;
-  far.query_circle(engine::Vec2(engine::f32(20000.0F), engine::f32(1000.0F)),
-                   engine::f32(100.0F), circle_hits);
+  far.query_circle(engine::Vec2(engine::f32(20000.0F), engine::f32(1000.0F)), engine::f32(100.0F),
+                   circle_hits);
   CHECK(circle_hits.size() == 1U);
 
   query.clear();
@@ -222,7 +233,8 @@ void test_spatial_query() {
   engine::World world;
   world.initialize();
   const auto entity = engine::spawn_entity(world, engine::EntityKind::kMob, 1,
-    engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::f32(10.0F), 32, 32);
+                                           engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)),
+                                           engine::f32(10.0F), 32, 32);
   CHECK(entity.valid());
   const engine::SpatialQuery from_world = engine::SpatialQuery::from_world(world);
   CHECK(from_world.size() == 1);
@@ -235,12 +247,14 @@ void test_spatial_query() {
   empty_world.initialize();
   const engine::SpatialQuery empty_query;
   int spawned_calls = 0;
-  const auto live_spawn = engine::spawn_from_band(empty_world, table, 0, empty_query,
-    [&](const engine::SpawnBandEntry& entry, const engine::SpawnPosition& position) {
-      ++spawned_calls;
-      return engine::spawn_entity(empty_world, engine::EntityKind::kMob, entry.entity_type,
-        engine::Vec2(position.x, position.y), engine::f32(14.0F), 32, 32);
-    });
+  const auto live_spawn = engine::spawn_from_band(
+      empty_world, table, 0, empty_query,
+      [&](const engine::SpawnBandEntry& entry, const engine::SpawnPosition& position) {
+        ++spawned_calls;
+        return engine::spawn_entity(empty_world, engine::EntityKind::kMob, entry.entity_type,
+                                    engine::Vec2(position.x, position.y), engine::f32(14.0F), 32,
+                                    32);
+      });
   CHECK(live_spawn.valid());
   CHECK(spawned_calls == 1);
 
@@ -249,17 +263,17 @@ void test_spatial_query() {
   engine::World blocked_world;
   blocked_world.initialize();
   int blocked_calls = 0;
-  const auto blocked_spawn = engine::spawn_from_band(blocked_world, table, 0, blocked,
-    [&](const engine::SpawnBandEntry& entry, const engine::SpawnPosition& position) {
-      ++blocked_calls;
-      return engine::spawn_entity(blocked_world, engine::EntityKind::kMob, entry.entity_type,
-        engine::Vec2(position.x, position.y), engine::f32(14.0F), 32, 32);
-    });
+  const auto blocked_spawn = engine::spawn_from_band(
+      blocked_world, table, 0, blocked,
+      [&](const engine::SpawnBandEntry& entry, const engine::SpawnPosition& position) {
+        ++blocked_calls;
+        return engine::spawn_entity(blocked_world, engine::EntityKind::kMob, entry.entity_type,
+                                    engine::Vec2(position.x, position.y), engine::f32(14.0F), 32,
+                                    32);
+      });
   CHECK(!blocked_spawn.valid());
   CHECK(blocked_calls == 0);
 }
-
-
 
 void test_catalog() {
   const engine::Catalog& catalog = engine::Catalog::instance();
@@ -281,7 +295,11 @@ void test_catalog() {
   CHECK(rock->petalTypeIds[0] == 2);
   CHECK(rock->petalTypeIds[2] == 4);
   int rose_count = 0;
-  for (const auto& petal : catalog.petals()) if (std::strcmp(petal.name, "Rose") == 0) ++rose_count;
+  for (const auto& petal : catalog.petals()) {
+    if (std::strcmp(petal.name, "Rose") == 0) {
+      ++rose_count;
+    }
+  }
   CHECK(rose_count == 3);
   CHECK(catalog.spawn_rules()[0].weight == 0.5F);
   CHECK(catalog.spawn_rules()[0].entityTypeId == 1);
@@ -317,11 +335,12 @@ void test_protocol_constants() {
   CHECK(queue.empty());
 }
 
-} // namespace
+}  // namespace
 
 void test_quadtree() {
   engine::QuadTree tree(engine::Aabb{engine::f32(-600.0F), engine::f32(-600.0F),
-                                     engine::f32(600.0F), engine::f32(600.0F)}, 2, 5);
+                                     engine::f32(600.0F), engine::f32(600.0F)},
+                        2, 5);
   std::vector<engine::Aabb> boxes;
   for (int index = 0; index < 100; ++index) {
     const float x = -500.0F + static_cast<float>(index % 10) * 111.0F;
@@ -332,36 +351,42 @@ void test_quadtree() {
   }
   CHECK(tree.size() == 100);
   CHECK(tree.node_count() > 1);
-  const engine::Aabb area{engine::f32(-100.0F), engine::f32(-100.0F),
-                          engine::f32(100.0F), engine::f32(100.0F)};
+  const engine::Aabb area{engine::f32(-100.0F), engine::f32(-100.0F), engine::f32(100.0F),
+                          engine::f32(100.0F)};
   std::vector<std::size_t> indexed;
   tree.query(area, indexed);
   std::vector<std::size_t> linear;
-  for (std::size_t index = 0; index < boxes.size(); ++index)
-    if (boxes[index].intersects(area)) linear.push_back(index);
+  for (std::size_t index = 0; index < boxes.size(); ++index) {
+    if (boxes[index].intersects(area)) {
+      linear.push_back(index);
+    }
+  }
   std::sort(indexed.begin(), indexed.end());
   CHECK(indexed == linear);
   std::vector<std::size_t> outside;
-  tree.query(engine::Aabb{engine::f32(700.0F), engine::f32(700.0F),
-                          engine::f32(800.0F), engine::f32(800.0F)}, outside);
+  tree.query(engine::Aabb{engine::f32(700.0F), engine::f32(700.0F), engine::f32(800.0F),
+                          engine::f32(800.0F)},
+             outside);
   CHECK(outside.empty());
 
-  tree.update(42, engine::Aabb{engine::f32(-3.0F), engine::f32(-3.0F),
-                               engine::f32(3.0F), engine::f32(3.0F)});
+  tree.update(42, engine::Aabb{engine::f32(-3.0F), engine::f32(-3.0F), engine::f32(3.0F),
+                               engine::f32(3.0F)});
   CHECK(tree.size() == 100);
-  tree.insert(42, engine::Aabb{engine::f32(-3.0F), engine::f32(-3.0F),
-                               engine::f32(3.0F), engine::f32(3.0F)});
+  tree.insert(42, engine::Aabb{engine::f32(-3.0F), engine::f32(-3.0F), engine::f32(3.0F),
+                               engine::f32(3.0F)});
   CHECK(tree.size() == 100);
   std::vector<std::size_t> updated;
-  tree.query(engine::Aabb{engine::f32(-4.0F), engine::f32(-4.0F),
-                          engine::f32(4.0F), engine::f32(4.0F)}, updated);
+  tree.query(
+      engine::Aabb{engine::f32(-4.0F), engine::f32(-4.0F), engine::f32(4.0F), engine::f32(4.0F)},
+      updated);
   CHECK(std::find(updated.begin(), updated.end(), 42) != updated.end());
 
   tree.remove(42);
   CHECK(tree.size() == 99);
   std::vector<std::size_t> all;
-  tree.query(engine::Aabb{engine::f32(-600.0F), engine::f32(-600.0F),
-                          engine::f32(600.0F), engine::f32(600.0F)}, all);
+  tree.query(engine::Aabb{engine::f32(-600.0F), engine::f32(-600.0F), engine::f32(600.0F),
+                          engine::f32(600.0F)},
+             all);
   CHECK(all.size() == 99);
   CHECK(std::find(all.begin(), all.end(), 42) == all.end());
 
@@ -369,8 +394,9 @@ void test_quadtree() {
   present[0] = false;
   tree.remove_missing(present);
   CHECK(tree.size() == 98);
-  tree.query(engine::Aabb{engine::f32(-600.0F), engine::f32(-600.0F),
-                          engine::f32(600.0F), engine::f32(600.0F)}, all);
+  tree.query(engine::Aabb{engine::f32(-600.0F), engine::f32(-600.0F), engine::f32(600.0F),
+                          engine::f32(600.0F)},
+             all);
   CHECK(all.size() == 98);
   CHECK(std::find(all.begin(), all.end(), 0) == all.end());
 
@@ -378,7 +404,8 @@ void test_quadtree() {
   CHECK(tree.size() == 0);
   tree.insert(0, boxes[0]);
   std::vector<std::size_t> after_clear;
-  tree.query(engine::Aabb{engine::f32(-501.0F), engine::f32(-501.0F),
-                          engine::f32(-499.0F), engine::f32(-499.0F)}, after_clear);
+  tree.query(engine::Aabb{engine::f32(-501.0F), engine::f32(-501.0F), engine::f32(-499.0F),
+                          engine::f32(-499.0F)},
+             after_clear);
   CHECK(after_clear == std::vector<std::size_t>{0});
 }

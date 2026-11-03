@@ -17,13 +17,6 @@
     "sp_server_debug_spawn_mob",
     "sp_server_debug_set_loadout_slot"
   ],
-  "runtime": [
-    "malloc",
-    "free"
-  ],
-  "toolchain": [
-    "setThrew",
-    "_emscripten_stack_restore",
-    "emscripten_stack_get_current"
-  ]
+  "runtime": ["malloc", "free"],
+  "toolchain": ["setThrew", "_emscripten_stack_restore", "emscripten_stack_get_current"]
 }

@@ -5,8 +5,14 @@ export interface ScalarState {
   readonly receivedAt: number;
   readonly known: boolean;
 }
-export function mergeScalar(previous: ScalarState | undefined, incoming: number | undefined,
-  displayed: number, at: number): ScalarState {
-  if (incoming === undefined) return previous ?? { value: 0, from: 0, receivedAt: at, known: false };
+export function mergeScalar(
+  previous: ScalarState | undefined,
+  incoming: number | undefined,
+  displayed: number,
+  at: number,
+): ScalarState {
+  if (incoming === undefined) {
+    return previous ?? { value: 0, from: 0, receivedAt: at, known: false };
+  }
   return { value: incoming, from: displayed, receivedAt: at, known: true };
 }

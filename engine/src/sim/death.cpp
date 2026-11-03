@@ -19,7 +19,9 @@ void kill_entity(World& world, EntityHandle target, EntityHandle attacker) {
 
 void kill_entity_from_source(World& world, EntityHandle target, const DamageSource& incoming) {
   Entity* entity = world.entities().get(target);
-  if (entity == nullptr || entity->death_processed) return;
+  if (entity == nullptr || entity->death_processed) {
+    return;
+  }
   const DamageSource source = incoming.entity.valid() ? incoming : entity->last_damage_source;
   const EntityHandle attacker = source.entity;
   entity->death_processed = true;
@@ -30,8 +32,7 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
   const EntityKind kind = entity->kind;
   const Vec2 position = entity->position;
   const std::uint16_t type_id = entity->type_id;
-  world.record_death(kind, type_id, position,
-                     source.kind, source.type_id);
+  world.record_death(kind, type_id, position, source.kind, source.type_id);
   if (kind == EntityKind::kPlayer || kind == EntityKind::kMob) {
     entity->killer_name = source.name;
     // Original updateKillerName writes the destroying entity's name into the
@@ -66,19 +67,25 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
     // window. retainPlayerLoot writes a separate loot component and the peer's
     // lost-item list; it does not replace the carried inventory in-place.
     auto* owner = world.players().by_body(target);
-    if (owner == nullptr) return;
+    if (owner == nullptr) {
+      return;
+    }
     auto& state = *owner;
     state.life = PlayerLife::kCorpse;
     state.death.position = position;
     bool wide_view = false;
-    for (std::size_t slot = 0; slot < state.profile().active_slots(); ++slot)
+    for (std::size_t slot = 0; slot < state.profile().active_slots(); ++slot) {
       wide_view = wide_view || state.loadout().slots()[slot].type_id == 25;
+    }
     state.death.view_scale = f32(wide_view ? 0.63F : 0.9F);
     // The frozen v1 Worker continues its orphan-petal orbit during the corpse
     // window using the last input. A new spawn always clears that lease.
-    if (!state.has_offline_input_lease()) state.clear_input();
+    if (!state.has_offline_input_lease()) {
+      state.clear_input();
+    }
     PlayerProfile retained_profile = state.profile();
-    const LootResult loot = retain_player_loot(retained_profile, world.random(), world.death_shuffle_random());
+    const LootResult loot =
+        retain_player_loot(retained_profile, world.random(), world.death_shuffle_random());
     state.profile().set_lost_items(loot.lost_count, loot.lost);
     // The first three eligible petals are ground loot. The remainder (up to
     // ten, historically named `lost`) belongs to the controller and respawns.
@@ -96,7 +103,9 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
     for (std::uint8_t slot = 0; slot < 8U; ++slot) {
       for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
         const EntityHandle handle = state.loadout().handle(slot, instance);
-        if (!handle.valid() || child_count >= children.size()) continue;
+        if (!handle.valid() || child_count >= children.size()) {
+          continue;
+        }
         child_slots[child_count] = slot;
         child_instances[child_count] = instance;
         children[child_count++] = handle;
@@ -108,10 +117,11 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
         state.loadout().clear_handle(child_slots[index], child_instances[index]);
         continue;
       }
-      if (child->health.value > 0.0F)
+      if (child->health.value > 0.0F) {
         (void)damage_entity_from_source(world, child->handle, child->health, source);
-      else
+      } else {
         (void)world.destroy(child->handle);
+      }
     }
     // Original43 schedules health+48 = now+1000 for players too. The viewer's
     // controlled-body handle and the healthless children remain live until
@@ -150,4 +160,4 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
   (void)world.destroy(target);
 }
 
-} // namespace engine
+}  // namespace engine

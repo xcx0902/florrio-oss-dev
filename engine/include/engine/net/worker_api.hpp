@@ -28,7 +28,7 @@ class WorkerApi {
   /** Live domain snapshot: fields 2/5/8/24/26/31/53/55, coalesced hit events and
    * pending deletes. This is the path used by `sp_server_think`. */
   [[nodiscard]] std::vector<std::uint8_t> domain_snapshot_bytes(std::uint32_t sequence,
-                                                               std::uint32_t reliable_ack = 0);
+                                                                std::uint32_t reliable_ack = 0);
   void enqueue_domain_snapshot(std::uint32_t sequence);
   void set_default_dense_groups(bool value) { publisher_.set_dense(value); }
   [[nodiscard]] bool default_dense_groups() const { return publisher_.dense(); }
@@ -48,4 +48,4 @@ class WorkerApi {
   std::uint32_t last_sequence_ = 0;
   PlayerId local_player_id_{};
 };
-} // namespace engine
+}  // namespace engine

@@ -20,4 +20,4 @@ void constrain_linked_entities(World& world);
 std::uint32_t debug_linked_roots(const World& world);
 std::uint32_t debug_linked_segments(const World& world);
 
-} // namespace engine
+}  // namespace engine

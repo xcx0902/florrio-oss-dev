@@ -44,13 +44,15 @@ class SpawnTable {
   /** Original113's up-to-100-trial loop. `occupied` is the spatial query
    * (original function 161); it returns true when the trial must be retried. */
   template <typename Occupied>
-  [[nodiscard]] std::optional<SpawnPosition> find_clear_position(
-      std::uint8_t index, ServerRng& rng, Occupied&& occupied,
-      f32 width = f32(50000.0F), f32 height = f32(4000.0F),
-      std::uint32_t max_trials = 100) const {
+  [[nodiscard]] std::optional<SpawnPosition>
+  find_clear_position(std::uint8_t index, ServerRng& rng, Occupied&& occupied,
+                      f32 width = f32(50000.0F), f32 height = f32(4000.0F),
+                      std::uint32_t max_trials = 100) const {
     for (std::uint32_t trial = 0; trial < max_trials; ++trial) {
       const SpawnPosition position = sample_position(index, rng, width, height);
-      if (!occupied(position)) return position;
+      if (!occupied(position)) {
+        return position;
+      }
     }
     return std::nullopt;
   }
@@ -58,13 +60,17 @@ class SpawnTable {
   /** Choose a species, then find a clear position and construct it. The factory
    * receives the selected catalog entry and accepted position. */
   template <typename Occupied, typename Factory>
-  [[nodiscard]] EntityHandle spawn_from_band(
-      World& world, std::uint8_t index, Occupied&& occupied, Factory&& factory) const {
+  [[nodiscard]] EntityHandle spawn_from_band(World& world, std::uint8_t index, Occupied&& occupied,
+                                             Factory&& factory) const {
     const SpawnBandEntry* entry = choose(index, world.random());
-    if (!entry) return EntityHandle{};
-    const auto position = find_clear_position(index, world.random(), std::forward<Occupied>(occupied),
-                                              world.width(), world.height());
-    if (!position) return EntityHandle{};
+    if (!entry) {
+      return EntityHandle{};
+    }
+    const auto position = find_clear_position(
+        index, world.random(), std::forward<Occupied>(occupied), world.width(), world.height());
+    if (!position) {
+      return EntityHandle{};
+    }
     return factory(*entry, *position);
   }
 
@@ -75,8 +81,7 @@ class SpawnTable {
 /** Allocate an entity slot and initialize the domain fields. Returns an invalid
  * handle when the pool is exhausted. */
 [[nodiscard]] EntityHandle spawn_entity(World& world, EntityKind kind, std::uint16_t type_id,
-                                        Vec2 position, f32 radius,
-                                        std::uint8_t world_flags = 0,
+                                        Vec2 position, f32 radius, std::uint8_t world_flags = 0,
                                         std::uint8_t entity_flags = 0);
 
 /** Construct from the probed catalog defaults. Dynamic-radius species (Rock /
@@ -95,20 +100,25 @@ struct RockBody {
 [[nodiscard]] EntityHandle spawn_rock(World& world, Vec2 position, bool massive, ServerRng& rng);
 
 /** Function 144's Rock path: three pre-configure draws, then configureRock. */
-[[nodiscard]] EntityHandle spawn_rock_with_component_draws(World& world, Vec2 position, bool massive, ServerRng& rng);
+[[nodiscard]] EntityHandle spawn_rock_with_component_draws(World& world, Vec2 position,
+                                                           bool massive, ServerRng& rng);
 
 /** Cactus initializer: one RNG draw, radius 40..60, max health radius * 0.7,
  * contact damage 30, physics flag 48 = 0. */
-struct CactusBody { f32 radius; f32 health; };
+struct CactusBody {
+  f32 radius;
+  f32 health;
+};
 [[nodiscard]] CactusBody configure_cactus(ServerRng& rng);
 [[nodiscard]] EntityHandle spawn_cactus(World& world, Vec2 position, ServerRng& rng);
-[[nodiscard]] EntityHandle spawn_cactus_with_component_draws(World& world, Vec2 position, ServerRng& rng);
+[[nodiscard]] EntityHandle spawn_cactus_with_component_draws(World& world, Vec2 position,
+                                                             ServerRng& rng);
 
 /** Spawn the explicit per-band counts using the live world as the occupied
  * predicate. Counts are caller-supplied; the original initializer's counts are
  * not asserted here. */
-[[nodiscard]] std::vector<EntityHandle> populate_world(
-    World& world, const SpawnTable& table, const std::array<std::uint8_t, 8>& counts);
+[[nodiscard]] std::vector<EntityHandle> populate_world(World& world, const SpawnTable& table,
+                                                       const std::array<std::uint8_t, 8>& counts);
 
 /** Original400 area targets: floor(width * height * scale) for the eight bands.
  * The recovered scales are 6e-7 for bands 0..5 and 2e-7 for bands 6/7. */
@@ -124,4 +134,4 @@ void release_ant_hole_ants(World& world);
  * parent spawns only (children carry spawn_band 255). */
 std::vector<EntityHandle> populate_world(World& world, const SpawnTable& table);
 
-} // namespace engine
+}  // namespace engine

@@ -29,21 +29,36 @@ struct PublicationBounds {
   std::vector<Aabb> boxes;
   std::vector<std::uint8_t> state;
   std::vector<std::uint32_t> touched;
-  bool cyclic=false;
+  bool cyclic = false;
   void begin() {
-    if(boxes.empty()){boxes.resize(kEntitySlotCount);state.resize(kEntitySlotCount);}
-    for(auto index:touched)state[index]=0;
-    touched.clear();cyclic=false;
+    if (boxes.empty()) {
+      boxes.resize(kEntitySlotCount);
+      state.resize(kEntitySlotCount);
+    }
+    for (auto index : touched) {
+      state[index] = 0;
+    }
+    touched.clear();
+    cyclic = false;
   }
 };
-Aabb publication_body_bounds(const World& world, const Entity& entity, PublicationBounds& cache, std::uint32_t depth = 0U);
+Aabb publication_body_bounds(const World& world, const Entity& entity, PublicationBounds& cache,
+                             std::uint32_t depth = 0U);
 class SnapshotPublisher {
  public:
-  void reset(bool populated) { session_ = {}; session_.visibility_enabled = populated; session_.viewer_started = !populated; pending_chat_.clear(); default_dense_groups_ = true; }
-  std::vector<std::uint8_t> publish(const World& world, PlayerId viewer, std::uint32_t sequence, std::uint32_t reliable_ack = 0);
+  void reset(bool populated) {
+    session_ = {};
+    session_.visibility_enabled = populated;
+    session_.viewer_started = !populated;
+    pending_chat_.clear();
+    default_dense_groups_ = true;
+  }
+  std::vector<std::uint8_t> publish(const World& world, PlayerId viewer, std::uint32_t sequence,
+                                    std::uint32_t reliable_ack = 0);
   void emit_chat(std::string text) { pending_chat_.push_back(std::move(text)); }
   void set_dense(bool enabled) { default_dense_groups_ = enabled; }
   bool dense() const { return default_dense_groups_; }
+
  private:
   WorkerReplicationSession session_;
   SnapshotEncoder writer_;

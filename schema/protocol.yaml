@@ -9,18 +9,49 @@ worker:
   request:
     fields:
       - { name: funcName, type: string, confidence: high }
-      - { name: callbackId, type: i32, confidence: high, note: "-1 for init; otherwise a monotonically increasing client callback slot" }
-      - { name: data, type: bytes, optional: true, confidence: high, note: "transferred Uint8Array; absent or zero-length for init/think/flush" }
+      - {
+          name: callbackId,
+          type: i32,
+          confidence: high,
+          note: '-1 for init; otherwise a monotonically increasing client callback slot',
+        }
+      - {
+          name: data,
+          type: bytes,
+          optional: true,
+          confidence: high,
+          note: 'transferred Uint8Array; absent or zero-length for init/think/flush',
+        }
   response:
     fields:
       - { name: callbackId, type: i32, confidence: high }
-      - { name: finalResponse, type: bool, confidence: high, note: "true completes the callback; false is an intermediate packet" }
+      - {
+          name: finalResponse,
+          type: bool,
+          confidence: high,
+          note: 'true completes the callback; false is an intermediate packet',
+        }
       - { name: data, type: bytes, optional: true, confidence: high }
   functions:
-    - { name: sp_server_init, args: [0, 0], confidence: high, behavior: "initialize world and catalogs, schedule the 50 ms tick, flush initial output" }
-    - { name: sp_server_send, args: [pointer, length], confidence: high, behavior: "decode one client input packet and apply its commands" }
-    - { name: sp_server_think, args: [], confidence: high, behavior: "one 20 Hz simulation tick" }
-    - { name: sp_server_flush, args: [0, 0], confidence: high, behavior: "drain the output queue, send one final empty response, free packets" }
+    - {
+        name: sp_server_init,
+        args: [0, 0],
+        confidence: high,
+        behavior: 'initialize world and catalogs, schedule the 50 ms tick, flush initial output',
+      }
+    - {
+        name: sp_server_send,
+        args: [pointer, length],
+        confidence: high,
+        behavior: 'decode one client input packet and apply its commands',
+      }
+    - { name: sp_server_think, args: [], confidence: high, behavior: 'one 20 Hz simulation tick' }
+    - {
+        name: sp_server_flush,
+        args: [0, 0],
+        confidence: high,
+        behavior: 'drain the output queue, send one final empty response, free packets',
+      }
 
 input:
   maxPacketBytes: 65536
@@ -47,14 +78,19 @@ input:
     - { opcode: 7, name: disconnect, confidence: high }
     - { opcode: 8, name: discard-petal, confidence: high, fields: [slot] }
     - { opcode: 10, name: swap-petals, confidence: high, fields: [slotA, slotB] }
-    - { opcode: 12, name: input-buttons-angle-strength, confidence: high, fields: [buttons, angle, strength] }
+    - {
+        opcode: 12,
+        name: input-buttons-angle-strength,
+        confidence: high,
+        fields: [buttons, angle, strength],
+      }
     - { opcode: 13, name: bench-cycle, confidence: high }
     - { opcode: 1, name: reserved-1, confidence: medium }
     - { opcode: 9, name: reserved-9, confidence: medium }
     - { opcode: 11, name: reserved-11, confidence: medium }
   fieldNotes:
-    - "Opcode 12 angle uses fixed binary64 constants and a bit-level normalization test."
-    - "Name strings are trimmed and UTF-8 truncated on the spawn path."
+    - 'Opcode 12 angle uses fixed binary64 constants and a bit-level normalization test.'
+    - 'Name strings are trimmed and UTF-8 truncated on the spawn path.'
 
 output:
   queue:
@@ -89,12 +125,18 @@ output:
         indexDeltaXor: 0
         indexedFields: [3, 10, 16, 25, 39, 60, 61]
         field26Role: entity-kind
-        note: "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md."
+        note: 'Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md.'
       # Decoded zero terminates both field and index lists. Fields4/33/35 are
       # scalar. Indexed counts below describe component storage, not an added
       # validation bound on the existing domain stream.
     domainExtensions:
-      - { field: 26, name: entity-kind, type: byte, permanent: true, note: "Domain packets retain the permanent kind byte; field 2 carries the catalog species." }
+      - {
+          field: 26,
+          name: entity-kind,
+          type: byte,
+          permanent: true,
+          note: 'Domain packets retain the permanent kind byte; field 2 carries the catalog species.',
+        }
     entityHandle:
       bits: 32
       indexMask: 16383
@@ -103,7 +145,11 @@ output:
       confidence: high
     blocks:
       - { name: entity-deletes, count: varint, entry: handle }
-      - { name: entity-updates, count: varint, entry: handle + component-declarations + field-values }
+      - {
+          name: entity-updates,
+          count: varint,
+          entry: handle + component-declarations + field-values,
+        }
       - { name: events, count: varint, entry: opcode + fields }
       - { name: trailing-framing, confidence: medium }
     componentModel:
@@ -213,7 +259,7 @@ output:
       varintArray: [39]
       shortArray: [61]
       confidence: high
-      note: "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing."
+      note: 'Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing.'
     denseGroups:
       - { offset: 52, component: 1, fields: [22, 54] }
       - { offset: 56, component: 2, fields: [36] }
@@ -235,7 +281,12 @@ output:
       # 259155, 259334 stores state+1600/1604/1608 = inline27+88/92/96.
       - { offset: -27, component: 27, fields: [4, 15, 18, 25, 27, 33, 35, 41, 44, 51] }
       - { offset: 144, component: 28, fields: [14] }
-      - { offset: 152, component: 30, fields: [2, 26, 31], extendedFields: [58, 59, 60, 61, 62, 63] }
+      - {
+          offset: 152,
+          component: 30,
+          fields: [2, 26, 31],
+          extendedFields: [58, 59, 60, 61, 62, 63],
+        }
     events:
       - { opcode: 9, name: chat-string, confidence: high }
       - { opcode: 11, name: entity-time, confidence: high }

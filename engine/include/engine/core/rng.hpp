@@ -72,7 +72,10 @@ class ServerRng {
   [[nodiscard]] constexpr std::uint32_t state() const { return state_; }
   /** Diagnostic: number of values drawn since seed (phase attribution). */
   [[nodiscard]] constexpr std::uint32_t draws() const { return draws_; }
-  constexpr void seed(std::uint32_t value) { state_ = value == 0U ? 1U : value; draws_ = 0U; }
+  constexpr void seed(std::uint32_t value) {
+    state_ = value == 0U ? 1U : value;
+    draws_ = 0U;
+  }
 
  private:
   std::uint32_t state_;
@@ -94,4 +97,4 @@ class ParkMillerRng {
   std::int32_t state_;
 };
 
-} // namespace engine
+}  // namespace engine

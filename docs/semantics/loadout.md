@@ -74,16 +74,16 @@ the backpack tail.
 
 ## Storage layout
 
-| Domain field | Meaning |
-| --- | --- |
-| `slots_[slot].type_id` | slot type byte |
+| Domain field               | Meaning                   |
+| -------------------------- | ------------------------- |
+| `slots_[slot].type_id`     | slot type byte            |
 | `handles_[slot][instance]` | intrusive equipped handle |
-| `pending_[slot][instance]` | pending spawn byte |
-| `timers_[slot][instance]` | pending timer (ms) |
-| `replication_epoch_` | loadout revision |
-| `slot_epoch_[slot]` | per-slot revision |
-| `score_` | death score source |
-| profile level | active/capacity band |
+| `pending_[slot][instance]` | pending spawn byte        |
+| `timers_[slot][instance]`  | pending timer (ms)        |
+| `replication_epoch_`       | loadout revision          |
+| `slot_epoch_[slot]`        | per-slot revision         |
+| `score_`                   | death score source        |
+| profile level              | active/capacity band      |
 
 `equip`/`discard` reset the slot's handles, pending bytes and timers; `swap`
 moves all four arrays and the slot epochs. `advance` ticks the pending timers

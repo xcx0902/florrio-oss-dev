@@ -20,7 +20,7 @@ void test_entity_pool() {
   CHECK(pool.active_count() == 0);
   const auto second = pool.allocate();
   CHECK(second.has_value());
-  CHECK(second->index() == 1); // FIFO free list: 0 was released to the tail
+  CHECK(second->index() == 1);  // FIFO free list: 0 was released to the tail
   CHECK(second->generation() == 1);
   CHECK(pool.get(*first) == nullptr);
   CHECK(pool.get(*second) != nullptr);
@@ -52,7 +52,8 @@ void test_zone_restriction() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const engine::EntityHandle player = engine::spawn_player_default(world, engine::test::player(world), "zone", engine::make_default_profile(), false);
+  const engine::EntityHandle player = engine::spawn_player_default(
+      world, engine::test::player(world), "zone", engine::make_default_profile(), false);
   CHECK(player.valid());
   engine::test::player(world).profile().set_level(60);
   engine::Entity* entity = world.entities().get(player);
@@ -69,8 +70,9 @@ void test_zone_restriction() {
   CHECK(engine::test::player(world).zone_progress() == 255U);
   CHECK(engine::test::player(world).petals().empty());
   entity->set_position_x(engine::f32(30000.0F));
-  for (int index = 0; index < 10; ++index)
+  for (int index = 0; index < 10; ++index) {
     engine::update_zone_restriction(world, engine::test::player(world), 1000.0);
+  }
   CHECK(!engine::test::player(world).zone_petals_disabled());
   CHECK(engine::test::player(world).zone_progress() < 255U);
 }
@@ -85,11 +87,13 @@ void test_petal_orbit() {
   CHECK(engine::orbit_radius(engine::OrbitProfile::kRock, 1) == engine::f32(110.0F));
   CHECK(engine::orbit_radius(engine::OrbitProfile::kRock, 2) == engine::f32(55.0F));
   for (std::uint32_t inputs = 0; inputs < 256; ++inputs) {
-    const auto value = engine::orbit_radius(engine::OrbitProfile::kFast, static_cast<std::uint8_t>(inputs));
+    const auto value =
+        engine::orbit_radius(engine::OrbitProfile::kFast, static_cast<std::uint8_t>(inputs));
     CHECK(value == engine::f32(inputs & 1U ? 145.0F : inputs & 2U ? 40.0F : 65.0F));
   }
   CHECK(engine::wing_orbit_radius(0, engine::f32(0.0F)) == engine::f32(65.0F));
   CHECK(engine::wing_orbit_radius(1, engine::f32(0.0F)) == engine::f32(140.0F));
   CHECK(engine::wing_orbit_radius(2, engine::f32(0.0F)) == engine::f32(40.0F));
-  CHECK(std::fabs(engine::wing_orbit_radius(1, engine::f32(1.5707963267948966F)).to_float() - 190.0F) < 1e-4F);
+  CHECK(std::fabs(engine::wing_orbit_radius(1, engine::f32(1.5707963267948966F)).to_float() -
+                  190.0F) < 1e-4F);
 }

@@ -4,14 +4,14 @@
 
 A default spawn writes these values before the avatar is published:
 
-| Field | Value |
-| --- | ---: |
-| Collision radius | 25 |
-| Maximum health | 100 |
-| Current health | 100 (or the prior ratio) |
-| Contact damage | 25 |
-| Spawn clearance radius | 100 (compact) / 800 |
-| Inner spawn radius | 50 (compact) / 100 |
+| Field                  |                    Value |
+| ---------------------- | -----------------------: |
+| Collision radius       |                       25 |
+| Maximum health         |                      100 |
+| Current health         | 100 (or the prior ratio) |
+| Contact damage         |                       25 |
+| Spawn clearance radius |      100 (compact) / 800 |
+| Inner spawn radius     |       50 (compact) / 100 |
 
 `PlayerConfig` carries these as defaults. `spawn_player` accepts explicit values
 for native tests.

@@ -10,15 +10,14 @@
 #include "ai_internal.hpp"
 namespace engine {
 using namespace ai_detail;
-void configure_mob_ai(Entity& entity, f32 radius, f32 speed, bool aggressive,
-                      bool can_alert) {
+void configure_mob_ai(Entity& entity, f32 radius, f32 speed, bool aggressive, bool can_alert) {
   apply_default_ai(entity, AiFamily::kNone);
   entity.ai.aggressive = aggressive;
   entity.ai.can_alert = can_alert;
   entity.ai.radius = radius;
   entity.ai.wave_frequency = speed;
-  entity.ai.timer_interval_ms = speed.value > 0.0F
-    ? static_cast<double>(kTau) / static_cast<double>(speed.value) : 0.0;
+  entity.ai.timer_interval_ms =
+      speed.value > 0.0F ? static_cast<double>(kTau) / static_cast<double>(speed.value) : 0.0;
   entity.ai.wave_enabled = true;
   entity.ai.wave_power = f32(2.0F);
   arm_timer(entity.ai, 0.0);
@@ -188,8 +187,8 @@ void configure_bee(Entity& entity, ServerRng& rng) {
   ai.sine_frequency = f32(0.002F);
   ai.sine_amplitude = f32(0.5F);
   const std::uint32_t sample = rng.next();
-  const f32 base = f32::from_double(
-    static_cast<double>(static_cast<float>(sample - 1U)) * (5000.0 / 2147483648.0));
+  const f32 base = f32::from_double(static_cast<double>(static_cast<float>(sample - 1U)) *
+                                    (5000.0 / 2147483648.0));
   const f32 delay = f32::from_double(static_cast<double>(base.value) + 5000.0);
   ai.timer_interval_ms = static_cast<double>(delay.value);
   ai.radius = f32(1000.0F);
@@ -223,16 +222,20 @@ void configure_hornet(Entity& entity, ServerRng& rng) {
   // the attack-speed sign before configureBehavior, so the orientation is the
   // fifth draw rather than the fourth.
   const std::uint32_t sign_sample = rng.next();
-  const f32 base = f32::from_double(
-    static_cast<double>(static_cast<float>(delay_sample - 1U)) * (5000.0 / 2147483648.0));
+  const f32 base = f32::from_double(static_cast<double>(static_cast<float>(delay_sample - 1U)) *
+                                    (5000.0 / 2147483648.0));
   const f32 delay = f32::from_double(static_cast<double>(base.value) + 5000.0);
   ai.timer_interval_ms = static_cast<double>(delay.value);
   ai.territory = f32(0.6F);
   ai.aggressive = true;
-  ai.chase = f32::from_double(static_cast<double>(aggression_sample - 1U) / 2147483648.0).value < 0.2F;
+  ai.chase =
+      f32::from_double(static_cast<double>(aggression_sample - 1U) / 2147483648.0).value < 0.2F;
   ai.lead_divisor = f32::from_double(
-    static_cast<double>(f32::from_double(static_cast<double>(static_cast<float>(turn_sample - 1U))
-      * (static_cast<double>(0.19999998807907104F) / 2147483648.0)).value) + 0.5);
+      static_cast<double>(
+          f32::from_double(static_cast<double>(static_cast<float>(turn_sample - 1U)) *
+                           (static_cast<double>(0.19999998807907104F) / 2147483648.0))
+              .value) +
+      0.5);
   ai.radius = f32(600.0F);
   ai.range_multiplier = f32(1.5F);
   ai.attack_range = f32(500.0F);
@@ -271,6 +274,5 @@ void configure_square(Entity& entity, ServerRng& rng) {
   configure_behavior_draws(rng, ai, false);
   arm_timer(ai, 0.0);
 }
-
 
 }

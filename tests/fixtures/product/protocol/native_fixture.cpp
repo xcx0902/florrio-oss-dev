@@ -30,7 +30,7 @@ std::vector<std::uint8_t> spawn_packet(std::string_view name) {
   writer.write_varint32(1);
   writer.write_varint32(6);
   writer.write_bytes(std::span<const std::uint8_t>(
-    reinterpret_cast<const std::uint8_t*>(name.data()), name.size()));
+      reinterpret_cast<const std::uint8_t*>(name.data()), name.size()));
   writer.write_u8(0);
   return input_packet(writer.bytes());
 }
@@ -52,50 +52,70 @@ std::vector<std::uint8_t> chat_packet(std::string_view text) {
   writer.write_varint32(3);
   writer.write_varint32(5);
   writer.write_bytes(std::span<const std::uint8_t>(
-    reinterpret_cast<const std::uint8_t*>(text.data()), text.size()));
+      reinterpret_cast<const std::uint8_t*>(text.data()), text.size()));
   writer.write_u8(0);
   return input_packet(writer.bytes());
 }
 
 void write_packet(std::ofstream& output, const std::vector<std::uint8_t>& packet) {
   const auto size = static_cast<std::uint32_t>(packet.size());
-  for (int shift = 0; shift < 32; shift += 8)
+  for (int shift = 0; shift < 32; shift += 8) {
     output.put(static_cast<char>((size >> shift) & 0xffU));
-  output.write(reinterpret_cast<const char*>(packet.data()), static_cast<std::streamsize>(packet.size()));
+  }
+  output.write(reinterpret_cast<const char*>(packet.data()),
+               static_cast<std::streamsize>(packet.size()));
 }
 
-} // namespace
+}  // namespace
 
 int main(int argc, char** argv) {
-  if (argc != 2) return 2;
+  if (argc != 2) {
+    return 2;
+  }
   engine::WorkerApi api;
   api.init(false);
 
   // The fixture goes through the real send gate: opcode 6 creates the player,
   // spawn_loadout_petals() creates the default five Basic slots, and think()
   // advances the fixed-step world. No entity is constructed directly.
-  if (!api.send(spawn_packet("Fixture"), kKey)) return 3;
+  if (!api.send(spawn_packet("Fixture"), kKey)) {
+    return 3;
+  }
   api.think();
   const engine::EntityHandle player = engine::test::player(api.world()).player();
-  if (!player.valid() || api.world().entities().get(player) == nullptr) return 4;
+  if (!player.valid() || api.world().entities().get(player) == nullptr) {
+    return 4;
+  }
 
   const std::vector<std::uint8_t> baseline = api.domain_snapshot_bytes(6U, 0U);
 
   // Opcode 12 is decoded by the input decoder and consumed by a real tick.
-  if (!api.send(movement_packet(), kKey)) return 5;
-  for (int tick = 0; tick < 20; ++tick) api.think();
+  if (!api.send(movement_packet(), kKey)) {
+    return 5;
+  }
+  for (int tick = 0; tick < 20; ++tick) {
+    api.think();
+  }
   const engine::Entity* body = api.world().entities().get(player);
-  if (body == nullptr) return 6;
+  if (body == nullptr) {
+    return 6;
+  }
 
-  const engine::EntityHandle mob = api.spawn(
-    engine::EntityKind::kMob, 1U,
-    engine::Vec2{engine::f32(body->position.x.value + 200.0F), body->position.y});
-  if (!mob.valid()) return 7;
-  if (!api.send(chat_packet("fixture"), kKey)) return 8;
+  const engine::EntityHandle mob =
+      api.spawn(engine::EntityKind::kMob, 1U,
+                engine::Vec2{engine::f32(body->position.x.value + 200.0F), body->position.y});
+  if (!mob.valid()) {
+    return 7;
+  }
+  if (!api.send(chat_packet("fixture"), kKey)) {
+    return 8;
+  }
   api.think();
 
   const std::vector<std::uint8_t> first = api.domain_snapshot_bytes(7U, 2U);
-  if (!api.despawn(mob)) return 9;
+  if (!api.despawn(mob)) {
+    return 9;
+  }
   const std::vector<std::uint8_t> second = api.domain_snapshot_bytes(8U, 7U);
   // Direct wire-boundary probe: the schema allows only uint8-publishable ids;
   // snapshot field 2 is the species byte. This packet is not a catalog row.
@@ -108,13 +128,17 @@ int main(int argc, char** argv) {
   const std::array<std::uint16_t, 8> recharge{};
   boundary_writer.write_mask_loadout_fields(boundary_handle, 1U, inventory, recharge, true, false);
   const std::vector<std::uint8_t> boundary = boundary_writer.finish();
-  if (baseline.empty() || first.empty() || second.empty() || boundary.empty()) return 10;
+  if (baseline.empty() || first.empty() || second.empty() || boundary.empty()) {
+    return 10;
+  }
 
   std::ofstream output(argv[1], std::ios::binary);
-  if (!output) return 11;
+  if (!output) {
+    return 11;
+  }
   output.write("FLRR", 4);
-  output.put(1); // fixture format version
-  output.put(4); // packet count: baseline, input+mob+event, deletion, id boundary
+  output.put(1);  // fixture format version
+  output.put(4);  // packet count: baseline, input+mob+event, deletion, id boundary
   write_packet(output, baseline);
   write_packet(output, first);
   write_packet(output, second);

@@ -7,8 +7,10 @@ test('home petals are drawn only from discovered petal types', () => {
   animation.setPetals([2, 6]);
   const flowers = animation.sample(1000, 1280, 720);
   assert.ok(flowers.length > 0, 'menu spawns floating petals');
-  assert.ok(flowers.every(flower => flower.type === 2 || flower.type === 6),
-    'no undiscovered Basic fallback once the gallery has entries');
+  assert.ok(
+    flowers.every((flower) => flower.type === 2 || flower.type === 6),
+    'no undiscovered Basic fallback once the gallery has entries',
+  );
 });
 
 test('an empty discovery list falls back to Basic during the first boot', () => {
@@ -16,5 +18,5 @@ test('an empty discovery list falls back to Basic during the first boot', () => 
   animation.setPetals([]);
   const flowers = animation.sample(500, 1280, 720);
   assert.ok(flowers.length > 0);
-  assert.ok(flowers.every(flower => flower.type === 1));
+  assert.ok(flowers.every((flower) => flower.type === 1));
 });

@@ -15,4 +15,4 @@ void initialize_world(World& world, const WorldConfig& config = {});
 /** One fixed 50ms simulation step and six legacy snapshot-seed draws.
  * Call once per world tick, independently of connection/publication count. */
 void advance_world(World& world);
-} // namespace engine
+}  // namespace engine

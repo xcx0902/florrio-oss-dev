@@ -12,14 +12,19 @@ inline void runTest(const char* name, void (*body)()) {
   body();
   ++testsRun;
   const bool passed = failures == before;
-  if (!passed) ++testsFailed;
-  if (tapOutput) std::printf("%s %d - %s\n", passed ? "ok" : "not ok", testsRun, name);
+  if (!passed) {
+    ++testsFailed;
+  }
+  if (tapOutput) {
+    std::printf("%s %d - %s\n", passed ? "ok" : "not ok", testsRun, name);
+  }
 }
-} // namespace engine::test
+}  // namespace engine::test
 
-#define CHECK(condition) do { \
-  if (!(condition)) { \
-    std::fprintf(stderr, "FAIL %s:%d: %s\n", __FILE__, __LINE__, #condition); \
-    ++engine::test::failures; \
-  } \
-} while (false)
+#define CHECK(condition)                                                        \
+  do {                                                                          \
+    if (!(condition)) {                                                         \
+      std::fprintf(stderr, "FAIL %s:%d: %s\n", __FILE__, __LINE__, #condition); \
+      ++engine::test::failures;                                                 \
+    }                                                                           \
+  } while (false)

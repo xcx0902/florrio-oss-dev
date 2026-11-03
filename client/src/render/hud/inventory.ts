@@ -5,10 +5,16 @@ import { HudLayout } from './layout.js';
 import { label } from './primitives.js';
 import { HudState } from './state.js';
 /** Retain the explicit expanded-inventory interaction used by the app, while
-* the source's eight-slot storage row remains visible without opening it. */
-export function drawInventory(context: HudContext, state: HudState, layout: HudLayout, raster: number): void {
-  if (!state.inventoryOpen)
+ * the source's eight-slot storage row remains visible without opening it. */
+export function drawInventory(
+  context: HudContext,
+  state: HudState,
+  layout: HudLayout,
+  raster: number,
+): void {
+  if (!state.inventoryOpen) {
     return;
+  }
   const geometry = inventoryLayout(layout.width, layout.height);
   const { x, y, width: panelWidth, height: panelHeight } = geometry.panel;
   const ratio = state.pixelRatio ?? 1;
@@ -28,11 +34,13 @@ export function drawInventory(context: HudContext, state: HudState, layout: HudL
     context.setFillRgb(35, 40, 38);
     context.fillRect(left, top, cell, cell);
     context.setGlobalAlpha(1);
-    context.setStrokeRgb(...(index === state.selectedSlot ? [255, 245, 180] : [200, 205, 200]) as [
-      number,
-      number,
-      number
-    ]);
+    context.setStrokeRgb(
+      ...((index === state.selectedSlot ? [255, 245, 180] : [200, 205, 200]) as [
+        number,
+        number,
+        number,
+      ]),
+    );
     context.setLineWidth(index === state.selectedSlot ? 3 : 1.5);
     context.strokeRect(left, top, cell, cell);
     const type = state.slots?.[index] ?? 0;

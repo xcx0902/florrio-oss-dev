@@ -88,4 +88,4 @@ std::size_t collect_drops(World& world);
 /** Initialize a slot from the petal catalog recharge and instance count. */
 [[nodiscard]] PetalSlot make_petal_slot(std::uint16_t type_id);
 
-} // namespace engine
+}  // namespace engine
