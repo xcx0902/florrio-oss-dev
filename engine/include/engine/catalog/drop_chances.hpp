@@ -3,6 +3,7 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 
 namespace engine::catalog {
 struct DropChance {

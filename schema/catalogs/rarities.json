@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "count": 8,
+  "rarities": [
+    {
+      "index": 0,
+      "symbol": "Common",
+      "name": "Common"
+    },
+    {
+      "index": 1,
+      "symbol": "Unusual",
+      "name": "Unusual"
+    },
+    {
+      "index": 2,
+      "symbol": "Rare",
+      "name": "Rare"
+    },
+    {
+      "index": 3,
+      "symbol": "Epic",
+      "name": "Epic"
+    },
+    {
+      "index": 4,
+      "symbol": "Legendary",
+      "name": "Legendary"
+    },
+    {
+      "index": 5,
+      "symbol": "Unique",
+      "name": "Unique"
+    },
+    {
+      "index": 6,
+      "symbol": "Ultra",
+      "name": "Ultra"
+    },
+    {
+      "index": 7,
+      "symbol": "Super",
+      "name": "Super"
+    }
+  ]
+}

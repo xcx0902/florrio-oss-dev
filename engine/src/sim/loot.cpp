@@ -8,6 +8,9 @@ namespace engine {
 
 namespace {
 
+constexpr std::size_t kRetainedDeathItems = 3;
+constexpr float kPollenConversionChance = 0.01F;
+
 /** libc++ std::shuffle with minstd_rand + independent_bits_engine, as recovered
  * from the death path. `state` is the independent engine's Park-Miller state. */
 void shuffle_petals(std::uint16_t* data, std::size_t count, ServerRng& rng) {
@@ -47,7 +50,8 @@ std::uint32_t rarity_of(std::uint16_t petal_type) {
 
 double loot_lifetime_ms(std::uint16_t petal_type) {
   const std::uint32_t rarity = rarity_of(petal_type);
-  if (rarity >= 2U && rarity <= 5U) {
+  if (rarity >= static_cast<std::uint8_t>(catalog::Rarity::kRare) &&
+      rarity <= static_cast<std::uint8_t>(catalog::Rarity::kUnique)) {
     static constexpr double kDurations[4]{42000.0, 52000.0, 62000.0, 62000.0};
     return kDurations[rarity - 2U];
   }
@@ -78,7 +82,7 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng&
   std::uint8_t occupied = 0;
   for (std::uint8_t slot = 0; slot < size; ++slot) {
     const std::uint16_t petal = profile.inventory(slot);
-    if (petal == 0) {
+    if (petal == static_cast<std::uint16_t>(catalog::PetalId::kNone)) {
       continue;
     }
     ++occupied;
@@ -90,7 +94,7 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng&
       bag_count < limit ? 0U : static_cast<std::uint8_t>(bag_count - limit);
   for (std::uint8_t index = bag_start; index < bag_count; ++index) {
     const std::uint16_t petal = profile.backpack()[index];
-    if (petal != 0) {
+    if (petal != static_cast<std::uint16_t>(catalog::PetalId::kNone)) {
       groups[std::min<std::uint32_t>(rarity_of(petal), 5U)].push_back(petal);
     }
   }
@@ -103,15 +107,15 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng&
     }
     shuffle_petals(group.data(), group.size(), shuffle_rng);
     for (const std::uint16_t petal : group) {
-      if (petal == 1) {
+      if (petal == static_cast<std::uint16_t>(catalog::PetalId::kBasicCommon)) {
         continue;
       }
       if (rng.next_fraction() < f32(0.1F)) {
         continue;
       }
-      if (retained < 3U) {
+      if (retained < kRetainedDeathItems) {
         result.retained[retained++] = petal;
-      } else if (lost <= 9U) {
+      } else if (lost < PlayerProfile::kMaxLost) {
         result.lost[lost++] = petal;
       }
     }
@@ -119,8 +123,9 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng&
   result.retained_count = static_cast<std::uint8_t>(retained);
   result.lost_count = static_cast<std::uint8_t>(lost);
   for (std::uint32_t index = 0; index < retained; ++index) {
-    if (rarity_of(result.retained[index]) >= 2U && rng.next_fraction() < f32(0.01F)) {
-      result.retained[index] = 19;
+    if (rarity_of(result.retained[index]) >= static_cast<std::uint8_t>(catalog::Rarity::kRare) &&
+        rng.next_fraction() < f32(kPollenConversionChance)) {
+      result.retained[index] = static_cast<std::uint16_t>(catalog::PetalId::kPollenEpic);
     }
   }
   profile.set_lost_items(result.lost_count, result.lost);
@@ -157,7 +162,7 @@ EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 positi
 }
 
 bool legendary_exists(const World& world, EntityHandle dead, std::uint16_t petal_type) {
-  if (rarity_of(petal_type) != 5U) {
+  if (rarity_of(petal_type) != catalog::rarity_index(catalog::Rarity::kUnique)) {
     return false;
   }
   bool equipped = false;

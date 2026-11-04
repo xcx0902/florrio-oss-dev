@@ -5,6 +5,7 @@
 #include "engine/sim/bounds.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/sim/petals.hpp"
+#include "engine/sim/player_loadout.hpp"
 #include "engine/sim/spawn.hpp"
 #include <algorithm>
 
@@ -13,7 +14,7 @@ namespace engine {
 bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hatchling_type) {
   const Entity* egg = world.entities().get(egg_handle);
   if (egg == nullptr || egg->kind != EntityKind::kPetal || egg->health.value <= 0.0F ||
-      (egg->type_id != 22U && egg->type_id != 23U)) {
+      !catalog::is_egg_petal(egg->type_id)) {
     return false;
   }
   const Vec2 position = egg->position;
@@ -42,7 +43,7 @@ bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hat
   pet->spawn_band = 0xFFU;
   attach_child(world, owner, pet_handle);
   auto& loadout = state.loadout();
-  if (slot < 8U && instance < PlayerLoadout::kInstances &&
+  if (slot < PlayerLoadout::kActiveSlots && instance < PlayerLoadout::kInstances &&
       loadout.handle(slot, instance) == egg_handle) {
     loadout.set_handle(slot, instance, pet_handle);
     loadout.slots()[slot].instances[instance] = pet_handle;
@@ -65,8 +66,8 @@ bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hat
 void refresh_egg_pet_slots(World& world, PlayerState& state) {
   auto& loadout = state.loadout();
   auto& slots = loadout.slots();
-  for (std::uint8_t slot = 0U; slot < 8U; ++slot) {
-    if (slots[slot].type_id != 22U && slots[slot].type_id != 23U) {
+  for (std::uint8_t slot = 0U; slot < PlayerLoadout::kActiveSlots; ++slot) {
+    if (!catalog::is_egg_petal(slots[slot].type_id)) {
       continue;
     }
     const EntityHandle handle = loadout.handle(slot, 0U);

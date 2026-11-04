@@ -31,7 +31,7 @@ and calls `kill_entity` once (`death_processed`):
   health to zero and keeps the entity as a corpse. The corpse timer is always
   1000 ms.
 - **Mob**: materializes the spawn-time loot list (the drop table is rolled by
-  the component draws at spawn, not at death; see `loot.md`), spawns pickups,
+  the drop draws at spawn, not at death; see `loot.md`), spawns pickups,
   awards the attacker
   owner's player the entity rarity experience, sets health to zero and keeps a
   one-second corpse. Population refill runs before the corpse sweep and before

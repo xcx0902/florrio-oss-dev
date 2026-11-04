@@ -1,4 +1,5 @@
 #include "engine/core/perf.hpp"
+#include "engine/model/catalog.hpp"
 #include "engine/sim/movement.hpp"
 #include "engine/sim/player_motion.hpp"
 #include "engine/sim/bounds.hpp"
@@ -151,8 +152,7 @@ void constrain_linked_entities(World& world) {
       if (entity.ai.predecessor.valid()) {
         continue;
       }
-      if (entity.type_id != 15U && entity.type_id != 16U && entity.type_id != 17U &&
-          entity.type_id != 18U) {
+      if (!catalog::is_centipede_species(entity.type_id)) {
         continue;
       }
       roots.push_back(entity.handle);
@@ -168,8 +168,7 @@ std::uint32_t debug_linked_roots(const World& world) {
   world.entities().with_ordered_slots([&](auto&& slots) {
     for (const auto& entity : slots) {
       if (entity.active && !entity.children.empty() && !entity.ai.predecessor.valid() &&
-          (entity.type_id == 15U || entity.type_id == 16U || entity.type_id == 17U ||
-           entity.type_id == 18U)) {
+          catalog::is_centipede_species(entity.type_id)) {
         ++count;
       }
     }

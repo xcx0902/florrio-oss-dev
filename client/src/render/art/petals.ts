@@ -1,4 +1,6 @@
+import { PetalVariantFlag } from '../../schema/state-flags.js';
 import { PETAL_INFO } from '../../schema/petals.js';
+import { PetalId } from '../../schema/catalog-ids.js';
 import type { Canvas2DContext } from '../canvas2d/context.js';
 import { inLocal } from './geometry.js';
 import { Rgb, TAU, flashColor, rgb, setFill, setStroke, shade } from './palette.js';
@@ -8,44 +10,44 @@ import { rockPoints } from './species.js';
 // ---------------------------------------------------------------------------
 /** Native catalogue colours, independent of rarity (rarity colours the tile). */
 export const petalColors: Readonly<Record<number, Rgb>> = {
-  1: rgb(255, 255, 255),
-  2: rgb(255, 255, 255),
-  3: rgb(187, 187, 187),
-  4: rgb(119, 119, 119),
-  5: rgb(255, 232, 105),
-  6: rgb(255, 148, 201),
-  7: rgb(51, 51, 51),
-  8: rgb(206, 118, 219),
-  9: rgb(255, 255, 255),
-  10: rgb(51, 51, 51),
-  11: rgb(138, 194, 85),
-  12: rgb(206, 118, 219),
-  13: rgb(56, 199, 95),
-  14: rgb(254, 255, 201),
-  15: rgb(255, 148, 201),
-  16: rgb(255, 255, 255),
-  17: rgb(255, 255, 255),
-  18: rgb(255, 255, 255),
-  19: rgb(255, 231, 99),
-  20: rgb(255, 255, 255),
-  21: rgb(180, 56, 199),
-  22: rgb(255, 240, 184),
-  23: rgb(255, 240, 184),
-  24: rgb(255, 148, 201),
-  25: rgb(51, 51, 51),
-  26: rgb(51, 51, 51),
-  27: rgb(51, 51, 51),
-  28: rgb(255, 255, 255),
-  29: rgb(255, 255, 255),
-  30: rgb(255, 255, 255),
-  31: rgb(247, 207, 47),
-  32: rgb(57, 181, 74),
-  33: rgb(56, 199, 95),
-  34: rgb(206, 118, 219),
-  35: rgb(255, 255, 255),
-  36: rgb(255, 255, 255),
-  37: rgb(255, 255, 255),
-  38: rgb(255, 228, 25),
+  [PetalId.BasicCommon]: rgb(255, 255, 255),
+  [PetalId.FastCommon]: rgb(255, 255, 255),
+  [PetalId.HeavyCommon]: rgb(187, 187, 187),
+  [PetalId.RockRare]: rgb(119, 119, 119),
+  [PetalId.SquareUnique]: rgb(255, 232, 105),
+  [PetalId.RoseUnusual]: rgb(255, 148, 201),
+  [PetalId.StingerUnusual]: rgb(51, 51, 51),
+  [PetalId.IrisUnusual]: rgb(206, 118, 219),
+  [PetalId.WingRare]: rgb(255, 255, 255),
+  [PetalId.MissileRare]: rgb(51, 51, 51),
+  [PetalId.PeasRare]: rgb(138, 194, 85),
+  [PetalId.PeasEpic]: rgb(206, 118, 219),
+  [PetalId.CactusRare]: rgb(56, 199, 95),
+  [PetalId.FasterRare]: rgb(254, 255, 201),
+  [PetalId.RoseEpic]: rgb(255, 148, 201),
+  [PetalId.TwinUnusual]: rgb(255, 255, 255),
+  [PetalId.TripletEpic]: rgb(255, 255, 255),
+  [PetalId.BubbleRare]: rgb(255, 255, 255),
+  [PetalId.PollenEpic]: rgb(255, 231, 99),
+  [PetalId.DandelionRare]: rgb(255, 255, 255),
+  [PetalId.CactusEpic]: rgb(180, 56, 199),
+  [PetalId.EggEpic]: rgb(255, 240, 184),
+  [PetalId.EggLegendary]: rgb(255, 240, 184),
+  [PetalId.RoseRare]: rgb(255, 148, 201),
+  [PetalId.AntennaeLegendary]: rgb(51, 51, 51),
+  [PetalId.HeaviestEpic]: rgb(51, 51, 51),
+  [PetalId.StingerLegendary]: rgb(51, 51, 51),
+  [PetalId.YinYangEpic]: rgb(255, 255, 255),
+  [PetalId.WebRare]: rgb(255, 255, 255),
+  [PetalId.WebLegendary]: rgb(255, 255, 255),
+  [PetalId.HoneyRare]: rgb(247, 207, 47),
+  [PetalId.LeafUnusual]: rgb(57, 181, 74),
+  [PetalId.CactusLegendary]: rgb(56, 199, 95),
+  [PetalId.PeasLegendary]: rgb(206, 118, 219),
+  [PetalId.BasicUnique]: rgb(255, 255, 255),
+  [PetalId.SaltRare]: rgb(255, 255, 255),
+  [PetalId.RiceEpic]: rgb(255, 255, 255),
+  [PetalId.CornEpic]: rgb(255, 228, 25),
 };
 export function petalColor(type: number): Rgb {
   return petalColors[type] ?? rgb(255, 255, 255);
@@ -106,10 +108,11 @@ export function drawPetalShape(
   phase = _now * 0.001,
 ): void {
   switch (type) {
-    case 4:
-    case 36: {
+    case PetalId.RockRare:
+    case PetalId.SaltRare: {
       // The original creates one irregular polygon per instance.
-      const points = rockPoints(seed, type === 4 ? 14 : 12, type === 4 ? 5 : 7);
+      const rock = type === PetalId.RockRare;
+      const points = rockPoints(seed, rock ? 14 : 12, rock ? 5 : 7);
       context.beginPath();
       points.forEach(([x, y], index) => (index ? context.lineTo(x, y) : context.moveTo(x, y)));
       context.closePath();
@@ -117,17 +120,17 @@ export function drawPetalShape(
       petalPaint(context, type);
       return;
     }
-    case 5:
+    case PetalId.SquareUnique:
       context.beginPath();
       context.rect(-10.60660171508789, -10.60660171508789, 21.21320343017578, 21.21320343017578);
       petalPaint(context, type, 2.250000089406967);
       return;
-    case 7:
-    case 27:
+    case PetalId.StingerUnusual:
+    case PetalId.StingerLegendary:
       petalPolygon(context, 7, 3);
       petalPaint(context, type);
       return;
-    case 9:
+    case PetalId.WingRare:
       inLocal(context, (local) => {
         local.beginPath();
         local.arc(0, 0, 15, -Math.PI / 2, Math.PI / 2);
@@ -136,7 +139,7 @@ export function drawPetalShape(
         petalPaint(local, type);
       });
       return;
-    case 10:
+    case PetalId.MissileRare:
       context.setLineJoin('round');
       context.beginPath();
       context.moveTo(11, 0);
@@ -149,14 +152,15 @@ export function drawPetalShape(
       context.fill();
       context.stroke();
       return;
-    case 11:
-    case 12:
-    case 34: {
+    case PetalId.PeasRare:
+    case PetalId.PeasEpic:
+    case PetalId.PeasLegendary: {
       // Native3628/3649/4283: diagonal offsets, independent fill/stroke per
       // pea, and a persistent random initial phase in the world. Native4283
       // uses radius 10 and offset 7 for the Legendary cluster.
-      const offset = type === 34 ? 7 : 6,
-        radius = type === 34 ? 10 : 7;
+      const legendary = type === PetalId.PeasLegendary;
+      const offset = legendary ? 7 : 6,
+        radius = legendary ? 10 : 7;
       inLocal(
         context,
         (local) => {
@@ -174,17 +178,17 @@ export function drawPetalShape(
       );
       return;
     }
-    case 13:
-    case 21:
-    case 33:
+    case PetalId.CactusRare:
+    case PetalId.CactusEpic:
+    case PetalId.CactusLegendary:
       petalPolygon(context, 15, 8, 0.739103626);
       petalPaint(context, type);
       context.beginPath();
       context.arc(0, 0, 8, 0, TAU);
-      setFill(context, type === 21 ? rgb(194, 116, 214) : rgb(116, 214, 143));
+      setFill(context, type === PetalId.CactusEpic ? rgb(194, 116, 214) : rgb(116, 214, 143));
       context.fill();
       return;
-    case 15:
+    case PetalId.RoseEpic:
       context.beginPath();
       context.moveTo(10, 0);
       for (let index = 1; index <= 3; index++) {
@@ -200,11 +204,11 @@ export function drawPetalShape(
       context.closePath();
       petalPaint(context, type);
       return;
-    case 16:
-    case 17:
+    case PetalId.TwinUnusual:
+    case PetalId.TripletEpic:
       petalDisc(context, type, 7);
       return;
-    case 18: {
+    case PetalId.BubbleRare: {
       const alpha = context.getGlobalAlpha?.() ?? 1;
       context.setGlobalAlpha(alpha * 0.7);
       context.beginPath();
@@ -223,7 +227,7 @@ export function drawPetalShape(
       context.setGlobalAlpha(alpha);
       return;
     }
-    case 20:
+    case PetalId.DandelionRare:
       context.setLineCap('round');
       context.setLineWidth(7);
       setStroke(context, rgb(51, 51, 51));
@@ -233,13 +237,21 @@ export function drawPetalShape(
       context.stroke();
       petalDisc(context, type, 9);
       return;
-    case 22:
-    case 23:
+    case PetalId.EggEpic:
+    case PetalId.EggLegendary:
       context.beginPath();
-      context.ellipse(0, 0, type === 22 ? 11 : 13, type === 22 ? 15 : 17, 0, 0, TAU);
+      context.ellipse(
+        0,
+        0,
+        type === PetalId.EggEpic ? 11 : 13,
+        type === PetalId.EggEpic ? 15 : 17,
+        0,
+        0,
+        TAU,
+      );
       petalPaint(context, type);
       return;
-    case 25:
+    case PetalId.AntennaeLegendary:
       context.setLineJoin('round');
       context.setLineCap('round');
       inLocal(
@@ -264,14 +276,14 @@ export function drawPetalShape(
         35,
       );
       return;
-    case 26:
+    case PetalId.HeaviestEpic:
       petalDisc(context, type, 16);
       context.beginPath();
       context.arc(6, -6, 4.6, 0, TAU);
       setFill(context, rgb(204, 204, 204));
       context.fill();
       return;
-    case 28:
+    case PetalId.YinYangEpic:
       context.setLineCap('round');
       context.setLineWidth(3);
       context.beginPath();
@@ -311,16 +323,16 @@ export function drawPetalShape(
         context.stroke();
       }
       return;
-    case 29:
-    case 30:
+    case PetalId.WebRare:
+    case PetalId.WebLegendary:
       petalPolygon(context, 11, 5, 0.4854101966);
       petalPaint(context, type);
       return;
-    case 31:
+    case PetalId.HoneyRare:
       petalPolygon(context, 11, 6);
       petalPaint(context, type);
       return;
-    case 32:
+    case PetalId.LeafUnusual:
       context.setLineCap('round');
       context.setLineWidth(3);
       setStroke(context, shade(petalColor(type)));
@@ -339,7 +351,7 @@ export function drawPetalShape(
       context.quadraticCurveTo(0, -1.5, 7.5, 0);
       context.stroke();
       return;
-    case 37:
+    case PetalId.RiceEpic:
       context.setLineCap('round');
       context.beginPath();
       context.moveTo(-8, 0);
@@ -351,7 +363,7 @@ export function drawPetalShape(
       context.setStrokeRgb(255, 255, 255);
       context.stroke();
       return;
-    case 38:
+    case PetalId.CornEpic:
       context.beginPath();
       context.moveTo(-5, 8);
       context.quadraticCurveTo(-15, -8, 0, -8);
@@ -379,9 +391,9 @@ export function drawPetalInstance(
   const scale = Number.isFinite(radius) && radius > 0 ? radius / base : 1;
   const draw = (local: Canvas2DContext): void =>
     drawPetalShape(local, type, false, now, seed, phase);
-  if (type === 9) {
+  if (type === PetalId.WingRare) {
     inLocal(context, draw, scale, now * 0.01);
-  } else if (type === 5) {
+  } else if (type === PetalId.SquareUnique) {
     inLocal(context, draw, scale, phase ?? now * 0.0003);
   } else if (scale === 1) {
     draw(context);
@@ -417,11 +429,13 @@ export function drawLaunchedPea(
   context: Canvas2DContext,
   type: number,
   flash = 0,
-  flags = type === 34 ? 3 : type === 12 ? 1 : 0,
+  flags = type === PetalId.PeasLegendary ? 3 : type === PetalId.PeasEpic ? 1 : 0,
 ): void {
-  const color = flashColor(petalColor(flags & 1 ? 12 : 11), flash);
+  const epic = (flags & PetalVariantFlag.EpicColor) !== 0;
+  const large = (flags & PetalVariantFlag.Large) !== 0;
+  const color = flashColor(petalColor(epic ? PetalId.PeasEpic : PetalId.PeasRare), flash);
   context.beginPath();
-  context.arc(0, 0, flags & 2 ? 10 : 7, 0, TAU);
+  context.arc(0, 0, large ? 10 : 7, 0, TAU);
   setFill(context, color);
   context.fill();
   setStroke(context, shade(color));
@@ -478,11 +492,22 @@ export function drawPetalIcon(context: Canvas2DContext, type: number, scale = 1)
   if (!type || !info) {
     return;
   }
-  const angle = [5, 9, 10, 11, 12, 20, 29, 30, 34].includes(type)
+  const upright = new Set<number>([
+    PetalId.SquareUnique,
+    PetalId.WingRare,
+    PetalId.MissileRare,
+    PetalId.PeasRare,
+    PetalId.PeasEpic,
+    PetalId.DandelionRare,
+    PetalId.WebRare,
+    PetalId.WebLegendary,
+    PetalId.PeasLegendary,
+  ]);
+  const angle = upright.has(type)
     ? 1
-    : type === 32
+    : type === PetalId.LeafUnusual
       ? -1
-      : type === 37 || type === 38
+      : type === PetalId.RiceEpic || type === PetalId.CornEpic
         ? 0.7
         : 0;
   if (info.instances === 1 && angle === 0 && scale === 1) {

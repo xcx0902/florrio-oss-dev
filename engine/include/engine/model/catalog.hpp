@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/catalog/drop_chances.hpp"
 #include "engine/catalog/entity_spawn_defaults.hpp"
+#include "engine/catalog/ids.hpp"
 #include "engine/catalog/petal_combat.hpp"
 #include "engine/catalog/generated_catalog_data.hpp"
 #include <array>
@@ -10,6 +11,32 @@
 #include <unordered_map>
 
 namespace engine {
+namespace catalog {
+
+[[nodiscard]] constexpr bool is_peas_petal(std::uint16_t type_id) {
+  const PetalId id = petal_id(type_id);
+  return id == PetalId::kPeasRare || id == PetalId::kPeasEpic || id == PetalId::kPeasLegendary;
+}
+[[nodiscard]] constexpr bool is_web_petal(std::uint16_t type_id) {
+  const PetalId id = petal_id(type_id);
+  return id == PetalId::kWebRare || id == PetalId::kWebLegendary;
+}
+[[nodiscard]] constexpr bool is_egg_petal(std::uint16_t type_id) {
+  const PetalId id = petal_id(type_id);
+  return id == PetalId::kEggEpic || id == PetalId::kEggLegendary;
+}
+[[nodiscard]] constexpr bool is_centipede_species(std::uint16_t type_id) {
+  const SpeciesId id = species_id(type_id);
+  return id == SpeciesId::kCentipedeHead || id == SpeciesId::kCentipedeSegment ||
+         id == SpeciesId::kEvilCentipedeHead || id == SpeciesId::kEvilCentipedeSegment;
+}
+[[nodiscard]] constexpr bool is_ant_species(std::uint16_t type_id) {
+  const SpeciesId id = species_id(type_id);
+  return id == SpeciesId::kBabyAnt || id == SpeciesId::kWorkerAnt || id == SpeciesId::kSoldierAnt ||
+         id == SpeciesId::kQueenAnt;
+}
+
+}  // namespace catalog
 
 /** Read-only view over the build-time catalog data generated from
  * schema/catalogs. Type ids are sparse keys backed by one-time indexes; no
@@ -31,6 +58,15 @@ class Catalog {
   }
   [[nodiscard]] std::span<const catalog::SpawnRuleCatalogEntry> spawn_rules() const {
     return catalog::kSpawnRules;
+  }
+  /** Catalog order of a petal id, independent of numeric id density. */
+  [[nodiscard]] std::size_t petal_ordinal(std::uint16_t type_id) const {
+    for (std::size_t index = 0; index < petals().size(); ++index) {
+      if (petals()[index].typeId == type_id) {
+        return index;
+      }
+    }
+    return petals().size();
   }
 
   [[nodiscard]] const catalog::PetalCatalogEntry* petal(std::uint16_t type_id) const {

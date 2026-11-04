@@ -1,7 +1,9 @@
 #pragma once
 #include "engine/core/f32.hpp"
 #include "engine/core/vec2.hpp"
+#include "engine/model/attack_behavior.hpp"
 #include "engine/model/player_id.hpp"
+#include "engine/model/state_flags.hpp"
 #include <array>
 #include <bitset>
 #include <cstdint>
@@ -117,34 +119,33 @@ struct AiModifiers {
 struct AiState {
   std::uint8_t activity_flags = 0;  // Original AI+8 / snapshot36, latched in AI.
   bool enabled = false;
-  bool aggressive = false;                  // AI+108: seek targets
-  bool can_alert = false;                   // AI+109: accept attacker aggro
-  bool chase = false;                       // AI+110: lead-prediction movement
-  bool angle_locked = true;                 // AI+64: face the computed direction directly
-  bool wave_enabled = false;                // AI+76: idle wave speed/turn modulation
-  bool sine_enabled = false;                // AI+88: idle sine angle wobble
-  bool guard_active = false;                // AI+184: moving to the guard point
-  bool clock_valid = true;                  // AI+16: server clock is available
-  bool timer_active = false;                // AI+32: random-angle timer armed
-  f32 turn_rate = f32(0.0F);                // AI+60
-  f32 drift_rate = f32(0.2F);               // AI+68
-  f32 idle_speed = f32(1.0F);               // AI+72
-  f32 wave_frequency = f32(0.0F);           // AI+80
-  f32 wave_power = f32(2.0F);               // AI+84
-  f32 wave_amplitude = f32(1.0F);           // AI+76
-  f32 sine_frequency = f32(0.0F);           // AI+92
-  f32 sine_amplitude = f32(0.0F);           // AI+96
-  double timer_interval_ms = 0.0;           // AI+100
-  f32 territory = f32(0.0F);                // AI+104: arena threshold fraction
-  f32 lead_divisor = f32(1.0F);             // AI+112
-  f32 chase_speed = f32(2.4F);              // AI+116
-  f32 radius = f32(0.0F);                   // AI+120: acquisition radius
-  f32 range_multiplier = f32(1.5F);         // AI+124
-  f32 attack_range = f32(0.0F);             // AI+128: strafe/attack distance
-  f32 attack_speed = f32(0.0F);             // AI+132: speed inside attack range
-  f32 guard_radius = f32(500.0F);           // AI+136
-  f32 leash = f32(1000.0F);                 // AI+140
-  std::uint32_t attack_callback = 0;        // AI+144: original indirect callback id
+  bool aggressive = false;           // AI+108: seek targets
+  bool can_alert = false;            // AI+109: accept attacker aggro
+  bool chase = false;                // AI+110: lead-prediction movement
+  bool angle_locked = true;          // AI+64: face the computed direction directly
+  bool wave_enabled = false;         // AI+76: idle wave speed/turn modulation
+  bool sine_enabled = false;         // AI+88: idle sine angle wobble
+  bool guard_active = false;         // AI+184: moving to the guard point
+  bool timer_active = false;         // AI+32: random-angle timer armed
+  f32 turn_rate = f32(0.0F);         // AI+60
+  f32 drift_rate = f32(0.2F);        // AI+68
+  f32 idle_speed = f32(1.0F);        // AI+72
+  f32 wave_frequency = f32(0.0F);    // AI+80
+  f32 wave_power = f32(2.0F);        // AI+84
+  f32 wave_amplitude = f32(1.0F);    // AI+76
+  f32 sine_frequency = f32(0.0F);    // AI+92
+  f32 sine_amplitude = f32(0.0F);    // AI+96
+  double timer_interval_ms = 0.0;    // AI+100
+  f32 territory = f32(0.0F);         // AI+104: arena threshold fraction
+  f32 lead_divisor = f32(1.0F);      // AI+112
+  f32 chase_speed = f32(2.4F);       // AI+116
+  f32 radius = f32(0.0F);            // AI+120: acquisition radius
+  f32 range_multiplier = f32(1.5F);  // AI+124
+  f32 attack_range = f32(0.0F);      // AI+128: strafe/attack distance
+  f32 attack_speed = f32(0.0F);      // AI+132: speed inside attack range
+  f32 guard_radius = f32(500.0F);    // AI+136
+  f32 leash = f32(1000.0F);          // AI+140
+  AttackBehavior attack = AttackBehavior::kNone;
   f32 attack_cooldown_gain = f32(1000.0F);  // AI+148
   f32 attack_cooldown_ms = f32(0.0F);       // AI+56
   f32 current_angle = f32(0.0F);            // AI+52: generic-AI drift angle
@@ -160,7 +161,6 @@ struct AiState {
   Vec2 guard_point;  // AI+176/+180
   Vec2 home;
   bool returning = false;
-  double retarget_ms = 0.0;
   AiFamily family = AiFamily::kNone;
   AiModifiers modifiers;
   std::uint8_t variant = 0;  // ladybug variant / ant caste / centipede head
@@ -222,11 +222,11 @@ struct Entity {
    * The native vtable is not reconstructed; this retains the multiplicative
    * effect on AI speed. */
   f32 behavior_speed_multiplier = f32(1.0F);
-  /** Physics +50: Web tag / one-shot collision marker. */
-  bool physics_flag50 = false;
-  /** Physics +48: mass-weighted contact path. Cleared for Rock/Boulder/Cactus
-   * and Ant Hole, which use the full-overlap push in original 390. */
-  bool physics_flag48 = true;
+  /** Web tag projectiles skip the ordinary contact response. */
+  bool skips_contact_response = false;
+  /** Contact solver uses both bodies' mass-weighted response. Cleared for
+   * Rock/Boulder/Cactus and Ant Hole, which use the full-overlap push. */
+  bool uses_mass_weighted_response = true;
   /** Physics +40 mass (every shipped body keeps 1.0). */
   f32 mass = f32(1.0F);
   /** Entity+184 score component. The original allocates a 16-byte record with
@@ -249,10 +249,10 @@ struct Entity {
    * disappear. Ordinary live ownership chains retain their original rules. */
   EntityHandle control_root{};
   bool world_controlled = false;
-  std::uint32_t flags = 0;
-  std::uint8_t world_flags = 0;   // original entity +95
-  std::uint8_t entity_flags = 0;  // original entity +93
-  std::uint8_t component_flags92 = 0;
+  /** Raw flag bytes are published in the snapshot. The domain interprets only
+   * the named bits in state_flags.hpp; remaining bits stay wire/catalog state. */
+  std::uint8_t world_flags = 0;
+  std::uint8_t entity_flags = 0;
 
   std::uint8_t loadout_slot = 0xFF;
   std::uint8_t loadout_instance = 0;
@@ -278,12 +278,10 @@ struct Entity {
   bool layer_ignore_ranges = false;
   std::uint8_t layer_side_selector = 0;
   std::uint32_t hit_epoch = 0;
-  std::uint32_t last_hit_epoch = 0;
-  std::uint32_t hit_count = 0;
   /** Projectile petal callback state; independent of the equipped slot. */
   bool petal_launched = false;
-  /** Original render+8 flags written by Peas split (0, 1 or 3). */
-  std::uint8_t petal_render_flags = 0;
+  /** Named PetalVariantFlag bits written by the Peas split. */
+  std::uint8_t petal_variant_flags = 0;
   double behavior_cooldown_ms = 0.0;
   /** Creation epoch used by the archived peer's one-tick arrival marker. */
   std::uint64_t spawn_tick = 0;
@@ -305,8 +303,6 @@ struct Entity {
   bool pickup_collected = false;
   PlayerId pickup_recipient{};
   double pickup_transfer_deadline_ms = 0.0;
-  /** Effect-vector epoch used by the shared area payload. */
-  std::uint32_t effect_epoch = 0;
 };
 
 }  // namespace engine

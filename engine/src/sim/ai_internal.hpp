@@ -73,7 +73,7 @@ inline void apply_default_ai(Entity& entity, AiFamily family) {
   ai.attack_speed = f32(0.0F);
   ai.guard_radius = f32(500.0F);
   ai.leash = f32(1000.0F);
-  ai.attack_callback = 0;
+  ai.attack = AttackBehavior::kNone;
   ai.attack_cooldown_gain = f32(1000.0F);
   ai.attack_cooldown_ms = f32(0.0F);
   ai.current_angle = f32(0.0F);

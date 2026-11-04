@@ -3,6 +3,7 @@
 #include "engine/model/catalog.hpp"
 #include "engine/sim/ai.hpp"
 #include "engine/sim/loot.hpp"
+#include "engine/sim/player_loadout.hpp"
 #include "engine/sim/petals.hpp"
 #include "engine/sim/progression.hpp"
 #include "engine/sim/player.hpp"
@@ -75,7 +76,8 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
     state.death.position = position;
     bool wide_view = false;
     for (std::size_t slot = 0; slot < state.profile().active_slots(); ++slot) {
-      wide_view = wide_view || state.loadout().slots()[slot].type_id == 25;
+      wide_view = wide_view || catalog::petal_id(state.loadout().slots()[slot].type_id) ==
+                                   catalog::PetalId::kAntennaeLegendary;
     }
     state.death.view_scale = f32(wide_view ? 0.63F : 0.9F);
     // The frozen v1 Worker continues its orphan-petal orbit during the corpse
@@ -100,7 +102,7 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
     std::array<std::uint8_t, 24> child_slots{};
     std::array<std::uint8_t, 24> child_instances{};
     std::size_t child_count = 0;
-    for (std::uint8_t slot = 0; slot < 8U; ++slot) {
+    for (std::uint8_t slot = 0; slot < PlayerLoadout::kActiveSlots; ++slot) {
       for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
         const EntityHandle handle = state.loadout().handle(slot, instance);
         if (!handle.valid() || child_count >= children.size()) {

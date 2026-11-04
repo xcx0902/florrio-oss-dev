@@ -71,7 +71,7 @@ All arithmetic is uint32 wrapping. The sequence from seed `1` starts
 
 Entity construction consumes RNG in this order:
 
-1. one draw per catalog component (`componentDrawCount` in
+1. one draw per drop-row entry (`dropDrawCount` in
    `schema/catalogs/entities.json`) before the species initializer;
 2. the initializer's own draws (for example the queen's extra draws, the
    centipede's segment chain and the ant hole's baby-ant loop);
@@ -79,8 +79,10 @@ Entity construction consumes RNG in this order:
    draw, and a second orientation draw when the species settings byte is clear
    (hornet and square).
 
-`consume_component_draws` and `configure_behavior_draws` implement steps 1 and 3. Native fixtures pin the per-type draw counts (for example type 11 = 57,
-type 15 = 82, type 16 = 8, type 17 = 62, type 18 = 6).
+`draw_drop_candidates` and `configure_behavior_draws` implement steps 1 and 3.
+Native fixtures pin the per-type draw counts (for example `AntHole` = 3,
+`CentipedeHead` = 6, `CentipedeSegment` = 6, `EvilCentipedeHead` = 4,
+`EvilCentipedeSegment` = 4).
 `schema/catalogs/entities.json` records the counts; variants 16/18 are runtime
 copies of 15/17 and do not re-run the parent initializer.
 
@@ -147,10 +149,10 @@ The 19 catalog species' radius, contact damage and entity flags live in
 `engine/include/engine/catalog/entity_spawn_defaults.hpp`.
 
 - Cactus: randomized radius 40..60, health `radius * 0.7`, contact `30`,
-  flags `(0,96,75)`.
-- Ladybug: radius `30`, health `25`, contact `10`, flags `(2,112,75)`.
-- Bee: radius `25`, health `15`, contact `50`, flags `(2,96,91)`.
-- Spider: radius `25`, health `20`, contact `25`, flags `(10,96,75)`.
+  entity/world flags `(96,75)`.
+- Ladybug: radius `30`, health `25`, contact `10`, entity/world flags `(112,75)`.
+- Bee: radius `25`, health `15`, contact `50`, entity/world flags `(96,91)`.
+- Spider: radius `25`, health `20`, contact `25`, entity/world flags `(96,75)`.
 - Rock/Boulder/Cactus are marked `dynamicRadius` and rejected by
   `spawn_entity_from_defaults`; use `configure_rock` / `spawn_rock` when the
   caller owns the RNG state.
@@ -166,10 +168,11 @@ health = f32((massive ? 2 : 1) * radius * 0.4)
 
 With RNG state `1677421613`, the next draw is `2095254635`, radius
 `39.513580322265625`, health `15.805432319641113`. `spawn_rock` writes contact
-`10`, flags `(75,96)` and component flag `4`. `spawn_rock_with_component_draws` performs
+`10`, world/entity flags `(75,96)` and `uses_mass_weighted_response = false`.
+`spawn_rock_with_drop_draws` performs
 the three pre-configure draws followed by `configure_rock`;
-`spawn_from_band_with_component_draws` routes type 1/2 through it, type 3 through
-`spawn_cactus_with_component_draws`, and other species through the catalog defaults.
+`spawn_from_band_with_drop_draws` routes Rock/Boulder through it, Cactus through
+`spawn_cactus_with_drop_draws`, and other species through the catalog defaults.
 With seed `787621659`, band 0 selects Rock, accepts the first position trial and
 ends at RNG state `2095254635` with radius `39.513580322265625`. The generic
 `spawn_from_band` leaves the factory choice to the caller.
@@ -182,22 +185,22 @@ radius = f32(f32(f32((random - 1) >>> 0) * (20 / 2^31)) + 40)
 health = f32(radius * 0.7)
 ```
 
-`spawn_cactus` writes contact `30`, flags `(75,96)` and component flag `0`;
-`spawn_cactus_with_component_draws` consumes the same three pre-draws. The factory
+`spawn_cactus` writes contact `30` and world/entity flags `(75,96)`;
+`spawn_cactus_with_drop_draws` consumes the same three pre-draws. The factory
 rejects Cactus because its radius is dynamic.
 
-`spawn_entity_from_defaults` creates the entity with the catalog radius/flags
-and sets `contact_damage`, `health`/`max_health` and `component_flags92`. It
-then dispatches the family initializers:
+`spawn_entity_from_defaults` creates the entity with the catalog radius and
+entity/world flags and sets `contact_damage` and `health`/`max_health`. It
+then dispatches the family initializers by `SpeciesId`:
 
-- Ladybug 4/5/20/21 → `configure_ladybug` (normal/massive/dark/shiny);
-- Ant 7/8/9/10 → `configure_ant` (baby/worker/soldier/queen, random turn
-  scale, soldier range 300/400);
-- Beetle 12/13 → `configure_beetle` (normal/massive);
-- Centipede 15/16/17/18 → `configure_centipede` (normal/evil, head/segment,
-  1% rare);
-- Spider 22 → `configure_spider` (aggressive, chase, territory 0.45);
-- Bee 6 / Hornet 14 / Square 19 → their family constructors;
+- Ladybug/MassiveLadybug/LadybugDark/LadybugShiny → `configure_ladybug`;
+- BabyAnt/WorkerAnt/SoldierAnt/QueenAnt → `configure_ant` (random turn scale,
+  soldier range 300/400);
+- Beetle/MassiveBeetle → `configure_beetle`;
+- CentipedeHead/CentipedeSegment/EvilCentipedeHead/EvilCentipedeSegment →
+  `configure_centipede` (1% rare);
+- Spider → `configure_spider` (aggressive, chase, territory 0.45);
+- Bee/Hornet/Square → their family constructors;
 - Ant Hole 11 → six children in the 7,7,7,8,8,9 caste order. Each child is
   spawned at the hole position, then one RNG draw adds a 0.25-unit velocity
   scatter `(cos, sin)(f32((random-1)*2π/2^31)) * 0.25`.

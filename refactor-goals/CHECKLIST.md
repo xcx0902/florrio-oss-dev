@@ -1,6 +1,6 @@
 # 实施清单
 
-**当前状态：P0 基线与 P1 格式/工具已完成；P2–P7 未开始。**
+**当前状态：P0 基线、P1 格式/工具、P2 标识/常量和 P3 字段/行为已完成；P4–P7 未开始。**
 
 日期和基线见 [README](README.md)。实际执行时逐项填写证据；复选框只在对应工作及检查真正完成后勾选。不能因本次提供了计划就把实施项标记完成。
 
@@ -25,26 +25,26 @@
 
 ## P2 — 标识和常量
 
-- [ ] 为全部花瓣、生物定义稳定唯一 symbol，并校验语言转换冲突。
-- [ ] 从单一 schema 生成 C++/TS 身份类型，登记新增输出。
-- [ ] 统一并复用实际稀有度、opcode、事件、动作和消息类型。
-- [ ] 命名实际 snapshot 字段、组件、标志和协议上限。
-- [ ] 按职责整理 slot/instance/容量、解锁、计时和数值规则。
-- [ ] 替换业务裸 ID，移除对 ID 连续性和算术差值的族群假设。
-- [ ] 验证数值不变、稀疏 ID、未知 ID 和跨端生成一致性。
+- [x] 为全部花瓣、生物定义稳定唯一 symbol，并校验语言转换冲突。证据：[p2-identifiers](evidence/p2-identifiers.md) §RF-L1；`petals.json` 39 个、`entities.json` 23 个、`rarities.json` 8 个 symbol。
+- [x] 从单一 schema 生成 C++/TS 身份类型，登记新增输出。证据：[p2-identifiers](evidence/p2-identifiers.md) §RF-L1–L2；`ids.hpp`、`catalog-ids.ts`、`state_flag_bits.hpp`、`state-flags.ts`、`loadout_rules.hpp`、`loadout.ts` 均登记在 `tools/schema/outputs.mjs`。
+- [x] 统一并复用实际稀有度、opcode、事件、动作和消息类型。证据：[p2-identifiers](evidence/p2-identifiers.md) §RF-L3；`InputOpcode`、`MessageType`、`SNAPSHOT_EVENT`、`EventKind`、`PlayerExpressionFlag`。
+- [x] 命名实际 snapshot 字段、组件、标志和协议上限。证据：[p2-identifiers](evidence/p2-identifiers.md) §RF-L3–L4；`inventory`、`EntityKind`、`EntityFlag`/`WorldFlag`/`ActivityFlag`/`PetalVariantFlag`、`protocol.hpp` 上限别名。
+- [x] 按职责整理 slot/instance/容量、解锁、计时和数值规则。证据：[p2-identifiers](evidence/p2-identifiers.md) §RF-L4；`schema/catalogs/loadout.json` + `loadout_rules.hpp`/`loadout.ts`；tick 由 `static_assert(kTickMilliseconds == net::kTickMs)` 约束。
+- [x] 替换业务裸 ID，移除对 ID 连续性和算术差值的族群假设。证据：[p2-identifiers](evidence/p2-identifiers.md) §RF-L2；`catalog::is_*`、`petal_ordinal`、`PlayerLoadout`/slot 循环改用生成容量。
+- [x] 验证数值不变、稀疏 ID、未知 ID 和跨端生成一致性。证据：[p2-identifiers](evidence/p2-identifiers.md) §RF-L5；schema 单元测试固定 C++/TS 值、稀疏/未知 ID；engine 19/19、integration 9/9。
 
 ## P3 — 字段和行为
 
-- [ ] 核查并删除无实际消费的 `opaque*` 全链字段。
-- [ ] 核查并删除 `flags92`/`component_flags92` 及无效断言。
-- [ ] 分别处理 catalog 的 `physicsFlag48` 与运行时物理字段。
-- [ ] 为有效实体/世界/物理/action/activity 标志建立具名类型和位。
-- [ ] 将轨道函数编号替换为行为类型及真正需要的参数。
-- [ ] 将 AI 历史回调编号替换为当前攻击行为类型。
-- [ ] 审查 `HitEvent` 重复计数和其他无用字段。
-- [ ] 保持掉落抽取和其他必要状态的当前作用及随机顺序。
-- [ ] schema、生成器、运行时、测试和当前文档同步完成。
-- [ ] 相关引擎、客户端、跨端和多人验证通过。
+- [x] 核查并删除无实际消费的 `opaque*` 全链字段。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §Removed；`entities.json` 的 `opaque100/104/108/110` 及生成结构字段已删除。
+- [x] 核查并删除 `flags92`/`component_flags92` 及无效断言。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §Removed；spawn defaults 与 `Entity` 字段已移除，测试改为具名 flag。
+- [x] 分别处理 catalog 的 `physicsFlag48` 与运行时物理字段。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §Physics；catalog 列删除，运行时使用 `uses_mass_weighted_response`/`skips_contact_response`。
+- [x] 为有效实体/世界/物理/action/activity 标志建立具名类型和位。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §Named flags；`schema/catalogs/state-flags.json` 生成双端类型。
+- [x] 将轨道函数编号替换为行为类型及真正需要的参数。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §Orbit；`PetalBehavior::{kOrbit,kRoseHeal}` + `healAmount`，Rose 10/22/3.5 保持。
+- [x] 将 AI 历史回调编号替换为当前攻击行为类型。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §AI；`AttackBehavior::{kNone,kHornetStinger}`，旧回调枚举/未知计数已删除。
+- [x] 审查 `HitEvent` 重复计数和其他无用字段。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §HitEvent；移除 `refcount`，合并时 `count` 只增一次；保留共享 `EffectPayload::refcount`。
+- [x] 保持掉落抽取和其他必要状态的当前作用及随机顺序。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §Drop；`dropDrawCount`/`draw_drop_candidates`，每行一次 RNG，顺序由图生成表决定；golden 通过。
+- [x] schema、生成器、运行时、测试和当前文档同步完成。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §Documentation；`schema:check` 26/26，unit/tools 断言更新。
+- [x] 相关引擎、客户端、跨端和多人验证通过。证据：[p3-fields-behavior](evidence/p3-fields-behavior.md) §Verification；engine 19/19、unit 42/42、integration 9/9、client 143+88；最终 `test:all` 见 `reports/latest-run.json`。
 
 ## P4 — 当前协议模型
 
@@ -91,9 +91,11 @@
 
 ## 执行记录模板
 
-| 阶段/任务             | 实际状态 | 变更文件/符号                                                                                                                                                                      | 验证命令与结果                                                                                                                        | 证据/runId                                                                                                                                                                                                                                                   | 日期       |
-| --------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| P0 当前基线           | 完成     | 无产品改动，仅证据                                                                                                                                                                 | `schema:check` 20 outputs；基线 `test:all` 17/17；unit 41、tools 24、client unit 143、integration 9、browser 88、engine 19、server 30 | runId `2026-11-02T23-11-30.963Z-d140d940`；[p0-baseline](evidence/p0-baseline.md)                                                                                                                                                                            | 2026-11-03 |
-| P0 字段/参数/保护清单 | 完成     | 无产品改动，新增证据与生成脚本                                                                                                                                                     | 891 行字段表；A/D/L/H 清单；G01–G06 缺口                                                                                              | [p0-field-disposition](evidence/p0-field-disposition.md)、[p0-field-inventory](evidence/p0-field-inventory.md)、[p0-literals-parameters-deadcode](evidence/p0-literals-parameters-deadcode.md)、[p0-protected-scenarios](evidence/p0-protected-scenarios.md) | 2026-11-03 |
-| P1 格式工具与接入     | 完成     | `.editorconfig`、`.prettierrc.json`、`.clang-format`、`.cmake-format.yaml`、`eslint.config.mjs`、`tools/format.mjs`、`tools/check-refactor.mjs`、`tools/verification/gates.mjs` 等 | `format:check`、`lint`、`check:refactor`、`schema:check` 全通过；`test:all` 20/20 stable                                              | runId `2026-11-03T00-42-22.702Z-88087b63`；[p1-format-batch](evidence/p1-format-batch.md)                                                                                                                                                                    | 2026-11-03 |
-| P1 性能回归修复       | 完成     | `tools/performance/browser.mjs`                                                                                                                                                    | 首次 54.6 FPS 失败；修复 warmup 起点后 60.005 FPS，20/20 通过                                                                         | 同上 runId；[p1-format-batch](evidence/p1-format-batch.md) §4–5                                                                                                                                                                                              | 2026-11-03 |
+| 阶段/任务             | 实际状态 | 变更文件/符号                                                                                                                                                                                                                                                                 | 验证命令与结果                                                                                                                                      | 证据/runId                                                                                                                                                                                                                                                   | 日期       |
+| --------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| P0 当前基线           | 完成     | 无产品改动，仅证据                                                                                                                                                                                                                                                            | `schema:check` 20 outputs；基线 `test:all` 17/17；unit 41、tools 24、client unit 143、integration 9、browser 88、engine 19、server 30               | runId `2026-11-02T23-11-30.963Z-d140d940`；[p0-baseline](evidence/p0-baseline.md)                                                                                                                                                                            | 2026-11-03 |
+| P0 字段/参数/保护清单 | 完成     | 无产品改动，新增证据与生成脚本                                                                                                                                                                                                                                                | 891 行字段表；A/D/L/H 清单；G01–G06 缺口                                                                                                            | [p0-field-disposition](evidence/p0-field-disposition.md)、[p0-field-inventory](evidence/p0-field-inventory.md)、[p0-literals-parameters-deadcode](evidence/p0-literals-parameters-deadcode.md)、[p0-protected-scenarios](evidence/p0-protected-scenarios.md) | 2026-11-03 |
+| P1 格式工具与接入     | 完成     | `.editorconfig`、`.prettierrc.json`、`.clang-format`、`.cmake-format.yaml`、`eslint.config.mjs`、`tools/format.mjs`、`tools/check-refactor.mjs`、`tools/verification/gates.mjs` 等                                                                                            | `format:check`、`lint`、`check:refactor`、`schema:check` 全通过；`test:all` 20/20 stable                                                            | runId `2026-11-03T00-42-22.702Z-88087b63`；[p1-format-batch](evidence/p1-format-batch.md)                                                                                                                                                                    | 2026-11-03 |
+| P1 性能回归修复       | 完成     | `tools/performance/browser.mjs`                                                                                                                                                                                                                                               | 首次 54.6 FPS 失败；修复 warmup 起点后 60.005 FPS，20/20 通过                                                                                       | 同上 runId；[p1-format-batch](evidence/p1-format-batch.md) §4–5                                                                                                                                                                                              | 2026-11-03 |
+| P2 标识与常量         | 完成     | `schema/catalogs/{petals,entities,rarities,state-flags,loadout}.json`；`ids.hpp`/`catalog-ids.ts`、`state_flag_bits.hpp`/`state-flags.ts`、`loadout_rules.hpp`/`loadout.ts`、`catalog.hpp`、`input.cpp`、`worker_api.cpp`、`player_loadout.cpp`、snapshot 解码/渲染调用点     | `format:check`、`lint`、`check:refactor`、`schema:check` 26/26；`test:unit` 42/42；`test:engine` 19/19；`test:integration` 9/9；client unit 143/143 | [p2-identifiers](evidence/p2-identifiers.md)；最终 `test:all` 见 `reports/latest-run.json`                                                                                                                                                                   | 2026-11-03 |
+| P3 字段与行为         | 完成     | `entity-spawn-defaults.json`、`petal-combat.json`、`state-flags.json`；`entity.hpp`、`world_records.hpp`、`petal_state.hpp`、`spawn.cpp`、`petals.cpp`、`loot.cpp`、`ai.cpp`/`species_attacks.cpp`、`attack_behavior.hpp`、`state_flags.hpp`；semantics 文档与引擎/客户端测试 | `schema:check` 26/26；`test:engine` 19/19；`test:unit` 42/42；`test:tools` 29/29；`test:integration` 9/9；`test:server:native` 30/30；client 143+88 | [p3-fields-behavior](evidence/p3-fields-behavior.md)；最终 `test:all` 见 `reports/latest-run.json`                                                                                                                                                           | 2026-11-03 |

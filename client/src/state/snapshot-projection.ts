@@ -1,4 +1,5 @@
 import { FIELD_COMPONENTS } from './field-types.js';
+import { INVENTORY_SLOTS } from './loadout-limits.js';
 import type { DenseValue, EntitySnapshot, DeathMetadata } from './snapshot-types.js';
 export function buildComponents(
   values: Readonly<Record<number, unknown>>,
@@ -76,8 +77,11 @@ export function projectDomain(
 
 /** Native player component491 field60 remains authoritative while an
  * equipped petal is recharging and has no live world entity. */
-export function playerLoadoutSlots(player: EntitySnapshot, count = 16): number[] | undefined {
-  const sparse = player.byteArrayFields?.[60] ?? player.byteArrayField60;
+export function playerLoadoutSlots(
+  player: EntitySnapshot,
+  count = INVENTORY_SLOTS,
+): number[] | undefined {
+  const sparse = player.byteArrayFields?.[60] ?? player.inventory;
   const dense = player.denseFields?.[60];
   if (sparse === undefined && !Array.isArray(dense)) {
     return undefined;

@@ -3,6 +3,7 @@ import { renderResources } from './resources.js';
  * Layout and pass ownership follow the menu resources.animation; tests verify it.
  */
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
+import { PetalId } from '../schema/catalog-ids.js';
 import { PETAL_INFO } from '../schema/petals.js';
 import type { Canvas2DContext } from './canvas2d/context.js';
 import { wrapContext } from './canvas2d/context.js';
@@ -152,9 +153,9 @@ export function drawMenu(
   ) {
     resources.animation = new MenuAnimation(seed ?? menuSeed());
   }
-  resources.animation.setPetals(petalTypes ?? [1]);
+  resources.animation.setPetals(petalTypes ?? [PetalId.BasicCommon]);
   for (const { scale: flowerScale, x, y, type } of resources.animation.sample(now, width, height)) {
-    if (type === 1) {
+    if (type === PetalId.BasicCommon) {
       context.save();
       context.beginPath();
       context.setTransform(

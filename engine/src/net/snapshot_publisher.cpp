@@ -1,4 +1,5 @@
 #include "engine/core/perf.hpp"
+#include "engine/model/catalog.hpp"
 #include "engine/net/snapshot_publisher.hpp"
 #include "engine/net/snapshot_codec.hpp"
 #include "engine/net/angle.hpp"
@@ -9,11 +10,11 @@ namespace engine {
 namespace {
 std::uint32_t projectile_render_component(const Entity& entity) {
   if (entity.kind == EntityKind::kPetal) {
-    const bool peas = entity.type_id == 11U || entity.type_id == 12U || entity.type_id == 34U;
+    const bool peas = catalog::is_peas_petal(entity.type_id);
     return peas && entity.petal_launched ? 5U : 7U;
   }
   if (entity.kind == EntityKind::kProjectile) {
-    return entity.has_tag_component && (entity.type_id == 29U || entity.type_id == 30U) ? 12U : 18U;
+    return entity.has_tag_component && catalog::is_web_petal(entity.type_id) ? 12U : 18U;
   }
   return 0U;
 }
@@ -106,7 +107,8 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(const World& world, PlayerI
       bool wide_view = false;
       const auto& slots = viewer->loadout().slots();
       for (std::size_t index = 0; index < viewer->profile().active_slots(); ++index) {
-        wide_view = wide_view || slots[index].type_id == 25U;
+        wide_view = wide_view ||
+                    catalog::petal_id(slots[index].type_id) == catalog::PetalId::kAntennaeLegendary;
       }
       session_.viewer_scale = f32(wide_view ? 0.63F : 0.9F);
     }
@@ -318,7 +320,7 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(const World& world, PlayerI
         const auto render_mask =
             mask | (1U << (render_component - 1U)) | (render_component == 5U ? 1U << 6U : 0U);
         if (render_component == 5U) {
-          writer.write_mask_byte_field(entity.handle, render_mask, 9U, entity.petal_render_flags);
+          writer.write_mask_byte_field(entity.handle, render_mask, 9U, entity.petal_variant_flags);
           writer.write_mask_byte_field(entity.handle, render_mask, 50U,
                                        static_cast<std::uint8_t>(entity.type_id));
         } else if (render_component == 7U) {

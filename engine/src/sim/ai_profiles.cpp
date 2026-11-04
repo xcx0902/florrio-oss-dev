@@ -241,7 +241,7 @@ void configure_hornet(Entity& entity, ServerRng& rng) {
   ai.attack_range = f32(500.0F);
   ai.attack_speed = ((sign_sample - 1U) & 1U) == 1U ? f32(0.4F) : f32(-0.4F);
   ai.chase_speed = f32(2.4F);
-  ai.attack_callback = 74U;
+  ai.attack = AttackBehavior::kHornetStinger;
   ai.attack_cooldown_gain = f32(2000.0F);
   entity.max_health = f32(40.0F);
   entity.health = entity.max_health;

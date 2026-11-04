@@ -17,7 +17,8 @@ PlayerState* living_player(World& world, PlayerId id, LifeEpoch life) {
 void clear_input(World& world, PlayerState& state) {
   state.clear_input();
   if (auto* body = world.entities().get(state.player())) {
-    body->player_expression = static_cast<std::uint8_t>(body->player_expression & 0xFCU);
+    set_flag(body->player_expression, PlayerExpressionFlag::kAttack, false);
+    set_flag(body->player_expression, PlayerExpressionFlag::kDefend, false);
   }
 }
 }
@@ -70,8 +71,10 @@ bool World::apply_input(PlayerId id, LifeEpoch life, std::uint32_t buttons, f32 
   state->input_valid_until_tick = ttl_ticks == kOfflineInputTtl ? UINT64_MAX : tick_ + ttl_ticks;
   if (auto* body = entities_.get(state->player())) {
     body->player_look = static_cast<std::uint8_t>(input.direction);
-    body->player_expression =
-        static_cast<std::uint8_t>((body->player_expression & 0xFCU) | (buttons & 3U));
+    set_flag(body->player_expression, PlayerExpressionFlag::kAttack,
+             has_flag(buttons, InputButton::kAttack));
+    set_flag(body->player_expression, PlayerExpressionFlag::kDefend,
+             has_flag(buttons, InputButton::kDefend));
   }
   return true;
 }

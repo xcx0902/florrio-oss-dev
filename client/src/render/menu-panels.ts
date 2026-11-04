@@ -1,6 +1,7 @@
 /** Native menu panels (func1095), sharing geometry with pointer hit tests. */
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
 import { MOB_INFO, RARITY_NAMES } from '../schema/petals.js';
+import { SpeciesId } from '../schema/catalog-ids.js';
 import type { Canvas2DContext } from './canvas2d/context.js';
 import { drawLabel, drawLabelBox, measureLabel } from './canvas2d/text-cache.js';
 import { drawPetalCard, drawSpecies } from './entity-art.js';
@@ -211,27 +212,43 @@ function portrait(context: Canvas2DContext, type: number, x: number, y: number):
 /** The gallery's fixed callbacks differ from live mob radii and animation. */
 export function drawMobPortrait(context: Canvas2DContext, type: number): void {
   const scale =
-    type === 1
+    type === SpeciesId.Rock
       ? 0.6
-      : type === 2
+      : type === SpeciesId.Boulder
         ? 0.8
-        : type === 5
+        : type === SpeciesId.MassiveLadybug
           ? 0.7
-          : [3, 12, 15, 17].includes(type)
+          : type === SpeciesId.Cactus ||
+              type === SpeciesId.Beetle ||
+              type === SpeciesId.CentipedeHead ||
+              type === SpeciesId.EvilCentipedeHead
             ? 0.4
             : 0.5;
   context.transform?.(scale, 0, 0, scale, 0, 0);
-  const radius = type === 3 ? 50 : type === 12 || type === 13 ? 40 : 30;
-  if (type === 12 || type === 13) {
+  const radius =
+    type === SpeciesId.Cactus
+      ? 50
+      : type === SpeciesId.Beetle || type === SpeciesId.MassiveBeetle
+        ? 40
+        : 30;
+  if (type === SpeciesId.Beetle || type === SpeciesId.MassiveBeetle) {
     context.transform?.(1, 0, 0, 1, -15, 0);
   }
-  if (type === 14) {
+  if (type === SpeciesId.Hornet) {
     context.transform?.(1, 0, 0, 1, -10, 0);
   }
-  if (type === 15 || type === 17) {
+  if (type === SpeciesId.CentipedeHead || type === SpeciesId.EvilCentipedeHead) {
     context.save();
     context.transform?.(1, 0, 0, 1, -70, 0);
-    drawSpecies(context, type + 1, 0, radius, 0);
+    drawSpecies(
+      context,
+      type === SpeciesId.CentipedeHead
+        ? SpeciesId.CentipedeSegment
+        : SpeciesId.EvilCentipedeSegment,
+      0,
+      radius,
+      0,
+    );
     context.restore();
   }
   drawSpecies(context, type, 0, radius, 0);

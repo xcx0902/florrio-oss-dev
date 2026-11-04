@@ -6,7 +6,7 @@
  * configuration examples, not compiled dependencies.
  */
 import { spawn } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { createServer, connect as tcpConnect } from 'node:net';
 import { get } from 'node:http';
 import { createHash } from 'node:crypto';
@@ -38,14 +38,18 @@ const packageDir = path.resolve(
       const { readdir } = await import('node:fs/promises');
       const entries = (
         await readdir('release/multiplayer', { withFileTypes: true }).catch(() => [])
-      )
-        .filter((entry) => entry.isDirectory() && !entry.name.includes('.stage-'))
-        .map((entry) => entry.name)
-        .sort();
+      ).filter((entry) => entry.isDirectory() && !entry.name.includes('.stage-'));
       if (!entries.length) {
         throw new Error('No native package; run npm run pack:native first');
       }
-      return path.join('release/multiplayer', entries.at(-1));
+      const packages = await Promise.all(
+        entries.map(async (entry) => ({
+          name: entry.name,
+          mtime: (await stat(path.join('release/multiplayer', entry.name))).mtimeMs,
+        })),
+      );
+      packages.sort((left, right) => right.mtime - left.mtime);
+      return path.join('release/multiplayer', packages[0].name);
     })(),
   ),
 );

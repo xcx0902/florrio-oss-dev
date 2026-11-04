@@ -5,6 +5,7 @@
  * draws the world pickup marker, not this screen-space transfer.
  */
 import { PETAL_INFO } from '../schema/petals.js';
+import { PetalId } from '../schema/catalog-ids.js';
 import type { Canvas2DContext } from './canvas2d/context.js';
 import { wrapContext } from './canvas2d/context.js';
 import type { RasterCanvas } from './canvas2d/text-cache.js';
@@ -201,7 +202,16 @@ function petalArtwork(type: number, raster: number): RasterCanvas | undefined {
     return cached;
   }
   // Antennae, clustered peas and eggs extend beyond a 24px disc.
-  const side = [1, 2, 6, 7, 8, 14, 35].includes(type) ? 24 : 56;
+  const compact = new Set<number>([
+    PetalId.BasicCommon,
+    PetalId.FastCommon,
+    PetalId.RoseUnusual,
+    PetalId.StingerUnusual,
+    PetalId.IrisUnusual,
+    PetalId.FasterRare,
+    PetalId.BasicUnique,
+  ]);
+  const side = compact.has(type) ? 24 : 56;
   const canvas = createRasterCanvas(Math.ceil(side * raster), Math.ceil(side * raster));
   if (!canvas) {
     return;

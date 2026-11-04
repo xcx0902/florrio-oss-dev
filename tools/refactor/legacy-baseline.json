@@ -1,28 +1,13 @@
 {
   "schema": 1,
   "note": "Known legacy occurrences at the P1 formatting baseline. Later phases must reduce them; P7 requires an empty ledger. Never raise an entry to hide new code.",
-  "scannedAt": "2026-11-02",
+  "scannedAt": "2026-11-03",
   "patterns": {
     "bare-business-id": {
-      "client/src/render/art/species.ts": 7,
-      "client/src/render/species-animation.ts": 4,
-      "client/src/render/world.ts": 14,
       "client/src/state/world.ts": 1,
       "client/tests/integration/worker-browser.test.mjs": 8,
-      "docs/semantics/loot.md": 1,
       "engine/include/engine/sim/loot.hpp": 1,
       "engine/src/diagnostics/entities.cpp": 1,
-      "engine/src/net/replication_session.cpp": 8,
-      "engine/src/net/snapshot_publisher.cpp": 6,
-      "engine/src/sim/death.cpp": 1,
-      "engine/src/sim/loot.cpp": 2,
-      "engine/src/sim/movement.cpp": 8,
-      "engine/src/sim/petal_effects.cpp": 6,
-      "engine/src/sim/petal_lifecycle.cpp": 4,
-      "engine/src/sim/petals.cpp": 2,
-      "engine/src/sim/pets.cpp": 4,
-      "engine/src/sim/player_loadout.cpp": 4,
-      "engine/src/sim/spawn.cpp": 10,
       "engine/tests/unit/cases/ai_families.inc": 9,
       "engine/tests/unit/cases/ai.inc": 6,
       "engine/tests/unit/cases/catalog.inc": 6,
@@ -41,16 +26,7 @@
       "tools/schema/catalogs.mjs": 1,
       "tools/schema/drop-chances.mjs": 4
     },
-    "callback-number": {
-      "docs/semantics/ai.md": 5,
-      "engine/include/engine/model/entity.hpp": 1,
-      "engine/include/engine/sim/species_attacks.hpp": 2,
-      "engine/src/sim/ai_internal.hpp": 1,
-      "engine/src/sim/ai_profiles.cpp": 1,
-      "engine/src/sim/ai.cpp": 1,
-      "engine/src/sim/species_attacks.cpp": 4,
-      "engine/tests/unit/cases/ai_families.inc": 3
-    },
+    "callback-number": {},
     "function-number": {
       "client/src/input/menu.ts": 1,
       "client/src/render/art/drops.ts": 3,
@@ -90,17 +66,15 @@
       "engine/tests/unit/cases/catalog.inc": 3,
       "engine/tests/unit/cases/worker_api.inc": 1
     },
-    "kept-alive": {
-      "engine/src/sim/petals.cpp": 1
-    },
+    "kept-alive": {},
     "memory-offset": {
       "client/src/render/world.ts": 1,
       "client/src/schema/protocol.ts": 145,
       "client/tests/integration/snapshot-codec.test.mjs": 19,
       "client/tests/unit/snapshot-domain.test.mjs": 5,
-      "docs/semantics/ai.md": 23,
+      "docs/semantics/ai.md": 22,
       "docs/semantics/tick.md": 2,
-      "engine/include/engine/model/entity.hpp": 60,
+      "engine/include/engine/model/entity.hpp": 53,
       "engine/include/engine/model/world.hpp": 4,
       "engine/include/engine/sim/combat.hpp": 1,
       "engine/include/engine/sim/loot.hpp": 1,
@@ -108,7 +82,6 @@
       "engine/include/engine/sim/player_loadout.hpp": 12,
       "engine/include/engine/sim/player.hpp": 2,
       "engine/include/engine/sim/spatial.hpp": 3,
-      "engine/include/engine/sim/species_attacks.hpp": 1,
       "engine/src/net/snapshot_codec.cpp": 1,
       "engine/src/sim/ai_internal.hpp": 2,
       "engine/src/sim/ai.cpp": 9,
@@ -137,7 +110,6 @@
       "client/tests/integration/menu-interactions.test.mjs": 4,
       "client/tests/integration/snapshot-codec.test.mjs": 10,
       "client/tests/unit/snapshot-domain.test.mjs": 1,
-      "docs/semantics/petals.md": 2,
       "engine/include/engine/net/snapshot_codec.hpp": 48,
       "engine/src/net/snapshot_codec.cpp": 96,
       "engine/tests/unit/test_passives_pets.cpp": 2,
@@ -147,33 +119,9 @@
       "tools/schema/protocol.mjs": 2
     },
     "unknown-field": {
-      "client/src/net/snapshot-decoder.ts": 1,
-      "client/src/state/snapshot-projection.ts": 1,
-      "client/src/state/snapshot-types.ts": 1,
-      "client/src/state/world.ts": 2,
-      "client/tests/integration/menu-interactions.test.mjs": 1,
-      "client/tests/integration/snapshot-codec.test.mjs": 1,
-      "docs/semantics/catalog.md": 1,
-      "docs/semantics/spawn.md": 1,
-      "engine/include/engine/catalog/catalog_types.hpp": 4,
-      "engine/include/engine/catalog/entity_spawn_defaults.hpp": 4,
-      "engine/include/engine/catalog/petal_combat.hpp": 1,
-      "engine/include/engine/model/entity.hpp": 1,
       "engine/include/engine/net/dense_fields.hpp": 1,
       "engine/include/engine/net/generated_protocol.hpp": 2,
-      "engine/src/sim/petal_lifecycle.cpp": 1,
-      "engine/src/sim/spawn.cpp": 6,
-      "engine/tests/unit/cases/catalog.inc": 1,
-      "engine/tests/unit/cases/spawn_loadout.inc": 1,
-      "engine/tests/unit/cases/worker_api.inc": 3,
-      "schema/catalogs/entities.json": 92,
-      "schema/catalogs/entity-spawn-defaults.json": 76,
-      "schema/catalogs/petal-combat.json": 39,
-      "tests/integration/multiplayer-snapshot.test.mjs": 1,
-      "tests/integration/native-snapshot.test.mjs": 1,
-      "tests/unit/protocol-contracts.test.mjs": 1,
-      "tools/schema/catalogs.mjs": 20,
-      "tools/schema/validate.mjs": 15
+      "tests/unit/protocol-contracts.test.mjs": 1
     }
   }
 }

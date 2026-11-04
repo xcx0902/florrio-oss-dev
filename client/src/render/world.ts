@@ -1,4 +1,9 @@
 import { FrameContext } from './frame-context.js';
+import { EntityKind } from '../state/snapshot-types.js';
+import { EntityFlag, PlayerExpressionFlag } from '../schema/state-flags.js';
+import { PetalId } from '../schema/catalog-ids.js';
+import { isBackgroundSpecies, usesActivityAnimation } from './species-groups.js';
+import { hasOrbitSeedPhase, spinsOnOrbit } from './petal-groups.js';
 import { renderResources } from './resources.js';
 import { releaseLabel, drawLabel } from './canvas2d/text-cache.js';
 import type { CameraState } from '../state/camera.js';
@@ -243,7 +248,7 @@ const speciesOf = (entity: EntityState): number => entity.speciesId ?? entity.ty
  * The domain's identity component is metadata, so only projectile/petal
  * declarations select these models. A species id cannot distinguish them. */
 function petalRenderComponent(entity: EntityState): number {
-  if (entity.kind !== 3 && entity.kind !== 5) {
+  if (entity.kind !== EntityKind.Petal && entity.kind !== EntityKind.Projectile) {
     return 0;
   }
   const mask = entity.componentMask ?? 0;
@@ -257,27 +262,26 @@ function petalRenderComponent(entity: EntityState): number {
       return offset;
     }
   }
-  return entity.kind === 3 ? 76 : 108;
+  return entity.kind === EntityKind.Petal ? 76 : 108;
 }
 
 /** Entities that belong to the static background layer in the archived
  * renderer: rocks, boulders, cacti, ant holes and squares. */
 function isBackgroundEntity(entity: EntityState): boolean {
-  const species = speciesOf(entity);
-  return species === 1 || species === 2 || species === 3 || species === 11 || species === 19;
+  return isBackgroundSpecies(speciesOf(entity));
 }
 
 function drawLayer(entity: EntityState): number {
-  if (entity.kind === 4) {
+  if (entity.kind === EntityKind.Drop) {
     return 0;
   }
   if (petalRenderComponent(entity) === 92) {
     return 1;
   }
-  if (entity.kind === 3) {
+  if (entity.kind === EntityKind.Petal) {
     return 2;
   }
-  if (entity.kind === 1) {
+  if (entity.kind === EntityKind.Player) {
     return 4;
   }
   if (isBackgroundEntity(entity)) {
@@ -443,8 +447,7 @@ function drawEntityBlock(
   if (fadeAt !== undefined) {
     context.setGlobalAlpha((context.getGlobalAlpha?.() ?? 1) * (1 - fade));
   }
-  const rotate =
-    species !== 1 && species !== 2 && species !== 3 && species !== 19 && entity.kind !== 4;
+  const rotate = !isBackgroundSpecies(species) && entity.kind !== EntityKind.Drop;
   setEntityTransform(context, camera, item.screenX, item.screenY, item.angle, rotate);
   if (fadeAt !== undefined) {
     context.transform?.(f(1 + fade), 0, 0, f(1 + fade), 0, 0);
@@ -482,9 +485,9 @@ function drawEntityBlock(
           state: playerVisual?.face,
           deltaMs,
           lookAngle: field(2) * ((2 * Math.PI) / 255),
-          attacking: (actions & 1) !== 0,
-          defending: (actions & 2) !== 0,
-          extraAction: (actions & 4) !== 0,
+          attacking: (actions & PlayerExpressionFlag.Attack) !== 0,
+          defending: (actions & PlayerExpressionFlag.Defend) !== 0,
+          extraAction: (actions & PlayerExpressionFlag.Antennae) !== 0,
           expressionFlags: field(31),
           dead: entity.healthKnown && entity.health <= 0,
           flash,
@@ -492,14 +495,14 @@ function drawEntityBlock(
         break;
       }
       case 3: {
-        if (species === 35) {
+        if (species === PetalId.BasicUnique) {
           drawUniqueTrail(context, petalVisual.trail, deltaMs, item.x, item.y, randomAngle);
         }
-        if ([11, 12, 34].includes(species)) {
+        if (spinsOnOrbit(species)) {
           petalVisual.phase = f(petalVisual.phase + f(deltaMs) * 0.001);
         }
         drawPetalInstance(context, species, radius, now, entity.handle, petalVisual.phase);
-        if (species === 5) {
+        if (species === PetalId.SquareUnique) {
           petalVisual.phase = f(petalVisual.phase + f(deltaMs) * 0.0003);
         }
         break;
@@ -521,8 +524,7 @@ function drawEntityBlock(
         // the network-facing domain table keeps its rotated wire encoding.
         const artworkSeed = ((entity.handle << 14) | (entity.handle >>> 18)) >>> 0;
         advanceSpeciesAnimation(animation, entity, item.x, item.y, deltaMs);
-        const animationTime =
-          species >= 7 && species <= 13 && species !== 11 ? animation.time : now;
+        const animationTime = usesActivityAnimation(species) ? animation.time : now;
         drawSpecies(context, species, artworkSeed, radius, animationTime, flash, animation);
         break;
       }
@@ -587,7 +589,7 @@ export function drawWorld(
       const phase = f(f(f(visuals.dropRandom - 1) * 9.313225884932663e-11) - 0.10000000149011612);
       drop = createDropVisualState(
         now,
-        entity.arrivalMarked === true || (entity.flags & 128) !== 0 || collected,
+        entity.arrivalMarked === true || (entity.flags & EntityFlag.Arrival) !== 0 || collected,
         phase,
       );
       visuals.drops.set(entity.handle, drop);
@@ -634,7 +636,7 @@ export function drawWorld(
   // Health bars are the first entity layer in the archived frame.
   context.save();
   for (const player of visible) {
-    if (player.entity.kind !== 1) {
+    if (player.entity.kind !== EntityKind.Player) {
       continue;
     }
     const maxHealth = player.entity.maxHealth;
@@ -672,8 +674,7 @@ export function drawWorld(
     if (!petal) {
       petal = {
         phase:
-          petalRenderComponent(item.entity) === 76 &&
-          [5, 11, 12, 34].includes(speciesOf(item.entity))
+          petalRenderComponent(item.entity) === 76 && hasOrbitSeedPhase(speciesOf(item.entity))
             ? visuals.randomAngle()
             : 0,
         trail: createUniqueTrail(),
@@ -688,14 +689,14 @@ export function drawWorld(
       item,
       now,
       deltaMs,
-      item.entity.kind === 1 ? playerVisual(item.entity.handle) : undefined,
+      item.entity.kind === EntityKind.Player ? playerVisual(item.entity.handle) : undefined,
       flash,
       animation,
       visuals.drops.get(item.entity.handle),
       petal,
       visuals.randomAngle,
     );
-    if (item.entity.kind === 1) {
+    if (item.entity.kind === EntityKind.Player) {
       playerVisual(item.entity.handle).fresh = false;
     }
   }

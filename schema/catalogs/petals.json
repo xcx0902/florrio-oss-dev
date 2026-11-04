@@ -4,6 +4,7 @@
   "petals": [
     {
       "typeId": 0,
+      "symbol": "None",
       "name": "None",
       "descriptions": [""],
       "rarityIndex": 0,
@@ -16,6 +17,7 @@
     },
     {
       "typeId": 1,
+      "symbol": "BasicCommon",
       "name": "Basic",
       "descriptions": ["A nice petal, not too strong but not too weak"],
       "rarityIndex": 0,
@@ -28,6 +30,7 @@
     },
     {
       "typeId": 2,
+      "symbol": "FastCommon",
       "name": "Fast",
       "descriptions": ["Weaker than most petals, but recharges very quickly"],
       "rarityIndex": 0,
@@ -40,6 +43,7 @@
     },
     {
       "typeId": 3,
+      "symbol": "HeavyCommon",
       "name": "Heavy",
       "descriptions": ["Very resilient and deals more damage, but recharges very slowly"],
       "rarityIndex": 0,
@@ -52,6 +56,7 @@
     },
     {
       "typeId": 4,
+      "symbol": "RockRare",
       "name": "Rock",
       "descriptions": ["Extremely durable, but takes a long time to recharge"],
       "rarityIndex": 2,
@@ -64,6 +69,7 @@
     },
     {
       "typeId": 5,
+      "symbol": "SquareUnique",
       "name": "Square",
       "descriptions": ["This shape... it looks familiar..."],
       "rarityIndex": 5,
@@ -76,6 +82,7 @@
     },
     {
       "typeId": 6,
+      "symbol": "RoseUnusual",
       "name": "Rose",
       "descriptions": ["Its healing properties are amazing. Not so good at combat though"],
       "rarityIndex": 1,
@@ -88,6 +95,7 @@
     },
     {
       "typeId": 7,
+      "symbol": "StingerUnusual",
       "name": "Stinger",
       "descriptions": ["It really hurts, but it's very fragile"],
       "rarityIndex": 1,
@@ -100,6 +108,7 @@
     },
     {
       "typeId": 8,
+      "symbol": "IrisUnusual",
       "name": "Iris",
       "descriptions": ["Very poisonous, but takes a little while to do its work"],
       "rarityIndex": 1,
@@ -112,6 +121,7 @@
     },
     {
       "typeId": 9,
+      "symbol": "WingRare",
       "name": "Wing",
       "descriptions": ["It comes and goes"],
       "rarityIndex": 2,
@@ -124,6 +134,7 @@
     },
     {
       "typeId": 10,
+      "symbol": "MissileRare",
       "name": "Missile",
       "descriptions": ["You can actually shoot this one"],
       "rarityIndex": 2,
@@ -136,6 +147,7 @@
     },
     {
       "typeId": 11,
+      "symbol": "PeasRare",
       "name": "Peas",
       "descriptions": ["4 in 1 deal"],
       "rarityIndex": 2,
@@ -148,6 +160,7 @@
     },
     {
       "typeId": 12,
+      "symbol": "PeasEpic",
       "name": "Peas",
       "descriptions": ["4 in 1 deal, now with a secret ingredient: poison"],
       "rarityIndex": 3,
@@ -160,6 +173,7 @@
     },
     {
       "typeId": 13,
+      "symbol": "CactusRare",
       "name": "Cactus",
       "descriptions": ["Not very strong, but somehow increases your maximum health"],
       "rarityIndex": 2,
@@ -172,6 +186,7 @@
     },
     {
       "typeId": 14,
+      "symbol": "FasterRare",
       "name": "Faster",
       "descriptions": ["It's so light it makes your other petals spin faster"],
       "rarityIndex": 2,
@@ -184,6 +199,7 @@
     },
     {
       "typeId": 15,
+      "symbol": "RoseEpic",
       "name": "Rose",
       "descriptions": ["Extremely powerful rose, almost unheard of"],
       "rarityIndex": 3,
@@ -196,6 +212,7 @@
     },
     {
       "typeId": 16,
+      "symbol": "TwinUnusual",
       "name": "Twin",
       "descriptions": ["Why stop at one? Why not TWO?!"],
       "rarityIndex": 1,
@@ -208,6 +225,7 @@
     },
     {
       "typeId": 17,
+      "symbol": "TripletEpic",
       "name": "Triplet",
       "descriptions": ["How about THREE?!"],
       "rarityIndex": 3,
@@ -220,6 +238,7 @@
     },
     {
       "typeId": 18,
+      "symbol": "BubbleRare",
       "name": "Bubble",
       "descriptions": ["You can right click to pop it and propel your flower"],
       "rarityIndex": 2,
@@ -232,6 +251,7 @@
     },
     {
       "typeId": 19,
+      "symbol": "PollenEpic",
       "name": "Pollen",
       "descriptions": ["Asthmatics beware"],
       "rarityIndex": 3,
@@ -244,6 +264,7 @@
     },
     {
       "typeId": 20,
+      "symbol": "DandelionRare",
       "name": "Dandelion",
       "descriptions": ["Its interesting properties prevent healing effects on affected units"],
       "rarityIndex": 2,
@@ -256,6 +277,7 @@
     },
     {
       "typeId": 21,
+      "symbol": "CactusEpic",
       "name": "Cactus",
       "descriptions": [
         "Increases your maximum health and makes your flower toxic",
@@ -271,6 +293,7 @@
     },
     {
       "typeId": 22,
+      "symbol": "EggEpic",
       "name": "Egg",
       "descriptions": ["Something interesting might pop out of this"],
       "rarityIndex": 3,
@@ -283,6 +306,7 @@
     },
     {
       "typeId": 23,
+      "symbol": "EggLegendary",
       "name": "Egg",
       "descriptions": ["Something interesting might pop out of this"],
       "rarityIndex": 4,
@@ -295,6 +319,7 @@
     },
     {
       "typeId": 24,
+      "symbol": "RoseRare",
       "name": "Rose",
       "descriptions": ["Its healing properties are amazing. Not so good at combat though"],
       "rarityIndex": 2,
@@ -307,6 +332,7 @@
     },
     {
       "typeId": 25,
+      "symbol": "AntennaeLegendary",
       "name": "Antennae",
       "descriptions": ["Allows your flower to sense foes farther away"],
       "rarityIndex": 4,
@@ -319,6 +345,7 @@
     },
     {
       "typeId": 26,
+      "symbol": "HeaviestEpic",
       "name": "Heaviest",
       "descriptions": ["This thing is so heavy that nothing gets in the way"],
       "rarityIndex": 3,
@@ -331,6 +358,7 @@
     },
     {
       "typeId": 27,
+      "symbol": "StingerLegendary",
       "name": "Stinger",
       "descriptions": ["It really hurts, but it's very fragile"],
       "rarityIndex": 4,
@@ -343,6 +371,7 @@
     },
     {
       "typeId": 28,
+      "symbol": "YinYangEpic",
       "name": "Yin Yang",
       "descriptions": ["This mysterious petal reverses the rotation direction of your petals"],
       "rarityIndex": 3,
@@ -355,6 +384,7 @@
     },
     {
       "typeId": 29,
+      "symbol": "WebRare",
       "name": "Web",
       "descriptions": ["It's really sticky"],
       "rarityIndex": 2,
@@ -367,6 +397,7 @@
     },
     {
       "typeId": 30,
+      "symbol": "WebLegendary",
       "name": "Web",
       "descriptions": ["It's really sticky"],
       "rarityIndex": 4,
@@ -379,6 +410,7 @@
     },
     {
       "typeId": 31,
+      "symbol": "HoneyRare",
       "name": "Honey",
       "descriptions": ["This is so sticky it slows down whatever it hits"],
       "rarityIndex": 2,
@@ -391,6 +423,7 @@
     },
     {
       "typeId": 32,
+      "symbol": "LeafUnusual",
       "name": "Leaf",
       "descriptions": ["Gathers energy from the sun to heal your flower passively"],
       "rarityIndex": 1,
@@ -403,6 +436,7 @@
     },
     {
       "typeId": 33,
+      "symbol": "CactusLegendary",
       "name": "Cactus",
       "descriptions": ["Not very strong, but somehow increases your maximum health"],
       "rarityIndex": 4,
@@ -415,6 +449,7 @@
     },
     {
       "typeId": 34,
+      "symbol": "PeasLegendary",
       "name": "Peas",
       "descriptions": ["4 in 1 deal, now with a secret ingredient: poison"],
       "rarityIndex": 4,
@@ -427,6 +462,7 @@
     },
     {
       "typeId": 35,
+      "symbol": "BasicUnique",
       "name": "Basic",
       "descriptions": ["Something incredibly rare and useless"],
       "rarityIndex": 5,
@@ -439,6 +475,7 @@
     },
     {
       "typeId": 36,
+      "symbol": "SaltRare",
       "name": "Salt",
       "descriptions": [
         "Reflects some of the damage you take back to the flower that dealt it",
@@ -454,6 +491,7 @@
     },
     {
       "typeId": 37,
+      "symbol": "RiceEpic",
       "name": "Rice",
       "descriptions": ["Spawns instantly, but not very strong"],
       "rarityIndex": 3,
@@ -466,6 +504,7 @@
     },
     {
       "typeId": 38,
+      "symbol": "CornEpic",
       "name": "Corn",
       "descriptions": ["Takes a long time to spawn, but has a lot of health"],
       "rarityIndex": 3,

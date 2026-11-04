@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "inventorySlots": 16,
+  "activeSlots": 8,
+  "instancesPerSlot": 3,
+  "unlockLevels": [15, 30, 45],
+  "inventorySizes": [13, 14, 15, 16],
+  "activeSlotCounts": [5, 6, 7, 8],
+  "rarityExperience": [2, 10, 50, 200, 1000, 2500, 0, 0],
+  "notes": [
+    "Level thresholds add one inventory slot and one active petal at 15/30/45.",
+    "Rarity experience is indexed by rarity index; Ultra/Super intentionally award zero."
+  ]
+}

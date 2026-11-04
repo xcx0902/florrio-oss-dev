@@ -7,6 +7,7 @@ import {
 import {
   CommandKind,
   ErrorCode,
+  MessageType,
   ResyncReason,
   type CommandResult,
   type Message,
@@ -224,7 +225,7 @@ export class NetworkTransport implements Transport {
       }
       return;
     }
-    if (message.type === 2) {
+    if (message.type === MessageType.Welcome) {
       if (this.state !== 'handshaking' || message.value.roomId !== this.config.roomId) {
         this.terminal('Invalid room handshake');
         return;
@@ -252,7 +253,7 @@ export class NetworkTransport implements Transport {
       return;
     }
     // Error/close are allowed before Welcome; other traffic belongs to this session.
-    if (message.type === 10 || message.type === 11) {
+    if (message.type === MessageType.Error || message.type === MessageType.CloseReason) {
       if (this.welcome && message.sessionEpoch !== this.welcome.sessionEpoch) {
         return;
       }
@@ -275,7 +276,7 @@ export class NetworkTransport implements Transport {
     ) {
       return;
     }
-    if (message.type === 6) {
+    if (message.type === MessageType.Snapshot) {
       const applied = this.decoder.decode(bytes);
       if (!applied) {
         this.requestResync(ResyncReason.Gap);
@@ -306,20 +307,24 @@ export class NetworkTransport implements Transport {
       if (!this.ping && !this.clock.sampleCount) {
         this.sampleClock();
       }
-    } else if (message.type === 5) {
+    } else if (message.type === MessageType.CommandResult) {
       const pending = this.pending.get(message.value.commandSeq);
       if (pending) {
         clearTimeout(pending.timer);
         this.pending.delete(message.value.commandSeq);
         pending.resolve(message.value);
       }
-    } else if (message.type === 8) {
+    } else if (message.type === MessageType.Ping) {
       this.write({
-        type: 9,
+        type: MessageType.Pong,
         sessionEpoch: this.welcome.sessionEpoch,
         value: { ...message.value, serverMonotonicMs: 0, serverTimeMs: 0 },
       });
-    } else if (message.type === 9 && this.ping && message.value.nonce === this.ping.nonce) {
+    } else if (
+      message.type === MessageType.Pong &&
+      this.ping &&
+      message.value.nonce === this.ping.nonce
+    ) {
       this.clock.sample(message.value, this.ping.sentAt, this.monotonicNow());
       this.ping = undefined;
     }

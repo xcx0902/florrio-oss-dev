@@ -31,12 +31,8 @@ struct EntityCatalogEntry {
   float scale;
   const std::uint32_t* petalTypeIds;
   std::uint8_t petalTypeIdCount;
-  std::uint8_t componentDrawCount;
-  std::uint32_t opaque100;
-  std::uint32_t opaque104;
-  std::uint8_t opaque108;
+  std::uint8_t dropDrawCount;
   std::uint16_t dropAliasOf;
-  std::uint8_t opaque110;
   float dropWeight;
 };
 

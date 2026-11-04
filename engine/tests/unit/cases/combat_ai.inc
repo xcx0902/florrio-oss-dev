@@ -329,7 +329,7 @@ void test_attribution_death_and_pickups() {
   }
   world.clear_hit_events();
 
-  // Coalesced hit messages carry an epoch and a reference count.
+  // Coalesced hit messages carry an epoch and the number of merged hits.
   const engine::EntityHandle target =
       engine::spawn_entity(world, engine::EntityKind::kMob, 4,
                            engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::f32(10.0F));
@@ -337,7 +337,6 @@ void test_attribution_death_and_pickups() {
   world.record_hit(target, attacker, engine::f32(4.0F), engine::f32(6.0F));
   CHECK(world.hit_events().size() == 1U);
   CHECK(world.hit_events().front().count == 2U);
-  CHECK(world.hit_events().front().refcount == 2U);
   CHECK(world.hit_events().front().amount.value == 7.0F);
 
   // A target allocated outside spawn_entity must also record domain hits.

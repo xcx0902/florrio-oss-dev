@@ -122,7 +122,8 @@ void test_petal_combat_catalog() {
   CHECK(engine::Catalog::instance().petal(38)->rechargeMilliseconds == 45000.0F);
   const auto* rose = engine::Catalog::instance().petal_combat(6);
   CHECK(rose != nullptr);
-  CHECK(rose->orbitFunctionIndex == 665);
+  CHECK(rose->behavior == engine::catalog::PetalBehavior::kRoseHeal);
+  CHECK(rose->healAmount == 10.0F);
   CHECK(engine::Catalog::instance().petal_combat(99) == nullptr);
 }
 
@@ -269,7 +270,7 @@ void test_orbit_reindex_after_removal() {
   CHECK(indices[0] == 0U && indices[1] == 1U && indices[2] == 2U && indices[3] == 3U);
 }
 
-void test_flag41_slot_without_component_keeps_shared_position() {
+void test_shared_orbit_slot_without_component_keeps_shared_position() {
   engine::World world;
   world.initialize();
   CHECK(engine::spawn_player_default(world, engine::test::player(world), "rose-slot",

@@ -1,7 +1,12 @@
+import { SNAPSHOT_EVENT } from '../schema/protocol.js';
+import { INVENTORY_SLOTS } from './loadout-limits.js';
+import { EntityFlag } from '../schema/state-flags.js';
 import { SnapshotBuffer } from './snapshot-buffer.js';
 import { LocalPrediction } from './local-prediction.js';
 import type { NetworkClock } from './network-clock.js';
 import { mergeScalar } from './scalar.js';
+import { EventKind } from '../schema/multiplayer.js';
+import { EntityKind } from './snapshot-types.js';
 import type { DeathMetadata } from './snapshot-types.js';
 import {
   playerLoadoutSlots,
@@ -69,7 +74,7 @@ export class WorldState {
     if (!player) {
       return [];
     }
-    const key = player.byteArrayFields?.[60] ?? player.byteArrayField60 ?? player.denseFields?.[60];
+    const key = player.byteArrayFields?.[60] ?? player.inventory ?? player.denseFields?.[60];
     if (
       !this.loadoutCache ||
       this.loadoutCache.player !== player.handle ||
@@ -80,7 +85,7 @@ export class WorldState {
         key,
         player: player.handle,
         revision: this.membershipRevision,
-        slots: playerLoadoutSlots(player) ?? loadoutSlots(this.all(), 16),
+        slots: playerLoadoutSlots(player) ?? loadoutSlots(this.all(), INVENTORY_SLOTS),
       };
     }
     return this.loadoutCache.slots;
@@ -150,7 +155,7 @@ export class WorldState {
         current.set(kind, (set = new Set()));
       }
       set.add(entity.handle);
-      if (kind === 1 && player === undefined) {
+      if (kind === EntityKind.Player && player === undefined) {
         player = entity.handle;
       }
     }
@@ -208,7 +213,7 @@ export class WorldState {
         // Synthetic traces apply at clock 0; treat those as already settled so
         // the archived first frame keeps the native full-size drop card.
         firstSeenAt: previous?.firstSeenAt ?? (now > 0 ? now : Number.NEGATIVE_INFINITY),
-        arrivalMarked: previous?.arrivalMarked ?? (entity.flags & 128) !== 0,
+        arrivalMarked: previous?.arrivalMarked ?? (entity.flags & EntityFlag.Arrival) !== 0,
         previousX: previous?.x ?? entity.x,
         previousY: previous?.y ?? entity.y,
         previousAngle: previous?.angle ?? entity.angle,
@@ -246,7 +251,7 @@ export class WorldState {
       // first follow coordinates therefore interpolate from the origin.
       const displayedCamera = previous
         ? interpolateCameraTarget(previous, now)
-        : entity.kind === 1
+        : entity.kind === EntityKind.Player
           ? this.controlledCamera
             ? interpolateCameraTarget(this.controlledCamera, now)
             : { x: 0, y: 0 }
@@ -412,7 +417,7 @@ export class WorldState {
       const merged: EntityState = {
         ...entity,
         firstSeenAt: previous?.firstSeenAt ?? (now > 0 ? now : Number.NEGATIVE_INFINITY),
-        arrivalMarked: previous?.arrivalMarked ?? (entity.flags & 128) !== 0,
+        arrivalMarked: previous?.arrivalMarked ?? (entity.flags & EntityFlag.Arrival) !== 0,
         typeId,
         kind,
         speciesId,
@@ -449,7 +454,7 @@ export class WorldState {
         bitFields: mergedBitFields,
         denseByteFields: mergedDenseByteFields,
         byteArrayFields: mergedByteArrays,
-        byteArrayField60: mergedByteArrays?.[60],
+        inventory: mergedByteArrays?.[60],
         shortArrayFields: mergedShortArrays,
         varintArrayFields: mergeIndexed(previous?.varintArrayFields, entity.varintArrayFields),
         handleArrayFields: mergeIndexed(previous?.handleArrayFields, entity.handleArrayFields),
@@ -475,7 +480,10 @@ export class WorldState {
       };
       this.noteEntity(merged, previous);
       this.entities.set(entity.handle, merged);
-      if (kind === 1 && (!this.explicitControl || entity.handle === this.playerHandle)) {
+      if (
+        kind === EntityKind.Player &&
+        (!this.explicitControl || entity.handle === this.playerHandle)
+      ) {
         this.controlledCamera = this.entities.get(entity.handle);
       }
     }
@@ -485,18 +493,18 @@ export class WorldState {
   private applyEvents(events: readonly SnapshotEvent[] | undefined, now: number): void {
     this.events = events ?? [];
     for (const event of this.events) {
-      if (event.opcode === 9) {
+      if (event.opcode === SNAPSHOT_EVENT.ChatString) {
         this.chatLines.push(event.text);
         if (this.chatLines.length > 8) {
           this.chatLines.shift();
         }
-      } else if (event.opcode === 14) {
+      } else if (event.opcode === SNAPSHOT_EVENT.Visual) {
         this.visualEvents.set(event.handle, {
           handle: event.handle,
           index: event.index,
           receivedAt: now,
         });
-      } else if (event.opcode === 11) {
+      } else if (event.opcode === SNAPSHOT_EVENT.EntityTime) {
         // Opcode 11 stamps the hit clock; opcode 14 has its own indexed
         // presentation object and must not overwrite the hit timestamp.
         this.hitTimes.set(event.handle, now);
@@ -592,14 +600,14 @@ export class WorldState {
       });
     });
     const events: SnapshotEvent[] = value.events.flatMap((event): SnapshotEvent[] => {
-      if (event.kind === 1) {
-        return [{ opcode: 11, handle: event.target }];
+      if (event.kind === EventKind.Hit) {
+        return [{ opcode: SNAPSHOT_EVENT.EntityTime, handle: event.target }];
       }
-      if (event.kind === 2 && event.actorPlayerId === playerId) {
-        return [{ opcode: 14, handle: event.target, index: event.slot }];
+      if (event.kind === EventKind.Pickup && event.actorPlayerId === playerId) {
+        return [{ opcode: SNAPSHOT_EVENT.Visual, handle: event.target, index: event.slot }];
       }
-      if (event.kind === 3) {
-        return [{ opcode: 9, text: event.text }];
+      if (event.kind === EventKind.Chat) {
+        return [{ opcode: SNAPSHOT_EVENT.ChatString, text: event.text }];
       }
       return [];
     });
@@ -650,7 +658,11 @@ export class WorldState {
     this.snapshotBuffer.sample(handle, renderTime, result);
     // Attached petals follow a bounded translation of their own authoritative
     // trajectory. Ownership, launch, cooldown and damage stay authoritative.
-    if (entity.ownerHandle === this.playerHandle && entity.kind === 3 && this.prediction.active) {
+    if (
+      entity.ownerHandle === this.playerHandle &&
+      entity.kind === EntityKind.Petal &&
+      this.prediction.active
+    ) {
       const body = this.playerEntity(),
         display = this.prediction.display(now, this.networkClock);
       if (body && display) {

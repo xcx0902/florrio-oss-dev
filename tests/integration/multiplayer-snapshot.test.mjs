@@ -105,7 +105,7 @@ test('native public entities expose real distinct profiles, owner-local petals a
   assert.ok(player(wb.playerId).records.some((r) => r.score === 5678));
   for (const e of sa.entities.values()) {
     for (const record of e.records) {
-      assert.deepEqual(record.byteArrayField60 ?? [], []);
+      assert.deepEqual(record.inventory ?? [], []);
       assert.equal(record.varintFields?.[58], undefined);
       for (const field of [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56, 58, 60, 61, 63]) {
         assert.equal(record.denseFields?.[field], undefined, `private dense ${field}`);

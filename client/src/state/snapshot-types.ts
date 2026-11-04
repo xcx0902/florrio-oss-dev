@@ -1,11 +1,27 @@
+import { SNAPSHOT_EVENT } from '../schema/protocol.js';
+
+/** Wire values of protocol field 26; keep in lockstep with engine::EntityKind. */
+export const EntityKind = {
+  None: 0,
+  Player: 1,
+  Mob: 2,
+  Petal: 3,
+  Drop: 4,
+  Projectile: 5,
+} as const;
+export type EntityKind = (typeof EntityKind)[keyof typeof EntityKind];
 import type { DenseFieldSpec } from './field-types.js';
 export type DenseValue = number | string | readonly number[] | readonly string[];
 
 /** Event opcodes decoded by the snapshot reader. */
 export type SnapshotEvent =
-  | { readonly opcode: 9; readonly text: string }
-  | { readonly opcode: 11; readonly handle: number }
-  | { readonly opcode: 14; readonly handle: number; readonly index: number };
+  | { readonly opcode: typeof SNAPSHOT_EVENT.ChatString; readonly text: string }
+  | { readonly opcode: typeof SNAPSHOT_EVENT.EntityTime; readonly handle: number }
+  | {
+      readonly opcode: typeof SNAPSHOT_EVENT.Visual;
+      readonly handle: number;
+      readonly index: number;
+    };
 
 export interface EntitySnapshot {
   readonly handle: number;
@@ -48,7 +64,7 @@ export interface EntitySnapshot {
     Record<number, readonly { index: number; value: number }[]>
   >;
   readonly shortArrayFields?: Readonly<Record<number, readonly { index: number; value: number }[]>>;
-  readonly byteArrayField60?: readonly { index: number; value: number }[];
+  readonly inventory?: readonly { index: number; value: number }[];
   readonly varintFields?: Readonly<Record<number, number>>;
   readonly referenceFields?: Readonly<Record<number, number>>;
   readonly stringFields?: Readonly<Record<number, string>>;

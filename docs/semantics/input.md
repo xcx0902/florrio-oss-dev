@@ -23,22 +23,25 @@ separate network/local session slots.
 
 ## Command layouts
 
-|   Opcode | Meaning           | Operands                                 |
-| -------: | ----------------- | ---------------------------------------- |
-|        3 | suicide           | varint argument                          |
-|        4 | restart           | none                                     |
-|        7 | disconnect        | varint argument                          |
-|        8 | discard petal     | u8 slot, u8 petal                        |
-|       10 | swap petals       | u8 slotA, u8 valueA, u8 slotB, u8 valueB |
-|       12 | input state       | varint buttons, f32 angle, f32 strength  |
-|       13 | bench cycle       | none                                     |
-|        0 | handshake         | u8 prefix, 3 NUL-terminated strings      |
-|        2 | handshake         | u8 prefix, 2 NUL-terminated strings      |
-|        5 | string            | one NUL-terminated string                |
-|        6 | player spawn/name | one NUL-terminated string                |
-| 1, 9, 11 | reserved          | opaque remaining bytes                   |
+`InputOpcode` in `generated_protocol.hpp` / `schema/protocol.ts` is the only
+opcode table. The values are wire bytes and remain fixed.
 
-For opcode 12, `readSanitizedFloat` uses the bit test:
+| InputOpcode                  |    Value | Meaning           | Operands                                 |
+| ---------------------------- | -------: | ----------------- | ---------------------------------------- |
+| `kSuicide`                   |        3 | suicide           | varint argument                          |
+| `kRestart`                   |        4 | restart           | none                                     |
+| `kDisconnect`                |        7 | disconnect        | varint argument                          |
+| `kDiscardPetal`              |        8 | discard petal     | u8 slot, u8 petal                        |
+| `kSwapPetals`                |       10 | swap petals       | u8 slotA, u8 valueA, u8 slotB, u8 valueB |
+| `kInputButtonsAngleStrength` |       12 | input state       | varint buttons, f32 angle, f32 strength  |
+| `kBenchCycle`                |       13 | bench cycle       | none                                     |
+| `kHandshakeString`           |        0 | handshake         | u8 prefix, 3 NUL-terminated strings      |
+| `kHandshakeStringAlt`        |        2 | handshake         | u8 prefix, 2 NUL-terminated strings      |
+| `kString`                    |        5 | string            | one NUL-terminated string                |
+| `kPlayerSpawnAndName`        |        6 | player spawn/name | one NUL-terminated string                |
+| `kReserved1/9/11`            | 1, 9, 11 | reserved          | remaining bytes have no command effect   |
+
+For `kInputButtonsAngleStrength`, `readSanitizedFloat` uses the bit test:
 
 ```
 if ((bits + 8388608) & 2130706432 == 0) value = 0
@@ -47,7 +50,7 @@ if ((bits + 8388608) & 2130706432 == 0) value = 0
 This maps subnormals, NaN and infinities to zero. The ABI stores the latest
 input in `World::PlayerInput`: buttons, angle, non-negative strength,
 `normalized_angle = fmod(angle, TAU)` and the packed 32-bit direction. Every
-accepted opcode-12 message overwrites angle and strength; the movement impulse
+accepted input-state message overwrites angle and strength; the movement impulse
 is applied once per simulation tick from these latest values, not once per
 packet.
 
@@ -79,22 +82,22 @@ reconstructed by these look/expression changes.
 
 ## Restart and spawn
 
-Opcode `4` requests a restart. The engine treats it as "create the default
-player when none exists", then spawns the loadout petals. A later opcode 6 is
+`kRestart` requests a restart. The engine treats it as "create the default
+player when none exists", then spawns the loadout petals. A later `kPlayerSpawnAndName` is
 ignored by the existing `has_player` gate.
 
-Opcode `6` carries one NUL-terminated player name. When the world has no
+`kPlayerSpawnAndName` carries one NUL-terminated player name. When the world has no
 player, `WorkerApi` calls `spawn_player_default` (or the explicitly configured
 spawn path) and `spawn_loadout_petals`.
 
-An empty opcode 0/2 command at the end of a packet is accepted as an empty
+An empty handshake command (`kHandshakeString`/`kHandshakeStringAlt`) at the end of a packet is accepted as an empty
 handshake. The string reader returns an empty string at end-of-buffer instead
 of rejecting the packet; this matters for the restart packet `02 04 03 06 00`,
 whose trailing `00` is an empty handshake.
 
 ## Latest-value input application
 
-Opcode 12 writes both the wrapped angle and the non-negative strength to the
+`kInputButtonsAngleStrength` writes both the wrapped angle and the non-negative strength to the
 player record for every accepted message. The movement path
 (`applyPlayerControls`) reads those two fields once per tick, so the latest
 packet wins and the impulse is applied once per simulation tick. A one-send
@@ -133,8 +136,8 @@ one send buffer behave like the server loop.
 
 ## Tests
 
-`test_input_decoder` in `engine/tests/unit/test_main.cpp` covers opcode 12
-fields, the byte layouts of discard/swap, handshake/name strings, restart/bench
+`test_input_decoder` in `engine/tests/unit/test_main.cpp` covers the input-state
+opcode fields, the byte layouts of discard/swap, handshake/name strings, restart/bench
 and the sanitized-float bit test. `client/tests/integration/worker-browser.test.mjs` exercises
 the client encoder end to end through the worker.
 
@@ -153,7 +156,7 @@ check. A packet that ends exactly after its sequence byte therefore decodes as
 one opcode-0 handshake, which is how the restart packet `02 04 03 06 00`
 terminates. Empty packets are accepted; only packets above 65,536 bytes are
 rejected. `test_input_decoder` covers the empty packet, a sequence-only packet,
-truncated opcode 12/8 operands and a reserved opcode payload.
+truncated input-state/discard operands and a reserved opcode payload.
 
 A legacy pending-byte flag could skip one byte before the next varint/string.
 No shipped command sets it, so the domain reader does not implement it.
@@ -168,11 +171,10 @@ No shipped command sets it, so the domain reader does not implement it.
 
 ## Client encoder
 
-`client/src/net/input.ts` writes the same XOR/varint framing. `spawn(name)` emits
-opcode 6; `input(buttons, angle, strength)` emits opcode 12 with little-endian
-binary32 angle/strength; `restart()`/`benchCycle()` emit opcodes 4/13;
-`discard(slot, petal)`/`swap(...)` emit 8/10; `suicide(argument = 0)` emits
-opcode 3. `client/tests/integration/worker-browser.test.mjs` exercises spawn, input and restart
+`client/src/net/input.ts` writes the same XOR/varint framing. `spawn(name)` emits `InputOpcode.PlayerSpawnAndName`; `input(buttons, angle, strength)` emits `InputOpcode.InputButtonsAngleStrength` with little-endian
+binary32 angle/strength; `restart()`/`benchCycle()` emit `InputOpcode.Restart`/`BenchCycle`;
+`discard(slot, petal)`/`swap(...)` emit `DiscardPetal`/`SwapPetals`;
+`suicide(argument = 0)` emits `InputOpcode.Suicide`. `client/tests/integration/worker-browser.test.mjs` exercises spawn, input and restart
 through the real worker. `client/src/schema/packet-key.ts` is generated from
 `schema/transport.json` and holds the 256-byte repeating key.
 
@@ -181,7 +183,7 @@ through the real worker. `client/src/schema/packet-key.ts` is generated from
 `WorkerApi::configure_player_spawn(PlayerConfig, position)` keeps an explicit
 override for tests and scripted scenarios. Opcode 3 with argument 0 sets the
 current player's health to zero; the next tick reaps it. Without an explicit
-override, opcode 6 calls
+override, `kPlayerSpawnAndName` calls
 `spawn_player_default`: level 0, five Basic petals, the 0.00005 rare starter
 roll, level-band position and the product defaults (radius 25, health 100, contact
 damage 25). See `docs/semantics/player.md`.

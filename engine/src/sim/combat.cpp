@@ -208,7 +208,7 @@ std::size_t resolve_contacts(World& world) {
       }
       // Original 390 skips the whole pair when either physics record has the
       // +50 one-shot marker.
-      if (a.physics_flag50 || b.physics_flag50) {
+      if (a.skips_contact_response || b.skips_contact_response) {
         continue;
       }
       if (!layers_collide(a, b)) {
@@ -253,7 +253,7 @@ std::size_t resolve_contacts(World& world) {
       // A body whose physics +48 byte is clear (Rock, Boulder, Cactus, Ant
       // Hole) never receives contact response: the call with that body as p1
       // returns before touching velocity or position.
-      const bool mass_path = a.physics_flag48 && b.physics_flag48;
+      const bool mass_path = a.uses_mass_weighted_response && b.uses_mass_weighted_response;
       const double effective_a = static_cast<double>(a.collision_radius.value) *
                                  static_cast<double>(a.collision_radius.value) *
                                  static_cast<double>(a.mass.value);
@@ -280,7 +280,7 @@ std::size_t resolve_contacts(World& world) {
               ? (mass_path ? dot * effective_a * -2.0 / (distance_squared * effective_total)
                            : dot * -2.0 / distance_squared)
               : 0.0;
-      if (a.physics_flag48) {
+      if (a.uses_mass_weighted_response) {
         a.velocity.x = a.velocity.x + -dx * response_a;
         a.velocity.y = a.velocity.y + -dy * response_a;
         if (!mass_path && overlap > 0.0) {
@@ -290,7 +290,7 @@ std::size_t resolve_contacts(World& world) {
               f32::from_double(static_cast<double>(a.position.y.value) - normal_y * overlap));
         }
       }
-      if (b.physics_flag48) {
+      if (b.uses_mass_weighted_response) {
         b.velocity.x = b.velocity.x + dx * response_b;
         b.velocity.y = b.velocity.y + dy * response_b;
         if (!mass_path) {
@@ -316,11 +316,11 @@ std::size_t resolve_contacts(World& world) {
       // pre-correction separation captured at entry, so it is evaluated from
       // dx/dy/distance rather than the already-pushed positions.
       if (distance > 0.0) {
-        if ((a.world_flags & 32U) != 0U) {
+        if (has_flag(a.world_flags, WorldFlag::kPlayerBody)) {
           a.velocity.x += -dx * 0.2 / distance;
           a.velocity.y += -dy * 0.2 / distance;
         }
-        if ((b.world_flags & 32U) != 0U) {
+        if (has_flag(b.world_flags, WorldFlag::kPlayerBody)) {
           b.velocity.x += dx * 0.2 / distance;
           b.velocity.y += dy * 0.2 / distance;
         }

@@ -24,7 +24,7 @@ class PlayerState;
                                        std::uint8_t orbit_index = 0);
 
 /** Recompute all petal orbit indices after a loadout mutation, mirroring
- * original function 85 (including configured missing instances and flag41
+ * original function 85 (including configured missing instances and sharedOrbit
  * shared positions). */
 void assign_petal_orbit_indices(World& world, PlayerState& state);
 

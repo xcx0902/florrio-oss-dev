@@ -55,19 +55,17 @@ class SpatialQuery {
 /** Spawn a band with component-drop defaults: Rock/Boulder use the dynamic
  * pre-draw path, other species use the catalog defaults. */
 template <typename Occupied>
-[[nodiscard]] EntityHandle
-spawn_from_band_with_component_draws(World& world, const SpawnTable& table, std::uint8_t band,
-                                     Occupied&& occupied) {
+[[nodiscard]] EntityHandle spawn_from_band_with_drop_draws(World& world, const SpawnTable& table,
+                                                           std::uint8_t band, Occupied&& occupied) {
   return table.spawn_from_band(
       world, band, std::forward<Occupied>(occupied),
       [&world](const SpawnBandEntry& entry, const SpawnPosition& position) {
         if (entry.entity_type == 1 || entry.entity_type == 2) {
-          return spawn_rock_with_component_draws(world, Vec2(position.x, position.y),
-                                                 entry.entity_type == 2, world.random());
+          return spawn_rock_with_drop_draws(world, Vec2(position.x, position.y),
+                                            entry.entity_type == 2, world.random());
         }
         if (entry.entity_type == 3) {
-          return spawn_cactus_with_component_draws(world, Vec2(position.x, position.y),
-                                                   world.random());
+          return spawn_cactus_with_drop_draws(world, Vec2(position.x, position.y), world.random());
         }
         return spawn_entity_from_defaults(world, EntityKind::kMob, entry.entity_type,
                                           Vec2(position.x, position.y));

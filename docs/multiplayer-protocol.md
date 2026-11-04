@@ -2,7 +2,7 @@
 
 # Multiplayer protocol v2
 
-Catalog SHA-256: `9d66e1aff774927d6bc7cdc709f16913bda06e56fb5cdd52f3172aeedbe7f287`. Catalog identity hashes the canonical schema catalog inputs, excluding display-only changelog.
+Catalog SHA-256: `84bbcaa2b3d1a72ab82c1ef7d63bc752ee8c7e3fc9b13f086b33aeb0d4dabb02`. Catalog identity hashes the canonical schema catalog inputs, excluding display-only changelog.
 
 One binary WebSocket message = one frame. No XOR, Worker RPC or native struct layout. Integers/floats are little-endian; floats must be finite. Envelope: ASCII FLR2 (4), version u16=2, type u8, flags u8=0, sessionEpoch u32, payloadBytes u32; exactly 16 bytes. Unknown type/version/flags, wrong direction, invalid lengths and trailing bytes reject the whole message.
 

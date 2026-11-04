@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/catalog/ids.hpp"
 #include "engine/core/vec2.hpp"
 #include "engine/model/entity.hpp"
 #include <cstdint>
@@ -22,7 +23,10 @@ struct PetalOrbitState {
   std::uint8_t slot = 0xFF;
   std::uint8_t instance = 0;
   std::uint8_t profile = 0;  // engine::OrbitProfile
-  std::uint16_t orbit_function = 0;
+  /** Catalog behavior for this petal; replaces the former function number. */
+  catalog::PetalBehavior behavior = catalog::PetalBehavior::kOrbit;
+  /** Heal amount used only by PetalBehavior::kRoseHeal. */
+  f32 heal_amount = f32(0.0F);
   f32 extra_radius = f32(0.0F);
   std::uint8_t instance_count = 1;
   std::uint8_t behavior_state = 0;

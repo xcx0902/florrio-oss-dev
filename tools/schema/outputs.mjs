@@ -6,6 +6,12 @@ import { generatePacketKeyHeader, generatePacketKeyTs } from './transport.mjs';
 import { deriveDropChances } from './drop-chances.mjs';
 import {
   generateCatalogData,
+  generateCatalogIdsHeader,
+  generateCatalogIdsTs,
+  generateStateFlagsHeader,
+  generateStateFlagsTs,
+  generateLoadoutRulesHeader,
+  generateLoadoutRulesTs,
   generateCatalogMarkdown,
   generateCatalogTypes,
   generateClientPetalsTs,
@@ -70,6 +76,34 @@ export async function buildOutputs(root = '.') {
   outputs.set('client/src/schema/protocol.ts', generateProtocolTs(contract));
   outputs.set('engine/include/engine/net/packet_key.hpp', generatePacketKeyHeader(transportBytes));
   outputs.set('client/src/schema/packet-key.ts', generatePacketKeyTs(transportBytes));
+  outputs.set(
+    'engine/include/engine/catalog/ids.hpp',
+    generateCatalogIdsHeader(
+      inputs.rarities.rarities,
+      inputs.petals.petals,
+      inputs.entities.entities,
+      inputs.petalCombat.behaviors,
+    ),
+  );
+  outputs.set(
+    'client/src/schema/catalog-ids.ts',
+    generateCatalogIdsTs(
+      inputs.rarities.rarities,
+      inputs.petals.petals,
+      inputs.entities.entities,
+      inputs.petalCombat.behaviors,
+    ),
+  );
+  outputs.set(
+    'engine/include/engine/catalog/state_flag_bits.hpp',
+    generateStateFlagsHeader(inputs.stateFlags.groups),
+  );
+  outputs.set('client/src/schema/state-flags.ts', generateStateFlagsTs(inputs.stateFlags.groups));
+  outputs.set(
+    'engine/include/engine/catalog/loadout_rules.hpp',
+    generateLoadoutRulesHeader(inputs.loadout),
+  );
+  outputs.set('client/src/schema/loadout.ts', generateLoadoutRulesTs(inputs.loadout));
   outputs.set('engine/include/engine/catalog/catalog_types.hpp', generateCatalogTypes());
   outputs.set(
     'engine/include/engine/catalog/generated_catalog_data.hpp',
@@ -89,7 +123,7 @@ export async function buildOutputs(root = '.') {
   outputs.set('engine/include/engine/catalog/drop_chances.hpp', generateDropChancesHeader(derived));
   outputs.set(
     'client/src/schema/petals.ts',
-    generateClientPetalsTs(petals, inputs.entities.entities),
+    generateClientPetalsTs(petals, inputs.entities.entities, inputs.rarities.rarities),
   );
   outputs.set(
     'client/src/schema/mob-gallery.ts',
@@ -117,6 +151,7 @@ export async function buildOutputs(root = '.') {
       generator: GENERATOR,
       protocolFields: contract.fields.length,
       denseGroups: contract.denseGroups.length,
+      rarities: inputs.rarities.rarities.length,
       petals: counts.petals,
       entities: counts.entities,
       spawnRules: counts.spawnRules,

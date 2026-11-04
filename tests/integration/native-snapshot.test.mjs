@@ -147,7 +147,7 @@ test('native snapshot preserves the uint8 publishable id boundary', async () => 
   assert.equal(boundary.sequence, 9);
   assert.equal(boundary.entities.length, 2);
   const species = boundary.entities.find((entity) => entity.typeId === 255);
-  const loadout = boundary.entities.find((entity) => entity.byteArrayField60?.[0]?.value === 255);
+  const loadout = boundary.entities.find((entity) => entity.inventory?.[0]?.value === 255);
   assert.ok(species, 'species field 2 preserves 255');
   assert.equal(species.speciesId, 255);
   assert.ok(loadout, 'loadout field 60 preserves the same one-byte id');

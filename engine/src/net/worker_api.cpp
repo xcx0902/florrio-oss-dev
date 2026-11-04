@@ -55,19 +55,21 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
       continue;
     }
     const InputCommand& command = message.command;
+    const auto opcode = static_cast<protocol::InputOpcode>(command.opcode);
     const bool has_player =
         state->player().valid() && world_.entities().get(state->player()) != nullptr;
-    if (command.opcode == 5U) {
+    if (opcode == protocol::InputOpcode::kString) {
       publisher_.emit_chat(command.text);
       continue;
     }
-    if ((command.opcode == 4U || command.opcode == 6U) && !has_player &&
-        can_spawn_player(world_, *state)) {
+    if ((opcode == protocol::InputOpcode::kRestart ||
+         opcode == protocol::InputOpcode::kPlayerSpawnAndName) &&
+        !has_player && can_spawn_player(world_, *state)) {
       reserve_spawn_placeholder(world_);
       (void)spawn_registered_player(world_, local_player_id_, state->life_epoch, command.text);
       continue;
     }
-    if (command.opcode == 3U && state->player().valid()) {
+    if (opcode == protocol::InputOpcode::kSuicide && state->player().valid()) {
       if (command.argument == 0U) {
         if (Entity* player = world_.entities().get(state->player())) {
           (void)damage_entity(world_, player->handle, player->health, EntityHandle{});
@@ -75,7 +77,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
       }
       continue;
     }
-    if (command.opcode == 8U && state->player().valid()) {
+    if (opcode == protocol::InputOpcode::kDiscardPetal && state->player().valid()) {
       const std::uint8_t slot = static_cast<std::uint8_t>(command.slot_a);
       if (state->loadout().discard(world_, *state, state->profile(), slot,
                                    static_cast<std::uint16_t>(command.value_a))) {
@@ -83,7 +85,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
       }
       continue;
     }
-    if (command.opcode == 10U && state->player().valid()) {
+    if (opcode == protocol::InputOpcode::kSwapPetals && state->player().valid()) {
       const std::uint8_t first = static_cast<std::uint8_t>(command.slot_a);
       const std::uint8_t second = static_cast<std::uint8_t>(command.slot_b);
       (void)state->loadout().swap(world_, *state, state->profile(), first,
@@ -91,7 +93,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
                                   static_cast<std::uint16_t>(command.value_b));
       continue;
     }
-    if (command.opcode != 12U) {
+    if (opcode != protocol::InputOpcode::kInputButtonsAngleStrength) {
       continue;
     }
     // Original 655 stores both angle and strength on the player record; the

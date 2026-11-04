@@ -1,10 +1,12 @@
 import { DeathLifecycle } from '../state/death.js';
+import { SNAPSHOT_EVENT } from '../schema/protocol.js';
+import { EventKind } from '../schema/multiplayer.js';
 import { DENSE_GROUPS, DENSE_GROUP_SPECS } from '../state/field-types.js';
 import { SnapshotDecoder, type DenseGroupPlan } from '../state/snapshot.js';
 import { type EntityState } from '../state/world.js';
 import type { GameApp } from '../app/game-app.js';
 import type { AppliedNetworkSnapshot } from '../net/multiplayer-snapshot.js';
-import { CommandKind, ResultCode, type Welcome } from '../schema/multiplayer.js';
+import { CommandKind, MessageType, ResultCode, type Welcome } from '../schema/multiplayer.js';
 import type { CommandIntent } from '../net/transport.js';
 export type GamePhase = 'menu' | 'joining' | 'playing' | 'dying' | 'dead' | 'returning' | 'error';
 export interface SessionFrameView {
@@ -114,11 +116,11 @@ export class GameSession {
       }
       this.status = '';
       app.transport.onControl((message) => {
-        if (message.type === 2) {
+        if (message.type === MessageType.Welcome) {
           this.networkIdentity = message.value;
         }
         if (
-          message.type === 12 &&
+          message.type === MessageType.Leaderboard &&
           this.networkIdentity &&
           message.value.roomEpoch.every(
             (byte, index) => byte === this.networkIdentity!.roomEpoch[index],
@@ -155,8 +157,14 @@ export class GameSession {
     const now = performance.now();
     // Pickup transfers need the old drop position before authoritative removal.
     const pickups = value.events
-      .filter((event) => event.kind === 2 && event.actorPlayerId === welcome.playerId)
-      .map((event) => ({ opcode: 14 as const, handle: event.target, index: event.slot }));
+      .filter(
+        (event) => event.kind === EventKind.Pickup && event.actorPlayerId === welcome.playerId,
+      )
+      .map((event) => ({
+        opcode: SNAPSHOT_EVENT.Visual,
+        handle: event.target,
+        index: event.slot,
+      }));
     if (value.snapshot.full || previousLife !== value.snapshot.selfState.lifeEpoch) {
       this.decoder = new SnapshotDecoder(this.densePlans);
       this.app.renderer.petalMotion.reset();

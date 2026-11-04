@@ -149,7 +149,7 @@ void update_ai(World& world, double delta_milliseconds) {
     f32 move_speed(0.0F);
     f32 move_angle(0.0F);
     if (ai.target.valid()) {
-      ai.activity_flags |= 1U;
+      set_flag(ai.activity_flags, ActivityFlag::kEngaged, true);
       Entity* target = world.entities().get(ai.target);
       Vec2 lead{};
       if (ai.chase && ai.lead_divisor.value > 0.0F) {
@@ -193,7 +193,7 @@ void update_ai(World& world, double delta_milliseconds) {
       }
     } else {
       // Idle/guard branch. Only owned entities receive a guard point.
-      ai.activity_flags &= static_cast<std::uint8_t>(~1U);
+      set_flag(ai.activity_flags, ActivityFlag::kEngaged, false);
       if (entity->owner != std::numeric_limits<std::uint32_t>::max()) {
         Entity* owner = world.entities().get(EntityHandle{entity->owner});
         if (owner != nullptr) {
@@ -384,7 +384,8 @@ void update_ai(World& world, double delta_milliseconds) {
     // either the in-range strafe or the out-of-range chase velocity update.
     // attack_range selects steering; it does not gate firing (oracle fixture
     // covers both 300 and 800 units with a retained target).
-    if (ai.target.valid() && ai.attack_callback != 0U && ai.attack_cooldown_ms.value <= 0.0F) {
+    if (ai.target.valid() && ai.attack != AttackBehavior::kNone &&
+        ai.attack_cooldown_ms.value <= 0.0F) {
       pending_attacks.push_back(handle);
       ai.attack_cooldown_ms =
           f32(ai.attack_cooldown_ms.value +
@@ -395,7 +396,7 @@ void update_ai(World& world, double delta_milliseconds) {
   // callback mutates the entity pool, but the domain keeps the AI iteration
   // vector stable by collecting due callbacks first.
   for (const EntityHandle handle : pending_attacks) {
-    (void)dispatch_attack_callback(world, handle);
+    (void)dispatch_attack(world, handle);
   }
 }
 

@@ -135,7 +135,7 @@ void test_cactus_construction() {
   engine::World world;
   world.initialize();
   engine::ServerRng spawn_rng(1383144482U);
-  const auto handle = engine::spawn_cactus_with_component_draws(
+  const auto handle = engine::spawn_cactus_with_drop_draws(
       world, engine::Vec2(engine::f32(1.0F), engine::f32(2.0F)), spawn_rng);
   CHECK(handle.valid());
   const auto* entity = world.entities().get(handle);
@@ -144,7 +144,6 @@ void test_cactus_construction() {
   CHECK(entity->contact_damage.value == 30.0F);
   CHECK(entity->world_flags == 75);
   CHECK(entity->entity_flags == 96);
-  CHECK(entity->component_flags92 == 0);
   CHECK(std::fabs(entity->health.value - entity->radius.value * 0.7F) < 1e-5F);
 }
 

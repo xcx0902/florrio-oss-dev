@@ -97,7 +97,13 @@ void split_peas(World& world, EntityHandle petal_handle) {
     entity->owner = petal->owner;
     entity->lifetime_remaining_ms = 1000.0;
     entity->petal_launched = true;
-    entity->petal_render_flags = type == 34U ? 3U : type == 12U ? 1U : 0U;
+    entity->petal_variant_flags = 0U;
+    if (catalog::petal_id(type) == catalog::PetalId::kPeasLegendary) {
+      set_flag(entity->petal_variant_flags, PetalVariantFlag::kEpicColor, true);
+      set_flag(entity->petal_variant_flags, PetalVariantFlag::kLarge, true);
+    } else if (catalog::petal_id(type) == catalog::PetalId::kPeasEpic) {
+      set_flag(entity->petal_variant_flags, PetalVariantFlag::kEpicColor, true);
+    }
     children.push_back(child);
   }
   if (!children.empty()) {
@@ -149,14 +155,14 @@ void spawn_web_tag(World& world, EntityHandle petal_handle, Vec2 position) {
   entity->collision_radius = f32(50.0F);
   entity->health = f32(5.0F);
   entity->max_health = f32(5.0F);
-  entity->physics_flag50 = true;
+  entity->skips_contact_response = true;
   entity->has_score_component = true;
   entity->score_epoch = static_cast<std::uint32_t>(world.tick() + 1U);
   entity->score_value = f32(0.0F);
   entity->has_tag_component = true;
-  entity->entity_flags = static_cast<std::uint8_t>(entity->entity_flags | 8U);
+  set_flag(entity->entity_flags, EntityFlag::kWebTag, true);
   entity->has_effect_area = true;
-  entity->world_flags = static_cast<std::uint8_t>(entity->world_flags | 128U);
+  set_flag(entity->world_flags, WorldFlag::kWebTag, true);
   entity->packet_epoch_a = static_cast<std::uint32_t>(world.tick() + 1U);
   entity->packet_epoch_b = entity->packet_epoch_a;
   entity->lifetime_remaining_ms = 12000.0;
@@ -170,14 +176,15 @@ void spawn_web_tag(World& world, EntityHandle petal_handle, Vec2 position) {
 
 bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::uint8_t buttons) {
   const auto type = state.type_id;
-  const bool peas = type == 11U || type == 12U || type == 34U;
-  const bool aimed = type == 10U || type == 20U;
-  const bool web = type == 29U || type == 30U;
-  const bool pollen = type == 19U;
+  const bool peas = catalog::is_peas_petal(type);
+  const bool aimed = catalog::petal_id(type) == catalog::PetalId::kMissileRare ||
+                     catalog::petal_id(type) == catalog::PetalId::kDandelionRare;
+  const bool web = catalog::is_web_petal(type);
+  const bool pollen = catalog::petal_id(type) == catalog::PetalId::kPollenEpic;
   if (!peas && !aimed && !web && !pollen) {
     return false;
   }
-  state.orbit_radius = !pollen && (buttons & 2U) != 0U ? f32(40.0F) : f32(65.0F);
+  state.orbit_radius = !pollen && has_flag(buttons, InputButton::kDefend) ? f32(40.0F) : f32(65.0F);
   Entity* petal = world.entities().get(state.handle);
   Entity* owner = petal != nullptr ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
   if (petal == nullptr || owner == nullptr || petal->health.value <= 0.0F) {
@@ -190,7 +197,10 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::ui
     petal->angle = f32(std::fmod(static_cast<double>(f32(std::atan2(dy, dx)).value), kTau));
     petal->bounds_dirty = true;
   }
-  if (state.behavior_state != 0U || (buttons & (pollen ? 3U : 1U)) == 0U ||
+  const bool action_pressed =
+      pollen ? (has_flag(buttons, InputButton::kAttack) || has_flag(buttons, InputButton::kDefend))
+             : has_flag(buttons, InputButton::kAttack);
+  if (state.behavior_state != 0U || !action_pressed ||
       !(world.time_ms() - state.behavior_started_at_ms > 500.0)) {
     return false;
   }
@@ -207,14 +217,14 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::ui
     uy = dy / length;
   }
   if (pollen) {
-    const double direction = (buttons & 1U) != 0U ? 1.0 : -1.0;
+    const double direction = has_flag(buttons, InputButton::kAttack) ? 1.0 : -1.0;
     petal->velocity.x += direction * (length < 2.220446049250313e-16 ? 0.5 : dx * 0.5 / length);
     petal->velocity.y += direction * (length < 2.220446049250313e-16 ? 0.0 : dy * 0.5 / length);
     const f32 draw = f32(static_cast<float>(world.random().next() - 1U));
     petal->lifetime_remaining_ms =
         f32(f32(draw.value * f32(1000.0 / 2147483648.0).value).value + 4500.0F).value;
   } else {
-    const bool round = web || type == 20U;
+    const bool round = web || catalog::petal_id(type) == catalog::PetalId::kDandelionRare;
     if (round) {
       ux = f32(ux).value;
       uy = f32(uy).value;
@@ -237,8 +247,7 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::ui
 
 void on_petal_death(World& world, EntityHandle handle) {
   Entity* petal = world.entities().get(handle);
-  if (petal == nullptr || !petal->petal_launched ||
-      (petal->type_id != 29U && petal->type_id != 30U)) {
+  if (petal == nullptr || !petal->petal_launched || !catalog::is_web_petal(petal->type_id)) {
     return;
   }
   petal->petal_launched = false;
@@ -250,7 +259,7 @@ bool consume_peas_attack(World& world, EntityHandle petal_handle, EntityHandle o
   if (petal == nullptr) {
     return false;
   }
-  if (petal->type_id != 11U && petal->type_id != 12U && petal->type_id != 34U) {
+  if (!catalog::is_peas_petal(petal->type_id)) {
     return false;
   }
   if (EntityHandle{petal->owner} != owner) {
@@ -288,7 +297,7 @@ void on_petal_hit(World& world, EntityHandle petal_handle, EntityHandle target_h
 
 void on_petal_incoming_hit(World& world, EntityHandle petal_handle, EntityHandle attacker) {
   Entity* petal = world.entities().get(petal_handle);
-  if (petal == nullptr || petal->type_id != 21U) {
+  if (petal == nullptr || catalog::petal_id(petal->type_id) != catalog::PetalId::kCactusEpic) {
     return;
   }
   if (!attacker.valid() || same_controlling_root(world, petal_handle, attacker)) {

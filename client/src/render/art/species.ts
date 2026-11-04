@@ -1,3 +1,5 @@
+import { SpeciesId } from '../../schema/catalog-ids.js';
+import { AntCaste, antCaste } from '../species-groups.js';
 import { ResourceCache } from '../resource-cache.js';
 import { renderResources } from '../resources.js';
 import type { Canvas2DContext } from '../canvas2d/context.js';
@@ -58,17 +60,24 @@ export function drawLadybug(
   handle: number,
   flash = 0,
   radius = 30,
-  species = 4,
+  species: number = SpeciesId.Ladybug,
 ): void {
   const resources = renderResources();
   radius = positiveRadius(radius, 30);
   context = localContext(context, f32(radius / 30));
   const dark = flashGrey(17, flash);
   const body = flashColor(
-    species === 20 ? rgb(150, 41, 33) : species === 21 ? rgb(235, 235, 52) : PALETTES.ladybugBody,
+    species === SpeciesId.LadybugDark
+      ? rgb(150, 41, 33)
+      : species === SpeciesId.LadybugShiny
+        ? rgb(235, 235, 52)
+        : PALETTES.ladybugBody,
     flash,
   );
-  const spots = flashColor(species === 20 ? rgb(190, 52, 42) : PALETTES.ladybugDark, flash);
+  const spots = flashColor(
+    species === SpeciesId.LadybugDark ? rgb(190, 52, 42) : PALETTES.ladybugDark,
+    flash,
+  );
   context.setLineWidth(7);
   context.setLineJoin('round');
   style(context, dark);
@@ -220,7 +229,7 @@ export function drawAnt(
   context: Canvas2DContext,
   _handle: number,
   _radius = 14,
-  species = 7,
+  caste: AntCaste = AntCaste.Baby,
   now = 0,
   flash = 0,
   activity = 0,
@@ -229,7 +238,7 @@ export function drawAnt(
   context.setLineJoin('round');
   context.setLineCap('round');
   const body = flashGrey(85, flash);
-  const stage = species - 7;
+  const stage = caste;
   if (stage === 1 || stage === 2) {
     style(context, body);
     disc(context, -8, 0, 10);
@@ -494,7 +503,9 @@ export function drawBeetle(
 export function drawCentipede(context: Canvas2DContext, species: number, flash = 0): void {
   const dark = flashGrey(51, flash);
   const body = flashColor(
-    species === 17 || species === 18 ? rgb(144, 93, 176) : rgb(138, 194, 85),
+    species === SpeciesId.EvilCentipedeHead || species === SpeciesId.EvilCentipedeSegment
+      ? rgb(144, 93, 176)
+      : rgb(138, 194, 85),
     flash,
   );
   context.setLineWidth(7);
@@ -505,7 +516,7 @@ export function drawCentipede(context: Canvas2DContext, species: number, flash =
   disc(context, 0, 30, 15, false);
   style(context, body);
   disc(context, 0, 0, 35);
-  if (species === 16 || species === 18) {
+  if (species === SpeciesId.CentipedeSegment || species === SpeciesId.EvilCentipedeSegment) {
     return;
   }
   setStroke(context, dark);
@@ -579,50 +590,54 @@ export function drawSpecies(
   animation: SpeciesAnimation = {},
 ): void {
   switch (species) {
-    case 0:
+    case SpeciesId.None:
       return;
-    case 1:
-    case 2:
+    case SpeciesId.Rock:
+    case SpeciesId.Boulder:
       drawRock(context, handle, radius, flash);
       return;
-    case 3:
+    case SpeciesId.Cactus:
       drawCactus(context, radius, now, flash);
       return;
-    case 4:
-    case 5:
-    case 20:
-    case 21:
+    case SpeciesId.Ladybug:
+    case SpeciesId.MassiveLadybug:
+    case SpeciesId.LadybugDark:
+    case SpeciesId.LadybugShiny:
       drawLadybug(context, handle, flash, radius, species);
       return;
-    case 6:
+    case SpeciesId.Bee:
       drawBee(context, flash);
       return;
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-      drawAnt(context, handle, radius, species, now, flash, animation.activity);
+    case SpeciesId.BabyAnt:
+    case SpeciesId.WorkerAnt:
+    case SpeciesId.SoldierAnt:
+    case SpeciesId.QueenAnt: {
+      const caste = antCaste(species);
+      if (caste !== undefined) {
+        drawAnt(context, handle, radius, caste, now, flash, animation.activity);
+      }
       return;
-    case 11:
+    }
+    case SpeciesId.AntHole:
       drawAntHole(context, flash);
       return;
-    case 12:
-    case 13:
+    case SpeciesId.Beetle:
+    case SpeciesId.MassiveBeetle:
       drawBeetle(context, radius, now, flash, animation.activity);
       return;
-    case 14:
+    case SpeciesId.Hornet:
       drawHornet(context, flash);
       return;
-    case 15:
-    case 16:
-    case 17:
-    case 18:
+    case SpeciesId.CentipedeHead:
+    case SpeciesId.CentipedeSegment:
+    case SpeciesId.EvilCentipedeHead:
+    case SpeciesId.EvilCentipedeSegment:
       drawCentipede(context, species, flash);
       return;
-    case 19:
+    case SpeciesId.Square:
       drawSquare(context, flash);
       return;
-    case 22:
+    case SpeciesId.Spider:
       drawSpider(context, animation.legPhase, flash);
       return;
     default:

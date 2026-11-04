@@ -155,7 +155,7 @@ int main() {
     for (std::uint8_t band = 0; band < 8; ++band) {
       for (unsigned i = 0; i < counts[band]; ++i) {
         const auto query = engine::SpatialQuery::from_world(reference);
-        const auto h = engine::spawn_from_band_with_component_draws(
+        const auto h = engine::spawn_from_band_with_drop_draws(
             reference, table, band, [&](const auto& p) { return query.occupied(p); });
         if (h.valid()) {
           reference.entities().get(h)->spawn_band = band;

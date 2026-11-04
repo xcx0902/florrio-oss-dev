@@ -1,30 +1,19 @@
 #pragma once
 #include "engine/core/byte_reader.hpp"
-#include <array>
+#include "engine/net/generated_protocol.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <string>
+#include <span>
 #include <vector>
 
 namespace engine {
 
-inline constexpr std::size_t kMaxInputPacketBytes = 65536;
-inline constexpr std::size_t kOutputQueueCapacity = 16;
-inline constexpr std::size_t kPacketHeaderBytes = 16;
-inline constexpr std::size_t kInlinePayloadBytes = 4096;
-inline constexpr std::size_t kPacketXorKeyBytes = 256;
-
-struct WorkerRequest {
-  std::string func_name;
-  std::int32_t callback_id = -1;
-  std::vector<std::uint8_t> data;
-};
-
-struct WorkerResponse {
-  std::int32_t callback_id = -1;
-  bool final_response = false;
-  std::vector<std::uint8_t> data;
-};
+inline constexpr std::size_t kMaxInputPacketBytes = protocol::kMaxInputPacketBytes;
+inline constexpr std::size_t kOutputQueueCapacity = protocol::kOutputQueueCapacity;
+inline constexpr std::size_t kPacketHeaderBytes = protocol::kPacketHeaderBytes;
+inline constexpr std::size_t kInlinePayloadBytes = protocol::kInlinePayloadBytes;
+inline constexpr std::size_t kPacketXorKeyBytes = protocol::kInputXorKeyBytes;
 
 struct OutputPacket {
   std::vector<std::uint8_t> payload;

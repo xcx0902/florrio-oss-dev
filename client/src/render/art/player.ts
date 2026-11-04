@@ -1,3 +1,4 @@
+import { PlayerExpressionFlag } from '../../schema/state-flags.js';
 import type { Canvas2DContext } from '../canvas2d/context.js';
 import { SpeciesContext, inLocal, inLocalTransform, localContext } from './geometry.js';
 import { PALETTES, Rgb, TAU, rgb, setFill, setStroke, shade } from './palette.js';
@@ -172,8 +173,9 @@ export function drawPlayerFace(context: Canvas2DContext, options: PlayerFaceOpti
   const angle = f(Number.isFinite(options.lookAngle) ? options.lookAngle! : 0);
   const targetX = f(Math.cos(angle)),
     targetY = f(Math.sin(angle));
-  const mouthTarget = busy || flags & 1 ? -5 : flags & 2 ? -3 : 5;
-  const eyeTarget = !busy && flags & 1 ? 1 : 0;
+  const mouthTarget =
+    busy || flags & PlayerExpressionFlag.Attack ? -5 : flags & PlayerExpressionFlag.Defend ? -3 : 5;
+  const eyeTarget = !busy && flags & PlayerExpressionFlag.Attack ? 1 : 0;
   const state = options.state ?? {
     gaze: [
       { x: targetX, y: targetY },
@@ -228,7 +230,7 @@ export function drawPlayerFace(context: Canvas2DContext, options: PlayerFaceOpti
   }
   context.fill();
   context.stroke();
-  if (flags & 4) {
+  if (flags & PlayerExpressionFlag.Antennae) {
     inLocal(
       context,
       (decoration) => {

@@ -5,6 +5,9 @@
     "schema/protocol.yaml",
     "schema/multiplayer.yaml",
     "schema/transport.json",
+    "schema/catalogs/rarities.json",
+    "schema/catalogs/state-flags.json",
+    "schema/catalogs/loadout.json",
     "schema/catalogs/petals.json",
     "schema/catalogs/entities.json",
     "schema/catalogs/spawn-rules.json",
@@ -17,14 +20,24 @@
   ],
   "outputs": [
     {
+      "path": "client/src/schema/catalog-ids.ts",
+      "bytes": 1808,
+      "sha256": "1166276362cc673ed8024e032e49fd8877ecdb5a4809d5c5f147c8878eda78f4"
+    },
+    {
+      "path": "client/src/schema/loadout.ts",
+      "bytes": 869,
+      "sha256": "1252313b2b4be4a5a8a578e53e3785fc0e5c6b764fcdaaae5cdb7ada6c4ee35b"
+    },
+    {
       "path": "client/src/schema/menu-content.ts",
       "bytes": 3938,
       "sha256": "a6ab0f09af8608a10a3d5e151ba16d42b69972360d55449dba3ddc2cc971e110"
     },
     {
       "path": "client/src/schema/mob-gallery.ts",
-      "bytes": 6943,
-      "sha256": "6ada1aaa43554731e52c002ef34107fa1ccdfc8671a13215c4f3859fff7443a1"
+      "bytes": 6992,
+      "sha256": "3bb52a22df832e08f63196f493effd436e99f1cf6aeed4175f5da35a41807982"
     },
     {
       "path": "client/src/schema/motion.ts",
@@ -33,8 +46,8 @@
     },
     {
       "path": "client/src/schema/multiplayer.ts",
-      "bytes": 24189,
-      "sha256": "9dd24b5fbd8c853b2f0771478b9ff82aeb69d64877fd5171a4b933c5bf42f7c4"
+      "bytes": 25345,
+      "sha256": "c16a1ca57bc248728a26e0d9383cca645eadc957fd4ac000dbce953dd4a7af4a"
     },
     {
       "path": "client/src/schema/packet-key.ts",
@@ -43,13 +56,18 @@
     },
     {
       "path": "client/src/schema/petals.ts",
-      "bytes": 9845,
-      "sha256": "57d007b5b260a1dcd2a7b8b03be2b1d52319f2caa89302fec502a3ffbb256de0"
+      "bytes": 9894,
+      "sha256": "144bd0c211440d3fc31210ebfabb684178b7af5fa5ed438fa521d04ce8c8d7f6"
     },
     {
       "path": "client/src/schema/protocol.ts",
-      "bytes": 15882,
-      "sha256": "5479cfa5f3fe7aecfe1815ddee2392656b0f84d1a17674fe9ef8ac87f7c27b3a"
+      "bytes": 16594,
+      "sha256": "e38080bee068314462a98ee108d1a1fe4e03c6a946572a384f4bbccff66448dc"
+    },
+    {
+      "path": "client/src/schema/state-flags.ts",
+      "bytes": 1096,
+      "sha256": "0b07d334c2bd23d129660aa2da8419087b96023515dfb891dfc4d897bd5e898d"
     },
     {
       "path": "docs/catalogs.md",
@@ -59,37 +77,52 @@
     {
       "path": "docs/multiplayer-protocol.md",
       "bytes": 14323,
-      "sha256": "d21c685fbd5015610a6f68e2057288355845e12304085c52d827639263c59fb3"
+      "sha256": "f26ad0af29c1bd1d142384754b826297a56eb5bd0119602877256875d8046b55"
     },
     {
       "path": "engine/include/engine/catalog/catalog_types.hpp",
-      "bytes": 1173,
-      "sha256": "7a36f7ef8c90a47148657426660e6a3b8505cc749fa964f905fd921d63d270a7"
+      "bytes": 1062,
+      "sha256": "936ef39564c906f1b3c040623180f02c62e691b9e28e8f485585772dffa47004"
     },
     {
       "path": "engine/include/engine/catalog/drop_chances.hpp",
-      "bytes": 5908,
-      "sha256": "c97100d3b9dab902fa981080242f88f79a3fa21d3ca9b2c1916a7038aeef927e"
+      "bytes": 5928,
+      "sha256": "905d92c78095d53bd8d22732a9e180a04f6c69d24b9f13bee60c0e5c47d657b8"
     },
     {
       "path": "engine/include/engine/catalog/entity_spawn_defaults.hpp",
-      "bytes": 2372,
-      "sha256": "e49f732475626694e5b6a959b64c2f5ad1903eb84863a9b61975831b41e64614"
+      "bytes": 1941,
+      "sha256": "c7b3a5436a34767c2e6150043f7cea42eedb2fe968899653c332bba030ef1ef6"
     },
     {
       "path": "engine/include/engine/catalog/generated_catalog_data.hpp",
-      "bytes": 25443,
-      "sha256": "3301e5923eb1dbc5d60fe8ff691a50bf83f3061b1cacf71ce813829a82ae15ef"
+      "bytes": 25123,
+      "sha256": "bd0f258fd54c5170fb691015d93e900a3db4f37c29e99fc69fcfdcf85566c264"
+    },
+    {
+      "path": "engine/include/engine/catalog/ids.hpp",
+      "bytes": 2369,
+      "sha256": "3b7d7cd97b77f2f35e41470a79e1adbbcd08f88385634975642800871dcdc7b2"
+    },
+    {
+      "path": "engine/include/engine/catalog/loadout_rules.hpp",
+      "bytes": 1401,
+      "sha256": "0bafcf1f4afab76c45a8385b6a5684122d849e0a8f086a6a1757e680062017cd"
     },
     {
       "path": "engine/include/engine/catalog/petal_combat.hpp",
-      "bytes": 3148,
-      "sha256": "69f0f66a0fa07bf5ec125574d409d8ac5877920bfd19033611eda461a3efd322"
+      "bytes": 4161,
+      "sha256": "019e0457c1881899ebce0a91f93516bd54518b8ae4620cef0f6b818b3a992110"
+    },
+    {
+      "path": "engine/include/engine/catalog/state_flag_bits.hpp",
+      "bytes": 767,
+      "sha256": "f31670e272dd9afadc6892cffbe314deeeab0d4c4e5390007a4447ebf52de392"
     },
     {
       "path": "engine/include/engine/net/generated_multiplayer.hpp",
-      "bytes": 28058,
-      "sha256": "faa4cd241ec4b168d26b2c1fdda5795eaa4dd3a955f9579144cf6ade3340d43e"
+      "bytes": 29363,
+      "sha256": "7485d44bd1f36ac01167af1044e3f7627a722ca9938730a4dbe9a7d0d6ad7565"
     },
     {
       "path": "engine/include/engine/net/generated_protocol.hpp",

@@ -8,7 +8,6 @@ namespace engine {
 
 namespace species_debug {
 std::uint32_t stinger_spawns = 0;
-std::uint32_t unknown_callbacks = 0;
 }  // namespace species_debug
 
 namespace {
@@ -76,23 +75,20 @@ EntityHandle spawn_hornet_stinger(World& world, EntityHandle hornet_handle,
   return stinger;
 }
 
-bool dispatch_attack_callback(World& world, EntityHandle attacker_handle) {
+bool dispatch_attack(World& world, EntityHandle attacker_handle) {
   Entity* attacker = world.entities().get(attacker_handle);
   if (attacker == nullptr || !attacker->active) {
     return false;
   }
-  const std::uint32_t callback = attacker->ai.attack_callback;
-  switch (static_cast<AttackCallback>(callback)) {
-    case AttackCallback::kNone:
+  switch (attacker->ai.attack) {
+    case AttackBehavior::kNone:
       return false;
-    case AttackCallback::kHornetStinger: {
+    case AttackBehavior::kHornetStinger:
       if (!attacker->ai.target.valid()) {
         return false;
       }
       return spawn_hornet_stinger(world, attacker_handle, attacker->ai.target).valid();
-    }
   }
-  ++species_debug::unknown_callbacks;
   return false;
 }
 

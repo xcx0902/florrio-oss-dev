@@ -1,9 +1,12 @@
 #include "engine/model/world_config.hpp"
 #include "engine/core/fixed_step.hpp"
+#include "engine/net/generated_multiplayer.hpp"
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/tick.hpp"
 
 namespace engine {
+static_assert(kTickMilliseconds == net::kTickMs,
+              "simulation tick and multiplayer contract must agree");
 void initialize_world(World& world, const WorldConfig& config) {
   world.initialize(config.handle_seed);
   world.random().seed(config.game_seed);

@@ -21,7 +21,7 @@ void test_ai_recovered_species_profiles() {
   CHECK(hornet_entity->ai.aggressive);
   CHECK(hornet_entity->ai.attack_range.value == 500.0F);
   CHECK(std::fabs(hornet_entity->ai.attack_speed.value) == 0.4F);
-  CHECK(hornet_entity->ai.attack_callback == 74U);
+  CHECK(hornet_entity->ai.attack == engine::AttackBehavior::kHornetStinger);
   CHECK(hornet_entity->ai.attack_cooldown_gain.value == 2000.0F);
   CHECK(hornet_entity->ai.territory.value == 0.6F);
   CHECK(hornet_entity->ai.radius.value == 600.0F);
@@ -77,7 +77,7 @@ void test_ai_behavior_modifiers() {
   engine::Entity* hornet_entity = hornet_world.entities().get(hornet);
   CHECK(hornet_entity != nullptr);
   hornet_entity->ai.target = hornet_player;
-  hornet_entity->ai.attack_callback = 74U;
+  hornet_entity->ai.attack = engine::AttackBehavior::kHornetStinger;
   hornet_entity->ai.attack_cooldown_ms = engine::f32(0.0F);
   hornet_entity->ai.attack_cooldown_gain = engine::f32(2000.0F);
   hornet_entity->ai.modifiers.attack = engine::f32(2.0F);
@@ -155,13 +155,11 @@ void test_hornet_stinger_callback() {
   engine::update_ai(far, 50.0);
   CHECK(far.entities().active_count() == far_before + 1U);
 
-  // An unknown callback id inside range is counted, not guessed into an attack.
-  const std::uint32_t unknown_before = engine::species_debug::unknown_callbacks;
+  // A mob with no attack behavior in range never spawns a projectile.
   const std::size_t world_before = world.entities().active_count();
-  hornet_entity->ai.attack_callback = 999U;
+  hornet_entity->ai.attack = engine::AttackBehavior::kNone;
   hornet_entity->ai.attack_cooldown_ms = engine::f32(0.0F);
   engine::update_ai(world, 50.0);
-  CHECK(engine::species_debug::unknown_callbacks == unknown_before + 1U);
   CHECK(world.entities().active_count() == world_before);
 }
 
@@ -685,7 +683,7 @@ void test_web_tag_domain_side_effects() {
   CHECK(tag_entity->lifetime_remaining_ms == 12000.0);
   CHECK(tag_entity->health.value == 5.0F);
   CHECK(tag_entity->max_health.value == 5.0F);
-  CHECK(tag_entity->physics_flag50);
+  CHECK(tag_entity->skips_contact_response);
   CHECK(tag_entity->has_score_component);
   CHECK(tag_entity->has_tag_component);
   CHECK(tag_entity->has_effect_area);

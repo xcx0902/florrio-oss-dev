@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/catalog/loadout_rules.hpp"
 #include "engine/core/f32.hpp"
 #include <array>
 #include <cstdint>
@@ -9,17 +10,17 @@ namespace engine {
  * Inventory slots hold petal type ids; zero means empty. */
 class PlayerProfile {
  public:
-  static constexpr std::size_t kMaxInventory = 16;
+  static constexpr std::size_t kMaxInventory = catalog::kInventorySlots;
   static constexpr std::size_t kMaxLost = 10;
-  static constexpr std::size_t kMaxBackpack = 16;
+  static constexpr std::size_t kMaxBackpack = catalog::kInventorySlots;
 
   [[nodiscard]] std::uint8_t level() const { return level_; }
   [[nodiscard]] f32 experience() const { return experience_; }
   [[nodiscard]] std::uint8_t inventory_size() const {
-    return level_ < 15 ? 13 : level_ < 30 ? 14 : level_ < 45 ? 15 : 16;
+    return catalog::inventory_size_for_level(level_);
   }
   [[nodiscard]] std::uint8_t active_slots() const {
-    return level_ < 15 ? 5 : level_ < 30 ? 6 : level_ < 45 ? 7 : 8;
+    return catalog::active_slots_for_level(level_);
   }
   [[nodiscard]] const std::array<std::uint16_t, kMaxInventory>& inventory() const {
     return inventory_;

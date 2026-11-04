@@ -1,5 +1,5 @@
 #include "engine/sim/progression.hpp"
-#include <array>
+#include "engine/catalog/loadout_rules.hpp"
 #include <cmath>
 
 namespace engine {
@@ -36,8 +36,7 @@ f32 experience_threshold(std::uint8_t level) {
 }
 
 f32 rarity_experience(std::uint32_t rarity_index) {
-  static constexpr std::array<float, 6> kExperience{{2.0F, 10.0F, 50.0F, 200.0F, 1000.0F, 2500.0F}};
-  return rarity_index < kExperience.size() ? f32(kExperience[rarity_index]) : f32(0.0F);
+  return f32(catalog::rarity_experience(rarity_index));
 }
 
 }  // namespace engine

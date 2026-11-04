@@ -1,6 +1,7 @@
 #include "engine/net/replication_session.hpp"
 #include "engine/sim/effects.hpp"
 #include "engine/net/snapshot_publisher.hpp"
+#include "engine/model/catalog.hpp"
 #include "engine/model/entity_relations.hpp"
 
 namespace engine::net {
@@ -42,11 +43,10 @@ std::optional<EntityUpdate> project(const World& world, const Entity& entity, bo
   if (entity.kind == EntityKind::kPetal) {
     codec.write_mask_byte_field(entity.handle, publicMask, 11, entity.loadout_slot);
     codec.write_mask_byte_field(entity.handle, publicMask, 12, entity.loadout_instance);
-    const bool peas = (entity.type_id == 11 || entity.type_id == 12 || entity.type_id == 34) &&
-                      entity.petal_launched;
+    const bool peas = catalog::is_peas_petal(entity.type_id) && entity.petal_launched;
     const auto mask = publicMask | (1U << 6) | (peas ? 1U << 4 : 0);
     if (peas) {
-      codec.write_mask_byte_field(entity.handle, mask, 9, entity.petal_render_flags);
+      codec.write_mask_byte_field(entity.handle, mask, 9, entity.petal_variant_flags);
     }
     codec.write_mask_byte_field(entity.handle, mask, 50, static_cast<std::uint8_t>(entity.type_id));
   } else if (entity.kind == EntityKind::kDrop) {
@@ -55,7 +55,7 @@ std::optional<EntityUpdate> project(const World& world, const Entity& entity, bo
     codec.write_mask_byte_field(entity.handle, publicMask, 54, entity.pickup_collected ? 1 : 0);
   } else if (entity.kind == EntityKind::kProjectile) {
     const auto ordinal =
-        entity.has_tag_component && (entity.type_id == 29 || entity.type_id == 30) ? 12U : 18U;
+        entity.has_tag_component && catalog::is_web_petal(entity.type_id) ? 12U : 18U;
     codec.write_mask_entity(entity.handle, publicMask | (1U << (ordinal - 1)));
   }
   update.fields = codec.finish();
@@ -110,7 +110,8 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
     next.viewerPosition = body->position;
     bool wide = false;
     for (std::size_t i = 0; i < player->profile().active_slots(); ++i) {
-      wide |= player->loadout().slots()[i].type_id == 25;
+      wide |= catalog::petal_id(player->loadout().slots()[i].type_id) ==
+              catalog::PetalId::kAntennaeLegendary;
     }
     next.viewerScale = f32(wide ? 0.63F : 0.9F);
   }
@@ -138,7 +139,7 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
       // Reuse the original creation marker: an old pickup entering the AOI
       // starts settled, while a just-created pickup grows and spins in.
       const bool groundWeb = entity.kind == EntityKind::kProjectile && entity.has_tag_component &&
-                             (entity.type_id == 29U || entity.type_id == 30U);
+                             catalog::is_web_petal(entity.type_id);
       const bool arriving = (entity.kind == EntityKind::kDrop || groundWeb) &&
                             !next.published.contains(entity.handle.to_wire()) &&
                             world.tick() <= entity.spawn_tick + 1U;

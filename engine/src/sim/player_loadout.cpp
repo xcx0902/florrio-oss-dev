@@ -31,11 +31,12 @@ void PlayerLoadout::reset_slot_state(std::uint8_t slot) {
 void PlayerLoadout::refresh_pending_cache() {
   pending_cache_count_ = 0;
   std::uint8_t order = 0;
-  for (std::uint8_t slot = 0; slot < 8U; ++slot) {
+  for (std::uint8_t slot = 0; slot < kActiveSlots; ++slot) {
     pending_cache_[slot].fill(0U);
     const std::uint16_t type = slots_[slot].type_id;
     const auto* petal = Catalog::instance().petal(type);
-    if (type == 0U || petal == nullptr || petal->orbitHidden) {
+    if (catalog::petal_id(type) == catalog::PetalId::kNone || petal == nullptr ||
+        petal->orbitHidden) {
       if (slot + 1U == active_slots_) {
         pending_cache_count_ = order;
       }
@@ -78,7 +79,7 @@ void PlayerLoadout::refresh_pending_cache() {
       pending_cache_count_ = order;
     }
   }
-  if (active_slots_ > 8U) {
+  if (active_slots_ > kActiveSlots) {
     pending_cache_count_ = order;
   }
 }
@@ -149,7 +150,7 @@ bool PlayerLoadout::discard(PlayerProfile& profile, std::uint8_t slot,
   if (petal == nullptr) {
     return false;
   }
-  if (value.type_id != 1U) {
+  if (catalog::petal_id(value.type_id) != catalog::PetalId::kBasicCommon) {
     profile.add_experience(rarity_experience(petal->rarityIndex));
   }
   profile.push_backpack(value.type_id);
@@ -247,7 +248,7 @@ void PlayerLoadout::restore_from_profile(const PlayerProfile& profile) {
   const std::uint8_t limit = std::min<std::size_t>(capacity, kSlots);
   for (std::uint8_t slot = 0; slot < limit; ++slot) {
     const std::uint16_t type = profile.inventory(slot);
-    if (type != 0U) {
+    if (catalog::petal_id(type) != catalog::PetalId::kNone) {
       (void)equip(slot, type);
     }
   }
@@ -261,14 +262,14 @@ bool PlayerLoadout::change_slot_type(World& world, PlayerState& state, PlayerPro
   if (slots_[slot].type_id == type_id && slots_[slot].count != 0) {
     return false;
   }
-  if (slot <= 7U) {
+  if (slot < kActiveSlots) {
     clear_handles(&world, slot);
     for (std::uint8_t instance = 0; instance < kInstances; ++instance) {
       pending_[slot][instance] = 1U;
       timers_[slot][instance] = 0U;
     }
   }
-  if (type_id == 0U) {
+  if (catalog::petal_id(type_id) == catalog::PetalId::kNone) {
     reset_slot_state(slot);
     profile.set_inventory(slot, 0);
   } else {
@@ -283,7 +284,7 @@ bool PlayerLoadout::change_slot_type(World& world, PlayerState& state, PlayerPro
     // 2.5 s for short-recharge petals). The next spawn pass skips pending
     // slots, so a swapped-in petal cannot appear immediately and a swapped
     // petal cannot keep its old orbit/handle.
-    if (slot <= 7U) {
+    if (slot < kActiveSlots) {
       const auto* combat = Catalog::instance().petal_combat(type_id);
       const std::uint32_t duration = static_cast<std::uint32_t>(
           std::max(2500.0F, combat == nullptr ? 0.0F : combat->rechargeMilliseconds));
@@ -313,10 +314,14 @@ bool PlayerLoadout::cycle_reserve_slots(World& world, PlayerState& state, Player
       break;
     }
     const std::uint16_t existing = previous <= 14U ? slots_[slot].type_id : 0U;
-    const std::uint32_t petal =
-        existing != 0U ? static_cast<std::uint32_t>(total - level_active - 1 + existing)
-                       : static_cast<std::uint32_t>(slot - level_active);
-    (void)change_slot_type(world, state, profile, slot, static_cast<std::uint16_t>(petal % 39U));
+    const auto petals = Catalog::instance().petals();
+    const std::size_t existing_ordinal =
+        existing != 0U ? Catalog::instance().petal_ordinal(existing) : petals.size();
+    const std::size_t index =
+        existing_ordinal < petals.size()
+            ? static_cast<std::size_t>(total - level_active - 1) + existing_ordinal
+            : static_cast<std::size_t>(slot - level_active);
+    (void)change_slot_type(world, state, profile, slot, petals[index % petals.size()].typeId);
     previous = slot;
   }
   return true;
@@ -348,7 +353,7 @@ bool PlayerLoadout::set_slot_type(PlayerProfile& profile, std::uint8_t slot,
   if (slots_[slot].type_id == type_id && slots_[slot].count != 0) {
     return false;
   }
-  if (type_id == 0U) {
+  if (catalog::petal_id(type_id) == catalog::PetalId::kNone) {
     reset_slot_state(slot);
     profile.set_inventory(slot, 0);
     return true;
@@ -365,14 +370,14 @@ bool PlayerLoadout::set_slot_type(PlayerProfile& profile, std::uint8_t slot,
 
 bool PlayerLoadout::create_equipped_petal(World& world, PlayerState& state, std::uint8_t slot,
                                           std::uint8_t instance) {
-  if (slot > 7U || instance >= kInstances) {
+  if (slot >= kActiveSlots || instance >= kInstances) {
     return false;
   }
   if (handles_[slot][instance].valid()) {
     return false;
   }
   const std::uint16_t type = slots_[slot].type_id;
-  if (type == 0U) {
+  if (catalog::petal_id(type) == catalog::PetalId::kNone) {
     return false;
   }
   const std::uint8_t active = active_slot_count(state.profile());
@@ -439,11 +444,12 @@ void PlayerLoadout::refresh_recharge_progress(const World& world, const PlayerSt
     return;
   }
   recharge_progress_.fill(65535U);
-  for (std::uint8_t slot = 0; slot < std::min<std::uint8_t>(state.profile().active_slots(), 8U);
-       ++slot) {
+  for (std::uint8_t slot = 0;
+       slot < std::min<std::uint8_t>(state.profile().active_slots(), kActiveSlots); ++slot) {
     const auto* combat = Catalog::instance().petal_combat(slots_[slot].type_id);
     const auto* definition = Catalog::instance().petal(slots_[slot].type_id);
-    if (slots_[slot].type_id == 0U || combat == nullptr || definition == nullptr) {
+    if (catalog::petal_id(slots_[slot].type_id) == catalog::PetalId::kNone || combat == nullptr ||
+        definition == nullptr) {
       continue;
     }
     for (std::uint8_t instance = 0;

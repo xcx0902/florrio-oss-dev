@@ -112,7 +112,7 @@ bool World::destroy(EntityHandle handle) {
   detach_linked_entities(handle);
   // Original404 reparents ordinary ownership only. It must not reconnect
   // constraint links that original43/424 already detached at health death.
-  const bool owned = (entity->entity_flags & 64U) != 0U;
+  const bool owned = has_flag(entity->entity_flags, EntityFlag::kOwned);
   const std::uint32_t inherited_owner = owned ? entity->owner : kInvalidEntity;
   const EntityHandle inherited_owner_handle{inherited_owner == kInvalidEntity ? 0U
                                                                               : inherited_owner};
@@ -198,7 +198,6 @@ void World::record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f
         event.source = source == nullptr ? damage_source(*this, attacker) : *source;
       }
       ++event.count;
-      ++event.refcount;
       return true;
     }
     return false;
@@ -207,9 +206,8 @@ void World::record_hit(EntityHandle target, EntityHandle attacker, f32 amount, f
     return;
   }
   HitEvent event{
-      target,       attacker, amount,
-      health_after, tick_,    1U,
-      epoch,        1U,       source == nullptr ? damage_source(*this, attacker) : *source};
+      target, attacker, amount, health_after,
+      tick_,  1U,       epoch,  source == nullptr ? damage_source(*this, attacker) : *source};
   hit_events_.push_back(event);
 }
 

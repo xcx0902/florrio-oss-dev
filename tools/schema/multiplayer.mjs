@@ -251,21 +251,29 @@ export function multiplayerOutputs(source, catalogInputs, protocol) {
         '\n',
       )}\n${name === 'EntityUpdate' ? '  validatePublicEntity(v.fields,v.handle);' : ''}\n  return v;\n}\n`;
   }
+  cpp += `enum class MessageType : std::uint16_t { ${Object.entries(s.messages)
+    .map(([name, message]) => `k${name} = ${message.id}`)
+    .join(', ')} };\n`;
   cpp += `using MessageValue = std::variant<${Object.keys(s.messages).join(', ')}>;\nstruct Message { std::uint32_t sessionEpoch; MessageValue value; };\n`;
+  ts += `export const MessageType = { ${Object.entries(s.messages)
+    .map(([name, message]) => `${name}: ${message.id}`)
+    .join(
+      ', ',
+    )} } as const;\nexport type MessageType = (typeof MessageType)[keyof typeof MessageType];\n`;
   ts += `export type Message = ${Object.entries(s.messages)
     .map(([n, m]) => `{ type: ${m.id}; sessionEpoch: number; value: ${n} }`)
     .join(' | ')};\n`;
   const epochCheck = (m, v) =>
     m.epoch === 'zero' ? `${v} == 0` : m.epoch === 'nonzero' ? `${v} != 0` : 'true';
   for (const [n, m] of Object.entries(s.messages)) {
-    cpp += `inline std::optional<std::vector<std::uint8_t>> encode_message(const ${n}& value, std::uint32_t sessionEpoch) {\n  if (!(${epochCheck(m, 'sessionEpoch')})${m.matchesField ? ` || value.${m.matchesField} != sessionEpoch` : ''}) return {};\n  WireWriter w; write${n}(w, value);\n  return w.frame(${m.id}, sessionEpoch, ${m.direction === 'client' ? 'kMaxClientFrameBytes' : 'kMaxServerFrameBytes'});\n}\n`;
+    cpp += `inline std::optional<std::vector<std::uint8_t>> encode_message(const ${n}& value, std::uint32_t sessionEpoch) {\n  if (!(${epochCheck(m, 'sessionEpoch')})${m.matchesField ? ` || value.${m.matchesField} != sessionEpoch` : ''}) return {};\n  WireWriter w; write${n}(w, value);\n  return w.frame(static_cast<std::uint16_t>(MessageType::k${n}), sessionEpoch, ${m.direction === 'client' ? 'kMaxClientFrameBytes' : 'kMaxServerFrameBytes'});\n}\n`;
   }
-  cpp += `inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes, bool fromClient) {\n  auto h = unframe(bytes, fromClient ? kMaxClientFrameBytes : kMaxServerFrameBytes); if (!h) return {};\n  WireReader r(bytes.subspan(16));\n  switch(h->type) {\n${Object.entries(
+  cpp += `inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes, bool fromClient) {\n  auto h = unframe(bytes, fromClient ? kMaxClientFrameBytes : kMaxServerFrameBytes); if (!h) return {};\n  WireReader r(bytes.subspan(16));\n  switch(static_cast<MessageType>(h->type)) {\n${Object.entries(
     s.messages,
   )
     .map(
       ([n, m]) =>
-        `    case ${m.id}: { if (!(${epochCheck(m, 'h->sessionEpoch')})${m.direction === 'both' ? '' : ` || ${m.direction === 'client' ? '!fromClient' : 'fromClient'}`}) return {}; auto v = read${n}(r); if (!r.done()${m.matchesField ? ` || v.${m.matchesField} != h->sessionEpoch` : ''}) return {}; return Message{h->sessionEpoch, std::move(v)}; }`,
+        `    case MessageType::k${n}: { if (!(${epochCheck(m, 'h->sessionEpoch')})${m.direction === 'both' ? '' : ` || ${m.direction === 'client' ? '!fromClient' : 'fromClient'}`}) return {}; auto v = read${n}(r); if (!r.done()${m.matchesField ? ` || v.${m.matchesField} != h->sessionEpoch` : ''}) return {}; return Message{h->sessionEpoch, std::move(v)}; }`,
     )
     .join('\n')}\n    default: return {};\n  }\n}\n} // namespace engine::net\n`;
   ts += `export function encodeMessage(m: Message): Uint8Array {\n  const w = new WireWriter();\n  switch (m.type) {\n${Object.entries(
@@ -273,7 +281,7 @@ export function multiplayerOutputs(source, catalogInputs, protocol) {
   )
     .map(
       ([n, m]) =>
-        `    case ${m.id}: if (!(${epochCheck(m, 'm.sessionEpoch')})${m.matchesField ? ` || m.value.${m.matchesField} !== m.sessionEpoch` : ''}) throw new Error('epoch'); write${n}(w, m.value); return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.${m.direction === 'client' ? 'maxClientFrameBytes' : 'maxServerFrameBytes'});`,
+        `    case MessageType.${n}: if (!(${epochCheck(m, 'm.sessionEpoch')})${m.matchesField ? ` || m.value.${m.matchesField} !== m.sessionEpoch` : ''}) throw new Error('epoch'); write${n}(w, m.value); return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.${m.direction === 'client' ? 'maxClientFrameBytes' : 'maxServerFrameBytes'});`,
     )
     .join('\n')}\n  }\n}\n`;
   ts += `export function decodeMessage(bytes: Uint8Array, fromClient = false): Message | null {\n  try {\n    const h = unframe(bytes, fromClient ? LIMITS.maxClientFrameBytes : LIMITS.maxServerFrameBytes);\n    const r = new WireReader(bytes.subarray(16));\n    let result: Message;\n    switch (h.type) {\n${Object.entries(
@@ -281,7 +289,7 @@ export function multiplayerOutputs(source, catalogInputs, protocol) {
   )
     .map(
       ([n, m]) =>
-        `      case ${m.id}: if (!(${epochCheck(m, 'h.sessionEpoch')})${m.direction === 'both' ? '' : ` || ${m.direction === 'client' ? '!fromClient' : 'fromClient'}`}) return null; result = { type: ${m.id}, sessionEpoch: h.sessionEpoch, value: read${n}(r) }; break;`,
+        `      case MessageType.${n}: if (!(${epochCheck(m, 'h.sessionEpoch')})${m.direction === 'both' ? '' : ` || ${m.direction === 'client' ? '!fromClient' : 'fromClient'}`}) return null; result = { type: MessageType.${n}, sessionEpoch: h.sessionEpoch, value: read${n}(r) }; break;`,
     )
     .join('\n')}\n      default: return null;\n    }\n    r.done(); ${Object.entries(s.messages)
     .filter(([, m]) => m.matchesField)

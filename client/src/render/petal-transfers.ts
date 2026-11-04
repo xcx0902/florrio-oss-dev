@@ -1,4 +1,6 @@
 import { PETAL_INFO } from '../schema/petals.js';
+import { SNAPSHOT_EVENT } from '../schema/protocol.js';
+import { INVENTORY_SLOTS } from '../state/loadout-limits.js';
 import type { CameraState } from '../state/camera.js';
 import { interpolateEntity } from '../state/interpolation.js';
 import type { SnapshotEvent } from '../state/snapshot.js';
@@ -49,7 +51,7 @@ export class PetalTransfers {
     );
     const f = Math.fround;
     for (const event of events) {
-      if (event.opcode !== 14 || this.slots.has(event.index)) {
+      if (event.opcode !== SNAPSHOT_EVENT.Visual || this.slots.has(event.index)) {
         continue;
       }
       const target = world.get(event.handle);
@@ -59,7 +61,7 @@ export class PetalTransfers {
       // Native pickup component670 +8 is field22; domain snapshots also expose
       // the same petal identifier as speciesId for their drop record.
       const type = target.byteFields?.[22] ?? target.denseByteFields?.[22] ?? target.speciesId ?? 0;
-      if (!PETAL_INFO[type] || event.index < 0 || event.index >= 16) {
+      if (!PETAL_INFO[type] || event.index < 0 || event.index >= INVENTORY_SLOTS) {
         continue;
       }
       const position = interpolateEntity(target, now);

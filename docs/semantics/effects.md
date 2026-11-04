@@ -37,16 +37,16 @@ amount)` refuses to heal while a heal-block effect is active.
 
 ## Petal callbacks
 
-|   Petal type | Callback          | Effect                                   |
-| -----------: | ----------------- | ---------------------------------------- |
-|       8 Iris | slot 4            | poison `20000/3` ms                      |
-|   12 Peas R3 | slot 4            | poison `8000/9` ms                       |
-| 20 Dandelion | slot 4            | heal block 10000 ms                      |
-| 21 Cactus R3 | slot 4            | poison `20000/3` ms                      |
-| 21 Cactus R3 | slot 5 (incoming) | poison `4444.444444444444` ms            |
-|    29/30 Web | slot 6            | slow 0.25 while the web area is attached |
-|     31 Honey | slot 4            | slow 0.5 for 4000 ms                     |
-|   34 Peas R4 | slot 4            | poison `16000/9` ms                      |
+|           Petal type | Callback          | Effect                                   |
+| -------------------: | ----------------- | ---------------------------------------- |
+|               8 Iris | slot 4            | poison `20000/3` ms                      |
+|           12 Peas R3 | slot 4            | poison `8000/9` ms                       |
+|         20 Dandelion | slot 4            | heal block 10000 ms                      |
+|         21 Cactus R3 | slot 4            | poison `20000/3` ms                      |
+|         21 Cactus R3 | slot 5 (incoming) | poison `4444.444444444444` ms            |
+| WebRare/WebLegendary | slot 6            | slow 0.25 while the web area is attached |
+|             31 Honey | slot 4            | slow 0.5 for 4000 ms                     |
+|           34 Peas R4 | slot 4            | poison `16000/9` ms                      |
 
 Poison intensity is the petal's contact damage, so the duration is the
 distinguishing parameter. The `500 ms` `behavior_cooldown_ms` gate prevents
@@ -54,19 +54,20 @@ multiple hits from the same behavior in one window.
 
 Special behaviors:
 
-- Peas 11/12/34: on the first eligible hit, spawn four temporary children at
+- PeasRare/PeasEpic/PeasLegendary: on the first eligible hit, spawn four temporary children at
   `sqrt(72)` units around the parent, consume the parent, give children a
   1000 ms lifetime, and queue a deferred radial launch one millisecond later.
   The launch advances the phase by `2π/count` per child and adds `1.4` to the
   child position plus `0.6` to its velocity along the current angle.
-- Egg 22/23: hatch after 1000 / 2500 ms into a Soldier Ant (9) / Beetle (12);
+- EggEpic/EggLegendary: hatch after 1000 / 2500 ms into a `SoldierAnt` /
+  `Beetle`;
   the petal is consumed.
-- Web 29/30: apply the slow payload, spawn the tag entity at the hit position,
+- WebRare/WebLegendary: apply the slow payload, spawn the tag entity at the hit position,
   and leave the parent on its cooldown. The tag is `kProjectile` with type
-  29/30, collision radius 50, health/max-health 5, `physics_flag50`, a score
+  their petal ids, collision radius 50, health/max-health 5, `skips_contact_response`, a score
   component (`has_score_component`, epoch = tick+1, value 0), the tag component
-  (`has_tag_component`, `entity_flags |= 8`), an effect area
-  (`has_effect_area`, `world_flags |= 128`), packet epochs `tick+1`, and a
+  (`has_tag_component`, `EntityFlag::kWebTag`), an effect area
+  (`has_effect_area`, `WorldFlag::kWebTag`), packet epochs `tick+1`, and a
   12000 ms lifetime. It owns a shared slow payload with radius 50, intensity
   0.25 and infinite duration, so contact with the tag applies the same slow as
   the Web area. The area link removes the effect when the target leaves; the

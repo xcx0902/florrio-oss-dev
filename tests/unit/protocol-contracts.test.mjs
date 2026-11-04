@@ -298,6 +298,8 @@ int main() {
       'state/field-types.ts',
       'schema/protocol.ts',
       'state/snapshot-projection.ts',
+      'state/loadout-limits.ts',
+      'schema/loadout.ts',
       'net/snapshot-decoder.ts',
       'net/binary-reader.ts',
     ]) {

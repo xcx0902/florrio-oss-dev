@@ -99,10 +99,14 @@ void peas_lifecycle() {
       require(entity->owner == owner.raw && entity->health.value == 5 &&
                   entity->max_health.value == 5,
               "split children keep owner and five health");
-      require(entity->petal_render_flags == (type == 34   ? 3
-                                             : type == 12 ? 1
-                                                          : 0),
-              "variant render flags");
+      const std::uint8_t expected_variant =
+          type == engine::catalog::petal_type_id(engine::catalog::PetalId::kPeasLegendary)
+              ? static_cast<std::uint8_t>(engine::PetalVariantFlag::kEpicColor) |
+                    static_cast<std::uint8_t>(engine::PetalVariantFlag::kLarge)
+          : type == engine::catalog::petal_type_id(engine::catalog::PetalId::kPeasEpic)
+              ? static_cast<std::uint8_t>(engine::PetalVariantFlag::kEpicColor)
+              : 0U;
+      require(entity->petal_variant_flags == expected_variant, "variant render flags");
       require(entity->lifetime_remaining_ms == 1000, "exact 1000ms child lifetime");
     }
     engine::update_petal_behaviors(world, 1000);
@@ -144,7 +148,7 @@ void web_death_and_area() {
             "ground area uses dying projectile position");
     require(ground->lifetime_remaining_ms == 12000 && ground->collision_radius.value == 50,
             "ground Web lifetime and area radius match original");
-    require(ground->physics_flag50 && ground->has_tag_component && ground->has_effect_area,
+    require(ground->skips_contact_response && ground->has_tag_component && ground->has_effect_area,
             "ground Web carries one-shot marker and area components");
     require(area.payload->intensity.value == 0.25F && std::isinf(area.payload->remaining_ms),
             "ground Web payload is permanent quarter-speed slow");
@@ -277,7 +281,7 @@ void split_trace() {
             "%s{\"type\":%u,\"seed\":%u,\"index\":%zu,\"x\":%.17g,\"y\":%.17g,"
             "\"flags\":%u,\"health\":%.17g,\"life\":%.17g,\"vx\":%.17g,\"vy\":%.17g,\"ax\":%.17g,\"ay\":%.17g}",
             first ? "" : ",", type, seed, index, static_cast<double>(child->position.x.value),
-            static_cast<double>(child->position.y.value), child->petal_render_flags,
+            static_cast<double>(child->position.y.value), child->petal_variant_flags,
             static_cast<double>(child->health.value), child->lifetime_remaining_ms,
             child->velocity.x, child->velocity.y, child->acceleration.x, child->acceleration.y);
         first = false;

@@ -360,6 +360,11 @@ export function compileProtocol(document) {
   };
 }
 
+function identityMap(rows, key) {
+  const entries = rows.map((row) => `${pascal(row.name)}: ${row[key]},`);
+  return `{\n  ${entries.join('\n  ')}\n} as const;`;
+}
+
 export function generateProtocolTs(contract) {
   const { constants, fields, denseGroups: groups } = contract;
   const lines = [
@@ -376,6 +381,13 @@ export function generateProtocolTs(contract) {
   );
   lines.push(
     `export const OUTPUT_PAYLOAD_TYPES = ${JSON.stringify(contract.output.payload.types)} as const;`,
+  );
+  lines.push(`export const InputOpcode = ${identityMap(contract.input.commands, 'opcode')}`);
+  lines.push(
+    `export const SNAPSHOT_EVENT = ${identityMap(contract.output.snapshot.events, 'opcode')}`,
+  );
+  lines.push(
+    `export const OUTPUT_PAYLOAD_TYPE = ${identityMap(contract.output.payload.types, 'type')}`,
   );
   lines.push(
     `export const FIELD_TYPES = ${JSON.stringify(contract.output.snapshot.fieldTypes)} as const;`,

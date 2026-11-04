@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/catalog/loadout_rules.hpp"
 #include "engine/model/entity.hpp"
 #include "engine/model/player_profile.hpp"
 #include "engine/sim/petal_slot.hpp"
@@ -28,8 +29,11 @@ class PlayerLoadout {
     EntityHandle drop{};
     std::uint8_t slot = 0U;
   };
-  static constexpr std::size_t kSlots = 16;
-  static constexpr std::size_t kInstances = 3;
+  static constexpr std::size_t kSlots = catalog::kInventorySlots;
+  /** Slots that can hold an active, orbit-spawning petal. */
+  static constexpr std::size_t kActiveSlots = catalog::kActiveSlots;
+  static constexpr std::size_t kInstances = catalog::kInstancesPerSlot;
+  static constexpr std::size_t kRechargeProgressSlots = kActiveSlots;
 
   bool equip(std::uint8_t slot, std::uint16_t type_id);
   bool discard(std::uint8_t slot, std::uint16_t expected_type);
@@ -163,7 +167,7 @@ class PlayerLoadout {
   void refresh_pending_cache();
 
   std::array<PetalSlot, kSlots> slots_{};
-  std::array<std::uint16_t, 8> recharge_progress_{};
+  std::array<std::uint16_t, kRechargeProgressSlots> recharge_progress_{};
   std::vector<PickupTransfer> pickup_transfers_;
   std::array<std::array<EntityHandle, kInstances>, kSlots> handles_{};
   std::array<std::array<std::uint8_t, kInstances>, kSlots> pending_{};
@@ -173,7 +177,7 @@ class PlayerLoadout {
   std::uint32_t packet_cache_epoch_ = 0;
   std::array<std::array<std::uint8_t, kInstances>, kSlots> pending_cache_{};
   std::uint8_t pending_cache_count_ = 0;
-  std::uint8_t active_slots_ = 8;
+  std::uint8_t active_slots_ = static_cast<std::uint8_t>(kActiveSlots);
   std::uint8_t orbit_positions_ = 0;
   f32 score_;
   /** Petal-ring phase (loadout +284): advances once per server tick. */

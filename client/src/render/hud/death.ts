@@ -1,3 +1,4 @@
+import { PetalId } from '../../schema/catalog-ids.js';
 import { PETAL_INFO } from '../../schema/petals.js';
 import { deathCardRects } from '../../ui/layout/death.js';
 import { drawLabelBox, measureLabel } from '../canvas2d/text-cache.js';
@@ -51,7 +52,7 @@ export function drawDeathOverlay(
   ] as const;
   for (const [slot, x, y] of behind) {
     const type = kept[slot] ?? 0;
-    if (!type || type === 25 || !PETAL_INFO[type]) {
+    if (!type || type === PetalId.AntennaeLegendary || !PETAL_INFO[type]) {
       continue;
     }
     context.save();
@@ -86,7 +87,7 @@ export function drawDeathOverlay(
   );
   for (const [slot, x, y] of front) {
     const type = kept[slot] ?? 0;
-    if (!type || type === 25 || !PETAL_INFO[type]) {
+    if (!type || type === PetalId.AntennaeLegendary || !PETAL_INFO[type]) {
       continue;
     }
     context.save();

@@ -140,9 +140,9 @@ void test_collision_bounds_cache_rebuild_counter() {
   CHECK(moved.min_x.value > first.min_x.value);
 }
 
-void test_loadout_flag41_pending_cache() {
+void test_loadout_shared_orbit_pending_cache() {
   engine::PlayerLoadout loadout;
-  // Rose (24) has flag41 and three instances: the special branch gives every
+  // Rose (24) has sharedOrbit and three instances: the special branch gives every
   // live instance the same cache index and advances once for the slot.
   CHECK(loadout.equip(0, 24));
   CHECK(loadout.pending_cache_count() == 1U);

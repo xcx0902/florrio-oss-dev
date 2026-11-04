@@ -1,4 +1,5 @@
 import { PACKET_XOR_KEY } from '../schema/packet-key.js';
+import { InputOpcode } from '../schema/protocol.js';
 
 /** Client-side input packet writer. The server applies the same repeating
  * 256-byte XOR key before reading the varint sequence and commands. */
@@ -41,7 +42,7 @@ export class InputPacketEncoder {
   restart(): Uint8Array {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);
-    InputPacketEncoder.varint(4, body);
+    InputPacketEncoder.varint(InputOpcode.Restart, body);
     return this.finish(body);
   }
 
@@ -50,7 +51,7 @@ export class InputPacketEncoder {
   suicide(argument = 0): Uint8Array {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);
-    InputPacketEncoder.varint(3, body);
+    InputPacketEncoder.varint(InputOpcode.Suicide, body);
     InputPacketEncoder.varint(argument >>> 0, body);
     return this.finish(body);
   }
@@ -59,7 +60,7 @@ export class InputPacketEncoder {
   benchCycle(): Uint8Array {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);
-    InputPacketEncoder.varint(13, body);
+    InputPacketEncoder.varint(InputOpcode.BenchCycle, body);
     return this.finish(body);
   }
 
@@ -67,7 +68,7 @@ export class InputPacketEncoder {
   discard(slot: number, petal: number): Uint8Array {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);
-    InputPacketEncoder.varint(8, body);
+    InputPacketEncoder.varint(InputOpcode.DiscardPetal, body);
     body.push(slot & 0xff, petal & 0xff);
     return this.finish(body);
   }
@@ -76,7 +77,7 @@ export class InputPacketEncoder {
   swap(first: number, firstValue: number, second: number, secondValue: number): Uint8Array {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);
-    InputPacketEncoder.varint(10, body);
+    InputPacketEncoder.varint(InputOpcode.SwapPetals, body);
     body.push(first & 0xff, firstValue & 0xff, second & 0xff, secondValue & 0xff);
     return this.finish(body);
   }
@@ -85,7 +86,7 @@ export class InputPacketEncoder {
   spawn(name: string): Uint8Array {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);
-    InputPacketEncoder.varint(6, body);
+    InputPacketEncoder.varint(InputOpcode.PlayerSpawnAndName, body);
     for (const byte of new TextEncoder().encode(name)) {
       body.push(byte);
     }
@@ -97,7 +98,7 @@ export class InputPacketEncoder {
   input(buttons: number, angle: number, strength: number): Uint8Array {
     const body: number[] = [];
     InputPacketEncoder.varint(this.nextSequence(), body);
-    InputPacketEncoder.varint(12, body);
+    InputPacketEncoder.varint(InputOpcode.InputButtonsAngleStrength, body);
     InputPacketEncoder.varint(buttons >>> 0, body);
     InputPacketEncoder.f32(angle, body);
     InputPacketEncoder.f32(strength, body);

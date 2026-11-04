@@ -1,5 +1,7 @@
 #pragma once
+#include "engine/catalog/ids.hpp"
 #include "engine/core/f32.hpp"
+#include "engine/model/state_flags.hpp"
 #include <cmath>
 #include <cstdint>
 #include <string_view>
@@ -47,22 +49,22 @@ struct OrbitRadii {
   return {f32(65.0F), f32(130.0F), f32(40.0F)};
 }
 
-/** Rose-family orbit functions keep their contracted 65u ring even while the
- * attack button is held; defending still pulls them in to 40u. */
-[[nodiscard]] constexpr bool is_rose_orbit_function(std::uint32_t function) {
-  return function == 665U || function == 682U || function == 723U;
+/** Rose-family behavior keeps its contracted 65u ring even while the attack
+ * button is held; defending still pulls it in to 40u. */
+[[nodiscard]] constexpr bool is_rose_behavior(catalog::PetalBehavior behavior) {
+  return behavior == catalog::PetalBehavior::kRoseHeal;
 }
 
-[[nodiscard]] constexpr f32 rose_orbit_radius(std::uint8_t inputs) {
-  return (inputs & 2U) != 0U ? f32(40.0F) : f32(65.0F);
+[[nodiscard]] constexpr f32 rose_orbit_radius(std::uint32_t inputs) {
+  return has_flag(inputs, InputButton::kDefend) ? f32(40.0F) : f32(65.0F);
 }
 
-[[nodiscard]] constexpr f32 orbit_radius(OrbitProfile profile, std::uint8_t inputs) {
+[[nodiscard]] constexpr f32 orbit_radius(OrbitProfile profile, std::uint32_t inputs) {
   const OrbitRadii radii = orbit_radii(profile);
-  if ((inputs & 1U) != 0U) {
+  if (has_flag(inputs, InputButton::kAttack)) {
     return radii.outward;
   }
-  if ((inputs & 2U) != 0U) {
+  if (has_flag(inputs, InputButton::kDefend)) {
     return radii.inward;
   }
   return radii.rest;
@@ -100,12 +102,12 @@ struct OrbitRadii {
   return OrbitProfile::kDefault;
 }
 
-[[nodiscard]] inline f32 wing_orbit_radius(std::uint8_t inputs, f32 phase) {
+[[nodiscard]] inline f32 wing_orbit_radius(std::uint32_t inputs, f32 phase) {
   const f32 wave = f32::from_double(std::sin(static_cast<double>(phase.value)));
-  if ((inputs & 1U) != 0U) {
+  if (has_flag(inputs, InputButton::kAttack)) {
     return f32::from_double(140.0 + 50.0 * static_cast<double>(wave.value));
   }
-  if ((inputs & 2U) != 0U) {
+  if (has_flag(inputs, InputButton::kDefend)) {
     return f32::from_double(40.0 + 5.0 * static_cast<double>(wave.value));
   }
   return f32::from_double(65.0 + 10.0 * static_cast<double>(wave.value));

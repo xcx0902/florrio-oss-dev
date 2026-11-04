@@ -1,5 +1,6 @@
 #include "engine/core/perf.hpp"
 #include "engine/net/snapshot_codec.hpp"
+#include "engine/catalog/loadout_rules.hpp"
 #include "engine/net/angle.hpp"
 #include <cmath>
 #include "engine/net/generated_protocol.hpp"
@@ -293,7 +294,7 @@ void SnapshotEncoder::write_mask_short_array_field(EntityHandle handle,
   if (!field_is(field, protocol::FieldType::kShortArray)) {
     return;
   }
-  if (index >= 8U) {
+  if (index >= catalog::kActiveSlots) {
     return;
   }
   updates_.write_u32_le(handle.to_wire());

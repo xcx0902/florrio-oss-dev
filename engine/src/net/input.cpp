@@ -73,34 +73,35 @@ Status decode_input_packet(std::span<const std::uint8_t> packet, std::span<const
     const std::uint32_t opcode = read_varint_or_zero(reader);
     InputCommand command;
     command.opcode = opcode;
-    switch (opcode) {
-      case 3:    // suicide
-      case 7: {  // disconnect
+    const auto input_opcode = static_cast<protocol::InputOpcode>(opcode);
+    switch (input_opcode) {
+      case protocol::InputOpcode::kSuicide:
+      case protocol::InputOpcode::kDisconnect: {
         command.argument = read_varint_or_zero(reader);
         break;
       }
-      case 8: {  // discard one inventory slot: u8 slot, u8 petal
+      case protocol::InputOpcode::kDiscardPetal: {
         command.slot_a = read_byte_or_zero(reader);
         command.value_a = read_byte_or_zero(reader);
         break;
       }
-      case 10: {  // swap: u8 slotA, u8 valueA, u8 slotB, u8 valueB
+      case protocol::InputOpcode::kSwapPetals: {
         command.slot_a = read_byte_or_zero(reader);
         command.value_a = read_byte_or_zero(reader);
         command.slot_b = read_byte_or_zero(reader);
         command.value_b = read_byte_or_zero(reader);
         break;
       }
-      case 12: {  // buttons + binary32 angle/strength
+      case protocol::InputOpcode::kInputButtonsAngleStrength: {
         command.buttons = read_varint_or_zero(reader);
         command.angle = sanitized_float(read_u32_or_zero(reader));
         command.strength = sanitized_float(read_u32_or_zero(reader));
         break;
       }
-      case 0:    // handshake: prefix byte + 3 strings
-      case 2: {  // handshake: prefix byte + 2 strings
+      case protocol::InputOpcode::kHandshakeString:
+      case protocol::InputOpcode::kHandshakeStringAlt: {
         command.value_a = read_byte_or_zero(reader);
-        const int count = opcode == 0U ? 3 : 2;
+        const int count = input_opcode == protocol::InputOpcode::kHandshakeString ? 3 : 2;
         for (int index = 0; index < count; ++index) {
           command.texts.push_back(read_lossy_cstring(reader));
         }
@@ -109,18 +110,18 @@ Status decode_input_packet(std::span<const std::uint8_t> packet, std::span<const
         }
         break;
       }
-      case 5: {  // single string
+      case protocol::InputOpcode::kString: {
         command.text = read_lossy_cstring(reader);
         command.texts.push_back(command.text);
         break;
       }
-      case 6: {  // player spawn/name: one string
+      case protocol::InputOpcode::kPlayerSpawnAndName: {
         command.text = read_lossy_cstring(reader);
         command.texts.push_back(command.text);
         break;
       }
-      case 4:   // restart
-      case 13:  // bench cycle
+      case protocol::InputOpcode::kRestart:
+      case protocol::InputOpcode::kBenchCycle:
         break;
       default: {
         // Reserved opcodes 1/9/11 and unknown commands keep the remaining bytes

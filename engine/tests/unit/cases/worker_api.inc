@@ -159,13 +159,13 @@ void test_rock_construction() {
   CHECK(entity->contact_damage.value == 10.0F);
   CHECK(entity->world_flags == 75);
   CHECK(entity->entity_flags == 96);
-  CHECK(entity->component_flags92 == 4);
+  CHECK(!entity->uses_mass_weighted_response);
 
   engine::World band_world;
   band_world.initialize();
   band_world.random().seed(787621659U);
   const engine::SpawnTable table = engine::SpawnTable::from_catalog();
-  const auto band_handle = engine::spawn_from_band_with_component_draws(
+  const auto band_handle = engine::spawn_from_band_with_drop_draws(
       band_world, table, 0, [](const engine::SpawnPosition&) { return false; });
   CHECK(band_handle.valid());
   const auto* band_entity = band_world.entities().get(band_handle);
@@ -180,8 +180,8 @@ void test_entity_spawn_defaults() {
   CHECK(cactus != nullptr);
   CHECK(cactus->radius == 49.99694061279297F);
   CHECK(cactus->contactDamage == 30.0F);
-  CHECK(cactus->flags95 == 75);
-  CHECK(cactus->flags93 == 96);
+  CHECK(cactus->worldFlags == 75);
+  CHECK(cactus->entityFlags == 96);
   CHECK(cactus->dynamicRadius);
 
   engine::World world;

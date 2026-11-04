@@ -1,7 +1,7 @@
 # Damage attribution, hit events and legendary drops
 
 Status: the domain path records attacker identity, killer name, per-epoch hit
-messages with reference counts, observer-independent tick events, death score/level,
+messages with a merged count, observer-independent tick events, death score/level,
 recursive child-handle damage and an intrusive pickup list.
 
 ## Hit events
@@ -10,9 +10,9 @@ recursive child-handle damage and an intrusive pickup list.
 damage to the same target within one tick:
 
 - the first hit appends `{target, attacker, amount, health_after, tick, epoch,
-count=1, refcount=1, known}`;
+count=1}`;
 - later hits to the same target/epoch in the same tick add `amount`, replace
-  `health_after`/attacker, and increment both `count` and `refcount`.
+  `health_after`/attacker, and increment `count` once per merged hit.
 
 `damage_entity` sets `Entity::hit_epoch = tick + 1`. M04 removed the global
 known/pending visibility gate: every domain hit is recorded before any viewer
@@ -66,8 +66,8 @@ list.
 
 ## Open
 
-- the exact message-object byte layout (the domain object carries the same
-  epoch/refcount/known semantics);
+- the exact message-object byte layout (the domain object carries epoch and
+  merged-count semantics);
 - killer-name short-string/heap growth beyond the domain `std::string`;
 - packet-cache invalidation epochs for every changed loadout slot;
 - the exact pickup free-list layout (the domain list preserves order and

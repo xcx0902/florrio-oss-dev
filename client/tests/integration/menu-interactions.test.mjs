@@ -314,7 +314,7 @@ async function expectSlots(page, expected, description) {
       if (!player) {
         return false;
       }
-      const sparse = player.byteArrayFields?.[60] ?? player.byteArrayField60;
+      const sparse = player.byteArrayFields?.[60] ?? player.inventory;
       const dense = player.denseFields?.[60];
       if (!sparse && !Array.isArray(dense)) {
         return false;

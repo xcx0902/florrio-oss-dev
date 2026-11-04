@@ -1,4 +1,5 @@
 /** Petal tooltip drawn on the main canvas in CSS-pixel coordinates. */
+import { PetalId } from '../schema/catalog-ids.js';
 import { PETAL_INFO, RARITY_NAMES } from '../schema/petals.js';
 import type { Canvas2DContext } from './canvas2d/context.js';
 import { drawLabelBox, measureLabel } from './canvas2d/text-cache.js';
@@ -46,7 +47,7 @@ export function drawPetalTooltipAt(
   opacity = 1,
 ): void {
   const info = PETAL_INFO[type];
-  if (!info || type === 0) {
+  if (!info || type === PetalId.None) {
     return;
   }
   const uiScale = Number.isFinite(scale) && scale > 0 ? scale : 1;

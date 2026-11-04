@@ -1,4 +1,5 @@
 import type { DenseFieldSpec } from '../state/field-types.js';
+import { OUTPUT_PAYLOAD_TYPE, SNAPSHOT_EVENT } from '../schema/protocol.js';
 import {
   BIT_FIELDS,
   BYTE_ARRAY_FIELDS,
@@ -24,12 +25,16 @@ export function decodeSnapshotEvents(reader: Reader, count: number): SnapshotEve
   const events: SnapshotEvent[] = [];
   for (let index = 0; index < count; ++index) {
     const opcode = reader.u8();
-    if (opcode === 9) {
-      events.push({ opcode: 9, text: reader.string() });
-    } else if (opcode === 11) {
-      events.push({ opcode: 11, handle: reader.u32() });
-    } else if (opcode === 14) {
-      events.push({ opcode: 14, handle: reader.u32(), index: reader.u8() });
+    if (opcode === SNAPSHOT_EVENT.ChatString) {
+      events.push({ opcode: SNAPSHOT_EVENT.ChatString, text: reader.string() });
+    } else if (opcode === SNAPSHOT_EVENT.EntityTime) {
+      events.push({ opcode: SNAPSHOT_EVENT.EntityTime, handle: reader.u32() });
+    } else if (opcode === SNAPSHOT_EVENT.Visual) {
+      events.push({
+        opcode: SNAPSHOT_EVENT.Visual,
+        handle: reader.u32(),
+        index: reader.u8(),
+      });
     } else {
       return null;
     }
@@ -46,7 +51,7 @@ export interface SnapshotHeader {
 export function decodeSnapshotHeader(bytes: Uint8Array): SnapshotHeader | null {
   try {
     const reader = new Reader(bytes);
-    if (reader.u8() !== 1) {
+    if (reader.u8() !== OUTPUT_PAYLOAD_TYPE.EntitySnapshot) {
       return null;
     }
     return { sequence: reader.varint(), reliableAck: reader.varint() };
@@ -67,7 +72,7 @@ export interface SnapshotBlockCounts {
 export function decodeSnapshotBlockCounts(bytes: Uint8Array): SnapshotBlockCounts | null {
   try {
     const reader = new Reader(bytes);
-    if (reader.u8() !== 1) {
+    if (reader.u8() !== OUTPUT_PAYLOAD_TYPE.EntitySnapshot) {
       return null;
     }
     return {
@@ -402,7 +407,7 @@ export class SnapshotDecoder {
       byteArrayFields,
       varintArrayFields,
       shortArrayFields,
-      byteArrayField60: byteArrayFields[60] ?? [],
+      inventory: byteArrayFields[60] ?? [],
       stringFields,
       stringArrayFields,
       varintFields,
@@ -443,7 +448,7 @@ export class SnapshotDecoder {
   private decodePacket(bytes: Uint8Array): Snapshot | null {
     try {
       const reader = new Reader(bytes);
-      if (reader.u8() !== 1) {
+      if (reader.u8() !== OUTPUT_PAYLOAD_TYPE.EntitySnapshot) {
         return null;
       }
       const sequence = reader.varint();

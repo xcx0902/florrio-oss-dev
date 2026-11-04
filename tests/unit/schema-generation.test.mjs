@@ -404,6 +404,7 @@ test('adding an existing-behavior petal needs schema owner inputs, not generator
   const document = JSON.parse(await readFile(petalsFile, 'utf8'));
   const added = structuredClone(document.petals[1]);
   added.typeId = 39;
+  added.symbol = 'BasicPlus';
   added.name = 'Basic Plus';
   added.descriptions = ['A new petal using the existing Basic behavior'];
   document.petals.push(added);
@@ -426,6 +427,142 @@ test('adding an existing-behavior petal needs schema owner inputs, not generator
   assert.match(cpp, /kPetalCount = 40/);
   assert.match(cpp, /\{39, "Basic Plus",/);
   assert.match(ts, /39: \{\s*name: 'Basic Plus',/);
+});
+
+test('catalog symbols are unique, keyword-safe and identical across generated languages', async () => {
+  const inputs = await loadSchemaInputs(root);
+  const mutate = (apply) => {
+    const copy = structuredClone(inputs);
+    apply(copy);
+    return copy;
+  };
+  assert.throws(
+    () =>
+      validateInputs(
+        mutate((copy) => {
+          copy.petals.petals[2].symbol = copy.petals.petals[1].symbol;
+        }),
+      ),
+    /duplicate symbol/,
+  );
+  assert.throws(
+    () =>
+      validateInputs(
+        mutate((copy) => {
+          copy.entities.entities[2].symbol = copy.entities.entities[1].symbol;
+        }),
+      ),
+    /duplicate symbol/,
+  );
+  assert.throws(
+    () =>
+      validateInputs(
+        mutate((copy) => {
+          copy.petals.petals[1].symbol = 'class';
+        }),
+      ),
+    /PascalCase/,
+  );
+  assert.throws(
+    () =>
+      validateInputs(
+        mutate((copy) => {
+          copy.rarities.rarities[1].symbol = copy.rarities.rarities[0].symbol;
+        }),
+      ),
+    /duplicate symbol/,
+  );
+  assert.throws(
+    () =>
+      validateInputs(
+        mutate((copy) => {
+          copy.loadout.inventorySizes[0] = 17;
+        }),
+      ),
+    /inventorySizes/,
+  );
+  assert.throws(
+    () =>
+      validateInputs(
+        mutate((copy) => {
+          const bee = copy.entities.entities.find((row) => row.symbol === 'Bee');
+          bee.dropDrawCount -= 1;
+        }),
+      ),
+    /dropDrawCount/,
+  );
+  assert.throws(
+    () =>
+      validateInputs(
+        mutate((copy) => {
+          copy.entities.entities.find((row) => row.symbol === 'CentipedeHead').dropAliasOf =
+            copy.entities.entities.find((row) => row.symbol === 'CentipedeSegment').typeId;
+        }),
+      ),
+    /alias cycle/,
+  );
+
+  const cpp = await readFile(path.join(root, 'engine/include/engine/catalog/ids.hpp'), 'utf8');
+  const ts = await readFile(path.join(root, 'client/src/schema/catalog-ids.ts'), 'utf8');
+  const cppBlock = (name) =>
+    cpp.match(new RegExp(`enum class ${name}[^{]*\\{([\\s\\S]*?)\\};`))?.[1] ?? '';
+  const tsBlock = (name) =>
+    ts.match(new RegExp(`export const ${name} = \\{([\\s\\S]*?)\\} as const;`))?.[1] ?? '';
+  const cppValues = (block) =>
+    new Map(
+      [...block.matchAll(/k([A-Za-z0-9_]+) = (\d+)/g)].map((match) => [match[1], Number(match[2])]),
+    );
+  const tsValues = (block) =>
+    new Map(
+      [...block.matchAll(/([A-Za-z0-9_]+): (\d+)/g)].map((match) => [match[1], Number(match[2])]),
+    );
+  for (const [name, owner, key] of [
+    ['PetalId', inputs.petals.petals, 'petals'],
+    ['SpeciesId', inputs.entities.entities, 'entities'],
+    ['Rarity', inputs.rarities.rarities, 'rarities'],
+  ]) {
+    const generatedCpp = cppValues(cppBlock(name));
+    const generatedTs = tsValues(tsBlock(name));
+    assert.deepEqual(generatedCpp, generatedTs, `${name} values must agree across languages`);
+    assert.equal(generatedCpp.size, owner.length, `${name} must contain every row`);
+    for (const row of owner) {
+      assert.equal(
+        generatedCpp.get(row.symbol),
+        row.typeId ?? row.index,
+        `${key}.${row.symbol} must keep the schema id`,
+      );
+    }
+  }
+
+  const flags = await readFile(
+    path.join(root, 'engine/include/engine/catalog/state_flag_bits.hpp'),
+    'utf8',
+  );
+  const flagsTs = await readFile(path.join(root, 'client/src/schema/state-flags.ts'), 'utf8');
+  for (const [name, bit] of [
+    ['kWebTag', 3],
+    ['kBlocksSpawn', 5],
+    ['kOwned', 6],
+  ]) {
+    assert.match(flags, new RegExp(`${name} = 1U << ${bit}`));
+  }
+  assert.match(flagsTs, /WebTag: 1 << 3/);
+  assert.match(flags, /kPlayerBody = 1U << 5/);
+  assert.match(flagsTs, /PlayerBody: 1 << 5/);
+
+  const loadoutCpp = await readFile(
+    path.join(root, 'engine/include/engine/catalog/loadout_rules.hpp'),
+    'utf8',
+  );
+  const loadoutTs = await readFile(path.join(root, 'client/src/schema/loadout.ts'), 'utf8');
+  assert.match(loadoutCpp, /kInventorySlots = 16U/);
+  assert.match(loadoutCpp, /kActiveSlots = 8U/);
+  assert.match(loadoutCpp, /kInstancesPerSlot = 3U/);
+  assert.match(loadoutCpp, /kSlotUnlockLevels\{\{15U, 30U, 45U\}\}/);
+  assert.match(loadoutTs, /INVENTORY_SLOTS = 16/);
+  assert.match(loadoutTs, /ACTIVE_SLOTS = 8/);
+  assert.match(loadoutTs, /INSTANCES_PER_SLOT = 3/);
+  assert.match(loadoutTs, /SLOT_UNLOCK_LEVELS = \[15, 30, 45\]/);
 });
 
 test('sparse uint16 type ids remain valid inputs and generated keys', async () => {
@@ -519,9 +656,11 @@ test('every publishable entity and reference id is capped at 255', async () => {
     const copy = structuredClone(inputs);
     const row = structuredClone(copy.entities.entities[1]);
     row.typeId = id;
+    row.symbol = `BoundaryEntity${id}`;
     row.name = `Boundary entity ${id}`;
     row.petalTypeIds = [];
     row.dropAliasOf = 0;
+    row.dropDrawCount = 0;
     copy.entities.entities.push(row);
     copy.entities.count = copy.entities.entities.length;
     return copy;

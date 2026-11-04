@@ -7,7 +7,7 @@ import {
   validatePublicEntity,
 } from '../net/multiplayer-wire.js';
 export const PROTOCOL_VERSION = 2;
-export const CATALOG_HASH = '9d66e1aff774927d6bc7cdc709f16913bda06e56fb5cdd52f3172aeedbe7f287';
+export const CATALOG_HASH = '84bbcaa2b3d1a72ab82c1ef7d63bc752ee8c7e3fc9b13f086b33aeb0d4dabb02';
 export const LIMITS = {
   maxClientFrameBytes: 4096,
   maxServerFrameBytes: 1048576,
@@ -649,6 +649,21 @@ export function readCloseReason(r: WireReader): CloseReason {
 
   return v;
 }
+export const MessageType = {
+  Hello: 1,
+  Welcome: 2,
+  Input: 3,
+  Command: 4,
+  CommandResult: 5,
+  Snapshot: 6,
+  ResyncRequest: 7,
+  Ping: 8,
+  Pong: 9,
+  Error: 10,
+  CloseReason: 11,
+  Leaderboard: 12,
+} as const;
+export type MessageType = (typeof MessageType)[keyof typeof MessageType];
 export type Message =
   | { type: 1; sessionEpoch: number; value: Hello }
   | { type: 2; sessionEpoch: number; value: Welcome }
@@ -665,52 +680,52 @@ export type Message =
 export function encodeMessage(m: Message): Uint8Array {
   const w = new WireWriter();
   switch (m.type) {
-    case 1:
+    case MessageType.Hello:
       if (!(m.sessionEpoch == 0)) throw new Error('epoch');
       writeHello(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxClientFrameBytes);
-    case 2:
+    case MessageType.Welcome:
       if (!(m.sessionEpoch != 0) || m.value.sessionEpoch !== m.sessionEpoch)
         throw new Error('epoch');
       writeWelcome(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
-    case 3:
+    case MessageType.Input:
       if (!(m.sessionEpoch != 0)) throw new Error('epoch');
       writeInput(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxClientFrameBytes);
-    case 4:
+    case MessageType.Command:
       if (!(m.sessionEpoch != 0)) throw new Error('epoch');
       writeCommand(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxClientFrameBytes);
-    case 5:
+    case MessageType.CommandResult:
       if (!(m.sessionEpoch != 0)) throw new Error('epoch');
       writeCommandResult(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
-    case 6:
+    case MessageType.Snapshot:
       if (!(m.sessionEpoch != 0)) throw new Error('epoch');
       writeSnapshot(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
-    case 7:
+    case MessageType.ResyncRequest:
       if (!(m.sessionEpoch != 0)) throw new Error('epoch');
       writeResyncRequest(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxClientFrameBytes);
-    case 8:
+    case MessageType.Ping:
       if (!(m.sessionEpoch != 0)) throw new Error('epoch');
       writePing(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
-    case 9:
+    case MessageType.Pong:
       if (!(m.sessionEpoch != 0)) throw new Error('epoch');
       writePong(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
-    case 10:
+    case MessageType.Error:
       if (!true) throw new Error('epoch');
       writeError(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
-    case 11:
+    case MessageType.CloseReason:
       if (!true) throw new Error('epoch');
       writeCloseReason(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
-    case 12:
+    case MessageType.Leaderboard:
       if (!(m.sessionEpoch != 0)) throw new Error('epoch');
       writeLeaderboard(w, m.value);
       return frame(m.type, m.sessionEpoch, w.finish(), LIMITS.maxServerFrameBytes);
@@ -722,53 +737,73 @@ export function decodeMessage(bytes: Uint8Array, fromClient = false): Message | 
     const r = new WireReader(bytes.subarray(16));
     let result: Message;
     switch (h.type) {
-      case 1:
+      case MessageType.Hello:
         if (!(h.sessionEpoch == 0) || !fromClient) return null;
-        result = { type: 1, sessionEpoch: h.sessionEpoch, value: readHello(r) };
+        result = { type: MessageType.Hello, sessionEpoch: h.sessionEpoch, value: readHello(r) };
         break;
-      case 2:
+      case MessageType.Welcome:
         if (!(h.sessionEpoch != 0) || fromClient) return null;
-        result = { type: 2, sessionEpoch: h.sessionEpoch, value: readWelcome(r) };
+        result = { type: MessageType.Welcome, sessionEpoch: h.sessionEpoch, value: readWelcome(r) };
         break;
-      case 3:
+      case MessageType.Input:
         if (!(h.sessionEpoch != 0) || !fromClient) return null;
-        result = { type: 3, sessionEpoch: h.sessionEpoch, value: readInput(r) };
+        result = { type: MessageType.Input, sessionEpoch: h.sessionEpoch, value: readInput(r) };
         break;
-      case 4:
+      case MessageType.Command:
         if (!(h.sessionEpoch != 0) || !fromClient) return null;
-        result = { type: 4, sessionEpoch: h.sessionEpoch, value: readCommand(r) };
+        result = { type: MessageType.Command, sessionEpoch: h.sessionEpoch, value: readCommand(r) };
         break;
-      case 5:
+      case MessageType.CommandResult:
         if (!(h.sessionEpoch != 0) || fromClient) return null;
-        result = { type: 5, sessionEpoch: h.sessionEpoch, value: readCommandResult(r) };
+        result = {
+          type: MessageType.CommandResult,
+          sessionEpoch: h.sessionEpoch,
+          value: readCommandResult(r),
+        };
         break;
-      case 6:
+      case MessageType.Snapshot:
         if (!(h.sessionEpoch != 0) || fromClient) return null;
-        result = { type: 6, sessionEpoch: h.sessionEpoch, value: readSnapshot(r) };
+        result = {
+          type: MessageType.Snapshot,
+          sessionEpoch: h.sessionEpoch,
+          value: readSnapshot(r),
+        };
         break;
-      case 7:
+      case MessageType.ResyncRequest:
         if (!(h.sessionEpoch != 0) || !fromClient) return null;
-        result = { type: 7, sessionEpoch: h.sessionEpoch, value: readResyncRequest(r) };
+        result = {
+          type: MessageType.ResyncRequest,
+          sessionEpoch: h.sessionEpoch,
+          value: readResyncRequest(r),
+        };
         break;
-      case 8:
+      case MessageType.Ping:
         if (!(h.sessionEpoch != 0)) return null;
-        result = { type: 8, sessionEpoch: h.sessionEpoch, value: readPing(r) };
+        result = { type: MessageType.Ping, sessionEpoch: h.sessionEpoch, value: readPing(r) };
         break;
-      case 9:
+      case MessageType.Pong:
         if (!(h.sessionEpoch != 0)) return null;
-        result = { type: 9, sessionEpoch: h.sessionEpoch, value: readPong(r) };
+        result = { type: MessageType.Pong, sessionEpoch: h.sessionEpoch, value: readPong(r) };
         break;
-      case 10:
+      case MessageType.Error:
         if (!true || fromClient) return null;
-        result = { type: 10, sessionEpoch: h.sessionEpoch, value: readError(r) };
+        result = { type: MessageType.Error, sessionEpoch: h.sessionEpoch, value: readError(r) };
         break;
-      case 11:
+      case MessageType.CloseReason:
         if (!true || fromClient) return null;
-        result = { type: 11, sessionEpoch: h.sessionEpoch, value: readCloseReason(r) };
+        result = {
+          type: MessageType.CloseReason,
+          sessionEpoch: h.sessionEpoch,
+          value: readCloseReason(r),
+        };
         break;
-      case 12:
+      case MessageType.Leaderboard:
         if (!(h.sessionEpoch != 0) || fromClient) return null;
-        result = { type: 12, sessionEpoch: h.sessionEpoch, value: readLeaderboard(r) };
+        result = {
+          type: MessageType.Leaderboard,
+          sessionEpoch: h.sessionEpoch,
+          value: readLeaderboard(r),
+        };
         break;
       default:
         return null;

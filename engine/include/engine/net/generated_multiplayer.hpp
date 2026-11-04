@@ -5,7 +5,7 @@
 namespace engine::net {
 inline constexpr std::uint16_t kProtocolVersion = 2;
 inline constexpr std::string_view kCatalogHash =
-    "9d66e1aff774927d6bc7cdc709f16913bda06e56fb5cdd52f3172aeedbe7f287";
+    "84bbcaa2b3d1a72ab82c1ef7d63bc752ee8c7e3fc9b13f086b33aeb0d4dabb02";
 inline constexpr std::uint32_t kMaxClientFrameBytes = 4096U;
 inline constexpr std::uint32_t kMaxServerFrameBytes = 1048576U;
 inline constexpr std::uint32_t kMaxSnapshotEntities = 16384U;
@@ -710,6 +710,20 @@ inline CloseReason readCloseReason(WireReader& r) {
 
   return v;
 }
+enum class MessageType : std::uint16_t {
+  kHello = 1,
+  kWelcome = 2,
+  kInput = 3,
+  kCommand = 4,
+  kCommandResult = 5,
+  kSnapshot = 6,
+  kResyncRequest = 7,
+  kPing = 8,
+  kPong = 9,
+  kError = 10,
+  kCloseReason = 11,
+  kLeaderboard = 12
+};
 using MessageValue = std::variant<Hello, Welcome, Input, Command, CommandResult, Snapshot,
                                   ResyncRequest, Ping, Pong, Error, CloseReason, Leaderboard>;
 struct Message {
@@ -723,7 +737,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Hello& valu
   }
   WireWriter w;
   writeHello(w, value);
-  return w.frame(1, sessionEpoch, kMaxClientFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kHello), sessionEpoch,
+                 kMaxClientFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Welcome& value,
                                                                std::uint32_t sessionEpoch) {
@@ -732,7 +747,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Welcome& va
   }
   WireWriter w;
   writeWelcome(w, value);
-  return w.frame(2, sessionEpoch, kMaxServerFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kWelcome), sessionEpoch,
+                 kMaxServerFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Input& value,
                                                                std::uint32_t sessionEpoch) {
@@ -741,7 +757,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Input& valu
   }
   WireWriter w;
   writeInput(w, value);
-  return w.frame(3, sessionEpoch, kMaxClientFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kInput), sessionEpoch,
+                 kMaxClientFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Command& value,
                                                                std::uint32_t sessionEpoch) {
@@ -750,7 +767,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Command& va
   }
   WireWriter w;
   writeCommand(w, value);
-  return w.frame(4, sessionEpoch, kMaxClientFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kCommand), sessionEpoch,
+                 kMaxClientFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const CommandResult& value,
                                                                std::uint32_t sessionEpoch) {
@@ -759,7 +777,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const CommandResu
   }
   WireWriter w;
   writeCommandResult(w, value);
-  return w.frame(5, sessionEpoch, kMaxServerFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kCommandResult), sessionEpoch,
+                 kMaxServerFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Snapshot& value,
                                                                std::uint32_t sessionEpoch) {
@@ -768,7 +787,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Snapshot& v
   }
   WireWriter w;
   writeSnapshot(w, value);
-  return w.frame(6, sessionEpoch, kMaxServerFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kSnapshot), sessionEpoch,
+                 kMaxServerFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const ResyncRequest& value,
                                                                std::uint32_t sessionEpoch) {
@@ -777,7 +797,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const ResyncReque
   }
   WireWriter w;
   writeResyncRequest(w, value);
-  return w.frame(7, sessionEpoch, kMaxClientFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kResyncRequest), sessionEpoch,
+                 kMaxClientFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Ping& value,
                                                                std::uint32_t sessionEpoch) {
@@ -786,7 +807,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Ping& value
   }
   WireWriter w;
   writePing(w, value);
-  return w.frame(8, sessionEpoch, kMaxServerFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kPing), sessionEpoch,
+                 kMaxServerFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Pong& value,
                                                                std::uint32_t sessionEpoch) {
@@ -795,7 +817,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Pong& value
   }
   WireWriter w;
   writePong(w, value);
-  return w.frame(9, sessionEpoch, kMaxServerFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kPong), sessionEpoch,
+                 kMaxServerFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Error& value,
                                                                std::uint32_t sessionEpoch) {
@@ -804,7 +827,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Error& valu
   }
   WireWriter w;
   writeError(w, value);
-  return w.frame(10, sessionEpoch, kMaxServerFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kError), sessionEpoch,
+                 kMaxServerFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const CloseReason& value,
                                                                std::uint32_t sessionEpoch) {
@@ -813,7 +837,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const CloseReason
   }
   WireWriter w;
   writeCloseReason(w, value);
-  return w.frame(11, sessionEpoch, kMaxServerFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kCloseReason), sessionEpoch,
+                 kMaxServerFrameBytes);
 }
 inline std::optional<std::vector<std::uint8_t>> encode_message(const Leaderboard& value,
                                                                std::uint32_t sessionEpoch) {
@@ -822,7 +847,8 @@ inline std::optional<std::vector<std::uint8_t>> encode_message(const Leaderboard
   }
   WireWriter w;
   writeLeaderboard(w, value);
-  return w.frame(12, sessionEpoch, kMaxServerFrameBytes);
+  return w.frame(static_cast<std::uint16_t>(MessageType::kLeaderboard), sessionEpoch,
+                 kMaxServerFrameBytes);
 }
 inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes, bool fromClient) {
   auto h = unframe(bytes, fromClient ? kMaxClientFrameBytes : kMaxServerFrameBytes);
@@ -830,8 +856,8 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
     return {};
   }
   WireReader r(bytes.subspan(16));
-  switch (h->type) {
-    case 1: {
+  switch (static_cast<MessageType>(h->type)) {
+    case MessageType::kHello: {
       if (!(h->sessionEpoch == 0) || !fromClient) {
         return {};
       }
@@ -841,7 +867,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 2: {
+    case MessageType::kWelcome: {
       if (!(h->sessionEpoch != 0) || fromClient) {
         return {};
       }
@@ -851,7 +877,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 3: {
+    case MessageType::kInput: {
       if (!(h->sessionEpoch != 0) || !fromClient) {
         return {};
       }
@@ -861,7 +887,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 4: {
+    case MessageType::kCommand: {
       if (!(h->sessionEpoch != 0) || !fromClient) {
         return {};
       }
@@ -871,7 +897,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 5: {
+    case MessageType::kCommandResult: {
       if (!(h->sessionEpoch != 0) || fromClient) {
         return {};
       }
@@ -881,7 +907,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 6: {
+    case MessageType::kSnapshot: {
       if (!(h->sessionEpoch != 0) || fromClient) {
         return {};
       }
@@ -891,7 +917,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 7: {
+    case MessageType::kResyncRequest: {
       if (!(h->sessionEpoch != 0) || !fromClient) {
         return {};
       }
@@ -901,7 +927,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 8: {
+    case MessageType::kPing: {
       if (!(h->sessionEpoch != 0)) {
         return {};
       }
@@ -911,7 +937,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 9: {
+    case MessageType::kPong: {
       if (!(h->sessionEpoch != 0)) {
         return {};
       }
@@ -921,7 +947,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 10: {
+    case MessageType::kError: {
       if (!(true) || fromClient) {
         return {};
       }
@@ -931,7 +957,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 11: {
+    case MessageType::kCloseReason: {
       if (!(true) || fromClient) {
         return {};
       }
@@ -941,7 +967,7 @@ inline std::optional<Message> decode_message(std::span<const std::uint8_t> bytes
       }
       return Message{h->sessionEpoch, std::move(v)};
     }
-    case 12: {
+    case MessageType::kLeaderboard: {
       if (!(h->sessionEpoch != 0) || fromClient) {
         return {};
       }

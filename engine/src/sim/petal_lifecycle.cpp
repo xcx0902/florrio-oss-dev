@@ -80,7 +80,7 @@ EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id
   entity->health = f32(combat->health);
   entity->max_health = f32(combat->health);
   // Original 726 writes physics+40 mass 4 for Heaviest (other petals use 1).
-  if (type_id == 26U) {
+  if (catalog::petal_id(type_id) == catalog::PetalId::kHeaviestEpic) {
     entity->mass = f32(4.0F);
   }
   entity->loadout_slot = slot;
@@ -97,12 +97,13 @@ EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id
   orbit.slot = slot;
   orbit.instance = instance;
   orbit.profile = static_cast<std::uint8_t>(orbit_profile_from_name(combat->orbitProfile));
-  orbit.orbit_function = combat->orbitFunctionIndex;
+  orbit.behavior = combat->behavior;
+  orbit.heal_amount = f32(combat->healAmount);
   orbit.behavior_started_at_ms = world.time_ms();
   orbit.instance_count = instance_count == 0 ? 1 : instance_count;
-  if (type_id == 22U) {
+  if (catalog::petal_id(type_id) == catalog::PetalId::kEggEpic) {
     entity->behavior_cooldown_ms = 1000.0;
-  } else if (type_id == 23U) {
+  } else if (catalog::petal_id(type_id) == catalog::PetalId::kEggLegendary) {
     entity->behavior_cooldown_ms = 2500.0;
   }
   const auto* petal = Catalog::instance().petal(type_id);
@@ -140,7 +141,8 @@ std::size_t spawn_loadout_petals(World& world, PlayerState& state) {
     if (!value.ready()) {
       continue;
     }
-    for (std::uint8_t instance = 0; instance < value.count && instance < 3; ++instance) {
+    for (std::uint8_t instance = 0; instance < value.count && instance < PlayerLoadout::kInstances;
+         ++instance) {
       if (state.loadout().pending(slot, instance)) {
         continue;
       }
@@ -185,10 +187,10 @@ std::size_t refresh_loadout_petals(World& world, PlayerState& state, double step
     const auto& slots = state.loadout().slots();
     for (std::size_t slot = 0; slot < state.profile().active_slots() && slot < slots.size();
          ++slot) {
-      antennae = antennae || slots[slot].type_id == 25U;
+      antennae = antennae ||
+                 catalog::petal_id(slots[slot].type_id) == catalog::PetalId::kAntennaeLegendary;
     }
-    player->player_expression = static_cast<std::uint8_t>(
-        antennae ? (player->player_expression | 4U) : (player->player_expression & ~4U));
+    set_flag(player->player_expression, PlayerExpressionFlag::kAntennae, antennae);
   }
   return spawned;
 }

@@ -108,8 +108,8 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_multi_instance_orbit_spacing", test_multi_instance_orbit_spacing);
   engine::test::runTest("test_twin_widens_orbit_spacing", test_twin_widens_orbit_spacing);
   engine::test::runTest("test_orbit_reindex_after_removal", test_orbit_reindex_after_removal);
-  engine::test::runTest("test_flag41_slot_without_component_keeps_shared_position",
-                        test_flag41_slot_without_component_keeps_shared_position);
+  engine::test::runTest("test_shared_orbit_slot_without_component_keeps_shared_position",
+                        test_shared_orbit_slot_without_component_keeps_shared_position);
   engine::test::runTest("test_peas_attack_consumes_petal", test_peas_attack_consumes_petal);
   engine::test::runTest("test_rose_healing", test_rose_healing);
   engine::test::runTest("test_rose_contracts_orbit_and_heals_promptly",
@@ -187,7 +187,8 @@ int main(int argc, char** argv) {
   engine::test::runTest("test_protocol_constants", test_protocol_constants);
   engine::test::runTest("test_collision_bounds_cache_rebuild_counter",
                         test_collision_bounds_cache_rebuild_counter);
-  engine::test::runTest("test_loadout_flag41_pending_cache", test_loadout_flag41_pending_cache);
+  engine::test::runTest("test_loadout_shared_orbit_pending_cache",
+                        test_loadout_shared_orbit_pending_cache);
   engine::test::runTest("test_loadout_slot_epochs_bump_on_change",
                         test_loadout_slot_epochs_bump_on_change);
   engine::test::runTest("test_loadout_pending_cache_order", test_loadout_pending_cache_order);

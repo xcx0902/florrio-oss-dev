@@ -131,9 +131,9 @@ bool SpatialQuery::occupied(const SpawnPosition& candidate, f32 half_extent) con
     }
 
     f32 threshold(600.0F);
-    if ((body.world_flags & 32U) == 0U) {
+    if (!has_flag(body.world_flags, WorldFlag::kPlayerBody)) {
       threshold = f32(100.0F);
-      if ((body.entity_flags & 32U) == 0U) {
+      if (!has_flag(body.entity_flags, EntityFlag::kBlocksSpawn)) {
         continue;
       }
     }

@@ -1,6 +1,7 @@
 #include "engine/diagnostics/entities.hpp"
 #include "engine/sim/spawn.hpp"
 #include "engine/sim/petals.hpp"
+#include "engine/sim/player_loadout.hpp"
 #include <cmath>
 
 namespace engine::diagnostics {
@@ -37,7 +38,7 @@ bool set_loadout_slot(World& world, PlayerId id, std::uint32_t slot, std::uint32
     return false;
   }
   auto& state = *owner;
-  if (slot >= 8U || type_id > 65535U || !state.player().valid()) {
+  if (slot >= PlayerLoadout::kActiveSlots || type_id > 65535U || !state.player().valid()) {
     return false;
   }
   if (!state.loadout().change_slot_type(world, state, state.profile(),
@@ -45,7 +46,7 @@ bool set_loadout_slot(World& world, PlayerId id, std::uint32_t slot, std::uint32
                                         static_cast<std::uint16_t>(type_id))) {
     return false;
   }
-  for (std::uint8_t instance = 0; instance < 3U; ++instance) {
+  for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
     state.loadout().set_pending(static_cast<std::uint8_t>(slot), instance, false);
     state.loadout().set_pending_timer(static_cast<std::uint8_t>(slot), instance, 0U);
   }

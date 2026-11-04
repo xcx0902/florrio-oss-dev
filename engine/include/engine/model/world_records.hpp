@@ -24,9 +24,8 @@ inline constexpr double kDirectionScale = 0x144ad13d5bfebaULL * 0x1p-47;
   return 0U;
 }
 
-/** One coalesced hit notification. The original merges repeated damage to the
- * same entity epoch into a single outgoing message, so the client sees one hit
- * per target per tick. */
+/** One coalesced hit notification. Repeated damage to the same target in a
+ * tick merges into one event; `count` records how many hits were merged. */
 struct HitEvent {
   EntityHandle target{};
   EntityHandle attacker{};
@@ -34,10 +33,7 @@ struct HitEvent {
   f32 health_after = f32(0.0F);
   std::uint64_t tick = 0;
   std::uint32_t count = 0;
-  /** Entity epoch carried by the original 4124-byte message object. */
   std::uint32_t epoch = 0;
-  /** Shared-message reference count (original message+4). */
-  std::uint32_t refcount = 1;
   DamageSource source;
 };
 

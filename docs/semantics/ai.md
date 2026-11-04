@@ -49,7 +49,7 @@ values under names:
 | +132      | `attack_speed`         | speed inside attack range                                          |
 | +136      | `guard_radius`         | guard-point radius                                                 |
 | +140      | `leash`                | owner leash                                                        |
-| +144      | `attack_callback`      | species attack callback id                                         |
+| +144      | `attack`               | `AttackBehavior` (`None`, `HornetStinger`)                         |
 | +148      | `attack_cooldown_gain` | cooldown gain                                                      |
 | +152      | `target`               | intrusive target handle                                            |
 | +164      | `owner`                | owner handle                                                       |
@@ -64,7 +64,7 @@ Probed anchors: AI+76 is the float wave amplitude (Bee/Hornet carry `2.0`),
 AI+80 is `wave_frequency` (0.0028723683 on Bee/Hornet), AI+84 is
 `wave_power`, AI+92 is `sine_frequency`, AI+96 is `sine_amplitude`, AI+108 is
 `aggressive`, AI+110 is `chase`, AI+120 is `radius` and AI+144/AI+148 are the
-attack callback and cooldown gain. The domain's `wave_enabled` is a separate
+attack behavior and cooldown gain. The domain's `wave_enabled` is a separate
 domain flag (set by each `configure_*` profile), not a byte read from AI+76;
 the amplitude table row is the one that matches the memory dump.
 
@@ -95,7 +95,7 @@ player is a distinct root. `same_root` therefore returns true for mob/mob
 pairs. This fixed the Beetle/Spider/Ladybug target divergence (they previously
 could acquire each other when the player was absent).
 
-## Hornet stinger (AI+144 callback 74)
+## Hornet stinger (`AttackBehavior::kHornetStinger`)
 
 The population path allocates an
 entity, attaches the transform/visual/AI components and writes:
@@ -106,7 +106,7 @@ entity, attaches the transform/visual/AI components and writes:
 
 The domain rebuild is `engine/src/sim/species_attacks.cpp`:
 
-- the tick gate fires when `attack_callback != 0`, `attack_cooldown_ms <= 0`,
+- the tick gate fires when `attack != AttackBehavior::kNone`, `attack_cooldown_ms <= 0`,
   and an eligible target remains retained. `attack_range=500` selects strafe
   versus chase, not whether to fire: a retained target at 800 still fires;
   one at 1000 is invalidated by the `600 * 1.5` retention radius;
@@ -116,8 +116,9 @@ The domain rebuild is `engine/src/sim/species_attacks.cpp`:
   it dies at 2000 ms (tick 40), remains a corpse through 2950 ms (tick 59),
   and is removed at 3000 ms (tick 60). Contact deals 10 once and kills the
   stinger, followed by the ordinary 1000 ms corpse-removal delay;
-- unknown callback ids increment `species_debug::unknown_callbacks` and are not
-  guessed into a species attack.
+- no numeric callback remains: `dispatch_attack` switches on the named
+  `AttackBehavior`, so an unknown value cannot silently select a species
+  attack.
 
 ## Hornet initializer draw order
 
@@ -140,7 +141,7 @@ motion.
 | 15, 16, 17, 18 | `configure_centipede` | health 50, radius 35, contact 20, speed 0.006, range 1000 (evil 600), turn scale 0.2 (evil 0.16), radius 1000, territory 0.35; heads spawn a 9-segment chain (49 at the 1% rare roll) at 70-unit spacing with `angle += 2π/20` (`2π/100` rare) |
 | 22             | `configure_spider`    | health 20, radius 25, contact 25, speed 0.002, aggressive, chase, range 600, radius 600, territory 0.45, chase speed 2.88, lead divisor 3.4                                                                                                    |
 | 6              | `configure_bee`       | health 15, radius 25, contact 50, speed 0.002, range 600, radius 1000, territory 0.3, timer 5000..10000 ms, wave enabled, wave frequency 0.002856924, wave power 0.5, sine 0.002/0.5                                                           |
-| 14             | `configure_hornet`    | health 40, radius 25, contact 50, speed 0.002, range 600, radius 600, territory 0.6, timer 5000..10000 ms, attack range 500, attack speed -0.4, callback 74, cooldown gain 2000                                                                |
+| 14             | `configure_hornet`    | health 40, radius 25, contact 50, speed 0.002, range 600, radius 600, territory 0.6, timer 5000..10000 ms, attack range 500, attack speed -0.4, HornetStinger behavior, cooldown gain 2000                                                     |
 | 19             | `configure_square`    | health 15, radius 30, contact 10, speed 0.002, turn rate 0.12321318, radius 1000, territory 0.3, angle-locked false, idle speed 0.2                                                                                                            |
 | 11             | Ant Hole              | stationary; six owned children in the caste order 7,7,7,8,8,9, each with a 0.25-unit velocity scatter from one RNG draw                                                                                                                        |
 
@@ -189,8 +190,8 @@ For every registered AI entity in spawn order:
 7. `velocity += (cos, sin)(move_angle) * move_speed * dt * 0.001 *
 behavior_speed_multiplier * slow_multiplier`.
 8. With an eligible retained target and expired cooldown, the domain records
-   the cooldown gain and dispatches Hornet callback 74 after the steering walk.
-   Unknown callback ids are counted rather than guessed.
+   the cooldown gain and dispatches `AttackBehavior::kHornetStinger` after the
+   steering walk.
 
 `ai.clock_ms` is the AI+24 clock; the current engine leaves it at zero, which is
 equivalent to the spawn time for the initial population spawned at `t=0`.

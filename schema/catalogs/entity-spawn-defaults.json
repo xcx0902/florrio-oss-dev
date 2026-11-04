@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "notes": "Spawn defaults for the current product catalog. Rock, Boulder and Cactus radius/health are randomized by their domain initializers and retain dynamicRadius/dynamicHealth=true.",
+  "notes": "Spawn defaults for the current product catalog. Rock, Boulder and Cactus radius/health are randomized by their domain initializers and retain dynamicRadius=true.",
   "defaults": [
     {
       "typeId": 1,
@@ -9,12 +9,9 @@
       "contactDamage": 10,
       "health": 9.865272521972656,
       "maxHealth": 9.865272521972656,
-      "flags92": 4,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777216,
-      "dynamicRadius": true,
-      "dynamicHealth": true
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": true
     },
     {
       "typeId": 2,
@@ -23,12 +20,9 @@
       "contactDamage": 10,
       "health": 79.98753356933594,
       "maxHealth": 79.98753356933594,
-      "flags92": 4,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777216,
-      "dynamicRadius": true,
-      "dynamicHealth": true
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": true
     },
     {
       "typeId": 3,
@@ -37,12 +31,9 @@
       "contactDamage": 30,
       "health": 34.997859954833984,
       "maxHealth": 34.997859954833984,
-      "flags92": 0,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777216,
-      "dynamicRadius": true,
-      "dynamicHealth": true
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": true
     },
     {
       "typeId": 4,
@@ -51,12 +42,9 @@
       "contactDamage": 10,
       "health": 25,
       "maxHealth": 25,
-      "flags92": 2,
-      "flags93": 112,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 112,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 5,
@@ -65,12 +53,9 @@
       "contactDamage": 10,
       "health": 1000,
       "maxHealth": 1000,
-      "flags92": 2,
-      "flags93": 112,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 112,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 6,
@@ -79,12 +64,9 @@
       "contactDamage": 50,
       "health": 15,
       "maxHealth": 15,
-      "flags92": 2,
-      "flags93": 96,
-      "flags95": 91,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 96,
+      "worldFlags": 91,
+      "dynamicRadius": false
     },
     {
       "typeId": 7,
@@ -93,12 +75,9 @@
       "contactDamage": 10,
       "health": 10,
       "maxHealth": 10,
-      "flags92": 2,
-      "flags93": 98,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 98,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 8,
@@ -107,12 +86,9 @@
       "contactDamage": 10,
       "health": 25,
       "maxHealth": 25,
-      "flags92": 2,
-      "flags93": 98,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 98,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 9,
@@ -121,12 +97,9 @@
       "contactDamage": 10,
       "health": 40,
       "maxHealth": 40,
-      "flags92": 2,
-      "flags93": 98,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 98,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 11,
@@ -135,12 +108,9 @@
       "contactDamage": 15,
       "health": 300,
       "maxHealth": 300,
-      "flags92": 0,
-      "flags93": 100,
-      "flags95": 75,
-      "physicsFlag48": 0,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 100,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 12,
@@ -149,12 +119,9 @@
       "contactDamage": 30,
       "health": 40,
       "maxHealth": 40,
-      "flags92": 2,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 13,
@@ -163,12 +130,9 @@
       "contactDamage": 20,
       "health": 300,
       "maxHealth": 300,
-      "flags92": 2,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 14,
@@ -177,12 +141,9 @@
       "contactDamage": 50,
       "health": 40,
       "maxHealth": 40,
-      "flags92": 2,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 15,
@@ -191,12 +152,9 @@
       "contactDamage": 10,
       "health": 50,
       "maxHealth": 50,
-      "flags92": 2,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 17,
@@ -205,12 +163,9 @@
       "contactDamage": 10,
       "health": 50,
       "maxHealth": 50,
-      "flags92": 2,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 19,
@@ -219,12 +174,9 @@
       "contactDamage": 10,
       "health": 15,
       "maxHealth": 15,
-      "flags92": 2,
-      "flags93": 97,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 97,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 20,
@@ -233,12 +185,9 @@
       "contactDamage": 10,
       "health": 35,
       "maxHealth": 35,
-      "flags92": 2,
-      "flags93": 112,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 112,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 21,
@@ -247,12 +196,9 @@
       "contactDamage": 10,
       "health": 35,
       "maxHealth": 35,
-      "flags92": 2,
-      "flags93": 112,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 112,
+      "worldFlags": 75,
+      "dynamicRadius": false
     },
     {
       "typeId": 22,
@@ -261,12 +207,9 @@
       "contactDamage": 25,
       "health": 20,
       "maxHealth": 20,
-      "flags92": 10,
-      "flags93": 96,
-      "flags95": 75,
-      "physicsFlag48": 16777217,
-      "dynamicRadius": false,
-      "dynamicHealth": false
+      "entityFlags": 96,
+      "worldFlags": 75,
+      "dynamicRadius": false
     }
   ]
 }

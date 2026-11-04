@@ -69,6 +69,43 @@ export const OUTPUT_PAYLOAD_TYPES = [
   { type: 5, name: 'events', confidence: 'high' },
   { type: 2, name: 'unknown-2', confidence: 'low' },
 ] as const;
+export const InputOpcode = {
+  HandshakeString: 0,
+  HandshakeStringAlt: 2,
+  Suicide: 3,
+  Restart: 4,
+  String: 5,
+  PlayerSpawnAndName: 6,
+  Disconnect: 7,
+  DiscardPetal: 8,
+  SwapPetals: 10,
+  InputButtonsAngleStrength: 12,
+  BenchCycle: 13,
+  Reserved1: 1,
+  Reserved9: 9,
+  Reserved11: 11,
+} as const;
+export const SNAPSHOT_EVENT = {
+  ChatString: 9,
+  EntityTime: 11,
+  Visual: 14,
+  Unreachable2: 2,
+  Unreachable3: 3,
+  Unreachable4: 4,
+  Unreachable5: 5,
+  Unreachable6: 6,
+  Unreachable7: 7,
+  Unreachable8: 8,
+  Unreachable10: 10,
+  Unreachable12: 12,
+  Unreachable13: 13,
+} as const;
+export const OUTPUT_PAYLOAD_TYPE = {
+  Handshake: 0,
+  EntitySnapshot: 1,
+  Events: 5,
+  Unknown2: 2,
+} as const;
 export const FIELD_TYPES = {
   byte: [1, 2, 9, 11, 12, 14, 17, 20, 22, 26, 31, 34, 36, 38, 43, 46, 47, 50, 54, 62, 63],
   float: [19, 21, 32, 42, 53, 55],

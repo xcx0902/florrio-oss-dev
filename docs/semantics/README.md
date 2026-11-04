@@ -23,7 +23,7 @@ for provenance.
 - [loot.md](loot.md) — drop chances, retention and pickup lifetimes.
 - [ai.md](ai.md) — target eligibility, alert propagation, family profiles, pickup recipient, quadtree order, cached bounds and movement.
 - [effects.md](effects.md) — poison, heal suppression, slow, special petal callbacks, shared payloads, area effects and deferred Peas launch.
-- [attribution.md](attribution.md) — hit epoch/refcount, known gate, killer identity, death score/level, child recursion, pickup list and legendary dedup.
+- [attribution.md](attribution.md) — hit epoch/merged count, killer identity, death score/level, child recursion, pickup list and legendary dedup.
 - [loadout.md](loadout.md) — active-slot restore, handle/pending/timer/epoch layout, slot type changes, equipped-petal creation and backpack pickup overflow.
 - [broadcast.md](broadcast.md) — packet-cache invalidation, event opcodes and the chat queue.
 - [tick.md](tick.md) — domain tick order and open phases.

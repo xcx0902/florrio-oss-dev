@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "groups": [
+    {
+      "symbol": "EntityFlag",
+      "bits": 8,
+      "description": "Named bits of snapshot field 22 (entity flags). Remaining bits stay catalog/wire state.",
+      "flags": [
+        {
+          "symbol": "WebTag",
+          "bit": 3,
+          "name": "Web projectile tag / attached marker"
+        },
+        {
+          "symbol": "BlocksSpawn",
+          "bit": 5,
+          "name": "Occupies the position for spawn checks"
+        },
+        {
+          "symbol": "Owned",
+          "bit": 6,
+          "name": "Owned by a player or mob parent"
+        },
+        {
+          "symbol": "Arrival",
+          "bit": 7,
+          "name": "One-tick pickup arrival marker in snapshot flags"
+        }
+      ]
+    },
+    {
+      "symbol": "WorldFlag",
+      "bits": 8,
+      "description": "Named bits of snapshot field 54 (world flags).",
+      "flags": [
+        {
+          "symbol": "PlayerBody",
+          "bit": 5,
+          "name": "Player body; blocks mob spawning nearby"
+        },
+        {
+          "symbol": "WebTag",
+          "bit": 7,
+          "name": "Ground Web marker"
+        }
+      ]
+    },
+    {
+      "symbol": "ActivityFlag",
+      "bits": 8,
+      "description": "Named bits of snapshot field 36 (AI activity flags).",
+      "flags": [
+        {
+          "symbol": "Engaged",
+          "bit": 0,
+          "name": "AI currently has a target and is acting"
+        }
+      ]
+    },
+    {
+      "symbol": "PlayerExpressionFlag",
+      "bits": 8,
+      "description": "Snapshot field 31 expression bits.",
+      "flags": [
+        {
+          "symbol": "Attack",
+          "bit": 0,
+          "name": "Attack button held"
+        },
+        {
+          "symbol": "Defend",
+          "bit": 1,
+          "name": "Defend button held"
+        },
+        {
+          "symbol": "Antennae",
+          "bit": 2,
+          "name": "Antennae petal equipped"
+        }
+      ]
+    },
+    {
+      "symbol": "InputButton",
+      "bits": 32,
+      "description": "Input command button bits.",
+      "flags": [
+        {
+          "symbol": "Attack",
+          "bit": 0,
+          "name": "Attack button"
+        },
+        {
+          "symbol": "Defend",
+          "bit": 1,
+          "name": "Defend button"
+        }
+      ]
+    },
+    {
+      "symbol": "PetalVariantFlag",
+      "bits": 8,
+      "description": "Snapshot field 9 flags for launched Peas projectiles.",
+      "flags": [
+        {
+          "symbol": "EpicColor",
+          "bit": 0,
+          "name": "Use the Epic Peas color"
+        },
+        {
+          "symbol": "Large",
+          "bit": 1,
+          "name": "Use the Legendary Peas size"
+        }
+      ]
+    }
+  ]
+}

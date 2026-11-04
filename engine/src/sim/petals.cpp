@@ -18,37 +18,21 @@ namespace engine {
 namespace {
 
 constexpr double kTau = 6.283185307179586476925286766559;
+constexpr std::uint8_t kRoseHealSteps = 10;
 
 std::uint8_t active_slot_count(const PlayerState& state) {
   return state.profile().active_slots();
 }
-
-f32 orbit_angle_for(std::uint8_t slot, std::uint8_t instance, std::uint8_t active,
-                    std::uint8_t count) {
-  if (active == 0) {
-    active = 5;
-  }
-  if (count == 0) {
-    count = 1;
-  }
-  const double base = static_cast<double>(slot) * kTau / static_cast<double>(active);
-  const double offset = static_cast<double>(instance) * kTau / static_cast<double>(count);
-  return f32::from_double(base + offset);
-}
-
-// Kept as the documented pre-R06 spawn-angle formula for the legacy tests that
-// compare the old slot/instance split; the live path uses petal_orbit_angle.
-[[maybe_unused]] constexpr auto* kLegacyOrbitAngleFor = &orbit_angle_for;
 
 }  // namespace
 
 std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot, std::uint8_t instance) {
   std::uint8_t orbit_index = 0;
   const auto& slots = state.loadout().slots();
-  for (std::uint8_t index = 0; index < 8U; ++index) {
+  for (std::uint8_t index = 0; index < PlayerLoadout::kActiveSlots; ++index) {
     const std::uint16_t type = slots[index].type_id;
     const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-    if (type == 0U || definition == nullptr) {
+    if (catalog::petal_id(type) == catalog::PetalId::kNone || definition == nullptr) {
       continue;
     }
     // definition+40 disables the orbit slot entirely.
@@ -57,7 +41,7 @@ std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot, std:
     }
     const std::uint8_t count = slots[index].count == 0U ? 1U : slots[index].count;
     if (definition->sharedOrbit) {
-      // flag41: instances share one orbital position.
+      // sharedOrbit: instances share one orbital position.
       if (index == slot) {
         return orbit_index;
       }
@@ -66,7 +50,7 @@ std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot, std:
       }
       continue;
     }
-    for (std::uint8_t candidate = 0; candidate < 3U; ++candidate) {
+    for (std::uint8_t candidate = 0; candidate < PlayerLoadout::kInstances; ++candidate) {
       if (index == slot && candidate == instance) {
         return orbit_index;
       }
@@ -95,16 +79,16 @@ void assign_petal_orbit_indices(World&, PlayerState& state) {
     }
     return nullptr;
   };
-  for (std::uint8_t slot = 0; slot < 8U; ++slot) {
+  for (std::uint8_t slot = 0; slot < PlayerLoadout::kActiveSlots; ++slot) {
     const std::uint16_t type = slots[slot].type_id;
     const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-    if (type == 0U || definition == nullptr) {
+    if (catalog::petal_id(type) == catalog::PetalId::kNone || definition == nullptr) {
       // Still write the boundary counter for empty slots.
     } else {
       if (!definition->orbitHidden) {
         if (definition->sharedOrbit) {
           bool position_used = false;
-          for (std::uint8_t instance = 0; instance < 3U; ++instance) {
+          for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
             const EntityHandle handle = loadout.handle(slot, instance);
             PetalOrbitState* state = petal_state(handle);
             if (state != nullptr) {
@@ -134,7 +118,7 @@ void assign_petal_orbit_indices(World&, PlayerState& state) {
             }
           }
         } else {
-          for (std::uint8_t instance = 0; instance < 3U; ++instance) {
+          for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
             const EntityHandle handle = loadout.handle(slot, instance);
             PetalOrbitState* state = petal_state(handle);
             if (state != nullptr) {
@@ -147,9 +131,7 @@ void assign_petal_orbit_indices(World&, PlayerState& state) {
         }
       }
     }
-    const std::uint8_t level = state.profile().level();
-    const std::uint8_t unlocked = level < 15U ? 5U : level < 30U ? 6U : level < 45U ? 7U : 8U;
-    if (static_cast<std::uint8_t>(slot + 1U) == unlocked) {
+    if (static_cast<std::uint8_t>(slot + 1U) == state.profile().active_slots()) {
       loadout.set_orbit_positions(orbit_index);
     }
   }
@@ -166,7 +148,8 @@ double petal_orbit_angle(const PlayerState& state, std::uint8_t orbit_index) {
     for (std::uint8_t slot = 0; slot < active && slot < loadout_slots.size(); ++slot) {
       const std::uint16_t type = loadout_slots[slot].type_id;
       const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-      if (type == 0U || definition == nullptr || definition->orbitHidden) {
+      if (catalog::petal_id(type) == catalog::PetalId::kNone || definition == nullptr ||
+          definition->orbitHidden) {
         continue;
       }
       if (definition->sharedOrbit) {
@@ -248,10 +231,11 @@ void advance_loadout_orbit_phase(World&, PlayerState& state, double step_millise
   std::uint32_t yinyang = 0;
   std::uint32_t faster = 0;
   for (std::uint8_t slot = 0; slot < active && slot < slots.size(); ++slot) {
-    if (slots[slot].type_id == 28U) {
+    if (catalog::petal_id(slots[slot].type_id) == catalog::PetalId::kYinYangEpic) {
       ++yinyang;
     }
-    if (slots[slot].type_id == 14U && !state.loadout().pending(slot, 0U)) {
+    if (catalog::petal_id(slots[slot].type_id) == catalog::PetalId::kFasterRare &&
+        !state.loadout().pending(slot, 0U)) {
       ++faster;
     }
   }
@@ -304,7 +288,7 @@ void damage_zone_locked_petals(World& world, PlayerState& state, double step_mil
   }
   // Original 654 sweeps all 8x3 equipped handles, including hatched pets that
   // no longer have an orbit record. Damage runs the ordinary corpse path.
-  for (std::uint8_t slot = 0U; slot < 8U; ++slot) {
+  for (std::uint8_t slot = 0U; slot < PlayerLoadout::kActiveSlots; ++slot) {
     for (std::uint8_t instance = 0U; instance < PlayerLoadout::kInstances; ++instance) {
       const auto handle = state.loadout().handle(slot, instance);
       Entity* entity = world.entities().get(handle);
@@ -323,7 +307,7 @@ void damage_zone_locked_petals(World& world, PlayerState& state, double step_mil
 
 void update_petal_orbits(World& world, PlayerState& state, double step_milliseconds) {
   assign_petal_orbit_indices(world, state);
-  const std::uint8_t buttons = static_cast<std::uint8_t>(state.input().buttons & 0xFFU);
+  const std::uint32_t buttons = state.input().buttons;
   const Entity* player = world.entities().get(state.player());
   // Rose consumption erases its own orbit record. Advance before processing,
   // then revisit the shifted element after a consumption so simultaneous
@@ -337,8 +321,8 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
       orbit.center = player->position;
     }
     const auto profile = static_cast<OrbitProfile>(orbit.profile);
-    const std::uint16_t type = orbit.type_id;
-    const bool defend = (buttons & 2U) != 0U;
+    const auto type = catalog::petal_id(orbit.type_id);
+    const bool defend = has_flag(buttons, InputButton::kDefend);
     const double held_ms = world.time_ms() - orbit.behavior_started_at_ms;
     if (update_projectile_petal_orbit(world, orbit, buttons)) {
       --index;
@@ -346,7 +330,7 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
     }
     // Bubble (684) stays at radius 60 and, while defending for 500 ms,
     // transfers its stored momentum to the flower before popping itself.
-    if (type == 18U) {
+    if (type == catalog::PetalId::kBubbleRare) {
       orbit.orbit_radius = f32(60.0F);
       if (orbit.behavior_state == 0U && defend && held_ms > 500.0) {
         const EntityHandle petal_handle = orbit.handle;
@@ -373,25 +357,31 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
           continue;
         }
       }
-    } else if (type == 19U) {
+    } else if (type == catalog::PetalId::kPollenEpic) {
       orbit.orbit_radius = f32(65.0F);
-    } else if (type == 10U || type == 20U || type == 29U || type == 30U) {
+    } else if (type == catalog::PetalId::kMissileRare || type == catalog::PetalId::kDandelionRare ||
+               type == catalog::PetalId::kWebRare || type == catalog::PetalId::kWebLegendary) {
       orbit.orbit_radius = defend ? f32(40.0F) : f32(65.0F);
-    } else if (type == 22U || type == 23U) {
+    } else if (type == catalog::PetalId::kEggEpic || type == catalog::PetalId::kEggLegendary) {
       // Egg callbacks always report radius 65 and never respond to buttons.
       orbit.orbit_radius = f32(65.0F);
-      if (held_ms > (type == 22U ? 1000.0 : 2500.0) &&
-          hatch_equipped_egg(world, orbit.handle, type == 22U ? 9U : 12U)) {
+      if (held_ms > (type == catalog::PetalId::kEggEpic ? 1000.0 : 2500.0) &&
+          hatch_equipped_egg(world, orbit.handle,
+                             catalog::species_type_id(type == catalog::PetalId::kEggEpic
+                                                          ? catalog::SpeciesId::kSoldierAnt
+                                                          : catalog::SpeciesId::kBeetle))) {
         --index;
         continue;
       }
-    } else if (is_rose_orbit_function(orbit.orbit_function)) {
+    } else if (is_rose_behavior(orbit.behavior)) {
       orbit.orbit_radius = rose_orbit_radius(buttons);
     } else if (profile == OrbitProfile::kWing) {
       orbit.phase =
           f32::from_double(static_cast<double>(orbit.phase.value) + step_milliseconds * 0.005);
       orbit.orbit_radius = wing_orbit_radius(buttons, orbit.phase);
-    } else if (type == 11U || type == 12U || type == 34U || type == 25U) {
+    } else if (type == catalog::PetalId::kPeasRare || type == catalog::PetalId::kPeasEpic ||
+               type == catalog::PetalId::kPeasLegendary ||
+               type == catalog::PetalId::kAntennaeLegendary) {
       orbit.orbit_radius = defend ? f32(40.0F) : f32(65.0F);
     } else {
       orbit.orbit_radius = orbit_radius(profile, buttons);
@@ -400,7 +390,7 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
     // tick: petalOrbitIndex * 2*pi / unlockedSlots + loadout+284.
     orbit.orbit_angle = petal_orbit_angle(state, orbit.orbit_index);
     orbit.angle = f32::from_double(orbit.orbit_angle);
-    if (is_rose_orbit_function(orbit.orbit_function)) {
+    if (is_rose_behavior(orbit.behavior)) {
       Entity* petal = world.entities().get(orbit.handle);
       Entity* owner = petal != nullptr ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
       if (owner != nullptr && owner->health.value > 0.0F && orbit.behavior_state == 0U) {
@@ -426,13 +416,10 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
             f32::from_double((static_cast<double>(owner->position.y.value) - y) * weight + y));
         invalidate_bounds(world, orbit.handle);
         ++orbit.behavior_state;
-        if (orbit.behavior_state != 10U) {
+        if (orbit.behavior_state != kRoseHealSteps) {
           continue;
         }
-        const f32 amount(orbit.orbit_function == 665U   ? 10.0F
-                         : orbit.orbit_function == 682U ? 22.0F
-                                                        : 3.5F);
-        (void)heal_entity(world, EntityHandle{petal->owner}, amount);
+        (void)heal_entity(world, EntityHandle{petal->owner}, orbit.heal_amount);
         // The original passes health+8 to damage, consuming the entire Rose.
         // This clears the equipped handle and starts its catalog recharge.
         (void)damage_entity(world, orbit.handle, petal->health, EntityHandle{});
