@@ -43,9 +43,10 @@ u8      componentFlags (1, 2, 8, 64, 128)
 
 Component declarations select dense groups. Flag 1 means a 32-bit mask;
 otherwise ordinal deltas are read. Flag 2 skips declarations. Flag 8 enables
-dense existing-component fields, flag 64 extends group 152 with fields 58–63,
-and flag 128 marks entity byte 44 bit 0. A declared component pointer gates the
-corresponding dense group; an undeclared group consumes no bytes.
+dense existing-component fields, flag 64 extends the identity component (30)
+with fields 58–63, and flag 128 marks entity byte 44 bit 0. A declared component
+presence gates the corresponding dense group; an undeclared group consumes no
+bytes.
 
 Sparse field deltas accumulate to field ids 1 through 63; zero terminates the
 field list. An out-of-range accumulated id rejects the whole packet, without
@@ -102,34 +103,47 @@ clear.
 
 ## Dense groups
 
-`engine/include/engine/net/dense_fields.hpp` defines 19 dense groups and their
-component offsets; `client/src/state/field-types.ts` mirrors the field-type sets
-and group specs. Groups cover byte, f32, f64, varint, angle, string, bit,
-reference and array shapes.
+`engine/include/engine/net/dense_fields.hpp` resolves 19 dense groups by
+`protocol::Component`; `client/src/state/field-types.ts` mirrors the same
+component ordinals and generated specs. Groups cover byte, f32, f64, varint,
+angle, string, bit, reference and array shapes. A group is decoded only when its
+component is present in the record's component mask or ordinal declaration.
 
-The default derived groups are:
+| Component | Name              | Fields                                              | Extended |
+| --------: | ----------------- | --------------------------------------------------- | -------- |
+|         1 | drop-state        | 22 / 54                                             |          |
+|         2 | ai-activity       | 36                                                  |          |
+|         5 | petal-variant     | 9                                                   |          |
+|         6 | player-controller | 1 / 5 / 6 / 16 / 20 / 21 / 24 / 32 / 34 / 47 / 56   |          |
+|         7 | petal-species     | 50                                                  |          |
+|         8 | reserved-8        | 13 / 37                                             |          |
+|        10 | reserved-10       | 17                                                  |          |
+|        14 | reserved-14       | 43                                                  |          |
+|        15 | reserved-15       | 23 / 57                                             |          |
+|        16 | loadout-record    | 3 / 10 / 11 / 12 / 19 / 30 / 39 / 42 / 45 / 46 / 52 |          |
+|        19 | reserved-19       | 48                                                  |          |
+|        20 | health            | 53 / 55                                             |          |
+|        21 | transform         | 8 / 28 / 49                                         |          |
+|        22 | reserved-22       | 29 / 40                                             |          |
+|        25 | lifecycle         | 38                                                  |          |
+|        26 | collision-radius  | 7                                                   |          |
+|        27 | inline-record     | 4 / 15 / 18 / 25 / 27 / 33 / 35 / 41 / 44 / 51      |          |
+|        28 | reserved-28       | 14                                                  |          |
+|        30 | identity          | 2 / 26 / 31                                         | 58–63    |
 
-| Group | Fields                                                                  |
-| ----: | ----------------------------------------------------------------------- |
-|    52 | 22 / 54                                                                 |
-|    56 | 36                                                                      |
-|    72 | camera                                                                  |
-|   116 | health / maxHealth                                                      |
-|   120 | raw angle + visual y/x                                                  |
-|   140 | radius                                                                  |
-|   152 | look/species, kind, expression/variant (extended by flag 64 with 58–63) |
+The default derived groups are drop-state, ai-activity, player-controller,
+health, transform, collision-radius and identity. The dense payload is exactly
+63 bytes. Profile records retain the complete declaration mask so the next dense
+record has the same length. The redundant dense record is omitted unless both
+camera axes or the encoded angle changed. `set_default_dense_groups(false)`
+restores compact-only framing for exact-byte tests. The client projects field 2
+to `speciesId`, field 26 to `kind`/`typeId`, and fields 53/55 to
+`health`/`maxHealth`.
 
-The dense payload is exactly 63 bytes. Profile records retain the complete
-declaration mask so the next dense record has the same length. The redundant
-dense record is omitted unless both camera axes or the encoded angle changed.
-`set_default_dense_groups(false)` restores compact-only framing for exact-byte
-tests. The client projects field 2 to `speciesId`, field 26 to `kind`/`typeId`,
-and fields 53/55 to `health`/`maxHealth`.
-
-Dense group 152 reads only fields 2/26/31 unless flag 64 is set, then adds 58
-(varint), 59 (f32), 60 (byte[16]), 61 (u16[8]), 62 and 63 (u8). Mixed groups
-72, -16 and -27 have dedicated readers in both the writer and the client
-decoder.
+The identity component reads only fields 2/26/31 unless flag 64 is set, then
+adds 58 (varint), 59 (f32), 60 (byte[16]), 61 (u16[8]), 62 and 63 (u8). The
+player-controller, loadout-record and inline-record components have dedicated
+readers in both the writer and the client decoder.
 
 ## Revision publication
 
@@ -172,11 +186,11 @@ publishes its real petal type and the collected bit.
   before committing masks/pointers, rejecting malformed or truncated input.
 - `client/src/state/snapshot-projection.ts` — named domain/death/loadout views;
   `state/snapshot.ts` is only a public compatibility re-export.
-- `client/src/state/field-types.ts` — field-type sets, 19 dense groups and
-  `FIELD_COMPONENTS`.
-- `client/src/state/world.ts` — `WorldState.applyDeltaSnapshot` merges health, maximum,
-  kind, species, position, angle, dense fields and component offsets; keeps
-  interpolation anchors, chat lines and visual hit indices.
+- `client/src/state/field-types.ts` — field-type sets, the generated
+  `Component` table, 19 dense groups and `componentBit`.
+- `client/src/state/world.ts` — `WorldState.applyDeltaSnapshot` merges sparse,
+  dense and indexed values by field identity; keeps interpolation anchors, chat
+  lines and visual hit indices.
 
 There is no `SkeletonSnapshotDecoder` or composite fallback; every packet is
 decoded against the live mask/dense contract.

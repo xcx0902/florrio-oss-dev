@@ -482,9 +482,9 @@ void SnapshotEncoder::write_dense_float_group(EntityHandle handle, std::span<con
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_health_angle_groups(EntityHandle handle, float health,
-                                                      float max_health, std::uint16_t angle_raw,
-                                                      float angle, float radius) {
+void SnapshotEncoder::write_dense_health_transform_groups(EntityHandle handle, float health,
+                                                          float max_health, std::uint16_t angle_raw,
+                                                          float angle, float radius) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);  // flags=8 (dense) XOR 54
   updates_.write_f32_le(health);
@@ -500,15 +500,15 @@ void SnapshotEncoder::write_dense_default_groups(const Entity& entity) {
   const auto raw = pack_snapshot_angle(entity.angle.value);
   updates_.write_u32_le(entity.handle.to_wire());
   updates_.write_u8(62U);  // flags=8 (dense) XOR 54
-  // 52 / 56
+  // drop-state, then ai-activity.
   updates_.write_u8(entity.kind == EntityKind::kDrop
                         ? static_cast<std::uint8_t>(entity.type_id)
                         : static_cast<std::uint8_t>(entity.entity_flags));
   updates_.write_u8(entity.kind == EntityKind::kDrop
                         ? (entity.pickup_collected ? 1U : 0U)
                         : static_cast<std::uint8_t>(entity.world_flags));
-  updates_.write_u8(entity.ai.activity_flags);  // 36: original AI+8, never slot
-  // 72: all eleven fields, including the ten-byte field-16 array.
+  updates_.write_u8(entity.ai.activity_flags);
+  // player-controller: all eleven fields, including the ten-byte field-16 array.
   updates_.write_u8(static_cast<std::uint8_t>(entity.world_flags));  // 1
   updates_.write_f32_le(entity.position.x.value);                    // 5
   updates_.write_u8(0);                                              // 6: empty string
@@ -522,15 +522,15 @@ void SnapshotEncoder::write_dense_default_groups(const Entity& entity) {
   updates_.write_u8(0);                            // 34
   updates_.write_u8(0);                            // 47
   updates_.write_u32_le(0);                        // 56
-  // 116 / 120. Original client 609: field 28 is local y, field 49 local x.
+  // health, then transform. Field 28 is visual y and field 49 visual x.
   updates_.write_f32_le(entity.health.value);
   updates_.write_f32_le(entity.max_health.value);
   updates_.write_u16_le(raw);
   updates_.write_f32_le(entity.position.y.value);
   updates_.write_f32_le(entity.position.x.value);
-  // 140: original client 467 +8 is the interpolated collider radius (field 7).
+  // collision-radius: the interpolated collider radius (field 7).
   updates_.write_f32_le(entity.collision_radius.value);
-  // 152 base (flags bit 64 is clear).
+  // identity base (flags bit 64 is clear).
   updates_.write_u8(entity.kind == EntityKind::kPlayer ? entity.player_look
                                                        : static_cast<std::uint8_t>(entity.type_id));
   updates_.write_u8(static_cast<std::uint8_t>(entity.kind));
@@ -579,7 +579,7 @@ void SnapshotEncoder::write_dense_angle_float_group(EntityHandle handle, std::ui
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_group152_base(EntityHandle handle, std::uint8_t field2,
+void SnapshotEncoder::write_dense_identity_base(EntityHandle handle, std::uint8_t field2,
                                                 std::uint8_t field26, std::uint8_t field31,
                                                 std::uint32_t field58) {
   updates_.write_u32_le(handle.to_wire());
@@ -635,7 +635,7 @@ void SnapshotEncoder::write_dense_reference_group(EntityHandle handle, std::uint
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_group_minus27(EntityHandle handle, std::string_view field4,
+void SnapshotEncoder::write_dense_inline_record(EntityHandle handle, std::string_view field4,
                                                 std::uint32_t field15, double field18,
                                                 std::string_view field25, float field27,
                                                 bool field33, double field35, std::uint32_t field41,
@@ -662,7 +662,7 @@ void SnapshotEncoder::write_dense_group_minus27(EntityHandle handle, std::string
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_group_minus16(
+void SnapshotEncoder::write_dense_loadout_record(
     EntityHandle handle, std::span<const std::uint32_t> field3,
     std::span<const std::string_view> field10, std::uint8_t field11, std::uint8_t field12,
     float field19, std::uint32_t field30, std::span<const std::uint32_t> field39, float field42,
@@ -693,12 +693,10 @@ void SnapshotEncoder::write_dense_group_minus16(
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_group72(EntityHandle handle, std::uint8_t field1, float field5,
-                                          std::string_view field6,
-                                          std::span<const std::uint8_t> field16,
-                                          std::uint8_t field20, float field21, float field24,
-                                          float field32, std::uint8_t field34, std::uint8_t field47,
-                                          std::uint32_t field56) {
+void SnapshotEncoder::write_dense_player_controller(
+    EntityHandle handle, std::uint8_t field1, float field5, std::string_view field6,
+    std::span<const std::uint8_t> field16, std::uint8_t field20, float field21, float field24,
+    float field32, std::uint8_t field34, std::uint8_t field47, std::uint32_t field56) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
   updates_.write_u8(field1);
@@ -721,7 +719,7 @@ void SnapshotEncoder::write_dense_group72(EntityHandle handle, std::uint8_t fiel
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_group152_extended(EntityHandle handle, std::uint8_t field2,
+void SnapshotEncoder::write_dense_identity_extended(EntityHandle handle, std::uint8_t field2,
                                                     std::uint8_t field26, std::uint8_t field31,
                                                     std::uint32_t field58, float field59,
                                                     std::span<const std::uint8_t> field60,
@@ -746,8 +744,8 @@ void SnapshotEncoder::write_dense_group152_extended(EntityHandle handle, std::ui
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_byte_group52(EntityHandle handle, std::uint8_t field22,
-                                               std::uint8_t field54) {
+void SnapshotEncoder::write_dense_drop_state(EntityHandle handle, std::uint8_t field22,
+                                             std::uint8_t field54) {
   const std::array<std::uint8_t, 2> values{{field22, field54}};
   write_dense_byte_group(handle, values);
 }

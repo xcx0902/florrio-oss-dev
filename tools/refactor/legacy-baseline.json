@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "note": "Known legacy occurrences at the P1 formatting baseline. Later phases must reduce them; P7 requires an empty ledger. Never raise an entry to hide new code.",
-  "scannedAt": "2026-11-03",
+  "scannedAt": "2026-11-04",
   "patterns": {
     "bare-business-id": {
       "client/src/state/world.ts": 1,
@@ -69,9 +69,6 @@
     "kept-alive": {},
     "memory-offset": {
       "client/src/render/world.ts": 1,
-      "client/src/schema/protocol.ts": 145,
-      "client/tests/integration/snapshot-codec.test.mjs": 19,
-      "client/tests/unit/snapshot-domain.test.mjs": 5,
       "docs/semantics/ai.md": 22,
       "docs/semantics/tick.md": 2,
       "engine/include/engine/model/entity.hpp": 53,
@@ -82,7 +79,6 @@
       "engine/include/engine/sim/player_loadout.hpp": 12,
       "engine/include/engine/sim/player.hpp": 2,
       "engine/include/engine/sim/spatial.hpp": 3,
-      "engine/src/net/snapshot_codec.cpp": 1,
       "engine/src/sim/ai_internal.hpp": 2,
       "engine/src/sim/ai.cpp": 9,
       "engine/src/sim/bounds.cpp": 1,
@@ -97,16 +93,13 @@
       "engine/src/sim/species_attacks.cpp": 1,
       "engine/src/sim/targeting.cpp": 1,
       "engine/src/sim/tick.cpp": 1,
-      "engine/tests/unit/cases/spawn_loadout.inc": 1,
-      "schema/protocol.yaml": 145,
-      "tests/unit/protocol-contracts.test.mjs": 3
+      "engine/tests/unit/cases/spawn_loadout.inc": 1
     },
     "numbered-snapshot-field": {
       "client/src/render/hud/index.ts": 1,
       "client/src/render/hud/state.ts": 1,
       "client/src/render/petal-transfers.ts": 1,
       "client/src/state/loadout.ts": 1,
-      "client/src/state/snapshot-projection.ts": 1,
       "client/tests/integration/menu-interactions.test.mjs": 4,
       "client/tests/integration/snapshot-codec.test.mjs": 10,
       "client/tests/unit/snapshot-domain.test.mjs": 1,
@@ -114,14 +107,9 @@
       "engine/src/net/snapshot_codec.cpp": 96,
       "engine/tests/unit/test_passives_pets.cpp": 2,
       "engine/tests/unit/test_peer_visibility.cpp": 1,
-      "schema/protocol.yaml": 1,
       "tests/unit/protocol-contracts.test.mjs": 2,
       "tools/schema/protocol.mjs": 2
     },
-    "unknown-field": {
-      "engine/include/engine/net/dense_fields.hpp": 1,
-      "engine/include/engine/net/generated_protocol.hpp": 2,
-      "tests/unit/protocol-contracts.test.mjs": 1
-    }
+    "unknown-field": {}
   }
 }

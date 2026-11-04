@@ -32,23 +32,23 @@ worker:
           note: 'true completes the callback; false is an intermediate packet',
         }
       - { name: data, type: bytes, optional: true, confidence: high }
+  # Entry points the Worker client calls. Argument types are the C declarations
+  # in engine/include/engine/abi.h and the export list in
+  # engine/abi-exports.json; this table records what each entry point does.
   functions:
     - {
         name: sp_server_init,
-        args: [0, 0],
         confidence: high,
         behavior: 'initialize world and catalogs, schedule the 50 ms tick, flush initial output',
       }
     - {
         name: sp_server_send,
-        args: [pointer, length],
         confidence: high,
         behavior: 'decode one client input packet and apply its commands',
       }
-    - { name: sp_server_think, args: [], confidence: high, behavior: 'one 20 Hz simulation tick' }
+    - { name: sp_server_think, confidence: high, behavior: 'one 20 Hz simulation tick' }
     - {
         name: sp_server_flush,
-        args: [0, 0],
         confidence: high,
         behavior: 'drain the output queue, send one final empty response, free packets',
       }
@@ -96,13 +96,8 @@ output:
   queue:
     capacity: 16
     confidence: high
-  packet:
-    headerBytes: 16
-    lengthOffset: 4
-    heapPayloadOffset: 12
-    inlinePayloadOffset: 16
-    inlinePayloadBytes: 4096
-    confidence: high
+  # Output packets are opaque byte payloads: OutputPacket owns a vector and the
+  # Worker copies it out. There is no heap/inline struct layout to describe.
   payload:
     typeByte: first
     types:
@@ -156,81 +151,72 @@ output:
       componentCount: 30
       sparseFieldCount: 63
       denseGroupCount: 19
-      denseComponent30ExtraFields: 6
+      denseExtendedFieldCount: 6
       flags:
         1: component declarations use a 32-bit mask
         2: skip component declarations
         8: dense existing-component fields
-        64: dense component 30 includes fields 58-63
-        128: mark entity byte 44 bit 0
+        64: the identity component also carries fields 58-63
+        128: arrival marker for this entity record
       confidence: high
-    fieldComponents:
-      # Sparse field groups:
-      # readField branches. Constructor 0 denotes an inline component, not an
-      # unverified/default mapping. Domain field26 remains a permanent kind byte.
-      1: { constructor: 478, offset: 8 }
-      2: { constructor: 491, offset: 8 }
-      3: { constructor: 477, offset: 8 }
-      4: { constructor: 0, offset: 8 }
-      5: { constructor: 478, offset: 16 }
-      6: { constructor: 478, offset: 40 }
-      7: { constructor: 467, offset: 8 }
-      8: { constructor: 609, offset: 8 }
-      9: { constructor: 755, offset: 8 }
-      10: { constructor: 477, offset: 88 }
-      11: { constructor: 477, offset: 248 }
-      12: { constructor: 477, offset: 249 }
-      13: { constructor: 0, offset: 8 }
-      14: { constructor: 756, offset: 8 }
-      15: { constructor: 0, offset: 24 }
-      16: { constructor: 478, offset: 52 }
-      17: { constructor: 549, offset: 8 }
-      18: { constructor: 0, offset: 32 }
-      19: { constructor: 477, offset: 252 }
-      20: { constructor: 478, offset: 104 }
-      21: { constructor: 478, offset: 108 }
-      22: { constructor: 670, offset: 8 }
-      23: { constructor: 0, offset: 8 }
-      24: { constructor: 478, offset: 112 }
-      25: { constructor: 0, offset: 40 }
-      26: { constructor: 491, offset: 9 }
-      27: { constructor: 0, offset: 56 }
-      28: { constructor: 609, offset: 40 }
-      29: { constructor: 533, offset: 8 }
-      30: { constructor: 477, offset: 256 }
-      31: { constructor: 491, offset: 10 }
-      32: { constructor: 478, offset: 136 }
-      33: { constructor: 0, offset: 60 }
-      34: { constructor: 478, offset: 140 }
-      35: { constructor: 0, offset: 72 }
-      36: { constructor: 493, offset: 8 }
-      37: { constructor: 0, offset: 32 }
-      38: { constructor: 809, offset: 8 }
-      39: { constructor: 477, offset: 260 }
-      40: { constructor: 533, offset: 9 }
-      41: { constructor: 0, offset: 88 }
-      42: { constructor: 477, offset: 340 }
-      43: { constructor: 757, offset: 8 }
-      44: { constructor: 0, offset: 92 }
-      45: { constructor: 477, offset: 344 }
-      46: { constructor: 477, offset: 352 }
-      47: { constructor: 478, offset: 141 }
-      48: { constructor: 677, offset: 8 }
-      49: { constructor: 609, offset: 64 }
-      50: { constructor: 758, offset: 8 }
-      51: { constructor: 0, offset: 96 }
-      52: { constructor: 477, offset: 356 }
-      53: { constructor: 458, offset: 8 }
-      54: { constructor: 670, offset: 9 }
-      55: { constructor: 458, offset: 12 }
-      56: { constructor: 478, offset: 144 }
-      57: { constructor: 0, offset: 20 }
-      58: { constructor: 491, offset: 12 }
-      59: { constructor: 491, offset: 16 }
-      60: { constructor: 491, offset: 40 }
-      61: { constructor: 491, offset: 120 }
-      62: { constructor: 491, offset: 168 }
-      63: { constructor: 491, offset: 169 }
+    # Component identities. The key is the real component-declaration ordinal:
+    # bit (ordinal - 1) of the update component mask. Every dense group below
+    # carries the payload of one component; a component without a dense group is
+    # a presence-only marker written by the replication path. Group fields are
+    # the complete set of fields that component stores.
+    components:
+      1: { name: drop-state, note: 'drop species byte and collected flag' }
+      2: { name: ai-activity, note: 'AI activity flags' }
+      5: { name: petal-variant, note: 'petal variant flags: epic colour, large, launched' }
+      6: { name: player-controller, note: 'camera target, profile/death bytes and viewer handle' }
+      7: { name: petal-species, note: 'petal species tag byte' }
+      8:
+        { name: reserved-8, note: 'decode-only record; the product publishes none of these fields' }
+      10:
+        {
+          name: reserved-10,
+          note: 'decode-only record; the product publishes none of these fields',
+        }
+      12:
+        {
+          name: web-projectile-tag,
+          payload: none,
+          note: 'presence marker for a web-tagged projectile',
+        }
+      14:
+        {
+          name: reserved-14,
+          note: 'decode-only record; the product publishes none of these fields',
+        }
+      15:
+        {
+          name: reserved-15,
+          note: 'decode-only record; the product publishes none of these fields',
+        }
+      16: { name: loadout-record, note: 'equipped petal slot/instance and loadout arrays' }
+      18: { name: projectile-tag, payload: none, note: 'presence marker for a projectile' }
+      19:
+        {
+          name: reserved-19,
+          note: 'decode-only record; the product publishes none of these fields',
+        }
+      20: { name: health, note: 'current and maximum health' }
+      21: { name: transform, note: 'angle and visual position' }
+      22:
+        {
+          name: reserved-22,
+          note: 'decode-only record; the product publishes none of these fields',
+        }
+      25: { name: lifecycle, note: 'death-processed flag' }
+      26: { name: collision-radius, note: 'physics collider radius' }
+      27: { name: inline-record, note: 'public display name and decode-only inline values' }
+      28:
+        {
+          name: reserved-28,
+          note: 'decode-only record; the product publishes none of these fields',
+        }
+      30:
+        { name: identity, note: 'look/species, kind, expression/variant, level progress and score' }
     indexedFields:
       3: { element: reference, count: 10 }
       4: { element: string, count: 1 }
@@ -261,32 +247,25 @@ output:
       confidence: high
       note: 'Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing.'
     denseGroups:
-      - { offset: 52, component: 1, fields: [22, 54] }
-      - { offset: 56, component: 2, fields: [36] }
-      - { offset: 68, component: 5, fields: [9] }
-      - { offset: 72, component: 6, fields: [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56] }
-      - { offset: 76, component: 7, fields: [50] }
-      - { offset: -8, component: 8, fields: [13, 37] }
-      - { offset: 84, component: 10, fields: [17] }
-      - { offset: 100, component: 14, fields: [43] }
-      - { offset: -15, component: 15, fields: [23, 57] }
-      - { offset: -16, component: 16, fields: [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52] }
-      - { offset: 112, component: 19, fields: [48] }
-      - { offset: 116, component: 20, fields: [53, 55] }
-      - { offset: 120, component: 21, fields: [8, 28, 49] }
-      - { offset: 124, component: 22, fields: [29, 40] }
-      - { offset: 136, component: 25, fields: [38] }
-      - { offset: 140, component: 26, fields: [7] }
-      # Dense decoding includes both 44/51.
-      # 259155, 259334 stores state+1600/1604/1608 = inline27+88/92/96.
-      - { offset: -27, component: 27, fields: [4, 15, 18, 25, 27, 33, 35, 41, 44, 51] }
-      - { offset: 144, component: 28, fields: [14] }
-      - {
-          offset: 152,
-          component: 30,
-          fields: [2, 26, 31],
-          extendedFields: [58, 59, 60, 61, 62, 63],
-        }
+      - { component: 1, fields: [22, 54] }
+      - { component: 2, fields: [36] }
+      - { component: 5, fields: [9] }
+      - { component: 6, fields: [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56] }
+      - { component: 7, fields: [50] }
+      - { component: 8, fields: [13, 37] }
+      - { component: 10, fields: [17] }
+      - { component: 14, fields: [43] }
+      - { component: 15, fields: [23, 57] }
+      - { component: 16, fields: [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52] }
+      - { component: 19, fields: [48] }
+      - { component: 20, fields: [53, 55] }
+      - { component: 21, fields: [8, 28, 49] }
+      - { component: 22, fields: [29, 40] }
+      - { component: 25, fields: [38] }
+      - { component: 26, fields: [7] }
+      - { component: 27, fields: [4, 15, 18, 25, 27, 33, 35, 41, 44, 51] }
+      - { component: 28, fields: [14] }
+      - { component: 30, fields: [2, 26, 31], extendedFields: [58, 59, 60, 61, 62, 63] }
     events:
       - { opcode: 9, name: chat-string, confidence: high }
       - { opcode: 11, name: entity-time, confidence: high }

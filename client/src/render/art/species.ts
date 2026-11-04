@@ -227,8 +227,6 @@ export function antWings(
  * radii/offsets are component geometry, not each species' collision radius. */
 export function drawAnt(
   context: Canvas2DContext,
-  _handle: number,
-  _radius = 14,
   caste: AntCaste = AntCaste.Baby,
   now = 0,
   flash = 0,
@@ -388,7 +386,7 @@ export function cactusPaths(radius: number): {
     },
   };
 }
-export function drawCactus(context: Canvas2DContext, radius: number, _now = 0, flash = 0): void {
+export function drawCactus(context: Canvas2DContext, radius: number, flash = 0): void {
   const resources = renderResources();
   radius = positiveRadius(radius, 50);
   const geometry = cactusPaths(radius),
@@ -597,7 +595,7 @@ export function drawSpecies(
       drawRock(context, handle, radius, flash);
       return;
     case SpeciesId.Cactus:
-      drawCactus(context, radius, now, flash);
+      drawCactus(context, radius, flash);
       return;
     case SpeciesId.Ladybug:
     case SpeciesId.MassiveLadybug:
@@ -614,7 +612,7 @@ export function drawSpecies(
     case SpeciesId.QueenAnt: {
       const caste = antCaste(species);
       if (caste !== undefined) {
-        drawAnt(context, handle, radius, caste, now, flash, animation.activity);
+        drawAnt(context, caste, now, flash, animation.activity);
       }
       return;
     }

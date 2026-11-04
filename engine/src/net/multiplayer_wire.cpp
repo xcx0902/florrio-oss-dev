@@ -193,7 +193,13 @@ bool validate_public_entity(std::span<const std::uint8_t> bytes, std::uint32_t h
     return value && std::isfinite(*value);
   };
   constexpr auto core = kPublicComponentMask;
-  constexpr auto render = (1U << 4) | (1U << 6) | (1U << 11) | (1U << 17);
+  // Render components are optional decorations on top of the public core:
+  // petal artwork and projectile presence. No other component is public.
+  constexpr auto renderComponents =
+      protocol::component_bit(protocol::Component::kPetalVariant) |
+      protocol::component_bit(protocol::Component::kPetalSpecies) |
+      protocol::component_bit(protocol::Component::kWebProjectileTag) |
+      protocol::component_bit(protocol::Component::kProjectileTag);
   for (std::uint32_t i = 0; i < count; ++i) {
     if (r.read_u32_le() != handle) {
       return false;
@@ -216,7 +222,7 @@ bool validate_public_entity(std::span<const std::uint8_t> bytes, std::uint32_t h
       return false;
     }
     const auto declared = r.read_u32_le();
-    if (!declared || (*declared & ~(core | render)) || (*declared & core) != core) {
+    if (!declared || (*declared & ~(core | renderComponents)) || (*declared & core) != core) {
       return false;
     }
     mask = *declared;

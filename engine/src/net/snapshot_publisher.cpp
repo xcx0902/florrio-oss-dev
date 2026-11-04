@@ -288,11 +288,10 @@ std::vector<std::uint8_t> SnapshotPublisher::publish(const World& world, PlayerI
         writer.write_dense_default_groups(entity);
       }
       if (entity.kind == EntityKind::kPlayer && entity.death_processed && owner != nullptr) {
-        // The archived client reads death statistics from control component 478,
-        // a standalone record that the domain transport does not carry. Emit the
-        // same fields on the controlled body so the death screen and the respawn
-        // menu retain the original killer/lost-item/score data. These records
-        // intentionally follow the dense defaults, whose group 72 writes zeros.
+        // The player-controller profile survives death, but the domain
+        // transport carries it on the controlled body. Emit the death screen
+        // fields there so the respawn menu can read killer, lost items and
+        // score. They follow the dense defaults, which zero the same fields.
         writer.write_mask_string_field(entity.handle, mask, 6U, entity.killer_name);
         // Controller survivors: up to ten, after the first three ground drops.
         const auto& kept_items = owner->last_death_kept();

@@ -12,8 +12,8 @@ import { DENSE_GROUPS, DENSE_GROUP_SPECS } from '../state/field-types.js';
 import type { EntitySnapshot } from '../state/snapshot-types.js';
 
 const plans = DENSE_GROUPS.map((group) => ({
-  offset: group.offset,
-  specs: DENSE_GROUP_SPECS[group.offset] ?? [],
+  component: group.component,
+  specs: DENSE_GROUP_SPECS[group.component],
 }));
 function same(a: Uint8Array, b: Uint8Array): boolean {
   return a.length === b.length && a.every((v, i) => v === b[i]);

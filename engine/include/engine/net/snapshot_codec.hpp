@@ -1,6 +1,8 @@
 #pragma once
 #include "engine/core/byte_reader.hpp"
 #include "engine/model/entity.hpp"
+#include "engine/net/generated_protocol.hpp"
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <string_view>
@@ -37,8 +39,8 @@ class SnapshotEncoder {
   /** Domain entry: 2 (species), 5/24 (camera target), 7 (radius), 8 (angle),
    * 26 (domain kind), 28/49 (visual y/x), 31 (expression/variant), 38
    * (lifecycle flags), 53 (health) and 55
-   * (maximum health). The field mapping follows the recovered client
-   * constructor table; kind is a documented permanent domain extension.
+   * (maximum health). The field mapping follows the generated component
+   * table; kind is a documented permanent domain extension.
    * Camera axes (5/24) and visual axes (49/28) have independent dirty clocks:
    * visual coordinates can change during movement then return after clamping. */
   void write_mask_domain_fields(EntityHandle handle, std::uint32_t component_mask,
@@ -70,19 +72,27 @@ class SnapshotEncoder {
   void write_dense_byte_groups(EntityHandle handle,
                                std::span<const std::span<const std::uint8_t>> groups);
   void write_dense_float_group(EntityHandle handle, std::span<const float> values);
-  /** Group 116 (health/maxHealth) followed by group 120 (raw angle, angle,
-   * radius) in one dense update, matching the client's present-group plan. */
-  void write_dense_health_angle_groups(EntityHandle handle, float health, float max_health,
-                                       std::uint16_t angle_raw, float angle, float radius);
-  /** Dense payload must contain every group selected by the last mask:
-   * 52, 56, 72 (camera target), 116, 120 (visual transform), 140 (radius),
-   * and 152 (species/kind/variant).
+  /** Health component (health/maxHealth) followed by transform (raw angle,
+   * angle) and collision radius in one dense update, matching the client's
+   * present-component plan. */
+  void write_dense_health_transform_groups(EntityHandle handle, float health, float max_health,
+                                           std::uint16_t angle_raw, float angle, float radius);
+  /** Dense payload must contain every component selected by the last mask:
+   * drop-state, AI activity, player controller, health, transform, collision
+   * radius and identity.
    * The three identity bytes are required even after player profile updates;
    * flags bit 64 stays clear, so the profile extension is not repeated. */
   static constexpr std::uint32_t kDefaultDenseComponentMask =
-      (1U << 0) | (1U << 1) | (1U << 5) | (1U << 19) | (1U << 20) | (1U << 25) | (1U << 29);
+      protocol::component_bit(protocol::Component::kDropState) |
+      protocol::component_bit(protocol::Component::kAiActivity) |
+      protocol::component_bit(protocol::Component::kPlayerController) |
+      protocol::component_bit(protocol::Component::kHealth) |
+      protocol::component_bit(protocol::Component::kTransform) |
+      protocol::component_bit(protocol::Component::kCollisionRadius) |
+      protocol::component_bit(protocol::Component::kIdentity);
   void write_dense_default_groups(const Entity& entity);
-  /** Network v2: groups 116/120/140/152 base; no control or inventory fields. */
+  /** Network v2: health, transform, collision radius and identity base fields;
+   * no control or inventory fields. */
   void write_dense_public_groups(const Entity& entity);
   /** Complete indexed player arrays, including zero entries on clear/discard.
    * Each array can be omitted when unchanged on this stream. */
@@ -93,34 +103,35 @@ class SnapshotEncoder {
   void write_dense_string_group(EntityHandle handle, std::string_view value);
   void write_dense_angle_float_group(EntityHandle handle, std::uint16_t angle_raw, float first,
                                      float second);
-  /** Partial group 152: fields 2, 26, 31 (u8) and 58 (varint). */
-  void write_dense_group152_base(EntityHandle handle, std::uint8_t field2, std::uint8_t field26,
+  /** Partial identity component: fields 2, 26, 31 (u8) and 58 (varint). */
+  void write_dense_identity_base(EntityHandle handle, std::uint8_t field2, std::uint8_t field26,
                                  std::uint8_t field31, std::uint32_t field58);
-  /** Group 152 extended: base + 59 f32, 60 byte[16], 61 short[8], 62/63 u8. */
   void write_dense_bit_group(EntityHandle handle, std::span<const bool> values);
   void write_dense_float_bit_group(EntityHandle handle, float value, bool bit_value);
   void write_dense_reference_group(EntityHandle handle, std::uint32_t first, std::uint32_t second);
-  /** Inline group -27: ten fields, ending in varints 41, 44 and 51. */
-  void write_dense_group_minus27(EntityHandle handle, std::string_view field4,
+  /** Inline record: ten fields, ending in varints 41, 44 and 51. */
+  void write_dense_inline_record(EntityHandle handle, std::string_view field4,
                                  std::uint32_t field15, double field18, std::string_view field25,
                                  float field27, bool field33, double field35, std::uint32_t field41,
                                  std::uint32_t field44, std::uint32_t field51);
-  void write_dense_group_minus16(EntityHandle handle, std::span<const std::uint32_t> field3,
-                                 std::span<const std::string_view> field10, std::uint8_t field11,
-                                 std::uint8_t field12, float field19, std::uint32_t field30,
-                                 std::span<const std::uint32_t> field39, float field42,
-                                 float field45, std::uint8_t field46, std::uint32_t field52);
-  void write_dense_group72(EntityHandle handle, std::uint8_t field1, float field5,
-                           std::string_view field6, std::span<const std::uint8_t> field16,
-                           std::uint8_t field20, float field21, float field24, float field32,
-                           std::uint8_t field34, std::uint8_t field47, std::uint32_t field56);
-  void write_dense_group152_extended(EntityHandle handle, std::uint8_t field2, std::uint8_t field26,
+  void write_dense_loadout_record(EntityHandle handle, std::span<const std::uint32_t> field3,
+                                  std::span<const std::string_view> field10, std::uint8_t field11,
+                                  std::uint8_t field12, float field19, std::uint32_t field30,
+                                  std::span<const std::uint32_t> field39, float field42,
+                                  float field45, std::uint8_t field46, std::uint32_t field52);
+  void write_dense_player_controller(EntityHandle handle, std::uint8_t field1, float field5,
+                                     std::string_view field6, std::span<const std::uint8_t> field16,
+                                     std::uint8_t field20, float field21, float field24,
+                                     float field32, std::uint8_t field34, std::uint8_t field47,
+                                     std::uint32_t field56);
+  /** Extended identity component: base + 59 f32, 60 byte[16], 61 short[8], 62/63 u8. */
+  void write_dense_identity_extended(EntityHandle handle, std::uint8_t field2, std::uint8_t field26,
                                      std::uint8_t field31, std::uint32_t field58, float field59,
                                      std::span<const std::uint8_t> field60,
                                      std::span<const std::uint16_t> field61, std::uint8_t field62,
                                      std::uint8_t field63);
-  /** Dense group 52 (fields 22,54), byte values only. */
-  void write_dense_byte_group52(EntityHandle handle, std::uint8_t field22, std::uint8_t field54);
+  /** Drop-state component (fields 22, 54), byte values only. */
+  void write_dense_drop_state(EntityHandle handle, std::uint8_t field22, std::uint8_t field54);
   /** Mask entry plus one inline array element. */
   void write_mask_byte_array_field(EntityHandle handle, std::uint32_t component_mask,
                                    std::uint32_t field, std::uint32_t index, std::uint8_t value);

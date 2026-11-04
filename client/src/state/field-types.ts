@@ -3,10 +3,9 @@ export {
   BIT_FIELDS,
   BYTE_ARRAY_FIELDS,
   BYTE_FIELDS,
-  DENSE_GROUP_COMPONENTS,
+  Component,
   DENSE_GROUP_SPECS,
   DENSE_GROUPS,
-  FIELD_COMPONENTS,
   FIELD_TYPES,
   FLOAT_FIELDS,
   INDEXED_FIELDS,
@@ -16,20 +15,21 @@ export {
   STRING_FIELDS,
   VARINT_FIELDS,
 } from '../schema/protocol.js';
-export type {
-  DenseFieldGroup,
-  DenseFieldSpec,
-  DenseFieldType,
-  FieldComponent,
-} from '../schema/protocol.js';
+export type { DenseFieldGroup, DenseFieldSpec, DenseFieldType } from '../schema/protocol.js';
 
-import { DENSE_GROUP_COMPONENTS } from '../schema/protocol.js';
+import { DENSE_GROUPS } from '../schema/protocol.js';
 
+/** Component-mask bit for a component ordinal. */
+export function componentBit(component: number): number {
+  return 1 << (component - 1);
+}
+
+/** Components whose dense payload is selected by a component mask. */
 export function densePresentForMask(mask: number): ReadonlySet<number> {
   const present = new Set<number>();
-  for (const [offsetText, ordinal] of Object.entries(DENSE_GROUP_COMPONENTS)) {
-    if ((mask & (1 << (ordinal - 1))) !== 0) {
-      present.add(Number(offsetText));
+  for (const { component } of DENSE_GROUPS) {
+    if ((mask & componentBit(component)) !== 0) {
+      present.add(component);
     }
   }
   return present;

@@ -64,12 +64,11 @@ export function advanceDropVisualState(
 }
 /** func763's pickup pass draws a black square rim around a rarity card.
  * func587 supplies that card, the catalogue icon and its outlined name.
- * The old radius/age arguments remain usable for isolated artwork fixtures;
- * live world rendering supplies the retained native state on every frame. */
+ * `ageMs` drives the arrival progress when no retained native state exists;
+ * live world rendering supplies that state on every frame. */
 export function drawDrop(
   context: Canvas2DContext,
   type: number,
-  _radius = 14,
   ageMs = Infinity,
   visual?: Readonly<DropVisualState>,
 ): void {

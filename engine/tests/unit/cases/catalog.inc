@@ -1,14 +1,14 @@
 void test_dense_field_catalog() {
-  CHECK(engine::kDenseGroups.size() == 19);
-  const auto* group52 = engine::dense_group_for_field(22);
-  CHECK(group52 != nullptr);
-  CHECK(group52->offset == 52);
-  const auto* group152 = engine::dense_group_for_field(59);
-  CHECK(group152 != nullptr);
-  CHECK(group152->offset == 152);
+  CHECK(engine::protocol::kDenseGroups.size() == 19);
+  const auto* dropState = engine::dense_group_for_field(22);
+  CHECK(dropState == engine::dense_group(engine::protocol::Component::kDropState));
+  CHECK(dropState->component == engine::protocol::Component::kDropState);
+  const auto* identity = engine::dense_group_for_field(59);
+  CHECK(identity == engine::dense_group(engine::protocol::Component::kIdentity));
   const auto* extended = engine::dense_group_for_field(60);
-  CHECK(extended == group152);
+  CHECK(extended == identity);
   CHECK(engine::dense_group_for_field(64) == nullptr);
+  CHECK(engine::dense_group(engine::protocol::Component::kProjectileTag) == nullptr);
 }
 
 void test_progression() {
@@ -259,7 +259,7 @@ void test_orbit_reindex_after_removal() {
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 5U);
   CHECK(engine::test::player(world).loadout().change_slot_type(
       world, engine::test::player(world), engine::test::player(world).profile(), 2, 0));
-  engine::assign_petal_orbit_indices(world, engine::test::player(world));
+  engine::assign_petal_orbit_indices(engine::test::player(world));
   CHECK(engine::test::player(world).petals().size() == 4U);
   CHECK(engine::test::player(world).loadout().orbit_positions() == 4U);
   std::array<std::uint8_t, 4> indices{};
@@ -291,7 +291,7 @@ void test_shared_orbit_slot_without_component_keeps_shared_position() {
       engine::f32(14.0F), 0U, 0U);
   CHECK(componentless.valid());
   engine::test::player(world).loadout().set_handle(0, 2, componentless);
-  engine::assign_petal_orbit_indices(world, engine::test::player(world));
+  engine::assign_petal_orbit_indices(engine::test::player(world));
   const engine::EntityHandle basic = engine::test::player(world).loadout().handle(1, 0);
   engine::PetalOrbitState* basic_state = nullptr;
   for (auto& state : engine::test::player(world).petals()) {

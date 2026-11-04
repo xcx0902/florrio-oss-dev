@@ -64,7 +64,7 @@ std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot, std:
   return orbit_index;
 }
 
-void assign_petal_orbit_indices(World&, PlayerState& state) {
+void assign_petal_orbit_indices(PlayerState& state) {
   auto& loadout = state.loadout();
   const auto& slots = loadout.slots();
   std::uint8_t orbit_index = 0;
@@ -224,7 +224,7 @@ void update_petal_orbit(World& world, const PetalOrbitState& state, double step_
   entity->velocity.y += acceleration * unit_y;
 }
 
-void advance_loadout_orbit_phase(World&, PlayerState& state, double step_milliseconds) {
+void advance_loadout_orbit_phase(PlayerState& state, double step_milliseconds) {
   const auto& slots = state.loadout().slots();
   const std::uint8_t active =
       std::min<std::uint8_t>(8U, static_cast<std::uint8_t>(state.profile().active_slots()));
@@ -306,7 +306,7 @@ void damage_zone_locked_petals(World& world, PlayerState& state, double step_mil
 }
 
 void update_petal_orbits(World& world, PlayerState& state, double step_milliseconds) {
-  assign_petal_orbit_indices(world, state);
+  assign_petal_orbit_indices(state);
   const std::uint32_t buttons = state.input().buttons;
   const Entity* player = world.entities().get(state.player());
   // Rose consumption erases its own orbit record. Advance before processing,

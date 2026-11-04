@@ -1,18 +1,25 @@
 import type { DenseFieldSpec } from '../state/field-types.js';
-import { OUTPUT_PAYLOAD_TYPE, SNAPSHOT_EVENT } from '../schema/protocol.js';
+import {
+  COMPONENT_COUNT,
+  EXTENDED_DENSE_BASE_FIELDS,
+  EXTENDED_DENSE_COMPONENT,
+  OUTPUT_PAYLOAD_TYPE,
+  SNAPSHOT_EVENT,
+} from '../schema/protocol.js';
 import {
   BIT_FIELDS,
   BYTE_ARRAY_FIELDS,
   BYTE_FIELDS,
-  DENSE_GROUP_COMPONENTS,
+  DENSE_GROUPS,
   FLOAT_FIELDS,
   REFERENCE_FIELDS,
   STRING_ARRAY_FIELDS,
   STRING_FIELDS,
   VARINT_FIELDS,
+  componentBit,
 } from '../state/field-types.js';
 
-import { buildComponents, projectDomain } from '../state/snapshot-projection.js';
+import { projectDomain } from '../state/snapshot-projection.js';
 import type {
   DenseGroupPlan,
   DenseValue,
@@ -89,9 +96,8 @@ export function decodeSnapshotBlockCounts(bytes: Uint8Array): SnapshotBlockCount
 
 export class SnapshotDecoder {
   private readonly masks = new Map<number, number>();
-  /** Native component-pointer presence: the original decoder reads dense
-   * groups only when the component constructor at the entity offset exists.
-   * The mask/ordinal declaration is the wire proxy for that pointer. */
+  /** Components declared for an entity. A dense group is decoded only when its
+   * component is present; the declaration mask and ordinal deltas both feed it. */
   private readonly componentPointers = new Map<number, Set<number>>();
 
   constructor(
@@ -103,25 +109,25 @@ export class SnapshotDecoder {
   private setMask(handle: number, mask: number): void {
     this.masks.set(handle, mask);
     const pointers = new Set<number>();
-    for (let ordinal = 1; ordinal <= 30; ++ordinal) {
-      if ((mask & (1 << (ordinal - 1))) !== 0) {
-        pointers.add(ordinal);
+    for (const { component } of DENSE_GROUPS) {
+      if ((mask & componentBit(component)) !== 0) {
+        pointers.add(component);
       }
     }
     this.componentPointers.set(handle, pointers);
   }
 
-  private addOrdinals(handle: number, ordinals: readonly number[]): void {
+  private addOrdinals(handle: number, components: readonly number[]): void {
     const pointers = this.componentPointers.get(handle) ?? new Set<number>();
-    for (const ordinal of ordinals) {
-      if (ordinal >= 1 && ordinal <= 30) {
-        pointers.add(ordinal);
+    for (const component of components) {
+      if (component >= 1 && component <= COMPONENT_COUNT) {
+        pointers.add(component);
       }
     }
     this.componentPointers.set(handle, pointers);
   }
 
-  /** Native component-pointer presence, with the caller-supplied mask callback
+  /** Components with dense payload, with the caller-supplied mask callback
    * retained for tests and transitional packets. */
   private presentForHandle(handle: number, mask: number): ReadonlySet<number> {
     if (this.presentFor) {
@@ -132,9 +138,9 @@ export class SnapshotDecoder {
       return this.present;
     }
     const result = new Set<number>();
-    for (const [offsetText, ordinal] of Object.entries(DENSE_GROUP_COMPONENTS)) {
-      if (pointers.has(ordinal)) {
-        result.add(Number(offsetText));
+    for (const { component } of DENSE_GROUPS) {
+      if (pointers.has(component)) {
+        result.add(component);
       }
     }
     return result;
@@ -190,11 +196,13 @@ export class SnapshotDecoder {
       const present = this.presentForHandle(handle, componentMask);
       const denseFields: Record<number, DenseValue> = {};
       for (const plan of this.plans) {
-        if (!present.has(plan.offset)) {
+        if (!present.has(plan.component)) {
           continue;
         }
         const specs =
-          plan.offset === 152 && (flags & 64) === 0 ? plan.specs.slice(0, 3) : plan.specs;
+          plan.component === EXTENDED_DENSE_COMPONENT && (flags & 64) === 0
+            ? plan.specs.slice(0, EXTENDED_DENSE_BASE_FIELDS)
+            : plan.specs;
         const values = this.readDense(reader, specs);
         if (values === null) {
           return null;
@@ -207,10 +215,9 @@ export class SnapshotDecoder {
       const cameraY = typeof denseFields[24] === 'number' ? denseFields[24] : undefined;
       const positionX = typeof denseFields[49] === 'number' ? denseFields[49] : (cameraX ?? 0);
       const positionY = typeof denseFields[28] === 'number' ? denseFields[28] : (cameraY ?? 0);
-      const components = buildComponents(denseFields);
       return {
         handle,
-        ...projectDomain(components, denseFields),
+        ...projectDomain(denseFields),
         x: positionX,
         y: positionY,
         cameraX,
@@ -219,11 +226,10 @@ export class SnapshotDecoder {
         flags,
         componentMask,
         denseFields,
-        components,
       };
     }
     let componentMask = this.masks.get(handle) ?? 0;
-    const componentOrdinals: number[] = [];
+    const declaredComponents: number[] = [];
     if ((flags & 1) !== 0) {
       componentMask = reader.u32();
       this.setMask(handle, componentMask);
@@ -235,11 +241,11 @@ export class SnapshotDecoder {
           break;
         }
         ordinal += delta;
-        componentOrdinals.push(ordinal);
-        componentMask |= 1 << (ordinal - 1);
+        declaredComponents.push(ordinal);
+        componentMask |= componentBit(ordinal);
       }
       this.setMask(handle, componentMask);
-      this.addOrdinals(handle, componentOrdinals);
+      this.addOrdinals(handle, declaredComponents);
     }
     let field = 0;
     let byteField1 = 0;
@@ -383,10 +389,9 @@ export class SnapshotDecoder {
     }
     const positionX = floatFields[49] ?? floatFields[5] ?? 0;
     const positionY = floatFields[28] ?? floatFields[24] ?? 0;
-    const components = buildComponents(scalarValues);
     return {
       handle,
-      ...projectDomain(components),
+      ...projectDomain(scalarValues),
       x: positionX,
       y: positionY,
       angle: angleField8 ?? 0,
@@ -394,8 +399,7 @@ export class SnapshotDecoder {
       cameraY: floatFields[24],
       flags,
       componentMask,
-      componentOrdinals,
-      components,
+      declaredComponents,
       byteField1,
       byteFields,
       floatField5,

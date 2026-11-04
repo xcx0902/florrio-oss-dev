@@ -11,8 +11,6 @@ namespace engine {
 
 inline constexpr std::size_t kMaxInputPacketBytes = protocol::kMaxInputPacketBytes;
 inline constexpr std::size_t kOutputQueueCapacity = protocol::kOutputQueueCapacity;
-inline constexpr std::size_t kPacketHeaderBytes = protocol::kPacketHeaderBytes;
-inline constexpr std::size_t kInlinePayloadBytes = protocol::kInlinePayloadBytes;
 inline constexpr std::size_t kPacketXorKeyBytes = protocol::kInputXorKeyBytes;
 
 struct OutputPacket {

@@ -68,7 +68,6 @@ const pascal = (value) =>
   value.replace(/(^|[^a-zA-Z0-9]+)([a-zA-Z0-9])/g, (_, separator, letter) => letter.toUpperCase());
 const upper = (value) => value.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase();
 const cppEnum = (value) => `k${pascal(value)}`;
-const groupName = (offset) => (offset < 0 ? `Minus${-offset}` : String(offset));
 
 export function parseProtocol(source) {
   const document = YAML.parseDocument(source, { uniqueKeys: true });
@@ -108,28 +107,37 @@ export function compileProtocol(document) {
       fail(`field ${id}`, 'missing wire type');
     }
   }
-  const components = object(snapshot.fieldComponents, 'fieldComponents');
+  const components = object(snapshot.components, 'components');
+  const declaredComponents = new Map();
+  for (const [key, value] of Object.entries(components)) {
+    if (!/^[1-9][0-9]*$/.test(key)) {
+      fail(`component ${key}`, 'expected component ordinal');
+    }
+    const id = integer(Number(key), `component ${key}`, 1, componentCount);
+    const entry = object(value, `component ${id}`);
+    const name = text(entry.name, `component ${id} name`);
+    if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
+      fail(`component ${id} name`, 'expected lowercase kebab-case');
+    }
+    if ([...declaredComponents.values()].some((candidate) => candidate.name === name)) {
+      fail(`component ${id}`, 'duplicate component name');
+    }
+    const payload = own(entry, 'payload')
+      ? text(entry.payload, `component ${id} payload`)
+      : 'dense';
+    if (payload !== 'dense' && payload !== 'none') {
+      fail(`component ${id} payload`, 'expected dense or none');
+    }
+    declaredComponents.set(id, { id, name, payload });
+  }
   const indexed = object(snapshot.indexedFields, 'indexedFields');
-  for (const key of [...Object.keys(components), ...Object.keys(indexed)]) {
+  for (const key of Object.keys(indexed)) {
     if (!/^[1-9][0-9]*$/.test(key) || !fields.has(Number(key))) {
       fail(`field ${key}`, 'unknown field metadata');
     }
   }
   for (let id = 1; id <= count; ++id) {
-    if (!own(components, id)) {
-      fail(`field ${id}`, 'missing component mapping');
-    }
-    const field = fields.get(id),
-      mapping = object(components[id], `field ${id} component`);
-    field.component = {
-      constructor: integer(
-        own(mapping, 'constructor') ? mapping.constructor : undefined,
-        `field ${id} constructor`,
-        0,
-        65535,
-      ),
-      offset: integer(mapping.offset, `field ${id} offset`, 0, 65535),
-    };
+    const field = fields.get(id);
     if (own(indexed, id)) {
       const entry = object(indexed[id], `field ${id} indexed`);
       const element = text(entry.element, `field ${id} element`);
@@ -201,19 +209,25 @@ export function compileProtocol(document) {
     },
   };
   const seenFields = new Set(),
-    seenOffsets = new Set(),
     seenComponents = new Set();
+  let previousComponent = 0;
   const groups = array(snapshot.denseGroups, 'denseGroups').map((entry, index) => {
     object(entry, `denseGroups[${index}]`);
-    const offset = integer(entry.offset, 'dense group offset', -65535, 65535);
     const component = integer(entry.component, 'dense component', 1, componentCount);
-    if (seenOffsets.has(offset) || seenComponents.has(component)) {
-      fail(`dense group ${offset}`, 'duplicate offset/component');
+    const declared = declaredComponents.get(component);
+    if (!declared) {
+      fail(`dense group ${index}`, `undeclared component ${component}`);
     }
-    if (offset === 0 || (offset < 0 && -offset !== component)) {
-      fail(`dense group ${offset}`, 'invalid component offset');
+    if (declared.payload !== 'dense') {
+      fail(`dense group ${index}`, `component ${component} has no dense payload`);
     }
-    seenOffsets.add(offset);
+    if (seenComponents.has(component)) {
+      fail(`dense group ${component}`, 'duplicate component');
+    }
+    if (component <= previousComponent) {
+      fail('denseGroups', 'groups must be ordered by component');
+    }
+    previousComponent = component;
     seenComponents.add(component);
     const checkFields = (values, label) => {
       let previous = 0;
@@ -227,25 +241,26 @@ export function compileProtocol(document) {
         }
         previous = id;
         seenFields.add(id);
+        fields.get(id).component = component;
         return id;
       });
     };
-    const base = checkFields(entry.fields, `dense group ${offset}`);
+    const base = checkFields(entry.fields, `dense group ${component}`);
     if (!base.length) {
-      fail(`dense group ${offset}`, 'empty group');
+      fail(`dense group ${component}`, 'empty group');
     }
     const extended = own(entry, 'extendedFields')
-      ? checkFields(entry.extendedFields, `dense group ${offset} extended`)
+      ? checkFields(entry.extendedFields, `dense group ${component} extended`)
       : [];
     if (extended.length && component !== componentCount) {
-      fail(`dense group ${offset}`, 'only last component has extended fields');
+      fail(`dense group ${component}`, 'only the last component has extended fields');
     }
     if (extended.length && extended[0] <= base.at(-1)) {
-      fail(`dense group ${offset}`, 'extended fields must follow base fields');
+      fail(`dense group ${component}`, 'extended fields must follow base fields');
     }
     return {
-      offset,
       component,
+      name: declared.name,
       fields: base,
       extendedFields: extended,
       specs: [...base, ...extended].map((id) => ({ field: id, type: fields.get(id).denseType })),
@@ -254,13 +269,23 @@ export function compileProtocol(document) {
   if (groups.length !== integer(model.denseGroupCount, 'denseGroupCount', 1)) {
     fail('denseGroups', 'count mismatch');
   }
+  for (const entry of declaredComponents.values()) {
+    if (seenComponents.has(entry.id) !== (entry.payload === 'dense')) {
+      fail(`component ${entry.id}`, 'dense group presence disagrees with the payload declaration');
+    }
+  }
   for (const id of fields.keys()) {
     if (!seenFields.has(id)) {
       fail(`field ${id}`, 'missing dense group');
     }
   }
-  const extendedCount = groups.reduce((sum, group) => sum + group.extendedFields.length, 0);
-  if (extendedCount !== integer(model.denseComponent30ExtraFields, 'denseComponent30ExtraFields')) {
+  const extendedGroups = groups.filter((group) => group.extendedFields.length);
+  if (extendedGroups.length !== 1) {
+    fail('extendedFields', 'exactly one component carries extended fields');
+  }
+  const extendedGroup = extendedGroups[0];
+  const extendedCount = extendedGroup.extendedFields.length;
+  if (extendedCount !== integer(model.denseExtendedFieldCount, 'denseExtendedFieldCount')) {
     fail('extendedFields', 'count mismatch');
   }
   const extensions = array(snapshot.domainExtensions, 'domainExtensions');
@@ -319,18 +344,6 @@ export function compileProtocol(document) {
   const constants = {
     maxInputPacketBytes: integer(input.maxPacketBytes, 'input.maxPacketBytes', 1),
     outputQueueCapacity: integer(output.queue?.capacity, 'output.queue.capacity', 1),
-    packetHeaderBytes: integer(output.packet?.headerBytes, 'output.packet.headerBytes', 1),
-    inlinePayloadBytes: integer(
-      output.packet?.inlinePayloadBytes,
-      'output.packet.inlinePayloadBytes',
-      1,
-    ),
-    packetLengthOffset: integer(output.packet?.lengthOffset, 'output.packet.lengthOffset'),
-    heapPayloadOffset: integer(output.packet?.heapPayloadOffset, 'output.packet.heapPayloadOffset'),
-    inlinePayloadOffset: integer(
-      output.packet?.inlinePayloadOffset,
-      'output.packet.inlinePayloadOffset',
-    ),
     inputXorKeyBytes: integer(input.xor?.keyLength, 'input.xor.keyLength', 1),
     snapshotXorKeyBytes: integer(snapshot.xorKeyLength, 'snapshot.xorKeyLength', 1),
     maxVarintBytes: integer(input.reader?.maxVarintBytes, 'input.reader.maxVarintBytes', 1),
@@ -339,7 +352,9 @@ export function compileProtocol(document) {
     componentCount,
     sparseFieldCount: count,
     denseGroupCount: groups.length,
-    denseComponent30ExtraFields: extendedCount,
+    denseExtendedFieldCount: extendedCount,
+    extendedDenseComponent: extendedGroup.component,
+    extendedDenseBaseFields: extendedGroup.fields.length,
     entityFlagsXor: integer(snapshot.framing?.entityFlagsXor, 'framing.entityFlagsXor', 0, 255),
     componentDeltaXor: integer(snapshot.framing?.componentDeltaXor, 'framing.componentDeltaXor'),
     entityIndexMask: integer(snapshot.entityHandle?.indexMask, 'entityHandle.indexMask', 1),
@@ -355,6 +370,7 @@ export function compileProtocol(document) {
     ...structuredClone(document),
     constants,
     fields: [...fields.values()].sort((a, b) => a.id - b.id),
+    components: [...declaredComponents.values()].sort((a, b) => a.id - b.id),
     denseGroups: groups,
     sparseModes: modes,
   };
@@ -389,6 +405,8 @@ export function generateProtocolTs(contract) {
   lines.push(
     `export const OUTPUT_PAYLOAD_TYPE = ${identityMap(contract.output.payload.types, 'type')}`,
   );
+  lines.push(`export const Component = ${identityMap(contract.components, 'id')}`);
+  lines.push(`export type Component = (typeof Component)[keyof typeof Component];`);
   lines.push(
     `export const FIELD_TYPES = ${JSON.stringify(contract.output.snapshot.fieldTypes)} as const;`,
   );
@@ -409,7 +427,7 @@ export function generateProtocolTs(contract) {
     );
   }
   lines.push(
-    'export interface DenseFieldGroup { readonly offset: number; readonly fields: readonly number[]; readonly extendedFields?: readonly number[] }',
+    'export interface DenseFieldGroup { readonly component: number; readonly name: string; readonly fields: readonly number[]; readonly extendedFields?: readonly number[] }',
   );
   lines.push(
     `export type DenseFieldType = ${denseTypes.map((type) => JSON.stringify(type)).join(' | ')};`,
@@ -417,29 +435,18 @@ export function generateProtocolTs(contract) {
   lines.push(
     'export interface DenseFieldSpec { readonly field: number; readonly type: DenseFieldType }',
   );
-  lines.push(
-    'export interface FieldComponent { readonly constructor: number; readonly offset: number }',
-  );
   lines.push('export const DENSE_GROUPS: readonly DenseFieldGroup[] = [');
   for (const group of groups) {
     lines.push(
-      `  ${JSON.stringify({ offset: group.offset, fields: group.fields, ...(group.extendedFields.length ? { extendedFields: group.extendedFields } : {}) })},`,
+      `  ${JSON.stringify({ component: group.component, name: group.name, fields: group.fields, ...(group.extendedFields.length ? { extendedFields: group.extendedFields } : {}) })},`,
     );
   }
-  lines.push('];', 'export const DENSE_GROUP_COMPONENTS: Readonly<Record<number, number>> = {');
-  for (const group of groups) {
-    lines.push(`  [${group.offset}]: ${group.component},`);
-  }
   lines.push(
-    '};',
+    '];',
     'export const DENSE_GROUP_SPECS: Readonly<Record<number, readonly DenseFieldSpec[]>> = {',
   );
   for (const group of groups) {
-    lines.push(`  [${group.offset}]: ${JSON.stringify(group.specs)},`);
-  }
-  lines.push('};', 'export const FIELD_COMPONENTS: Readonly<Record<number, FieldComponent>> = {');
-  for (const field of fields) {
-    lines.push(`  ${field.id}: ${JSON.stringify(field.component)},`);
+    lines.push(`  [Component.${pascal(group.name)}]: ${JSON.stringify(group.specs)},`);
   }
   lines.push(
     '};',
@@ -473,6 +480,14 @@ export function generateProtocolCpp(contract) {
   entries('InputOpcode', contract.input.commands, 'opcode');
   entries('SnapshotEventOpcode', contract.output.snapshot.events, 'opcode');
   entries('OutputPayloadType', contract.output.payload.types, 'type');
+  lines.push('enum class Component : std::uint8_t {');
+  for (const component of contract.components) {
+    lines.push(`  ${cppEnum(component.name)} = ${component.id},`);
+  }
+  lines.push('};');
+  lines.push(
+    'inline constexpr std::uint32_t component_bit(Component component) { return 1U << (static_cast<unsigned>(component) - 1U); }',
+  );
   const typeNames = Object.keys(contract.output.snapshot.fieldTypes).filter(
     (name) => name !== 'confidence' && name !== 'note',
   );
@@ -504,28 +519,20 @@ export function generateProtocolCpp(contract) {
     );
   }
   lines.push(
-    'struct FieldComponent { std::uint32_t field; std::uint16_t constructor; std::uint16_t offset; };',
-    'struct FieldDefinition { std::uint32_t field; FieldType type; DenseFieldType dense_type; };',
+    'struct FieldDefinition { std::uint32_t field; FieldType type; DenseFieldType dense_type; Component component; };',
     'struct DenseFieldSpec { std::uint32_t field; DenseFieldType type; };',
-    'struct DenseFieldGroup { int offset; std::span<const std::uint32_t> fields; std::span<const std::uint32_t> extended_fields{}; };',
-    'struct DenseGroupSpec { int offset; std::uint8_t component; std::span<const DenseFieldSpec> specs; };',
+    'struct DenseFieldGroup { Component component; std::span<const std::uint32_t> fields; std::span<const std::uint32_t> extended_fields{}; };',
+    'struct DenseGroupSpec { Component component; std::span<const DenseFieldSpec> specs; };',
   );
-  lines.push(`inline constexpr std::array<FieldComponent, ${fields.length}> kFieldComponents{{`);
-  for (const field of fields) {
-    lines.push(`  {${field.id}, ${field.component.constructor}, ${field.component.offset}},`);
-  }
-  lines.push(
-    '}};',
-    `inline constexpr std::array<FieldDefinition, ${fields.length}> kFieldDefinitions{{`,
-  );
+  lines.push(`inline constexpr std::array<FieldDefinition, ${fields.length}> kFieldDefinitions{{`);
   for (const field of fields) {
     lines.push(
-      `  {${field.id}, FieldType::${cppEnum(field.type)}, DenseFieldType::${cppEnum(field.denseType)}},`,
+      `  {${field.id}, FieldType::${cppEnum(field.type)}, DenseFieldType::${cppEnum(field.denseType)}, Component::${cppEnum(contract.components.find((component) => component.id === field.component).name)}},`,
     );
   }
   lines.push('}};');
   for (const group of groups) {
-    const name = groupName(group.offset);
+    const name = pascal(group.name);
     lines.push(
       `inline constexpr std::array<std::uint32_t, ${group.fields.length}> kDenseFields${name}{${group.fields.join(', ')}};`,
     );
@@ -544,9 +551,9 @@ export function generateProtocolCpp(contract) {
   }
   lines.push(`inline constexpr std::array<DenseFieldGroup, ${groups.length}> kDenseGroups{{`);
   for (const group of groups) {
-    const name = groupName(group.offset);
+    const name = pascal(group.name);
     lines.push(
-      `  {${group.offset}, kDenseFields${name}${group.extendedFields.length ? `, kDenseFields${name}Extended` : ''}},`,
+      `  {Component::${cppEnum(group.name)}, kDenseFields${name}${group.extendedFields.length ? `, kDenseFields${name}Extended` : ''}},`,
     );
   }
   lines.push(
@@ -554,18 +561,25 @@ export function generateProtocolCpp(contract) {
     `inline constexpr std::array<DenseGroupSpec, ${groups.length}> kDenseGroupSpecs{{`,
   );
   for (const group of groups) {
-    lines.push(`  {${group.offset}, ${group.component}, kDenseSpecs${groupName(group.offset)}},`);
+    lines.push(`  {Component::${cppEnum(group.name)}, kDenseSpecs${pascal(group.name)}},`);
   }
   lines.push(
     '}};',
     'consteval bool validate_tables() {',
     '  std::array<unsigned, kSparseFieldCount> seen{};',
-    '  for (const auto& group : kDenseGroupSpecs) for (const auto& spec : group.specs) {',
-    '    if (spec.field == 0 || spec.field > kSparseFieldCount || ++seen[spec.field - 1] != 1) return false;',
-    '    if (kFieldDefinitions[spec.field - 1].dense_type != spec.type) return false;',
+    '  unsigned previous = 0;',
+    '  for (const auto& group : kDenseGroupSpecs) {',
+    '    const auto component = static_cast<unsigned>(group.component);',
+    '    if (component <= previous || component > kComponentCount) return false;',
+    '    previous = component;',
+    '    for (const auto& spec : group.specs) {',
+    '      if (spec.field == 0 || spec.field > kSparseFieldCount || ++seen[spec.field - 1] != 1) return false;',
+    '      if (kFieldDefinitions[spec.field - 1].dense_type != spec.type) return false;',
+    '      if (kFieldDefinitions[spec.field - 1].component != group.component) return false;',
+    '    }',
     '  }',
     '  for (std::size_t index = 0; index < seen.size(); ++index)',
-    '    if (seen[index] != 1 || kFieldComponents[index].field != index + 1) return false;',
+    '    if (seen[index] != 1) return false;',
     '  return kDenseGroups.size() == kDenseGroupCount && kFieldDefinitions.size() == kSparseFieldCount;',
     '}',
     'static_assert(validate_tables(), "protocol tables must cover each field exactly once with the declared type");',

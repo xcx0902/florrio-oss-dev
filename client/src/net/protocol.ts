@@ -1,8 +1,6 @@
 /** Wire contract shared with schema/protocol.yaml. */
 export const MAX_INPUT_PACKET_BYTES = 65536;
 export const OUTPUT_QUEUE_CAPACITY = 16;
-export const PACKET_HEADER_BYTES = 16;
-export const INLINE_PAYLOAD_BYTES = 4096;
 
 export type ServerFunction =
   | 'step'

@@ -45,7 +45,7 @@ Command 有界排队、每 tick 有执行上限，执行结果保留有限幂等
 
 ## 公开实体与私有状态
 
-公开实体只包含 schema 的 publicFields/publicDenseGroups：真实外观、位置、生命、等级、分数、昵称、拾取外观和必要的花瓣渲染字段。dense 只用 116/120/140/152 base，完全排除携带装备与死亡资料的 control/group72 和 profile 扩展；不会发送伪造的远端空背包。
+公开实体只包含 schema 的 publicFields/publicDenseGroups：真实外观、位置、生命、等级、分数、昵称、拾取外观和必要的花瓣渲染字段。dense 只用组件 20/21/26/30 的 base 字段，完全排除携带装备与死亡资料的 control（组件 6）和 profile 扩展；不会发送伪造的远端空背包。
 
 ownerPlayerId/ownerHandle 与 slot/instance 一起传输，局部槽位不会混淆为自己的 HUD。inventory、recharge、backpack、XP、zone、死亡保留物/击杀者/分数/等级和 nextSpawnTick 仅在接收者 selfState 中。拾取事件只公开目标、拾取者和动画槽位。聊天发送者取绑定 PlayerId。
 

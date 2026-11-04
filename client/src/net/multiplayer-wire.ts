@@ -1,5 +1,5 @@
 /** Strict network v2 primitives. No Worker framing, XOR or implicit coercion. */
-import { BYTE_FIELDS } from '../state/field-types.js';
+import { BYTE_FIELDS, Component, componentBit } from '../state/field-types.js';
 import { PUBLIC_FIELDS, PUBLIC_COMPONENT_MASK, LIMITS } from '../schema/multiplayer.js';
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
@@ -235,7 +235,13 @@ export function validatePublicEntity(bytes: Uint8Array, handle: number): void {
     throw new Error('entity counts');
   }
   const core = PUBLIC_COMPONENT_MASK,
-    render = (1 << 4) | (1 << 6) | (1 << 11) | (1 << 17);
+    // Render components are optional decorations on top of the public core:
+    // petal artwork and projectile presence. No other component is public.
+    renderComponents =
+      componentBit(Component.PetalVariant) |
+      componentBit(Component.PetalSpecies) |
+      componentBit(Component.WebProjectileTag) |
+      componentBit(Component.ProjectileTag);
   let mask = 0;
   const seen = new Set<number>();
   const allowed: ReadonlySet<number> = new Set(PUBLIC_FIELDS);
@@ -263,7 +269,7 @@ export function validatePublicEntity(bytes: Uint8Array, handle: number): void {
       throw new Error('entity flags');
     }
     mask = r.u32();
-    if (mask & ~(core | render) || (mask & core) !== core) {
+    if (mask & ~(core | renderComponents) || (mask & core) !== core) {
       throw new Error('private mask');
     }
     let field = 0;

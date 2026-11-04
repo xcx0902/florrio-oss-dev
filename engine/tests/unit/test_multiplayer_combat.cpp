@@ -206,8 +206,8 @@ void passives_orbit_modifiers_and_bubble_are_isolated() {
     if (type == 32) {
       CHECK(body(*world, a).health.value > body(*world, b).health.value);
     }
-    advance_loadout_orbit_phase(*world, state(*world, a), 50);
-    advance_loadout_orbit_phase(*world, state(*world, b), 50);
+    advance_loadout_orbit_phase(state(*world, a), 50);
+    advance_loadout_orbit_phase(state(*world, b), 50);
     CHECK(state(*world, b).loadout().orbit_phase() == f32(0.125));
     if (type == 14) {
       CHECK(state(*world, a).loadout().orbit_phase() == f32(0.165));

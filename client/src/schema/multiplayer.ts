@@ -818,4 +818,4 @@ export function decodeMessage(bytes: Uint8Array, fromClient = false): Message | 
 export const PUBLIC_FIELDS = [
   2, 4, 7, 8, 9, 11, 12, 22, 26, 28, 31, 36, 38, 49, 50, 53, 54, 55, 59, 62,
 ] as const;
-export const PUBLIC_DENSE_GROUPS = [116, 120, 140, 152] as const;
+export const PUBLIC_DENSE_GROUPS = [20, 21, 26, 30] as const;

@@ -26,7 +26,7 @@ class PlayerState;
 /** Recompute all petal orbit indices after a loadout mutation, mirroring
  * original function 85 (including configured missing instances and sharedOrbit
  * shared positions). */
-void assign_petal_orbit_indices(World& world, PlayerState& state);
+void assign_petal_orbit_indices(PlayerState& state);
 
 [[nodiscard]] std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot,
                                              std::uint8_t instance);
@@ -46,7 +46,7 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
 
 /** Advance the shared loadout ring phase (loadout+284) with the original
  * YinYang direction table and Faster count contribution. */
-void advance_loadout_orbit_phase(World& world, PlayerState& state, double step_milliseconds);
+void advance_loadout_orbit_phase(PlayerState& state, double step_milliseconds);
 
 /** Update the overlevel zone countdown and progress. When the timer reaches
  * its limit equipped petals stop recharging/spawning and take the original

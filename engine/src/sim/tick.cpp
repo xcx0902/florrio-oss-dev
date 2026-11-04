@@ -138,7 +138,7 @@ void tick(World& world, double delta_milliseconds) {
       return;
     }
     has_enabled_player = true;
-    advance_loadout_orbit_phase(world, state, delta_milliseconds);
+    advance_loadout_orbit_phase(state, delta_milliseconds);
   });
   // Preserve the legacy phase trace for empty/single-player worlds too.
   if (has_enabled_player || world.players().size() == 0) {

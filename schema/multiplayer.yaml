@@ -213,7 +213,10 @@ messages:
   Leaderboard: { id: 12, direction: server, epoch: nonzero }
 visibility:
   publicFields: [2, 4, 7, 8, 9, 11, 12, 22, 26, 28, 31, 36, 38, 49, 50, 53, 54, 55, 59, 62]
-  publicDenseGroups: [116, 120, 140, 152]
+  # Component ordinals of the dense groups a peer may receive: health,
+  # transform, collision radius and identity. The mask derived from them must
+  # stay 571998208.
+  publicDenseGroups: [20, 21, 26, 30]
   private:
     [
       inventory,
@@ -227,4 +230,4 @@ visibility:
       killerName,
       nextSpawnTick,
     ]
-  entityCodec: 'protocol.yaml sparse fields; optional public dense groups, group 152 base only; each fields blob is a complete independent type-1 entity block, sequence=1 ack=0, no deletes/events'
+  entityCodec: 'protocol.yaml sparse fields; optional public dense groups (components 20, 21, 26, 30), identity base fields only; each fields blob is a complete independent type-1 entity block, sequence=1 ack=0, no deletes/events'

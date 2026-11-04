@@ -102,10 +102,9 @@ export function petalPolygon(
 export function drawPetalShape(
   context: Canvas2DContext,
   type: number,
-  _icon: boolean,
-  _now: number,
+  now = 0,
   seed = type,
-  phase = _now * 0.001,
+  phase = now * 0.001,
 ): void {
   switch (type) {
     case PetalId.RockRare:
@@ -174,7 +173,7 @@ export function drawPetalShape(
           }
         },
         1,
-        _icon ? 0 : Math.fround(phase),
+        Math.fround(phase),
       );
       return;
     }
@@ -389,8 +388,7 @@ export function drawPetalInstance(
   }
   const base = PETAL_INFO[type]?.radius ?? 10;
   const scale = Number.isFinite(radius) && radius > 0 ? radius / base : 1;
-  const draw = (local: Canvas2DContext): void =>
-    drawPetalShape(local, type, false, now, seed, phase);
+  const draw = (local: Canvas2DContext): void => drawPetalShape(local, type, now, seed, phase);
   if (type === PetalId.WingRare) {
     inLocal(context, draw, scale, now * 0.01);
   } else if (type === PetalId.SquareUnique) {
@@ -511,7 +509,7 @@ export function drawPetalIcon(context: Canvas2DContext, type: number, scale = 1)
         ? 0.7
         : 0;
   if (info.instances === 1 && angle === 0 && scale === 1) {
-    drawPetalShape(context, type, true, 0);
+    drawPetalShape(context, type, 0);
     return;
   }
   inLocal(
@@ -524,7 +522,7 @@ export function drawPetalIcon(context: Canvas2DContext, type: number, scale = 1)
           // applies its own icon rotation, preserving the cluster's orientation.
           inLocal(
             local,
-            (part) => drawPetalShape(part, type, true, 0),
+            (part) => drawPetalShape(part, type, 0),
             1,
             angle,
             Math.fround(Math.fround(Math.cos(phase)) * 10),
@@ -532,7 +530,7 @@ export function drawPetalIcon(context: Canvas2DContext, type: number, scale = 1)
           );
         }
       } else {
-        inLocal(local, (part) => drawPetalShape(part, type, true, 0), 1, angle);
+        inLocal(local, (part) => drawPetalShape(part, type, 0), 1, angle);
       }
     },
     scale,

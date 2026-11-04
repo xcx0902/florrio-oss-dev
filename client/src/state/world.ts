@@ -385,18 +385,6 @@ export class WorldState {
           61: denseRecharge.map((value, index) => ({ index, value: Number(value) })),
         };
       }
-      let mergedComponents = previous?.components;
-      if (entity.components !== undefined) {
-        const components: Record<number, Record<number, unknown>> = {};
-        for (const [constructor, offsets] of Object.entries(previous?.components ?? {})) {
-          components[Number(constructor)] = { ...offsets };
-        }
-        for (const [constructor, offsets] of Object.entries(entity.components)) {
-          const key = Number(constructor);
-          components[key] = { ...(components[key] ?? {}), ...offsets };
-        }
-        mergedComponents = components;
-      }
       // Only this record can supply a new angle. A dense value retained from
       // an earlier packet must not override a subsequent sparse field 8.
       const dense8 = entity.denseFields?.[8];
@@ -459,7 +447,6 @@ export class WorldState {
         varintArrayFields: mergeIndexed(previous?.varintArrayFields, entity.varintArrayFields),
         handleArrayFields: mergeIndexed(previous?.handleArrayFields, entity.handleArrayFields),
         stringArrayFields: mergeIndexed(previous?.stringArrayFields, entity.stringArrayFields),
-        components: mergedComponents,
         previousX: x.from,
         previousY: y.from,
         previousAngle: hasAngle ? displayed.angle : (previous?.previousAngle ?? entity.angle),
@@ -724,7 +711,7 @@ export class WorldState {
   }
   /** Authoritative deletion is immediate: the old 150 ms retiring window made
    * killed mobs/petals flash back into view before disappearing. */
-  *renderable(_now: number): IterableIterator<EntityState> {
+  *renderable(): IterableIterator<EntityState> {
     for (const entity of this.entities.values()) {
       if (!this.collected.has(entity.handle)) {
         yield entity;

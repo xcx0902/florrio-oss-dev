@@ -24,6 +24,6 @@ export interface EntityState extends EntitySnapshot {
   readonly receivedCameraYAt?: number;
   /** First snapshot clock at which this handle was rendered. */
   readonly firstSeenAt?: number;
-  /** Retain the constructor marker across deltas received before a render. */
+  /** Retain the arrival marker across deltas received before a render. */
   readonly arrivalMarked?: boolean;
 }

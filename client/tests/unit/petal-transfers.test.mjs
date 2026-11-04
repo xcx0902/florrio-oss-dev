@@ -34,7 +34,7 @@ test('event14 captures the previous pickup before deletion and suppresses its wo
   const { world, camera, transfers } = fixture();
   transfers.receive(receive, world, camera, 0, viewport);
   assert.equal(world.count, 1, 'receipt changes presentation ownership, not authoritative state');
-  assert.equal([...world.renderable(0)].length, 0);
+  assert.equal([...world.renderable()].length, 0);
   world.applyDeltaSnapshot(
     { sequence: 2, serverTime: 16, entities: [], events: [], deletedHandles: [91] },
     16,
@@ -46,7 +46,7 @@ test('event14 captures the previous pickup before deletion and suppresses its wo
   assert.ok(effect.opacity > 0 && effect.opacity < 1);
   assert.equal(effect.phase, 'arriving');
   assert.equal(
-    [...world.renderable(16)].length,
+    [...world.renderable()].length,
     0,
     'deleted pickup does not fade a second time in world',
   );

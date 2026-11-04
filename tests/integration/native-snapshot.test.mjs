@@ -16,8 +16,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const temporary = await mkdtemp(path.join(os.tmpdir(), 'florr-native-integration-'));
 after(() => rm(temporary, { recursive: true, force: true }));
 const plans = DENSE_GROUPS.map((group) => ({
-  offset: group.offset,
-  specs: DENSE_GROUP_SPECS[group.offset] ?? [],
+  component: group.component,
+  specs: DENSE_GROUP_SPECS[group.component],
 }));
 
 function parseFixture(bytes) {

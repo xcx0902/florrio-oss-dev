@@ -39,8 +39,8 @@ test(
               world = new WorldState();
             const decoder = new SnapshotDecoder(
               DENSE_GROUPS.map((group) => ({
-                offset: group.offset,
-                specs: DENSE_GROUP_SPECS[group.offset] ?? [],
+                component: group.component,
+                specs: DENSE_GROUP_SPECS[group.component],
               })),
             );
             await worker.init();

@@ -1,23 +1,5 @@
-import { FIELD_COMPONENTS } from './field-types.js';
 import { INVENTORY_SLOTS } from './loadout-limits.js';
-import type { DenseValue, EntitySnapshot, DeathMetadata } from './snapshot-types.js';
-export function buildComponents(
-  values: Readonly<Record<number, unknown>>,
-): Readonly<Record<number, Readonly<Record<number, unknown>>>> {
-  const components: Record<number, Record<number, unknown>> = {};
-  for (const [fieldText, value] of Object.entries(values)) {
-    if (value === undefined) {
-      continue;
-    }
-    const field = Number(fieldText);
-    const component = FIELD_COMPONENTS[field];
-    if (component === undefined) {
-      continue;
-    }
-    (components[component.constructor] ??= {})[component.offset] = value;
-  }
-  return components;
-}
+import type { EntitySnapshot, DeathMetadata } from './snapshot-types.js';
 
 interface DomainProjection {
   readonly typeId: number;
@@ -34,28 +16,20 @@ interface DomainProjection {
   readonly score?: number;
 }
 
-/** Project protocol fields through the generated component locations. Component
- * ids and layout offsets belong to the schema table, not domain projection
- * logic. Field 26 remains the accepted permanent domain extension. */
-export function projectDomain(
-  components: Readonly<Record<number, Readonly<Record<number, unknown>>>>,
-  denseFields?: Readonly<Record<number, DenseValue>>,
-): DomainProjection {
-  const numberField = (field: number, denseFallback = false): number | undefined => {
-    const location = FIELD_COMPONENTS[field];
-    const value = components[location.constructor]?.[location.offset];
-    if (typeof value === 'number') {
-      return value;
-    }
-    const dense = denseFallback ? denseFields?.[field] : undefined;
-    return typeof dense === 'number' ? dense : undefined;
+/** Project the domain fields of one entity record. Values are keyed by wire
+ * field id; the component tables describe encoding, not projection. Field 26
+ * remains the accepted permanent domain extension. */
+export function projectDomain(values: Readonly<Record<number, unknown>>): DomainProjection {
+  const numberField = (field: number): number | undefined => {
+    const value = values[field];
+    return typeof value === 'number' ? value : undefined;
   };
-  const species = numberField(2, true);
-  const kind = numberField(26, true);
-  const health = numberField(53, true);
-  const maxHealth = numberField(55, true);
-  const variant = numberField(31, true);
-  const radius = numberField(7, true);
+  const species = numberField(2);
+  const kind = numberField(26);
+  const health = numberField(53);
+  const maxHealth = numberField(55);
+  const variant = numberField(31);
+  const radius = numberField(7);
   const level = numberField(62);
   const progressRaw = numberField(58);
   const score = numberField(59);
@@ -75,8 +49,8 @@ export function projectDomain(
   };
 }
 
-/** Native player component491 field60 remains authoritative while an
- * equipped petal is recharging and has no live world entity. */
+/** The identity component keeps field 60 authoritative while an equipped petal
+ * is recharging and has no live world entity. */
 export function playerLoadoutSlots(
   player: EntitySnapshot,
   count = INVENTORY_SLOTS,

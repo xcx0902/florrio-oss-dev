@@ -62,7 +62,7 @@ void rotation_and_heaviest() {
       faster += type == 14U;
       yin += type == 28U;
     }
-    advance_loadout_orbit_phase(world, engine::test::player(world), 50.0);
+    advance_loadout_orbit_phase(engine::test::player(world), 50.0);
     const auto direction = yin == 0U ? 1.0 : yin == 1U ? -1.0 : 0.0;
     require(engine::test::player(world).loadout().orbit_phase() ==
                 f32::from_double((2.5 + 0.8 * faster) * direction * 0.05),
@@ -70,7 +70,7 @@ void rotation_and_heaviest() {
     if (*types.begin() == 14U) {
       engine::test::player(world).loadout().set_pending(0, 0, true);
       engine::test::player(world).loadout().set_orbit_phase(f32(0.0F));
-      advance_loadout_orbit_phase(world, engine::test::player(world), 50.0);
+      advance_loadout_orbit_phase(engine::test::player(world), 50.0);
       require(engine::test::player(world).loadout().orbit_phase() ==
                   f32::from_double((2.5 + 0.8 * (faster - 1)) * direction * 0.05),
               "pending Faster contributes no bonus");

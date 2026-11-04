@@ -16,7 +16,7 @@ for provenance.
 - [spawn.md](spawn.md) — spawn bands, weights, server RNG and weighted choice.
 - [input.md](input.md) — packet XOR/varint framing and command layouts.
 - [collision.md](collision.md) — spawn rect, physics AABB/radius, quadtree order, cached bounds and flag rules.
-- [snapshot.md](snapshot.md) — sparse fields, dense component pointers, events 9/11/14 and health/kind projection.
+- [snapshot.md](snapshot.md) — sparse fields, dense component presence, events 9/11/14 and health/kind projection.
 - [player.md](player.md) — defaults, spawn bands, profile/level and loadout.
 - [petals.md](petals.md) — combat stats, orbit profiles, recharge and pickup.
 - [damage.md](damage.md) — contact damage and the death domain.

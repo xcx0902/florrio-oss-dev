@@ -89,8 +89,8 @@ export class GameSession {
   constructor(readonly app: GameApp) {
     this.deathLifecycle = new DeathLifecycle();
     this.densePlans = DENSE_GROUPS.map((group) => ({
-      offset: group.offset,
-      specs: DENSE_GROUP_SPECS[group.offset] ?? [],
+      component: group.component,
+      specs: DENSE_GROUP_SPECS[group.component],
     }));
     this.decoder = new SnapshotDecoder(this.densePlans);
     this.serverInitialized = false;

@@ -4,11 +4,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parse as parseYaml } from 'yaml';
 import {
+  Component,
   DENSE_GROUPS,
   DENSE_GROUP_SPECS,
-  DENSE_GROUP_COMPONENTS,
+  componentBit,
   densePresentForMask,
-  FIELD_COMPONENTS,
 } from '../../../build/client/state/field-types.js';
 import { browser, origin, start, stop } from '../support/worker-fixture.mjs';
 
@@ -163,7 +163,7 @@ test('original bare update decoder reads handle and flags', async () => {
       stringArray25:
         stringArray25Snapshot?.entities.map((entity) => entity.stringArrayFields) ?? null,
       float45: float45Snapshot?.entities.map((entity) => entity.floatField45) ?? null,
-      sparseOrdinals: sparseSnapshot?.entities.map((entity) => entity.componentOrdinals) ?? null,
+      sparseOrdinals: sparseSnapshot?.entities.map((entity) => entity.declaredComponents) ?? null,
       bit33: bitSnapshot?.entities.map((entity) => entity.bitFields) ?? null,
       angle8: angleSnapshot?.entities.map((entity) => entity.angleField8) ?? null,
       handleArray3: handleArraySnapshot?.entities.map((entity) => entity.handleArrayFields) ?? null,
@@ -230,43 +230,55 @@ test('protocol schema covers all 63 field ordinals', () => {
 });
 
 test('field component map covers every ordinal', () => {
-  assert.equal(Object.keys(FIELD_COMPONENTS).length, 63);
-  assert.deepEqual(FIELD_COMPONENTS[5], { constructor: 478, offset: 16 });
-  assert.deepEqual(FIELD_COMPONENTS[24], { constructor: 478, offset: 112 });
-  assert.deepEqual(FIELD_COMPONENTS[8], { constructor: 609, offset: 8 });
+  const owner = (field) => {
+    const group = DENSE_GROUPS.find((candidate) =>
+      [...candidate.fields, ...(candidate.extendedFields ?? [])].includes(field),
+    );
+    return group?.component;
+  };
+  for (let field = 1; field <= 63; ++field) {
+    assert.ok(owner(field), `field ${field} has no component`);
+  }
+  assert.equal(owner(5), Component.PlayerController);
+  assert.equal(owner(24), Component.PlayerController);
+  assert.equal(owner(8), Component.Transform);
+  assert.equal(owner(63), Component.Identity);
 });
 
 test('field catalog mirrors 19 dense groups', () => {
   assert.equal(DENSE_GROUPS.length, 19);
   assert.deepEqual(DENSE_GROUPS.at(-1).extendedFields, [58, 59, 60, 61, 62, 63]);
   assert.equal(Object.keys(DENSE_GROUP_SPECS).length, 19);
-  assert.equal(DENSE_GROUP_SPECS[-16].length, 11);
-  assert.equal(DENSE_GROUP_SPECS[152].length, 9);
-  assert.equal(Object.keys(DENSE_GROUP_COMPONENTS).length, 19);
+  assert.equal(DENSE_GROUP_SPECS[Component.LoadoutRecord].length, 11);
+  assert.equal(DENSE_GROUP_SPECS[Component.Identity].length, 9);
   for (const group of DENSE_GROUPS) {
-    const specs = DENSE_GROUP_SPECS[group.offset];
-    assert.ok(specs, `missing specs for group ${group.offset}`);
+    const specs = DENSE_GROUP_SPECS[group.component];
+    assert.ok(specs, `missing specs for component ${group.component}`);
     const expected = [...group.fields, ...(group.extendedFields ?? [])];
     assert.deepEqual(
       specs.map((spec) => spec.field),
       expected,
-      `fields for group ${group.offset}`,
+      `fields for component ${group.component}`,
     );
   }
 });
 
 test('dense groups follow the component-presence mask', () => {
-  assert.equal(DENSE_GROUP_COMPONENTS[72], 6);
-  assert.equal(DENSE_GROUP_COMPONENTS[152], 30);
-  assert.ok(densePresentForMask(1 << 5).has(72));
-  assert.ok(!densePresentForMask(1 << 5).has(120));
-  assert.ok(densePresentForMask(1 << 29).has(152));
-  assert.ok(densePresentForMask(1 << 7).has(-8));
-  assert.ok(densePresentForMask(1 << 14).has(-15));
-  assert.ok(densePresentForMask(1 << 26).has(-27));
-  assert.equal(DENSE_GROUP_SPECS[152].length, 9);
-  assert.equal(Object.keys(DENSE_GROUP_COMPONENTS).length, 19);
-  assert.equal(DENSE_GROUP_SPECS[152].slice(0, 3).length, 3);
+  assert.ok(
+    densePresentForMask(componentBit(Component.PlayerController)).has(Component.PlayerController),
+  );
+  assert.ok(
+    !densePresentForMask(componentBit(Component.PlayerController)).has(Component.Transform),
+  );
+  assert.ok(densePresentForMask(componentBit(Component.Identity)).has(Component.Identity));
+  assert.ok(densePresentForMask(componentBit(Component.Reserved8)).has(Component.Reserved8));
+  assert.ok(densePresentForMask(componentBit(Component.Reserved15)).has(Component.Reserved15));
+  assert.ok(densePresentForMask(componentBit(Component.InlineRecord)).has(Component.InlineRecord));
+  assert.ok(
+    !densePresentForMask(componentBit(Component.ProjectileTag)).has(Component.ProjectileTag),
+  );
+  assert.equal(DENSE_GROUP_SPECS[Component.Identity].length, 9);
+  assert.equal(DENSE_GROUP_SPECS[Component.Identity].slice(0, 3).length, 3);
 });
 
 test('dense group 52 decoder reads two byte fields', async () => {
@@ -276,17 +288,10 @@ test('dense group 52 decoder reads two byte fields', async () => {
     const { DenseGroup52Decoder } = await import('/test-support/dense-codec.js');
     const bytes = new Uint8Array([1, 41, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x22]);
     const snapshot = new DenseGroup52Decoder().decode(bytes);
-    return (
-      snapshot?.entities.map((entity) => ({
-        dense: entity.denseByteFields,
-        components: entity.components,
-      })) ?? null
-    );
+    return snapshot?.entities.map((entity) => entity.denseByteFields) ?? null;
   });
   await page.close();
-  assert.deepEqual(result, [
-    { dense: { 22: 0x11, 54: 0x22 }, components: { 670: { 8: 0x11, 9: 0x22 } } },
-  ]);
+  assert.deepEqual(result, [{ 22: 0x11, 54: 0x22 }]);
 });
 
 test('dense byte group decoder reads configured fields', async () => {
@@ -655,24 +660,28 @@ test('dense plan decoder respects present groups', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const plans = [
       {
-        offset: 52,
+        component: Component.DropState,
         specs: [
           { field: 22, type: 'byte' },
           { field: 54, type: 'byte' },
         ],
       },
-      { offset: 56, specs: [{ field: 36, type: 'byte' }] },
+      { component: Component.AiActivity, specs: [{ field: 36, type: 'byte' }] },
     ];
     const one = new Uint8Array([1, 60, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x22]);
     const both = new Uint8Array([1, 61, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x22, 0x33]);
     return {
-      one: new DensePlanDecoder(plans, new Set([52])).decode(one)?.entities[0]?.denseFields ?? null,
+      one:
+        new SnapshotDecoder(plans, new Set([Component.DropState])).decode(one)?.entities[0]
+          ?.denseFields ?? null,
       both:
-        new DensePlanDecoder(plans, new Set([52, 56])).decode(both)?.entities[0]?.denseFields ??
-        null,
+        new SnapshotDecoder(plans, new Set([Component.DropState, Component.AiActivity])).decode(
+          both,
+        )?.entities[0]?.denseFields ?? null,
     };
   });
   await page.close();
@@ -686,14 +695,15 @@ test('dense plan decoder handles angle and floats', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const packet = new Uint8Array([
       1, 62, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0x40, 0, 0, 0xc0, 0x3f, 0, 0, 0x20, 0x40,
     ]);
-    const snapshot = new DensePlanDecoder(
+    const snapshot = new SnapshotDecoder(
       [
         {
-          offset: 120,
+          component: Component.Transform,
           specs: [
             { field: 8, type: 'angle' },
             { field: 28, type: 'f32' },
@@ -701,7 +711,7 @@ test('dense plan decoder handles angle and floats', async () => {
           ],
         },
       ],
-      new Set([120]),
+      new Set([Component.Transform]),
     ).decode(packet);
     return snapshot?.entities[0]?.denseFields ?? null;
   });
@@ -713,23 +723,25 @@ test('dense plan decoder reads multiple byte groups in one entry', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const plans = [
       {
-        offset: 52,
+        component: Component.DropState,
         specs: [
           { field: 22, type: 'byte' },
           { field: 54, type: 'byte' },
         ],
       },
-      { offset: 56, specs: [{ field: 36, type: 'byte' }] },
+      { component: Component.AiActivity, specs: [{ field: 36, type: 'byte' }] },
     ];
     const packet = new Uint8Array([
       1, 63, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x22, 0x33,
     ]);
     return (
-      new DensePlanDecoder(plans, new Set([52, 56])).decode(packet)?.entities[0]?.denseFields ??
-      null
+      new SnapshotDecoder(plans, new Set([Component.DropState, Component.AiActivity])).decode(
+        packet,
+      )?.entities[0]?.denseFields ?? null
     );
   });
   await page.close();
@@ -740,15 +752,17 @@ test('dense plan decodes live byte values for groups 56/68', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const plans = [
-      { offset: 56, specs: [{ field: 36, type: 'byte' }] },
-      { offset: 68, specs: [{ field: 9, type: 'byte' }] },
+      { component: Component.AiActivity, specs: [{ field: 36, type: 'byte' }] },
+      { component: Component.PetalVariant, specs: [{ field: 9, type: 'byte' }] },
     ];
     const packet = new Uint8Array([1, 64, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x33, 0x44]);
     return (
-      new DensePlanDecoder(plans, new Set([56, 68])).decode(packet)?.entities[0]?.denseFields ??
-      null
+      new SnapshotDecoder(plans, new Set([Component.AiActivity, Component.PetalVariant])).decode(
+        packet,
+      )?.entities[0]?.denseFields ?? null
     );
   });
   await page.close();
@@ -759,20 +773,21 @@ test('dense plan decodes live bit group 124', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const packet = new Uint8Array([1, 69, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 3]);
     return (
-      new DensePlanDecoder(
+      new SnapshotDecoder(
         [
           {
-            offset: 124,
+            component: Component.Reserved22,
             specs: [
               { field: 29, type: 'bit' },
               { field: 40, type: 'bit' },
             ],
           },
         ],
-        new Set([124]),
+        new Set([Component.Reserved22]),
       ).decode(packet)?.entities[0]?.denseFields ?? null
     );
   });
@@ -784,16 +799,17 @@ test('dense plan decodes live mixed group -27', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const packet = new Uint8Array([
       1, 70, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x61, 0, 0xac, 2, 0, 0, 0, 0, 0, 0, 0xf8, 0x3f,
       0x62, 0, 0, 0, 0x20, 0x40, 1, 0, 0, 0, 0, 0, 0, 0x0c, 0x40, 0x90, 3, 5, 6,
     ]);
     return (
-      new DensePlanDecoder(
+      new SnapshotDecoder(
         [
           {
-            offset: -27,
+            component: Component.InlineRecord,
             specs: [
               { field: 4, type: 'string' },
               { field: 15, type: 'varint' },
@@ -808,7 +824,7 @@ test('dense plan decodes live mixed group -27', async () => {
             ],
           },
         ],
-        new Set([-27]),
+        new Set([Component.InlineRecord]),
       ).decode(packet)?.entities[0]?.denseFields ?? null
     );
   });
@@ -831,13 +847,14 @@ test('dense plan gates group 152 base fields', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const body = new Uint8Array([1, 76, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 2, 26, 31]);
     return (
-      new DensePlanDecoder(
+      new SnapshotDecoder(
         [
           {
-            offset: 152,
+            component: Component.Identity,
             specs: [
               { field: 2, type: 'byte' },
               { field: 26, type: 'byte' },
@@ -851,7 +868,7 @@ test('dense plan gates group 152 base fields', async () => {
             ],
           },
         ],
-        new Set([152]),
+        new Set([Component.Identity]),
       ).decode(body)?.entities[0]?.denseFields ?? null
     );
   });
@@ -863,7 +880,8 @@ test('dense plan decodes live group 152 extended fields', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DensePlanDecoder } = await import('/test-support/dense-codec.js');
+    const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const varint = (value) => {
       const out = [];
       do {
@@ -886,10 +904,10 @@ test('dense plan decodes live group 152 extended fields', async () => {
     }
     body.push(62, 63);
     return (
-      new DensePlanDecoder(
+      new SnapshotDecoder(
         [
           {
-            offset: 152,
+            component: Component.Identity,
             specs: [
               { field: 2, type: 'byte' },
               { field: 26, type: 'byte' },
@@ -903,7 +921,7 @@ test('dense plan decodes live group 152 extended fields', async () => {
             ],
           },
         ],
-        new Set([152]),
+        new Set([Component.Identity]),
       ).decode(new Uint8Array(body))?.entities[0]?.denseFields ?? null
     );
   });
@@ -926,20 +944,21 @@ test('original decoder mixes bare and dense updates', async () => {
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { SnapshotDecoder } = await import('/state/snapshot.js');
+    const { Component } = await import('/state/field-types.js');
     const packet = new Uint8Array([
       1, 76, 4, 0, 2, 0, 0x11, 0x11, 0x11, 0x11, 52, 0, 0x22, 0x22, 0x22, 0x22, 62, 0x11, 0x22,
     ]);
     const snapshot = new SnapshotDecoder(
       [
         {
-          offset: 52,
+          component: Component.DropState,
           specs: [
             { field: 22, type: 'byte' },
             { field: 54, type: 'byte' },
           ],
         },
       ],
-      new Set([52]),
+      new Set([Component.DropState]),
     ).decode(packet);
     return (
       snapshot?.entities.map((entity) => ({
@@ -975,8 +994,10 @@ test('snapshot decoder rejects out-of-range fields without changing dense presen
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
     const { SnapshotDecoder } = await import('/state/snapshot.js');
-    const { DENSE_GROUP_SPECS } = await import('/state/field-types.js');
-    const decoder = new SnapshotDecoder([{ offset: 52, specs: DENSE_GROUP_SPECS[52] }]);
+    const { Component, DENSE_GROUP_SPECS } = await import('/state/field-types.js');
+    const decoder = new SnapshotDecoder([
+      { component: Component.DropState, specs: DENSE_GROUP_SPECS[Component.DropState] },
+    ]);
     const dense = new Uint8Array([1, 2, 0, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 2, 0]);
     const before = decoder.decode(dense);
     const bytes = new Uint8Array([
@@ -998,14 +1019,10 @@ test('original decoder maps fields 5/24 to world position', async () => {
       0x0a, 0x42, 0,
     ]);
     const entity = new SnapshotDecoder().decode(packet)?.entities[0] ?? null;
-    return entity ? { x: entity.x, y: entity.y, components: entity.components } : null;
+    return entity ? { x: entity.x, y: entity.y, float: entity.floatFields } : null;
   });
   await page.close();
-  assert.deepEqual(result, {
-    x: 12.5,
-    y: 34.5,
-    components: { 478: { 16: 12.5, 112: 34.5 } },
-  });
+  assert.deepEqual(result, { x: 12.5, y: 34.5, float: { 5: 12.5, 24: 34.5 } });
 });
 
 test('WorldState.applyPartial preserves missing gameplay fields', async () => {
@@ -1184,7 +1201,7 @@ test('WorldState.applyPartial merges scalar field records', async () => {
   assert.deepEqual(result, { float: { 5: 5, 24: 6, 7: 1.5 }, byte: { 1: 7, 2: 9 }, x: 5, y: 6 });
 });
 
-test('WorldState.applyPartial merges component offsets', async () => {
+test('WorldState.applyPartial merges field records', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
@@ -1204,7 +1221,7 @@ test('WorldState.applyPartial merges component offsets', async () => {
             health: 1,
             maxHealth: 1,
             flags: 1,
-            components: { 478: { 16: 1 } },
+            floatFields: { 5: 1 },
           },
         ],
       },
@@ -1224,14 +1241,15 @@ test('WorldState.applyPartial merges component offsets', async () => {
             health: 0,
             maxHealth: 0,
             flags: 0,
-            components: { 478: { 112: 2 }, 609: { 8: 0.5 } },
+            floatFields: { 24: 2 },
+            byteFields: { 2: 9 },
           },
         ],
       },
       100,
     );
-    return world.get(4)?.components ?? null;
+    return world.get(4) ? { float: world.get(4).floatFields, byte: world.get(4).byteFields } : null;
   });
   await page.close();
-  assert.deepEqual(result, { 478: { 16: 1, 112: 2 }, 609: { 8: 0.5 } });
+  assert.deepEqual(result, { float: { 5: 1, 24: 2 }, byte: { 2: 9 } });
 });

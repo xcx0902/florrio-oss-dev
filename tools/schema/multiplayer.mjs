@@ -94,8 +94,9 @@ export function multiplayerOutputs(source, catalogInputs, protocol) {
     }
   }
   const groups = s.visibility.publicDenseGroups.map(
-    (offset) =>
-      protocol.denseGroups.find((g) => g.offset === offset) ?? fail(`dense group ${offset}`),
+    (component) =>
+      protocol.denseGroups.find((g) => g.component === component) ??
+      fail(`dense component ${component}`),
   );
   const publicMask = groups.reduce((mask, g) => (mask | (1 << (g.component - 1))) >>> 0, 0);
   for (const field of s.visibility.publicFields) {
@@ -109,12 +110,12 @@ export function multiplayerOutputs(source, catalogInputs, protocol) {
       fail(`public field ${field}`);
     }
   }
-  if (JSON.stringify(s.visibility.publicDenseGroups) !== '[116,120,140,152]') {
+  if (JSON.stringify(s.visibility.publicDenseGroups) !== '[20,21,26,30]') {
     fail('public dense codec recipe changed');
   }
   for (const group of groups) {
     if (group.fields.some((f) => !s.visibility.publicFields.includes(f))) {
-      fail(`private dense group ${group.offset}`);
+      fail(`private dense group ${group.component}`);
     }
   }
   const catalogHash = createHash('sha256').update(JSON.stringify(catalogInputs)).digest('hex');
@@ -323,7 +324,7 @@ export function multiplayerOutputs(source, catalogInputs, protocol) {
     .map(([k, v]) => `- ${k}: ${v}`)
     .join(
       '\n',
-    )}\n\n## Visibility and replication\n\n${s.visibility.entityCodec}. Public field IDs: ${s.visibility.publicFields.join(', ')}. Public dense groups: ${s.visibility.publicDenseGroups.join(', ')}. Private fields appear only in the receiver's selfState: ${s.visibility.private.join(', ')}. Entity ownership is public; slot/instance are owner-local. Controlled handle 0 means no body.\n\nFull snapshots replace the entire entity/component state with a new baselineId; deltas require the same room/session/baseline and contiguous snapshotSeq. Event identity is roomEpoch + tick + ordinal, retained across resync and reset on new session binding. Resync never re-executes commands or rewards. Overflow closes the connection; encoded deltas cannot be dropped. Counters must drain before counterDrainAt, with a new room/session epoch before reuse. RoomEpoch and resume tokens require host cryptographic entropy, separate from World RNG. Welcome establishes identity; input/commands carry no player selector. Input receipt and actual simulation adoption are distinct. See [implementation contract](multiplayer/replication.md).\n`;
+    )}\n\n## Visibility and replication\n\n${s.visibility.entityCodec}. Public field IDs: ${s.visibility.publicFields.join(', ')}. Public dense group components: ${s.visibility.publicDenseGroups.join(', ')}. Private fields appear only in the receiver's selfState: ${s.visibility.private.join(', ')}. Entity ownership is public; slot/instance are owner-local. Controlled handle 0 means no body.\n\nFull snapshots replace the entire entity/component state with a new baselineId; deltas require the same room/session/baseline and contiguous snapshotSeq. Event identity is roomEpoch + tick + ordinal, retained across resync and reset on new session binding. Resync never re-executes commands or rewards. Overflow closes the connection; encoded deltas cannot be dropped. Counters must drain before counterDrainAt, with a new room/session epoch before reuse. RoomEpoch and resume tokens require host cryptographic entropy, separate from World RNG. Welcome establishes identity; input/commands carry no player selector. Input receipt and actual simulation adoption are distinct. See [implementation contract](multiplayer/replication.md).\n`;
   const motionCpp = `// Generated from schema/multiplayer.yaml. Do not edit.\n#pragma once\nnamespace engine::motion_config {\n${Object.entries(
     s.motion,
   )

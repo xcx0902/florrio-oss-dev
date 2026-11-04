@@ -38,7 +38,8 @@ export interface EntitySnapshot {
   readonly variant?: number;
   readonly x: number;
   readonly y: number;
-  /** Camera-follow component 478; visual position belongs to component 609. */
+  /** Camera target from the player-controller component; visual position
+   * comes from the transform component. */
   readonly cameraX?: number;
   readonly cameraY?: number;
   readonly angle: number;
@@ -72,7 +73,7 @@ export interface EntitySnapshot {
     Record<number, readonly { index: number; value: string }[]>
   >;
   readonly floatField45?: number;
-  readonly componentOrdinals?: readonly number[];
+  readonly declaredComponents?: readonly number[];
   readonly bitFields?: Readonly<Record<number, number>>;
   readonly angleField8?: number;
   readonly handleArrayFields?: Readonly<
@@ -80,7 +81,6 @@ export interface EntitySnapshot {
   >;
   readonly denseByteFields?: Readonly<Record<number, number>>;
   readonly denseFields?: Readonly<Record<number, DenseValue>>;
-  readonly components?: Readonly<Record<number, Readonly<Record<number, unknown>>>>;
   readonly componentMask?: number;
 }
 
@@ -94,12 +94,11 @@ export interface Snapshot {
 }
 
 export interface DenseGroupPlan {
-  readonly offset: number;
+  readonly component: number;
   readonly specs: readonly DenseFieldSpec[];
 }
 
-/** Fields of the native controller record (component 478) that survive the
- * player's death and drive the death/menu HUD. */
+/** Player-controller fields that survive death and drive the death/menu HUD. */
 export interface DeathMetadata {
   readonly killerName: string;
   readonly keptCount: number;

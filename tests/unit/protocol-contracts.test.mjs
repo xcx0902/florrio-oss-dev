@@ -41,11 +41,11 @@ test('generated C++/TS and saved protocol exactly match YAML, covering 63 fields
   assert.equal(contract.fields.length, 63);
   assert.equal(contract.denseGroups.length, 19);
   assert.deepEqual(
-    contract.denseGroups.find((group) => group.offset === -16).fields,
+    contract.denseGroups.find((group) => group.name === 'loadout-record').fields,
     [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52],
   );
   assert.deepEqual(
-    contract.denseGroups.find((group) => group.offset === -27).fields,
+    contract.denseGroups.find((group) => group.name === 'inline-record').fields,
     [4, 15, 18, 25, 27, 33, 35, 41, 44, 51],
   );
   assert.deepEqual(contract.denseGroups.at(-1).extendedFields, [58, 59, 60, 61, 62, 63]);
@@ -53,6 +53,30 @@ test('generated C++/TS and saved protocol exactly match YAML, covering 63 fields
   assert.equal(
     contract.output.snapshot.domainExtensions.find((entry) => entry.field === 26).permanent,
     true,
+  );
+});
+
+test('components are declared once and dense groups agree with their payload', () => {
+  const components = contract.components;
+  assert.deepEqual(
+    components.map((component) => component.id),
+    [...components.map((component) => component.id)].sort((a, b) => a - b),
+  );
+  assert.equal(components.length, 21);
+  assert.equal(components.filter((component) => component.payload === 'dense').length, 19);
+  for (const group of contract.denseGroups) {
+    const declared = components.find((component) => component.id === group.component);
+    assert.equal(declared.payload, 'dense');
+    assert.equal(group.name, declared.name);
+  }
+  for (const field of contract.fields) {
+    const declared = components.find((component) => component.id === field.component);
+    assert.ok(declared, `field ${field.id} names an undeclared component`);
+    assert.equal(declared.payload, 'dense');
+  }
+  assert.equal(
+    contract.components.find((component) => component.name === 'web-projectile-tag').payload,
+    'none',
   );
 });
 
@@ -98,30 +122,37 @@ for (const [name, change, expected] of [
   [
     'missing component',
     (s) => {
-      delete s.fieldComponents[63];
+      delete s.components[27];
     },
-    /missing component/,
+    /undeclared component/,
   ],
   [
-    'invalid constructor',
+    'invalid component ordinal',
     (s) => {
-      s.fieldComponents[2].constructor = '491';
+      s.components[31] = { name: 'extra', payload: 'none' };
     },
-    /constructor/,
+    /expected integer 1\.\.30/,
   ],
   [
-    'invalid offset',
+    'invalid component name',
     (s) => {
-      s.fieldComponents[2].offset = -1;
+      s.components[27].name = 'Inline_27';
     },
-    /offset/,
+    /lowercase kebab-case/,
   ],
   [
-    'unknown component field',
+    'component without dense payload',
     (s) => {
-      s.fieldComponents[64] = { constructor: 0, offset: 0 };
+      s.components[27].payload = 'none';
     },
-    /unknown field metadata/,
+    /has no dense payload/,
+  ],
+  [
+    'extra dense component',
+    (s) => {
+      s.components[12].payload = 'dense';
+    },
+    /dense group presence disagrees/,
   ],
   [
     'missing indexed metadata',
@@ -152,23 +183,30 @@ for (const [name, change, expected] of [
     /duplicate dense field/,
   ],
   [
-    'implicit zero in dense -16',
+    'implicit zero in dense loadout record',
     (s) => {
-      s.denseGroups.find((g) => g.offset === -16).fields.push(0);
+      s.denseGroups.find((g) => g.component === 16).fields.push(0);
     },
     /expected integer/,
   ],
   [
-    'duplicate dense group',
+    'duplicate dense component',
     (s) => {
-      s.denseGroups[1].offset = 52;
+      s.denseGroups[1].component = s.denseGroups[0].component;
     },
-    /duplicate offset/,
+    /duplicate component/,
+  ],
+  [
+    'dense groups out of order',
+    (s) => {
+      s.denseGroups.reverse();
+    },
+    /ordered by component/,
   ],
   [
     'missing dense field',
     (s) => {
-      s.denseGroups.find((g) => g.offset === -27).fields.pop();
+      s.denseGroups.find((g) => g.component === 27).fields.pop();
     },
     /missing dense group/,
   ],
@@ -243,15 +281,15 @@ void check(bool ok) { if (!ok) throw std::runtime_error("native wire assertion")
 void print(const std::vector<std::uint8_t>& packet) { for (auto byte : packet) std::printf("%02x", byte); std::puts(""); }
 int main() {
   static_assert(engine::protocol::validate_tables());
-  static_assert(engine::kDenseFieldsMinus16.size() == 11);
-  static_assert(engine::kDenseFieldsMinus27.size() == 10);
+  static_assert(engine::protocol::kDenseFieldsLoadoutRecord.size() == 11);
+  static_assert(engine::protocol::kDenseFieldsInlineRecord.size() == 10);
   static_assert(engine::protocol::kDomainSparse.index_delta_xor == 0);
   for (unsigned field = 1; field <= 63; ++field) check(engine::dense_group_for_field(field) != nullptr);
   check(engine::dense_group_for_field(0) == nullptr);
   const auto handle = engine::EntityHandle::from_wire(0x12345678U);
   engine::SnapshotEncoder writer;
   writer.begin(128, 4);
-  writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
+  writer.write_dense_inline_record(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
   const auto bytes = writer.finish();
   engine::ByteReader reader(bytes);
   check(reader.read_u8() == 1);
@@ -264,8 +302,8 @@ int main() {
   check(reader.read_f64_le() == 3.5); check(reader.read_varint32() == 400);
   check(reader.read_varint32() == 16385); check(reader.read_varint32() == 268435457);
   check(reader.eof()); print(bytes);
-  writer.begin(129, 4); writer.write_mask_entity(handle, 1U << 26);
-  writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
+  writer.begin(129, 4); writer.write_mask_entity(handle, engine::protocol::component_bit(engine::protocol::Component::kInlineRecord));
+  writer.write_dense_inline_record(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385, 268435457);
   print(writer.finish());
   writer.begin(130); writer.write_mask_string_field(handle, 0, 4, "domain");
   writer.write_mask_bit_field(handle, 0, 33, true);
@@ -332,7 +370,12 @@ test('native writer/byte-reader covers all ten -27 fields; actual bytes roundtri
     'hex',
   );
   assert.deepEqual(Buffer.from(packets[0]), expected);
-  const plan = [{ offset: -27, specs: fields.DENSE_GROUP_SPECS[-27] }];
+  const plan = [
+    {
+      component: fields.Component.InlineRecord,
+      specs: fields.DENSE_GROUP_SPECS[fields.Component.InlineRecord],
+    },
+  ];
   const decoder = new decoded.SnapshotDecoder(plan);
   const snapshot = decoder.decode(packets[1]);
   assert.ok(snapshot);

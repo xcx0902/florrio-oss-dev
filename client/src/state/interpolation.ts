@@ -48,8 +48,8 @@ export interface InterpolatedTransform {
   readonly radius?: number;
 }
 
-/** The camera follows component478 while artwork uses component609. They
- * have separate scalar clocks in the original receiver. */
+/** The camera target (player-controller component) and the artwork position
+ * (transform component) keep separate scalar clocks. */
 export function interpolateCameraTarget(
   entity: EntityState,
   now: number,

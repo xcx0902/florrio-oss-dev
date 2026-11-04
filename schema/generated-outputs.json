@@ -46,8 +46,8 @@
     },
     {
       "path": "client/src/schema/multiplayer.ts",
-      "bytes": 25345,
-      "sha256": "c16a1ca57bc248728a26e0d9383cca645eadc957fd4ac000dbce953dd4a7af4a"
+      "bytes": 25341,
+      "sha256": "bcfca45acc3af66f43acaa727952e0891418fdea3714285a185277199079af1b"
     },
     {
       "path": "client/src/schema/packet-key.ts",
@@ -61,8 +61,8 @@
     },
     {
       "path": "client/src/schema/protocol.ts",
-      "bytes": 16594,
-      "sha256": "e38080bee068314462a98ee108d1a1fe4e03c6a946572a384f4bbccff66448dc"
+      "bytes": 14843,
+      "sha256": "8421a2dc5ebb5c8ba7d955cd15e296dbc21b6398f9c61a7e1a20467068c362ea"
     },
     {
       "path": "client/src/schema/state-flags.ts",
@@ -76,8 +76,8 @@
     },
     {
       "path": "docs/multiplayer-protocol.md",
-      "bytes": 14323,
-      "sha256": "f26ad0af29c1bd1d142384754b826297a56eb5bd0119602877256875d8046b55"
+      "bytes": 14363,
+      "sha256": "0a2321a7fbb87cc35c19569e507322b219a33ab955f5734d0d2ea18ca99b091f"
     },
     {
       "path": "engine/include/engine/catalog/catalog_types.hpp",
@@ -126,8 +126,8 @@
     },
     {
       "path": "engine/include/engine/net/generated_protocol.hpp",
-      "bytes": 19675,
-      "sha256": "d32a99f9910fa99eb073060f9440ab62dfec9763be4350beb431588513111859"
+      "bytes": 22031,
+      "sha256": "6dd7c12ddba2ca847e32ab6e9f17a5cd0e29fc6784b50bc340e392f9bbd25d98"
     },
     {
       "path": "engine/include/engine/net/packet_key.hpp",
@@ -146,8 +146,8 @@
     },
     {
       "path": "schema/generated/protocol-contracts.json",
-      "bytes": 47294,
-      "sha256": "8c1b3c7dd7941c5ed35eb29acdca0e2aa47a61aa9f661063ff0027e3397b6cd1"
+      "bytes": 42013,
+      "sha256": "0210f8e96792c42b0c073b49750bcadfa087a79d67fc1ed9fddfa24ef471f8ac"
     }
   ]
 }

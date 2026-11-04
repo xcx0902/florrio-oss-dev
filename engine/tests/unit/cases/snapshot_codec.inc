@@ -722,7 +722,7 @@ void test_snapshot_writer_fields() {
 
   engine::SnapshotEncoder dense_writer;
   dense_writer.begin(41, 4);
-  dense_writer.write_dense_byte_group52(handle, 0x11, 0x22);
+  dense_writer.write_dense_drop_state(handle, 0x11, 0x22);
   const auto dense_bytes = dense_writer.finish();
   engine::ByteReader dense_reader(dense_bytes);
   CHECK(dense_reader.read_u8().value() == 1);
@@ -811,7 +811,7 @@ void test_snapshot_writer_fields() {
 
   engine::SnapshotEncoder dense152_writer;
   dense152_writer.begin(46, 4);
-  dense152_writer.write_dense_group152_base(handle, 1, 2, 3, 300);
+  dense152_writer.write_dense_identity_base(handle, 1, 2, 3, 300);
   const auto dense152_bytes = dense152_writer.finish();
   engine::ByteReader dense152_reader(dense152_bytes);
   CHECK(dense152_reader.read_u8().value() == 1);
@@ -838,7 +838,7 @@ void test_snapshot_writer_fields() {
   for (std::uint16_t index = 0; index < 8; ++index) {
     shorts61[index] = static_cast<std::uint16_t>(100 + index);
   }
-  dense152x_writer.write_dense_group152_extended(handle, 1, 2, 3, 300, 1.5F, bytes60, shorts61, 7,
+  dense152x_writer.write_dense_identity_extended(handle, 1, 2, 3, 300, 1.5F, bytes60, shorts61, 7,
                                                  8);
   const auto dense152x_bytes = dense152x_writer.finish();
   engine::ByteReader dense152x_reader(dense152x_bytes);
@@ -922,8 +922,8 @@ void test_snapshot_writer_fields() {
   for (std::uint8_t index = 0; index < 10; ++index) {
     bytes16[index] = index;
   }
-  dense72_writer.write_dense_group72(handle, 9, 1.25F, "n", bytes16, 20, 2.5F, 3.5F, 4.5F, 34, 47,
-                                     0xABCD);
+  dense72_writer.write_dense_player_controller(handle, 9, 1.25F, "n", bytes16, 20, 2.5F, 3.5F, 4.5F,
+                                               34, 47, 0xABCD);
   const auto dense72_bytes = dense72_writer.finish();
   engine::ByteReader dense72_reader(dense72_bytes);
   CHECK(dense72_reader.read_u8().value() == 1);
@@ -952,7 +952,7 @@ void test_snapshot_writer_fields() {
 
   engine::SnapshotEncoder denseM27_writer;
   denseM27_writer.begin(52, 4);
-  denseM27_writer.write_dense_group_minus27(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385,
+  denseM27_writer.write_dense_inline_record(handle, "a", 300, 1.5, "b", 2.5F, true, 3.5, 400, 16385,
                                             268435457);
   const auto denseM27_bytes = denseM27_writer.finish();
   engine::ByteReader denseM27_reader(denseM27_bytes);
@@ -1000,8 +1000,8 @@ void test_snapshot_writer_fields() {
   for (std::uint32_t index = 0; index < 10; ++index) {
     varints39[index] = 400 + index;
   }
-  denseM16_writer.write_dense_group_minus16(handle, handles3, strings10, 1, 2, 1.5F, 300, varints39,
-                                            2.5F, 3.5F, 46, 500);
+  denseM16_writer.write_dense_loadout_record(handle, handles3, strings10, 1, 2, 1.5F, 300,
+                                             varints39, 2.5F, 3.5F, 46, 500);
   const auto denseM16_bytes = denseM16_writer.finish();
   engine::ByteReader denseM16_reader(denseM16_bytes);
   CHECK(denseM16_reader.read_u8().value() == 1);

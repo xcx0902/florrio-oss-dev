@@ -3,11 +3,6 @@
 // Field26 remains the permanent domain-kind extension.
 export const MAX_INPUT_PACKET_BYTES = 65536;
 export const OUTPUT_QUEUE_CAPACITY = 16;
-export const PACKET_HEADER_BYTES = 16;
-export const INLINE_PAYLOAD_BYTES = 4096;
-export const PACKET_LENGTH_OFFSET = 4;
-export const HEAP_PAYLOAD_OFFSET = 12;
-export const INLINE_PAYLOAD_OFFSET = 16;
 export const INPUT_XOR_KEY_BYTES = 256;
 export const SNAPSHOT_XOR_KEY_BYTES = 256;
 export const MAX_VARINT_BYTES = 5;
@@ -16,7 +11,9 @@ export const EVENT_TYPE = 5;
 export const COMPONENT_COUNT = 30;
 export const SPARSE_FIELD_COUNT = 63;
 export const DENSE_GROUP_COUNT = 19;
-export const DENSE_COMPONENT30_EXTRA_FIELDS = 6;
+export const DENSE_EXTENDED_FIELD_COUNT = 6;
+export const EXTENDED_DENSE_COMPONENT = 30;
+export const EXTENDED_DENSE_BASE_FIELDS = 3;
 export const ENTITY_FLAGS_XOR = 54;
 export const COMPONENT_DELTA_XOR = 1;
 export const ENTITY_INDEX_MASK = 16383;
@@ -106,6 +103,30 @@ export const OUTPUT_PAYLOAD_TYPE = {
   Events: 5,
   Unknown2: 2,
 } as const;
+export const Component = {
+  DropState: 1,
+  AiActivity: 2,
+  PetalVariant: 5,
+  PlayerController: 6,
+  PetalSpecies: 7,
+  Reserved8: 8,
+  Reserved10: 10,
+  WebProjectileTag: 12,
+  Reserved14: 14,
+  Reserved15: 15,
+  LoadoutRecord: 16,
+  ProjectileTag: 18,
+  Reserved19: 19,
+  Health: 20,
+  Transform: 21,
+  Reserved22: 22,
+  Lifecycle: 25,
+  CollisionRadius: 26,
+  InlineRecord: 27,
+  Reserved28: 28,
+  Identity: 30,
+} as const;
+export type Component = (typeof Component)[keyof typeof Component];
 export const FIELD_TYPES = {
   byte: [1, 2, 9, 11, 12, 14, 17, 20, 22, 26, 31, 34, 36, 38, 43, 46, 47, 50, 54, 62, 63],
   float: [19, 21, 32, 42, 53, 55],
@@ -213,7 +234,8 @@ export const STRING_ARRAY_FIELDS: ReadonlySet<number> = new Set([10, 25]);
 export const BYTE_ARRAY_FIELDS: ReadonlySet<number> = new Set([16, 60]);
 export const REFERENCE_FIELDS: ReadonlySet<number> = new Set([23, 56, 57]);
 export interface DenseFieldGroup {
-  readonly offset: number;
+  readonly component: number;
+  readonly name: string;
   readonly fields: readonly number[];
   readonly extendedFields?: readonly number[];
 }
@@ -236,60 +258,40 @@ export interface DenseFieldSpec {
   readonly field: number;
   readonly type: DenseFieldType;
 }
-export interface FieldComponent {
-  readonly constructor: number;
-  readonly offset: number;
-}
 export const DENSE_GROUPS: readonly DenseFieldGroup[] = [
-  { offset: 52, fields: [22, 54] },
-  { offset: 56, fields: [36] },
-  { offset: 68, fields: [9] },
-  { offset: 72, fields: [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56] },
-  { offset: 76, fields: [50] },
-  { offset: -8, fields: [13, 37] },
-  { offset: 84, fields: [17] },
-  { offset: 100, fields: [43] },
-  { offset: -15, fields: [23, 57] },
-  { offset: -16, fields: [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52] },
-  { offset: 112, fields: [48] },
-  { offset: 116, fields: [53, 55] },
-  { offset: 120, fields: [8, 28, 49] },
-  { offset: 124, fields: [29, 40] },
-  { offset: 136, fields: [38] },
-  { offset: 140, fields: [7] },
-  { offset: -27, fields: [4, 15, 18, 25, 27, 33, 35, 41, 44, 51] },
-  { offset: 144, fields: [14] },
-  { offset: 152, fields: [2, 26, 31], extendedFields: [58, 59, 60, 61, 62, 63] },
+  { component: 1, name: 'drop-state', fields: [22, 54] },
+  { component: 2, name: 'ai-activity', fields: [36] },
+  { component: 5, name: 'petal-variant', fields: [9] },
+  { component: 6, name: 'player-controller', fields: [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56] },
+  { component: 7, name: 'petal-species', fields: [50] },
+  { component: 8, name: 'reserved-8', fields: [13, 37] },
+  { component: 10, name: 'reserved-10', fields: [17] },
+  { component: 14, name: 'reserved-14', fields: [43] },
+  { component: 15, name: 'reserved-15', fields: [23, 57] },
+  { component: 16, name: 'loadout-record', fields: [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52] },
+  { component: 19, name: 'reserved-19', fields: [48] },
+  { component: 20, name: 'health', fields: [53, 55] },
+  { component: 21, name: 'transform', fields: [8, 28, 49] },
+  { component: 22, name: 'reserved-22', fields: [29, 40] },
+  { component: 25, name: 'lifecycle', fields: [38] },
+  { component: 26, name: 'collision-radius', fields: [7] },
+  { component: 27, name: 'inline-record', fields: [4, 15, 18, 25, 27, 33, 35, 41, 44, 51] },
+  { component: 28, name: 'reserved-28', fields: [14] },
+  {
+    component: 30,
+    name: 'identity',
+    fields: [2, 26, 31],
+    extendedFields: [58, 59, 60, 61, 62, 63],
+  },
 ];
-export const DENSE_GROUP_COMPONENTS: Readonly<Record<number, number>> = {
-  [52]: 1,
-  [56]: 2,
-  [68]: 5,
-  [72]: 6,
-  [76]: 7,
-  [-8]: 8,
-  [84]: 10,
-  [100]: 14,
-  [-15]: 15,
-  [-16]: 16,
-  [112]: 19,
-  [116]: 20,
-  [120]: 21,
-  [124]: 22,
-  [136]: 25,
-  [140]: 26,
-  [-27]: 27,
-  [144]: 28,
-  [152]: 30,
-};
 export const DENSE_GROUP_SPECS: Readonly<Record<number, readonly DenseFieldSpec[]>> = {
-  [52]: [
+  [Component.DropState]: [
     { field: 22, type: 'byte' },
     { field: 54, type: 'byte' },
   ],
-  [56]: [{ field: 36, type: 'byte' }],
-  [68]: [{ field: 9, type: 'byte' }],
-  [72]: [
+  [Component.AiActivity]: [{ field: 36, type: 'byte' }],
+  [Component.PetalVariant]: [{ field: 9, type: 'byte' }],
+  [Component.PlayerController]: [
     { field: 1, type: 'byte' },
     { field: 5, type: 'f32' },
     { field: 6, type: 'string' },
@@ -302,18 +304,18 @@ export const DENSE_GROUP_SPECS: Readonly<Record<number, readonly DenseFieldSpec[
     { field: 47, type: 'byte' },
     { field: 56, type: 'reference' },
   ],
-  [76]: [{ field: 50, type: 'byte' }],
-  [-8]: [
+  [Component.PetalSpecies]: [{ field: 50, type: 'byte' }],
+  [Component.Reserved8]: [
     { field: 13, type: 'f32' },
     { field: 37, type: 'bit' },
   ],
-  [84]: [{ field: 17, type: 'byte' }],
-  [100]: [{ field: 43, type: 'byte' }],
-  [-15]: [
+  [Component.Reserved10]: [{ field: 17, type: 'byte' }],
+  [Component.Reserved14]: [{ field: 43, type: 'byte' }],
+  [Component.Reserved15]: [
     { field: 23, type: 'reference' },
     { field: 57, type: 'reference' },
   ],
-  [-16]: [
+  [Component.LoadoutRecord]: [
     { field: 3, type: 'handleArray10' },
     { field: 10, type: 'stringArray10' },
     { field: 11, type: 'byte' },
@@ -326,23 +328,23 @@ export const DENSE_GROUP_SPECS: Readonly<Record<number, readonly DenseFieldSpec[
     { field: 46, type: 'byte' },
     { field: 52, type: 'varint' },
   ],
-  [112]: [{ field: 48, type: 'string' }],
-  [116]: [
+  [Component.Reserved19]: [{ field: 48, type: 'string' }],
+  [Component.Health]: [
     { field: 53, type: 'f32' },
     { field: 55, type: 'f32' },
   ],
-  [120]: [
+  [Component.Transform]: [
     { field: 8, type: 'angle' },
     { field: 28, type: 'f32' },
     { field: 49, type: 'f32' },
   ],
-  [124]: [
+  [Component.Reserved22]: [
     { field: 29, type: 'bit' },
     { field: 40, type: 'bit' },
   ],
-  [136]: [{ field: 38, type: 'byte' }],
-  [140]: [{ field: 7, type: 'f32' }],
-  [-27]: [
+  [Component.Lifecycle]: [{ field: 38, type: 'byte' }],
+  [Component.CollisionRadius]: [{ field: 7, type: 'f32' }],
+  [Component.InlineRecord]: [
     { field: 4, type: 'string' },
     { field: 15, type: 'varint' },
     { field: 18, type: 'f64' },
@@ -354,8 +356,8 @@ export const DENSE_GROUP_SPECS: Readonly<Record<number, readonly DenseFieldSpec[
     { field: 44, type: 'varint' },
     { field: 51, type: 'varint' },
   ],
-  [144]: [{ field: 14, type: 'byte' }],
-  [152]: [
+  [Component.Reserved28]: [{ field: 14, type: 'byte' }],
+  [Component.Identity]: [
     { field: 2, type: 'byte' },
     { field: 26, type: 'byte' },
     { field: 31, type: 'byte' },
@@ -366,71 +368,6 @@ export const DENSE_GROUP_SPECS: Readonly<Record<number, readonly DenseFieldSpec[
     { field: 62, type: 'byte' },
     { field: 63, type: 'byte' },
   ],
-};
-export const FIELD_COMPONENTS: Readonly<Record<number, FieldComponent>> = {
-  1: { constructor: 478, offset: 8 },
-  2: { constructor: 491, offset: 8 },
-  3: { constructor: 477, offset: 8 },
-  4: { constructor: 0, offset: 8 },
-  5: { constructor: 478, offset: 16 },
-  6: { constructor: 478, offset: 40 },
-  7: { constructor: 467, offset: 8 },
-  8: { constructor: 609, offset: 8 },
-  9: { constructor: 755, offset: 8 },
-  10: { constructor: 477, offset: 88 },
-  11: { constructor: 477, offset: 248 },
-  12: { constructor: 477, offset: 249 },
-  13: { constructor: 0, offset: 8 },
-  14: { constructor: 756, offset: 8 },
-  15: { constructor: 0, offset: 24 },
-  16: { constructor: 478, offset: 52 },
-  17: { constructor: 549, offset: 8 },
-  18: { constructor: 0, offset: 32 },
-  19: { constructor: 477, offset: 252 },
-  20: { constructor: 478, offset: 104 },
-  21: { constructor: 478, offset: 108 },
-  22: { constructor: 670, offset: 8 },
-  23: { constructor: 0, offset: 8 },
-  24: { constructor: 478, offset: 112 },
-  25: { constructor: 0, offset: 40 },
-  26: { constructor: 491, offset: 9 },
-  27: { constructor: 0, offset: 56 },
-  28: { constructor: 609, offset: 40 },
-  29: { constructor: 533, offset: 8 },
-  30: { constructor: 477, offset: 256 },
-  31: { constructor: 491, offset: 10 },
-  32: { constructor: 478, offset: 136 },
-  33: { constructor: 0, offset: 60 },
-  34: { constructor: 478, offset: 140 },
-  35: { constructor: 0, offset: 72 },
-  36: { constructor: 493, offset: 8 },
-  37: { constructor: 0, offset: 32 },
-  38: { constructor: 809, offset: 8 },
-  39: { constructor: 477, offset: 260 },
-  40: { constructor: 533, offset: 9 },
-  41: { constructor: 0, offset: 88 },
-  42: { constructor: 477, offset: 340 },
-  43: { constructor: 757, offset: 8 },
-  44: { constructor: 0, offset: 92 },
-  45: { constructor: 477, offset: 344 },
-  46: { constructor: 477, offset: 352 },
-  47: { constructor: 478, offset: 141 },
-  48: { constructor: 677, offset: 8 },
-  49: { constructor: 609, offset: 64 },
-  50: { constructor: 758, offset: 8 },
-  51: { constructor: 0, offset: 96 },
-  52: { constructor: 477, offset: 356 },
-  53: { constructor: 458, offset: 8 },
-  54: { constructor: 670, offset: 9 },
-  55: { constructor: 458, offset: 12 },
-  56: { constructor: 478, offset: 144 },
-  57: { constructor: 0, offset: 20 },
-  58: { constructor: 491, offset: 12 },
-  59: { constructor: 491, offset: 16 },
-  60: { constructor: 491, offset: 40 },
-  61: { constructor: 491, offset: 120 },
-  62: { constructor: 491, offset: 168 },
-  63: { constructor: 491, offset: 169 },
 };
 export const INDEXED_FIELDS = {
   '3': { element: 'reference', count: 10 },

@@ -59,7 +59,7 @@ bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hat
                      [egg_handle](const auto& state) { return state.handle == egg_handle; }),
       states.end());
   (void)damage_entity(world, egg_handle, egg->health, EntityHandle{});
-  assign_petal_orbit_indices(world, state);
+  assign_petal_orbit_indices(state);
   return true;
 }
 

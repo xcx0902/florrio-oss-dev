@@ -1,15 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SnapshotDecoder } from '../../../build/client/state/snapshot.js';
-import { DenseGroupDecoder, DensePlanDecoder } from '../support/dense-codec.mjs';
-import { DENSE_GROUP_SPECS } from '../../../build/client/state/field-types.js';
+import { DenseGroupDecoder } from '../support/dense-codec.mjs';
+import { Component, DENSE_GROUP_SPECS } from '../../../build/client/state/field-types.js';
 import { WorldState } from '../../../build/client/state/world.js';
 import {
   interpolateCameraTarget,
   interpolateEntity,
 } from '../../../build/client/state/interpolation.js';
 
-test('pickup constructor marker survives position deltas before the first render and resets on deletion', () => {
+test('pickup arrival marker survives position deltas before the first render and resets on deletion', () => {
   const world = new WorldState();
   const drop = {
     handle: 91,
@@ -243,7 +243,10 @@ test('dense convenience decoders preserve coordinate semantics, removals and ful
   ]);
   for (const decoder of [
     new DenseGroupDecoder(specs),
-    new DensePlanDecoder([{ offset: 120, specs }], new Set([120])),
+    new SnapshotDecoder(
+      [{ component: Component.Transform, specs }],
+      new Set([Component.Transform]),
+    ),
   ]) {
     const snapshot = decoder.decode(bytes);
     assert.ok(snapshot);
@@ -268,13 +271,13 @@ test('authoritative deletion removes artwork immediately (no flash-back)', () =>
   assert.equal(world.get(handle), undefined);
   assert.equal(world.count, 0);
   assert.equal([...world.all()].length, 0);
-  assert.equal([...world.renderable(100)].length, 0);
-  assert.equal([...world.renderable(249)].length, 0);
-  assert.equal([...world.renderable(250)].length, 0);
+  assert.equal([...world.renderable()].length, 0);
+  assert.equal([...world.renderable()].length, 0);
+  assert.equal([...world.renderable()].length, 0);
   world.applyDeltaSnapshot(new SnapshotDecoder().decode(bytes), 300);
-  assert.equal([...world.renderable(300)].length, 1);
+  assert.equal([...world.renderable()].length, 1);
   world.reset();
-  assert.equal([...world.renderable(300)].length, 0);
+  assert.equal([...world.renderable()].length, 0);
 });
 
 test('indexed visual effects do not reset the independent hit and camera-shake clock', () => {
@@ -383,7 +386,7 @@ test('world stores chat lines and visual hit indices', () => {
 
 test('dense groups use native component-pointer presence from the mask entry', () => {
   const handle = 0x22334455;
-  const dense = DENSE_GROUP_SPECS[72];
+  const dense = DENSE_GROUP_SPECS[Component.PlayerController];
   const bytes = [
     1,
     ...varint(52),
@@ -393,7 +396,7 @@ test('dense groups use native component-pointer presence from the mask entry', (
     ...varint(0), // events
     ...u32(handle),
     55, // mask entry
-    ...u32(1 << 5), // component ordinal 6 -> dense group offset 72
+    ...u32(1 << 5), // component 6 (player-controller)
     ...varint(2),
     4, // species id
     0, // field terminator
@@ -421,7 +424,7 @@ test('dense groups use native component-pointer presence from the mask entry', (
     47, // field 47
     ...u32(0), // field 56 reference
   ];
-  const decoder = new SnapshotDecoder([{ offset: 72, specs: dense }]);
+  const decoder = new SnapshotDecoder([{ component: Component.PlayerController, specs: dense }]);
   const snapshot = decoder.decode(Uint8Array.from(bytes));
   assert.ok(snapshot);
   // The mask entry and the dense entry are two update records for one handle;
@@ -557,7 +560,7 @@ test('failed packets roll back component masks before the next dense update', ()
   const handle = 0x12345678;
   const decoder = new SnapshotDecoder([
     {
-      offset: 52,
+      component: Component.DropState,
       specs: [
         { field: 22, type: 'byte' },
         { field: 54, type: 'byte' },
@@ -593,7 +596,9 @@ test('sparse field boundaries accept 1 and 63 and reject direct or accumulated o
 
 test('out-of-range fields cannot install masks or enable dense groups on a fresh decoder', () => {
   const handle = 0x12345678;
-  const decoder = new SnapshotDecoder([{ offset: 52, specs: DENSE_GROUP_SPECS[52] }]);
+  const decoder = new SnapshotDecoder([
+    { component: Component.DropState, specs: DENSE_GROUP_SPECS[Component.DropState] },
+  ]);
   const dense = (values) => Uint8Array.from([1, 2, 0, 0, 1, 0, ...u32(handle), 62, ...values]);
   const before = decoder.decode(dense([]));
   assert.equal(decoder.decode(dense([2, 0])), null);
@@ -610,7 +615,9 @@ test('invalid sparse fields roll back deletions, earlier records and ordinal pre
   const first = 7,
     second = 8,
     added = 9;
-  const decoder = new SnapshotDecoder([{ offset: 52, specs: DENSE_GROUP_SPECS[52] }]);
+  const decoder = new SnapshotDecoder([
+    { component: Component.DropState, specs: DENSE_GROUP_SPECS[Component.DropState] },
+  ]);
   assert.ok(
     decoder.decode(
       Uint8Array.from([

@@ -1,4 +1,5 @@
 #include "engine/net/replication_session.hpp"
+#include "engine/net/generated_protocol.hpp"
 #include "engine/sim/effects.hpp"
 #include "engine/net/snapshot_publisher.hpp"
 #include "engine/model/catalog.hpp"
@@ -7,6 +8,14 @@
 namespace engine::net {
 namespace {
 constexpr std::uint32_t publicMask = kPublicComponentMask;
+constexpr std::uint32_t petalVariantMask =
+    protocol::component_bit(protocol::Component::kPetalVariant);
+constexpr std::uint32_t petalSpeciesMask =
+    protocol::component_bit(protocol::Component::kPetalSpecies);
+constexpr std::uint32_t webProjectileMask =
+    protocol::component_bit(protocol::Component::kWebProjectileTag);
+constexpr std::uint32_t projectileMask =
+    protocol::component_bit(protocol::Component::kProjectileTag);
 std::optional<EntityUpdate> project(const World& world, const Entity& entity, bool dense,
                                     bool arriving) {
   EntityUpdate update;
@@ -44,7 +53,7 @@ std::optional<EntityUpdate> project(const World& world, const Entity& entity, bo
     codec.write_mask_byte_field(entity.handle, publicMask, 11, entity.loadout_slot);
     codec.write_mask_byte_field(entity.handle, publicMask, 12, entity.loadout_instance);
     const bool peas = catalog::is_peas_petal(entity.type_id) && entity.petal_launched;
-    const auto mask = publicMask | (1U << 6) | (peas ? 1U << 4 : 0);
+    const auto mask = publicMask | petalSpeciesMask | (peas ? petalVariantMask : 0U);
     if (peas) {
       codec.write_mask_byte_field(entity.handle, mask, 9, entity.petal_variant_flags);
     }
@@ -54,9 +63,10 @@ std::optional<EntityUpdate> project(const World& world, const Entity& entity, bo
                                 static_cast<std::uint8_t>(entity.type_id));
     codec.write_mask_byte_field(entity.handle, publicMask, 54, entity.pickup_collected ? 1 : 0);
   } else if (entity.kind == EntityKind::kProjectile) {
-    const auto ordinal =
-        entity.has_tag_component && catalog::is_web_petal(entity.type_id) ? 12U : 18U;
-    codec.write_mask_entity(entity.handle, publicMask | (1U << (ordinal - 1)));
+    const auto tagMask = entity.has_tag_component && catalog::is_web_petal(entity.type_id)
+                             ? webProjectileMask
+                             : projectileMask;
+    codec.write_mask_entity(entity.handle, publicMask | tagMask);
   }
   update.fields = codec.finish();
   return update;

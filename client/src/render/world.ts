@@ -514,7 +514,6 @@ function drawEntityBlock(
             entity.denseByteFields?.[22] ??
             (typeof entity.denseFields?.[22] === 'number' ? entity.denseFields[22] : undefined) ??
             species,
-          14,
           Infinity,
           dropVisual,
         );

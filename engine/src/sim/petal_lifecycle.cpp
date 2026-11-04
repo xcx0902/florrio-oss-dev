@@ -115,7 +115,7 @@ EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id
 }
 
 std::size_t spawn_loadout_petals(World& world, PlayerState& state) {
-  assign_petal_orbit_indices(world, state);
+  assign_petal_orbit_indices(state);
   const Entity* player = world.entities().get(state.player());
   if (player == nullptr || player->health.value <= 0.0F) {
     return 0;
@@ -171,7 +171,7 @@ std::size_t spawn_loadout_petals(World& world, PlayerState& state) {
       ++spawned;
     }
   }
-  assign_petal_orbit_indices(world, state);
+  assign_petal_orbit_indices(state);
   return spawned;
 }
 

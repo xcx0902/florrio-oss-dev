@@ -322,8 +322,6 @@ void test_catalog() {
 void test_protocol_constants() {
   CHECK(engine::kMaxInputPacketBytes == 65536);
   CHECK(engine::kOutputQueueCapacity == 16);
-  CHECK(engine::kPacketHeaderBytes == 16);
-  CHECK(engine::kInlinePayloadBytes == 4096);
   CHECK(engine::kPacketXorKeyBytes == 256);
   engine::OutputQueue queue;
   for (std::size_t index = 0; index < engine::kOutputQueueCapacity; ++index) {

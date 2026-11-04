@@ -3,41 +3,20 @@
 
 namespace engine {
 
-// Public compatibility names; all protocol values come from protocol.yaml.
-using protocol::DenseFieldGroup;
-using protocol::kDenseFields100;
-using protocol::kDenseFields112;
-using protocol::kDenseFields116;
-using protocol::kDenseFields120;
-using protocol::kDenseFields124;
-using protocol::kDenseFields136;
-using protocol::kDenseFields140;
-using protocol::kDenseFields144;
-using protocol::kDenseFields152;
-using protocol::kDenseFields152Extended;
-using protocol::kDenseFields52;
-using protocol::kDenseFields56;
-using protocol::kDenseFields68;
-using protocol::kDenseFields72;
-using protocol::kDenseFields76;
-using protocol::kDenseFields84;
-using protocol::kDenseFieldsMinus15;
-using protocol::kDenseFieldsMinus16;
-using protocol::kDenseFieldsMinus27;
-using protocol::kDenseFieldsMinus8;
-using protocol::kDenseGroups;
-
-inline const DenseFieldGroup* dense_group_by_offset(int offset) {
-  for (const auto& group : kDenseGroups) {
-    if (group.offset == offset) {
+/** Dense group for a component, or nullptr when the component carries no dense
+ * payload in the current protocol. */
+inline const protocol::DenseFieldGroup* dense_group(protocol::Component component) {
+  for (const auto& group : protocol::kDenseGroups) {
+    if (group.component == component) {
       return &group;
     }
   }
   return nullptr;
 }
 
-inline const DenseFieldGroup* dense_group_for_field(std::uint32_t field) {
-  for (const auto& group : kDenseGroups) {
+/** Dense group that stores a field, or nullptr for an unknown field. */
+inline const protocol::DenseFieldGroup* dense_group_for_field(std::uint32_t field) {
+  for (const auto& group : protocol::kDenseGroups) {
     for (const std::uint32_t candidate : group.fields) {
       if (candidate == field) {
         return &group;
