@@ -65,7 +65,7 @@ npm run pack:native         # platform package; use --target linux-x86_64 in CI
 ## Test
 
 ```sh
-npm run format:check        # all tracked text is formatter-clean
+npm run format:check        # hand-written text is formatter-clean
 npm run lint                # ESLint structural/unused rules
 npm run check:refactor      # legacy representation ledger
 npm run test:unit           # protocol/wire unit tests
@@ -98,8 +98,11 @@ once, unit/tools/client unit, cross-end integration, ABI, delivery integrity,
 browser scenarios/entrypoint smoke/render performance in one pinned Chromium
 process, engine performance and integration performance, plus the M01 native
 host build/CTest (20 gates). Each gate binds the same run and delivery identity.
-The format gate is read-only; generated outputs are formatted before hashing and
-must be refreshed with `npm run schema:generate`, never hand-edited.
+The format gate is read-only and covers hand-written files only. Schema-generated
+outputs never pass through a formatter: `tools/generate.mjs` writes its template
+text verbatim, `.prettierignore` keeps Prettier away from it, and
+`npm run schema:check` is its gate. Only `npm run schema:generate` may change it;
+never hand-edit generated output.
 
 The M08 multiplayer profile is `tools/run-multiplayer-verification.mjs`; it consumes
 the passing offline ledger and writes `reports/multiplayer/current-verification.json`.

@@ -42,4 +42,4 @@ struct SpawnRuleCatalogEntry {
   std::uint8_t regionCount;
   std::uint8_t entityTypeId;
 };
-}  // namespace engine::catalog
+} // namespace engine::catalog

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Install the exact clang-format and cmake-format versions used by the
- * generator and the format gate. The virtual environment lives under the
- * ignored `.emcache/` directory; nothing is installed into the product tree.
+ * Install the exact clang-format and cmake-format versions used by the format
+ * gate. The virtual environment lives under the ignored `.emcache/` directory;
+ * nothing is installed into the product tree. Schema-generated output is
+ * written verbatim by `tools/generate.mjs` and never uses these tools.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';

@@ -8,17 +8,17 @@ Counts: 39 petals, 23 entities, 20 spawn rules, 99 strings.
 
 ## Input ownership
 
-| Input                        | Owns                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------- |
-| `petals.json`                | petal identity, descriptions, rarity, recharge, slot count, label font size and orbit flags |
-| `petal-combat.json`          | draw radius, collision radius, contact damage, health and orbit profile                     |
-| `entities.json`              | entity identity, scale, droppable petal ids, drop alias and drop weight                     |
-| `spawn-rules.json`           | weighted spawn bands                                                                        |
-| `entity-spawn-defaults.json` | fixed spawn defaults; dynamic species keep their domain random formulas                     |
-| `drop-rules.json`            | band areas, petal drop mass, summoned children and convergence thresholds                   |
-| `gallery-overrides.json`     | only reasoned display differences from runtime drops                                        |
-| `strings.json`               | deduplicated names and descriptions                                                         |
-| `CHANGELOG.md`               | menu release notes (not a catalog input)                                                    |
+| Input | Owns |
+| --- | --- |
+| `petals.json` | petal identity, descriptions, rarity, recharge, slot count, label font size and orbit flags |
+| `petal-combat.json` | draw radius, collision radius, contact damage, health and orbit profile |
+| `entities.json` | entity identity, scale, droppable petal ids, drop alias and drop weight |
+| `spawn-rules.json` | weighted spawn bands |
+| `entity-spawn-defaults.json` | fixed spawn defaults; dynamic species keep their domain random formulas |
+| `drop-rules.json` | band areas, petal drop mass, summoned children and convergence thresholds |
+| `gallery-overrides.json` | only reasoned display differences from runtime drops |
+| `strings.json` | deduplicated names and descriptions |
+| `CHANGELOG.md` | menu release notes (not a catalog input) |
 
 Duplicate fields were removed from `petal-combat.json`; rarity, recharge and
 instances are joined from `petals.json` at generation time. `PetalCombat`
@@ -26,75 +26,75 @@ therefore owns only combat values.
 
 ## Petals
 
-|  Id | Name      | Rarity | Recharge | Instances | Label | Collision | Draw |
-| --: | --------- | -----: | -------: | --------: | ----: | --------: | ---: |
-|   0 | None      |      0 |        0 |         1 |    14 |         0 |   14 |
-|   1 | Basic     |      0 |     2500 |         1 |    14 |        10 |   14 |
-|   2 | Fast      |      0 |      500 |         1 |    14 |         7 |   14 |
-|   3 | Heavy     |      0 |     5500 |         1 |    14 |        12 |   14 |
-|   4 | Rock      |      2 |    10000 |         1 |    14 |        14 |   14 |
-|   5 | Square    |      5 |     2500 |         1 |    14 |        10 |   14 |
-|   6 | Rose      |      1 |     3500 |         1 |    14 |        10 |   14 |
-|   7 | Stinger   |      1 |     4000 |         1 |    14 |         7 |   14 |
-|   8 | Iris      |      1 |     6000 |         1 |    14 |         6 |   14 |
-|   9 | Wing      |      2 |     1250 |         1 |    14 |        15 |   14 |
-|  10 | Missile   |      2 |     3000 |         1 |    14 |        10 |   14 |
-|  11 | Peas      |      2 |     1000 |         1 |    14 |         7 |   14 |
-|  12 | Peas      |      3 |     1000 |         1 |    14 |         7 |   14 |
-|  13 | Cactus    |      2 |     1000 |         1 |    14 |        15 |   14 |
-|  14 | Faster    |      2 |      500 |         1 |    14 |         7 |   14 |
-|  15 | Rose      |      3 |     3500 |         1 |    14 |        10 |   14 |
-|  16 | Twin      |      1 |     1000 |         2 |    14 |         7 |   14 |
-|  17 | Triplet   |      3 |     1000 |         3 |    14 |         7 |   14 |
-|  18 | Bubble    |      2 |     3500 |         1 |    14 |        12 |   14 |
-|  19 | Pollen    |      3 |     1000 |         3 |    14 |         7 |   14 |
-|  20 | Dandelion |      2 |     2000 |         1 |    11 |         9 |   11 |
-|  21 | Cactus    |      3 |     1000 |         1 |    14 |        15 |   14 |
-|  22 | Egg       |      3 |     1000 |         1 |    14 |        13 |   14 |
-|  23 | Egg       |      4 |     1000 |         1 |    14 |        15 |   14 |
-|  24 | Rose      |      2 |     3500 |         3 |    14 |         7 |   14 |
-|  25 | Antennae  |      4 |        0 |         1 |    12 |        10 |   12 |
-|  26 | Heaviest  |      3 |    20000 |         1 |    12 |        16 |   12 |
-|  27 | Stinger   |      4 |     4000 |         3 |    14 |         7 |   14 |
-|  28 | Yin Yang  |      3 |     1000 |         1 |    12 |        12 |   12 |
-|  29 | Web       |      2 |     3000 |         1 |    14 |        10 |   14 |
-|  30 | Web       |      4 |     3000 |         3 |    14 |        10 |   14 |
-|  31 | Honey     |      2 |     1700 |         1 |    14 |        10 |   14 |
-|  32 | Leaf      |      1 |     1000 |         1 |    14 |        10 |   14 |
-|  33 | Cactus    |      4 |     1000 |         3 |    14 |        15 |   14 |
-|  34 | Peas      |      4 |     1000 |         1 |    14 |        10 |   14 |
-|  35 | Basic     |      5 |     2500 |         1 |    14 |        10 |   14 |
-|  36 | Salt      |      2 |     2500 |         1 |    14 |        10 |   14 |
-|  37 | Rice      |      3 |        0 |         1 |    14 |        10 |   14 |
-|  38 | Corn      |      3 |    45000 |         1 |    14 |        10 |   14 |
+| Id | Name | Rarity | Recharge | Instances | Label | Collision | Draw |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | None | 0 | 0 | 1 | 14 | 0 | 14 |
+| 1 | Basic | 0 | 2500 | 1 | 14 | 10 | 14 |
+| 2 | Fast | 0 | 500 | 1 | 14 | 7 | 14 |
+| 3 | Heavy | 0 | 5500 | 1 | 14 | 12 | 14 |
+| 4 | Rock | 2 | 10000 | 1 | 14 | 14 | 14 |
+| 5 | Square | 5 | 2500 | 1 | 14 | 10 | 14 |
+| 6 | Rose | 1 | 3500 | 1 | 14 | 10 | 14 |
+| 7 | Stinger | 1 | 4000 | 1 | 14 | 7 | 14 |
+| 8 | Iris | 1 | 6000 | 1 | 14 | 6 | 14 |
+| 9 | Wing | 2 | 1250 | 1 | 14 | 15 | 14 |
+| 10 | Missile | 2 | 3000 | 1 | 14 | 10 | 14 |
+| 11 | Peas | 2 | 1000 | 1 | 14 | 7 | 14 |
+| 12 | Peas | 3 | 1000 | 1 | 14 | 7 | 14 |
+| 13 | Cactus | 2 | 1000 | 1 | 14 | 15 | 14 |
+| 14 | Faster | 2 | 500 | 1 | 14 | 7 | 14 |
+| 15 | Rose | 3 | 3500 | 1 | 14 | 10 | 14 |
+| 16 | Twin | 1 | 1000 | 2 | 14 | 7 | 14 |
+| 17 | Triplet | 3 | 1000 | 3 | 14 | 7 | 14 |
+| 18 | Bubble | 2 | 3500 | 1 | 14 | 12 | 14 |
+| 19 | Pollen | 3 | 1000 | 3 | 14 | 7 | 14 |
+| 20 | Dandelion | 2 | 2000 | 1 | 11 | 9 | 11 |
+| 21 | Cactus | 3 | 1000 | 1 | 14 | 15 | 14 |
+| 22 | Egg | 3 | 1000 | 1 | 14 | 13 | 14 |
+| 23 | Egg | 4 | 1000 | 1 | 14 | 15 | 14 |
+| 24 | Rose | 2 | 3500 | 3 | 14 | 7 | 14 |
+| 25 | Antennae | 4 | 0 | 1 | 12 | 10 | 12 |
+| 26 | Heaviest | 3 | 20000 | 1 | 12 | 16 | 12 |
+| 27 | Stinger | 4 | 4000 | 3 | 14 | 7 | 14 |
+| 28 | Yin Yang | 3 | 1000 | 1 | 12 | 12 | 12 |
+| 29 | Web | 2 | 3000 | 1 | 14 | 10 | 14 |
+| 30 | Web | 4 | 3000 | 3 | 14 | 10 | 14 |
+| 31 | Honey | 2 | 1700 | 1 | 14 | 10 | 14 |
+| 32 | Leaf | 1 | 1000 | 1 | 14 | 10 | 14 |
+| 33 | Cactus | 4 | 1000 | 3 | 14 | 15 | 14 |
+| 34 | Peas | 4 | 1000 | 1 | 14 | 10 | 14 |
+| 35 | Basic | 5 | 2500 | 1 | 14 | 10 | 14 |
+| 36 | Salt | 2 | 2500 | 1 | 14 | 10 | 14 |
+| 37 | Rice | 3 | 0 | 1 | 14 | 10 | 14 |
+| 38 | Corn | 3 | 45000 | 1 | 14 | 10 | 14 |
 
 ## Entities
 
-|  Id | Name            | Rarity |         Drop weight | Drops                 |
-| --: | --------------- | -----: | ------------------: | --------------------- |
-|   0 | None            |      0 |                   1 |                       |
-|   1 | Rock            |      0 |                   1 | 2, 3, 4               |
-|   2 | Boulder         |      1 |                   1 | 3, 4, 26              |
-|   3 | Cactus          |      0 |                   1 | 7, 10, 13, 21, 33     |
-|   4 | Ladybug         |      0 |                   1 | 2, 6, 16, 9, 18       |
-|   5 | Massive Ladybug |      3 |                  10 | 6, 18, 24, 15         |
-|   6 | Bee             |      0 |                   1 | 2, 7, 16, 9, 18, 31   |
-|   7 | Baby Ant        |      0 |                   1 | 2, 32, 16, 17, 37     |
-|   8 | Worker Ant      |      0 |                   1 | 2, 32, 16, 17, 38     |
-|   9 | Soldier Ant     |      1 |                   1 | 16, 8, 9, 14, 17      |
-|  10 | Queen Ant       |      2 |                   1 | 16, 9, 14, 17, 22, 27 |
-|  11 | Ant Hole        |      2 |                   1 | 8, 9, 22              |
-|  12 | Beetle          |      1 |                   1 | 8, 9, 36, 17          |
-|  13 | Massive Beetle  |      2 |                   1 | 8, 9, 17, 23          |
-|  14 | Hornet          |      1 |                   2 | 10, 9, 31, 18, 20, 25 |
-|  15 | Centipede       |      1 |                   1 | 2, 32, 16, 11, 12, 17 |
-|  16 | Centipede       |      1 |                   1 |                       |
-|  17 | Evil Centipede  |      2 |                   1 | 8, 12, 34, 17         |
-|  18 | Evil Centipede  |      2 |                   1 |                       |
-|  19 | Square          |      5 |                   1 | 5                     |
-|  20 | Ladybug         |      1 |                   1 | 15, 24, 9, 18, 17, 28 |
-|  21 | Ladybug         |      1 | 0.20000000298023224 | 6, 24, 16, 9, 18, 17  |
-|  22 | Spider          |      1 |                   1 | 8, 7, 14, 29, 30      |
+| Id | Name | Rarity | Drop weight | Drops |
+| ---: | --- | ---: | ---: | --- |
+| 0 | None | 0 | 1 |  |
+| 1 | Rock | 0 | 1 | 2, 3, 4 |
+| 2 | Boulder | 1 | 1 | 3, 4, 26 |
+| 3 | Cactus | 0 | 1 | 7, 10, 13, 21, 33 |
+| 4 | Ladybug | 0 | 1 | 2, 6, 16, 9, 18 |
+| 5 | Massive Ladybug | 3 | 10 | 6, 18, 24, 15 |
+| 6 | Bee | 0 | 1 | 2, 7, 16, 9, 18, 31 |
+| 7 | Baby Ant | 0 | 1 | 2, 32, 16, 17, 37 |
+| 8 | Worker Ant | 0 | 1 | 2, 32, 16, 17, 38 |
+| 9 | Soldier Ant | 1 | 1 | 16, 8, 9, 14, 17 |
+| 10 | Queen Ant | 2 | 1 | 16, 9, 14, 17, 22, 27 |
+| 11 | Ant Hole | 2 | 1 | 8, 9, 22 |
+| 12 | Beetle | 1 | 1 | 8, 9, 36, 17 |
+| 13 | Massive Beetle | 2 | 1 | 8, 9, 17, 23 |
+| 14 | Hornet | 1 | 2 | 10, 9, 31, 18, 20, 25 |
+| 15 | Centipede | 1 | 1 | 2, 32, 16, 11, 12, 17 |
+| 16 | Centipede | 1 | 1 |  |
+| 17 | Evil Centipede | 2 | 1 | 8, 12, 34, 17 |
+| 18 | Evil Centipede | 2 | 1 |  |
+| 19 | Square | 5 | 1 | 5 |
+| 20 | Ladybug | 1 | 1 | 15, 24, 9, 18, 17, 28 |
+| 21 | Ladybug | 1 | 0.20000000298023224 | 6, 24, 16, 9, 18, 17 |
+| 22 | Spider | 1 | 1 | 8, 7, 14, 29, 30 |
 
 ## Regenerate and check
 

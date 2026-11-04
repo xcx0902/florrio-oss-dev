@@ -41,6 +41,11 @@ the exact output inventory, and that no unregistered file carries the generator
 header. `schema:generate` computes all contents before its first write, then
 removes only outputs recorded in the previous manifest.
 
+Generated text is the template output itself: the generator runs no formatter,
+and both the format gate and `.prettierignore` exclude these files. Layout
+changes belong in the `tools/schema/*.mjs` templates and reach the tree only
+through `npm run schema:generate`.
+
 Every generated output has one owner: protocol fields and transport come from
 `protocol.yaml`/`transport.json`; catalog attributes have exactly one JSON
 owner (for example, rarity/recharge/instances live only in `petals.json`);

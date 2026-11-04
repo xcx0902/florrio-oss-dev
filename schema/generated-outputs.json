@@ -31,23 +31,23 @@
     },
     {
       "path": "client/src/schema/menu-content.ts",
-      "bytes": 3938,
-      "sha256": "a6ab0f09af8608a10a3d5e151ba16d42b69972360d55449dba3ddc2cc971e110"
+      "bytes": 3941,
+      "sha256": "14f4036f4f6577de7854cc32899d7164346d4dff4f69c918f995884d553e68a6"
     },
     {
       "path": "client/src/schema/mob-gallery.ts",
-      "bytes": 6992,
-      "sha256": "3bb52a22df832e08f63196f493effd436e99f1cf6aeed4175f5da35a41807982"
+      "bytes": 6000,
+      "sha256": "35ba39899506538bbcf89c8a834504485ca571d002673450fa5ede0d3ade34da"
     },
     {
       "path": "client/src/schema/motion.ts",
-      "bytes": 613,
-      "sha256": "cd2053d85230dfe49fcbff5e7093f2ed4a616bbe6858b2928e2e4a3dd1fd9313"
+      "bytes": 656,
+      "sha256": "4307591555e47b04590a914dcf6baa27da31304f625709c1204cf51db40f51d5"
     },
     {
       "path": "client/src/schema/multiplayer.ts",
-      "bytes": 25341,
-      "sha256": "bcfca45acc3af66f43acaa727952e0891418fdea3714285a185277199079af1b"
+      "bytes": 24158,
+      "sha256": "321136e042c940eb2dec19905c4a2adfa25b4c8582a33aaeaef7298586212b5f"
     },
     {
       "path": "client/src/schema/packet-key.ts",
@@ -56,13 +56,13 @@
     },
     {
       "path": "client/src/schema/petals.ts",
-      "bytes": 9894,
-      "sha256": "144bd0c211440d3fc31210ebfabb684178b7af5fa5ed438fa521d04ce8c8d7f6"
+      "bytes": 8659,
+      "sha256": "6d93d6e48755764981bae3ac6eacb9f8d001ec0d63f13f5fa3e7ac5e667071a2"
     },
     {
       "path": "client/src/schema/protocol.ts",
-      "bytes": 14843,
-      "sha256": "8421a2dc5ebb5c8ba7d955cd15e296dbc21b6398f9c61a7e1a20467068c362ea"
+      "bytes": 13433,
+      "sha256": "841ea2f22f9f9c480c05b06d11d0a7e3c7364127518ec14c16016833f59348e8"
     },
     {
       "path": "client/src/schema/state-flags.ts",
@@ -71,48 +71,48 @@
     },
     {
       "path": "docs/catalogs.md",
-      "bytes": 7246,
-      "sha256": "ed6855e167232f11ca7d6e7e935f959fd7cdc677fb9ef5eb9a7cea64350a82ff"
+      "bytes": 4289,
+      "sha256": "5c87fc93fdc4154b8b8240edf65fe431672d9785155b6adf3b615a8261360d9d"
     },
     {
       "path": "docs/multiplayer-protocol.md",
-      "bytes": 14363,
-      "sha256": "0a2321a7fbb87cc35c19569e507322b219a33ab955f5734d0d2ea18ca99b091f"
+      "bytes": 9062,
+      "sha256": "91e5fcf1984d70020f282a0bd5d745fcefae24a21f969d64770e43743e6cf10e"
     },
     {
       "path": "engine/include/engine/catalog/catalog_types.hpp",
-      "bytes": 1062,
-      "sha256": "936ef39564c906f1b3c040623180f02c62e691b9e28e8f485585772dffa47004"
+      "bytes": 1061,
+      "sha256": "7179f214aa1f2924169d980e0e7f1c95dfcdcbd9b51ae938b2512d0434b0217d"
     },
     {
       "path": "engine/include/engine/catalog/drop_chances.hpp",
-      "bytes": 5928,
-      "sha256": "905d92c78095d53bd8d22732a9e180a04f6c69d24b9f13bee60c0e5c47d657b8"
+      "bytes": 5824,
+      "sha256": "696ac1907069afb865de8a0d547f10d3e828433033c54b9d6f2d584095054641"
     },
     {
       "path": "engine/include/engine/catalog/entity_spawn_defaults.hpp",
-      "bytes": 1941,
-      "sha256": "c7b3a5436a34767c2e6150043f7cea42eedb2fe968899653c332bba030ef1ef6"
+      "bytes": 1897,
+      "sha256": "81474fb31ca3862f1096e7e966d5d93bfdaf5e88d7e9a51ad24f221ccfa346b1"
     },
     {
       "path": "engine/include/engine/catalog/generated_catalog_data.hpp",
-      "bytes": 25123,
-      "sha256": "bd0f258fd54c5170fb691015d93e900a3db4f37c29e99fc69fcfdcf85566c264"
+      "bytes": 24415,
+      "sha256": "8c0f195cf520ac018fe7a8b2049fc2ee8741783f60155277c1a9e3341f335f2e"
     },
     {
       "path": "engine/include/engine/catalog/ids.hpp",
-      "bytes": 2369,
-      "sha256": "3b7d7cd97b77f2f35e41470a79e1adbbcd08f88385634975642800871dcdc7b2"
+      "bytes": 2366,
+      "sha256": "17c975ad321d87cea03e29d5cc1345102ba526214300a6ffb33c2d68db186684"
     },
     {
       "path": "engine/include/engine/catalog/loadout_rules.hpp",
-      "bytes": 1401,
-      "sha256": "0bafcf1f4afab76c45a8385b6a5684122d849e0a8f086a6a1757e680062017cd"
+      "bytes": 1466,
+      "sha256": "e34ba7af014651e086e8893655fc2a17c583c59aeac3a227c0033dab1e2c1c69"
     },
     {
       "path": "engine/include/engine/catalog/petal_combat.hpp",
-      "bytes": 4161,
-      "sha256": "019e0457c1881899ebce0a91f93516bd54518b8ae4620cef0f6b818b3a992110"
+      "bytes": 4082,
+      "sha256": "cc23356ebe7cdf9d20383fdc117ce8eb51864f5d0fb6a0b5e21fce8f596b6c7d"
     },
     {
       "path": "engine/include/engine/catalog/state_flag_bits.hpp",
@@ -121,18 +121,18 @@
     },
     {
       "path": "engine/include/engine/net/generated_multiplayer.hpp",
-      "bytes": 29363,
-      "sha256": "7485d44bd1f36ac01167af1044e3f7627a722ca9938730a4dbe9a7d0d6ad7565"
+      "bytes": 26706,
+      "sha256": "07df9d320d427a123fad06df74da91acc791731d5479574dc1746f1187d621a9"
     },
     {
       "path": "engine/include/engine/net/generated_protocol.hpp",
-      "bytes": 22031,
-      "sha256": "6dd7c12ddba2ca847e32ab6e9f17a5cd0e29fc6784b50bc340e392f9bbd25d98"
+      "bytes": 21086,
+      "sha256": "f230992f921d3c33433391498cadbcd36882e81118693ba90e86bc8cc7fca869"
     },
     {
       "path": "engine/include/engine/net/packet_key.hpp",
-      "bytes": 1846,
-      "sha256": "daa435b15928acf187af54a38ee3bb6e34302e7c0109f4d389bbf5f8b5920034"
+      "bytes": 1813,
+      "sha256": "361c4b7f7be5b7b2f1f20b0166b824e584a3026a798a0f7c38ed0a2b51dabd6e"
     },
     {
       "path": "engine/include/engine/sim/generated_motion.hpp",
@@ -141,13 +141,13 @@
     },
     {
       "path": "schema/catalogs/drop-chances.json",
-      "bytes": 12799,
-      "sha256": "7e2abbfaf27d890efaaff94218ba7791149ce08c321ca09c5636fb2270967c04"
+      "bytes": 13089,
+      "sha256": "b7e32576aefdb4a9b5ab9e3e3ba2ff0b57563f92099b13bba47b06510540bc10"
     },
     {
       "path": "schema/generated/protocol-contracts.json",
-      "bytes": 42013,
-      "sha256": "0210f8e96792c42b0c073b49750bcadfa087a79d67fc1ed9fddfa24ef471f8ac"
+      "bytes": 45239,
+      "sha256": "2ec66d2c9ce6280553b8cf3a36a6a38d2e14d4ed159fb0410c5f48a61b7430be"
     }
   ]
 }

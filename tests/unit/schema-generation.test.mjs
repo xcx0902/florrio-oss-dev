@@ -382,7 +382,7 @@ test('one owning input propagates a petal field to both generated views and labe
   assert.match(cpp, /\{1, "Basic",[^\n]*, 4321\.0F, 1, 14\.0F,/);
   assert.match(
     ts,
-    /1: \{\s*name: 'Basic',\s*rarity: 0,\s*recharge: 4321,\s*radius: 10,\s*labelSize: 14,/,
+    /1: \{\s*name: ["']Basic["'],\s*rarity: 0,\s*recharge: 4321,\s*radius: 10,\s*labelSize: 14,/,
   );
 
   const combatFile = path.join(fixture, 'schema/catalogs/petal-combat.json');
@@ -393,7 +393,7 @@ test('one owning input propagates a petal field to both generated views and labe
   const nextTs = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(
     nextTs,
-    /1: \{\s*name: 'Basic',\s*rarity: 0,\s*recharge: 4321,\s*radius: 10,\s*labelSize: 14,/,
+    /1: \{\s*name: ["']Basic["'],\s*rarity: 0,\s*recharge: 4321,\s*radius: 10,\s*labelSize: 14,/,
     'draw radius must not change collision radius or label size',
   );
 });
@@ -426,7 +426,7 @@ test('adding an existing-behavior petal needs schema owner inputs, not generator
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(cpp, /kPetalCount = 40/);
   assert.match(cpp, /\{39, "Basic Plus",/);
-  assert.match(ts, /39: \{\s*name: 'Basic Plus',/);
+  assert.match(ts, /39: \{\s*name: ["']Basic Plus["'],/);
 });
 
 test('catalog symbols are unique, keyword-safe and identical across generated languages', async () => {
@@ -558,7 +558,7 @@ test('catalog symbols are unique, keyword-safe and identical across generated la
   assert.match(loadoutCpp, /kInventorySlots = 16U/);
   assert.match(loadoutCpp, /kActiveSlots = 8U/);
   assert.match(loadoutCpp, /kInstancesPerSlot = 3U/);
-  assert.match(loadoutCpp, /kSlotUnlockLevels\{\{15U, 30U, 45U\}\}/);
+  assert.match(loadoutCpp, /kSlotUnlockLevels\{\{\s*15U, 30U, 45U\s*\}\}/);
   assert.match(loadoutTs, /INVENTORY_SLOTS = 16/);
   assert.match(loadoutTs, /ACTIVE_SLOTS = 8/);
   assert.match(loadoutTs, /INSTANCES_PER_SLOT = 3/);
@@ -589,7 +589,7 @@ test('sparse uint16 type ids remain valid inputs and generated keys', async () =
   );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(cpp, /\{100, "Basic",/);
-  assert.match(ts, /100: \{\s*name: 'Basic',/);
+  assert.match(ts, /100: \{\s*name: ["']Basic["'],/);
 });
 
 test('publishable ids accept 255 and reject 256 at the uint8 wire boundary', async () => {
@@ -637,7 +637,7 @@ test('publishable ids accept 255 and reject 256 at the uint8 wire boundary', asy
   );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(cpp, /\{255, "Basic",/);
-  assert.match(ts, /255: \{\s*name: 'Basic',/);
+  assert.match(ts, /255: \{\s*name: ["']Basic["'],/);
 
   await replacePetal(255, 256);
   const rejected = run(fixture);

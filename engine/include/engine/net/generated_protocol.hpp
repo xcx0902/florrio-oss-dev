@@ -84,414 +84,327 @@ enum class Component : std::uint8_t {
   kReserved28 = 28,
   kIdentity = 30,
 };
-inline constexpr std::uint32_t component_bit(Component component) {
-  return 1U << (static_cast<unsigned>(component) - 1U);
-}
-enum class FieldType : std::uint8_t {
-  kByte,
-  kFloat,
-  kInterpolatedFloat,
-  kString,
-  kVarint,
-  kReference,
-  kBit,
-  kAngleRaw16,
-  kDouble,
-  kSpecialFloat,
-  kStringArray,
-  kByteArray,
-  kHandleArray,
-  kVarintArray,
-  kShortArray
-};
-enum class DenseFieldType : std::uint8_t {
-  kByte,
-  kF32,
-  kF64,
-  kVarint,
-  kAngle,
-  kString,
-  kByteArray16,
-  kShortArray8,
-  kBit,
-  kReference,
-  kByteArray10,
-  kHandleArray10,
-  kStringArray10,
-  kVarintArray10
-};
-enum class SparseEncoding : std::uint8_t {
-  kScalar,
-  kIndexedUpdate
-};
-enum class SparseValueType : std::uint8_t {
-  kByte,
-  kF32,
-  kF64,
-  kString,
-  kVarint,
-  kReference,
-  kBit,
-  kAngle,
-  kShort
-};
-struct SparseFieldSpec {
-  std::uint32_t field;
-  SparseEncoding encoding;
-  SparseValueType value_type;
-};
-struct SparseMode {
-  const char* packet_format;
-  std::uint8_t field_delta_xor;
-  std::uint8_t index_delta_xor;
-  const char* field26_role;
-  std::span<const SparseFieldSpec> fields;
-};
+inline constexpr std::uint32_t component_bit(Component component) { return 1U << (static_cast<unsigned>(component) - 1U); }
+enum class FieldType : std::uint8_t { kByte, kFloat, kInterpolatedFloat, kString, kVarint, kReference, kBit, kAngleRaw16, kDouble, kSpecialFloat, kStringArray, kByteArray, kHandleArray, kVarintArray, kShortArray };
+enum class DenseFieldType : std::uint8_t { kByte, kF32, kF64, kVarint, kAngle, kString, kByteArray16, kShortArray8, kBit, kReference, kByteArray10, kHandleArray10, kStringArray10, kVarintArray10 };
+enum class SparseEncoding : std::uint8_t { kScalar, kIndexedUpdate };
+enum class SparseValueType : std::uint8_t { kByte, kF32, kF64, kString, kVarint, kReference, kBit, kAngle, kShort };
+struct SparseFieldSpec { std::uint32_t field; SparseEncoding encoding; SparseValueType value_type; };
+struct SparseMode { const char* packet_format; std::uint8_t field_delta_xor; std::uint8_t index_delta_xor; const char* field26_role; std::span<const SparseFieldSpec> fields; };
 inline constexpr std::array<SparseFieldSpec, 63> kDomainSparseFields{{
-    {1, SparseEncoding::kScalar, SparseValueType::kByte},
-    {2, SparseEncoding::kScalar, SparseValueType::kByte},
-    {3, SparseEncoding::kIndexedUpdate, SparseValueType::kReference},
-    {4, SparseEncoding::kScalar, SparseValueType::kString},
-    {5, SparseEncoding::kScalar, SparseValueType::kF32},
-    {6, SparseEncoding::kScalar, SparseValueType::kString},
-    {7, SparseEncoding::kScalar, SparseValueType::kF32},
-    {8, SparseEncoding::kScalar, SparseValueType::kAngle},
-    {9, SparseEncoding::kScalar, SparseValueType::kByte},
-    {10, SparseEncoding::kIndexedUpdate, SparseValueType::kString},
-    {11, SparseEncoding::kScalar, SparseValueType::kByte},
-    {12, SparseEncoding::kScalar, SparseValueType::kByte},
-    {13, SparseEncoding::kScalar, SparseValueType::kF32},
-    {14, SparseEncoding::kScalar, SparseValueType::kByte},
-    {15, SparseEncoding::kScalar, SparseValueType::kVarint},
-    {16, SparseEncoding::kIndexedUpdate, SparseValueType::kByte},
-    {17, SparseEncoding::kScalar, SparseValueType::kByte},
-    {18, SparseEncoding::kScalar, SparseValueType::kF64},
-    {19, SparseEncoding::kScalar, SparseValueType::kF32},
-    {20, SparseEncoding::kScalar, SparseValueType::kByte},
-    {21, SparseEncoding::kScalar, SparseValueType::kF32},
-    {22, SparseEncoding::kScalar, SparseValueType::kByte},
-    {23, SparseEncoding::kScalar, SparseValueType::kReference},
-    {24, SparseEncoding::kScalar, SparseValueType::kF32},
-    {25, SparseEncoding::kIndexedUpdate, SparseValueType::kString},
-    {26, SparseEncoding::kScalar, SparseValueType::kByte},
-    {27, SparseEncoding::kScalar, SparseValueType::kF32},
-    {28, SparseEncoding::kScalar, SparseValueType::kF32},
-    {29, SparseEncoding::kScalar, SparseValueType::kBit},
-    {30, SparseEncoding::kScalar, SparseValueType::kVarint},
-    {31, SparseEncoding::kScalar, SparseValueType::kByte},
-    {32, SparseEncoding::kScalar, SparseValueType::kF32},
-    {33, SparseEncoding::kScalar, SparseValueType::kBit},
-    {34, SparseEncoding::kScalar, SparseValueType::kByte},
-    {35, SparseEncoding::kScalar, SparseValueType::kF64},
-    {36, SparseEncoding::kScalar, SparseValueType::kByte},
-    {37, SparseEncoding::kScalar, SparseValueType::kBit},
-    {38, SparseEncoding::kScalar, SparseValueType::kByte},
-    {39, SparseEncoding::kIndexedUpdate, SparseValueType::kVarint},
-    {40, SparseEncoding::kScalar, SparseValueType::kBit},
-    {41, SparseEncoding::kScalar, SparseValueType::kVarint},
-    {42, SparseEncoding::kScalar, SparseValueType::kF32},
-    {43, SparseEncoding::kScalar, SparseValueType::kByte},
-    {44, SparseEncoding::kScalar, SparseValueType::kVarint},
-    {45, SparseEncoding::kScalar, SparseValueType::kF32},
-    {46, SparseEncoding::kScalar, SparseValueType::kByte},
-    {47, SparseEncoding::kScalar, SparseValueType::kByte},
-    {48, SparseEncoding::kScalar, SparseValueType::kString},
-    {49, SparseEncoding::kScalar, SparseValueType::kF32},
-    {50, SparseEncoding::kScalar, SparseValueType::kByte},
-    {51, SparseEncoding::kScalar, SparseValueType::kVarint},
-    {52, SparseEncoding::kScalar, SparseValueType::kVarint},
-    {53, SparseEncoding::kScalar, SparseValueType::kF32},
-    {54, SparseEncoding::kScalar, SparseValueType::kByte},
-    {55, SparseEncoding::kScalar, SparseValueType::kF32},
-    {56, SparseEncoding::kScalar, SparseValueType::kReference},
-    {57, SparseEncoding::kScalar, SparseValueType::kReference},
-    {58, SparseEncoding::kScalar, SparseValueType::kVarint},
-    {59, SparseEncoding::kScalar, SparseValueType::kF32},
-    {60, SparseEncoding::kIndexedUpdate, SparseValueType::kByte},
-    {61, SparseEncoding::kIndexedUpdate, SparseValueType::kShort},
-    {62, SparseEncoding::kScalar, SparseValueType::kByte},
-    {63, SparseEncoding::kScalar, SparseValueType::kByte},
+  {1, SparseEncoding::kScalar, SparseValueType::kByte},
+  {2, SparseEncoding::kScalar, SparseValueType::kByte},
+  {3, SparseEncoding::kIndexedUpdate, SparseValueType::kReference},
+  {4, SparseEncoding::kScalar, SparseValueType::kString},
+  {5, SparseEncoding::kScalar, SparseValueType::kF32},
+  {6, SparseEncoding::kScalar, SparseValueType::kString},
+  {7, SparseEncoding::kScalar, SparseValueType::kF32},
+  {8, SparseEncoding::kScalar, SparseValueType::kAngle},
+  {9, SparseEncoding::kScalar, SparseValueType::kByte},
+  {10, SparseEncoding::kIndexedUpdate, SparseValueType::kString},
+  {11, SparseEncoding::kScalar, SparseValueType::kByte},
+  {12, SparseEncoding::kScalar, SparseValueType::kByte},
+  {13, SparseEncoding::kScalar, SparseValueType::kF32},
+  {14, SparseEncoding::kScalar, SparseValueType::kByte},
+  {15, SparseEncoding::kScalar, SparseValueType::kVarint},
+  {16, SparseEncoding::kIndexedUpdate, SparseValueType::kByte},
+  {17, SparseEncoding::kScalar, SparseValueType::kByte},
+  {18, SparseEncoding::kScalar, SparseValueType::kF64},
+  {19, SparseEncoding::kScalar, SparseValueType::kF32},
+  {20, SparseEncoding::kScalar, SparseValueType::kByte},
+  {21, SparseEncoding::kScalar, SparseValueType::kF32},
+  {22, SparseEncoding::kScalar, SparseValueType::kByte},
+  {23, SparseEncoding::kScalar, SparseValueType::kReference},
+  {24, SparseEncoding::kScalar, SparseValueType::kF32},
+  {25, SparseEncoding::kIndexedUpdate, SparseValueType::kString},
+  {26, SparseEncoding::kScalar, SparseValueType::kByte},
+  {27, SparseEncoding::kScalar, SparseValueType::kF32},
+  {28, SparseEncoding::kScalar, SparseValueType::kF32},
+  {29, SparseEncoding::kScalar, SparseValueType::kBit},
+  {30, SparseEncoding::kScalar, SparseValueType::kVarint},
+  {31, SparseEncoding::kScalar, SparseValueType::kByte},
+  {32, SparseEncoding::kScalar, SparseValueType::kF32},
+  {33, SparseEncoding::kScalar, SparseValueType::kBit},
+  {34, SparseEncoding::kScalar, SparseValueType::kByte},
+  {35, SparseEncoding::kScalar, SparseValueType::kF64},
+  {36, SparseEncoding::kScalar, SparseValueType::kByte},
+  {37, SparseEncoding::kScalar, SparseValueType::kBit},
+  {38, SparseEncoding::kScalar, SparseValueType::kByte},
+  {39, SparseEncoding::kIndexedUpdate, SparseValueType::kVarint},
+  {40, SparseEncoding::kScalar, SparseValueType::kBit},
+  {41, SparseEncoding::kScalar, SparseValueType::kVarint},
+  {42, SparseEncoding::kScalar, SparseValueType::kF32},
+  {43, SparseEncoding::kScalar, SparseValueType::kByte},
+  {44, SparseEncoding::kScalar, SparseValueType::kVarint},
+  {45, SparseEncoding::kScalar, SparseValueType::kF32},
+  {46, SparseEncoding::kScalar, SparseValueType::kByte},
+  {47, SparseEncoding::kScalar, SparseValueType::kByte},
+  {48, SparseEncoding::kScalar, SparseValueType::kString},
+  {49, SparseEncoding::kScalar, SparseValueType::kF32},
+  {50, SparseEncoding::kScalar, SparseValueType::kByte},
+  {51, SparseEncoding::kScalar, SparseValueType::kVarint},
+  {52, SparseEncoding::kScalar, SparseValueType::kVarint},
+  {53, SparseEncoding::kScalar, SparseValueType::kF32},
+  {54, SparseEncoding::kScalar, SparseValueType::kByte},
+  {55, SparseEncoding::kScalar, SparseValueType::kF32},
+  {56, SparseEncoding::kScalar, SparseValueType::kReference},
+  {57, SparseEncoding::kScalar, SparseValueType::kReference},
+  {58, SparseEncoding::kScalar, SparseValueType::kVarint},
+  {59, SparseEncoding::kScalar, SparseValueType::kF32},
+  {60, SparseEncoding::kIndexedUpdate, SparseValueType::kByte},
+  {61, SparseEncoding::kIndexedUpdate, SparseValueType::kShort},
+  {62, SparseEncoding::kScalar, SparseValueType::kByte},
+  {63, SparseEncoding::kScalar, SparseValueType::kByte},
 }};
-inline constexpr SparseMode kDomainSparse{"domain-counted", 0, 0, "entity-kind",
-                                          kDomainSparseFields};
-struct FieldDefinition {
-  std::uint32_t field;
-  FieldType type;
-  DenseFieldType dense_type;
-  Component component;
-};
-struct DenseFieldSpec {
-  std::uint32_t field;
-  DenseFieldType type;
-};
-struct DenseFieldGroup {
-  Component component;
-  std::span<const std::uint32_t> fields;
-  std::span<const std::uint32_t> extended_fields{};
-};
-struct DenseGroupSpec {
-  Component component;
-  std::span<const DenseFieldSpec> specs;
-};
+inline constexpr SparseMode kDomainSparse{"domain-counted", 0, 0, "entity-kind", kDomainSparseFields};
+struct FieldDefinition { std::uint32_t field; FieldType type; DenseFieldType dense_type; Component component; };
+struct DenseFieldSpec { std::uint32_t field; DenseFieldType type; };
+struct DenseFieldGroup { Component component; std::span<const std::uint32_t> fields; std::span<const std::uint32_t> extended_fields{}; };
+struct DenseGroupSpec { Component component; std::span<const DenseFieldSpec> specs; };
 inline constexpr std::array<FieldDefinition, 63> kFieldDefinitions{{
-    {1, FieldType::kByte, DenseFieldType::kByte, Component::kPlayerController},
-    {2, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
-    {3, FieldType::kHandleArray, DenseFieldType::kHandleArray10, Component::kLoadoutRecord},
-    {4, FieldType::kString, DenseFieldType::kString, Component::kInlineRecord},
-    {5, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kPlayerController},
-    {6, FieldType::kString, DenseFieldType::kString, Component::kPlayerController},
-    {7, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kCollisionRadius},
-    {8, FieldType::kAngleRaw16, DenseFieldType::kAngle, Component::kTransform},
-    {9, FieldType::kByte, DenseFieldType::kByte, Component::kPetalVariant},
-    {10, FieldType::kStringArray, DenseFieldType::kStringArray10, Component::kLoadoutRecord},
-    {11, FieldType::kByte, DenseFieldType::kByte, Component::kLoadoutRecord},
-    {12, FieldType::kByte, DenseFieldType::kByte, Component::kLoadoutRecord},
-    {13, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kReserved8},
-    {14, FieldType::kByte, DenseFieldType::kByte, Component::kReserved28},
-    {15, FieldType::kVarint, DenseFieldType::kVarint, Component::kInlineRecord},
-    {16, FieldType::kByteArray, DenseFieldType::kByteArray10, Component::kPlayerController},
-    {17, FieldType::kByte, DenseFieldType::kByte, Component::kReserved10},
-    {18, FieldType::kDouble, DenseFieldType::kF64, Component::kInlineRecord},
-    {19, FieldType::kFloat, DenseFieldType::kF32, Component::kLoadoutRecord},
-    {20, FieldType::kByte, DenseFieldType::kByte, Component::kPlayerController},
-    {21, FieldType::kFloat, DenseFieldType::kF32, Component::kPlayerController},
-    {22, FieldType::kByte, DenseFieldType::kByte, Component::kDropState},
-    {23, FieldType::kReference, DenseFieldType::kReference, Component::kReserved15},
-    {24, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kPlayerController},
-    {25, FieldType::kStringArray, DenseFieldType::kString, Component::kInlineRecord},
-    {26, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
-    {27, FieldType::kSpecialFloat, DenseFieldType::kF32, Component::kInlineRecord},
-    {28, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kTransform},
-    {29, FieldType::kBit, DenseFieldType::kBit, Component::kReserved22},
-    {30, FieldType::kVarint, DenseFieldType::kVarint, Component::kLoadoutRecord},
-    {31, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
-    {32, FieldType::kFloat, DenseFieldType::kF32, Component::kPlayerController},
-    {33, FieldType::kBit, DenseFieldType::kBit, Component::kInlineRecord},
-    {34, FieldType::kByte, DenseFieldType::kByte, Component::kPlayerController},
-    {35, FieldType::kDouble, DenseFieldType::kF64, Component::kInlineRecord},
-    {36, FieldType::kByte, DenseFieldType::kByte, Component::kAiActivity},
-    {37, FieldType::kBit, DenseFieldType::kBit, Component::kReserved8},
-    {38, FieldType::kByte, DenseFieldType::kByte, Component::kLifecycle},
-    {39, FieldType::kVarintArray, DenseFieldType::kVarintArray10, Component::kLoadoutRecord},
-    {40, FieldType::kBit, DenseFieldType::kBit, Component::kReserved22},
-    {41, FieldType::kVarint, DenseFieldType::kVarint, Component::kInlineRecord},
-    {42, FieldType::kFloat, DenseFieldType::kF32, Component::kLoadoutRecord},
-    {43, FieldType::kByte, DenseFieldType::kByte, Component::kReserved14},
-    {44, FieldType::kVarint, DenseFieldType::kVarint, Component::kInlineRecord},
-    {45, FieldType::kSpecialFloat, DenseFieldType::kF32, Component::kLoadoutRecord},
-    {46, FieldType::kByte, DenseFieldType::kByte, Component::kLoadoutRecord},
-    {47, FieldType::kByte, DenseFieldType::kByte, Component::kPlayerController},
-    {48, FieldType::kString, DenseFieldType::kString, Component::kReserved19},
-    {49, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kTransform},
-    {50, FieldType::kByte, DenseFieldType::kByte, Component::kPetalSpecies},
-    {51, FieldType::kVarint, DenseFieldType::kVarint, Component::kInlineRecord},
-    {52, FieldType::kVarint, DenseFieldType::kVarint, Component::kLoadoutRecord},
-    {53, FieldType::kFloat, DenseFieldType::kF32, Component::kHealth},
-    {54, FieldType::kByte, DenseFieldType::kByte, Component::kDropState},
-    {55, FieldType::kFloat, DenseFieldType::kF32, Component::kHealth},
-    {56, FieldType::kReference, DenseFieldType::kReference, Component::kPlayerController},
-    {57, FieldType::kReference, DenseFieldType::kReference, Component::kReserved15},
-    {58, FieldType::kVarint, DenseFieldType::kVarint, Component::kIdentity},
-    {59, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kIdentity},
-    {60, FieldType::kByteArray, DenseFieldType::kByteArray16, Component::kIdentity},
-    {61, FieldType::kShortArray, DenseFieldType::kShortArray8, Component::kIdentity},
-    {62, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
-    {63, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
+  {1, FieldType::kByte, DenseFieldType::kByte, Component::kPlayerController},
+  {2, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
+  {3, FieldType::kHandleArray, DenseFieldType::kHandleArray10, Component::kLoadoutRecord},
+  {4, FieldType::kString, DenseFieldType::kString, Component::kInlineRecord},
+  {5, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kPlayerController},
+  {6, FieldType::kString, DenseFieldType::kString, Component::kPlayerController},
+  {7, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kCollisionRadius},
+  {8, FieldType::kAngleRaw16, DenseFieldType::kAngle, Component::kTransform},
+  {9, FieldType::kByte, DenseFieldType::kByte, Component::kPetalVariant},
+  {10, FieldType::kStringArray, DenseFieldType::kStringArray10, Component::kLoadoutRecord},
+  {11, FieldType::kByte, DenseFieldType::kByte, Component::kLoadoutRecord},
+  {12, FieldType::kByte, DenseFieldType::kByte, Component::kLoadoutRecord},
+  {13, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kReserved8},
+  {14, FieldType::kByte, DenseFieldType::kByte, Component::kReserved28},
+  {15, FieldType::kVarint, DenseFieldType::kVarint, Component::kInlineRecord},
+  {16, FieldType::kByteArray, DenseFieldType::kByteArray10, Component::kPlayerController},
+  {17, FieldType::kByte, DenseFieldType::kByte, Component::kReserved10},
+  {18, FieldType::kDouble, DenseFieldType::kF64, Component::kInlineRecord},
+  {19, FieldType::kFloat, DenseFieldType::kF32, Component::kLoadoutRecord},
+  {20, FieldType::kByte, DenseFieldType::kByte, Component::kPlayerController},
+  {21, FieldType::kFloat, DenseFieldType::kF32, Component::kPlayerController},
+  {22, FieldType::kByte, DenseFieldType::kByte, Component::kDropState},
+  {23, FieldType::kReference, DenseFieldType::kReference, Component::kReserved15},
+  {24, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kPlayerController},
+  {25, FieldType::kStringArray, DenseFieldType::kString, Component::kInlineRecord},
+  {26, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
+  {27, FieldType::kSpecialFloat, DenseFieldType::kF32, Component::kInlineRecord},
+  {28, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kTransform},
+  {29, FieldType::kBit, DenseFieldType::kBit, Component::kReserved22},
+  {30, FieldType::kVarint, DenseFieldType::kVarint, Component::kLoadoutRecord},
+  {31, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
+  {32, FieldType::kFloat, DenseFieldType::kF32, Component::kPlayerController},
+  {33, FieldType::kBit, DenseFieldType::kBit, Component::kInlineRecord},
+  {34, FieldType::kByte, DenseFieldType::kByte, Component::kPlayerController},
+  {35, FieldType::kDouble, DenseFieldType::kF64, Component::kInlineRecord},
+  {36, FieldType::kByte, DenseFieldType::kByte, Component::kAiActivity},
+  {37, FieldType::kBit, DenseFieldType::kBit, Component::kReserved8},
+  {38, FieldType::kByte, DenseFieldType::kByte, Component::kLifecycle},
+  {39, FieldType::kVarintArray, DenseFieldType::kVarintArray10, Component::kLoadoutRecord},
+  {40, FieldType::kBit, DenseFieldType::kBit, Component::kReserved22},
+  {41, FieldType::kVarint, DenseFieldType::kVarint, Component::kInlineRecord},
+  {42, FieldType::kFloat, DenseFieldType::kF32, Component::kLoadoutRecord},
+  {43, FieldType::kByte, DenseFieldType::kByte, Component::kReserved14},
+  {44, FieldType::kVarint, DenseFieldType::kVarint, Component::kInlineRecord},
+  {45, FieldType::kSpecialFloat, DenseFieldType::kF32, Component::kLoadoutRecord},
+  {46, FieldType::kByte, DenseFieldType::kByte, Component::kLoadoutRecord},
+  {47, FieldType::kByte, DenseFieldType::kByte, Component::kPlayerController},
+  {48, FieldType::kString, DenseFieldType::kString, Component::kReserved19},
+  {49, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kTransform},
+  {50, FieldType::kByte, DenseFieldType::kByte, Component::kPetalSpecies},
+  {51, FieldType::kVarint, DenseFieldType::kVarint, Component::kInlineRecord},
+  {52, FieldType::kVarint, DenseFieldType::kVarint, Component::kLoadoutRecord},
+  {53, FieldType::kFloat, DenseFieldType::kF32, Component::kHealth},
+  {54, FieldType::kByte, DenseFieldType::kByte, Component::kDropState},
+  {55, FieldType::kFloat, DenseFieldType::kF32, Component::kHealth},
+  {56, FieldType::kReference, DenseFieldType::kReference, Component::kPlayerController},
+  {57, FieldType::kReference, DenseFieldType::kReference, Component::kReserved15},
+  {58, FieldType::kVarint, DenseFieldType::kVarint, Component::kIdentity},
+  {59, FieldType::kInterpolatedFloat, DenseFieldType::kF32, Component::kIdentity},
+  {60, FieldType::kByteArray, DenseFieldType::kByteArray16, Component::kIdentity},
+  {61, FieldType::kShortArray, DenseFieldType::kShortArray8, Component::kIdentity},
+  {62, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
+  {63, FieldType::kByte, DenseFieldType::kByte, Component::kIdentity},
 }};
 inline constexpr std::array<std::uint32_t, 2> kDenseFieldsDropState{22, 54};
 inline constexpr std::array<DenseFieldSpec, 2> kDenseSpecsDropState{{
-    {22, DenseFieldType::kByte},
-    {54, DenseFieldType::kByte},
+  {22, DenseFieldType::kByte},
+  {54, DenseFieldType::kByte},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsAiActivity{36};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsAiActivity{{
-    {36, DenseFieldType::kByte},
+  {36, DenseFieldType::kByte},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsPetalVariant{9};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsPetalVariant{{
-    {9, DenseFieldType::kByte},
+  {9, DenseFieldType::kByte},
 }};
-inline constexpr std::array<std::uint32_t, 11> kDenseFieldsPlayerController{1,  5,  6,  16, 20, 21,
-                                                                            24, 32, 34, 47, 56};
+inline constexpr std::array<std::uint32_t, 11> kDenseFieldsPlayerController{1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56};
 inline constexpr std::array<DenseFieldSpec, 11> kDenseSpecsPlayerController{{
-    {1, DenseFieldType::kByte},
-    {5, DenseFieldType::kF32},
-    {6, DenseFieldType::kString},
-    {16, DenseFieldType::kByteArray10},
-    {20, DenseFieldType::kByte},
-    {21, DenseFieldType::kF32},
-    {24, DenseFieldType::kF32},
-    {32, DenseFieldType::kF32},
-    {34, DenseFieldType::kByte},
-    {47, DenseFieldType::kByte},
-    {56, DenseFieldType::kReference},
+  {1, DenseFieldType::kByte},
+  {5, DenseFieldType::kF32},
+  {6, DenseFieldType::kString},
+  {16, DenseFieldType::kByteArray10},
+  {20, DenseFieldType::kByte},
+  {21, DenseFieldType::kF32},
+  {24, DenseFieldType::kF32},
+  {32, DenseFieldType::kF32},
+  {34, DenseFieldType::kByte},
+  {47, DenseFieldType::kByte},
+  {56, DenseFieldType::kReference},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsPetalSpecies{50};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsPetalSpecies{{
-    {50, DenseFieldType::kByte},
+  {50, DenseFieldType::kByte},
 }};
 inline constexpr std::array<std::uint32_t, 2> kDenseFieldsReserved8{13, 37};
 inline constexpr std::array<DenseFieldSpec, 2> kDenseSpecsReserved8{{
-    {13, DenseFieldType::kF32},
-    {37, DenseFieldType::kBit},
+  {13, DenseFieldType::kF32},
+  {37, DenseFieldType::kBit},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsReserved10{17};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsReserved10{{
-    {17, DenseFieldType::kByte},
+  {17, DenseFieldType::kByte},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsReserved14{43};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsReserved14{{
-    {43, DenseFieldType::kByte},
+  {43, DenseFieldType::kByte},
 }};
 inline constexpr std::array<std::uint32_t, 2> kDenseFieldsReserved15{23, 57};
 inline constexpr std::array<DenseFieldSpec, 2> kDenseSpecsReserved15{{
-    {23, DenseFieldType::kReference},
-    {57, DenseFieldType::kReference},
+  {23, DenseFieldType::kReference},
+  {57, DenseFieldType::kReference},
 }};
-inline constexpr std::array<std::uint32_t, 11> kDenseFieldsLoadoutRecord{3,  10, 11, 12, 19, 30,
-                                                                         39, 42, 45, 46, 52};
+inline constexpr std::array<std::uint32_t, 11> kDenseFieldsLoadoutRecord{3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52};
 inline constexpr std::array<DenseFieldSpec, 11> kDenseSpecsLoadoutRecord{{
-    {3, DenseFieldType::kHandleArray10},
-    {10, DenseFieldType::kStringArray10},
-    {11, DenseFieldType::kByte},
-    {12, DenseFieldType::kByte},
-    {19, DenseFieldType::kF32},
-    {30, DenseFieldType::kVarint},
-    {39, DenseFieldType::kVarintArray10},
-    {42, DenseFieldType::kF32},
-    {45, DenseFieldType::kF32},
-    {46, DenseFieldType::kByte},
-    {52, DenseFieldType::kVarint},
+  {3, DenseFieldType::kHandleArray10},
+  {10, DenseFieldType::kStringArray10},
+  {11, DenseFieldType::kByte},
+  {12, DenseFieldType::kByte},
+  {19, DenseFieldType::kF32},
+  {30, DenseFieldType::kVarint},
+  {39, DenseFieldType::kVarintArray10},
+  {42, DenseFieldType::kF32},
+  {45, DenseFieldType::kF32},
+  {46, DenseFieldType::kByte},
+  {52, DenseFieldType::kVarint},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsReserved19{48};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsReserved19{{
-    {48, DenseFieldType::kString},
+  {48, DenseFieldType::kString},
 }};
 inline constexpr std::array<std::uint32_t, 2> kDenseFieldsHealth{53, 55};
 inline constexpr std::array<DenseFieldSpec, 2> kDenseSpecsHealth{{
-    {53, DenseFieldType::kF32},
-    {55, DenseFieldType::kF32},
+  {53, DenseFieldType::kF32},
+  {55, DenseFieldType::kF32},
 }};
 inline constexpr std::array<std::uint32_t, 3> kDenseFieldsTransform{8, 28, 49};
 inline constexpr std::array<DenseFieldSpec, 3> kDenseSpecsTransform{{
-    {8, DenseFieldType::kAngle},
-    {28, DenseFieldType::kF32},
-    {49, DenseFieldType::kF32},
+  {8, DenseFieldType::kAngle},
+  {28, DenseFieldType::kF32},
+  {49, DenseFieldType::kF32},
 }};
 inline constexpr std::array<std::uint32_t, 2> kDenseFieldsReserved22{29, 40};
 inline constexpr std::array<DenseFieldSpec, 2> kDenseSpecsReserved22{{
-    {29, DenseFieldType::kBit},
-    {40, DenseFieldType::kBit},
+  {29, DenseFieldType::kBit},
+  {40, DenseFieldType::kBit},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsLifecycle{38};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsLifecycle{{
-    {38, DenseFieldType::kByte},
+  {38, DenseFieldType::kByte},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsCollisionRadius{7};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsCollisionRadius{{
-    {7, DenseFieldType::kF32},
+  {7, DenseFieldType::kF32},
 }};
-inline constexpr std::array<std::uint32_t, 10> kDenseFieldsInlineRecord{4,  15, 18, 25, 27,
-                                                                        33, 35, 41, 44, 51};
+inline constexpr std::array<std::uint32_t, 10> kDenseFieldsInlineRecord{4, 15, 18, 25, 27, 33, 35, 41, 44, 51};
 inline constexpr std::array<DenseFieldSpec, 10> kDenseSpecsInlineRecord{{
-    {4, DenseFieldType::kString},
-    {15, DenseFieldType::kVarint},
-    {18, DenseFieldType::kF64},
-    {25, DenseFieldType::kString},
-    {27, DenseFieldType::kF32},
-    {33, DenseFieldType::kBit},
-    {35, DenseFieldType::kF64},
-    {41, DenseFieldType::kVarint},
-    {44, DenseFieldType::kVarint},
-    {51, DenseFieldType::kVarint},
+  {4, DenseFieldType::kString},
+  {15, DenseFieldType::kVarint},
+  {18, DenseFieldType::kF64},
+  {25, DenseFieldType::kString},
+  {27, DenseFieldType::kF32},
+  {33, DenseFieldType::kBit},
+  {35, DenseFieldType::kF64},
+  {41, DenseFieldType::kVarint},
+  {44, DenseFieldType::kVarint},
+  {51, DenseFieldType::kVarint},
 }};
 inline constexpr std::array<std::uint32_t, 1> kDenseFieldsReserved28{14};
 inline constexpr std::array<DenseFieldSpec, 1> kDenseSpecsReserved28{{
-    {14, DenseFieldType::kByte},
+  {14, DenseFieldType::kByte},
 }};
 inline constexpr std::array<std::uint32_t, 3> kDenseFieldsIdentity{2, 26, 31};
 inline constexpr std::array<std::uint32_t, 6> kDenseFieldsIdentityExtended{58, 59, 60, 61, 62, 63};
 inline constexpr std::array<DenseFieldSpec, 9> kDenseSpecsIdentity{{
-    {2, DenseFieldType::kByte},
-    {26, DenseFieldType::kByte},
-    {31, DenseFieldType::kByte},
-    {58, DenseFieldType::kVarint},
-    {59, DenseFieldType::kF32},
-    {60, DenseFieldType::kByteArray16},
-    {61, DenseFieldType::kShortArray8},
-    {62, DenseFieldType::kByte},
-    {63, DenseFieldType::kByte},
+  {2, DenseFieldType::kByte},
+  {26, DenseFieldType::kByte},
+  {31, DenseFieldType::kByte},
+  {58, DenseFieldType::kVarint},
+  {59, DenseFieldType::kF32},
+  {60, DenseFieldType::kByteArray16},
+  {61, DenseFieldType::kShortArray8},
+  {62, DenseFieldType::kByte},
+  {63, DenseFieldType::kByte},
 }};
 inline constexpr std::array<DenseFieldGroup, 19> kDenseGroups{{
-    {Component::kDropState, kDenseFieldsDropState},
-    {Component::kAiActivity, kDenseFieldsAiActivity},
-    {Component::kPetalVariant, kDenseFieldsPetalVariant},
-    {Component::kPlayerController, kDenseFieldsPlayerController},
-    {Component::kPetalSpecies, kDenseFieldsPetalSpecies},
-    {Component::kReserved8, kDenseFieldsReserved8},
-    {Component::kReserved10, kDenseFieldsReserved10},
-    {Component::kReserved14, kDenseFieldsReserved14},
-    {Component::kReserved15, kDenseFieldsReserved15},
-    {Component::kLoadoutRecord, kDenseFieldsLoadoutRecord},
-    {Component::kReserved19, kDenseFieldsReserved19},
-    {Component::kHealth, kDenseFieldsHealth},
-    {Component::kTransform, kDenseFieldsTransform},
-    {Component::kReserved22, kDenseFieldsReserved22},
-    {Component::kLifecycle, kDenseFieldsLifecycle},
-    {Component::kCollisionRadius, kDenseFieldsCollisionRadius},
-    {Component::kInlineRecord, kDenseFieldsInlineRecord},
-    {Component::kReserved28, kDenseFieldsReserved28},
-    {Component::kIdentity, kDenseFieldsIdentity, kDenseFieldsIdentityExtended},
+  {Component::kDropState, kDenseFieldsDropState},
+  {Component::kAiActivity, kDenseFieldsAiActivity},
+  {Component::kPetalVariant, kDenseFieldsPetalVariant},
+  {Component::kPlayerController, kDenseFieldsPlayerController},
+  {Component::kPetalSpecies, kDenseFieldsPetalSpecies},
+  {Component::kReserved8, kDenseFieldsReserved8},
+  {Component::kReserved10, kDenseFieldsReserved10},
+  {Component::kReserved14, kDenseFieldsReserved14},
+  {Component::kReserved15, kDenseFieldsReserved15},
+  {Component::kLoadoutRecord, kDenseFieldsLoadoutRecord},
+  {Component::kReserved19, kDenseFieldsReserved19},
+  {Component::kHealth, kDenseFieldsHealth},
+  {Component::kTransform, kDenseFieldsTransform},
+  {Component::kReserved22, kDenseFieldsReserved22},
+  {Component::kLifecycle, kDenseFieldsLifecycle},
+  {Component::kCollisionRadius, kDenseFieldsCollisionRadius},
+  {Component::kInlineRecord, kDenseFieldsInlineRecord},
+  {Component::kReserved28, kDenseFieldsReserved28},
+  {Component::kIdentity, kDenseFieldsIdentity, kDenseFieldsIdentityExtended},
 }};
 inline constexpr std::array<DenseGroupSpec, 19> kDenseGroupSpecs{{
-    {Component::kDropState, kDenseSpecsDropState},
-    {Component::kAiActivity, kDenseSpecsAiActivity},
-    {Component::kPetalVariant, kDenseSpecsPetalVariant},
-    {Component::kPlayerController, kDenseSpecsPlayerController},
-    {Component::kPetalSpecies, kDenseSpecsPetalSpecies},
-    {Component::kReserved8, kDenseSpecsReserved8},
-    {Component::kReserved10, kDenseSpecsReserved10},
-    {Component::kReserved14, kDenseSpecsReserved14},
-    {Component::kReserved15, kDenseSpecsReserved15},
-    {Component::kLoadoutRecord, kDenseSpecsLoadoutRecord},
-    {Component::kReserved19, kDenseSpecsReserved19},
-    {Component::kHealth, kDenseSpecsHealth},
-    {Component::kTransform, kDenseSpecsTransform},
-    {Component::kReserved22, kDenseSpecsReserved22},
-    {Component::kLifecycle, kDenseSpecsLifecycle},
-    {Component::kCollisionRadius, kDenseSpecsCollisionRadius},
-    {Component::kInlineRecord, kDenseSpecsInlineRecord},
-    {Component::kReserved28, kDenseSpecsReserved28},
-    {Component::kIdentity, kDenseSpecsIdentity},
+  {Component::kDropState, kDenseSpecsDropState},
+  {Component::kAiActivity, kDenseSpecsAiActivity},
+  {Component::kPetalVariant, kDenseSpecsPetalVariant},
+  {Component::kPlayerController, kDenseSpecsPlayerController},
+  {Component::kPetalSpecies, kDenseSpecsPetalSpecies},
+  {Component::kReserved8, kDenseSpecsReserved8},
+  {Component::kReserved10, kDenseSpecsReserved10},
+  {Component::kReserved14, kDenseSpecsReserved14},
+  {Component::kReserved15, kDenseSpecsReserved15},
+  {Component::kLoadoutRecord, kDenseSpecsLoadoutRecord},
+  {Component::kReserved19, kDenseSpecsReserved19},
+  {Component::kHealth, kDenseSpecsHealth},
+  {Component::kTransform, kDenseSpecsTransform},
+  {Component::kReserved22, kDenseSpecsReserved22},
+  {Component::kLifecycle, kDenseSpecsLifecycle},
+  {Component::kCollisionRadius, kDenseSpecsCollisionRadius},
+  {Component::kInlineRecord, kDenseSpecsInlineRecord},
+  {Component::kReserved28, kDenseSpecsReserved28},
+  {Component::kIdentity, kDenseSpecsIdentity},
 }};
 consteval bool validate_tables() {
   std::array<unsigned, kSparseFieldCount> seen{};
   unsigned previous = 0;
   for (const auto& group : kDenseGroupSpecs) {
     const auto component = static_cast<unsigned>(group.component);
-    if (component <= previous || component > kComponentCount) {
-      return false;
-    }
+    if (component <= previous || component > kComponentCount) return false;
     previous = component;
     for (const auto& spec : group.specs) {
-      if (spec.field == 0 || spec.field > kSparseFieldCount || ++seen[spec.field - 1] != 1) {
-        return false;
-      }
-      if (kFieldDefinitions[spec.field - 1].dense_type != spec.type) {
-        return false;
-      }
-      if (kFieldDefinitions[spec.field - 1].component != group.component) {
-        return false;
-      }
+      if (spec.field == 0 || spec.field > kSparseFieldCount || ++seen[spec.field - 1] != 1) return false;
+      if (kFieldDefinitions[spec.field - 1].dense_type != spec.type) return false;
+      if (kFieldDefinitions[spec.field - 1].component != group.component) return false;
     }
   }
-  for (std::size_t index = 0; index < seen.size(); ++index) {
-    if (seen[index] != 1) {
-      return false;
-    }
-  }
+  for (std::size_t index = 0; index < seen.size(); ++index)
+    if (seen[index] != 1) return false;
   return kDenseGroups.size() == kDenseGroupCount && kFieldDefinitions.size() == kSparseFieldCount;
 }
-static_assert(validate_tables(),
-              "protocol tables must cover each field exactly once with the declared type");
-}  // namespace engine::protocol
+static_assert(validate_tables(), "protocol tables must cover each field exactly once with the declared type");
+} // namespace engine::protocol

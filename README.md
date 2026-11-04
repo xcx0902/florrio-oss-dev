@@ -167,7 +167,7 @@ serve.mjs     静态服务器
 
 ```bash
 npm run setup:format        # 安装锁定的 clang-format/cmake-format（.emcache）
-npm run format:check        # 全部受版本控制文本的只读格式检查
+npm run format:check        # 手写文本的只读格式检查（schema 生成物原样输出，不经过 formatter）
 npm run lint                # ESLint 结构与未使用符号检查
 npm run check:refactor      # 历史表示/编号规则台账
 npm run build:engine        # 原生 Release 构建

@@ -6,11 +6,13 @@
  *   node tools/format.mjs --check   # read-only verification (acceptance gate)
  *
  * File types are routed to a formatter that understands them; there is no
- * catch-all formatter. Generated outputs are never rewritten here: they must be
- * regenerated (`npm run schema:generate`) so bytes and hashes stay in sync.
+ * catch-all formatter. Schema-generated outputs are out of scope in both
+ * modes: tools/generate.mjs writes its templates verbatim, `schema:check`
+ * verifies their bytes, and only regeneration may change them
+ * (`npm run schema:generate`).
  */
 import { execFileSync, spawnSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { PRODUCT_ROOT, loadPrettier, resolveTool } from './lib/format-tools.mjs';
 
@@ -50,7 +52,11 @@ const CLANG_EXTENSIONS = new Set(['.cpp', '.hpp', '.h', '.inc']);
 const CMAKE_EXTENSIONS = new Set(['.cmake']);
 const NOT_FORMATTED = new Set(['package-lock.json']);
 
-/** Tracked plus untracked product files, without build trees or dependencies. */
+/**
+ * Tracked plus untracked product files, without build trees or dependencies.
+ * Git still lists a deleted-but-unstaged file, so paths absent from disk are
+ * dropped: there is nothing left to format.
+ */
 function listProductFiles() {
   let files;
   try {
@@ -62,7 +68,7 @@ function listProductFiles() {
   } catch {
     files = walk(PRODUCT_ROOT, '');
   }
-  return files.filter(Boolean).sort();
+  return files.filter((file) => file && existsSync(path.join(PRODUCT_ROOT, file))).sort();
 }
 
 /** Fallback discovery for a source copy without Git metadata. */
@@ -112,6 +118,29 @@ function generatedFiles() {
     readFileSync(path.join(PRODUCT_ROOT, 'schema/generated-outputs.json'), 'utf8'),
   );
   return new Set(manifest.outputs.map((entry) => entry.path));
+}
+
+/**
+ * `.prettierignore` must cover every generated file Prettier could parse.
+ * This tool excludes them from its own manifest, but direct CLI and editor use
+ * only see the ignore file, so a new generated output has to be listed there.
+ */
+async function assertGeneratedIgnored(files) {
+  if (!files.length) {
+    return;
+  }
+  const prettier = await loadPrettier();
+  const ignorePath = path.join(PRODUCT_ROOT, '.prettierignore');
+  const missing = [];
+  for (const relative of files) {
+    const info = await prettier.getFileInfo(relative, { ignorePath });
+    if (!info.ignored) {
+      missing.push(relative);
+    }
+  }
+  if (missing.length) {
+    throw new Error(`generated output missing from .prettierignore: ${missing.join(', ')}`);
+  }
 }
 
 function run(command, commandArgs, label) {
@@ -199,33 +228,22 @@ if (!total) {
   throw new Error('no formattable product files were discovered');
 }
 
+// Generated outputs are owned by tools/generate.mjs, which writes its templates
+// verbatim; `schema:check` is their gate. Neither mode here may pass them to a
+// formatter: that would desynchronise the bytes from the manifest.
+// `.prettierignore` mirrors this for direct CLI use.
 const generated = generatedFiles();
-const selected = (kind) => groups[kind].filter((relative) => check || !generated.has(relative));
 const generatedInScope = [...groups.prettier, ...groups.clang, ...groups.cmake].filter((relative) =>
   generated.has(relative),
 );
+const selected = (kind) => groups[kind].filter((relative) => !generated.has(relative));
 
-if (check) {
-  runPrettier(selected('prettier'), false);
-  runClangFormat(selected('clang'), false);
-  runCmakeFormat(selected('cmake'), false);
-} else {
-  // Generated files must already be formatted; regeneration is the only
-  // supported way to change them.
-  if (generatedInScope.length) {
-    runPrettier(
-      generatedInScope.filter((file) => groups.prettier.includes(file)),
-      false,
-    );
-    runClangFormat(
-      generatedInScope.filter((file) => groups.clang.includes(file)),
-      false,
-    );
-  }
-  runPrettier(selected('prettier'), true);
-  runClangFormat(selected('clang'), true);
-  runCmakeFormat(selected('cmake'), true);
-}
+await assertGeneratedIgnored(generatedInScope.filter((file) => groups.prettier.includes(file)));
+
+const write = !check;
+runPrettier(selected('prettier'), write);
+runClangFormat(selected('clang'), write);
+runCmakeFormat(selected('cmake'), write);
 
 const versions = {
   'clang-format': resolveTool('clang-format').version,

@@ -23,7 +23,6 @@ import {
 } from './catalogs.mjs';
 import { generateMenuContent } from './menu.mjs';
 import { multiplayerOutputs } from './multiplayer.mjs';
-import { formatGeneratedOutput } from './format.mjs';
 
 export const OUTPUT_MANIFEST = 'schema/generated-outputs.json';
 export const GENERATOR = 'tools/generate.mjs';
@@ -139,14 +138,11 @@ export async function buildOutputs(root = '.') {
       counts,
     }),
   );
-  // Formatting is part of generation: bytes, SHA-256 and the manifest describe
-  // the readable text that is actually written, never the raw template text.
-  const formatted = new Map();
-  for (const [file, content] of outputs) {
-    formatted.set(file, await formatGeneratedOutput(file, content));
-  }
+  // Generated text is written exactly as the templates produce it. No
+  // formatter runs on it: bytes, SHA-256 and the manifest describe the template
+  // output itself, and regeneration is the only way to change layout.
   return {
-    outputs: formatted,
+    outputs,
     summary: {
       generator: GENERATOR,
       protocolFields: contract.fields.length,

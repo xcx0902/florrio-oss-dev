@@ -14,27 +14,21 @@ inline constexpr std::size_t kStringCount = 99;
 
 inline constexpr const char* const kPetal0Descriptions0 = "";
 inline constexpr const char* const kPetal0DescriptionsValues[] = {kPetal0Descriptions0};
-inline constexpr const char* const kPetal1Descriptions0 =
-    "A nice petal, not too strong but not too weak";
+inline constexpr const char* const kPetal1Descriptions0 = "A nice petal, not too strong but not too weak";
 inline constexpr const char* const kPetal1DescriptionsValues[] = {kPetal1Descriptions0};
-inline constexpr const char* const kPetal2Descriptions0 =
-    "Weaker than most petals, but recharges very quickly";
+inline constexpr const char* const kPetal2Descriptions0 = "Weaker than most petals, but recharges very quickly";
 inline constexpr const char* const kPetal2DescriptionsValues[] = {kPetal2Descriptions0};
-inline constexpr const char* const kPetal3Descriptions0 =
-    "Very resilient and deals more damage, but recharges very slowly";
+inline constexpr const char* const kPetal3Descriptions0 = "Very resilient and deals more damage, but recharges very slowly";
 inline constexpr const char* const kPetal3DescriptionsValues[] = {kPetal3Descriptions0};
-inline constexpr const char* const kPetal4Descriptions0 =
-    "Extremely durable, but takes a long time to recharge";
+inline constexpr const char* const kPetal4Descriptions0 = "Extremely durable, but takes a long time to recharge";
 inline constexpr const char* const kPetal4DescriptionsValues[] = {kPetal4Descriptions0};
 inline constexpr const char* const kPetal5Descriptions0 = "This shape... it looks familiar...";
 inline constexpr const char* const kPetal5DescriptionsValues[] = {kPetal5Descriptions0};
-inline constexpr const char* const kPetal6Descriptions0 =
-    "Its healing properties are amazing. Not so good at combat though";
+inline constexpr const char* const kPetal6Descriptions0 = "Its healing properties are amazing. Not so good at combat though";
 inline constexpr const char* const kPetal6DescriptionsValues[] = {kPetal6Descriptions0};
 inline constexpr const char* const kPetal7Descriptions0 = "It really hurts, but it's very fragile";
 inline constexpr const char* const kPetal7DescriptionsValues[] = {kPetal7Descriptions0};
-inline constexpr const char* const kPetal8Descriptions0 =
-    "Very poisonous, but takes a little while to do its work";
+inline constexpr const char* const kPetal8Descriptions0 = "Very poisonous, but takes a little while to do its work";
 inline constexpr const char* const kPetal8DescriptionsValues[] = {kPetal8Descriptions0};
 inline constexpr const char* const kPetal9Descriptions0 = "It comes and goes";
 inline constexpr const char* const kPetal9DescriptionsValues[] = {kPetal9Descriptions0};
@@ -42,122 +36,91 @@ inline constexpr const char* const kPetal10Descriptions0 = "You can actually sho
 inline constexpr const char* const kPetal10DescriptionsValues[] = {kPetal10Descriptions0};
 inline constexpr const char* const kPetal11Descriptions0 = "4 in 1 deal";
 inline constexpr const char* const kPetal11DescriptionsValues[] = {kPetal11Descriptions0};
-inline constexpr const char* const kPetal12Descriptions0 =
-    "4 in 1 deal, now with a secret ingredient: poison";
+inline constexpr const char* const kPetal12Descriptions0 = "4 in 1 deal, now with a secret ingredient: poison";
 inline constexpr const char* const kPetal12DescriptionsValues[] = {kPetal12Descriptions0};
-inline constexpr const char* const kPetal13Descriptions0 =
-    "Not very strong, but somehow increases your maximum health";
+inline constexpr const char* const kPetal13Descriptions0 = "Not very strong, but somehow increases your maximum health";
 inline constexpr const char* const kPetal13DescriptionsValues[] = {kPetal13Descriptions0};
-inline constexpr const char* const kPetal14Descriptions0 =
-    "It's so light it makes your other petals spin faster";
+inline constexpr const char* const kPetal14Descriptions0 = "It's so light it makes your other petals spin faster";
 inline constexpr const char* const kPetal14DescriptionsValues[] = {kPetal14Descriptions0};
-inline constexpr const char* const kPetal15Descriptions0 =
-    "Extremely powerful rose, almost unheard of";
+inline constexpr const char* const kPetal15Descriptions0 = "Extremely powerful rose, almost unheard of";
 inline constexpr const char* const kPetal15DescriptionsValues[] = {kPetal15Descriptions0};
 inline constexpr const char* const kPetal16Descriptions0 = "Why stop at one? Why not TWO?!";
 inline constexpr const char* const kPetal16DescriptionsValues[] = {kPetal16Descriptions0};
 inline constexpr const char* const kPetal17Descriptions0 = "How about THREE?!";
 inline constexpr const char* const kPetal17DescriptionsValues[] = {kPetal17Descriptions0};
-inline constexpr const char* const kPetal18Descriptions0 =
-    "You can right click to pop it and propel your flower";
+inline constexpr const char* const kPetal18Descriptions0 = "You can right click to pop it and propel your flower";
 inline constexpr const char* const kPetal18DescriptionsValues[] = {kPetal18Descriptions0};
 inline constexpr const char* const kPetal19Descriptions0 = "Asthmatics beware";
 inline constexpr const char* const kPetal19DescriptionsValues[] = {kPetal19Descriptions0};
-inline constexpr const char* const kPetal20Descriptions0 =
-    "Its interesting properties prevent healing effects on affected units";
+inline constexpr const char* const kPetal20Descriptions0 = "Its interesting properties prevent healing effects on affected units";
 inline constexpr const char* const kPetal20DescriptionsValues[] = {kPetal20Descriptions0};
-inline constexpr const char* const kPetal21Descriptions0 =
-    "Increases your maximum health and makes your flower toxic";
-inline constexpr const char* const kPetal21Descriptions1 =
-    "Enemies hit by your flower will get poisoned";
-inline constexpr const char* const kPetal21DescriptionsValues[] = {kPetal21Descriptions0,
-                                                                   kPetal21Descriptions1};
-inline constexpr const char* const kPetal22Descriptions0 =
-    "Something interesting might pop out of this";
+inline constexpr const char* const kPetal21Descriptions0 = "Increases your maximum health and makes your flower toxic";
+inline constexpr const char* const kPetal21Descriptions1 = "Enemies hit by your flower will get poisoned";
+inline constexpr const char* const kPetal21DescriptionsValues[] = {kPetal21Descriptions0, kPetal21Descriptions1};
+inline constexpr const char* const kPetal22Descriptions0 = "Something interesting might pop out of this";
 inline constexpr const char* const kPetal22DescriptionsValues[] = {kPetal22Descriptions0};
-inline constexpr const char* const kPetal23Descriptions0 =
-    "Something interesting might pop out of this";
+inline constexpr const char* const kPetal23Descriptions0 = "Something interesting might pop out of this";
 inline constexpr const char* const kPetal23DescriptionsValues[] = {kPetal23Descriptions0};
-inline constexpr const char* const kPetal24Descriptions0 =
-    "Its healing properties are amazing. Not so good at combat though";
+inline constexpr const char* const kPetal24Descriptions0 = "Its healing properties are amazing. Not so good at combat though";
 inline constexpr const char* const kPetal24DescriptionsValues[] = {kPetal24Descriptions0};
-inline constexpr const char* const kPetal25Descriptions0 =
-    "Allows your flower to sense foes farther away";
+inline constexpr const char* const kPetal25Descriptions0 = "Allows your flower to sense foes farther away";
 inline constexpr const char* const kPetal25DescriptionsValues[] = {kPetal25Descriptions0};
-inline constexpr const char* const kPetal26Descriptions0 =
-    "This thing is so heavy that nothing gets in the way";
+inline constexpr const char* const kPetal26Descriptions0 = "This thing is so heavy that nothing gets in the way";
 inline constexpr const char* const kPetal26DescriptionsValues[] = {kPetal26Descriptions0};
 inline constexpr const char* const kPetal27Descriptions0 = "It really hurts, but it's very fragile";
 inline constexpr const char* const kPetal27DescriptionsValues[] = {kPetal27Descriptions0};
-inline constexpr const char* const kPetal28Descriptions0 =
-    "This mysterious petal reverses the rotation direction of your petals";
+inline constexpr const char* const kPetal28Descriptions0 = "This mysterious petal reverses the rotation direction of your petals";
 inline constexpr const char* const kPetal28DescriptionsValues[] = {kPetal28Descriptions0};
 inline constexpr const char* const kPetal29Descriptions0 = "It's really sticky";
 inline constexpr const char* const kPetal29DescriptionsValues[] = {kPetal29Descriptions0};
 inline constexpr const char* const kPetal30Descriptions0 = "It's really sticky";
 inline constexpr const char* const kPetal30DescriptionsValues[] = {kPetal30Descriptions0};
-inline constexpr const char* const kPetal31Descriptions0 =
-    "This is so sticky it slows down whatever it hits";
+inline constexpr const char* const kPetal31Descriptions0 = "This is so sticky it slows down whatever it hits";
 inline constexpr const char* const kPetal31DescriptionsValues[] = {kPetal31Descriptions0};
-inline constexpr const char* const kPetal32Descriptions0 =
-    "Gathers energy from the sun to heal your flower passively";
+inline constexpr const char* const kPetal32Descriptions0 = "Gathers energy from the sun to heal your flower passively";
 inline constexpr const char* const kPetal32DescriptionsValues[] = {kPetal32Descriptions0};
-inline constexpr const char* const kPetal33Descriptions0 =
-    "Not very strong, but somehow increases your maximum health";
+inline constexpr const char* const kPetal33Descriptions0 = "Not very strong, but somehow increases your maximum health";
 inline constexpr const char* const kPetal33DescriptionsValues[] = {kPetal33Descriptions0};
-inline constexpr const char* const kPetal34Descriptions0 =
-    "4 in 1 deal, now with a secret ingredient: poison";
+inline constexpr const char* const kPetal34Descriptions0 = "4 in 1 deal, now with a secret ingredient: poison";
 inline constexpr const char* const kPetal34DescriptionsValues[] = {kPetal34Descriptions0};
 inline constexpr const char* const kPetal35Descriptions0 = "Something incredibly rare and useless";
 inline constexpr const char* const kPetal35DescriptionsValues[] = {kPetal35Descriptions0};
-inline constexpr const char* const kPetal36Descriptions0 =
-    "Reflects some of the damage you take back to the flower that dealt it";
+inline constexpr const char* const kPetal36Descriptions0 = "Reflects some of the damage you take back to the flower that dealt it";
 inline constexpr const char* const kPetal36Descriptions1 = "Does not stack with itself";
-inline constexpr const char* const kPetal36DescriptionsValues[] = {kPetal36Descriptions0,
-                                                                   kPetal36Descriptions1};
+inline constexpr const char* const kPetal36DescriptionsValues[] = {kPetal36Descriptions0, kPetal36Descriptions1};
 inline constexpr const char* const kPetal37Descriptions0 = "Spawns instantly, but not very strong";
 inline constexpr const char* const kPetal37DescriptionsValues[] = {kPetal37Descriptions0};
-inline constexpr const char* const kPetal38Descriptions0 =
-    "Takes a long time to spawn, but has a lot of health";
+inline constexpr const char* const kPetal38Descriptions0 = "Takes a long time to spawn, but has a lot of health";
 inline constexpr const char* const kPetal38DescriptionsValues[] = {kPetal38Descriptions0};
 inline constexpr const char* const kEntity0Descriptions0 = "???";
 inline constexpr const char* const kEntity0DescriptionsValues[] = {kEntity0Descriptions0};
 inline constexpr const char* const kEntity1Descriptions0 = "A rock. It doesn't do much.";
 inline constexpr const char* const kEntity1DescriptionsValues[] = {kEntity1Descriptions0};
-inline constexpr const char* const kEntity2Descriptions0 =
-    "A bigger rock. It doesn't do much either.";
+inline constexpr const char* const kEntity2Descriptions0 = "A bigger rock. It doesn't do much either.";
 inline constexpr const char* const kEntity2DescriptionsValues[] = {kEntity2Descriptions0};
 inline constexpr const char* const kEntity3Descriptions0 = "Avoid touching it, it hurts.";
 inline constexpr const char* const kEntity3DescriptionsValues[] = {kEntity3Descriptions0};
 inline constexpr const char* const kEntity4Descriptions0 = "Cute and harmless.";
 inline constexpr const char* const kEntity4DescriptionsValues[] = {kEntity4Descriptions0};
-inline constexpr const char* const kEntity5Descriptions0 =
-    "This one is really big, but still cute.";
+inline constexpr const char* const kEntity5Descriptions0 = "This one is really big, but still cute.";
 inline constexpr const char* const kEntity5DescriptionsValues[] = {kEntity5Descriptions0};
 inline constexpr const char* const kEntity6Descriptions0 = "It stings. Don't touch it.";
 inline constexpr const char* const kEntity6DescriptionsValues[] = {kEntity6Descriptions0};
 inline constexpr const char* const kEntity7Descriptions0 = "Weak and defenseless, but big dreams.";
 inline constexpr const char* const kEntity7DescriptionsValues[] = {kEntity7Descriptions0};
-inline constexpr const char* const kEntity8Descriptions0 =
-    "It's a bit temperamental, probably from working all the time.";
+inline constexpr const char* const kEntity8Descriptions0 = "It's a bit temperamental, probably from working all the time.";
 inline constexpr const char* const kEntity8DescriptionsValues[] = {kEntity8Descriptions0};
-inline constexpr const char* const kEntity9Descriptions0 =
-    "It's got wings and it's ready to use them.";
+inline constexpr const char* const kEntity9Descriptions0 = "It's got wings and it's ready to use them.";
 inline constexpr const char* const kEntity9DescriptionsValues[] = {kEntity9Descriptions0};
-inline constexpr const char* const kEntity10Descriptions0 =
-    "You must have done something really bad if she's chasing you.";
+inline constexpr const char* const kEntity10Descriptions0 = "You must have done something really bad if she's chasing you.";
 inline constexpr const char* const kEntity10DescriptionsValues[] = {kEntity10Descriptions0};
-inline constexpr const char* const kEntity11Descriptions0 =
-    "Ants go in, and come out. Can't explain that.";
+inline constexpr const char* const kEntity11Descriptions0 = "Ants go in, and come out. Can't explain that.";
 inline constexpr const char* const kEntity11DescriptionsValues[] = {kEntity11Descriptions0};
-inline constexpr const char* const kEntity12Descriptions0 =
-    "It's hungry and flowers are its favorite meal.";
+inline constexpr const char* const kEntity12Descriptions0 = "It's hungry and flowers are its favorite meal.";
 inline constexpr const char* const kEntity12DescriptionsValues[] = {kEntity12Descriptions0};
-inline constexpr const char* const kEntity13Descriptions0 =
-    "Someone overfed this one, you might be next.";
+inline constexpr const char* const kEntity13Descriptions0 = "Someone overfed this one, you might be next.";
 inline constexpr const char* const kEntity13DescriptionsValues[] = {kEntity13Descriptions0};
-inline constexpr const char* const kEntity14Descriptions0 =
-    "These aren't quite as nice as the little bees.";
+inline constexpr const char* const kEntity14Descriptions0 = "These aren't quite as nice as the little bees.";
 inline constexpr const char* const kEntity14DescriptionsValues[] = {kEntity14Descriptions0};
 inline constexpr const char* const kEntity15Descriptions0 = "It's just there doing its thing.";
 inline constexpr const char* const kEntity15DescriptionsValues[] = {kEntity15Descriptions0};
@@ -169,8 +132,7 @@ inline constexpr const char* const kEntity18Descriptions0 = "This one loves flow
 inline constexpr const char* const kEntity18DescriptionsValues[] = {kEntity18Descriptions0};
 inline constexpr const char* const kEntity19Descriptions0 = "This shape... it looks familiar...";
 inline constexpr const char* const kEntity19DescriptionsValues[] = {kEntity19Descriptions0};
-inline constexpr const char* const kEntity20Descriptions0 =
-    "Cute and harmless... if left unprovoked.";
+inline constexpr const char* const kEntity20Descriptions0 = "Cute and harmless... if left unprovoked.";
 inline constexpr const char* const kEntity20DescriptionsValues[] = {kEntity20Descriptions0};
 inline constexpr const char* const kEntity21Descriptions0 = "Shiny, cute and mostly harmless.";
 inline constexpr const char* const kEntity21DescriptionsValues[] = {kEntity21Descriptions0};
@@ -178,84 +140,45 @@ inline constexpr const char* const kEntity22Descriptions0 = "Spooky.";
 inline constexpr const char* const kEntity22DescriptionsValues[] = {kEntity22Descriptions0};
 
 inline constexpr std::array<PetalCatalogEntry, kPetalCount> kPetals{{
-    {0, "None", kPetal0DescriptionsValues, 1, 0, 0.0F, 1, 14.0F, 14.0F, 0.0F, 0.0F, 0.0F, false,
-     false, 0.0F},
-    {1, "Basic", kPetal1DescriptionsValues, 1, 0, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F,
-     false, false, 0.0F},
-    {2, "Fast", kPetal2DescriptionsValues, 1, 0, 500.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false,
-     false, 0.0F},
-    {3, "Heavy", kPetal3DescriptionsValues, 1, 0, 5500.0F, 1, 14.0F, 14.0F, 12.0F, 20.0F, 20.0F,
-     false, false, 0.0F},
-    {4, "Rock", kPetal4DescriptionsValues, 1, 2, 10000.0F, 1, 14.0F, 14.0F, 14.0F, 10.0F, 90.0F,
-     false, false, 0.0F},
-    {5, "Square", kPetal5DescriptionsValues, 1, 5, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F,
-     false, false, 0.0F},
-    {6, "Rose", kPetal6DescriptionsValues, 1, 1, 3500.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false,
-     false, 0.0F},
-    {7, "Stinger", kPetal7DescriptionsValues, 1, 1, 4000.0F, 1, 14.0F, 14.0F, 7.0F, 35.0F, 8.0F,
-     false, false, 0.0F},
-    {8, "Iris", kPetal8DescriptionsValues, 1, 1, 6000.0F, 1, 14.0F, 14.0F, 6.0F, 5.0F, 5.0F, false,
-     false, 0.0F},
-    {9, "Wing", kPetal9DescriptionsValues, 1, 2, 1250.0F, 1, 14.0F, 14.0F, 15.0F, 15.0F, 15.0F,
-     false, false, 0.0F},
-    {10, "Missile", kPetal10DescriptionsValues, 1, 2, 3000.0F, 1, 14.0F, 14.0F, 10.0F, 35.0F, 10.0F,
-     false, false, 0.0F},
-    {11, "Peas", kPetal11DescriptionsValues, 1, 2, 1000.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 20.0F,
-     false, false, 0.0F},
-    {12, "Peas", kPetal12DescriptionsValues, 1, 3, 1000.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 20.0F,
-     false, false, 0.0F},
-    {13, "Cactus", kPetal13DescriptionsValues, 1, 2, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F,
-     false, false, 0.0F},
-    {14, "Faster", kPetal14DescriptionsValues, 1, 2, 500.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F,
-     false, false, 0.0F},
-    {15, "Rose", kPetal15DescriptionsValues, 1, 3, 3500.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F,
-     false, false, 0.0F},
-    {16, "Twin", kPetal16DescriptionsValues, 1, 1, 1000.0F, 2, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F,
-     false, false, 0.0F},
-    {17, "Triplet", kPetal17DescriptionsValues, 1, 3, 1000.0F, 3, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F,
-     false, false, 0.0F},
-    {18, "Bubble", kPetal18DescriptionsValues, 1, 2, 3500.0F, 1, 14.0F, 14.0F, 12.0F, 0.0F, 1.0F,
-     false, false, 0.0F},
-    {19, "Pollen", kPetal19DescriptionsValues, 1, 3, 1000.0F, 3, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F,
-     false, false, 0.0F},
-    {20, "Dandelion", kPetal20DescriptionsValues, 1, 2, 2000.0F, 1, 11.0F, 11.0F, 9.0F, 5.0F, 10.0F,
-     false, false, 0.0F},
-    {21, "Cactus", kPetal21DescriptionsValues, 2, 3, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F,
-     false, false, 0.0F},
-    {22, "Egg", kPetal22DescriptionsValues, 1, 3, 1000.0F, 1, 14.0F, 14.0F, 13.0F, 1.0F, 50.0F,
-     false, false, 0.0F},
-    {23, "Egg", kPetal23DescriptionsValues, 1, 4, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 1.0F, 50.0F,
-     false, false, 0.0F},
-    {24, "Rose", kPetal24DescriptionsValues, 1, 2, 3500.0F, 3, 14.0F, 14.0F, 7.0F, 5.0F, 5.0F,
-     false, true, 11.0F},
-    {25, "Antennae", kPetal25DescriptionsValues, 1, 4, 0.0F, 1, 12.0F, 12.0F, 10.0F, 10.0F, 10.0F,
-     true, false, 0.0F},
-    {26, "Heaviest", kPetal26DescriptionsValues, 1, 3, 20000.0F, 1, 12.0F, 12.0F, 16.0F, 10.0F,
-     200.0F, false, false, 0.0F},
-    {27, "Stinger", kPetal27DescriptionsValues, 1, 4, 4000.0F, 3, 14.0F, 14.0F, 7.0F, 35.0F, 8.0F,
-     false, true, 11.0F},
-    {28, "Yin Yang", kPetal28DescriptionsValues, 1, 3, 1000.0F, 1, 12.0F, 12.0F, 12.0F, 15.0F,
-     15.0F, false, false, 0.0F},
-    {29, "Web", kPetal29DescriptionsValues, 1, 2, 3000.0F, 1, 14.0F, 14.0F, 10.0F, 8.0F, 5.0F,
-     false, false, 0.0F},
-    {30, "Web", kPetal30DescriptionsValues, 1, 4, 3000.0F, 3, 14.0F, 14.0F, 10.0F, 8.0F, 5.0F,
-     false, true, 13.0F},
-    {31, "Honey", kPetal31DescriptionsValues, 1, 2, 1700.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F,
-     false, false, 0.0F},
-    {32, "Leaf", kPetal32DescriptionsValues, 1, 1, 1000.0F, 1, 14.0F, 14.0F, 10.0F, 8.0F, 10.0F,
-     false, false, 0.0F},
-    {33, "Cactus", kPetal33DescriptionsValues, 1, 4, 1000.0F, 3, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F,
-     false, true, 15.0F},
-    {34, "Peas", kPetal34DescriptionsValues, 1, 4, 1000.0F, 1, 14.0F, 14.0F, 10.0F, 12.0F, 20.0F,
-     false, false, 0.0F},
-    {35, "Basic", kPetal35DescriptionsValues, 1, 5, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F,
-     false, false, 0.0F},
-    {36, "Salt", kPetal36DescriptionsValues, 2, 2, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F,
-     false, false, 0.0F},
-    {37, "Rice", kPetal37DescriptionsValues, 1, 3, 0.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false,
-     false, 0.0F},
-    {38, "Corn", kPetal38DescriptionsValues, 1, 3, 45000.0F, 1, 14.0F, 14.0F, 10.0F, 1.0F, 2000.0F,
-     false, false, 0.0F},
+  {0, "None", kPetal0DescriptionsValues, 1, 0, 0.0F, 1, 14.0F, 14.0F, 0.0F, 0.0F, 0.0F, false, false, 0.0F},
+  {1, "Basic", kPetal1DescriptionsValues, 1, 0, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {2, "Fast", kPetal2DescriptionsValues, 1, 0, 500.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {3, "Heavy", kPetal3DescriptionsValues, 1, 0, 5500.0F, 1, 14.0F, 14.0F, 12.0F, 20.0F, 20.0F, false, false, 0.0F},
+  {4, "Rock", kPetal4DescriptionsValues, 1, 2, 10000.0F, 1, 14.0F, 14.0F, 14.0F, 10.0F, 90.0F, false, false, 0.0F},
+  {5, "Square", kPetal5DescriptionsValues, 1, 5, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {6, "Rose", kPetal6DescriptionsValues, 1, 1, 3500.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
+  {7, "Stinger", kPetal7DescriptionsValues, 1, 1, 4000.0F, 1, 14.0F, 14.0F, 7.0F, 35.0F, 8.0F, false, false, 0.0F},
+  {8, "Iris", kPetal8DescriptionsValues, 1, 1, 6000.0F, 1, 14.0F, 14.0F, 6.0F, 5.0F, 5.0F, false, false, 0.0F},
+  {9, "Wing", kPetal9DescriptionsValues, 1, 2, 1250.0F, 1, 14.0F, 14.0F, 15.0F, 15.0F, 15.0F, false, false, 0.0F},
+  {10, "Missile", kPetal10DescriptionsValues, 1, 2, 3000.0F, 1, 14.0F, 14.0F, 10.0F, 35.0F, 10.0F, false, false, 0.0F},
+  {11, "Peas", kPetal11DescriptionsValues, 1, 2, 1000.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 20.0F, false, false, 0.0F},
+  {12, "Peas", kPetal12DescriptionsValues, 1, 3, 1000.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 20.0F, false, false, 0.0F},
+  {13, "Cactus", kPetal13DescriptionsValues, 1, 2, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, false, 0.0F},
+  {14, "Faster", kPetal14DescriptionsValues, 1, 2, 500.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {15, "Rose", kPetal15DescriptionsValues, 1, 3, 3500.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
+  {16, "Twin", kPetal16DescriptionsValues, 1, 1, 1000.0F, 2, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {17, "Triplet", kPetal17DescriptionsValues, 1, 3, 1000.0F, 3, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {18, "Bubble", kPetal18DescriptionsValues, 1, 2, 3500.0F, 1, 14.0F, 14.0F, 12.0F, 0.0F, 1.0F, false, false, 0.0F},
+  {19, "Pollen", kPetal19DescriptionsValues, 1, 3, 1000.0F, 3, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {20, "Dandelion", kPetal20DescriptionsValues, 1, 2, 2000.0F, 1, 11.0F, 11.0F, 9.0F, 5.0F, 10.0F, false, false, 0.0F},
+  {21, "Cactus", kPetal21DescriptionsValues, 2, 3, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, false, 0.0F},
+  {22, "Egg", kPetal22DescriptionsValues, 1, 3, 1000.0F, 1, 14.0F, 14.0F, 13.0F, 1.0F, 50.0F, false, false, 0.0F},
+  {23, "Egg", kPetal23DescriptionsValues, 1, 4, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 1.0F, 50.0F, false, false, 0.0F},
+  {24, "Rose", kPetal24DescriptionsValues, 1, 2, 3500.0F, 3, 14.0F, 14.0F, 7.0F, 5.0F, 5.0F, false, true, 11.0F},
+  {25, "Antennae", kPetal25DescriptionsValues, 1, 4, 0.0F, 1, 12.0F, 12.0F, 10.0F, 10.0F, 10.0F, true, false, 0.0F},
+  {26, "Heaviest", kPetal26DescriptionsValues, 1, 3, 20000.0F, 1, 12.0F, 12.0F, 16.0F, 10.0F, 200.0F, false, false, 0.0F},
+  {27, "Stinger", kPetal27DescriptionsValues, 1, 4, 4000.0F, 3, 14.0F, 14.0F, 7.0F, 35.0F, 8.0F, false, true, 11.0F},
+  {28, "Yin Yang", kPetal28DescriptionsValues, 1, 3, 1000.0F, 1, 12.0F, 12.0F, 12.0F, 15.0F, 15.0F, false, false, 0.0F},
+  {29, "Web", kPetal29DescriptionsValues, 1, 2, 3000.0F, 1, 14.0F, 14.0F, 10.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {30, "Web", kPetal30DescriptionsValues, 1, 4, 3000.0F, 3, 14.0F, 14.0F, 10.0F, 8.0F, 5.0F, false, true, 13.0F},
+  {31, "Honey", kPetal31DescriptionsValues, 1, 2, 1700.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {32, "Leaf", kPetal32DescriptionsValues, 1, 1, 1000.0F, 1, 14.0F, 14.0F, 10.0F, 8.0F, 10.0F, false, false, 0.0F},
+  {33, "Cactus", kPetal33DescriptionsValues, 1, 4, 1000.0F, 3, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, true, 15.0F},
+  {34, "Peas", kPetal34DescriptionsValues, 1, 4, 1000.0F, 1, 14.0F, 14.0F, 10.0F, 12.0F, 20.0F, false, false, 0.0F},
+  {35, "Basic", kPetal35DescriptionsValues, 1, 5, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {36, "Salt", kPetal36DescriptionsValues, 2, 2, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {37, "Rice", kPetal37DescriptionsValues, 1, 3, 0.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
+  {38, "Corn", kPetal38DescriptionsValues, 1, 3, 45000.0F, 1, 14.0F, 14.0F, 10.0F, 1.0F, 2000.0F, false, false, 0.0F},
 }};
 
 inline constexpr std::array<std::uint32_t, 3> kEntity1PetalIds{{2, 3, 4}};
@@ -279,43 +202,29 @@ inline constexpr std::array<std::uint32_t, 6> kEntity20PetalIds{{15, 24, 9, 18, 
 inline constexpr std::array<std::uint32_t, 6> kEntity21PetalIds{{6, 24, 16, 9, 18, 17}};
 inline constexpr std::array<std::uint32_t, 5> kEntity22PetalIds{{8, 7, 14, 29, 30}};
 inline constexpr std::array<EntityCatalogEntry, kEntityCount> kEntities{{
-    {0, "None", kEntity0DescriptionsValues, 1, 0, 0.0F, nullptr, 0, 0, 0, 1.0F},
-    {1, "Rock", kEntity1DescriptionsValues, 1, 0, 1.0F, kEntity1PetalIds.data(), 3, 3, 0, 1.0F},
-    {2, "Boulder", kEntity2DescriptionsValues, 1, 1, 10.0F, kEntity2PetalIds.data(), 3, 3, 0, 1.0F},
-    {3, "Cactus", kEntity3DescriptionsValues, 1, 0, 2.0F, kEntity3PetalIds.data(), 5, 5, 0, 1.0F},
-    {4, "Ladybug", kEntity4DescriptionsValues, 1, 0, 3.0F, kEntity4PetalIds.data(), 5, 5, 0, 1.0F},
-    {5, "Massive Ladybug", kEntity5DescriptionsValues, 1, 3, 50.0F, kEntity5PetalIds.data(), 4, 4,
-     0, 10.0F},
-    {6, "Bee", kEntity6DescriptionsValues, 1, 0, 3.0F, kEntity6PetalIds.data(), 6, 6, 0, 1.0F},
-    {7, "Baby Ant", kEntity7DescriptionsValues, 1, 0, 1.0F, kEntity7PetalIds.data(), 5, 5, 0, 1.0F},
-    {8, "Worker Ant", kEntity8DescriptionsValues, 1, 0, 2.0F, kEntity8PetalIds.data(), 5, 5, 0,
-     1.0F},
-    {9, "Soldier Ant", kEntity9DescriptionsValues, 1, 1, 5.0F, kEntity9PetalIds.data(), 5, 5, 0,
-     1.0F},
-    {10, "Queen Ant", kEntity10DescriptionsValues, 1, 2, 20.0F, kEntity10PetalIds.data(), 6, 6, 0,
-     1.0F},
-    {11, "Ant Hole", kEntity11DescriptionsValues, 1, 2, 20.0F, kEntity11PetalIds.data(), 3, 3, 0,
-     1.0F},
-    {12, "Beetle", kEntity12DescriptionsValues, 1, 1, 5.0F, kEntity12PetalIds.data(), 4, 4, 0,
-     1.0F},
-    {13, "Massive Beetle", kEntity13DescriptionsValues, 1, 2, 50.0F, kEntity13PetalIds.data(), 4, 4,
-     0, 1.0F},
-    {14, "Hornet", kEntity14DescriptionsValues, 1, 1, 10.0F, kEntity14PetalIds.data(), 6, 6, 0,
-     2.0F},
-    {15, "Centipede", kEntity15DescriptionsValues, 1, 1, 3.0F, kEntity15PetalIds.data(), 6, 6, 0,
-     1.0F},
-    {16, "Centipede", kEntity16DescriptionsValues, 1, 1, 3.0F, nullptr, 0, 6, 15, 1.0F},
-    {17, "Evil Centipede", kEntity17DescriptionsValues, 1, 2, 5.0F, kEntity17PetalIds.data(), 4, 4,
-     0, 1.0F},
-    {18, "Evil Centipede", kEntity18DescriptionsValues, 1, 2, 5.0F, nullptr, 0, 4, 17, 1.0F},
-    {19, "Square", kEntity19DescriptionsValues, 1, 5, 10.0F, kEntity19PetalIds.data(), 1, 1, 0,
-     1.0F},
-    {20, "Ladybug", kEntity20DescriptionsValues, 1, 1, 5.0F, kEntity20PetalIds.data(), 6, 6, 0,
-     1.0F},
-    {21, "Ladybug", kEntity21DescriptionsValues, 1, 1, 5.0F, kEntity21PetalIds.data(), 6, 6, 0,
-     0.20000000298023224F},
-    {22, "Spider", kEntity22DescriptionsValues, 1, 1, 5.0F, kEntity22PetalIds.data(), 5, 5, 0,
-     1.0F},
+  {0, "None", kEntity0DescriptionsValues, 1, 0, 0.0F, nullptr, 0, 0, 0, 1.0F},
+  {1, "Rock", kEntity1DescriptionsValues, 1, 0, 1.0F, kEntity1PetalIds.data(), 3, 3, 0, 1.0F},
+  {2, "Boulder", kEntity2DescriptionsValues, 1, 1, 10.0F, kEntity2PetalIds.data(), 3, 3, 0, 1.0F},
+  {3, "Cactus", kEntity3DescriptionsValues, 1, 0, 2.0F, kEntity3PetalIds.data(), 5, 5, 0, 1.0F},
+  {4, "Ladybug", kEntity4DescriptionsValues, 1, 0, 3.0F, kEntity4PetalIds.data(), 5, 5, 0, 1.0F},
+  {5, "Massive Ladybug", kEntity5DescriptionsValues, 1, 3, 50.0F, kEntity5PetalIds.data(), 4, 4, 0, 10.0F},
+  {6, "Bee", kEntity6DescriptionsValues, 1, 0, 3.0F, kEntity6PetalIds.data(), 6, 6, 0, 1.0F},
+  {7, "Baby Ant", kEntity7DescriptionsValues, 1, 0, 1.0F, kEntity7PetalIds.data(), 5, 5, 0, 1.0F},
+  {8, "Worker Ant", kEntity8DescriptionsValues, 1, 0, 2.0F, kEntity8PetalIds.data(), 5, 5, 0, 1.0F},
+  {9, "Soldier Ant", kEntity9DescriptionsValues, 1, 1, 5.0F, kEntity9PetalIds.data(), 5, 5, 0, 1.0F},
+  {10, "Queen Ant", kEntity10DescriptionsValues, 1, 2, 20.0F, kEntity10PetalIds.data(), 6, 6, 0, 1.0F},
+  {11, "Ant Hole", kEntity11DescriptionsValues, 1, 2, 20.0F, kEntity11PetalIds.data(), 3, 3, 0, 1.0F},
+  {12, "Beetle", kEntity12DescriptionsValues, 1, 1, 5.0F, kEntity12PetalIds.data(), 4, 4, 0, 1.0F},
+  {13, "Massive Beetle", kEntity13DescriptionsValues, 1, 2, 50.0F, kEntity13PetalIds.data(), 4, 4, 0, 1.0F},
+  {14, "Hornet", kEntity14DescriptionsValues, 1, 1, 10.0F, kEntity14PetalIds.data(), 6, 6, 0, 2.0F},
+  {15, "Centipede", kEntity15DescriptionsValues, 1, 1, 3.0F, kEntity15PetalIds.data(), 6, 6, 0, 1.0F},
+  {16, "Centipede", kEntity16DescriptionsValues, 1, 1, 3.0F, nullptr, 0, 6, 15, 1.0F},
+  {17, "Evil Centipede", kEntity17DescriptionsValues, 1, 2, 5.0F, kEntity17PetalIds.data(), 4, 4, 0, 1.0F},
+  {18, "Evil Centipede", kEntity18DescriptionsValues, 1, 2, 5.0F, nullptr, 0, 4, 17, 1.0F},
+  {19, "Square", kEntity19DescriptionsValues, 1, 5, 10.0F, kEntity19PetalIds.data(), 1, 1, 0, 1.0F},
+  {20, "Ladybug", kEntity20DescriptionsValues, 1, 1, 5.0F, kEntity20PetalIds.data(), 6, 6, 0, 1.0F},
+  {21, "Ladybug", kEntity21DescriptionsValues, 1, 1, 5.0F, kEntity21PetalIds.data(), 6, 6, 0, 0.20000000298023224F},
+  {22, "Spider", kEntity22DescriptionsValues, 1, 1, 5.0F, kEntity22PetalIds.data(), 5, 5, 0, 1.0F},
 }};
 
 inline constexpr std::array<std::uint8_t, 2> kSpawnRule0Regions{{0, 1}};
@@ -339,29 +248,29 @@ inline constexpr std::array<std::uint8_t, 8> kSpawnRule17Regions{{0, 1, 2, 3, 4,
 inline constexpr std::array<std::uint8_t, 5> kSpawnRule18Regions{{3, 4, 5, 6, 7}};
 inline constexpr std::array<std::uint8_t, 8> kSpawnRule19Regions{{0, 1, 2, 3, 4, 5, 6, 7}};
 inline constexpr std::array<SpawnRuleCatalogEntry, kSpawnRuleCount> kSpawnRules{{
-    {0.5F, kSpawnRule0Regions.data(), 2, 1},
-    {0.009999999776482582F, kSpawnRule1Regions.data(), 2, 2},
-    {0.10000000149011612F, kSpawnRule2Regions.data(), 3, 2},
-    {0.4000000059604645F, kSpawnRule3Regions.data(), 2, 3},
-    {0.15000000596046448F, kSpawnRule4Regions.data(), 5, 4},
-    {0.004999999888241291F, kSpawnRule5Regions.data(), 2, 21},
-    {0.00019999999494757503F, kSpawnRule6Regions.data(), 2, 5},
-    {0.10000000149011612F, kSpawnRule7Regions.data(), 4, 6},
-    {0.02500000037252903F, kSpawnRule8Regions.data(), 3, 7},
-    {0.02500000037252903F, kSpawnRule9Regions.data(), 3, 8},
-    {0.02500000037252903F, kSpawnRule10Regions.data(), 3, 9},
-    {0.0020000000949949026F, kSpawnRule11Regions.data(), 5, 11},
-    {0.10000000149011612F, kSpawnRule12Regions.data(), 5, 12},
-    {0.0020000000949949026F, kSpawnRule13Regions.data(), 5, 13},
-    {0.10000000149011612F, kSpawnRule14Regions.data(), 3, 14},
-    {0.10000000149011612F, kSpawnRule15Regions.data(), 4, 22},
-    {0.10000000149011612F, kSpawnRule16Regions.data(), 2, 20},
-    {0.008999999612569809F, kSpawnRule17Regions.data(), 8, 15},
-    {0.0010000000474974513F, kSpawnRule18Regions.data(), 5, 17},
-    {9.999999974752427e-7F, kSpawnRule19Regions.data(), 8, 19},
+  {0.5F, kSpawnRule0Regions.data(), 2, 1},
+  {0.009999999776482582F, kSpawnRule1Regions.data(), 2, 2},
+  {0.10000000149011612F, kSpawnRule2Regions.data(), 3, 2},
+  {0.4000000059604645F, kSpawnRule3Regions.data(), 2, 3},
+  {0.15000000596046448F, kSpawnRule4Regions.data(), 5, 4},
+  {0.004999999888241291F, kSpawnRule5Regions.data(), 2, 21},
+  {0.00019999999494757503F, kSpawnRule6Regions.data(), 2, 5},
+  {0.10000000149011612F, kSpawnRule7Regions.data(), 4, 6},
+  {0.02500000037252903F, kSpawnRule8Regions.data(), 3, 7},
+  {0.02500000037252903F, kSpawnRule9Regions.data(), 3, 8},
+  {0.02500000037252903F, kSpawnRule10Regions.data(), 3, 9},
+  {0.0020000000949949026F, kSpawnRule11Regions.data(), 5, 11},
+  {0.10000000149011612F, kSpawnRule12Regions.data(), 5, 12},
+  {0.0020000000949949026F, kSpawnRule13Regions.data(), 5, 13},
+  {0.10000000149011612F, kSpawnRule14Regions.data(), 3, 14},
+  {0.10000000149011612F, kSpawnRule15Regions.data(), 4, 22},
+  {0.10000000149011612F, kSpawnRule16Regions.data(), 2, 20},
+  {0.008999999612569809F, kSpawnRule17Regions.data(), 8, 15},
+  {0.0010000000474974513F, kSpawnRule18Regions.data(), 5, 17},
+  {9.999999974752427e-7F, kSpawnRule19Regions.data(), 8, 19},
 }};
 
 static_assert(std::size(kPetals) == kPetalCount);
 static_assert(std::size(kEntities) == kEntityCount);
 static_assert(std::size(kSpawnRules) == kSpawnRuleCount);
-}  // namespace engine::catalog
+} // namespace engine::catalog

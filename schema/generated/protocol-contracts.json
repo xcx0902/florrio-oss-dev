@@ -125,7 +125,10 @@
           "opcode": 6,
           "name": "player-spawn-and-name",
           "confidence": "high",
-          "fields": ["name-string", "level"]
+          "fields": [
+            "name-string",
+            "level"
+          ]
         },
         {
           "opcode": 7,
@@ -136,19 +139,28 @@
           "opcode": 8,
           "name": "discard-petal",
           "confidence": "high",
-          "fields": ["slot"]
+          "fields": [
+            "slot"
+          ]
         },
         {
           "opcode": 10,
           "name": "swap-petals",
           "confidence": "high",
-          "fields": ["slotA", "slotB"]
+          "fields": [
+            "slotA",
+            "slotB"
+          ]
         },
         {
           "opcode": 12,
           "name": "input-buttons-angle-strength",
           "confidence": "high",
-          "fields": ["buttons", "angle", "strength"]
+          "fields": [
+            "buttons",
+            "angle",
+            "strength"
+          ]
         },
         {
           "opcode": 13,
@@ -219,7 +231,15 @@
             "packetFormat": "domain-counted",
             "fieldDeltaXor": 0,
             "indexDeltaXor": 0,
-            "indexedFields": [3, 10, 16, 25, 39, 60, 61],
+            "indexedFields": [
+              3,
+              10,
+              16,
+              25,
+              39,
+              60,
+              61
+            ],
             "field26Role": "entity-kind",
             "note": "Domain semantics also include petal slot/instance fields11/12; see docs/semantics/snapshot.md."
           }
@@ -406,101 +426,262 @@
           }
         },
         "fieldTypes": {
-          "byte": [1, 2, 9, 11, 12, 14, 17, 20, 22, 26, 31, 34, 36, 38, 43, 46, 47, 50, 54, 62, 63],
-          "float": [19, 21, 32, 42, 53, 55],
-          "interpolatedFloat": [5, 7, 13, 24, 28, 49, 59],
-          "string": [4, 6, 48],
-          "varint": [15, 30, 41, 44, 51, 52, 58],
-          "reference": [23, 56, 57],
-          "bit": [29, 33, 37, 40],
-          "angleRaw16": [8],
-          "double": [18, 35],
-          "specialFloat": [27, 45],
-          "stringArray": [10, 25],
-          "byteArray": [16, 60],
-          "handleArray": [3],
-          "varintArray": [39],
-          "shortArray": [61],
+          "byte": [
+            1,
+            2,
+            9,
+            11,
+            12,
+            14,
+            17,
+            20,
+            22,
+            26,
+            31,
+            34,
+            36,
+            38,
+            43,
+            46,
+            47,
+            50,
+            54,
+            62,
+            63
+          ],
+          "float": [
+            19,
+            21,
+            32,
+            42,
+            53,
+            55
+          ],
+          "interpolatedFloat": [
+            5,
+            7,
+            13,
+            24,
+            28,
+            49,
+            59
+          ],
+          "string": [
+            4,
+            6,
+            48
+          ],
+          "varint": [
+            15,
+            30,
+            41,
+            44,
+            51,
+            52,
+            58
+          ],
+          "reference": [
+            23,
+            56,
+            57
+          ],
+          "bit": [
+            29,
+            33,
+            37,
+            40
+          ],
+          "angleRaw16": [
+            8
+          ],
+          "double": [
+            18,
+            35
+          ],
+          "specialFloat": [
+            27,
+            45
+          ],
+          "stringArray": [
+            10,
+            25
+          ],
+          "byteArray": [
+            16,
+            60
+          ],
+          "handleArray": [
+            3
+          ],
+          "varintArray": [
+            39
+          ],
+          "shortArray": [
+            61
+          ],
           "confidence": "high",
           "note": "Shared field value categories and dense widths. Consult sparseModes for indexed/scalar framing."
         },
         "denseGroups": [
           {
             "component": 1,
-            "fields": [22, 54]
+            "fields": [
+              22,
+              54
+            ]
           },
           {
             "component": 2,
-            "fields": [36]
+            "fields": [
+              36
+            ]
           },
           {
             "component": 5,
-            "fields": [9]
+            "fields": [
+              9
+            ]
           },
           {
             "component": 6,
-            "fields": [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56]
+            "fields": [
+              1,
+              5,
+              6,
+              16,
+              20,
+              21,
+              24,
+              32,
+              34,
+              47,
+              56
+            ]
           },
           {
             "component": 7,
-            "fields": [50]
+            "fields": [
+              50
+            ]
           },
           {
             "component": 8,
-            "fields": [13, 37]
+            "fields": [
+              13,
+              37
+            ]
           },
           {
             "component": 10,
-            "fields": [17]
+            "fields": [
+              17
+            ]
           },
           {
             "component": 14,
-            "fields": [43]
+            "fields": [
+              43
+            ]
           },
           {
             "component": 15,
-            "fields": [23, 57]
+            "fields": [
+              23,
+              57
+            ]
           },
           {
             "component": 16,
-            "fields": [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52]
+            "fields": [
+              3,
+              10,
+              11,
+              12,
+              19,
+              30,
+              39,
+              42,
+              45,
+              46,
+              52
+            ]
           },
           {
             "component": 19,
-            "fields": [48]
+            "fields": [
+              48
+            ]
           },
           {
             "component": 20,
-            "fields": [53, 55]
+            "fields": [
+              53,
+              55
+            ]
           },
           {
             "component": 21,
-            "fields": [8, 28, 49]
+            "fields": [
+              8,
+              28,
+              49
+            ]
           },
           {
             "component": 22,
-            "fields": [29, 40]
+            "fields": [
+              29,
+              40
+            ]
           },
           {
             "component": 25,
-            "fields": [38]
+            "fields": [
+              38
+            ]
           },
           {
             "component": 26,
-            "fields": [7]
+            "fields": [
+              7
+            ]
           },
           {
             "component": 27,
-            "fields": [4, 15, 18, 25, 27, 33, 35, 41, 44, 51]
+            "fields": [
+              4,
+              15,
+              18,
+              25,
+              27,
+              33,
+              35,
+              41,
+              44,
+              51
+            ]
           },
           {
             "component": 28,
-            "fields": [14]
+            "fields": [
+              14
+            ]
           },
           {
             "component": 30,
-            "fields": [2, 26, 31],
-            "extendedFields": [58, 59, 60, 61, 62, 63]
+            "fields": [
+              2,
+              26,
+              31
+            ],
+            "extendedFields": [
+              58,
+              59,
+              60,
+              61,
+              62,
+              63
+            ]
           }
         ],
         "events": [
@@ -518,7 +699,10 @@
             "opcode": 14,
             "name": "visual",
             "confidence": "high",
-            "fields": ["entity-handle", "visual-index"]
+            "fields": [
+              "entity-handle",
+              "visual-index"
+            ]
           },
           {
             "opcode": 2,
@@ -1124,7 +1308,10 @@
       {
         "component": 1,
         "name": "drop-state",
-        "fields": [22, 54],
+        "fields": [
+          22,
+          54
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1140,7 +1327,9 @@
       {
         "component": 2,
         "name": "ai-activity",
-        "fields": [36],
+        "fields": [
+          36
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1152,7 +1341,9 @@
       {
         "component": 5,
         "name": "petal-variant",
-        "fields": [9],
+        "fields": [
+          9
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1164,7 +1355,19 @@
       {
         "component": 6,
         "name": "player-controller",
-        "fields": [1, 5, 6, 16, 20, 21, 24, 32, 34, 47, 56],
+        "fields": [
+          1,
+          5,
+          6,
+          16,
+          20,
+          21,
+          24,
+          32,
+          34,
+          47,
+          56
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1216,7 +1419,9 @@
       {
         "component": 7,
         "name": "petal-species",
-        "fields": [50],
+        "fields": [
+          50
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1228,7 +1433,10 @@
       {
         "component": 8,
         "name": "reserved-8",
-        "fields": [13, 37],
+        "fields": [
+          13,
+          37
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1244,7 +1452,9 @@
       {
         "component": 10,
         "name": "reserved-10",
-        "fields": [17],
+        "fields": [
+          17
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1256,7 +1466,9 @@
       {
         "component": 14,
         "name": "reserved-14",
-        "fields": [43],
+        "fields": [
+          43
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1268,7 +1480,10 @@
       {
         "component": 15,
         "name": "reserved-15",
-        "fields": [23, 57],
+        "fields": [
+          23,
+          57
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1284,7 +1499,19 @@
       {
         "component": 16,
         "name": "loadout-record",
-        "fields": [3, 10, 11, 12, 19, 30, 39, 42, 45, 46, 52],
+        "fields": [
+          3,
+          10,
+          11,
+          12,
+          19,
+          30,
+          39,
+          42,
+          45,
+          46,
+          52
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1336,7 +1563,9 @@
       {
         "component": 19,
         "name": "reserved-19",
-        "fields": [48],
+        "fields": [
+          48
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1348,7 +1577,10 @@
       {
         "component": 20,
         "name": "health",
-        "fields": [53, 55],
+        "fields": [
+          53,
+          55
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1364,7 +1596,11 @@
       {
         "component": 21,
         "name": "transform",
-        "fields": [8, 28, 49],
+        "fields": [
+          8,
+          28,
+          49
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1384,7 +1620,10 @@
       {
         "component": 22,
         "name": "reserved-22",
-        "fields": [29, 40],
+        "fields": [
+          29,
+          40
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1400,7 +1639,9 @@
       {
         "component": 25,
         "name": "lifecycle",
-        "fields": [38],
+        "fields": [
+          38
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1412,7 +1653,9 @@
       {
         "component": 26,
         "name": "collision-radius",
-        "fields": [7],
+        "fields": [
+          7
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1424,7 +1667,18 @@
       {
         "component": 27,
         "name": "inline-record",
-        "fields": [4, 15, 18, 25, 27, 33, 35, 41, 44, 51],
+        "fields": [
+          4,
+          15,
+          18,
+          25,
+          27,
+          33,
+          35,
+          41,
+          44,
+          51
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1472,7 +1726,9 @@
       {
         "component": 28,
         "name": "reserved-28",
-        "fields": [14],
+        "fields": [
+          14
+        ],
         "extendedFields": [],
         "specs": [
           {
@@ -1484,8 +1740,19 @@
       {
         "component": 30,
         "name": "identity",
-        "fields": [2, 26, 31],
-        "extendedFields": [58, 59, 60, 61, 62, 63],
+        "fields": [
+          2,
+          26,
+          31
+        ],
+        "extendedFields": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+        ],
         "specs": [
           {
             "field": 2,

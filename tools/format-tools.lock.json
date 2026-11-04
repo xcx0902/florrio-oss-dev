@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "note": "Exact formatting toolchain. Node packages are pinned in package.json/package-lock.json; this file pins the external binaries and the packages that provide them. Generated output identity depends on these versions, so a mismatch is a hard failure.",
+  "note": "Exact formatting toolchain for hand-written files. Node packages are pinned in package.json/package-lock.json; this file pins the external binaries and the packages that provide them. A version mismatch is a hard failure. Schema-generated output is written verbatim by tools/generate.mjs and never depends on these versions.",
   "tools": {
     "clang-format": "21.1.8",
     "cmake-format": "0.6.13",

@@ -1,6 +1,10 @@
 # Paths owned by other tools or produced by builds. Prettier is also limited
 # to an explicit file list by tools/format.mjs; this file protects direct CLI
 # use from touching history, dependencies and delivery output.
+#
+# Schema-generated outputs are listed at the end: tools/generate.mjs writes the
+# template text verbatim, so Prettier must neither read nor rewrite them.
+# Change their layout only in the templates, then regenerate.
 archive/
 node_modules/
 build/
@@ -19,3 +23,16 @@ package-lock.json
 *.ico
 *.wasm
 *.gz
+
+# Schema-generated outputs (schema/generated-outputs.json is the manifest).
+schema/generated/
+schema/generated-outputs.json
+schema/catalogs/drop-chances.json
+client/src/schema/
+docs/catalogs.md
+docs/multiplayer-protocol.md
+engine/include/engine/catalog/
+engine/include/engine/net/generated_multiplayer.hpp
+engine/include/engine/net/generated_protocol.hpp
+engine/include/engine/net/packet_key.hpp
+engine/include/engine/sim/generated_motion.hpp

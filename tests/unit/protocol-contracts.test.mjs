@@ -6,7 +6,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readFile, writeFile, mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import ts from 'typescript';
-import { formatGeneratedText } from '../../tools/lib/format-tools.mjs';
 import {
   parseProtocol,
   compileProtocol,
@@ -25,15 +24,9 @@ const read = (relative) => readFile(path.join(root, relative), 'utf8');
 test('generated C++/TS and saved protocol exactly match YAML, covering 63 fields and 19 groups', async () => {
   assert.equal(
     await read('engine/include/engine/net/generated_protocol.hpp'),
-    await formatGeneratedText(
-      'engine/include/engine/net/generated_protocol.hpp',
-      generateProtocolCpp(contract),
-    ),
+    generateProtocolCpp(contract),
   );
-  assert.equal(
-    await read('client/src/schema/protocol.ts'),
-    await formatGeneratedText('client/src/schema/protocol.ts', generateProtocolTs(contract)),
-  );
+  assert.equal(await read('client/src/schema/protocol.ts'), generateProtocolTs(contract));
   assert.deepEqual(
     JSON.parse(await read('schema/generated/protocol-contracts.json')).protocol,
     contract,

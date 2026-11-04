@@ -1,14 +1,16 @@
 /**
- * Resolve the pinned formatting toolchain.
+ * Resolve the pinned formatting toolchain for hand-written files.
  *
  * Every entry point fails closed when a tool is missing or has another
- * version: a formatter difference would silently change generated output
- * identity, so falling back to an arbitrary installed binary is not allowed.
+ * version: a formatter difference would silently rewrite hand-written sources,
+ * so falling back to an arbitrary installed binary is not allowed.
+ *
+ * Schema-generated output is never formatted: `tools/generate.mjs` writes the
+ * templates verbatim, so these tools only serve `tools/format.mjs`.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -93,53 +95,6 @@ export function resolveTool(name, { env = process.env, pathLookup = true } = {})
   );
 }
 
-/** Format C++ source text without touching disk. */
-export function formatCppText(content, filename = 'input.hpp', { root = PRODUCT_ROOT } = {}) {
-  const tool = resolveTool('clang-format');
-  const style = `file:${path.join(root, '.clang-format')}`;
-  const result = spawnSync(tool.command, [`--style=${style}`, `--assume-filename=${filename}`], {
-    input: content,
-    encoding: 'utf8',
-    maxBuffer: 256 * 1024 * 1024,
-    timeout: 120000,
-  });
-  if (result.error) {
-    throw result.error;
-  }
-  if (result.status !== 0) {
-    throw new Error(`clang-format failed for ${filename}: ${result.stderr}`);
-  }
-  return result.stdout;
-}
-
-/** Format CMake listfile text without touching the product tree. */
-export function formatCmakeText(
-  content,
-  filename = 'CMakeLists.txt',
-  { root = PRODUCT_ROOT } = {},
-) {
-  const tool = resolveTool('cmake-format');
-  const directory = mkdtempSync(path.join(os.tmpdir(), 'florrio-cmake-format-'));
-  const temporary = path.join(directory, path.basename(filename));
-  try {
-    writeFileSync(temporary, content, 'utf8');
-    const result = spawnSync(
-      tool.command,
-      [temporary, '-i', '-c', path.join(root, '.cmake-format.yaml')],
-      { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 60000 },
-    );
-    if (result.error) {
-      throw result.error;
-    }
-    if (result.status !== 0) {
-      throw new Error(`cmake-format failed for ${filename}: ${result.stderr}`);
-    }
-    return readFileSync(temporary, 'utf8');
-  } finally {
-    rmSync(directory, { recursive: true, force: true });
-  }
-}
-
 let prettierModule = null;
 
 /** Load Prettier as a module and verify its pinned version. */
@@ -158,18 +113,4 @@ export async function loadPrettier() {
   }
   prettierModule = prettier;
   return prettier;
-}
-
-/** Format one generated text file with the formatter that owns its language. */
-export async function formatGeneratedText(relativePath, content, { root = PRODUCT_ROOT } = {}) {
-  if (/\.(hpp|h|cpp|inc)$/.test(relativePath)) {
-    return formatCppText(content, relativePath, { root });
-  }
-  if (/(^|\/)CMakeLists\.txt$|\.cmake$/.test(relativePath)) {
-    return formatCmakeText(content, relativePath, { root });
-  }
-  const prettier = await loadPrettier();
-  const filepath = path.join(root, relativePath);
-  const options = (await prettier.resolveConfig(filepath, { editorconfig: true })) ?? {};
-  return prettier.format(content, { ...options, filepath });
 }

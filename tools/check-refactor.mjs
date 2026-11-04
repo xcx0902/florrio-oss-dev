@@ -100,7 +100,8 @@ function listFiles() {
   } catch {
     files = walk(PRODUCT_ROOT, '');
   }
-  return files.filter(Boolean).sort();
+  // Git still lists a deleted-but-unstaged file; only files on disk are scanned.
+  return files.filter((file) => file && existsSync(path.join(PRODUCT_ROOT, file))).sort();
 }
 
 function walk(directory, prefix) {
