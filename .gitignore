@@ -28,3 +28,6 @@ reports/*
 
 # OS noise
 .DS_Store
+
+# CodeGraph
+.codegraph/
