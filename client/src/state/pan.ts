@@ -1,17 +1,16 @@
-/** Mouse camera pan from original763 queuePlayerInput, recovered in
- * The camera pan follows the render-frame transform.
- * These are world offsets at game +2056/+2060 == state +2048/+2052. */
+/** Mouse camera pan fed by queued input. The pan is smoothed per render frame
+ * and expressed as world offsets. */
 export interface PanState {
   readonly x: number;
   readonly y: number;
 }
 
 export interface PointerMovementInput {
-  /** Cached native input transform (+152/+160), including the previous pan
-   * and arena clamp applied by updateWorldTransform409. */
+  /** Cached input transform, including the previous pan and the arena clamp
+   * applied by the world-transform update. */
   readonly displayedX: number;
   readonly displayedY: number;
-  /** Mouse coordinates in viewport pixels, matching the native i32 inputs. */
+  /** Mouse coordinates in viewport pixels, truncated to i32 on use. */
   readonly mouseX: number;
   readonly mouseY: number;
   /** Current camera projection, before this frame's follow/zoom update. */
@@ -23,10 +22,10 @@ export interface PointerMovementInput {
   readonly viewportHeight: number;
 }
 export interface PointerMovement {
-  /** Original802 atan2f direction in radians. */
+  /** atan2f direction in radians. */
   readonly angle: number;
-  /** Raw world distance narrowed to f32, as sent by native mouse controls.
-   * This is neither the capped pan factor nor a normalized movement input. */
+  /** Raw world distance narrowed to f32. This is neither the capped pan factor
+   * nor a normalized movement input. */
   readonly strength: number;
 }
 export interface PanInput extends PointerMovementInput {
@@ -50,8 +49,8 @@ const atanLow = [
   5.01215824399992e-9, 3.774894707930798e-8, 3.447321716976148e-8, 7.549789415861596e-8,
 ];
 
-/** Native atan2 approximation. The polynomial keeps the browser and wasm
- * divides in f32 before this polynomial; rounding Math.atan2 differs by ULPs. */
+/** f32 atan2 approximation: the ratio is divided in f32 before the polynomial,
+ * so rounding Math.atan2 differs by ULPs. */
 function atanFloat(value: number): number {
   const absolute = floatBits(value) & 0x7fffffff;
   if (absolute > 0x4c7fffff) {
@@ -94,7 +93,7 @@ function atanFloat(value: number): number {
   return value < 0 ? -result : result;
 }
 
-/** Original802: f32 ratio, signed quadrants and split-pi correction. */
+/** f32 ratio, signed quadrants and split-pi correction. */
 function atan2Float(y: number, x: number): number {
   const rawX = floatBits(x),
     rawY = floatBits(y);
@@ -122,7 +121,7 @@ function atan2Float(y: number, x: number): number {
   return quadrant === 2 ? f(f(Math.PI) - corrected) : f(corrected - f(Math.PI));
 }
 
-/** Native mouse movement, before queuePlayerInput applies its UI suppression.
+/** Raw mouse movement before queued input applies its UI suppression.
  * Inputs use a finite camera projection with positive zoom. Pan enablement
  * does not affect movement; keyboard/touch inputs use their separate rules. */
 export function getPointerMovement(input: PointerMovementInput): PointerMovement {
@@ -140,7 +139,7 @@ export function getPointerMovement(input: PointerMovementInput): PointerMovement
   return { strength: f(Math.sqrt(dx * dx + dy * dy)), angle: atan2Float(f(dy), f(dx)) };
 }
 
-/** Native pan derives from mouse movement with separate f32 narrowings.
+/** Pan derives from mouse movement with separate f32 narrowings.
  * A direct normalized dx/dy changes these results. */
 export function getPanTarget(input: PanInput): PanState {
   if (input.enabled === false) {
@@ -155,7 +154,7 @@ export function getPanTarget(input: PanInput): PanState {
 }
 
 /** Pure update: retain this result per local player and pass x/y as world
- * offsets to camera follow. Delta remains f64 here, as in queuePlayerInput. */
+ * offsets to camera follow. Delta remains f64 here. */
 export function updatePanState(previous: PanState, input: PanInput): PanState {
   const target = getPanTarget(input);
   const blend = Math.max(0, Math.min(1, 1 - Math.pow(0.95, input.deltaMs * 0.06)));

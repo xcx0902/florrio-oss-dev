@@ -12,6 +12,11 @@
 
 import { PUBLISHABLE_TYPE_ID_MAX } from './wire-ids.mjs';
 
+/** Type id 0 means "no published type". */
+const NO_TYPE_ID = 0;
+/** Type ids are unsigned bytes; any negative id is invalid. */
+const MIN_TYPE_ID = 0;
+
 const f32 = Math.fround;
 const fail = (message) => {
   throw new Error(`drop rules: ${message}`);
@@ -75,7 +80,7 @@ export function validateDropInputs({ entities, spawnRules, petals, rules }) {
       fail('entity must be an object');
     }
     integer(entity.typeId, 'entity.typeId');
-    if (entity.typeId < 0 || entity.typeId > PUBLISHABLE_TYPE_ID_MAX) {
+    if (entity.typeId < MIN_TYPE_ID || entity.typeId > PUBLISHABLE_TYPE_ID_MAX) {
       fail(`entity.typeId ${entity.typeId} is outside uint8`);
     }
     if (entityIds.has(entity.typeId)) {
@@ -91,7 +96,7 @@ export function validateDropInputs({ entities, spawnRules, petals, rules }) {
     }
     for (const petalId of entity.petalTypeIds) {
       integer(petalId, `entity ${entity.typeId} petalTypeId`);
-      if (petalId < 0 || petalId > PUBLISHABLE_TYPE_ID_MAX) {
+      if (petalId < MIN_TYPE_ID || petalId > PUBLISHABLE_TYPE_ID_MAX) {
         fail(`entity ${entity.typeId} petalTypeId ${petalId} is outside uint8`);
       }
       if (!petals.some((petal) => petal.typeId === petalId)) {
@@ -169,7 +174,7 @@ export function validateDropInputs({ entities, spawnRules, petals, rules }) {
         fail(`spawn rule ${rule.index} band ${band} is outside 0..${bands - 1}`);
       }
     }
-    if (rule.entityTypeId < 0 || rule.entityTypeId > PUBLISHABLE_TYPE_ID_MAX) {
+    if (rule.entityTypeId < MIN_TYPE_ID || rule.entityTypeId > PUBLISHABLE_TYPE_ID_MAX) {
       fail(`spawn rule ${rule.index} entityTypeId is outside uint8`);
     }
     if (!byId.has(rule.entityTypeId)) {
@@ -179,7 +184,7 @@ export function validateDropInputs({ entities, spawnRules, petals, rules }) {
 
   for (const petal of petals) {
     integer(petal.typeId, 'petal.typeId');
-    if (petal.typeId < 0 || petal.typeId > PUBLISHABLE_TYPE_ID_MAX) {
+    if (petal.typeId < MIN_TYPE_ID || petal.typeId > PUBLISHABLE_TYPE_ID_MAX) {
       fail(`petal.typeId ${petal.typeId} is outside uint8`);
     }
     integer(petal.rarityIndex, `petal ${petal.typeId} rarityIndex`);
@@ -271,7 +276,7 @@ export function deriveDropChances({ entities, spawnRules, petals, rules }) {
 
   const sources = new Map();
   for (const entity of entities) {
-    if (entity.typeId === 0 || alias.has(entity.typeId)) {
+    if (entity.typeId === NO_TYPE_ID || alias.has(entity.typeId)) {
       continue;
     }
     for (const petal of entity.petalTypeIds) {
@@ -284,7 +289,7 @@ export function deriveDropChances({ entities, spawnRules, petals, rules }) {
 
   const chances = new Map(entities.map((entity) => [entity.typeId, new Map()]));
   for (const petal of petals) {
-    if (petal.typeId === 0) {
+    if (petal.typeId === NO_TYPE_ID) {
       continue;
     }
     const petalSources = sources.get(petal.typeId);

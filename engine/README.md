@@ -48,9 +48,8 @@ Strict options include `-Wall -Wextra -Werror -ffp-contract=off -fno-fast-math
   they do not initialize or access WorkerApi.
 
 `abi-exports.json` is the only export list: 8 core and 5 product diagnostics,
-plus malloc/free and explicit toolchain support. Original replay/contact/field
-probe exports, ComponentStore, skeleton writers and full-field injection state
-are retired. No original adapter is linked.
+plus malloc/free and explicit toolchain support. Replay, contact and field-probe exports, ComponentStore, skeleton writers and
+full-field injection state are retired; no compatibility adapter is linked.
 
 World destruction invalidates ownership, AI, pickup, effect and spatial records
 once; read-only publication observes it and the room finishes tick changes after
@@ -89,10 +88,10 @@ Strict engine options are PRIVATE, and do not propagate into the host or Boost.
 
 `initialize_world(World&, WorldConfig)` owns handle/game/death seeds and optional
 population. `advance_world(World&)` performs exactly one 50ms simulation followed
-by the legacy six RNG draws, even without snapshot publication. The low-level
+by the six end-of-tick RNG draws, even without snapshot publication. The low-level
 `tick()` keeps its existing phase ordering. Native hosts initialize new Worlds
-with explicit config; offline init on an existing Worker preserves its historical
-independent death-shuffle stream. No connection-count RNG behavior is introduced.
+with explicit config; offline init on an existing Worker keeps its own death-shuffle
+stream. No connection-count RNG behavior is introduced.
 
 The native-only test compares isolated runs against interleaved Worlds with
 different seeds, including explicit domain values, snapshots, events, RNG and

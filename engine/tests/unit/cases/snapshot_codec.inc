@@ -114,8 +114,8 @@ void test_input_decoder() {
   CHECK(string_messages[2].command.texts.size() == 3);
   CHECK(string_messages[2].command.texts[2] == "c");
 
-  // Malformed / truncated packets follow the original lossy readers: OOB byte
-  // and varint reads return zero, and the command still dispatches.
+  // Malformed / truncated packets decode leniently: out-of-bounds byte and
+  // varint reads return zero, and the command still dispatches.
   {
     std::vector<engine::InputMessage> empty_messages;
     CHECK(engine::decode_input_packet(std::span<const std::uint8_t>{}, key, empty_messages) ==

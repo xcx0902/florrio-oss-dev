@@ -78,7 +78,7 @@ Packet snapshot(WorkerApi& api, std::uint32_t sequence = 1U) {
       byte(1U);
       scalar(5U);
       (void)reader.read_cstring().value();  // 6
-      require(reader.read_bytes(10U).size() == 10U, "complete dense field16 array");
+      require(reader.read_bytes(10U).size() == 10U, "complete dense kept-items array");
       byte(20U);
       scalar(21U);
       scalar(24U);

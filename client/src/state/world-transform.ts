@@ -3,7 +3,7 @@ import { interpolateEntity } from './interpolation.js';
 import type { PanState } from './pan.js';
 import type { EntityState } from './world.js';
 
-/** Original760 tests interpolated collider bounds against a viewport expanded
+/** Tests interpolated collider bounds against a viewport expanded
  * by 100 world units on each side, independently of artwork dimensions. */
 export interface WorldViewportBounds {
   readonly left: number;
@@ -42,9 +42,9 @@ export function isOutsideWorldViewport(
   return isOutsideWorldBounds(x, y, radius, worldViewportBounds(camera));
 }
 
-/** Original409 constrains the controlled player's interpolated transform after
- * adding pan. Its result is cached until original763 invalidates transforms,
- * after queuePlayerInput has consumed the previous render's cached value. */
+/** Constrains the controlled player's interpolated transform after adding pan.
+ * The result is cached until the per-frame invalidation, once queued input has
+ * consumed the previous render's cached value. */
 export function playerWorldPosition(
   entity: EntityState,
   now: number,

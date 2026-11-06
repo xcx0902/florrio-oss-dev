@@ -4,10 +4,9 @@
 
 namespace engine {
 
-/** Shared timed-effect payload. The original allocates one effect object and
- * transfers unique ownership into an area; every tracked target's effect
- * vector holds the same pointer. Reference counting is explicit so a payload
- * can outlive the area while targets still reference it. */
+/** Shared timed-effect payload. One payload is created per area or callback and
+ * every tracked target's effect slot points at it. Reference counting is
+ * explicit so a payload can outlive the area while targets still reference it. */
 struct EffectPayload {
   virtual ~EffectPayload() = default;
 

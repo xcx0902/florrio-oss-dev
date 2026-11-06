@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   LEGACY_PATTERNS,
   codeLines,
@@ -16,7 +17,7 @@ function counts(text) {
   return result;
 }
 
-test('legacy patterns match the representations they own', () => {
+test('historical-representation patterns match what they own', () => {
   const text = [
     'callback 74 and attack_callback',
     'entity + 184 and constructor: -27',
@@ -102,4 +103,10 @@ test('the checked-in ledger covers only known patterns and real files', () => {
     assert.ok(Object.keys(files).length > 0, `${id} has no files`);
   }
   assert.equal(actual.scanned > 400, true);
+});
+
+test('the checked-in ledger is empty after P6', () => {
+  const url = new URL('../../tools/refactor/legacy-baseline.json', import.meta.url);
+  const baseline = JSON.parse(readFileSync(url, 'utf8'));
+  assert.deepEqual(baseline.patterns, {});
 });

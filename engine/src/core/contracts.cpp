@@ -1,9 +1,8 @@
 // Product ABI invariants that every engine_core build must satisfy.
 //
 // These checks describe the current domain types and the generated wire
-// protocol. They intentionally do not mention the retired original memory
-// layout, EntitySlot, or probe output: a successful compilation here proves the
-// product's own byte-width and handle rules, not equivalence with the archive.
+// protocol: a successful compilation here proves the product's own byte-width,
+// field-width and handle rules.
 #include "engine/core/f32.hpp"
 #include "engine/model/entity.hpp"
 #include "engine/net/generated_protocol.hpp"

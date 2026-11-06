@@ -50,7 +50,7 @@ void integrate_movement(World& world, double delta_milliseconds) {
       if (!entity.active) {
         continue;
       }
-      // Original 654 integrates local angle first (transform +8 / +72).
+      // The local angle integrates first, before linear motion.
       const f32 angular_step = f32::from_double(delta_milliseconds * 0.001 *
                                                 static_cast<double>(entity.angular_velocity.value));
       if (std::fabs(static_cast<double>(angular_step.value)) >= 1.1920928955078125e-07) {
@@ -74,8 +74,8 @@ void integrate_movement(World& world, double delta_milliseconds) {
       entity.set_position_y(f32(motion.y));
       entity.velocity.x = motion.vx;
       entity.velocity.y = motion.vy;
-      // Original 167 caches a union including attached children; any transform
-      // change invalidates the entity and its owner chain.
+      // The bounds cache includes attached children; any transform change
+      // invalidates the entity and its owner chain.
       invalidate_bounds(world, entity.handle);
     }
   });
@@ -92,14 +92,14 @@ void constrain_entity(World& world, EntityHandle handle) {
   if (entity == nullptr || !entity->active) {
     return;
   }
-  // Original 401 skips only when the dedicated +56 parent link is live. The
-  // shipped centipede/ant-hole records leave +56 at zero (the owner at +236 is
-  // a different field), so no domain skip is needed here.
+  // The constraint follows the AI predecessor link, not ordinary ownership.
+  // Chain segments carry a live predecessor; Ant Hole children carry none, so
+  // they are left unconstrained.
   const EntityHandle predecessor = entity->ai.predecessor;
   if (predecessor.valid()) {
     Entity* parent = world.entities().get(predecessor);
     if (parent != nullptr) {
-      // Original 401: f32(f32(own radius + 0.0001) + predecessor radius). The
+      // Link distance: f32(f32(own radius + 0.0001) + predecessor radius). The
       // intermediate f32 rounding is observable in the clamped position.
       const f32 own_plus = f32(entity->collision_radius.value + 0.0001F);
       const f32 link_radius = f32(own_plus.value + parent->collision_radius.value);
@@ -108,7 +108,7 @@ void constrain_entity(World& world, EntityHandle handle) {
                   static_cast<double>(entity->position.x.value);
       double dy = static_cast<double>(parent->position.y.value) -
                   static_cast<double>(entity->position.y.value);
-      // Original 401 first writes the facing angle from the unclamped vector.
+      // The facing angle is written first from the unclamped vector.
       entity->angle = f32::from_double(linked_angle(dy, dx));
       const double length_squared = dx * dx + dy * dy;
       if (length_squared > distance * distance) {
@@ -138,7 +138,7 @@ void constrain_entity(World& world, EntityHandle handle) {
 void constrain_linked_entities(World& world) {
   // Only chain roots are entry points: a segment with a live predecessor is
   // reached recursively from its head. Ant Hole children have no predecessor
-  // link and are not affected by original 401.
+  // link and are not constrained.
   std::vector<EntityHandle> roots;
   world.entities().with_ordered_slots([&](auto&& slots) {
     for (const auto& entity : slots) {

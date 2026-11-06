@@ -79,7 +79,7 @@ void test_status_effects_and_slow() {
   CHECK(std::fabs(engine::slow_multiplier(*player_entity).value - 0.5F) < 1e-6F);
   CHECK(engine::apply_effect(world, player, engine::EffectType::kSlow, engine::f32(0.5F), 1000.0,
                              mob2));
-  // Original608 multiplies active slow effects (0.5 * 0.5), not min().
+  // Active slow effects multiply (0.5 * 0.5); they do not take the minimum.
   CHECK(std::fabs(engine::slow_multiplier(*player_entity).value - 0.25F) < 1e-6F);
   CHECK((engine::effect_flags(*player_entity) & 6U) == 6U);
   (void)engine::update_effects(world, 2000.0);
@@ -131,8 +131,8 @@ void test_slow_does_not_scale_integrate_movement() {
   CHECK(engine::apply_effect(world, mob, engine::EffectType::kSlow, engine::f32(0.25F), 1000.0,
                              source));
   engine::integrate_movement(world, 50.0);
-  // Original654 never multiplies acceleration by the effect multiplier; slow
-  // is applied by the behavior that produces velocity (e.g. original608).
+  // Movement never multiplies acceleration by the effect multiplier; slow is
+  // applied by the behavior that produces velocity.
   CHECK(entity->position.x.value == unslowed.value);
 }
 
@@ -154,8 +154,8 @@ void test_attribution_and_legendary() {
   const engine::Entity* attributed_corpse = world.entities().get(mob);
   CHECK(attributed_corpse != nullptr);
   CHECK(attributed_corpse->death_processed);
-  // The replicated killer-name field belongs to player deaths only (original
-  // updateKillerName); a mob dying to the player must not populate it.
+  // The replicated killer-name field belongs to player deaths only; a mob dying
+  // to the player must not populate it.
   CHECK(!engine::test::player(world).last_killer().valid());
   CHECK(engine::test::player(world).last_killer_name().empty());
   CHECK(engine::test::player(world).profile().level() > 0U ||
@@ -185,12 +185,16 @@ void test_loadout_restore_and_backpack() {
   profile.set_inventory_count(6);
   engine::PlayerLoadout loadout;
   loadout.restore_from_profile(profile);
-  CHECK(loadout.slots()[0].type_id == 1);
-  CHECK(loadout.slots()[1].type_id == 2);
-  CHECK(loadout.slots()[5].type_id == 3);
+  CHECK(loadout.slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+  CHECK(loadout.slots()[1].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
+  CHECK(loadout.slots()[5].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
   CHECK(loadout.slots()[6].count == 0);
   CHECK(loadout.set_slot_type(profile, 0, 4));
-  CHECK(loadout.slots()[0].type_id == 4);
+  CHECK(loadout.slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kRockRare));
   CHECK(profile.inventory(0) == 4);
   CHECK(!loadout.set_slot_type(profile, 0, 4));
 
@@ -201,8 +205,8 @@ void test_loadout_restore_and_backpack() {
   engine::Entity* player = world.entities().get(engine::test::player(world).player());
   CHECK(player != nullptr);
   player->position = engine::Vec2{};
-  // Original pickup fills a carried slot; full inventory never falls through
-  // to the backpack. Keep grace, capacity and strict range failures isolated.
+  // Pickup fills a carried slot; a full inventory never falls through to the
+  // backpack. Keep grace, capacity and strict range failures isolated.
   for (std::uint8_t slot = 0; slot < engine::test::player(world).profile().inventory_size();
        ++slot) {
     CHECK(engine::test::player(world).loadout().equip(slot, 1));
@@ -242,7 +246,8 @@ void test_loadout_restore_and_backpack() {
   world.entities().get(drop)->position.x = engine::f32(65.0F);
   CHECK(engine::collect_drops(world) == 1U);
   CHECK(world.entities().get(drop)->pickup_collected);
-  CHECK(engine::test::player(world).loadout().slots()[free_slot].type_id == 2U);
+  CHECK(engine::test::player(world).loadout().slots()[free_slot].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
   CHECK(engine::test::player(world).profile().inventory(free_slot) == 2U);
   CHECK(engine::test::player(world).profile().backpack_count() == 0U);
   CHECK(engine::test::player(world).loadout().pickup_transfers().size() == 1U);
@@ -294,7 +299,7 @@ void test_petal_special_effects() {
     petal->owner = player.raw;
   }
   engine::on_petal_hit(world, web, mob, player);
-  CHECK(world.area_effects().empty());  // Original732 is a death callback.
+  CHECK(world.area_effects().empty());  // The tag area appears on death, not on hit.
   world.set_time_ms(550.0);
   for (auto& state : engine::test::player(world).petals()) {
     if (state.handle != web) {
@@ -318,8 +323,8 @@ void test_petal_special_effects() {
   }
   CHECK(web_tag);
   (void)world.update_area_effects();
-  // Honey (0.5) and the web area (0.25) are both active; original608
-  // multiplies the effect multipliers, so the combined value is 0.125.
+  // Honey (0.5) and the web area (0.25) are both active; effect multipliers
+  // multiply, so the combined value is 0.125.
   CHECK(engine::slow_multiplier(*mob_entity).value == 0.125F);
 
   const engine::EntityHandle cactus =
@@ -373,7 +378,9 @@ void test_petal_special_effects() {
   const auto* hatchling = eggs.entities().get(pet);
   CHECK(hatchling != nullptr);
   if (hatchling != nullptr) {
-    CHECK(hatchling->kind == engine::EntityKind::kMob && hatchling->type_id == 9U);
+    CHECK(hatchling->kind == engine::EntityKind::kMob &&
+          hatchling->type_id ==
+              engine::catalog::species_type_id(engine::catalog::SpeciesId::kSoldierAnt));
     CHECK(hatchling->owner == egg_owner.raw);
   }
   CHECK(eggs.entities().get(egg) != nullptr && eggs.entities().get(egg)->health.value == 0.0F);

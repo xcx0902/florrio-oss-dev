@@ -28,10 +28,14 @@ void test_loadout_reserve_cycle_and_packet_cache() {
   CHECK(engine::test::player(world).loadout().cycle_reserve_slots(
       world, engine::test::player(world), engine::test::player(world).profile()));
   CHECK(engine::test::player(world).loadout().packet_cache_epoch() > epoch_before);
-  CHECK(engine::test::player(world).loadout().slots()[6].type_id == 1U);
-  CHECK(engine::test::player(world).loadout().slots()[7].type_id == 1U);
-  CHECK(engine::test::player(world).loadout().slots()[8].type_id == 2U);
-  CHECK(engine::test::player(world).loadout().slots()[13].type_id == 7U);
+  CHECK(engine::test::player(world).loadout().slots()[6].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+  CHECK(engine::test::player(world).loadout().slots()[7].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+  CHECK(engine::test::player(world).loadout().slots()[8].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
+  CHECK(engine::test::player(world).loadout().slots()[13].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kStingerUnusual));
   const engine::Entity* player_entity = world.entities().get(player);
   CHECK(player_entity != nullptr);
   CHECK(player_entity->packet_epoch_a ==
@@ -69,9 +73,9 @@ void test_contact_nearest_candidate_first() {
     entity->max_health = engine::f32(10.0F);
   }
   (void)engine::resolve_contacts(world);
-  // Slot order is left/center/right. The original broad phase visits the
-  // nearest candidate first, so center is pushed right by left and then left
-  // again by right: the net position stays on the left side of the origin.
+  // Slot order is left/center/right. The broad phase visits the nearest
+  // candidate first, so center is pushed right by left and then left again by
+  // right: the net position stays on the left side of the origin.
   const engine::Entity* moved = world.entities().get(center);
   CHECK(moved != nullptr);
   CHECK(moved->position.x.value < 0.0F);
@@ -88,8 +92,8 @@ void test_chain_constraint_clamps_segments() {
   engine::Entity* head_entity = world.entities().get(head);
   CHECK(head_entity != nullptr);
   CHECK(head_entity->children.size() == 1U);
-  // Move the head far enough that every link is stretched, then run the
-  // original 401 constraint pass.
+  // Move the head far enough that every link is stretched, then run the chain
+  // constraint pass.
   head_entity->position.x = engine::f32(500.0F);
   engine::constrain_linked_entities(world);
   std::size_t links = 0;

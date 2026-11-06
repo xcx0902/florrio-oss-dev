@@ -169,7 +169,7 @@ serve.mjs     静态服务器
 npm run setup:format        # 安装锁定的 clang-format/cmake-format（.emcache）
 npm run format:check        # 手写文本的只读格式检查（schema 生成物原样输出，不经过 formatter）
 npm run lint                # ESLint 结构与未使用符号检查
-npm run check:refactor      # 历史表示/编号规则台账
+npm run check:refactor      # 历史表示/编号规则检查（台账必须为空）
 npm run build:engine        # 原生 Release 构建
 npm run test:engine         # 构建 + 19 项 engine CTest（含 M02—M04）
 npm run build:server        # 原生 WebSocket 服务 + 锁定依赖 + native identity

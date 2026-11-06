@@ -20,9 +20,9 @@ export function flowerEntries(state: HudState): readonly FlowerEntry[] {
         .sort((a, b) => b.score - a.score)
         .slice(0, 10);
 }
-/** Source format strings at 15745/14099/13648: %.0f, %.1fk, %.1fm.
- * The archived func1983 rounds half-integers down at precision zero;
- * its one-decimal abbreviation path rounds exact ties to even. */
+/** Score format strings: %.0f, %.1fk, %.1fm.
+ * Half-integers round down at precision zero; the one-decimal abbreviation
+ * path rounds exact ties to even. */
 export function formatScore(score: number): string {
   const absolute = Math.abs(score);
   const value =
@@ -83,9 +83,9 @@ export function drawPanelContent(
     );
     context.stroke();
     const score = `- ${formatScore(displayedScore)}`;
-    // func1132/819 lays out two left-aligned cache boxes as one centered
-    // line. Their outline margins overlap at the join; long names retain
-    // native font size rather than being independently fitted to the bar.
+    // Two left-aligned cache boxes form one centered line. Their outline
+    // margins overlap at the join; long names keep their font size rather
+    // than being independently fitted to the bar.
     const nameWidth = f(measureLabel(entry.name, 13) + 6);
     const scoreWidth = f(measureLabel(score, 13) + 6);
     const left = f(f(f(6 - f(nameWidth + scoreWidth)) * 0.5) + 100);
@@ -112,7 +112,7 @@ export function drawPanelContent(
       false,
     );
   });
-  // func1132 draws the header last, with square lower corners.
+  // The header draws last, with square lower corners.
   context.beginPath();
   context.moveTo(5, 0);
   context.lineTo(195, 0);
@@ -142,8 +142,8 @@ export function drawFlowerPanel(
   context.save();
   const x = layout.logicalWidth - 230 + slide;
   if (canvasAvailable()) {
-    // The native panel cache compares displayed strings and score fractions,
-    // rather than invalidating on each fractional step toward a score target.
+    // The panel cache compares displayed strings and score fractions, rather
+    // than invalidating on each fractional step toward a score target.
     const rows = entries.map(
       (entry) =>
         [

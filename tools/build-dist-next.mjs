@@ -38,7 +38,7 @@ if (
     'reference',
     'web',
     'upstream',
-    'legacy',
+    'archive',
     'dist',
     'dist-readable',
     'dist-reference',

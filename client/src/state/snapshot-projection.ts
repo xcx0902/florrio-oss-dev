@@ -1,4 +1,5 @@
 import { INVENTORY_SLOTS } from './loadout-limits.js';
+import { byteField, numberField, stringField } from './snapshot-fields.js';
 import type { EntitySnapshot, DeathMetadata } from './snapshot-types.js';
 
 interface DomainProjection {
@@ -20,24 +21,22 @@ interface DomainProjection {
  * field id; the component tables describe encoding, not projection. Field 26
  * remains the accepted permanent domain extension. */
 export function projectDomain(values: Readonly<Record<number, unknown>>): DomainProjection {
-  const numberField = (field: number): number | undefined => {
-    const value = values[field];
-    return typeof value === 'number' ? value : undefined;
+  const value = (field: number): number | undefined => {
+    const raw = values[field];
+    return typeof raw === 'number' ? raw : undefined;
   };
-  const species = numberField(2);
-  const kind = numberField(26);
-  const health = numberField(53);
-  const maxHealth = numberField(55);
-  const variant = numberField(31);
-  const radius = numberField(7);
-  const level = numberField(62);
-  const progressRaw = numberField(58);
-  const score = numberField(59);
+  const species = value(2);
+  const kind = value(26);
+  const health = value(53);
+  const maxHealth = value(55);
+  const variant = value(31);
+  const level = value(62);
+  const progressRaw = value(58);
   return {
     typeId: kind ?? species ?? 0,
     level,
     levelProgress: progressRaw === undefined ? undefined : (progressRaw & 0xffff) / 65535,
-    score,
+    score: value(59),
     kind,
     speciesId: species,
     variant,
@@ -45,17 +44,18 @@ export function projectDomain(values: Readonly<Record<number, unknown>>): Domain
     maxHealth: maxHealth ?? 0,
     healthKnown: health !== undefined,
     maxHealthKnown: maxHealth !== undefined,
-    radius,
+    radius: value(7),
   };
 }
 
-/** The identity component keeps field 60 authoritative while an equipped petal
- * is recharging and has no live world entity. */
+/** Field 60 stays authoritative while an equipped petal is recharging and has
+ * no live world entity. Dense group 60 replaces the whole array; sparse element
+ * deltas override individual indices. */
 export function playerLoadoutSlots(
   player: EntitySnapshot,
   count = INVENTORY_SLOTS,
 ): number[] | undefined {
-  const sparse = player.byteArrayFields?.[60] ?? player.inventory;
+  const sparse = player.byteArrayFields?.[60];
   const dense = player.denseFields?.[60];
   if (sparse === undefined && !Array.isArray(dense)) {
     return undefined;
@@ -74,6 +74,8 @@ export function playerLoadoutSlots(
   return slots;
 }
 
+/** Field 61 holds the eight active-slot recharge progress values (0..65535);
+ * dense group 61 replaces the array, sparse deltas override one index. */
 export function playerSlotProgress(player: EntitySnapshot): number[] | undefined {
   const sparse = player.shortArrayFields?.[61],
     dense = player.denseFields?.[61];
@@ -100,10 +102,8 @@ export function playerSlotProgress(player: EntitySnapshot): number[] | undefined
 export function loadoutSlots(entities: Iterable<EntitySnapshot>, count = 5): number[] {
   const slots: number[] = Array.from({ length: count }, () => 0);
   for (const entity of entities) {
-    const slot =
-      entity.byteFields?.[11] ?? entity.denseByteFields?.[11] ?? entity.denseFields?.[11];
-    const instance =
-      entity.byteFields?.[12] ?? entity.denseByteFields?.[12] ?? entity.denseFields?.[12];
+    const slot = byteField(entity, 11);
+    const instance = byteField(entity, 12);
     if (typeof slot !== 'number' || !Number.isInteger(slot) || slot < 0 || slot >= count) {
       continue;
     }
@@ -118,36 +118,29 @@ export function loadoutSlots(entities: Iterable<EntitySnapshot>, count = 5): num
   return slots;
 }
 
+/** A player controller record carries the controlled-body reference (56) and
+ * the controller byte (20). */
 export function isController(entity: EntitySnapshot): boolean {
-  return (
-    (entity.referenceFields?.[56] ?? entity.varintFields?.[56] ?? entity.denseFields?.[56]) !==
-      undefined && (entity.byteFields?.[20] ?? entity.denseFields?.[20]) !== undefined
-  );
+  return numberField(entity, 56) !== undefined && numberField(entity, 20) !== undefined;
 }
+
+/** Any death/profile marker that makes the death overlay meaningful. */
 export function hasDeathMetadata(entity: EntitySnapshot): boolean {
   return (
-    entity.byteFields?.[34] !== undefined ||
-    entity.byteFields?.[47] !== undefined ||
-    entity.floatFields?.[21] !== undefined ||
-    entity.stringFields?.[6] !== undefined ||
+    numberField(entity, 34) !== undefined ||
+    numberField(entity, 47) !== undefined ||
+    numberField(entity, 21) !== undefined ||
+    stringField(entity, 6) !== undefined ||
     entity.byteArrayFields?.[16] !== undefined ||
     entity.denseFields?.[34] !== undefined
   );
 }
+
 export function projectDeathMetadata(entity: EntitySnapshot | undefined): DeathMetadata {
   const controller = entity;
-  // The profile record carries these values as
-  // sparse fields. The live domain transport scopes the same values onto the
-  // controlled body's dense group 72, so accept either representation.
-  const dense = controller?.denseFields;
-  const denseString = (field: number): string | undefined => {
-    const value = dense?.[field];
-    return typeof value === 'string' ? value : undefined;
-  };
-  const denseNumber = (field: number): number | undefined => {
-    const value = dense?.[field];
-    return typeof value === 'number' ? value : undefined;
-  };
+  // The profile record carries these values as sparse fields. The live domain
+  // transport scopes the same values onto the controlled body's dense group, so
+  // both encodings are read through the same field accessors.
   const items = Array.from({ length: 10 }, () => 0);
   for (const entry of controller?.byteArrayFields?.[16] ?? []) {
     if (entry.index >= 0 && entry.index < items.length) {
@@ -155,7 +148,7 @@ export function projectDeathMetadata(entity: EntitySnapshot | undefined): DeathM
     }
   }
   if (!controller?.byteArrayFields?.[16]) {
-    const packed = dense?.[16];
+    const packed = controller?.denseFields?.[16];
     if (Array.isArray(packed)) {
       for (let index = 0; index < items.length; ++index) {
         if (typeof packed[index] === 'number') {
@@ -164,29 +157,25 @@ export function projectDeathMetadata(entity: EntitySnapshot | undefined): DeathM
       }
     }
   }
-  // The first three eligible petals become ground drops. Controller field
-  // 16 contains up to ten remaining survivors for the next spawn.
-  const keptCount = Math.max(0, Math.min(10, controller?.byteFields?.[34] ?? denseNumber(34) ?? 0));
+  // The first three eligible petals become ground drops. Controller field 16
+  // contains up to ten remaining survivors for the next spawn.
+  const keptCount = Math.max(0, Math.min(10, numberField(controller, 34) ?? 0));
+  const deathLevel = numberField(controller, 47) ?? 0;
   return {
-    killerName: controller?.stringFields?.[6] ?? denseString(6) ?? '',
+    killerName: stringField(controller, 6) ?? '',
     keptCount,
     keptItems: items.slice(0, keptCount),
-    score: controller?.floatFields?.[21] ?? denseNumber(21) ?? 0,
-    deathLevel: controller?.byteFields?.[47] ?? denseNumber(47) ?? 0,
-    // Field 47 is the level at death; field 1 is the remembered spawn
-    // level. The original menu clamps the latter to a minimum of one.
-    respawnLevel: Math.max(
-      1,
-      controller?.byteFields?.[1] ??
-        denseNumber(1) ??
-        Math.floor(((controller?.byteFields?.[47] ?? denseNumber(47) ?? 0) * 3) / 4),
-    ),
-    viewerHandle:
-      controller?.referenceFields?.[56] ?? controller?.varintFields?.[56] ?? denseNumber(56),
+    score: numberField(controller, 21) ?? 0,
+    deathLevel,
+    // Field 47 is the level at death; field 1 is the remembered spawn level,
+    // clamped to a minimum of one.
+    respawnLevel: Math.max(1, numberField(controller, 1) ?? Math.floor((deathLevel * 3) / 4)),
+    viewerHandle: numberField(controller, 56),
   };
 }
 
+/** Field 63 is the zone byte (0..255); the identity dense group carries it
+ * densely. */
 export function playerZoneProgress(entity: EntitySnapshot): number {
-  const value = entity.byteFields?.[63] ?? entity.denseByteFields?.[63] ?? entity.denseFields?.[63];
-  return typeof value === 'number' ? value : 0;
+  return byteField(entity, 63) ?? 0;
 }

@@ -1,13 +1,12 @@
 import type { Canvas2DContext } from '../canvas2d/context.js';
 import { Rgb, TAU, setFill, setStroke, shade } from './palette.js';
 // ---------------------------------------------------------------------------
-// Species artwork. Evidence: entity-renderer.mjs render priority and client.wat
-// 614/615/616/782/785/1038–1045. These are domain shapes, not recorded handles.
+// Species artwork primitives: domain shapes shared by the species renderers.
 // drawWorld owns the outer entity transform and its save/restore pair.
 // ---------------------------------------------------------------------------
 /** Optional bridge additions. The primitive-only bridge remains usable; its
  * compatibility path bakes local similarity transforms into coordinates.
- * Native path/transform support preserves the original Canvas command kinds. */
+ * Path/transform support preserves the Canvas command kinds. */
 export interface SpeciesPath {
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
@@ -49,8 +48,8 @@ export const disc = (
   }
 };
 /** Similarity transforms only (all species' internal transforms are uniform
- * scale/rotation/translation). Never substitute ellipse for a native arc when
- * the bridge offers transform(). No screen-space assumptions live here. */
+ * scale/rotation/translation). Never substitute an ellipse for an arc when the
+ * bridge offers transform(). No screen-space assumptions live here. */
 export function localContext(
   context: Canvas2DContext,
   scale = 1,
@@ -127,8 +126,8 @@ export function inLocal(
   draw(localContext(context, scale, angle, x, y));
   context.restore();
 }
-/** Native690 saves only the logical matrix around each eye; Canvas state is
- * saved solely for the pupil clip and the enclosing face expression pass. */
+/** Only the logical matrix is saved around each eye; Canvas state is saved
+ * solely for the pupil clip and the enclosing face expression pass. */
 export function inLocalTransform(
   context: Canvas2DContext,
   draw: (local: Canvas2DContext) => void,
@@ -147,8 +146,8 @@ export function inLocalTransform(
   context.setTransform(...matrix);
 }
 /** Every rectangle is composed from the same caller matrix and
- * restores it without a Canvas save. Expanded zero products retain native
- * f32 grouping (including signed zero and nonfinite propagation). */
+ * restores it without a Canvas save. Expanded zero products retain f32
+ * grouping (including signed zero and nonfinite propagation). */
 export function fillArtRectangle(
   context: Canvas2DContext,
   x: number,

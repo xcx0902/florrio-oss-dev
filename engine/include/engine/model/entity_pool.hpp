@@ -79,8 +79,8 @@ class EntityPool {
     return owns(handle) ? &(*entities_)[handle.index()] : nullptr;
   }
   /** Reserve slots at the front of the free list without activating them.
-   * The original world keeps three storage records in slots 0..2, so the first
-   * gameplay entity is allocated from slot 3. */
+   * World initialization reserves three slots (0..2), so the first gameplay
+   * entity is allocated from slot 3. */
   void reserve_front(std::uint32_t count) {
     while (count-- > 0U && !free_.empty()) {
       free_.pop_front();
@@ -135,7 +135,7 @@ class EntityPool {
   };
   [[nodiscard]] ActiveRange<false> active_entities() { return ActiveRange<false>(this); }
   [[nodiscard]] ActiveRange<true> active_entities() const { return ActiveRange<true>(this); }
-  // Select once per phase. Dense consumers receive the original array;
+  // Select once per phase. Dense consumers receive the full entity array;
   // sparse consumers receive a live bitset range. Keep the active check.
   template <class Visitor>
   [[gnu::always_inline]] decltype(auto) with_ordered_slots(Visitor&& visit) {
@@ -157,7 +157,7 @@ class EntityPool {
   [[nodiscard]] const std::array<Entity, kEntitySlotCount>& entities() const { return *entities_; }
 
  private:
-  // Dense phases scan the original array, so avoid maintaining an unused
+  // Dense phases scan the full entity array, so avoid maintaining an unused
   // bitmap during their allocation churn. Every bitset read synchronizes
   // first, including ++ after a mutation inside a live dense ActiveRange.
   void ensure_active_index() const {

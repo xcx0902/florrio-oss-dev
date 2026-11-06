@@ -6,7 +6,7 @@
 
 namespace engine {
 
-/** Level, experience and inventory state restored by the original spawn path.
+/** Level, experience and inventory state carried across a respawn.
  * Inventory slots hold petal type ids; zero means empty. */
 class PlayerProfile {
  public:
@@ -69,7 +69,8 @@ class PlayerProfile {
   }
 
   /** Add experience and level up while the current threshold is reached.
-   * Thresholds and the growth factor are the recovered original formulas. */
+   * Each threshold is floor(1.06^(level-1) * level) + 3, evaluated in f64 and
+   * narrowed once; the running total pays it and keeps the remainder. */
   void add_experience(f32 amount);
   void clear();
 

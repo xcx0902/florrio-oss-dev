@@ -1,5 +1,8 @@
 /** Pure catalog/menu view rendering. No writes and no archived inputs. */
 
+/** Type id 0 means "no published type"; gallery rows start at 1. */
+const NO_TYPE_ID = 0;
+
 const cppFloat = (value) => {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     throw new Error(`invalid float ${value}`);
@@ -582,7 +585,7 @@ export function applyGalleryOverrides(derived, overrides, entities) {
 export function generateMobGalleryTs(derived, overrides, catalogEntities) {
   const entities = applyGalleryOverrides(derived, overrides, catalogEntities);
   const rows = entities
-    .filter((entry) => entry.typeId > 0)
+    .filter((entry) => entry.typeId > NO_TYPE_ID)
     .map(
       (entry) =>
         `  ${entry.typeId}: { rarity: ${entry.rarity}, drops: [${entry.drops.map((drop) => `{ petalTypeId: ${drop.petalTypeId}, chance: ${drop.chance} }`).join(', ')}] },`,

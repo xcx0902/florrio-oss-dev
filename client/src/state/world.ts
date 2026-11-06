@@ -74,7 +74,7 @@ export class WorldState {
     if (!player) {
       return [];
     }
-    const key = player.byteArrayFields?.[60] ?? player.inventory ?? player.denseFields?.[60];
+    const key = player.byteArrayFields?.[60] ?? player.denseFields?.[60];
     if (
       !this.loadoutCache ||
       this.loadoutCache.player !== player.handle ||
@@ -196,7 +196,7 @@ export class WorldState {
   private readonly visualEvents = new Map<number, VisualEventState>();
   private readonly hitTimes = new Map<number, number>();
   private readonly collected = new Set<number>();
-  /** The native control component survives player death and respawn. */
+  /** The controlled entity record survives player death and respawn. */
   private controlledCamera: EntityState | undefined;
 
   applyFullSnapshot(snapshot: Snapshot, now: number): void {
@@ -211,7 +211,7 @@ export class WorldState {
       this.entities.set(entity.handle, {
         ...entity,
         // Synthetic traces apply at clock 0; treat those as already settled so
-        // the archived first frame keeps the native full-size drop card.
+        // the first frame keeps the full-size drop card.
         firstSeenAt: previous?.firstSeenAt ?? (now > 0 ? now : Number.NEGATIVE_INFINITY),
         arrivalMarked: previous?.arrivalMarked ?? (entity.flags & EntityFlag.Arrival) !== 0,
         previousX: previous?.x ?? entity.x,
@@ -229,8 +229,8 @@ export class WorldState {
     this.indexMembership();
   }
 
-  /** Merge an original-style snapshot that may contain only a subset of the
-   * gameplay fields. Missing position/health/flags keep the prior state. */
+  /** Merge a delta snapshot that may contain only a subset of the gameplay
+   * fields. Missing position/health/flags keep the prior state. */
   applyDeltaSnapshot(snapshot: Snapshot, now: number): void {
     this.sequence = snapshot.sequence;
     this.serverTime = snapshot.serverTime;
@@ -241,13 +241,13 @@ export class WorldState {
     }
     for (const entity of snapshot.entities) {
       const previous = this.entities.get(entity.handle);
-      // The original scalar receiver samples the value currently on screen
-      // before installing the next target (entity-snapshot/readInterpolated).
+      // The interpolation samples the value currently on screen before
+      // installing the next target.
       // Using the previous target makes a 20 Hz stream rotate petals too far
       // ahead; resetting every clock for a health-only update causes a jump.
       const displayed = previous ? interpolateEntity(previous, now) : entity;
-      // The native control component already exists at the menu with a zero
-      // camera target. Joining attaches the player to that component; its
+      // The camera control record already exists at the menu with a zero
+      // camera target. Joining attaches the player to that record; its
       // first follow coordinates therefore interpolate from the origin.
       const displayedCamera = previous
         ? interpolateCameraTarget(previous, now)
@@ -300,7 +300,7 @@ export class WorldState {
         displayed.y,
         now,
       );
-      const hasAngle = entity.angleField8 !== undefined || hasDense(8);
+      const hasAngle = entity.floatFields?.[8] !== undefined || hasDense(8);
       const hasRadius = hasFloat(7) || hasDense(7);
       const hasScore = hasFloat(59) || hasDense(59);
       const displayedScore =
@@ -314,8 +314,7 @@ export class WorldState {
                     Math.min(1, (now - (previous.receivedScoreAt ?? previous.receivedAt)) / 120),
                   ),
             );
-      const rawVisualFlags =
-        entity.byteFields?.[38] ?? entity.denseByteFields?.[38] ?? entity.denseFields?.[38];
+      const rawVisualFlags = entity.byteFields?.[38] ?? entity.denseFields?.[38];
       const visualFlags =
         typeof rawVisualFlags === 'number' ? rawVisualFlags : previous?.visualFlags;
       const mergedDenseFields =
@@ -329,7 +328,7 @@ export class WorldState {
         a !== undefined && b !== undefined ? { ...a, ...b } : (b ?? a);
       let mergedFloatFields = mergeRecord(previous?.floatFields, entity.floatFields);
       let mergedByteFields = mergeRecord(previous?.byteFields, entity.byteFields);
-      // Dense and sparse records write the same native component slots.
+      // Dense and sparse records write the same component fields.
       // Keep the current field view coherent when the encoding changes, so
       // an older sparse flag cannot hide a newer dense activity/effect byte.
       for (const [fieldText, value] of Object.entries(entity.denseFields ?? {})) {
@@ -347,7 +346,7 @@ export class WorldState {
       const mergedReferenceFields = mergeRecord(previous?.referenceFields, entity.referenceFields);
       const mergedStringFields = mergeRecord(previous?.stringFields, entity.stringFields);
       const mergedBitFields = mergeRecord(previous?.bitFields, entity.bitFields);
-      const mergedDenseByteFields = mergeRecord(previous?.denseByteFields, entity.denseByteFields);
+      const mergedDoubleFields = mergeRecord(previous?.doubleFields, entity.doubleFields);
       const mergeIndexed = <T extends { readonly index: number }>(
         a: Readonly<Record<number, readonly T[]>> | undefined,
         b: Readonly<Record<number, readonly T[]>> | undefined,
@@ -386,7 +385,7 @@ export class WorldState {
         };
       }
       // Only this record can supply a new angle. A dense value retained from
-      // an earlier packet must not override a subsequent sparse field 8.
+      // an earlier packet must not override the angle of a later sparse record.
       const dense8 = entity.denseFields?.[8];
       const angle = hasAngle
         ? typeof dense8 === 'number'
@@ -401,7 +400,8 @@ export class WorldState {
       const radius = entity.radius ?? previous?.radius;
       const speciesId = entity.speciesId ?? previous?.speciesId;
       const typeId =
-        kind ?? (entity.typeId !== 0 ? entity.typeId : (previous?.typeId ?? entity.typeId));
+        kind ??
+        (entity.typeId !== EntityKind.None ? entity.typeId : (previous?.typeId ?? entity.typeId));
       const merged: EntityState = {
         ...entity,
         firstSeenAt: previous?.firstSeenAt ?? (now > 0 ? now : Number.NEGATIVE_INFINITY),
@@ -435,14 +435,13 @@ export class WorldState {
         componentMask: entity.componentMask ?? previous?.componentMask,
         denseFields: mergedDenseFields,
         floatFields: mergedFloatFields,
+        doubleFields: mergedDoubleFields,
         byteFields: mergedByteFields,
         varintFields: mergedVarintFields,
         referenceFields: mergedReferenceFields,
         stringFields: mergedStringFields,
         bitFields: mergedBitFields,
-        denseByteFields: mergedDenseByteFields,
         byteArrayFields: mergedByteArrays,
-        inventory: mergedByteArrays?.[60],
         shortArrayFields: mergedShortArrays,
         varintArrayFields: mergeIndexed(previous?.varintArrayFields, entity.varintArrayFields),
         handleArrayFields: mergeIndexed(previous?.handleArrayFields, entity.handleArrayFields),
@@ -556,7 +555,7 @@ export class WorldState {
       if (!entry) {
         return [];
       }
-      const nickname = entry.records.find((record) => record.stringField4)?.stringField4;
+      const nickname = entry.records.find((record) => record.stringFields?.[4])?.stringFields?.[4];
       return entry.records.map((record) => {
         const entity = {
           ...record,
@@ -674,8 +673,8 @@ export class WorldState {
   all(): IterableIterator<EntityState> {
     return this.entities.values();
   }
-  /** The controller record is the only entity carrying field 56 (viewer
-   * handle); its death fields remain after the controlled body is removed. */
+  /** The controller record is the only entity carrying the viewer handle;
+   * its death fields remain after the controlled body is removed. */
   controller(): EntityState | undefined {
     if (this.controllerHandle !== undefined) {
       const controller = this.entities.get(this.controllerHandle);
@@ -683,7 +682,7 @@ export class WorldState {
         return controller;
       }
     }
-    // The original controller storage record is not a gameplay entity. A
+    // The controller storage record is not a gameplay entity. A
     // few snapshots merge its profile fields onto the controlled body when
     // both records use the same wire slot; keep that body usable as the
     // death metadata source instead of showing the menu fallbacks.
@@ -724,7 +723,7 @@ export class WorldState {
   get count(): number {
     return this.entities.size;
   }
-  /** Original event14 marks the pickup visual as owned by its HUD transfer. */
+  /** Collecting a pickup marks its visual as owned by the HUD transfer. */
   markCollected(handle: number): void {
     this.collected.add(handle);
   }

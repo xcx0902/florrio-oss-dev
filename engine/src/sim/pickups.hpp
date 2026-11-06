@@ -3,6 +3,6 @@
 #include <cstddef>
 
 namespace engine {
-// Original advanceTimedEntitiesAndAi, before population, AI and movement.
+// Runs in the timed-entity phase, before population, AI and movement.
 std::size_t advance_pickups(World& world, double delta_milliseconds);
 }

@@ -8,13 +8,13 @@ export interface HudContext extends Canvas2DContext {
   stroke(path?: Path2D): void;
 }
 
-/** The native renderer keeps a logical f32 matrix and flushes only before an
- * operation that consumes it. Text blits restore that logical matrix without
- * emitting a native save/restore pair for every label (text.mjs func443).
+/** The HUD keeps a logical f32 matrix and flushes only before an operation
+ * that consumes it. Text blits restore that logical matrix without emitting a
+ * save/restore pair for every label.
  */
 export function hudRenderer(native: Canvas2DContext): HudContext {
   let matrix: Matrix = [1, 0, 0, 1, 0, 0];
-  // The caller's native matrix can still be the world pass's cached matrix.
+  // The caller's canvas matrix can still be the world pass's cached matrix.
   let flushed: Matrix = [NaN, NaN, NaN, NaN, NaN, NaN];
   const states: { matrix: Matrix; flushed: Matrix }[] = [];
   const flush = (): void => {

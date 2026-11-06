@@ -413,12 +413,12 @@ void SnapshotEncoder::write_mask_handle_array_field3(EntityHandle handle,
 }
 
 void SnapshotEncoder::write_mask_float_angle8(EntityHandle handle, std::uint32_t component_mask,
-                                              float field5, std::uint16_t angle_raw) {
+                                              float camera_x, std::uint16_t angle_raw) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(55U);
   updates_.write_u32_le(component_mask);
   updates_.write_varint32(5);
-  updates_.write_f32_le(field5);
+  updates_.write_f32_le(camera_x);
   updates_.write_varint32(3);  // 8 - 5
   updates_.write_u16_le(angle_raw);
   updates_.write_u8(0);
@@ -579,15 +579,15 @@ void SnapshotEncoder::write_dense_angle_float_group(EntityHandle handle, std::ui
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_identity_base(EntityHandle handle, std::uint8_t field2,
-                                                std::uint8_t field26, std::uint8_t field31,
-                                                std::uint32_t field58) {
+void SnapshotEncoder::write_dense_identity_base(EntityHandle handle, std::uint8_t species,
+                                                std::uint8_t kind, std::uint8_t variant,
+                                                std::uint32_t level_progress) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
-  updates_.write_u8(field2);
-  updates_.write_u8(field26);
-  updates_.write_u8(field31);
-  updates_.write_varint32(field58);
+  updates_.write_u8(species);
+  updates_.write_u8(kind);
+  updates_.write_u8(variant);
+  updates_.write_varint32(level_progress);
   PERF_ADD(fields, (4U));
   ++update_count_;
 }
@@ -635,118 +635,122 @@ void SnapshotEncoder::write_dense_reference_group(EntityHandle handle, std::uint
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_inline_record(EntityHandle handle, std::string_view field4,
-                                                std::uint32_t field15, double field18,
-                                                std::string_view field25, float field27,
-                                                bool field33, double field35, std::uint32_t field41,
-                                                std::uint32_t field44, std::uint32_t field51) {
+void SnapshotEncoder::write_dense_inline_record(EntityHandle handle, std::string_view display_name,
+                                                std::uint32_t inline_varint, double inline_double,
+                                                std::string_view inline_text, float inline_float,
+                                                bool inline_bit, double secondary_double,
+                                                std::uint32_t reserved_varint_a,
+                                                std::uint32_t reserved_varint_b,
+                                                std::uint32_t reserved_varint_c) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
-  for (const char byte : field4) {
+  for (const char byte : display_name) {
     updates_.write_u8(static_cast<std::uint8_t>(byte));
   }
   updates_.write_u8(0);
-  updates_.write_varint32(field15);
-  updates_.write_f64_le(field18);
-  for (const char byte : field25) {
+  updates_.write_varint32(inline_varint);
+  updates_.write_f64_le(inline_double);
+  for (const char byte : inline_text) {
     updates_.write_u8(static_cast<std::uint8_t>(byte));
   }
   updates_.write_u8(0);
-  updates_.write_f32_le(field27);
-  updates_.write_u8(field33 ? 1U : 0U);
-  updates_.write_f64_le(field35);
-  updates_.write_varint32(field41);
-  updates_.write_varint32(field44);
-  updates_.write_varint32(field51);
+  updates_.write_f32_le(inline_float);
+  updates_.write_u8(inline_bit ? 1U : 0U);
+  updates_.write_f64_le(secondary_double);
+  updates_.write_varint32(reserved_varint_a);
+  updates_.write_varint32(reserved_varint_b);
+  updates_.write_varint32(reserved_varint_c);
   PERF_ADD(fields, (10U));
   ++update_count_;
 }
 
 void SnapshotEncoder::write_dense_loadout_record(
-    EntityHandle handle, std::span<const std::uint32_t> field3,
-    std::span<const std::string_view> field10, std::uint8_t field11, std::uint8_t field12,
-    float field19, std::uint32_t field30, std::span<const std::uint32_t> field39, float field42,
-    float field45, std::uint8_t field46, std::uint32_t field52) {
+    EntityHandle handle, std::span<const std::uint32_t> handles,
+    std::span<const std::string_view> names, std::uint8_t slot, std::uint8_t instance,
+    float reserved_float_a, std::uint32_t reserved_varint_a,
+    std::span<const std::uint32_t> reserved_varints, float reserved_float_b, float reserved_float_c,
+    std::uint8_t reserved_byte, std::uint32_t reserved_varint_b) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
-  for (const std::uint32_t value : field3) {
+  for (const std::uint32_t value : handles) {
     updates_.write_u32_le(value);
   }
-  for (const std::string_view value : field10) {
+  for (const std::string_view value : names) {
     for (const char byte : value) {
       updates_.write_u8(static_cast<std::uint8_t>(byte));
     }
     updates_.write_u8(0);
   }
-  updates_.write_u8(field11);
-  updates_.write_u8(field12);
-  updates_.write_f32_le(field19);
-  updates_.write_varint32(field30);
-  for (const std::uint32_t value : field39) {
+  updates_.write_u8(slot);
+  updates_.write_u8(instance);
+  updates_.write_f32_le(reserved_float_a);
+  updates_.write_varint32(reserved_varint_a);
+  for (const std::uint32_t value : reserved_varints) {
     updates_.write_varint32(value);
   }
-  updates_.write_f32_le(field42);
-  updates_.write_f32_le(field45);
-  updates_.write_u8(field46);
-  updates_.write_varint32(field52);
+  updates_.write_f32_le(reserved_float_b);
+  updates_.write_f32_le(reserved_float_c);
+  updates_.write_u8(reserved_byte);
+  updates_.write_varint32(reserved_varint_b);
   PERF_ADD(fields, (11U));
   ++update_count_;
 }
 
 void SnapshotEncoder::write_dense_player_controller(
-    EntityHandle handle, std::uint8_t field1, float field5, std::string_view field6,
-    std::span<const std::uint8_t> field16, std::uint8_t field20, float field21, float field24,
-    float field32, std::uint8_t field34, std::uint8_t field47, std::uint32_t field56) {
+    EntityHandle handle, std::uint8_t spawn_level, float camera_x, std::string_view killer_name,
+    std::span<const std::uint8_t> kept_items, std::uint8_t controller_byte, float death_score,
+    float camera_y, float reserved_float, std::uint8_t kept_count, std::uint8_t death_level,
+    std::uint32_t viewer_handle) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(62U);
-  updates_.write_u8(field1);
-  updates_.write_f32_le(field5);
-  for (const char byte : field6) {
+  updates_.write_u8(spawn_level);
+  updates_.write_f32_le(camera_x);
+  for (const char byte : killer_name) {
     updates_.write_u8(static_cast<std::uint8_t>(byte));
   }
   updates_.write_u8(0);
-  for (const std::uint8_t value : field16) {
+  for (const std::uint8_t value : kept_items) {
     updates_.write_u8(value);
   }
-  updates_.write_u8(field20);
-  updates_.write_f32_le(field21);
-  updates_.write_f32_le(field24);
-  updates_.write_f32_le(field32);
-  updates_.write_u8(field34);
-  updates_.write_u8(field47);
-  updates_.write_u32_le(field56);
+  updates_.write_u8(controller_byte);
+  updates_.write_f32_le(death_score);
+  updates_.write_f32_le(camera_y);
+  updates_.write_f32_le(reserved_float);
+  updates_.write_u8(kept_count);
+  updates_.write_u8(death_level);
+  updates_.write_u32_le(viewer_handle);
   PERF_ADD(fields, (11U));
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_identity_extended(EntityHandle handle, std::uint8_t field2,
-                                                    std::uint8_t field26, std::uint8_t field31,
-                                                    std::uint32_t field58, float field59,
-                                                    std::span<const std::uint8_t> field60,
-                                                    std::span<const std::uint16_t> field61,
-                                                    std::uint8_t field62, std::uint8_t field63) {
+void SnapshotEncoder::write_dense_identity_extended(EntityHandle handle, std::uint8_t species,
+                                                    std::uint8_t kind, std::uint8_t variant,
+                                                    std::uint32_t level_progress, float live_score,
+                                                    std::span<const std::uint8_t> inventory,
+                                                    std::span<const std::uint16_t> recharge,
+                                                    std::uint8_t level, std::uint8_t zone) {
   updates_.write_u32_le(handle.to_wire());
   updates_.write_u8(126U);  // flags=8|64 (72) XOR 54
-  updates_.write_u8(field2);
-  updates_.write_u8(field26);
-  updates_.write_u8(field31);
-  updates_.write_varint32(field58);
-  updates_.write_f32_le(field59);
-  for (const std::uint8_t value : field60) {
+  updates_.write_u8(species);
+  updates_.write_u8(kind);
+  updates_.write_u8(variant);
+  updates_.write_varint32(level_progress);
+  updates_.write_f32_le(live_score);
+  for (const std::uint8_t value : inventory) {
     updates_.write_u8(value);
   }
-  for (const std::uint16_t value : field61) {
+  for (const std::uint16_t value : recharge) {
     updates_.write_varint32(value);
   }
-  updates_.write_u8(field62);
-  updates_.write_u8(field63);
+  updates_.write_u8(level);
+  updates_.write_u8(zone);
   PERF_ADD(fields, (9U));
   ++update_count_;
 }
 
-void SnapshotEncoder::write_dense_drop_state(EntityHandle handle, std::uint8_t field22,
-                                             std::uint8_t field54) {
-  const std::array<std::uint8_t, 2> values{{field22, field54}};
+void SnapshotEncoder::write_dense_drop_state(EntityHandle handle, std::uint8_t drop_species,
+                                             std::uint8_t collected) {
+  const std::array<std::uint8_t, 2> values{{drop_species, collected}};
   write_dense_byte_group(handle, values);
 }
 

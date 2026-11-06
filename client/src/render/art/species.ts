@@ -17,7 +17,7 @@ import {
   style,
 } from './geometry.js';
 import { PALETTES, Rgb, TAU, flashColor, rgb, setFill, setStroke, shade } from './palette.js';
-/** Component96 consumes three independent minstd_rand values per spot. */
+/** Three independent minstd_rand values are consumed per spot. */
 export function ladybugSpots(
   handle: number,
   radius = 30,
@@ -34,7 +34,7 @@ export function ladybugSpots(
   );
 }
 export function traceLadybugBody(path: SpeciesPath): void {
-  // Native static path constants, including the f32 -> f64 promotion.
+  // Static path constants, including the f32 -> f64 promotion.
   path.arc(0, 0, 30, 0.6000000238418579, 5.683185283337728, false);
   path.quadraticCurveTo(10, 0, 24.760068893432617, 16.939273834228516);
   path.closePath();
@@ -53,8 +53,8 @@ export function usePath(
     context[operation]();
   }
 }
-/** Component96: red, dark red and yellow shells; massive uses radius/30 and
- * five spots. Outlines shade the flashed fill instead of flashing the rim. */
+/** Red, dark red and yellow shells; massive uses radius/30 and five spots.
+ * Outlines shade the flashed fill instead of flashing the rim. */
 export function drawLadybug(
   context: Canvas2DContext,
   handle: number,
@@ -99,7 +99,7 @@ export function drawLadybug(
   context.restore();
   usePath(context, path, traceLadybugBody, 'stroke');
 }
-/** Native constant-grey palettes fold their remainder to base - weight * base.
+/** Constant-grey palettes fold their remainder to base - weight * base.
  * Reassociating it as (1 - weight) * base changes truncated f32 colours. */
 export function flashGrey(base: number, flash: number): Rgb {
   if (!(flash > 0)) {
@@ -113,7 +113,7 @@ export function flashGrey(base: number, flash: number): Rgb {
 }
 export function drawStripedBug(context: Canvas2DContext, flash: number, hornet: boolean): void {
   const dark = flashGrey(51, flash);
-  // Native1040/1044 keep the yellow body's red channel at a constant 255.
+  // The yellow body's red channel stays at a constant 255.
   const body = { ...flashColor(hornet ? PALETTES.hornetBody : PALETTES.beeBody, flash), r: 255 };
   const outline = flashColor(hornet ? PALETTES.hornetOutline : PALETTES.beeOutline, flash);
   context.setLineWidth(5);
@@ -138,9 +138,9 @@ export function drawStripedBug(context: Canvas2DContext, flash: number, hornet: 
   // Warning rectangles are drawn from right to left.
   const native = context as SpeciesContext;
   if (native.transform && !native.getTransform) {
-    // Legacy bridges cannot restore a logical matrix without a Canvas save.
-    // Keep their previous trace structure; exact native410 f32 composition
-    // requires the read-only logical-matrix hook above.
+    // A bridge without save/restore cannot restore a logical matrix.
+    // Keep their trace structure; exact f32 composition requires the
+    // read-only logical-matrix hook above.
     native.transform(10, 0, 0, 40, 10, -20);
     context.fillRect(0, 0, 1, 1);
     native.transform(1, 0, 0, 1, -2, 0);
@@ -183,13 +183,13 @@ export function drawStripedBug(context: Canvas2DContext, flash: number, hornet: 
 export function drawBee(context: Canvas2DContext, flash = 0): void {
   drawStripedBug(context, flash, false);
 }
-/** Component132 applies its own scale(1.3), irrespective of the wire radius. */
+/** The hornet applies its own scale(1.3), irrespective of the wire radius. */
 export function drawHornet(context: Canvas2DContext, flash = 0): void {
   drawStripedBug(localContext(context, 1.2999999523162842), flash, true);
 }
-/** Time at rest follows the original slow cosine; movement uses the fast
- * cosine. Motion input is optional because drawSpecies's six-argument API
- * cannot infer displacement or attack flags from a wire handle. */
+/** Time at rest follows the slow cosine; movement uses the fast cosine.
+ * Motion input is optional because drawSpecies's six-argument API cannot
+ * infer displacement or attack flags from a wire handle. */
 export function insectWave(now: number, activity = 0): number {
   const time = finiteTime(now);
   const slow = f32(0.5 - Math.cos(time * 0.01) * 0.5);
@@ -271,8 +271,8 @@ export function drawAnt(
   style(head, body);
   disc(head, 0, 0, f32(size * 14));
 }
-/** Component60: two canonical uniform doubles per vertex, four RNG samples.
- * Keep f32 trig and multiplication boundaries from native785. */
+/** Two canonical uniform doubles per vertex, four RNG samples. f32 trig and
+ * multiplication boundaries are preserved. */
 export function rockPoints(
   handle: number,
   radius: number,
@@ -298,9 +298,9 @@ export function rockPoints(
   }
   return points;
 }
-// Native785 stores a Path2D in component60 +8, built once from seed/radius.
-// Intern procedural geometry per context with a bounded cache; no captured
-// entity identities or paint commands are used as artwork fixtures.
+// The Path2D is built once from seed/radius and interned per context with a
+// bounded cache; no concrete entity identities or paint commands are used as
+// artwork fixtures.
 export function drawRock(
   context: Canvas2DContext,
   handle: number,
@@ -350,7 +350,7 @@ export function drawRock(
     context.stroke();
   }
 }
-/** Component128: rounded polygon with a dark, miter-joined inset star. */
+/** Rounded polygon with a dark, miter-joined inset star. */
 export function cactusPaths(radius: number): {
   outer: (path: SpeciesPath) => void;
   inset: (path: SpeciesPath) => void;
@@ -416,7 +416,7 @@ export function drawCactus(context: Canvas2DContext, radius: number, flash = 0):
   usePath(context, cached?.outer, geometry.outer, 'fill');
   usePath(context, cached?.outer, geometry.outer, 'stroke');
 }
-/** Component88: three filled, concentric soil discs, with no rim. */
+/** Three filled, concentric soil discs, with no rim. */
 export function drawAntHole(context: Canvas2DContext, flash = 0): void {
   context.setLineWidth(7);
   context.setLineJoin('round');
@@ -430,7 +430,7 @@ export function drawAntHole(context: Canvas2DContext, flash = 0): void {
     disc(context, 0, 0, radius, false);
   }
 }
-/** Component104: animated front mandibles, a purple shell, seam, six spots. */
+/** Animated front mandibles, a purple shell, seam, six spots. */
 export function drawBeetle(
   context: Canvas2DContext,
   radius = 40,
@@ -496,7 +496,7 @@ export function drawBeetle(
     disc(context, x, y, 5, false);
   }
 }
-/** Component124 represents one segment. Head antennae are present only for
+/** Each visual represents one segment. Head antennae are present only for
  * ids15/17; ownership and world transforms place ids16/18 along the chain. */
 export function drawCentipede(context: Canvas2DContext, species: number, flash = 0): void {
   const dark = flashGrey(51, flash);
@@ -528,14 +528,14 @@ export function drawCentipede(context: Canvas2DContext, species: number, flash =
     disc(context, 55, side * 30, 5, false);
   }
 }
-/** Component64's eight quadratic legs. `phase` is accumulated movement (not
+/** Eight quadratic legs. `phase` is accumulated movement (not
  * an arbitrary handle hash); use 0 at rest. drawSpecies exposes a stable pose.
  * Call drawSpider with accumulated phase when the caller tracks motion. */
 export function drawSpider(context: Canvas2DContext, phase = 0, flash = 0): void {
   context.setLineWidth(5);
   context.setLineJoin('round');
   context.setLineCap('round');
-  // Native spider legs deliberately do not participate in hit flashing.
+  // Spider legs deliberately do not participate in hit flashing.
   setStroke(context, rgb(51, 51, 51));
   const wavePhase = f32(finiteTime(phase) * 0.015);
   for (const side of [-1, 1]) {
@@ -567,9 +567,9 @@ export function drawSquare(context: Canvas2DContext, flash = 0): void {
   context.stroke();
 }
 export interface SpeciesAnimation {
-  /** Native component64's accumulated, speed-smoothed movement phase. */
+  /** Accumulated, speed-smoothed movement phase for the legs. */
   readonly legPhase?: number;
-  /** Native components84/104's smoothed active/attack blend, in [0,1]. */
+  /** Smoothed active/attack blend, in [0,1]. */
   readonly activity?: number;
 }
 /** All 23 catalog ids (0=None). Unknown ids draw nothing rather than inventing
@@ -577,7 +577,7 @@ export interface SpeciesAnimation {
  * now is elapsed animation time in ms; flash is remaining blend in [0,1].
  * Caller owns rotation, alpha, lifecycle and the outer save/restore. The
  * optional seventh argument carries actual motion state when available;
- * the required six-argument API has the native resting pose. */
+ * the required six-argument API draws the resting pose. */
 export function drawSpecies(
   context: Canvas2DContext,
   species: number,

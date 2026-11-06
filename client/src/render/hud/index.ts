@@ -151,8 +151,8 @@ export function drawChat(
   );
   context.restore();
 }
-/** client588 rounds the level boundary to the nearest 50 world units.
- * The warning follows current position, while field63 can take 450 seconds
+/** The level boundary rounds to the nearest 50 world units.
+ * The warning follows current position, while the zone byte can take 450 seconds
  * to drain after returning to the correct zone. */
 export function zoneWarningVisible(state: HudState): boolean {
   if (state.death) {
@@ -259,7 +259,7 @@ export function drawHudLayer(
   const raster = f(layout.scale * 2.4);
   if (clear) {
     context.setTransform(1, 0, 0, 1, 0, 0);
-    // resizeCanvas and clearCanvas both clear in the archived source.
+    // Both the resize and the clear path perform this double clear.
     for (let pass = 0; pass < 2; pass++) {
       context.clearRect(
         0,
@@ -305,7 +305,7 @@ export function drawHudLayer(
   drawZoneWarning(context, state, layout, raster);
   context.restore();
 }
-/** Native menu's second clear of renderer7926712, followed by its HUD/death
+/** Second clear of the menu's 1x1 renderer, followed by its HUD/death
  * branch. That renderer retains identity, independently of the main UI scale;
  * only the logo layer uses the UI scale. amount is persistent presentation
  * state advanced by the menu owner only while world metadata is available.
@@ -356,7 +356,7 @@ export function drawMenuPreviewHud(
     context.drawImage(surface.canvas, 0, 0);
     context.restore();
   }
-  // func1095 uses the unscaled offscreen renderer for the remaining HUD.
+  // The remaining HUD uses the unscaled offscreen renderer.
   const hidden = { ...layout, scale: ratio };
   drawFlowerPanel(
     context,

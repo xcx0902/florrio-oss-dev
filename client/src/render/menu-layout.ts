@@ -1,5 +1,5 @@
 import { renderResources } from './resources.js';
-/** Shared native menu geometry. All rectangles are logical client units; the
+/** Shared menu geometry. All rectangles are logical client units; the
  * caller converts pointer coordinates with the same HUD scale. */
 import { CHANGELOG } from '../schema/menu-content.js';
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
@@ -60,7 +60,7 @@ export const MENU_RESPAWN_CARD_SIZE = 60;
 export const MENU_RESPAWN_CARD_PITCH = 70;
 /** Card centre, relative to half the logical viewport height. */
 export const MENU_RESPAWN_CARD_Y = 114.5;
-/** Native623 is called with (0, -40) in the card's local space. */
+/** Respawn tooltip anchor: (0, -40) in the card's local space. */
 export const MENU_RESPAWN_TOOLTIP_Y = -40;
 
 export function menuRespawnCardAnchor(
@@ -102,8 +102,8 @@ export const MENU_PANEL_DIMENSIONS: Readonly<
   Changelog: { x: 150, width: 500, height: 400 },
 };
 
-/** Original clientFrame places the tabs 45 logical units above the viewport
- * bottom, with ten-unit gaps between tabs. 1029 is the legacy 720px fixture. */
+/** Menu tabs sit 45 logical units above the viewport bottom, with ten-unit
+ * gaps between tabs. 1029 is the 720px fixture default. */
 export function menuTabRect(panel: MenuPanel, height = 1029): Rect {
   let x = 10;
   for (const tab of MENU_TABS) {
@@ -260,7 +260,7 @@ export const MOB_GALLERY_TYPES: readonly number[] = Object.keys(MOB_GALLERY)
       a - b,
   );
 
-/** Original multiline labels wrap the glyph advances before adding the outline. */
+/** Multiline labels wrap the glyph advances before adding the outline. */
 export function wrapMenuText(value: string, font: number, maxWidth: number): readonly string[] {
   const cache = renderResources().layouts;
   const key = `wrap:${font}:${maxWidth}:${value}`;
@@ -276,7 +276,7 @@ export function wrapMenuText(value: string, font: number, maxWidth: number): rea
     }
     let start = 0;
     while (start < paragraph.length) {
-      // Native1058 upper-bounds prefix lengths, then retreats to a space or
+      // Prefix lengths are upper-bounded, then the split retreats to a space or
       // to the character immediately after comma, hyphen or period.
       let first = start,
         count = paragraph.length - start;
@@ -420,8 +420,8 @@ export function changelogEntries(): readonly {
     return cached;
   }
   const result = CHANGELOG.map((entry) => {
-    // The native scroll area reserves 16 units, each entry 20, and the
-    // bullet and multiline label each retain their six-unit outline margin.
+    // The scroll area reserves 16 units, each entry 20, and the bullet and
+    // multiline label each retain their six-unit outline margin.
     const notes = entry.notes.map((note) =>
       wrapMenuText(note, 14, 480 - 16 - 20 - measureLabel('-', 14) - 12),
     );

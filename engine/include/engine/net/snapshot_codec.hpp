@@ -104,34 +104,39 @@ class SnapshotEncoder {
   void write_dense_angle_float_group(EntityHandle handle, std::uint16_t angle_raw, float first,
                                      float second);
   /** Partial identity component: fields 2, 26, 31 (u8) and 58 (varint). */
-  void write_dense_identity_base(EntityHandle handle, std::uint8_t field2, std::uint8_t field26,
-                                 std::uint8_t field31, std::uint32_t field58);
+  void write_dense_identity_base(EntityHandle handle, std::uint8_t species, std::uint8_t kind,
+                                 std::uint8_t variant, std::uint32_t level_progress);
   void write_dense_bit_group(EntityHandle handle, std::span<const bool> values);
   void write_dense_float_bit_group(EntityHandle handle, float value, bool bit_value);
   void write_dense_reference_group(EntityHandle handle, std::uint32_t first, std::uint32_t second);
   /** Inline record: ten fields, ending in varints 41, 44 and 51. */
-  void write_dense_inline_record(EntityHandle handle, std::string_view field4,
-                                 std::uint32_t field15, double field18, std::string_view field25,
-                                 float field27, bool field33, double field35, std::uint32_t field41,
-                                 std::uint32_t field44, std::uint32_t field51);
-  void write_dense_loadout_record(EntityHandle handle, std::span<const std::uint32_t> field3,
-                                  std::span<const std::string_view> field10, std::uint8_t field11,
-                                  std::uint8_t field12, float field19, std::uint32_t field30,
-                                  std::span<const std::uint32_t> field39, float field42,
-                                  float field45, std::uint8_t field46, std::uint32_t field52);
-  void write_dense_player_controller(EntityHandle handle, std::uint8_t field1, float field5,
-                                     std::string_view field6, std::span<const std::uint8_t> field16,
-                                     std::uint8_t field20, float field21, float field24,
-                                     float field32, std::uint8_t field34, std::uint8_t field47,
-                                     std::uint32_t field56);
+  void write_dense_inline_record(EntityHandle handle, std::string_view display_name,
+                                 std::uint32_t inline_varint, double inline_double,
+                                 std::string_view inline_text, float inline_float, bool inline_bit,
+                                 double secondary_double, std::uint32_t reserved_varint_a,
+                                 std::uint32_t reserved_varint_b, std::uint32_t reserved_varint_c);
+  void write_dense_loadout_record(EntityHandle handle, std::span<const std::uint32_t> handles,
+                                  std::span<const std::string_view> names, std::uint8_t slot,
+                                  std::uint8_t instance, float reserved_float_a,
+                                  std::uint32_t reserved_varint_a,
+                                  std::span<const std::uint32_t> reserved_varints,
+                                  float reserved_float_b, float reserved_float_c,
+                                  std::uint8_t reserved_byte, std::uint32_t reserved_varint_b);
+  void write_dense_player_controller(EntityHandle handle, std::uint8_t spawn_level, float camera_x,
+                                     std::string_view killer_name,
+                                     std::span<const std::uint8_t> kept_items,
+                                     std::uint8_t controller_byte, float death_score,
+                                     float camera_y, float reserved_float, std::uint8_t kept_count,
+                                     std::uint8_t death_level, std::uint32_t viewer_handle);
   /** Extended identity component: base + 59 f32, 60 byte[16], 61 short[8], 62/63 u8. */
-  void write_dense_identity_extended(EntityHandle handle, std::uint8_t field2, std::uint8_t field26,
-                                     std::uint8_t field31, std::uint32_t field58, float field59,
-                                     std::span<const std::uint8_t> field60,
-                                     std::span<const std::uint16_t> field61, std::uint8_t field62,
-                                     std::uint8_t field63);
+  void write_dense_identity_extended(EntityHandle handle, std::uint8_t species, std::uint8_t kind,
+                                     std::uint8_t variant, std::uint32_t level_progress,
+                                     float live_score, std::span<const std::uint8_t> inventory,
+                                     std::span<const std::uint16_t> recharge, std::uint8_t level,
+                                     std::uint8_t zone);
   /** Drop-state component (fields 22, 54), byte values only. */
-  void write_dense_drop_state(EntityHandle handle, std::uint8_t field22, std::uint8_t field54);
+  void write_dense_drop_state(EntityHandle handle, std::uint8_t drop_species,
+                              std::uint8_t collected);
   /** Mask entry plus one inline array element. */
   void write_mask_byte_array_field(EntityHandle handle, std::uint32_t component_mask,
                                    std::uint32_t field, std::uint32_t index, std::uint8_t value);
@@ -163,7 +168,7 @@ class SnapshotEncoder {
   void write_mask_handle_array_field3(EntityHandle handle, std::uint32_t component_mask,
                                       std::uint32_t index, std::uint32_t target);
   /** Mask entry with field 5 (f32) then field 8 (u16 raw angle). */
-  void write_mask_float_angle8(EntityHandle handle, std::uint32_t component_mask, float field5,
+  void write_mask_float_angle8(EntityHandle handle, std::uint32_t component_mask, float camera_x,
                                std::uint16_t angle_raw);
   void write_chat_event(std::string_view text);
   void write_entity_time_event(EntityHandle handle);

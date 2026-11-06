@@ -146,7 +146,7 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
            !publication_body_bounds(world, entity, bounds).intersects(view))) {
         continue;
       }
-      // Reuse the original creation marker: an old pickup entering the AOI
+      // Reuse the spawn-tick creation marker: an old pickup entering the AOI
       // starts settled, while a just-created pickup grows and spins in.
       const bool groundWeb = entity.kind == EntityKind::kProjectile && entity.has_tag_component &&
                              catalog::is_web_petal(entity.type_id);

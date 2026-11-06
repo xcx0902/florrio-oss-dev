@@ -28,12 +28,12 @@ function rounded(
 }
 
 /**
- * Native1099 lays out a tooltip as a stack of cached text lines:
+ * A tooltip lays out as a stack of cached text lines:
  *   width  = max(line boxWidth) + 10
  *   height = sum(font * 1.1) + 10
  * Every line box is the cached bitmap's own width (text + two outline
- * margins); the old code stretched the bitmap down to the bare measured text
- * width, which compressed glyphs and made them look narrower.
+ * margins); stretching the bitmap to the bare measured text width compresses
+ * glyphs and makes them look narrower.
  */
 export function drawPetalTooltipAt(
   context: Canvas2DContext,
@@ -56,15 +56,15 @@ export function drawPetalTooltipAt(
     height = viewportHeight / uiScale;
   const anchorLogicalX = anchorX / uiScale,
     anchorLogicalY = anchorY / uiScale;
-  // func1099 receives the unscaled font metrics and divides the anchor by the
-  // UI scale; its whole layout is then drawn under the HUD matrix. Keeping the
-  // cache font unscaled is what makes glyph advance widths and the box edges
-  // land on the same fractional pixels as the native renderer.
+  // The layout takes unscaled font metrics and divides the anchor by the
+  // UI scale; it is then drawn under the HUD matrix. Keeping the cache font
+  // unscaled is what makes glyph advance widths and the box edges land on the
+  // same fractional pixels as the rest of the HUD.
   const titleFont = 24,
     lineFont = 14;
   const titleText = info.name;
   const rarity = RARITY_NAMES[info.rarity] ?? RARITY_NAMES[0];
-  // 623 stores each definition line separately; it does not word-wrap them.
+  // Each definition line is stored separately; the text is not word-wrapped.
   const descriptionLines = info.description.split('\n').filter((line) => line.length > 0);
   const marginFor = (font: number): number => Math.trunc(font * 0.12 * 2);
   const lineWidth = (text: string, font: number): number =>
@@ -73,12 +73,12 @@ export function drawPetalTooltipAt(
   const rarityWidth = lineWidth(rarity, lineFont);
   const descriptionWidths = descriptionLines.map((line) => lineWidth(line, lineFont));
   const contentWidth = Math.max(titleWidth, rarityWidth, 0, ...descriptionWidths);
-  // The empty line inserted by 623 is initialized with the native default
-  // font (16), not the 14-unit stat font.
+  // The inserted empty line uses the default font (16), not the 14-unit stat
+  // font.
   const blankFont = 16;
   const contentHeight =
     titleFont * 1.1 + lineFont * 1.1 + blankFont * 1.1 + lineFont * 1.1 * descriptionLines.length;
-  // func1099 clamps the un-padded content edge to 15 logical units and the
+  // The un-padded content edge is clamped to 15 logical units, and the
   // rounded panel adds a fixed 5-unit padding on every side.
   const edge = 15;
   const contentLeft = Math.max(
@@ -104,8 +104,8 @@ export function drawPetalTooltipAt(
   drawLabelBox(
     context,
     { text: titleText, font: titleFont, rasterScale, fill: '#FFFFFF', stroke: '#000000' },
-    // Native623 supplies [-2] as the per-line offsets to 691/1099. Only
-    // the title receives it, compensating its larger outline margin.
+    // The per-line offset is [-2]; only the title receives it, compensating
+    // its larger outline margin.
     contentLeft - 2,
     lineTop,
     titleWidth,

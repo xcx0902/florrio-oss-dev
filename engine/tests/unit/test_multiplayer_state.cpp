@@ -1,6 +1,7 @@
 // Core-only native tests: no WorkerApi, decoder, WASM or network initialization.
 #include "../support/multiplayer.hpp"
 #include "../support/test_support.hpp"
+#include "engine/catalog/ids.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/sim/effects.hpp"
 #include "engine/sim/passives.hpp"
@@ -149,12 +150,13 @@ void profiles_are_isolated() {
   CHECK(state(*world, b).profile().inventory() == b_profile);
   CHECK(swap_player_slots(*world, a, 1, 0, 13, 2, 1));
   CHECK(state(*world, a).profile().inventory(2) == 13);
-  CHECK(state(*world, b).loadout().slots()[2].type_id == 1);
+  CHECK(state(*world, b).loadout().slots()[2].type_id ==
+        catalog::petal_type_id(catalog::PetalId::kBasicCommon));
   const auto b_hp = body(*world, b).health;
   CHECK(apply_effect(*world, state(*world, b).player(), EffectType::kHealBlock, f32(1), 1000,
                      state(*world, a).player()));
   regenerate_players(*world, 50);
-  // Even a blocked heal retains original145's binary32 health rescale.
+  // Even a blocked heal retains the binary32 health rescale.
   CHECK(body(*world, b).health == (f32(100) * b_hp) / f32(100));
 }
 

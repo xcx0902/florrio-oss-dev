@@ -35,7 +35,7 @@ std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot, std:
     if (catalog::petal_id(type) == catalog::PetalId::kNone || definition == nullptr) {
       continue;
     }
-    // definition+40 disables the orbit slot entirely.
+    // An orbitHidden definition removes the slot from the ring entirely.
     if (definition->orbitHidden) {
       continue;
     }
@@ -55,7 +55,7 @@ std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot, std:
         return orbit_index;
       }
       // Existing entities take a position; otherwise the configured instance
-      // count reserves one (petal-lifecycle assignPetalOrbitIndices).
+      // count reserves one. assign_petal_orbit_indices owns the same rule.
       if (state.loadout().handle(index, candidate).valid() || candidate < count) {
         ++orbit_index;
       }
@@ -139,8 +139,8 @@ void assign_petal_orbit_indices(PlayerState& state) {
 
 double petal_orbit_angle(const PlayerState& state, std::uint8_t orbit_index) {
   const std::uint8_t active = active_slot_count(state);
-  // Original loadout+292 stores the number of occupied orbit positions at
-  // the active-slot boundary. Use it when available; derive it from the same
+  // The loadout caches the number of occupied orbit positions at the
+  // active-slot boundary. Use it when available; derive it from the same
   // configured-instance rules for callers before the first assignment.
   std::uint8_t orbit_positions = state.loadout().orbit_positions();
   if (orbit_positions == 0U) {
@@ -162,8 +162,7 @@ double petal_orbit_angle(const PlayerState& state, std::uint8_t orbit_index) {
   const double slots = orbit_positions > 1U ? static_cast<double>(orbit_positions) : 1.0;
   const double angle = static_cast<double>(orbit_index) * kTau / slots +
                        static_cast<double>(state.loadout().orbit_phase().value);
-  // Original updatePetalOrbits wraps the angle with fmod(angle, 2*pi) before
-  // calling sin/cos.
+  // The ring angle wraps with fmod(angle, 2*pi) before sin/cos.
   return std::fmod(angle, kTau);
 }
 
@@ -187,8 +186,8 @@ void update_petal_orbit(World& world, const PetalOrbitState& state, double step_
   if (entity == nullptr) {
     return;
   }
-  // The orbit angle is kept full-width (original updatePetalOrbits computes it
-  // from the f32 loadout phase and feeds it straight to sin/cos).
+  // The orbit angle stays f64: it is built from the f32 loadout phase and fed
+  // straight to sin/cos without narrowing.
   const double radians = state.orbit_angle;
   double target_x = static_cast<double>(state.center.x.value) +
                     std::cos(radians) * static_cast<double>(state.orbit_radius.value);
@@ -210,8 +209,9 @@ void update_petal_orbit(World& world, const PetalOrbitState& state, double step_
     unit_x = dx / distance;
     unit_y = dy / distance;
   }
-  // Original updatePetalOrbits rounds only the final product to f32:
-  // f32((dx*dx + dy*dy) * 0.0011111111111111111).
+  // Only the final product narrows to f32:
+  // f32((dx*dx + dy*dy) * 0.0011111111111111111); the clamp below runs on the
+  // narrowed value widened back to f64.
   const f32 raw_factor = f32::from_double(distance_squared * 0.0011111111111111111);
   double factor = raw_factor.value;
   if (factor < 0.009999999776482582) {
@@ -239,7 +239,9 @@ void advance_loadout_orbit_phase(PlayerState& state, double step_milliseconds) {
       ++faster;
     }
   }
-  // Original data $d0 read at address 1024: 1, -1, 0, 1, -1, 0, 1, -1, 5.
+  // Phase direction per equipped Yin-Yang count, indexed modulo nine:
+  // 1, -1, 0, 1, -1, 0, 1, -1, 5. The direction cycles advance, reverse, stop
+  // as more are equipped; at eight it steps the phase five times over.
   static constexpr f32 kYinYangDirection[9] = {
       f32(1.0F), f32(-1.0F), f32(0.0F),  f32(1.0F), f32(-1.0F),
       f32(0.0F), f32(1.0F),  f32(-1.0F), f32(5.0F),
@@ -286,8 +288,8 @@ void damage_zone_locked_petals(World& world, PlayerState& state, double step_mil
   if (!state.zone_petals_disabled()) {
     return;
   }
-  // Original 654 sweeps all 8x3 equipped handles, including hatched pets that
-  // no longer have an orbit record. Damage runs the ordinary corpse path.
+  // Sweep all 8x3 equipped handles, including hatched pets that no longer have
+  // an orbit record. Damage runs the ordinary corpse path.
   for (std::uint8_t slot = 0U; slot < PlayerLoadout::kActiveSlots; ++slot) {
     for (std::uint8_t instance = 0U; instance < PlayerLoadout::kInstances; ++instance) {
       const auto handle = state.loadout().handle(slot, instance);
@@ -299,8 +301,8 @@ void damage_zone_locked_petals(World& world, PlayerState& state, double step_mil
     }
   }
   refresh_egg_pet_slots(world, state);
-  // Original advances recharge in this same slot sweep, while blocking new
-  // spawns. It does not hold an Egg's timer at zero after the pet is defeated.
+  // Recharge advances in this same slot sweep, while new spawns stay blocked.
+  // An Egg's timer is not held at zero after the pet is defeated.
   state.loadout().advance(step_milliseconds);
   state.loadout().refresh_recharge_progress(world, state);
 }
@@ -328,7 +330,7 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
       --index;
       continue;
     }
-    // Bubble (684) stays at radius 60 and, while defending for 500 ms,
+    // Bubble stays at radius 60 and, while defending for 500 ms,
     // transfers its stored momentum to the flower before popping itself.
     if (type == catalog::PetalId::kBubbleRare) {
       orbit.orbit_radius = f32(60.0F);
@@ -386,26 +388,26 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
     } else {
       orbit.orbit_radius = orbit_radius(profile, buttons);
     }
-    // Original recomputes the ring angle from the shared loadout phase every
-    // tick: petalOrbitIndex * 2*pi / unlockedSlots + loadout+284.
+    // The ring angle is recomputed from the shared loadout phase every
+    // tick: orbitIndex * 2*pi / unlockedSlots + loadout phase.
     orbit.orbit_angle = petal_orbit_angle(state, orbit.orbit_index);
     orbit.angle = f32::from_double(orbit.orbit_angle);
     if (is_rose_behavior(orbit.behavior)) {
       Entity* petal = world.entities().get(orbit.handle);
       Entity* owner = petal != nullptr ? world.entities().get(EntityHandle{petal->owner}) : nullptr;
       if (owner != nullptr && owner->health.value > 0.0F && orbit.behavior_state == 0U) {
-        // Original RoseR1 arms its 1000 ms timer even while the owner is at
-        // full health. Once armed, damage is healed almost immediately; the
-        // ten-step state below then advances once per simulation tick.
+        // The Rose arms its 1000 ms timer even while the owner is at full
+        // health. Once armed, damage is healed almost immediately; the ten-step
+        // state below then advances once per simulation tick.
         if (world.time_ms() - orbit.behavior_started_at_ms > 1000.0 &&
             owner->health.value < owner->max_health.value && !blocks_healing(*owner)) {
           orbit.behavior_state = 1U;
         }
       }
       if (owner != nullptr && orbit.behavior_state != 0U) {
-        // Original 665/682/723 marks the orbit callback handled and moves the
-        // petal toward the owner's current world position instead of applying
-        // the ordinary orbital spring. The callback receives f32 elapsed time.
+        // An armed Rose marks the orbit callback handled and moves the petal
+        // toward the owner's current world position instead of applying the
+        // ordinary orbital spring. The elapsed time narrows to f32 first.
         const double elapsed = static_cast<double>(f32::from_double(step_milliseconds).value);
         const double weight = std::clamp(1.0 - std::pow(0.8, elapsed * 0.06), 0.0, 1.0);
         const double x = static_cast<double>(petal->position.x.value);
@@ -420,7 +422,7 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
           continue;
         }
         (void)heal_entity(world, EntityHandle{petal->owner}, orbit.heal_amount);
-        // The original passes health+8 to damage, consuming the entire Rose.
+        // Passing the petal's full health to damage consumes the entire Rose.
         // This clears the equipped handle and starts its catalog recharge.
         (void)damage_entity(world, orbit.handle, petal->health, EntityHandle{});
         --index;
@@ -432,9 +434,9 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
 }
 
 std::size_t advance_pickups(World& world, double delta_milliseconds) {
-  // Original simulation-tick 845..1270 keeps all arithmetic in f64 until
-  // setLocalX/Y demotes the final position to f32. Follow runs even after the
-  // recipient dies, until its intrusive handle is actually released.
+  // All follow arithmetic stays f64 until the final position narrows to f32.
+  // Following runs even after the recipient dies, until its pickup handle is
+  // actually released.
   const double factor = std::clamp(1.0 - std::pow(0.8, delta_milliseconds * 0.06), 0.0, 1.0);
   std::size_t collected = 0;
   for (const EntityHandle handle : world.pickups()) {

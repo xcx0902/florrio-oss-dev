@@ -3,6 +3,7 @@
 #include "engine/sim/petals.hpp"
 #include "engine/sim/player_loadout.hpp"
 #include <cmath>
+#include <limits>
 
 namespace engine::diagnostics {
 bool set_entity_field(World& world, EntityHandle handle, std::uint32_t field, double value) {
@@ -38,7 +39,8 @@ bool set_loadout_slot(World& world, PlayerId id, std::uint32_t slot, std::uint32
     return false;
   }
   auto& state = *owner;
-  if (slot >= PlayerLoadout::kActiveSlots || type_id > 65535U || !state.player().valid()) {
+  if (slot >= PlayerLoadout::kActiveSlots || type_id > std::numeric_limits<std::uint16_t>::max() ||
+      !state.player().valid()) {
     return false;
   }
   if (!state.loadout().change_slot_type(world, state, state.profile(),

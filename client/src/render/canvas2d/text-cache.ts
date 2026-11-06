@@ -1,5 +1,5 @@
 import { renderResources } from '../resources.js';
-/** Reimplementation of the archived client's outlined-text cache.
+/** Outlined-text cache for canvas labels.
  *
  * The renderer rasterizes every label once into an offscreen canvas at a
  * multiple of the logical font size (`projectedScale = 2.4 * max(|a|,|b|,|c|,|d|)`
@@ -8,8 +8,7 @@ import { renderResources } from '../resources.js';
  * bitmap is therefore downsampled on screen, which is what produced the
  * characteristic soft glyph edges in the golden screenshots.
  *
- * The cache width/height formulas below mirror the recovered wasm text module
- * (`rasterizeLabel` / `drawTextLabel`):
+ * The cache width/height formulas are:
  *   height = trunc(fontPixels * 1.4)
  *   width  = trunc(measure(text @ fontPixels) + 2 * rasterScale * trunc(2 * outline))
  * The label itself is centred in that bitmap at (width / 2, height / 2).
@@ -24,18 +23,18 @@ export interface LabelSpec {
   readonly text: string;
   /** Logical font size in UI/screen units (before the current transform). */
   readonly font: number;
-  /** Offscreen raster scale; 1.68 == 2.4 * the archived 0.7 UI transform. */
+  /** Offscreen raster scale; 1.68 == 2.4 * the 0.7 UI transform. */
   readonly rasterScale: number;
   /** f32(2 * max(abs(a,b,c,d))) before the 1.2 raster oversampling margin.
-   * Supplying it preserves native hysteresis at adjacent-f32 boundaries. */
+   * Supplying it preserves the hysteresis at adjacent-f32 boundaries. */
   readonly projectedScale?: number;
-  /** Outline width as a fraction of the font size (original: 0.12). */
+  /** Outline width as a fraction of the font size (default 0.12). */
   readonly outline?: number;
   readonly fill?: string;
   readonly stroke?: string;
-  /** Force the cached bitmap width (used where the original cache predates a layout change). */
+  /** Force the cached bitmap width where a caller's layout predates the cache. */
   readonly cacheWidth?: number;
-  /** Native label owner, retaining its bitmap across supported scale changes. */
+  /** Label owner key, retaining its bitmap across supported scale changes. */
   readonly cacheKey?: string | number;
 }
 
@@ -54,7 +53,7 @@ const DEFAULT_OUTLINE = 0.12;
 export type RasterCanvas = HTMLCanvasElement | OffscreenCanvas;
 export type RasterContext2D = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
-/** Native bridge allocates OffscreenCanvas when supported, with a DOM fallback. */
+/** Allocate OffscreenCanvas when supported, with a DOM fallback. */
 export function createRasterCanvas(width: number, height: number): RasterCanvas | undefined {
   if (typeof OffscreenCanvas !== 'undefined') {
     try {
@@ -111,13 +110,13 @@ function measuringContext(): RasterContext2D | null {
   return renderResources().measureContext ?? null;
 }
 
-/** Quantize like the archived host: `(2048 * size | 0) / 2048`. */
+/** Quantize onto the 1/2048 grid: `(2048 * size | 0) / 2048`. */
 function quantizeFont(size: number): number {
   return Math.trunc(size * 2048) / 2048;
 }
 
-/** Keep the host's f64 width for func444's bitmap allocation. func385 rounds
- * that same measurement to f32 only when exposing a logical label width. */
+/** Keep the f64 measurement for bitmap allocation; the f32 value is only
+ * exposed as the logical label width. */
 function measureNative(text: string, font: number): number {
   const key = `${text}\u0000${quantizeFont(font)}`;
   const cached = renderResources().measurements.get(key);
@@ -151,8 +150,9 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
     spec.cacheKey === undefined ? undefined : renderResources().ownedLabels.get(spec.cacheKey);
   let key: string | undefined;
   if (spec.cacheKey !== undefined) {
-    // func444 compares the projected (2 * transform) scale with the stored
-    // raster scale (projected * 1.2), before adding the oversampling margin.
+    // An owner is reused while its projected scale stays within [0.4, 1.0001]
+    // of the cached raster scale (the raster is drawn at projected * 1.2,
+    // before the oversampling margin).
     // A content/style change dirties this owner even if an older bitmap with
     // the requested string happens to exist elsewhere in the cache.
     const projected = Math.fround(spec.projectedScale ?? spec.rasterScale / 1.2);
@@ -179,8 +179,8 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
     }
   }
 
-  // The renderer stores the unquantized font/scale in f32. Only the host's
-  // CSS font string is quantized; bitmap dimensions use the raster value.
+  // The renderer stores the unquantized font/scale in f32. Only the CSS font
+  // string is quantized; bitmap dimensions use the raster value.
   const fontPixels = Math.fround(Math.fround(spec.font) * Math.fround(spec.rasterScale));
   const margin = Math.trunc(Math.fround(Math.fround(spec.font * outline) * 2));
   const textWidth = measureLabel(spec.text, spec.font);
@@ -221,9 +221,9 @@ export function getLabel(spec: LabelSpec): CachedLabel | null {
   context.lineWidth = Math.fround(fontPixels * outline);
   context.strokeStyle = stroke;
   context.fillStyle = fill;
-  // The archived text module centres on integer canvas coordinates
-  // (`floor(width / 2)`), not on the fractional midpoint; that half-pixel
-  // decides the glyph antialiasing and is required for pixel parity.
+  // Labels centre on integer canvas coordinates (`floor(width / 2)`), not on
+  // the fractional midpoint; that half-pixel decides the glyph antialiasing
+  // and is required for pixel parity.
   const centerX = Math.floor(width / 2);
   const centerY = Math.floor(height / 2);
   if (outline > 0) {

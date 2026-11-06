@@ -73,7 +73,7 @@ DamageResult damage_entity_from_source(World& world, EntityHandle target, f32 am
   }
   const bool died = entity->health.value <= 0.0F;
   (void)alert_to_attacker(world, target, attacker);
-  // Original43's low option byte suppresses notification only. Health,
+  // The low option byte suppresses the hit notification only. Health loss,
   // attacker propagation and death still run; the high byte is independent.
   if (amount.value > 0.0F && (options & 0xFFU) == 0U) {
     entity->hit_epoch = static_cast<std::uint32_t>(world.tick() + 1U);

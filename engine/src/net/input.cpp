@@ -6,7 +6,7 @@ namespace engine {
 
 namespace {
 
-/** Original readString: scan to NUL or end-of-buffer, never fail. */
+/** Scan to a NUL terminator or the end of the buffer; never fails. */
 std::string read_lossy_cstring(engine::ByteReader& reader) {
   std::string value;
   while (!reader.eof()) {
@@ -19,8 +19,8 @@ std::string read_lossy_cstring(engine::ByteReader& reader) {
   return value;
 }
 
-/** Original readSanitizedFloat: the bit test maps subnormals, NaN and
- * infinities to zero. */
+/** Decode a float and map subnormals, NaN and infinities to zero; the bit test
+ * leaves every finite normal value untouched. */
 float sanitized_float(std::uint32_t bits) {
   if (((bits + 8388608U) & 2130706432U) == 0U) {
     return 0.0F;
@@ -30,15 +30,14 @@ float sanitized_float(std::uint32_t bits) {
   return value;
 }
 
-/** Original readByte: an out-of-bounds read yields zero instead of aborting the
- * whole packet. */
+/** An out-of-bounds read yields zero instead of aborting the whole packet. */
 std::uint8_t read_byte_or_zero(ByteReader& reader) {
   const auto value = reader.read_u8();
   return value ? *value : 0U;
 }
 
-/** Original readVarUint: an out-of-bounds read yields the partial value, and a
- * truncated multi-byte varint keeps the bits it did read. */
+/** An out-of-bounds read, including a varint that overruns the buffer, yields
+ * zero instead of failing the packet. */
 std::uint32_t read_varint_or_zero(ByteReader& reader) {
   const auto value = reader.read_varint32();
   return value ? *value : 0U;
@@ -53,9 +52,9 @@ std::uint32_t read_u32_or_zero(ByteReader& reader) {
 
 Status decode_input_packet(std::span<const std::uint8_t> packet, std::span<const std::uint8_t> key,
                            std::vector<InputMessage>& messages) {
-  // The original sp_server_send accepts an empty packet (the loop breaks on the
-  // cursor check) and rejects only packets above 65536 bytes by setting the
-  // connection error flag.
+  // An empty packet is a successful no-op; only a packet above 65536 bytes is
+  // rejected, and that rejection fails the whole send with an invalid-argument
+  // status.
   if (packet.size() > kMaxInputPacketBytes) {
     return Status::kInvalidArgument;
   }
@@ -67,9 +66,9 @@ Status decode_input_packet(std::span<const std::uint8_t> packet, std::span<const
   ByteReader reader(decoded);
   while (!reader.eof()) {
     const std::uint32_t sequence = read_varint_or_zero(reader);
-    // The original reads the opcode even when the sequence was the last byte;
-    // an end-of-buffer opcode read yields zero and dispatches the empty
-    // handshake, which is how the restart packet `02 04 03 06 00` terminates.
+    // The opcode is read even when the sequence was the last byte; an
+    // end-of-buffer opcode read yields zero and dispatches the empty handshake,
+    // which is how the restart packet `02 04 03 06 00` terminates.
     const std::uint32_t opcode = read_varint_or_zero(reader);
     InputCommand command;
     command.opcode = opcode;
@@ -125,7 +124,7 @@ Status decode_input_packet(std::span<const std::uint8_t> packet, std::span<const
         break;
       default: {
         // Reserved opcodes 1/9/11 and unknown commands keep the remaining bytes
-        // opaque, matching the original switch default (no operand reads).
+        // opaque: the default branch reads no operands.
         const std::size_t remaining = reader.remaining();
         const auto payload = reader.read_bytes(remaining);
         command.payload.assign(payload.begin(), payload.end());

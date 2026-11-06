@@ -39,13 +39,13 @@ engine::EntityHandle setup(engine::World& world, std::uint16_t type) {
 void recharge_cycles(std::uint16_t type) {
   engine::World world;
   const auto owner = setup(world, type);
-  const auto old = engine::test::player(world).loadout().slots()[0].instances;
+  const auto old = engine::test::player(world).loadout().handles(0);
   const auto count = engine::test::player(world).loadout().slots()[0].count;
   const auto* combat = engine::Catalog::instance().petal_combat(type);
   require(combat != nullptr, "catalog exists");
   const float heal = type == 6U ? 10.0F : type == 15U ? 22.0F : 3.5F;
   for (int cycle = 0; cycle < 2; ++cycle) {
-    const auto handles = engine::test::player(world).loadout().slots()[0].instances;
+    const auto handles = engine::test::player(world).loadout().handles(0);
     const double start = world.time_ms();
     world.entities().get(owner)->health = engine::f32(50.0F);
     for (int tick = 1; tick <= 28; ++tick) {
@@ -162,7 +162,7 @@ void lifecycle_trace() {
     for (int frame = 1; frame <= 200; ++frame) {
       engine::tick(world, 50.0);
       unsigned alive = 0;
-      for (const auto handle : engine::test::player(world).loadout().slots()[0].instances) {
+      for (const auto handle : engine::test::player(world).loadout().handles(0)) {
         const auto* petal = world.entities().get(handle);
         if (petal != nullptr && petal->health.value > 0.0F) {
           ++alive;

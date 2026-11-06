@@ -99,7 +99,7 @@ function domainPacket(handle = 0x12345678) {
   return { bytes: Uint8Array.from(bytes), handle };
 }
 
-test('original mask entry projects species, kind, health and maximum', () => {
+test('mask entry projects species, kind, health and maximum', () => {
   const { bytes, handle } = domainPacket();
   const snapshot = new SnapshotDecoder().decode(bytes);
   assert.ok(snapshot);
@@ -173,7 +173,7 @@ test('schema component locations project progression, variant, radius and known 
   );
 });
 
-test('visual position, camera follow and collider radius use distinct original fields', () => {
+test('visual position, camera follow and collider radius use distinct snapshot fields', () => {
   const handle = 0x12345678;
   const fields = [
     [5, 100],
@@ -702,7 +702,7 @@ test('a sparse record without angle leaves its interpolation clock unchanged', (
   ]);
   const snapshot = decoder.decode(update);
   assert.ok(snapshot);
-  assert.equal(snapshot.entities[0].angleField8, undefined);
+  assert.equal(snapshot.entities[0].floatFields?.[8], undefined);
   world.applyDeltaSnapshot(snapshot, 50);
   assert.equal(world.get(handle).receivedAngleAt, 0);
   assert.equal(world.get(handle).angle, (Math.PI * 2 * 0x4000) / 65535);
@@ -719,7 +719,7 @@ test('sparse angle updates replace a previously dense angle', () => {
   const initial = 8192 * ((2 * Math.PI) / 65535);
   const next = 16384 * ((2 * Math.PI) / 65535);
   put(0, { angle: initial, denseFields: { 8: 8192 } });
-  put(120, { angle: next, angleField8: next });
+  put(120, { angle: next, floatFields: { 8: next } });
   assert.equal(world.get(21).angle, next);
   assert.equal(world.get(21).previousAngle, initial);
   assert.equal(world.get(21).receivedAngleAt, 120);
@@ -856,7 +856,7 @@ test('radius retargets from its displayed value with an independent field-seven 
   assert.equal(interpolateEntity(world.get(9), 170).radius, 67.5);
 });
 
-test('visual fade follows field38 rather than a zero-health heuristic', () => {
+test('visual fade follows the lifecycle byte rather than a zero-health heuristic', () => {
   const world = new WorldState();
   const put = (at, extra) =>
     world.applyDeltaSnapshot(

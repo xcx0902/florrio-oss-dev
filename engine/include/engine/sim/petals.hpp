@@ -15,42 +15,40 @@ class PlayerState;
 [[nodiscard]] f32 petal_radius(std::uint16_t type_id);
 
 /** Spawn a petal entity at its orbit position using the catalog draw radius,
- * collision radius, damage and maximum health from the recovered initializer.
- * `orbit_index` is the ring slot assigned by original function 85 (petal +18). */
+ * collision radius, damage and maximum health.
+ * `orbit_index` is the ring slot assigned by assign_petal_orbit_indices. */
 [[nodiscard]] EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id,
                                        Vec2 center, f32 orbit_radius, f32 angle,
                                        std::uint8_t slot = 0xFF, std::uint8_t instance = 0,
                                        std::uint8_t instance_count = 1,
                                        std::uint8_t orbit_index = 0);
 
-/** Recompute all petal orbit indices after a loadout mutation, mirroring
- * original function 85 (including configured missing instances and sharedOrbit
- * shared positions). */
+/** Recompute all petal orbit indices after a loadout mutation, including
+ * configured missing instances and sharedOrbit shared positions. */
 void assign_petal_orbit_indices(PlayerState& state);
 
 [[nodiscard]] std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot,
                                              std::uint8_t instance);
 
 /** Orbit angle for one petal: index*(2*pi/unlockedSlots) + loadout phase.
- * The original keeps this in double and wraps it with fmod before sin/cos. */
+ * The result stays in double and is wrapped with fmod before sin/cos. */
 [[nodiscard]] double petal_orbit_angle(const PlayerState& state, std::uint8_t orbit_index);
 
-/** Accelerate a petal toward its orbit target using the recovered
- * updatePetalOrbits acceleration/damping constants. Position integration is
- * performed by the normal movement pass. */
+/** Accelerate a petal toward its orbit target using the orbit
+ * acceleration/damping constants. Position integration is performed by the
+ * normal movement pass. */
 void update_petal_orbit(World& world, const PetalOrbitState& state, double step_milliseconds);
 
 /** Advance all petal orbits. Orbit radii follow the current input buttons and
- * each petal's recovered orbit profile; Wing uses its wave track. */
+ * each petal's orbit profile; Wing uses its wave track. */
 void update_petal_orbits(World& world, PlayerState& state, double step_milliseconds);
 
-/** Advance the shared loadout ring phase (loadout+284) with the original
- * YinYang direction table and Faster count contribution. */
+/** Advance the shared loadout ring phase using the YinYang direction table and
+ * the Faster count contribution. */
 void advance_loadout_orbit_phase(PlayerState& state, double step_milliseconds);
 
 /** Update the overlevel zone countdown and progress. When the timer reaches
- * its limit equipped petals stop recharging/spawning and take the original
- * per-tick damage. */
+ * its limit equipped petals stop recharging/spawning and take per-tick damage. */
 void update_zone_restriction(World& world, PlayerState& state, double step_milliseconds);
 void damage_zone_locked_petals(World& world, PlayerState& state, double step_milliseconds);
 
@@ -67,8 +65,8 @@ std::size_t refresh_loadout_petals(World& world, PlayerState& state, double step
 bool on_petal_destroyed(World& world, EntityHandle handle);
 
 /** Release a petal from its loadout slot without starting the recharge timer.
- * Original detachFromSlot is used by Peas, Pollen and Web projectiles; the
- * detached entity keeps flying for its remaining lifetime. */
+ * Peas, Pollen and Web projectiles use this; the detached entity keeps flying
+ * for its remaining lifetime. */
 bool detach_petal_from_slot(World& world, EntityHandle handle);
 
 /** Remove every spawned instance belonging to a loadout slot. */
@@ -81,8 +79,8 @@ void swap_slot_petals(World& world, PlayerState& state, std::uint8_t first, std:
 [[nodiscard]] EntityHandle spawn_drop(World& world, std::uint16_t type_id, Vec2 position);
 
 /** Equip a touching pickup into its selected slot and queue the actual event-14
- * transfer. Collected pickups stay for the original 2000 ms visual window.
- * Original eligibility delay / proximity query remain a separate gap. */
+ * transfer. Collected pickups stay for the 2000 ms visual window. Eligibility
+ * delay and the proximity query remain a separate gap. */
 std::size_t collect_drops(World& world);
 
 /** Initialize a slot from the petal catalog recharge and instance count. */

@@ -14,6 +14,11 @@ import { applyGalleryOverrides } from '../../tools/schema/catalogs.mjs';
 import { parseChangelog, generateMenuContent } from '../../tools/schema/menu.mjs';
 import { multiplayerOutputs } from '../../tools/schema/multiplayer.mjs';
 
+// Entity catalog ids from schema/catalogs/entities.json.
+const ROCK = 1; // Rock
+const CENTIPEDE_HEAD = 15; // CentipedeHead
+const CENTIPEDE_SEGMENT = 16; // CentipedeSegment
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const generator = path.join(root, 'tools/generate.mjs');
 const temporary = await mkdtemp(path.join(os.tmpdir(), 'florr-schema-generation-'));
@@ -225,7 +230,7 @@ test('drop derivation is deterministic and keeps the product reference mass and 
     rules: inputs.dropRules,
   });
   assert.equal(derived.constants.referenceMass, 7.031205701793481e-7);
-  assert.deepEqual(derived.entities.find((entity) => entity.typeId === 1).drops, [
+  assert.deepEqual(derived.entities.find((entity) => entity.typeId === ROCK).drops, [
     { petalTypeId: 4, chance: 0.00522140646353364 },
     { petalTypeId: 2, chance: 0.034809377044439316 },
     { petalTypeId: 3, chance: 0.10442813485860825 },
@@ -235,8 +240,8 @@ test('drop derivation is deterministic and keeps the product reference mass and 
     102,
   );
   assert.deepEqual(
-    derived.entities.find((entity) => entity.typeId === 16).drops,
-    derived.entities.find((entity) => entity.typeId === 15).drops,
+    derived.entities.find((entity) => entity.typeId === CENTIPEDE_SEGMENT).drops,
+    derived.entities.find((entity) => entity.typeId === CENTIPEDE_HEAD).drops,
   );
 });
 
@@ -264,7 +269,7 @@ test('mob gallery shows drops in descending chance order with or without overrid
   ]) {
     const gallery = applyGalleryOverrides(derived, overrides, inputs.entities.entities);
     assert.deepEqual(
-      gallery.find((entity) => entity.typeId === 1).drops.map((drop) => drop.petalTypeId),
+      gallery.find((entity) => entity.typeId === ROCK).drops.map((drop) => drop.petalTypeId),
       overrides.length ? [2, 3, 4] : [3, 2, 4],
     );
     for (const entity of gallery) {

@@ -63,8 +63,8 @@ EntityBounds collision_bounds(World& world, EntityHandle handle) {
                                   static_cast<double>(radius.value));
   bounds.valid = true;
   bounds.epoch = world.tick();
-  // The original follows entity+84; our domain list may contain stale handles
-  // after a child is removed, so ignore missing entries.
+  // The domain list may contain stale handles after a child is removed, so
+  // missing entries are ignored.
   for (const EntityHandle child : entity->children) {
     const EntityBounds child_bounds = collision_bounds(world, child);
     if (!child_bounds.valid) {

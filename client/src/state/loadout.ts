@@ -1,10 +1,10 @@
 export { playerLoadoutSlots, playerSlotProgress, loadoutSlots } from './snapshot-projection.js';
 
-/** Native func587, slot visual +24: field61 is an immediate u16 target,
- * not a 120ms interpolated field. A decrease snaps before the exponential;
- * an increase eases from the retained f32 value. New visuals start at 1.
- * The original WASM snaps within 1e-7, then stores f32. delta is the actual
- * render-frame delta.
+/** The slot recharge array holds an immediate u16 target, not a 120 ms
+ * interpolated field. A decrease snaps before the exponential ease; an increase
+ * eases from the retained f32 value, and new visuals start at 1. A change
+ * smaller than 1e-7 counts as already snapped. `deltaMilliseconds` is the
+ * actual render-frame delta.
  */
 export function advanceSlotRecharge(
   current: number,

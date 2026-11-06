@@ -16,7 +16,7 @@ export function drawDeathOverlay(
   layout: HudLayout,
   ratio: number,
 ): void {
-  // clientFrame interpolates 159188 toward 1 with pow(.95, dt * .06).
+  // Overlay opacity eases toward 1 with pow(.95, dt * .06).
   const elapsed = state.deathState?.elapsedMilliseconds;
   const amount =
     state.deathState?.progress ??
@@ -36,10 +36,10 @@ export function drawDeathOverlay(
   const centerY = f(Math.trunc(layout.logicalHeight / 2) - displacement);
   const raster = f(f(layout.scale * ratio) * 2.4);
   baseTransform(context, layout, ratio, centerX, centerY);
-  // clientFrame draws the retained petals behind the dead flower, then the
-  // dead face at 1.5x, rotated -0.2 radians. Artwork stays in entity-art.
-  // Native1095 snapshots the actual loadout. Slots 2/3/4 appear behind the
-  // face, 1/0 in front; Antennae's definition suppresses its world instance.
+  // Retained petals draw behind the dead flower, then the dead face at 1.5x,
+  // rotated -0.2 radians. Artwork stays in entity-art. The overlay snapshots
+  // the actual loadout. Slots 2/3/4 appear behind the face, 1/0 in front;
+  // Antennae's definition suppresses its world instance.
   const kept = state.deathState?.keptSlots ?? [];
   const behind = [
     [2, -48, 7.5],
@@ -118,15 +118,15 @@ export function drawDeathOverlay(
     const { index, type, size, centerX } = card;
     const alpha = tooltipAlpha?.[index] ?? 0;
     if (alpha > 0.0001) {
-      // Native1095 queues renderPetalTooltip from inside the retained-card
-      // transform but func1099 drains that queue after the cards and stats.
+      // Tooltips queued while drawing the retained cards are drained after the
+      // cards and stats.
       tooltips.push({ type, centerX, size, alpha });
     }
     filledSlot(context, type, centerX, cardY, size, scaled, raster, 1, `retained:${index}`);
   }
   context.restore();
-  // Native1095 prints the retained death statistics at the bottom-left in
-  // the HUD's logical space. Statistics and item row slide up together.
+  // Retained death statistics print at the bottom-left in the HUD's logical
+  // space. Statistics and item row slide up together.
   baseTransform(context, layout, ratio);
   const statsRaster = f(f(layout.scale * ratio) * 2.4);
   for (const [text, font, top] of [

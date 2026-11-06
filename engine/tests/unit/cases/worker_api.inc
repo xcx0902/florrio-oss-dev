@@ -49,7 +49,7 @@ void test_player_input_appearance() {
     engine::test::input(world, buttons, engine::f32(1.0F), engine::f32(0.0F));
     CHECK(entity->player_look == 40U);
     CHECK(entity->player_expression == (0xA0U | (buttons & 3U)));
-    CHECK(entity->type_id == 0U);
+    CHECK(entity->type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kNone));
   }
   engine::test::input(world, 2U, engine::f32(-1.0F), engine::f32(0.0F));
   CHECK(entity->player_look == 214U);
@@ -73,7 +73,8 @@ void test_entity_domain_state() {
       api.spawn(engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(12.5F), engine::f32(-3.25F)));
   const auto* entity = api.world().entities().get(handle);
   CHECK(entity != nullptr);
-  CHECK(entity->handle == handle && entity->type_id == 4U);
+  CHECK(entity->handle == handle &&
+        entity->type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kLadybug));
   CHECK(entity->kind == engine::EntityKind::kMob);
   CHECK(entity->position.x.value == 12.5F && entity->position.y.value == -3.25F);
   CHECK(entity->velocity.x == 0.0F && entity->velocity.y == 0.0F);
@@ -134,7 +135,7 @@ void test_worker_api() {
 
 void test_rock_construction() {
   engine::ServerRng rng(1383144482U);
-  (void)rng.next();  // function 144's three pre-configure draws
+  (void)rng.next();  // three definition-component draws precede configure_rock
   (void)rng.next();
   (void)rng.next();
   const engine::RockBody body = engine::configure_rock(rng, false);
@@ -153,7 +154,7 @@ void test_rock_construction() {
   CHECK(handle.valid());
   const auto* entity = world.entities().get(handle);
   CHECK(entity != nullptr);
-  CHECK(entity->type_id == 1);
+  CHECK(entity->type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kRock));
   CHECK(entity->radius.value == 39.513580322265625F);
   CHECK(entity->health.value == 15.805432319641113F);
   CHECK(entity->contact_damage.value == 10.0F);
@@ -165,12 +166,13 @@ void test_rock_construction() {
   band_world.initialize();
   band_world.random().seed(787621659U);
   const engine::SpawnTable table = engine::SpawnTable::from_catalog();
-  const auto band_handle = engine::spawn_from_band_with_drop_draws(
+  const auto band_handle = engine::spawn_from_band(
       band_world, table, 0, [](const engine::SpawnPosition&) { return false; });
   CHECK(band_handle.valid());
   const auto* band_entity = band_world.entities().get(band_handle);
   CHECK(band_entity != nullptr);
-  CHECK(band_entity->type_id == 1);
+  CHECK(band_entity->type_id ==
+        engine::catalog::species_type_id(engine::catalog::SpeciesId::kRock));
   CHECK(band_entity->radius.value == 39.513580322265625F);
   CHECK(band_world.random().state() == 2095254635U);
 }
@@ -302,18 +304,22 @@ void test_catalog() {
   }
   CHECK(rose_count == 3);
   CHECK(catalog.spawn_rules()[0].weight == 0.5F);
-  CHECK(catalog.spawn_rules()[0].entityTypeId == 1);
+  CHECK(catalog.spawn_rules()[0].entityTypeId ==
+        engine::catalog::species_type_id(engine::catalog::SpeciesId::kRock));
   CHECK(catalog.petal(39) == nullptr);
   const auto* rock_drops = catalog.drop_table(1);
   CHECK(rock_drops != nullptr);
   CHECK(rock_drops->dropCount == 3);
-  CHECK(rock_drops->drops[0].petalTypeId == 4);
-  CHECK(rock_drops->drops[2].petalTypeId == 3);
+  CHECK(rock_drops->drops[0].petalTypeId ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kRockRare));
+  CHECK(rock_drops->drops[2].petalTypeId ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
   CHECK(catalog.drop_table(0) != nullptr);
   CHECK(catalog.drop_table(0)->dropCount == 0);
   CHECK(catalog.drop_table(22) != nullptr);
   CHECK(catalog.petals().size() == 39);
-  CHECK(catalog.petals()[1].typeId == 1);
+  CHECK(catalog.petals()[1].typeId ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(catalog.petals()[1].rechargeMilliseconds == 2500.0F);
   CHECK(catalog.petals()[1].labelFontSize == 14.0F);
   CHECK(catalog.petals()[3].rechargeMilliseconds == 5500.0F);

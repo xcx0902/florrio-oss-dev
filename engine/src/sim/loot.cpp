@@ -11,8 +11,10 @@ namespace {
 constexpr std::size_t kRetainedDeathItems = 3;
 constexpr float kPollenConversionChance = 0.01F;
 
-/** libc++ std::shuffle with minstd_rand + independent_bits_engine, as recovered
- * from the death path. `state` is the independent engine's Park-Miller state. */
+/** Fisher-Yates shuffle whose index draws match libc++ std::shuffle over
+ * minstd_rand with independent_bits_engine: each step rejection-samples
+ * ceil(log2(range)) bits until the value falls below the range. `rng` is the
+ * independent engine's Park-Miller state. */
 void shuffle_petals(std::uint16_t* data, std::size_t count, ServerRng& rng) {
   if (count < 2) {
     return;
@@ -140,8 +142,9 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng&
 
 EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 position, Vec2 impulse,
                              Vec2d base_velocity) {
-  // Loot is a fixed-size card (original 70 px world tile), independent of the
-  // petal's combat draw radius. Using drawRadius made Mythic drops enormous.
+  // Loot is a fixed-size card (70 px world tile), independent of the petal's
+  // combat draw radius; scaling it by the draw radius would make Mythic drops
+  // enormous.
   const f32 draw_radius = f32(35.0F);
   const EntityHandle handle =
       spawn_entity(world, EntityKind::kDrop, petal_type, position, draw_radius);
@@ -150,8 +153,8 @@ EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 positi
   }
   Entity* drop = world.entities().get(handle);
   drop->collision_radius = f32(35.0F);
-  // Original spawnLoot copies the dying transform's velocity (+40/+48) plus
-  // its per-tick impulse accumulator (+56/+64), then adds the radial spread.
+  // The drop inherits the dying body's velocity plus its per-tick impulse
+  // accumulator, then adds the radial spread.
   drop->velocity = Vec2d(base_velocity.x + static_cast<double>(impulse.x.value),
                          base_velocity.y + static_cast<double>(impulse.y.value));
   drop->lifetime_remaining_ms = loot_lifetime_ms(petal_type);
@@ -179,7 +182,7 @@ bool legendary_exists(const World& world, EntityHandle dead, std::uint16_t petal
   if (equipped) {
     return true;
   }
-  // Original legendaryExists scans the world's pickup intrusive list.
+  // A copy already on the ground also suppresses the drop.
   for (const EntityHandle handle : world.pickups()) {
     const Entity* entity = world.entities().get(handle);
     if (entity != nullptr && entity->active && entity->type_id == petal_type) {
@@ -205,8 +208,9 @@ std::vector<EntityHandle> spawn_loot_drops(World& world, const std::vector<std::
     }
     Vec2 impulse;
     if (petals.size() >= 2) {
-      // Original 43 demotes the angle, calls float cos/sin, then multiplies
-      // each float result by the binary32 spread constant.
+      // The spread angle is computed in f64 and narrowed to f32; cos/sin run in
+      // f64 on that narrowed angle and each result narrows to f32 before the
+      // binary32 0.6 spread scale.
       const f32 angle =
           f32::from_double(static_cast<double>(index) * (2.0 * 3.14159265358979323846) / count);
       const f32 cosine = f32::from_double(std::cos(static_cast<double>(angle.value)));

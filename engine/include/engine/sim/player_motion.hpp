@@ -2,7 +2,7 @@
 #include "engine/sim/generated_motion.hpp"
 namespace engine {
 /** No World, collision, combat or clock ownership. Positions narrow to f32;
- * velocity and additive acceleration retain the original f64 chain. */
+ * velocity and additive acceleration stay f64 throughout. */
 struct MotionState {
   float x = 0, y = 0;
   double vx = 0, vy = 0;

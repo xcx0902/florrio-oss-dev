@@ -8,7 +8,7 @@ import { rockPoints } from './species.js';
 // ---------------------------------------------------------------------------
 // Petals and drops
 // ---------------------------------------------------------------------------
-/** Native catalogue colours, independent of rarity (rarity colours the tile). */
+/** Catalogue colours, independent of rarity (rarity colours the tile). */
 export const petalColors: Readonly<Record<number, Rgb>> = {
   [PetalId.BasicCommon]: rgb(255, 255, 255),
   [PetalId.FastCommon]: rgb(255, 255, 255),
@@ -95,10 +95,9 @@ export function petalPolygon(
   }
   context.closePath();
 }
-/** Recovered catalogue shapes. World instances and inventory icons have
- * different multiplicities (Twin/Triplet/Peas); neither is a generic disc.
- * Coordinates/colours are checked against the actual catalogue vtables in
- * client.wasm, not against the old eight-scene golden's social-media paths. */
+/** Catalogue shapes. World instances and inventory icons have different
+ * multiplicities (Twin/Triplet/Peas); neither is a generic disc. Each type has
+ * fixed coordinates and colours. */
 export function drawPetalShape(
   context: Canvas2DContext,
   type: number,
@@ -109,7 +108,7 @@ export function drawPetalShape(
   switch (type) {
     case PetalId.RockRare:
     case PetalId.SaltRare: {
-      // The original creates one irregular polygon per instance.
+      // One irregular polygon is created per instance.
       const rock = type === PetalId.RockRare;
       const points = rockPoints(seed, rock ? 14 : 12, rock ? 5 : 7);
       context.beginPath();
@@ -154,9 +153,9 @@ export function drawPetalShape(
     case PetalId.PeasRare:
     case PetalId.PeasEpic:
     case PetalId.PeasLegendary: {
-      // Native3628/3649/4283: diagonal offsets, independent fill/stroke per
-      // pea, and a persistent random initial phase in the world. Native4283
-      // uses radius 10 and offset 7 for the Legendary cluster.
+      // Diagonal offsets, independent fill/stroke per pea, and a persistent
+      // random initial phase in the world. The Legendary cluster uses radius 10
+      // and offset 7.
       const legendary = type === PetalId.PeasLegendary;
       const offset = legendary ? 7 : 6,
         radius = legendary ? 10 : 7;
@@ -399,8 +398,8 @@ export function drawPetalInstance(
     inLocal(context, draw, scale);
   }
 }
-/** Native760 component+108. Hornet projectiles have their own fixed 1.3
- * transform, round caps/joins and 5-unit stroke, independent of collider size. */
+/** Hornet projectiles use their own fixed 1.3 transform, round caps/joins and
+ * 5-unit stroke, independent of collider size. */
 export function drawHornetMissile(context: Canvas2DContext, flash = 0): void {
   inLocal(
     context,
@@ -422,7 +421,7 @@ export function drawHornetMissile(context: Canvas2DContext, flash = 0): void {
     Math.fround(1.3),
   );
 }
-/** Split Peas use native760 component+68, not the catalogue cluster. */
+/** Split Peas draw a single launched pea, not the catalogue cluster. */
 export function drawLaunchedPea(
   context: Canvas2DContext,
   type: number,
@@ -440,9 +439,8 @@ export function drawLaunchedPea(
   context.setLineWidth(3);
   context.stroke();
 }
-/** Native760 component+92: five scalloped rings and thirteen 55-unit spokes.
- * The original caches this path in a 120-unit bitmap. Keep its actual geometry
- * here so a ground Web can never be scaled into a collider-sized Missile. */
+/** Five scalloped rings and thirteen 55-unit spokes, traced at their actual
+ * size so a ground Web is never scaled into a collider-sized Missile. */
 export function drawGroundWeb(context: Canvas2DContext, progress = 1): void {
   const f = Math.fround,
     step = TAU / 13;
@@ -518,8 +516,8 @@ export function drawPetalIcon(context: Canvas2DContext, type: number, scale = 1)
       if (info.instances > 1) {
         for (let index = 0; index < info.instances; index++) {
           const phase = Math.fround((index * 6.283185) / info.instances);
-          // Native587 translates the group first. Each catalogue visual then
-          // applies its own icon rotation, preserving the cluster's orientation.
+          // The group is translated first. Each catalogue visual then applies
+          // its own icon rotation, preserving the cluster's orientation.
           inLocal(
             local,
             (part) => drawPetalShape(part, type, 0),

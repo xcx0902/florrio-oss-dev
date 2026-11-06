@@ -67,7 +67,7 @@ npm run pack:native         # platform package; use --target linux-x86_64 in CI
 ```sh
 npm run format:check        # hand-written text is formatter-clean
 npm run lint                # ESLint structural/unused rules
-npm run check:refactor      # legacy representation ledger
+npm run check:refactor      # historical-representation scan (must stay empty)
 npm run test:unit           # protocol/wire unit tests
 npm run test:tools          # delivery and verification tool tests
 npm run test:engine         # native build + 19 CTest targets
@@ -93,7 +93,7 @@ npm run test:all
 ```
 
 The sole definition is `tools/verification/gates.mjs`: format check, lint,
-refactor ledger, schema check, native build/complete CTest, wasm, TS, package
+refactor scan, schema check, native build/complete CTest, wasm, TS, package
 once, unit/tools/client unit, cross-end integration, ABI, delivery integrity,
 browser scenarios/entrypoint smoke/render performance in one pinned Chromium
 process, engine performance and integration performance, plus the M01 native

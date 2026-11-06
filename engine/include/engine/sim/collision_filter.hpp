@@ -3,7 +3,7 @@
 
 namespace engine {
 
-/** Recovered collision-layer filter (original function 394). The owner record
+/** Collision-layer filter. The owner record
  * carries four flag bytes; each set bit enables one layer. A layer matches when
  * its threshold is greater than the probe and, when it has a side slot, the
  * selected side threshold is not greater than the probe. With

@@ -101,5 +101,3 @@ state.
   and timer semantics);
 - packet-cache record layout (the domain stores the same index in
   `pending_cache_`).
-
-The archived source tables contain the original field offsets for provenance.

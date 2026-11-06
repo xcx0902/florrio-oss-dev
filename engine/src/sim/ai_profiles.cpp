@@ -218,7 +218,7 @@ void configure_hornet(Entity& entity, ServerRng& rng) {
   const std::uint32_t delay_sample = rng.next();
   const std::uint32_t aggression_sample = rng.next();
   const std::uint32_t turn_sample = rng.next();
-  // Original 14's initializer calls function_102 on a {0,1} distribution for
+  // The initializer draws from a {0,1} distribution for
   // the attack-speed sign before configureBehavior, so the orientation is the
   // fifth draw rather than the fourth.
   const std::uint32_t sign_sample = rng.next();

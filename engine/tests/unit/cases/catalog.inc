@@ -41,8 +41,8 @@ void test_reward_health_and_level_cap() {
       world, engine::test::player(world), "progression", engine::make_default_profile(), false);
   auto* player = world.entities().get(handle);
   CHECK(player != nullptr);
-  // Original func215/145 oracle: multiple levels must retain each intermediate
-  // multiply/divide rounding, including the sub-maximum result at level 11.
+  // Multiple levels must retain each intermediate multiply/divide rounding,
+  // including the sub-maximum result at level 11.
   const float rewards[] = {3.0F, 3.0F, 10.0F, 100.0F};
   const unsigned levels[] = {1U, 2U, 4U, 11U};
   const float health[] = {100.0F, 101.13636016845703F, 103.40908813476562F, 111.3636245727539F};
@@ -89,8 +89,10 @@ void test_player_default_spawn() {
   CHECK(engine::test::player(world).profile().level() == 1);
   CHECK(engine::test::player(world).profile().inventory_count() == 5);
   CHECK(engine::test::player(world).profile().inventory(0) == 1);
-  CHECK(engine::test::player(world).loadout().slots()[0].type_id == 1);
-  CHECK(engine::test::player(world).loadout().slots()[4].type_id == 1);
+  CHECK(engine::test::player(world).loadout().slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+  CHECK(engine::test::player(world).loadout().slots()[4].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(engine::test::player(world).loadout().slots()[5].count == 0);
   CHECK(entity->position.x.to_float() >= -25000.0F);
   CHECK(entity->position.x.to_float() <= -25000.0F + 15000.0F);
@@ -131,13 +133,17 @@ void test_drop_chances() {
   const auto* rock = engine::Catalog::instance().drop_table(1);
   CHECK(rock != nullptr);
   CHECK(rock->dropCount == 3);
-  CHECK(rock->drops[0].petalTypeId == 4);
+  CHECK(rock->drops[0].petalTypeId ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kRockRare));
   CHECK(std::fabs(rock->drops[0].chance - 0.00522140646353364) < 1e-12);
-  CHECK(rock->drops[2].petalTypeId == 3);
+  CHECK(rock->drops[2].petalTypeId ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
   CHECK(std::fabs(rock->drops[2].chance - 0.10442813485860825) < 1e-12);
-  const auto* alias = engine::Catalog::instance().drop_table(16);
+  const auto* alias = engine::Catalog::instance().drop_table(
+      engine::catalog::species_type_id(engine::catalog::SpeciesId::kCentipedeSegment));
   CHECK(alias != nullptr);
-  CHECK(alias->aliasOf == 15);
+  CHECK(alias->aliasOf ==
+        engine::catalog::species_type_id(engine::catalog::SpeciesId::kCentipedeHead));
   CHECK(alias->dropCount == 6);
   engine::ServerRng rng(1);
   const auto loot = engine::roll_entity_loot(rng, 1, false);
@@ -230,10 +236,10 @@ void test_multi_instance_orbit_spacing() {
   CHECK(engine::test::player(world).petals()[0].extra_radius.to_float() == 11.0F);
   CHECK(engine::test::player(world).petals()[0].instance_count == 3);
   CHECK(std::fabs(engine::test::player(world).petals()[0].angle.to_float() - 0.0F) < 1e-6F);
-  // R06: Rose has definition+41 set, so original function 85 gives all three
-  // instances the same orbit index (petal +18); the ring position is shared and
-  // the per-instance separation comes from the extra radius (+44 = 11) added
-  // at angle*1.1 + instance*2*pi/3.
+  // Rose's catalog entry sets the shared-orbit flag, so all three instances
+  // receive the same orbit index; the ring position is shared and the
+  // per-instance separation comes from the extra radius (11) added at
+  // angle*1.1 + instance*2*pi/3.
   CHECK(std::fabs(engine::test::player(world).petals()[1].angle.to_float() - 0.0F) < 1e-6F);
   CHECK(std::fabs(engine::test::player(world).petals()[2].angle.to_float() - 0.0F) < 1e-6F);
   CHECK(engine::test::player(world).petals()[1].orbit_index ==
@@ -284,8 +290,8 @@ void test_shared_orbit_slot_without_component_keeps_shared_position() {
   CHECK(engine::test::player(world).loadout().equip(1, 1));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 4U);
   // Replace Rose's third instance with a live entity that has no petal
-  // component. Original function 85 adds only the already-used shared
-  // position, so Basic remains at orbit 1 instead of jumping to 2.
+  // component. Its shared position is already taken, so Basic remains at
+  // orbit 1 instead of jumping to 2.
   const engine::EntityHandle componentless = engine::spawn_entity(
       world, engine::EntityKind::kPetal, 1U, engine::Vec2{engine::f32(20.0F), engine::f32(0.0F)},
       engine::f32(14.0F), 0U, 0U);
@@ -321,7 +327,8 @@ void test_peas_attack_consumes_petal() {
   CHECK(world.entities().get(pea) == nullptr);
   std::uint32_t children = 0;
   for (const auto& entity : world.entities().entities()) {
-    if (entity.active && entity.kind == engine::EntityKind::kPetal && entity.type_id == 11) {
+    if (entity.active && entity.kind == engine::EntityKind::kPetal &&
+        entity.type_id == engine::catalog::petal_type_id(engine::catalog::PetalId::kPeasRare)) {
       ++children;
     }
   }
@@ -366,14 +373,14 @@ void test_rose_healing() {
   engine::Entity* player = world.entities().get(engine::test::player(world).player());
   CHECK(player != nullptr);
   player->health = engine::f32(50.0F);
-  const engine::EntityHandle petal = engine::test::player(world).loadout().slots()[0].instances[0];
+  const engine::EntityHandle petal = engine::test::player(world).loadout().handle(0, 0);
   for (int index = 0; index < 200; ++index) {
     engine::tick(world, 50.0);
   }
   CHECK(player->health.to_float() > 50.0F);
   const engine::Entity* petal_entity = world.entities().get(petal);
   CHECK(petal_entity == nullptr);
-  CHECK(engine::test::player(world).loadout().slots()[0].instances[0] != petal);
+  CHECK(engine::test::player(world).loadout().handle(0, 0) != petal);
 }
 
 void test_rose_contracts_orbit_and_heals_promptly() {
@@ -443,7 +450,7 @@ void test_petal_recharge() {
   engine::test::player(world).loadout().equip(0, 2);  // Fast: 500 ms recharge, one instance.
   const std::size_t spawned = engine::spawn_loadout_petals(world, engine::test::player(world));
   CHECK(spawned >= 1);
-  const engine::EntityHandle petal = engine::test::player(world).loadout().slots()[0].instances[0];
+  const engine::EntityHandle petal = engine::test::player(world).loadout().handle(0, 0);
   CHECK(petal.valid());
   CHECK(engine::damage_entity(world, petal, engine::f32(1000.0F)).died);
   const engine::Entity* petal_corpse = world.entities().get(petal);
@@ -453,9 +460,8 @@ void test_petal_recharge() {
   const double remaining = engine::test::player(world).loadout().slots()[0].recharge_remaining_ms;
   CHECK(remaining == 500.0);
   engine::refresh_loadout_petals(world, engine::test::player(world), 500.0);
-  CHECK(engine::test::player(world).loadout().slots()[0].instances[0].valid());
-  CHECK(world.entities().get(engine::test::player(world).loadout().slots()[0].instances[0]) !=
-        nullptr);
+  CHECK(engine::test::player(world).loadout().handle(0, 0).valid());
+  CHECK(world.entities().get(engine::test::player(world).loadout().handle(0, 0)) != nullptr);
 }
 
 void test_auto_population() {
@@ -524,7 +530,8 @@ void test_worker_api_default_spawn() {
   CHECK(engine::test::player(api.world()).player_name() == "default");
   CHECK(engine::test::player(api.world()).profile().level() == 1);
   CHECK(engine::test::player(api.world()).profile().inventory_count() == 5);
-  CHECK(engine::test::player(api.world()).loadout().slots()[0].type_id == 1);
+  CHECK(engine::test::player(api.world()).loadout().slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   const engine::Entity* entity =
       api.world().entities().get(engine::test::player(api.world()).player());
   CHECK(entity != nullptr);
@@ -577,8 +584,8 @@ void test_worker_api_default_spawn() {
   CHECK(api.world().entities().get(first) == nullptr);
   CHECK(!engine::test::player(api.world()).player().valid());
   engine::ByteWriter reopen;
-  // Death releases the corpse after 1000ms; original peer+288 independently
-  // blocks the next spawn until 2500ms after the previous successful spawn.
+  // Death releases the corpse after 1000ms; the peer also blocks the next
+  // spawn until 2500ms after the previous successful spawn.
   while (api.world().time_ms() < 2500.0) {
     api.think();
   }
@@ -611,7 +618,7 @@ void test_worker_api_default_spawn() {
   }
   CHECK(second_corpse->death_processed);
   CHECK(second_corpse->health.value == 0.0F);
-  // Original opcode 3 calls damage43 synchronously in send(). think() above
+  // The suicide opcode damages the player synchronously in send(); think() above
   // already advanced 50ms toward that existing deadline.
   CHECK(second_corpse->death_time_ms == api.world().time_ms() + 950.0);
   CHECK(engine::test::player(api.world()).player() == second);

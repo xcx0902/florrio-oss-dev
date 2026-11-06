@@ -19,6 +19,8 @@ const plans = DENSE_GROUPS.map((group) => ({
   component: group.component,
   specs: DENSE_GROUP_SPECS[group.component],
 }));
+// One-byte species id probe at the uint8 wire boundary.
+const ONE_BYTE_SPECIES_ID = 255;
 
 function parseFixture(bytes) {
   assert.equal(bytes.subarray(0, 4).toString('ascii'), 'FLRR');
@@ -146,8 +148,10 @@ test('native snapshot preserves the uint8 publishable id boundary', async () => 
   assert.ok(boundary, 'boundary packet decodes');
   assert.equal(boundary.sequence, 9);
   assert.equal(boundary.entities.length, 2);
-  const species = boundary.entities.find((entity) => entity.typeId === 255);
-  const loadout = boundary.entities.find((entity) => entity.inventory?.[0]?.value === 255);
+  const species = boundary.entities.find((entity) => entity.typeId === ONE_BYTE_SPECIES_ID);
+  const loadout = boundary.entities.find(
+    (entity) => entity.byteArrayFields?.[60]?.[0]?.value === 255,
+  );
   assert.ok(species, 'species field 2 preserves 255');
   assert.equal(species.speciesId, 255);
   assert.ok(loadout, 'loadout field 60 preserves the same one-byte id');

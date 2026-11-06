@@ -167,7 +167,7 @@ export function compileProtocol(document) {
   }
   const mode = object(sparseModes.domainSparse, 'sparseModes.domainSparse');
   if (mode.packetFormat !== 'domain-counted' || mode.field26Role !== 'entity-kind') {
-    fail('sparseModes.domainSparse', 'wrong packet format or field26 role');
+    fail('sparseModes.domainSparse', 'wrong packet format or entity-kind role');
   }
   for (const key of ['fieldDeltaXor', 'indexDeltaXor']) {
     if (integer(mode[key], `sparseModes.domainSparse.${key}`, 0, 1) !== 0) {
@@ -291,7 +291,7 @@ export function compileProtocol(document) {
   const extensions = array(snapshot.domainExtensions, 'domainExtensions');
   const kind = extensions.find((entry) => entry.field === 26);
   if (!kind || kind.permanent !== true || kind.type !== 'byte' || fields.get(26)?.type !== 'byte') {
-    fail('domainExtensions', 'field26 must remain the permanent byte kind extension');
+    fail('domainExtensions', 'the entity-kind field must remain the permanent byte extension');
   }
   for (const entry of extensions) {
     if (!fields.has(entry.field) || fields.get(entry.field).type !== entry.type) {

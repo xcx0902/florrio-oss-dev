@@ -43,7 +43,7 @@ const unsafe = [
   'reference',
   'web',
   'upstream',
-  'legacy',
+  'archive',
   'dist',
   'dist-next',
   'dist-readable',

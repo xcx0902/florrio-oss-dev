@@ -106,7 +106,8 @@ void test_ai_family_profiles() {
     const engine::EntityHandle first_segment = world.entities().get(centipede)->children.front();
     engine::Entity* segment = world.entities().get(first_segment);
     CHECK(segment != nullptr);
-    CHECK(segment->type_id == 16U);
+    CHECK(segment->type_id ==
+          engine::catalog::species_type_id(engine::catalog::SpeciesId::kCentipedeSegment));
     CHECK(segment->owner == centipede.raw);
   }
 
@@ -368,9 +369,9 @@ void test_killer_name_uses_attacker_identity() {
         world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
     CHECK(player.valid());
     CHECK(attacker.valid());
-    // Original43 reads attacker+160 (the attacker's own name), not the
-    // attacker's stored killer. A mob killed by the player must still report
-    // "Ladybug" if its death throes finish the player.
+    // The recorded killer name is the attacker's own name, not the attacker's
+    // stored killer. A mob killed by the player must still report "Ladybug" if
+    // its death throes finish the player.
     world.entities().get(attacker)->killer_name = "hero";
     (void)engine::damage_entity(world, player, world.entities().get(player)->health, attacker);
     CHECK(engine::test::player(world).last_killer_name() == "Ladybug");
@@ -402,14 +403,15 @@ void test_loadout_exact_layout() {
       2, 3);  // Heavy, so the final swap is a real type change.
   engine::test::player(world).profile().set_inventory_count(6);
   engine::test::player(world).loadout().restore_from_profile(engine::test::player(world).profile());
-  CHECK(engine::test::player(world).loadout().slots()[0].type_id == 1U);
+  CHECK(engine::test::player(world).loadout().slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(!engine::test::player(world).loadout().handle(0, 0).valid());
 
   const std::size_t spawned = engine::spawn_loadout_petals(world, engine::test::player(world));
   CHECK(spawned == 6U);
   for (std::uint8_t slot = 0; slot < 6; ++slot) {
     CHECK(engine::test::player(world).loadout().handle(slot, 0).valid());
-    CHECK(engine::test::player(world).loadout().slots()[slot].instances[0] ==
+    CHECK(engine::test::player(world).loadout().handle(slot, 0) ==
           engine::test::player(world).loadout().handle(slot, 0));
     CHECK(!engine::test::player(world).loadout().pending(slot, 0));
   }
@@ -430,7 +432,8 @@ void test_loadout_exact_layout() {
   CHECK(old_corpse != nullptr);
   CHECK(old_corpse->death_processed);
   CHECK(!engine::test::player(world).loadout().handle(0, 0).valid());
-  CHECK(engine::test::player(world).loadout().slots()[0].type_id == 3U);
+  CHECK(engine::test::player(world).loadout().slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
   CHECK(engine::test::player(world).profile().inventory(0) == 3U);
   CHECK(engine::test::player(world).loadout().pending(0, 0));
   CHECK(engine::test::player(world).loadout().pending(0, 1));
@@ -450,7 +453,8 @@ void test_loadout_exact_layout() {
       world, engine::test::player(world), 0, 0));
   const engine::EntityHandle created = engine::test::player(world).loadout().handle(0, 0);
   CHECK(created.valid());
-  CHECK(world.entities().get(created)->type_id == 3U);
+  CHECK(world.entities().get(created)->type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
   CHECK(world.entities().get(created)->owner == player.raw);
   CHECK(!engine::test::player(world).loadout().pending(0, 0));
 

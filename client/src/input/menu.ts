@@ -1,4 +1,4 @@
-/** Canvas-native menu state and hit testing. The only remaining DOM control is
+/** Canvas-rendered menu state and hit testing. The only remaining DOM control is
  * the flower-name input, which needs real text editing and IME support. */
 import type { MenuInputPresentation } from '../render/menu-animation.js';
 import {
@@ -80,7 +80,7 @@ export class MenuControls {
   };
   private hoveredMobDrop: { mob: number; index: number } | undefined;
   private readonly mobDropAlphas = new Map<string, number>();
-  /** Survivor row, in native rebuild order: record types and +384 alphas. */
+  /** Survivor row, in rebuild order: record types and their tooltip alphas. */
   private respawnItems: readonly number[] = [];
   private respawnAlphas: number[] = [];
   private hoveredRespawn: number | undefined;
@@ -206,8 +206,8 @@ export class MenuControls {
       this.name.blur();
     }
   }
-  /** Native rebuilds the card records when the survivor list changes, which
-   * also resets every +384 tooltip alpha; preserve that boundary. */
+  /** Rebuilding the card records when the survivor list changes also resets
+   * every tooltip alpha; preserve that boundary. */
   setRespawn(items: readonly number[] | undefined): void {
     const next = (items ?? []).filter((type) => PETAL_INFO[type]);
     if (
@@ -452,8 +452,8 @@ export class MenuControls {
       return false;
     }
     const max = menuScrollMax(this.panel, this.height, this.discoveredMobs);
-    // Native func626 converts the normalized browser wheel into 75 content
-    // units before storing its float32 scroll target (the panel scale is 1).
+    // A wheel notch converts into 75 content units before storing the f32
+    // scroll target (the panel scale is 1).
     this.scrollTarget[this.panel] = Math.max(
       0,
       Math.min(max, f(this.scrollTarget[this.panel] + f(deltaY * 75))),
@@ -463,8 +463,8 @@ export class MenuControls {
   advance(delta: number, pressed = false): void {
     const step = Math.max(0, Math.min(1, 1 - Math.pow(0.7, Math.fround(delta) * 0.06)));
     // Only the visible panel scrolls; evaluating hidden Changelog layout here
-    // would measure text before the menu surface exists and reorder native
-    // offscreen allocations.
+    // would measure text before the menu surface exists and reorder offscreen
+    // allocations.
     if (this.panel !== undefined) {
       const panel = this.panel;
       const max = menuScrollMax(panel, this.height, this.discoveredMobs);
@@ -494,9 +494,8 @@ export class MenuControls {
         this.tooltipAlphas.delete(type);
       }
     }
-    // Respawn cards use the same easing but their native target is only
-    // `f[37] != 0` (the hover flag); unlike the galleries, a held mouse button
-    // does not suppress it.
+    // Respawn cards use the same easing, but only the hover flag raises their
+    // target; unlike the galleries, a held mouse button does not suppress it.
     for (let index = 0; index < this.respawnItems.length; index++) {
       const target = +(this.hoveredRespawn === index);
       const current = this.respawnAlphas[index] ?? 0;

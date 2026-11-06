@@ -5,6 +5,7 @@ import { RenderingCanvas } from '../helpers/recording-canvas.mjs';
 import { drawWorld } from '../../../build/client/render/world.js';
 import { WorldState } from '../../../build/client/state/world.js';
 import { CameraState } from '../../../build/client/state/camera.js';
+import { EntityKind } from '../../../build/client/state/snapshot-types.js';
 import {
   browser,
   origin,
@@ -13,6 +14,9 @@ import {
   readPeerVisibleSet,
   assertPeerVisibleSet,
 } from '../support/worker-fixture.mjs';
+
+// `EntityKind` is Node-side; browser predicates receive the value as an argument.
+const PLAYER_KIND = EntityKind.Player;
 
 before(start);
 after(stop);
@@ -193,18 +197,18 @@ test('client joins the native peer-visible set with a healthy player and nearby 
   await page.waitForFunction(() => window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(
-    () => {
+    (playerKind) => {
       if (!window.__florr || window.__florr.world.count === 0) {
         return false;
       }
       for (const entity of window.__florr.world.all()) {
-        if ((entity.kind ?? entity.typeId) === 1 || entity.typeId === 1) {
+        if ((entity.kind ?? entity.typeId) === playerKind || entity.typeId === playerKind) {
           return true;
         }
       }
       return false;
     },
-    null,
+    PLAYER_KIND,
     { timeout: 15000 },
   );
   const result = await page.evaluate(readPeerVisibleSet);
@@ -218,29 +222,29 @@ test('single match: spawn, suicide, death overlay and restart', async () => {
   await page.waitForFunction(() => window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(
-    () => {
+    (playerKind) => {
       for (const entity of window.__florr.world.all()) {
-        if (entity.typeId === 1) {
+        if (entity.typeId === playerKind) {
           return true;
         }
       }
       return false;
     },
-    null,
+    PLAYER_KIND,
     { timeout: 15000 },
   );
   const before = await page.evaluate(readPeerVisibleSet);
   await page.evaluate(() => window.__florr.suicide());
   await page.waitForFunction(
-    () => {
+    (playerKind) => {
       for (const entity of window.__florr.world.all()) {
-        if (entity.typeId === 1) {
+        if (entity.typeId === playerKind) {
           return false;
         }
       }
       return window.__florr.ui.dead === true;
     },
-    null,
+    PLAYER_KIND,
     { timeout: 15000 },
   );
   const dead = await page.evaluate(() => window.__florr.ui);
@@ -248,15 +252,15 @@ test('single match: spawn, suicide, death overlay and restart', async () => {
   // simulating; the renderer test covers its text.
   await page.evaluate(() => window.__florr.restart());
   await page.waitForFunction(
-    () => {
+    (playerKind) => {
       for (const entity of window.__florr.world.all()) {
-        if (entity.typeId === 1 && entity.health > 0) {
+        if (entity.typeId === playerKind && entity.health > 0) {
           return true;
         }
       }
       return false;
     },
-    null,
+    PLAYER_KIND,
     { timeout: 15000 },
   );
   const after = await page.evaluate(readPeerVisibleSet);
@@ -442,15 +446,15 @@ test('match interactions drive equip, attack, defend, no-discard, swap, chat and
   await page.waitForFunction(() => window.__florr);
   await page.evaluate(() => window.__florr.start());
   await page.waitForFunction(
-    () => {
+    (playerKind) => {
       for (const entity of window.__florr.world.all()) {
-        if (entity.typeId === 1) {
+        if (entity.typeId === playerKind) {
           return true;
         }
       }
       return false;
     },
-    null,
+    PLAYER_KIND,
     { timeout: 15000 },
   );
   // Let the first frames sync inventoryTypes/hotbarTypes from the snapshot.
@@ -664,26 +668,26 @@ test(
     await page.waitForFunction(() => window.__florr);
     await page.evaluate(() => window.__florr.start());
     await page.waitForFunction(
-      () => {
+      (playerKind) => {
         for (const entity of window.__florr.world.all()) {
-          if (entity.typeId === 1) {
+          if (entity.typeId === playerKind) {
             return true;
           }
         }
         return false;
       },
-      null,
+      PLAYER_KIND,
       { timeout: 15000 },
     );
     await page.waitForTimeout(200);
-    const before = await page.evaluate(() => {
+    const before = await page.evaluate((playerKind) => {
       for (const entity of window.__florr.world.all()) {
-        if (entity.typeId === 1) {
+        if (entity.typeId === playerKind) {
           return { x: entity.x, y: entity.y };
         }
       }
       return null;
-    });
+    }, PLAYER_KIND);
     // Drag the stick to the right and hold it: the player must move +x.
     await cdp.send('Input.dispatchTouchEvent', {
       type: 'touchStart',
@@ -695,14 +699,14 @@ test(
     });
     await page.waitForTimeout(600);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    const after = await page.evaluate(() => {
+    const after = await page.evaluate((playerKind) => {
       for (const entity of window.__florr.world.all()) {
-        if (entity.typeId === 1) {
+        if (entity.typeId === playerKind) {
           return { x: entity.x, y: entity.y };
         }
       }
       return null;
-    });
+    }, PLAYER_KIND);
     await context.close();
     assert.ok(before && after, 'player exists before and after the touch drag');
     assert.ok(

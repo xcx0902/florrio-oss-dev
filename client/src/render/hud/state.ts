@@ -11,33 +11,33 @@ export interface FlowerEntry {
   /** Authoritative score; leaderboard order follows this value. */
   readonly score: number;
   readonly local?: boolean;
-  /** Presentation value produced by createHudState, after native smoothing. */
+  /** Presentation value produced by createHudState, after smoothing. */
   readonly displayedScore?: number;
 }
 /** Snapshot of the death notification; elapsed time is supplied by the caller,
  * so rendering a frame twice never advances or replays an event. */
 export interface HudDeathState {
   readonly elapsedMilliseconds: number;
-  /** Native binary32 animation state, advanced once per render frame. */
+  /** f32 animation state, advanced once per render frame. */
   readonly progress?: number;
   readonly killerName?: string;
   readonly respawnLevel?: number;
-  /** Last death score (controller field 21). */
+  /** Last death score. */
   readonly score?: number;
   /** Full carried inventory at death, including reserve slots. */
   readonly keptSlots?: readonly number[];
   /** Occupied retained-card index under the pointer, or undefined. */
   readonly hoveredSlot?: number;
-  /** Smoothed per-card tooltip alpha from the native 0.7 exponential. */
+  /** Smoothed per-card tooltip alpha (0.7 exponential per frame). */
   readonly tooltipAlpha?: readonly number[];
 }
 export interface HudState {
   readonly health: number;
   readonly maxHealth: number;
   readonly level: number;
-  /** Native zone timer byte (field 63), 0..255. */
+  /** Zone timer byte (0..255) from the snapshot. */
   readonly zoneProgress?: number;
-  /** Retained native warning visibility and radial countdown, advanced once
+  /** Retained warning visibility and radial countdown, advanced once
    * per rendered frame by createHudState. */
   readonly zoneWarningAlpha?: number;
   readonly zoneCountdownProgress?: number;
@@ -53,9 +53,9 @@ export interface HudState {
   /** Equipped slots first (5/6/7/8 by level), then eight storage slots. */
   readonly slots?: readonly number[];
   readonly storageSlots?: readonly number[];
-  /** Normalized field61 targets (0..1) supplied to createHudState, which
+  /** Normalized slot recharge targets (0..1) supplied to createHudState, which
    * returns retained displayed fractions. drawHud squares those fractions
-   * for the source func587 radial wipe. */
+   * for the radial recharge wipe. */
   readonly slotProgress?: readonly number[];
   /** Caller owns receipt/update/retirement. Active visuals replace their
    * static slot content; departing visuals draw alongside current contents.
@@ -67,7 +67,7 @@ export interface HudState {
   readonly hoveredSlot?: number;
   readonly draggedSlot?: number;
   readonly keyboardSlot?: number;
-  /** Fade 0..1 for the native [1]..[8]/[T] inventory hints. */
+  /** Fade 0..1 for the [1]..[8]/[T] inventory hints. */
   readonly keyboardHint?: number;
   readonly deleteAlpha?: number;
   /** Smooth position of the keyboard selection ring, in CSS pixels. */
@@ -93,7 +93,7 @@ export interface HudState {
   readonly movementDisabled?: boolean;
   readonly menu?: boolean;
   readonly interactiveMenu?: boolean;
-  /** Native menu still renders its world into a 1x1 offscreen surface. */
+  /** The menu still renders its world into a 1x1 offscreen surface. */
   readonly menuPreview?: MenuPreviewPass;
   /** A player received during the last menu pass already owns its hidden HUD. */
   readonly menuPreviewState?: HudState;
@@ -107,19 +107,19 @@ export interface HudState {
     readonly level: number;
     readonly items: readonly number[];
   };
-  /** Canvas-native menu panel state and discovered-petal pool. */
+  /** Canvas menu panel state and discovered-petal pool. */
   readonly menuState?: MenuRenderState;
   readonly menuPetalTypes?: readonly number[];
   /** The frame owner can draw the moving input after capturing the menu. */
   readonly separateMenuInput?: boolean;
-  /** Authoritative normalized XP progress from snapshot field 58. */
+  /** Authoritative normalized XP progress from the snapshot. */
   readonly levelProgress?: number;
   readonly flowers?: number;
   readonly flowerEntries?: readonly FlowerEntry[];
   readonly playerName?: string;
   readonly score?: number;
-  /** Optional native score field transition (120 ms), supplied by the
-   * receiver. receivedAt must be the score field's clock, not any packet. */
+  /** Optional score transition (120 ms), supplied by the receiver. receivedAt
+   * must be the score field's clock, not any packet. */
   readonly scoreTransition?: {
     readonly previous: number;
     readonly receivedAt: number;
@@ -177,9 +177,9 @@ export function createHudState(): HudFrameState {
       }
       if (!repeated) {
         if (target.death) {
-          // Native1095 retreats the level bar/hotbar by 400 logical units
-          // with the same pow(0.9, dt * .06) curve as the level bar's shield
-          // and the death overlay. Existing death UI is otherwise frozen.
+          // The death transition retreats the level bar/hotbar by 400 logical
+          // units with the same pow(0.9, dt * .06) curve as the level bar's
+          // shield and the death overlay. Existing death UI is otherwise frozen.
           hudSlide = f(hudSlide + clamp(1 - Math.pow(0.9, delta * 0.06)) * (400 - hudSlide));
           const tooltipStep = clamp(1 - Math.pow(0.7, delta * 0.06));
           for (let index = 0; index < deathTooltip.length; index += 1) {
@@ -193,7 +193,7 @@ export function createHudState(): HudFrameState {
           deathTooltip.fill(0);
           const warning = +zoneWarningVisible(target);
           zoneAlpha = f(zoneAlpha + clamp(1 - Math.pow(0.7, delta * 0.06)) * (warning - zoneAlpha));
-          // client1095 uses the literal 0.003922 rather than 1/255.
+          // The zone countdown uses the literal 0.003922 rather than 1/255.
           const countdown = f((target.zoneProgress ?? 0) * 0.003922);
           zoneCountdown = f(zoneCountdown + amount * (countdown - zoneCountdown));
         }
@@ -208,8 +208,8 @@ export function createHudState(): HudFrameState {
       let score = target.score ?? 0;
       if (target.scoreTransition) {
         const previous = f(target.scoreTransition.previous);
-        // clientFrame samples the receiver's local score transition before
-        // casting it to uint32 for the leaderboard's second smoothing pass.
+        // The score transition is sampled before it is cast to uint32 for the
+        // leaderboard's second smoothing pass.
         score = f(
           previous +
             f(f(score) - previous) * clamp((now - target.scoreTransition.receivedAt) / 120),

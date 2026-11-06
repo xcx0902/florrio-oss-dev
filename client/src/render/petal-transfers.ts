@@ -3,6 +3,7 @@ import { SNAPSHOT_EVENT } from '../schema/protocol.js';
 import { INVENTORY_SLOTS } from '../state/loadout-limits.js';
 import type { CameraState } from '../state/camera.js';
 import { interpolateEntity } from '../state/interpolation.js';
+import { byteField } from '../state/snapshot-fields.js';
 import type { SnapshotEvent } from '../state/snapshot.js';
 import type { WorldState } from '../state/world.js';
 import {
@@ -13,7 +14,7 @@ import {
 } from './event-effects.js';
 import { getHudLayout } from './hud.js';
 
-/** One native event14 object per occupied slot; retired objects retain their
+/** One event14 effect per occupied slot; retired effects retain their
  * own fade instead of being overwritten by the next transfer into that slot. */
 export class PetalTransfers {
   private readonly slots = new Map<number, Event14Effect>();
@@ -58,9 +59,9 @@ export class PetalTransfers {
       if (!target) {
         continue;
       }
-      // Native pickup component670 +8 is field22; domain snapshots also expose
+      // The pickup component carries the drop species byte; domain snapshots also expose
       // the same petal identifier as speciesId for their drop record.
-      const type = target.byteFields?.[22] ?? target.denseByteFields?.[22] ?? target.speciesId ?? 0;
+      const type = byteField(target, 22) ?? target.speciesId ?? 0;
       if (!PETAL_INFO[type] || event.index < 0 || event.index >= INVENTORY_SLOTS) {
         continue;
       }

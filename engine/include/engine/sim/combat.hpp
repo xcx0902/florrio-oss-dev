@@ -17,8 +17,7 @@ DamageResult damage_entity_from_source(World&, EntityHandle target, f32 amount, 
                                        std::uint16_t options = 0U);
 
 /** Contact pass: overlapping non-allied bodies push apart and exchange their
- * physics +44 contact damage. The original collision resolver applies damage
- * for both orderings of a pair; this pass does the same in one step. */
+ * contact damage. Both orderings of a pair are resolved in one step. */
 void update_contact_tree(World& world);
 std::size_t resolve_contacts(World& world);
 
@@ -26,15 +25,14 @@ std::size_t resolve_contacts(World& world);
 void kill_entity(World& world, EntityHandle target, EntityHandle attacker = EntityHandle{});
 void kill_entity_from_source(World&, EntityHandle target, const DamageSource&);
 
-/** Original healing clamp: dead entities are not healed, live health is
- * clamped to [0, maximum]. Returns the new health. */
+/** Healing clamp: dead entities are not healed, live health is clamped to
+ * [0, maximum]. Returns the new health. */
 f32 heal_entity(Entity& entity, f32 amount);
 
-/** Healing through the world also honors healing-suppression effects (the
- * recovered Dandelion family). */
+/** Healing through the world also honors healing-suppression effects. */
 f32 heal_entity(World& world, EntityHandle target, f32 amount);
 
-/** Original attacker propagation: nearby untargeted AI acquire the attacker. */
+/** Attacker propagation: nearby untargeted AI acquire the attacker. */
 std::size_t alert_to_attacker(World& world, EntityHandle target, EntityHandle attacker);
 
 }  // namespace engine

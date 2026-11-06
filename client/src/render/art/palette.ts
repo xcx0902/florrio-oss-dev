@@ -54,8 +54,8 @@ export function flashColor(base: Rgb, amount: number): Rgb {
     Math.trunc(f(f(f(1 - weight) * value) + f(weight * to)));
   return rgb(blend(base.r, target.r), blend(base.g, target.g), blend(base.b, target.b));
 }
-/** Darkened outline colour used by the original `sqrt(channel / 255) * 0.9`
- * shading pass; kept as a helper so outlines track their body palette. */
+/** Darkened outline colour from the `sqrt(channel / 255) * 0.9` shading pass,
+ * kept as a helper so outlines track their body palette. */
 export function shade(color: Rgb, scale = 0.8999999985098839): Rgb {
   const channel = (value: number): number => {
     const normalized = Math.sqrt(Math.max(0, value) / 255) * scale;

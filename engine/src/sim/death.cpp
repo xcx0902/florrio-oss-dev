@@ -26,8 +26,8 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
   const DamageSource source = incoming.entity.valid() ? incoming : entity->last_damage_source;
   const EntityHandle attacker = source.entity;
   entity->death_processed = true;
-  // Original43 calls424 immediately, a full second before corpse removal.
-  // Leave the ordinary owner/children alive, but let the next segment steer
+  // Constraint links detach immediately, a full second before corpse removal.
+  // The ordinary owner/children stay alive, but the next segment steers
   // independently on the next AI tick instead of following the dead head.
   world.detach_linked_entities(target);
   const EntityKind kind = entity->kind;
@@ -36,11 +36,10 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
   world.record_death(kind, type_id, position, source.kind, source.type_id);
   if (kind == EntityKind::kPlayer || kind == EntityKind::kMob) {
     entity->killer_name = source.name;
-    // Original updateKillerName writes the destroying entity's name into the
-    // player's own replicated string field. Keep the per-player copy for the
-    // local death payload only: mobs keep dying (and may die with no attacker)
-    // after the player, and those later deaths must not erase or replace the
-    // name the death screen is about to show.
+    // The killer name is a per-player local copy for the death payload only:
+    // mobs keep dying (and may die with no attacker) after the player, and
+    // those later deaths must not erase or replace the name the death screen is
+    // about to show.
     if (auto* state = world.players().by_body(target)) {
       state->set_last_killer(attacker, entity->killer_name);
       state->death.source = source;
@@ -48,15 +47,10 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
   }
 
   if (kind == EntityKind::kPetal) {
-    // Original 43 clears the equipped handle and arms the recharge timer first;
-    // the petal entity itself survives as a health-0 corpse and is reaped one
-    // second later (probed in the attack trace: hp reaches 0 at ~2.4 s and the
-    // world entity count drops at 3.35 s).
+    // The equipped handle clears and the recharge timer arms first; the petal
+    // entity itself survives as a health-0 corpse, reaped one second later.
     (void)on_petal_destroyed(world, target);
     entity->health = f32(0.0F);
-    // The shipped attack trace dies at 2350 ms and is reaped at 3350 ms, i.e.
-    // one second later regardless of the attack button; the earlier 800 ms
-    // "attack-held" branch was not observable in any golden trace (R01).
     entity->death_time_ms = world.time_ms() + 1000.0;
     return;
   }
@@ -64,9 +58,9 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
   if (kind == EntityKind::kPlayer) {
     entity->death_flag = true;
     entity->death_time_ms = world.time_ms() + 1000.0;
-    // Original43 retains the body's carried loadout throughout its corpse
-    // window. retainPlayerLoot writes a separate loot component and the peer's
-    // lost-item list; it does not replace the carried inventory in-place.
+    // The body retains its carried loadout throughout the corpse window. Loot
+    // retention writes a separate lost-item list; it does not replace the
+    // carried inventory in place.
     auto* owner = world.players().by_body(target);
     if (owner == nullptr) {
       return;
@@ -80,8 +74,8 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
                                    catalog::PetalId::kAntennaeLegendary;
     }
     state.death.view_scale = f32(wide_view ? 0.63F : 0.9F);
-    // The frozen v1 Worker continues its orphan-petal orbit during the corpse
-    // window using the last input. A new spawn always clears that lease.
+    // A corpse keeps its last input only while an offline input lease is held;
+    // every other death clears it.
     if (!state.has_offline_input_lease()) {
       state.clear_input();
     }
@@ -90,14 +84,14 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
         retain_player_loot(retained_profile, world.random(), world.death_shuffle_random());
     state.profile().set_lost_items(loot.lost_count, loot.lost);
     // The first three eligible petals are ground loot. The remainder (up to
-    // ten, historically named `lost`) belongs to the controller and respawns.
+    // ten) belongs to the controller and respawns.
     state.set_last_death_kept(std::span<const std::uint16_t>(loot.lost.data(), loot.lost_count));
     std::vector<std::uint16_t> retained(loot.retained.begin(),
                                         loot.retained.begin() + loot.retained_count);
     (void)spawn_loot_drops(world, retained, position, target);
     state.set_last_death(state.loadout().score(), state.profile().level());
-    // Original 43 walks all 24 owned handles (8 slots x 3 instances), damages
-    // live children to zero and queues handle-less children for removal.
+    // Walk all 24 owned handles (8 slots x 3 instances); live children are
+    // damaged to zero and children that are already dead are destroyed.
     std::array<EntityHandle, 24> children{};
     std::array<std::uint8_t, 24> child_slots{};
     std::array<std::uint8_t, 24> child_instances{};
@@ -125,23 +119,23 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
         (void)world.destroy(child->handle);
       }
     }
-    // Original43 schedules health+48 = now+1000 for players too. The viewer's
-    // controlled-body handle and the healthless children remain live until
-    // the ordinary removal sweep releases their intrusive references.
+    // The player corpse also expires one second after death. The viewer's
+    // controlled-body handle and the healthless children remain live until the
+    // ordinary removal sweep releases their intrusive references.
     return;
   }
 
   if (kind == EntityKind::kMob) {
-    // Loot entries were attached at spawn by the component draws; the death
-    // path only materializes them and consumes no additional RNG values.
+    // Loot entries were chosen at spawn; the death path only materializes them
+    // and consumes no additional RNG values.
     std::vector<std::uint16_t> petals(entity->loot_petals.begin(),
                                       entity->loot_petals.begin() + entity->loot_count);
     (void)spawn_loot_drops(world, petals, position, target);
     if (auto* player = world.players().get(source.player)) {
       const auto* definition = Catalog::instance().entity(type_id);
       if (definition != nullptr) {
-        // spawnEntity writes the entity definition scale into loot +4; the
-        // damage path awards that value to the attacker's player.
+        // The catalog scale is the experience reward granted to the attacker's
+        // player.
         const f32 reward(definition->scale);
         award_player_experience(world, player->id(), reward);
       }

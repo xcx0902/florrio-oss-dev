@@ -44,8 +44,8 @@ Effect* free_effect(Entity& entity) {
     }
   }
   // All slots are occupied: replace the effect with the shortest remaining
-  // lifetime. The original effect vector can grow without bound; a bounded
-  // domain record is sufficient for the recovered poison/slow/heal families.
+  // lifetime. A bounded record is enough for the poison/slow/heal-block
+  // families.
   Effect* shortest = &entity.effects[0];
   for (std::size_t index = 1; index < kMaxEffects; ++index) {
     if (entity.effects[index].remaining_ms < shortest->remaining_ms) {
@@ -204,8 +204,8 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
       if (!entity.active) {
         continue;
       }
-      // The tick applies only the strongest active damage effect; the original
-      // does not stack every poison instance in the same frame.
+      // The tick applies only the strongest active poison effect; poison
+      // instances do not stack in the same frame.
       const Effect* strongest = nullptr;
       for (const auto& effect : entity.effects) {
         if (!effect.active || effect.type != EffectType::kPoison) {
@@ -219,7 +219,7 @@ std::size_t update_effects(World& world, double delta_milliseconds) {
         const double duration = std::min(delta_milliseconds, strongest->remaining_ms);
         const double amount = static_cast<double>(strongest->intensity.value) * duration * 0.001;
         if (amount > 0.0) {
-          // Original654 effects+40/+48 gates feedback, not poison damage.
+          // The 600 ms window suppresses hit feedback, not poison damage.
           // A replacement/stronger poison shares this entity's same clock.
           const bool quiet = world.time_ms() - entity.poison_hit_time_ms < 600.0;
           if (!quiet) {
@@ -307,8 +307,8 @@ f32 slow_multiplier(const Entity& entity) {
     if (!effect.active || effect.type != EffectType::kSlow) {
       continue;
     }
-    // Original608 multiplies every effect's vtable+20 return value into one
-    // float32, starting at 1.0; it does not take the minimum.
+    // Every slow effect multiplies into one f32 starting at 1.0; the result is
+    // not the minimum.
     multiplier = f32(multiplier.value * effect.intensity.value);
   }
   return multiplier;
@@ -424,9 +424,9 @@ std::size_t World::update_area_effects() {
       }
       alive.push_back(target);
     }
-    // The original query rectangle is owner centre +/- scale (a square).
-    // Payload attach/detach does not mutate geometry. This view ends before
-    // petal spawning, movement or destruction in later phases.
+    // The query rectangle is owner centre +/- scale (a square). Payload
+    // attach/detach does not mutate geometry. This view ends before petal
+    // spawning, movement or destruction in later phases.
     if (!phase_query) {
       phase_query.emplace(SpatialQuery::from_world(*this));
     }
@@ -474,9 +474,9 @@ std::size_t World::update_area_effects() {
 std::size_t World::run_deferred_launches(double now_ms) {
   std::size_t launched = 0;
   last_launch_order_.clear();
-  // Original deferred callbacks are dispatched by due time. Pull every due
-  // entry first, then sort by (due_ms, insertion sequence) so multiple
-  // callbacks scheduled in the same tick have a deterministic order.
+  // Deferred launches are dispatched by due time. Pull every due entry first,
+  // then sort by (due_ms, insertion sequence) so multiple launches scheduled
+  // in the same tick have a deterministic order.
   std::vector<DeferredLaunch> due;
   for (auto it = deferred_launches_.begin(); it != deferred_launches_.end();) {
     if (it->due_ms > now_ms) {
@@ -507,8 +507,8 @@ std::size_t World::run_deferred_launches(double now_ms) {
       if (child == nullptr) {
         continue;
       }
-      // Original launchPeas only adds an impulse to velocity (+40/+48) and
-      // acceleration (+56/+64); the radial offset was written by splitPeas.
+      // A launch only adds an impulse to velocity and acceleration; the radial
+      // spawn offset was already applied when the children were split.
       const double x = static_cast<double>(projectile_math::peas_cos(angle.value));
       const double y = static_cast<double>(projectile_math::peas_sin(angle.value));
       const f32 impulse_x = f32(x * 1.4);

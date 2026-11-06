@@ -171,7 +171,7 @@ test('storage hover uses authoritative storage contents and wraps inside viewpor
         `y=${coordinates[index + 1]}`,
       );
     }
-    // func1099 works in logical units under the UI matrix; the logical matrix
+    // The tooltip works in logical units under the UI matrix; the logical matrix
     // is the CSS pixel ratio multiplied once by the HUD scale.
     const transform = result.tooltip.find(([op]) => op === 'setTransform')[1];
     const matrix = Math.fround(pixelRatio * layout.scale);

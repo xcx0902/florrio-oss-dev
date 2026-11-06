@@ -39,7 +39,7 @@ void PlayerProfile::add_experience(f32 amount) {
 }
 
 f32 player_level_max_health(std::uint8_t level) {
-  // Original 145: f32((level-1) * f64(1/44)), min(1), f32(*50), f32(+100).
+  // f32((level-1) * f64(1/44)) clamped to [0, 1], then *50 and +100 in f32.
   const f32 fraction = f32::from_double((static_cast<int>(level) - 1) * (1.0 / 44.0));
   const f32 growth(std::clamp(fraction.value, 0.0F, 1.0F));
   return f32(f32(growth.value * 50.0F).value + 100.0F);
@@ -62,8 +62,8 @@ void award_player_experience(World& world, PlayerId id, f32 amount) {
   for (unsigned level = previous_level + 1U; level <= state.profile().level(); ++level) {
     const f32 maximum = player_level_max_health(static_cast<std::uint8_t>(level)) +
                         equipped_max_health_bonus(state, static_cast<std::uint8_t>(level));
-    // 145 uses f32(maximum * currentHealth) / previousMaximum, once per
-    // level; collapsing several gains into a single ratio loses rounding.
+    // Health rescales as f32(maximum * currentHealth) / previousMaximum once
+    // per level; collapsing several gains into a single ratio loses rounding.
     player->health =
         player->max_health.value <= 0.0F
             ? maximum
@@ -78,8 +78,8 @@ EntityHandle spawn_player(World& world, PlayerState& state, std::string_view nam
   if (!can_spawn_player(world, state)) {
     return {};
   }
-  // Recovered player record: world flags 0x6b (bit 32 marks a player for spawn
-  // clearance and the 390 knockback) and entity flags 0x40 (attachment owner).
+  // Player record flags: world flags 0x6b (bit 32 marks a player for spawn
+  // clearance and contact knockback) and entity flags 0x40 (attachment owner).
   const EntityHandle handle =
       spawn_entity(world, EntityKind::kPlayer, 0, position, config.radius, 0x6BU, 0x40U);
   if (!handle.valid()) {
@@ -106,7 +106,7 @@ EntityHandle spawn_player(World& world, PlayerState& state, std::string_view nam
 
 PlayerProfile make_default_profile() {
   PlayerProfile profile;
-  // Original fresh loadout starts at level 1 (server loadout +148).
+  // A fresh loadout starts at level 1.
   profile.set_level(1);
   profile.set_experience(f32(0.0F));
   const std::uint8_t active = profile.active_slots();
@@ -166,12 +166,12 @@ void regenerate_players(World& world, double delta_milliseconds) {
     auto& entity = *player;
     const f32 maximum = player_level_max_health(state.profile().level()) +
                         equipped_max_health_bonus(state, state.profile().level());
-    // Original tick calls 145 even with an unchanged maximum: the f32
+    // The maximum is recomputed every tick even when unchanged: the f32
     // multiply/divide can change health by one ULP before regeneration.
     entity.health =
         entity.max_health.value > 0.0F ? (maximum * entity.health) / entity.max_health : maximum;
     entity.max_health = maximum;
-    // Original 216 receives an f32 healing amount, then adds it in f32.
+    // The healing amount is f32 and is added in f32.
     if (blocks_healing(entity)) {
       return;
     }
@@ -228,8 +228,8 @@ EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_
   }
   const bool rare = allow_rare_starter && world.random().next_fraction() < f32(0.00005F);
   if (rare) {
-    // Original spawn restores survivors first, then fills the active row. The
-    // rare starter can replace the first filler, never a surviving petal.
+    // Spawn restores survivors first, then fills the active row. The rare
+    // starter can replace the first filler, never a surviving petal.
     for (std::uint8_t slot = 0; slot < profile.active_slots(); ++slot) {
       if (profile.inventory(slot) != 1U) {
         continue;
@@ -246,8 +246,8 @@ EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_
   }
   state.profile() = profile;
   state.loadout().restore_from_profile(profile);
-  // Original spawn repeatedly awards exactly the XP missing to reach the
-  // remembered level. It recreates cumulative points, with zero partial XP.
+  // Spawn awards exactly the XP missing to reach the remembered level,
+  // recreating cumulative points with zero partial XP.
   f32 score(0.0F);
   for (std::uint8_t level = 1; level < profile.level(); ++level) {
     score += experience_threshold(level);

@@ -45,8 +45,8 @@ void PlayerLoadout::refresh_pending_cache() {
     const std::uint8_t instances =
         static_cast<std::uint8_t>(std::min<std::uint32_t>(petal->instancesPerSlot, kInstances));
     if (petal->sharedOrbit) {
-      // Original function 85's special branch: every live instance shares the
-      // same cache index; the index advances once for the whole slot.
+      // Shared-orbit branch: every live instance shares the same cache index;
+      // the index advances once for the whole slot.
       std::uint8_t carry = 0;
       if (handles_[slot][0].valid()) {
         pending_cache_[slot][0] = order;
@@ -68,7 +68,7 @@ void PlayerLoadout::refresh_pending_cache() {
         order = static_cast<std::uint8_t>(order + carry);
       }
     } else {
-      // Normal branch: one cache index per live or catalog-declared instance.
+      // Ordinary branch: one cache index per live or catalog-declared instance.
       for (std::uint8_t instance = 0; instance < kInstances; ++instance) {
         if (handles_[slot][instance].valid() || instance < instances) {
           pending_cache_[slot][instance] = order++;
@@ -103,7 +103,16 @@ void PlayerLoadout::clear_handles(World* world, std::uint8_t slot) {
     }
     handles_[slot][instance] = EntityHandle{};
   }
-  slots_[slot].instances.fill(EntityHandle{});
+}
+
+void PlayerLoadout::retire_handle(std::uint8_t slot, std::uint8_t instance) {
+  if (slot >= kSlots || instance >= kInstances) {
+    return;
+  }
+  handles_[slot][instance] = EntityHandle{};
+  if (const auto* combat = Catalog::instance().petal_combat(slots_[slot].type_id)) {
+    slots_[slot].recharge_remaining_ms = combat->rechargeMilliseconds;
+  }
 }
 
 bool PlayerLoadout::equip(std::uint8_t slot, std::uint16_t type_id) {
@@ -171,9 +180,9 @@ bool PlayerLoadout::discard(World& world, PlayerState& state, PlayerProfile& pro
       Catalog::instance().petal(value.type_id) == nullptr) {
     return false;
   }
-  // Original opcode8 ends in 125: damage the occupant while its equipped
-  // handle is still reachable, then clear the slot. A hatched pet has no
-  // orbit record, so remove_slot_petals cannot retire it after this reset.
+  // Damage the occupant while its equipped handle is still reachable, then
+  // clear the slot. A hatched pet has no orbit record, so remove_slot_petals
+  // cannot retire it after this reset.
   clear_handles(&world, slot);
   const bool discarded = discard(profile, slot, expected_type);
   if (discarded) {
@@ -226,10 +235,10 @@ bool PlayerLoadout::swap(World& world, PlayerState& state, PlayerProfile& profil
   if (slots_[first].type_id != first_type || slots_[second].type_id != second_type) {
     return false;
   }
-  // Original input.mjs swapInventory performs two independent
-  // changeSlotType calls (second <- first value, then first <- second value).
-  // Both sides therefore retire their current children and re-enter the
-  // catalog recharge/pending state; states are never exchanged in place.
+  // A swap performs two independent change_slot_type calls (second <- first
+  // value, then first <- second value). Both sides therefore retire their
+  // current children and re-enter the catalog recharge/pending state; states
+  // are never exchanged in place.
   const std::uint16_t first_value = slots_[first].type_id;
   const std::uint16_t second_value = slots_[second].type_id;
   bool changed = false;
@@ -409,7 +418,6 @@ bool PlayerLoadout::create_equipped_petal(World& world, PlayerState& state, std:
   }
   attach_child(world, state.player(), handle);
   handles_[slot][instance] = handle;
-  slots_[slot].instances[instance] = handle;
   pending_[slot][instance] = 0U;
   timers_[slot][instance] = 0U;
   const std::uint32_t epoch =
@@ -461,8 +469,8 @@ void PlayerLoadout::refresh_recharge_progress(const World& world, const PlayerSt
       if (definition->orbitHidden) {
         continue;
       }
-      // Original 654 advances the elapsed timer but publishes zero for an
-      // equipped slot whose zone restriction currently blocks spawning.
+      // The elapsed timer still advances, but an equipped slot whose zone
+      // restriction currently blocks spawning publishes zero progress.
       if (state.zone_petals_disabled()) {
         recharge_progress_[slot] = 0U;
         continue;

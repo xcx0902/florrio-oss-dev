@@ -127,7 +127,7 @@ void self_petal_pet_projectile_and_wild_roots() {
 void catalog_equipment_ownership_and_recharge() {
   unsigned covered = 0;
   for (const auto& definition : Catalog::instance().petals()) {
-    if (definition.typeId == 0) {
+    if (definition.typeId == catalog::petal_type_id(catalog::PetalId::kNone)) {
       continue;
     }
     ++covered;
@@ -137,7 +137,7 @@ void catalog_equipment_ownership_and_recharge() {
     CHECK(apply_player_input(*world, a, 1, 2, f32(0), f32(0)));
     update_petal_orbits(*world, state(*world, a), 50);
     update_petal_orbits(*world, state(*world, b), 50);
-    const auto b_handles = state(*world, b).loadout().slots()[0].instances;
+    const auto b_handles = state(*world, b).loadout().handles(0);
     const auto b_phase = state(*world, b).loadout().orbit_phase();
     for (auto id : {a, b}) {
       for (const auto& orbit : state(*world, id).petals()) {
@@ -161,7 +161,7 @@ void catalog_equipment_ownership_and_recharge() {
       (void)refresh_loadout_petals(*world, state(*world, a), 0);
       CHECK((body(*world, a).player_expression & 4) != 0);
     }
-    CHECK(state(*world, b).loadout().slots()[0].instances == b_handles);
+    CHECK(state(*world, b).loadout().handles(0) == b_handles);
     CHECK(state(*world, b).loadout().orbit_phase() == b_phase);
     CHECK(state(*world, b).loadout().slots()[0].recharge_remaining_ms == 0);
     CHECK(!discard_player_slot(*world, a, 1, 0, 65535));
@@ -179,14 +179,14 @@ void roses_heal_only_their_owner() {
     const auto b = join_player(*world, "B", at(1000), profile(type));
     body(*world, a).health = f32(50);
     body(*world, b).health = f32(50);
-    const auto b_handles = state(*world, b).loadout().slots()[0].instances;
+    const auto b_handles = state(*world, b).loadout().handles(0);
     for (unsigned tick = 1; tick <= 29; ++tick) {
       world->set_time_ms(tick * 50);
       update_petal_orbits(*world, state(*world, a), 50);
     }
     CHECK(body(*world, a).health == f32(type == 6 ? 60 : type == 15 ? 72 : 60.5));
     CHECK(body(*world, b).health == f32(50));
-    CHECK(state(*world, b).loadout().slots()[0].instances == b_handles);
+    CHECK(state(*world, b).loadout().handles(0) == b_handles);
     CHECK(state(*world, a).petals().empty());
   }
 }

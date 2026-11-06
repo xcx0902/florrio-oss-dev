@@ -24,8 +24,8 @@ struct Aabb {
 /** Deterministic quadtree over a fixed world box.
  *
  * Bodies are stored once in the deepest node whose bounds contain the body
- * box. Query returns candidate ids; callers still run the exact original
- * collision predicate, so this index cannot change gameplay results.
+ * box. Query returns candidate ids; callers still run the exact collision
+ * predicate, so this index cannot change gameplay results.
  */
 class QuadTree {
  public:
@@ -33,14 +33,15 @@ class QuadTree {
 
   void clear();
   void insert(std::size_t id, const Aabb& box);
-  /** Remove one id from its node (swap-remove, preserving the archived order). */
+  /** Remove one id from its node (swap-remove: the node's last item takes the
+   * freed slot). */
   void remove(std::size_t id);
   /** Replace one id's box; reinsert only when the containing node changed. */
   void update(std::size_t id, const Aabb& box);
   /** Remove ids that are no longer present in the current tick. */
   void remove_missing(const std::vector<bool>& present);
-  /** Original163: collapse four leaf children when the total is <= capacity,
-   * appending their items in child index order after the parent items. */
+  /** Collapse four leaf children when their total is <= capacity, appending
+   * their items in child index order after the parent items. */
   void compact();
   void query(const Aabb& area, std::vector<std::size_t>& out) const;
   [[nodiscard]] std::size_t size() const { return size_; }

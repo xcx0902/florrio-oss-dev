@@ -1,6 +1,7 @@
 import { ActivityFlag } from '../schema/state-flags.js';
 import { SpeciesId } from '../schema/catalog-ids.js';
 import type { EntityState } from '../state/world.js';
+import { byteField } from '../state/snapshot-fields.js';
 import { usesActivityAnimation } from './species-groups.js';
 
 /** Presentation clocks advance only when the native component is drawn.
@@ -32,8 +33,7 @@ export function advanceSpeciesAnimation(
   const species = entity.speciesId ?? entity.typeId;
   if (usesActivityAnimation(species)) {
     state.time += elapsed;
-    const flags =
-      entity.byteFields?.[36] ?? entity.denseByteFields?.[36] ?? entity.denseFields?.[36];
+    const flags = byteField(entity, 36);
     const target = typeof flags === 'number' && (flags & ActivityFlag.Engaged) !== 0 ? 1 : 0;
     const blend = Math.max(0, Math.min(1, 1 - Math.pow(0.7, elapsed * 0.06)));
     state.activity = f(

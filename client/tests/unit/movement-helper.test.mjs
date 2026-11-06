@@ -211,7 +211,7 @@ test('16ms smoothing uses the separate native 0.7/0.6 rates and reset reproduces
   assert.deepEqual(stationary.ops, []);
 });
 
-test('death fades an existing arrow and preserves the original absolute-world endpoint scaling', () => {
+test('death fades an existing arrow and preserves the absolute-world endpoint scaling', () => {
   const helper = new MovementHelper();
   helper.draw(surface().context, input());
   const fading = surface();

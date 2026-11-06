@@ -38,15 +38,14 @@ bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hat
   pet->ai.radius = f32(1000.0F);
   pet->ai.guard_radius = f32(300.0F);
   pet->ai.leash = f32(1000.0F);
-  // The species' original aggression/chase/idle profile remains in force.
-  // 693/719 disable the population-band record (+204), not the AI (+104).
+  // The species' aggression/chase/idle profile remains in force. Only the
+  // population-band counter is cleared, not the AI record.
   pet->spawn_band = 0xFFU;
   attach_child(world, owner, pet_handle);
   auto& loadout = state.loadout();
   if (slot < PlayerLoadout::kActiveSlots && instance < PlayerLoadout::kInstances &&
       loadout.handle(slot, instance) == egg_handle) {
     loadout.set_handle(slot, instance, pet_handle);
-    loadout.slots()[slot].instances[instance] = pet_handle;
     loadout.set_pending(slot, instance, false);
     loadout.set_pending_timer(slot, instance, 0U);
     loadout.slots()[slot].recharge_remaining_ms = 0.0;
@@ -79,11 +78,7 @@ void refresh_egg_pet_slots(World& world, PlayerState& state) {
     if (pet != nullptr && pet->kind != EntityKind::kMob) {
       continue;
     }
-    loadout.clear_handle(slot, 0U);
-    slots[slot].instances[0] = EntityHandle{};
-    if (const auto* definition = Catalog::instance().petal_combat(slots[slot].type_id)) {
-      slots[slot].recharge_remaining_ms = definition->rechargeMilliseconds;
-    }
+    loadout.retire_handle(slot, 0U);
   }
 }
 }  // namespace engine

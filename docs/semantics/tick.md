@@ -1,7 +1,6 @@
 # Server tick order
 
-Status: the domain tick has a fixed phase order. It is not a phase-by-phase port
-of a monolithic server body.
+Status: every step runs in a fixed phase order and each phase is implemented.
 
 ## Domain order
 
@@ -20,13 +19,15 @@ can read `World::phase_trace()` and assert the exact order:
    phase and before the corpse sweep. Spawn-selection draws precede same-tick AI
    timer redraws, and a corpse expiring this tick is replaced next tick;
 5. `ai` — validate/acquire targets, spawn-protection timer, accelerate or
-   wander, AI+32/+40/+100 random-angle timer;
+   wander, `timer_active` random-angle timer with `timer_deadline_ms` and
+   `timer_interval_ms` (ms);
 6. `deferred-launches` — due Peas radial-impulse callbacks;
 7. `effects` — advance each shared payload once, apply the strongest poison,
    refresh effect flags;
 8. `area-effects` — expire/prune area payloads and rebuild target lists from
    the `owner ± scale` square query;
-9. `petal-phase` — advance the equipped-petal ring phase (loadout +284);
+9. `petal-phase` — advance the equipped-petal ring phase (`loadout.orbit_phase`,
+   radians);
 10. `loadout-petals` — slot recharge, pending timers, missing instance respawn;
 11. `petal-orbits` — input-driven radius, orbit acceleration, Rose heal;
 12. `player-controls` — input-derived velocity impulse and angle, then

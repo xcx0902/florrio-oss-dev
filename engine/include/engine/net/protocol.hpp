@@ -17,7 +17,9 @@ struct OutputPacket {
   std::vector<std::uint8_t> payload;
 };
 
-/** Output queue with the original capacity and final-response contract. */
+/** Bounded output queue holding at most kOutputQueueCapacity packets. Enqueue
+ * fails once full; drain() hands every queued packet to the caller, which owns
+ * the final-response framing. */
 class OutputQueue {
  public:
   [[nodiscard]] bool enqueue(OutputPacket packet) {

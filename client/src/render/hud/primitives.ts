@@ -125,7 +125,7 @@ export function filledSlot(
   const side = f(size - f(size / 12)),
     half = f(side * 0.5);
   if (angle !== 0) {
-    // Rotate the entire native card pass, including its recharge clip, art
+    // Rotate the entire card pass, including its recharge clip, art
     // and label, about the same center. Keep logical getTransform unrotated
     // so cached text composition does not apply the rotation twice.
     const cosine = f(Math.cos(angle)),
@@ -180,7 +180,7 @@ export function filledSlot(
   const recharge = clamp(progress);
   const rechargeAngle = f(recharge * recharge * TAU);
   if (rechargeAngle < TAU * 0.99999) {
-    // func587: rotating sector clipped before the border and petal art.
+    // Rotating recharge sector, clipped before the border and petal art.
     context.save();
     context.setGlobalAlpha(1);
     context.beginPath();
@@ -207,9 +207,9 @@ export function filledSlot(
   drawPetalIcon(context, type, size / 70);
   context.restore();
   context.setTransform(1, 0, 0, 1, 0, 0);
-  // func587 sizes the label from the petal definition's label radius
-  // (n[9] * slotSize / 70), not from its collision radius. The cached font
-  // stays in source units under the HUD matrix, so the bitmap's measured
+  // The label size comes from the petal definition's label radius
+  // (labelSize * slotSize / 70), not from its collision radius. The cached
+  // font stays in logical units under the HUD matrix, so the bitmap's measured
   // advance and outline margins are scaled exactly once.
   const logicalFont = f((PETAL_INFO[type].labelSize * size) / 70);
   const textWidth = measureLabel(PETAL_INFO[type].name, logicalFont);

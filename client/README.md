@@ -2,7 +2,7 @@
 
 The client owns input, interpolation, rendering and UI. The default profile connects to the native
 C++ server over binary WebSocket v2. `?profile=offline` explicitly selects the
-local Worker adapter for diagnostics and legacy regressions.
+local Worker adapter for diagnostics and compatibility regressions.
 
 ```sh
 npm run build:client   # fresh staging -> build/client (JS only)
@@ -14,8 +14,8 @@ Handwritten index/worker/fonts live in `client/static/`, compiler output in
 `build/client/`, and the served product in `dist-next/`. Build the delivery before
 running browser tests. The online input pump samples every 50ms independently of
 snapshots; the native server owns simulation time. Commands have bounded promises
-and explicit results. The offline adapter retains the original one-in-flight
-Worker step and its error/timeout/termination cleanup.
+and explicit results. The offline adapter keeps one Worker step in flight
+and the same error/timeout/termination cleanup.
 
 `FrameContext` retains ordered membership and finished interpolation values;
 `RenderResources` owns bounded LRU caches and explicit bitmap release. See

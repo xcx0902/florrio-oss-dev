@@ -9,7 +9,7 @@ export function lerp(a: number, b: number, t: number): number {
 }
 
 export function lerpAngle(a: number, b: number, t: number): number {
-  // Original705 normalizes each endpoint before choosing its nearest winding.
+  // Each endpoint is normalized before choosing its nearest winding.
   // Returning an equivalent angle around 2π instead changes the later f32
   // narrowing and therefore the Canvas rotation matrix.
   const turn = 2 * Math.PI;

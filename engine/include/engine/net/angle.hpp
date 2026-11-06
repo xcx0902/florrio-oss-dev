@@ -4,9 +4,10 @@
 
 namespace engine {
 
-/** Original setLocalAngle / writeEntityDelta: positive floating remainder,
- * multiply by the shipped f64 constant, truncate (not round), retain u16.
- * This quantizes replication only; the simulation angle is unchanged. */
+/** Quantize a simulation angle for snapshots: take the positive floating
+ * remainder in [0, 2*pi), scale by 65535/2*pi in f64, truncate (not round) and
+ * keep the low 16 bits. This quantizes replication only; the simulation angle
+ * is unchanged. */
 [[nodiscard]] inline std::uint16_t pack_snapshot_angle(double radians) {
   constexpr double kTau = 6.283185307179586;
   double value = std::fmod(radians, kTau);

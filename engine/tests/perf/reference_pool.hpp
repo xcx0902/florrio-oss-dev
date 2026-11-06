@@ -66,7 +66,7 @@ class ReferenceEntityPool {
     return owns(handle) ? &(*entities_)[handle.index()] : nullptr;
   }
   /** Reserve slots at the front of the free list without activating them.
-   * The original world keeps three storage records in slots 0..2, so the first
+   * The world keeps three storage records in slots 0..2, so the first
    * gameplay entity is allocated from slot 3. */
   void reserve_front(std::uint32_t count) {
     while (count-- > 0U && !free_.empty()) {

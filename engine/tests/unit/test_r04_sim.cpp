@@ -64,7 +64,7 @@ void loot_precedes_mass_separation() {
   const auto drop_handle = world.pickups()[0];
   const auto* drop = world.entities().get(drop_handle);
   require(drop != nullptr && drop->position.x.value == 100.0F && drop->position.y.value == 50.0F,
-          "loot keeps original pre-separation position");
+          "loot keeps pre-separation position");
   require(drop->health.value == 0.0F && drop->max_health.value == 0.0F,
           "pickup has no health component");
   engine::tick(world, 50.0);
@@ -102,7 +102,7 @@ void pickup_grace_follow_and_expiry() {
   auto* drop = world.entities().get(handle);
   require(drop != nullptr && drop->pickup_collected,
           "70-unit query collects at 65-unit separation");
-  require(drop->position.x.value == 31.719999313354492F, "original f64 follow rounds once to f32");
+  require(drop->position.x.value == 31.719999313354492F, "f64 follow rounds once to f32");
   require(engine::test::player(world).loadout().pickup_transfers().size() == 1U,
           "one real transfer event");
   require(engine::test::player(world).profile().inventory(0) == 2U,
@@ -133,7 +133,7 @@ void full_inventory_does_not_invent_backpack_pickup() {
   for (int tick = 0; tick < 11; ++tick) {
     engine::tick(world, 50.0);
   }
-  require(!world.entities().get(handle)->pickup_collected, "original198 rejects a full inventory");
+  require(!world.entities().get(handle)->pickup_collected, "full inventory rejects the pickup");
   require(engine::test::player(world).profile().backpack_count() == 0U &&
               engine::test::player(world).loadout().pickup_transfers().empty(),
           "no synthetic backpack or sentinel event");
@@ -162,7 +162,7 @@ void dead_query_body_stops_contact_traversal() {
   require(first_health + second_health == 10.0F, "corpse does not kill a second live petal");
 }
 
-void player_and_owned_corpses_keep_original_window() {
+void player_and_owned_corpses_keep_corpse_window() {
   engine::World world;
   world.initialize();
   const auto player = engine::spawn_player(world, engine::test::player(world), "corpse", {}, {});
@@ -199,12 +199,12 @@ void player_health_refreshes_before_each_regeneration() {
   const auto player = engine::spawn_player(world, engine::test::player(world), "health", {}, {});
   require(player.valid(), "health refresh setup");
   auto* entity = world.entities().get(player);
-  // Unmodified original wasm, death scenario at 6100ms: the unchanged 100
-  // maximum still rescales 90.02083587646484 to 90.02084350585938 first.
+  // Health refresh rescales against the unchanged 100 maximum before
+  // regenerating: 90.02083587646484 becomes 90.02084350585938 first.
   entity->health = engine::f32(90.02083587646484F);
   engine::regenerate_players(world, 50.0);
   require(entity->health.bits() == engine::f32(90.04167938232422F).bits(),
-          "original per-tick health refresh and regeneration are bit-exact");
+          "per-tick health refresh and regeneration are bit-exact");
   require(entity->max_health.bits() == engine::f32(100.0F).bits(),
           "refresh does not require a maximum-health change");
   const auto before_no_step = entity->health.bits();
@@ -227,13 +227,13 @@ int main() {
   mob_manager_contacts_do_not_damage();
   std::cout << "ok 3 - shared mob manager contacts remain harmless\n";
   pickup_grace_follow_and_expiry();
-  std::cout << "ok 4 - pickup grace, follow and absolute expiry match original\n";
+  std::cout << "ok 4 - pickup grace, follow and absolute expiry\n";
   full_inventory_does_not_invent_backpack_pickup();
   std::cout << "ok 5 - full inventory leaves pickup in world\n";
   dead_query_body_stops_contact_traversal();
   std::cout << "ok 6 - dead querying body stops remaining contacts\n";
-  player_and_owned_corpses_keep_original_window();
-  std::cout << "ok 7 - player and owned corpses retain original 1000ms window\n";
+  player_and_owned_corpses_keep_corpse_window();
+  std::cout << "ok 7 - player and owned corpses keep the 1000ms corpse window\n";
   player_health_refreshes_before_each_regeneration();
-  std::cout << "ok 8 - original per-tick player health refresh is bit-exact\n1..8\n";
+  std::cout << "ok 8 - per-tick player health refresh is bit-exact\n1..8\n";
 }

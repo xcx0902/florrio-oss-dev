@@ -25,8 +25,8 @@ bool same_controlling_root(const World& world, EntityHandle first, EntityHandle 
   if (a == b) {
     return true;
   }
-  // The domain has no manager entity. Uncontrolled mob roots all represent
-  // that one original controller; pets instead end at their owning player.
+  // The domain has no manager entity. All uncontrolled mob roots count as one
+  // shared controller; pets instead end at their owning player.
   const bool wild_a =
       root_a != nullptr ? root_a->kind == EntityKind::kMob : source_a->world_controlled;
   const bool wild_b =
@@ -70,7 +70,7 @@ std::size_t alert_nearby(World& world, EntityHandle attacker, f32 radius) {
   }
   std::size_t changed = 0;
   const f32 radius_squared = radius * radius;
-  // Original 196 walks the quadtree with the recovered 0,2,1,3 quadrant order.
+  // Candidate order follows the quadtree's NW, SW, NE, SE traversal.
   SpatialQuery query = SpatialQuery::from_world(world);
   std::vector<EntityHandle> candidates;
   query.query_circle(source->position, radius, candidates);
@@ -132,8 +132,7 @@ EntityHandle find_target(const World& world, const SpatialQuery& query, EntityHa
     if (!is_actor(*entity)) {
       continue;
     }
-    // Original 197 tests entity+224, not the ordinary +236 owner handle.
-    // An Egg pet has +224 == 0 and remains an eligible actor.
+    // Players and mobs are actors; a hatched Egg pet stays eligible here.
     const double distance = distance_squared_d(seeker->position, entity->position);
     if (distance >= static_cast<double>(radius.value) * static_cast<double>(radius.value)) {
       continue;

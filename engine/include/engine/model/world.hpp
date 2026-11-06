@@ -26,15 +26,15 @@ namespace engine {
 inline constexpr std::uint32_t kInvalidEntity = std::numeric_limits<std::uint32_t>::max();
 
 /** Server-side world skeleton. Simulation domains are filled in by
- * engine/src/sim/; this header intentionally has no magic offsets. */
+ * engine/src/sim/; this header declares typed state and accessors only. */
 class World {
  public:
   World() = default;
 
   void reset();
 
-  /** Match sp_server_init's 16,384 entity-slot handle pass: every index gets a
-   * nonzero generation from the 64-bit LCG, rejecting generation & 262143 == 0. */
+  /** Initialize all 16,384 entity slots: every index gets a nonzero generation
+   * from the 64-bit LCG, rejecting generation & 262143 == 0. */
   void initialize(std::uint64_t handle_seed = 0);
 
   [[nodiscard]] CollisionContext& collision() { return collision_; }
@@ -46,10 +46,9 @@ class World {
   [[nodiscard]] const MinstdRng& rng() const { return rng_; }
   [[nodiscard]] ServerRng& random() { return random_; }
   [[nodiscard]] const ServerRng& random() const { return random_; }
-  /** Original retainPlayerLoot has a separate, once-initialized minstd stream.
-   * Original130 obtains four host entropy bytes; seed modulo INT_MAX, zero->1.
-   * Host entropy is not shared with this deterministic reconstruction: seed1
-   * is the bounded fixture default. Callers can supply an explicit raw seed. */
+  /** The death shuffle keeps its own random stream, separate from the world
+   * RNG. The seed is the supplied entropy modulo INT_MAX, with zero coerced to
+   * one; the default seed of 1 keeps runs deterministic. */
   void seed_death_shuffle(std::uint32_t entropy) { death_shuffle_.seed(entropy % 2147483647U); }
   [[nodiscard]] ServerRng& death_shuffle_random() { return death_shuffle_; }
   [[nodiscard]] PlayerRegistry& players() { return players_; }
@@ -90,9 +89,10 @@ class World {
   }
   [[nodiscard]] const std::deque<DeathRecord>& deaths() const { return deaths_; }
 
-  /** Original424 detaches the entity+212 constraint links at health death,
-   * independently of ordinary ownership. Centipede links have +76 clear,
-   * so a surviving next segment becomes a root even after a middle death. */
+  /** Detach constraint links at health death, independently of ordinary
+   * ownership. The dead handle and any segment that names it as predecessor
+   * lose that link, so a surviving next segment becomes a root even after a
+   * middle death. */
   void detach_linked_entities(EntityHandle handle);
 
   [[nodiscard]] bool destroy(EntityHandle handle);
@@ -103,7 +103,7 @@ class World {
   [[nodiscard]] const std::vector<HitEvent>& hit_events() const { return hit_events_; }
   void clear_hit_events() { hit_events_.clear(); }
 
-  /** Pickup intrusive registry (world +36 count / +44 pointer vector). */
+  /** Intrusive pickup registry; `pickup_prev`/`pickup_next` link live pickups. */
   void register_pickup(EntityHandle handle) {
     Entity* entity = entities_.get(handle);
     if (entity == nullptr || entity->pickup_listed) {
@@ -140,9 +140,9 @@ class World {
   }
   [[nodiscard]] const std::vector<EntityHandle>& pickups() const { return pickups_; }
 
-  /** AI component registry: append on creation, swap with the tail on removal,
-   * matching the original dense component vector. Its order determines RNG
-   * assignment when several wandering timers fire in one tick. */
+  /** AI component registry: append on creation, swap with the tail on removal.
+   * Its order determines RNG assignment when several wandering timers fire in
+   * one tick. */
   void register_ai(EntityHandle handle) {
     if (!handle.valid()) {
       return;
@@ -161,10 +161,9 @@ class World {
   }
   [[nodiscard]] const std::vector<EntityHandle>& ai_entities() const { return ai_order_; }
 
-  /** Original ant-hole release registry: append on species initialization,
-   * swap with the tail on destruction. The iteration order is the order in
-   * which holes were spawned, which determines RNG assignment when several
-   * holes cross a threshold in the same tick. */
+  /** Ant-hole release registry: append on species initialization, swap with
+   * the tail on destruction. Registration order determines RNG assignment when
+   * several holes cross a threshold in the same tick. */
   void register_ant_hole(EntityHandle handle) {
     if (!handle.valid()) {
       return;
@@ -191,7 +190,7 @@ class World {
     return ant_hole_releases_;
   }
 
-  /** Area-effect domain (original world+24780 vector and function 271). */
+  /** Area-effect domain: one payload per effect owner, refreshed each tick. */
   std::shared_ptr<EffectPayload> replace_area_effect(EntityHandle owner, f32 scale,
                                                      std::shared_ptr<EffectPayload> payload);
   std::size_t update_area_effects();
@@ -199,7 +198,7 @@ class World {
   [[nodiscard]] const std::vector<AreaEffect>& area_effects() const { return area_effects_; }
   [[nodiscard]] std::uint32_t allocate_effect_id() { return next_effect_id_++; }
 
-  /** Deferred Peas launch queue (original world+1916 vector). */
+  /** Deferred Peas launch queue, dispatched in due-time order. */
   void schedule_deferred_launch(double due_ms, f32 phase, std::vector<EntityHandle> children) {
     DeferredLaunch launch;
     launch.due_ms = due_ms;
@@ -217,8 +216,7 @@ class World {
     return last_launch_order_;
   }
 
-  /** R05 phase trace: the ordered system names executed by the last tick.
-   * This is evidence for the phase-level comparison against spServerThink. */
+  /** Phase trace: the ordered system names executed by the last tick. */
   void record_phase(const char* phase) {
     PERF_PHASE(phase);
     phase_trace_.push_back(phase);

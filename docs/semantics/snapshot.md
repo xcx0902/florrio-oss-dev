@@ -185,12 +185,23 @@ publishes its real petal type and the collected bit.
   schema-derived dense plans and events 9/11/14; validates the entire packet
   before committing masks/pointers, rejecting malformed or truncated input.
 - `client/src/state/snapshot-projection.ts` — named domain/death/loadout views;
-  `state/snapshot.ts` is only a public compatibility re-export.
+  `state/snapshot.ts` re-exports the public types and the single decoder.
+- `client/src/state/snapshot-fields.ts` — `byteField`/`floatField`/`stringField`/
+  `numberField` read one wire field from either encoding, so a value is stored
+  once and consumers never keep a second copy.
 - `client/src/state/field-types.ts` — field-type sets, the generated
   `Component` table, 19 dense groups and `componentBit`.
 - `client/src/state/world.ts` — `WorldState.applyDeltaSnapshot` merges sparse,
   dense and indexed values by field identity; keeps interpolation anchors, chat
   lines and visual hit indices.
+
+A decoded record stores each field once: sparse values in the map for their
+protocol type (`byteFields`, `floatFields`, `doubleFields`, `varintFields`,
+`referenceFields`, `stringFields`, `bitFields`, and the indexed arrays) and dense
+payloads in `denseFields`. `applyDeltaSnapshot` merges those maps by field id and
+folds a dense group into the same view, so dense and sparse encodings of one
+field cannot disagree, and no named mirror (`inventory`, `byteField1`,
+`angleField8`, `denseByteFields`) is kept beside it.
 
 There is no `SkeletonSnapshotDecoder` or composite fallback; every packet is
 decoded against the live mask/dense contract.

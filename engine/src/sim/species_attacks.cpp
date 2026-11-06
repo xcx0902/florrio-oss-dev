@@ -13,8 +13,8 @@ std::uint32_t stinger_spawns = 0;
 namespace {
 
 constexpr double kTwoPi = 6.283185307179586476925286766559;
-// Original 695 writes a persistent acceleration (transform +56/+64),
-// an initial velocity (+40/+48), and an opposite recoil on the firing body.
+// The launch writes a persistent acceleration, an initial velocity, and an
+// opposite recoil on the firing body.
 constexpr float kLaunchVelocity = 1.4F;
 constexpr float kLaunchAcceleration = 0.6F;
 constexpr float kRecoil = -0.4F;
@@ -35,8 +35,8 @@ EntityHandle spawn_hornet_stinger(World& world, EntityHandle hornet_handle,
     return EntityHandle{};
   }
 
-  // The callback's second argument is unused in the oracle. It launches
-  // along the body's recorded facing, which AI has already updated this tick.
+  // The target only gates the launch. The stinger launches along the body's
+  // recorded facing, which AI has already updated this tick.
   const double angle = static_cast<double>(hornet->angle.value);
   const f32 direction_x = f32::from_double(std::cos(angle));
   const f32 direction_y = f32::from_double(std::sin(angle));

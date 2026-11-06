@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
                         test_killer_name_uses_attacker_identity);
   engine::test::runTest("test_loadout_exact_layout", test_loadout_exact_layout);
   engine::test::runTest("test_alert_to_attacker_is_local", test_alert_to_attacker_is_local);
-  engine::test::runTest("test_ai_recovered_species_profiles", test_ai_recovered_species_profiles);
+  engine::test::runTest("test_ai_species_profiles", test_ai_species_profiles);
   engine::test::runTest("test_ai_behavior_modifiers", test_ai_behavior_modifiers);
   engine::test::runTest("test_hornet_stinger_callback", test_hornet_stinger_callback);
   engine::test::runTest("test_hornet_stinger_lifecycle", test_hornet_stinger_lifecycle);

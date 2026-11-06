@@ -4,18 +4,17 @@
 
 namespace engine {
 
-/** Original function 262: 1.06 raised to an integer exponent by repeated
- * squaring. The loop termination test is unsigned in the shipped body; this
- * version follows the recovered JS body exactly for the non-negative range
- * used by progression. */
+/** 1.06 raised to an integer exponent by repeated squaring. Progression only
+ * passes non-negative exponents; the loop counts them down as an unsigned
+ * value. */
 [[nodiscard]] double growth_factor(std::int32_t exponent);
 
 /** Experience required to advance from `level` to `level + 1`:
  * floor(1.06 ** (level - 1) * level) + 3, rounded to binary32. */
 [[nodiscard]] f32 experience_threshold(std::uint8_t level);
 
-/** Experience awarded by a petal of the given rarity index. Values are read
- * from the original server data table at 6960. */
+/** Experience awarded by a petal of the given rarity index, read from the
+ * generated catalog table. */
 [[nodiscard]] f32 rarity_experience(std::uint32_t rarity_index);
 
 }  // namespace engine

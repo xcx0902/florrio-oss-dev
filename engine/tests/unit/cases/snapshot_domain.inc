@@ -90,7 +90,8 @@ void test_player_loadout_replication() {
   const auto player = engine::spawn_player_default(api.world(), engine::test::player(api.world()),
                                                    "inventory", profile, false);
   CHECK(player.valid());
-  CHECK(engine::test::player(api.world()).loadout().slots()[9].type_id == 3U);
+  CHECK(engine::test::player(api.world()).loadout().slots()[9].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
   (void)engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 0.0);
   const auto basic = engine::test::player(api.world()).loadout().handle(0U, 0U);
   CHECK(basic.valid());
@@ -203,7 +204,7 @@ void test_player_loadout_replication() {
     CHECK(type == 0U);
   }
   CHECK(values.score_count == 1U && values.score == 0.0F);
-  // Original aggregation takes the least ready missing instance, rather than
+  // Recharge aggregation takes the least ready missing instance, rather than
   // hiding recharge behind any one surviving petal in a multi-instance slot.
   CHECK(engine::test::player(api.world()).loadout().equip(0U, 17U));
   engine::test::player(api.world()).loadout().slots()[0].recharge_remaining_ms = 250.0;
@@ -218,7 +219,7 @@ void test_player_loadout_replication() {
 }
 
 void test_snapshot_angle_quantization() {
-  // Values captured from original func94's new-angle packet (8555152).
+  // Golden packed angles for the snapshot new-angle field.
   CHECK(engine::pack_snapshot_angle(1.0) == 10430U);
   CHECK(engine::pack_snapshot_angle(0.0) == 0U);
   CHECK(engine::pack_snapshot_angle(0.00005) == 0U);
@@ -343,7 +344,8 @@ void test_pickup_transfer_snapshot() {
   CHECK(event.read_u8().value() == 0U);
   CHECK(event.eof());
   CHECK(api.world().entities().get(drop)->pickup_collected);
-  CHECK(engine::test::player(api.world()).loadout().slots()[0].type_id == 2U);
+  CHECK(engine::test::player(api.world()).loadout().slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
   CHECK(engine::test::player(api.world()).loadout().pickup_transfers().empty());
   const auto next = api.domain_snapshot_bytes(12U, 0U);
   engine::ByteReader next_header(next);
@@ -382,7 +384,7 @@ void test_domain_boot_visibility() {
     return;
   }
   CHECK(controlled->health.value > 0.0F);
-  // Original beginSnapshot uses the live viewer's f32 rectangle, not every
+  // The snapshot domain uses the live viewer's f32 rectangle, not every
   // simulated body. Compare exact membership, independently of wire count:
   // one handle may have base, dense, profile and loadout records.
   const engine::f32 width = engine::f32(1920.0F) / engine::f32(0.9F) + engine::f32(200.0F);

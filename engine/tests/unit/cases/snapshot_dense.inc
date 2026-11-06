@@ -282,8 +282,8 @@ void test_input_discard_deletion_then_swap() {
   discard.write_varint32(2U);
   discard.write_varint32(1U);
   send(discard);
-  // Original125 damages the slot occupant through43. Its healthless body
-  // remains visible for1000ms, then the ordinary removal is replicated.
+  // A discard damages the slot occupant to zero health. Its healthless body
+  // remains visible for 1000 ms, then the ordinary removal is replicated.
   const auto* discarded_body = api.world().entities().get(discarded);
   CHECK(discarded_body != nullptr);
   CHECK(discarded_body != nullptr && discarded_body->health.value == 0.0F);
@@ -313,11 +313,12 @@ void test_input_discard_deletion_then_swap() {
   }
   send(swap);
   api.think();
-  // Original swap is two changeSlotType calls: the old slot-0 petal is retired
-  // and the incoming slot-2 petal waits out a full recharge before spawning.
+  // The swap is two change_slot_type calls: the old slot-0 petal is retired and
+  // the incoming slot-2 petal waits out a full recharge before spawning.
   CHECK(!engine::test::player(api.world()).loadout().handle(2U, 0U).valid());
   CHECK(engine::test::player(api.world()).loadout().pending(2U, 0U));
-  CHECK(engine::test::player(api.world()).loadout().slots()[2].type_id == 1U);
+  CHECK(engine::test::player(api.world()).loadout().slots()[2].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   unsigned count = 0U, slot2 = 0U;
   for (const auto& entity : api.world().entities().entities()) {
     if (!entity.active || entity.health.value <= 0.0F ||

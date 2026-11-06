@@ -62,8 +62,8 @@ export function wrapContext(
   let matrix = current();
   let flushed = matrix;
   const stack: { matrix: Matrix; flushed: Matrix }[] = [];
-  // The recovered renderer keeps a logical f32 matrix and flushes its cache
-  // at coordinate/path-resource operations, after intervening style setters.
+  // The renderer keeps a logical f32 matrix and flushes its cache at
+  // coordinate/path-resource operations, after intervening style setters.
   const flush = (): void => {
     if (
       matrix[0] !== flushed[0] ||

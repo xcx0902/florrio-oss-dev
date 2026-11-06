@@ -248,7 +248,6 @@ export class SnapshotDecoder {
       this.addOrdinals(handle, declaredComponents);
     }
     let field = 0;
-    let byteField1 = 0;
     const byteFields: Record<number, number> = {};
     const byteArrayFields: Record<number, { index: number; value: number }[]> = {};
     const varintArrayFields: Record<number, { index: number; value: number }[]> = {};
@@ -259,14 +258,8 @@ export class SnapshotDecoder {
     const bitFields: Record<number, number> = {};
     const handleArrayFields: Record<number, { index: number; handle: number }[]> = {};
     const referenceFields: Record<number, number> = {};
-    let floatField5 = 0;
-    let doubleField35 = 0;
-    let doubleField18 = 0;
-    let floatField27 = 0;
-    let stringField4 = '';
-    let floatField45 = 0;
-    let angleField8: number | undefined;
     const floatFields: Record<number, number> = {};
+    const doubleFields: Record<number, number> = {};
     for (;;) {
       const delta = reader.varint();
       if (delta === 0) {
@@ -277,23 +270,13 @@ export class SnapshotDecoder {
         return null;
       }
       if (BYTE_FIELDS.has(field)) {
-        const value = reader.u8();
-        byteFields[field] = value;
-        if (field === 1) {
-          byteField1 = value;
-        }
+        byteFields[field] = reader.u8();
       } else if (FLOAT_FIELDS.has(field)) {
-        const value = reader.f32();
-        floatFields[field] = value;
-        if (field === 5) {
-          floatField5 = value;
-        }
-      } else if (field === 35) {
-        doubleField35 = reader.f64();
-      } else if (field === 18) {
-        doubleField18 = reader.f64();
-      } else if (field === 27) {
-        floatField27 = reader.f32();
+        floatFields[field] = reader.f32();
+      } else if (field === 35 || field === 18) {
+        doubleFields[field] = reader.f64();
+      } else if (field === 27 || field === 45) {
+        floatFields[field] = reader.f32();
       } else if (field === 3) {
         let elementIndex = 0;
         handleArrayFields[3] = [];
@@ -332,8 +315,6 @@ export class SnapshotDecoder {
             value: field === 61 ? value & 0xffff : value,
           });
         }
-      } else if (field === 4) {
-        stringField4 = reader.string();
       } else if (STRING_FIELDS.has(field)) {
         stringFields[field] = reader.string();
       } else if (STRING_ARRAY_FIELDS.has(field)) {
@@ -350,11 +331,11 @@ export class SnapshotDecoder {
       } else if (REFERENCE_FIELDS.has(field)) {
         referenceFields[field] = reader.u32();
       } else if (field === 8) {
-        angleField8 = reader.u16() * ((2 * Math.PI) / 65535);
+        // Sparse angles are raw u16 on the wire; the domain stores radians so
+        // the sparse and dense views agree.
+        floatFields[8] = reader.u16() * ((2 * Math.PI) / 65535);
       } else if (BIT_FIELDS.has(field)) {
         bitFields[field] = reader.bit();
-      } else if (field === 45) {
-        floatField45 = reader.f32();
       } else if (VARINT_FIELDS.has(field)) {
         varintFields[field] = reader.varint();
       } else {
@@ -364,29 +345,12 @@ export class SnapshotDecoder {
     const scalarValues: Record<number, unknown> = {
       ...byteFields,
       ...floatFields,
+      ...doubleFields,
       ...varintFields,
       ...referenceFields,
       ...stringFields,
       ...bitFields,
     };
-    if (stringField4 !== '') {
-      scalarValues[4] = stringField4;
-    }
-    if (angleField8 !== undefined) {
-      scalarValues[8] = angleField8;
-    }
-    if (doubleField35 !== 0) {
-      scalarValues[35] = doubleField35;
-    }
-    if (doubleField18 !== 0) {
-      scalarValues[18] = doubleField18;
-    }
-    if (floatField27 !== 0) {
-      scalarValues[27] = floatField27;
-    }
-    if (floatField45 !== 0) {
-      scalarValues[45] = floatField45;
-    }
     const positionX = floatFields[49] ?? floatFields[5] ?? 0;
     const positionY = floatFields[28] ?? floatFields[24] ?? 0;
     return {
@@ -394,31 +358,23 @@ export class SnapshotDecoder {
       ...projectDomain(scalarValues),
       x: positionX,
       y: positionY,
-      angle: angleField8 ?? 0,
+      angle: floatFields[8] ?? 0,
       cameraX: floatFields[5],
       cameraY: floatFields[24],
       flags,
       componentMask,
       declaredComponents,
-      byteField1,
       byteFields,
-      floatField5,
       floatFields,
-      doubleField35,
-      doubleField18,
-      floatField27,
-      stringField4,
+      doubleFields,
       byteArrayFields,
       varintArrayFields,
       shortArrayFields,
-      inventory: byteArrayFields[60] ?? [],
       stringFields,
       stringArrayFields,
       varintFields,
       referenceFields,
-      floatField45,
       bitFields,
-      angleField8,
       handleArrayFields,
     };
   }

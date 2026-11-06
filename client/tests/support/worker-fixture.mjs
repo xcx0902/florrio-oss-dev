@@ -10,12 +10,11 @@ let server;
 export let browser;
 export let origin;
 
-/** Original beginSnapshot (simulation-tick.mjs 5939–5958) queries a
- * (1920 / viewScale + 200) x (1080 / viewScale + 200) rectangle. A fresh
- * Basic loadout uses f32(0.9), from original func145. These stationary smoke
+/** Visibility queries a (1920 / viewScale + 200) x (1080 / viewScale + 200)
+ * rectangle. A fresh Basic loadout uses f32(0.9). These stationary smoke
  * checks use the authoritative player position, not the easing client camera.
- * func192 tests inclusive AABB overlap; func167 includes attached children in
- * a root's bounds, so a visible Centipede may include an off-edge segment. */
+ * The predicate uses inclusive AABB overlap and a root's bounds include
+ * attached children, so a visible Centipede may include an off-edge segment. */
 export function readPeerVisibleSet() {
   const entities = [...window.__florr.world.all()];
   const byHandle = new Map(entities.map((entity) => [entity.handle, entity]));

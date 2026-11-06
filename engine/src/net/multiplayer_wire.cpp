@@ -141,10 +141,9 @@ std::optional<FrameHeader> unframe(std::span<const std::uint8_t> bytes, std::siz
     return {};
   }
   WireReader r(bytes.subspan(4, 12));
-  const auto version = r.u16(2, 2);
-  const auto type = r.u8(1), flags = r.u8(0, 0);
-  (void)version;
-  (void)flags;
+  r.u16(2, 2);  // Version 2; a mismatch fails the reader.
+  const auto type = r.u8(1);
+  r.u8(0, 0);  // Flags must be zero.
   const auto epoch = r.u32(), length = r.u32();
   if (!r.done() || length != bytes.size() - 16) {
     return {};

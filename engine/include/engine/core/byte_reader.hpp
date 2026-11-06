@@ -84,7 +84,8 @@ class ByteReader {
     return value;
   }
 
-  /** Unsigned LEB128, at most five bytes (matching the original reader). */
+  /** Unsigned LEB128, at most five bytes; five continuing bytes report
+   * kVarintOverflow instead of yielding a value. */
   [[nodiscard]] std::optional<std::uint32_t> read_varint32() {
     std::uint32_t value = 0;
     for (unsigned index = 0; index < 5; ++index) {

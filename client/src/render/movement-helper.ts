@@ -26,8 +26,8 @@ const ease = (current: number, target: number, base: number, elapsed: number): n
     ? f(target)
     : f(current + (target - current) * clamp(1 - Math.pow(base, elapsed * 0.06)));
 
-/** Original mouse guide: independently smooth the mouse and alive opacity,
- * then draw its world-space arrow. Camera/input state is never modified.
+/** Mouse guide: independently smooth the mouse and alive opacity, then draw
+ * the world-space arrow. Camera/input state is never modified.
  * Invisible strokes are omitted so draw() reports visible submissions.
  */
 export class MovementHelper {
@@ -89,8 +89,8 @@ export class MovementHelper {
     this.mouseX = ease(this.mouseX, worldX, 0.6, elapsed);
     this.mouseY = ease(this.mouseY, worldY, 0.6, elapsed);
 
-    // The original fade scales absolute world coordinates, not a vector
-    // relative to the player. Keep that observable startup/death behavior.
+    // The fade scales absolute world coordinates, not a vector relative to the
+    // player; this drives the observable startup/death behavior.
     const tipX = f(clamp(this.visibility) * this.mouseX);
     const tipY = f(clamp(this.visibility) * this.mouseY);
     const dx = tipX - playerX,

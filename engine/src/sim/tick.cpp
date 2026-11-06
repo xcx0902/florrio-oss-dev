@@ -26,7 +26,7 @@ void reap_dead(World& world) {
       if (!entity.active) {
         continue;
       }
-      // Pickups have no original health component; their 0/0 state is not death.
+      // Pickups have no health component; their 0/0 state is not death.
       if (entity.kind == EntityKind::kDrop) {
         continue;
       }
@@ -46,7 +46,7 @@ void reap_dead(World& world) {
   });
 }
 
-/** Original pickup lifetime countdown (pickup +32, 32..62 s by rarity). */
+/** Drop expiry deadline (32 to 62 s after spawn, by rarity); a drop past it is destroyed. */
 void expire_drops(World& world) {
   auto& entities = world.entities();
   entities.with_ordered_slots([&](auto&& slots) {
@@ -66,8 +66,8 @@ void expire_drops(World& world) {
   });
 }
 
-/** Original health+24 timer: expiry deals the current health as damage;
- * the zero-health body then persists for the ordinary 1000 ms death window. */
+/** Projectile lifetime timer: expiry deals the current health as damage; the
+ * zero-health body then persists for the ordinary 1000 ms death window. */
 void expire_projectiles(World& world, double delta_milliseconds) {
   world.entities().with_ordered_slots([&](auto&& slots) {
     for (auto& entity : slots) {
@@ -91,15 +91,14 @@ void tick(World& world, double delta_milliseconds) {
   if (!world.initialized()) {
     return;
   }
-  // The original tick reads the absolute clock (readClock) while simulating.
-  // `time_ms()` is therefore advanced to the tick's target time before any
-  // system runs; `advance_tick` at the end only bumps the tick counter.
+  // The tick reads the absolute clock, so `time_ms()` is advanced to the
+  // tick's target time before any system runs; `advance_tick` at the end only
+  // bumps the tick counter.
   world.set_time_ms(world.time_ms() + delta_milliseconds);
   world.clear_phase_trace();
   prepare_players(world);
-  // Original tick order: timed entities/AI, active damage effects, area
-  // targets, equipped petals, petal orbits, movement, collisions, snapshot.
-  // The trace is the domain evidence for R05's phase-level comparison.
+  // Tick order: timed entities/AI, active damage effects, area targets,
+  // equipped petals, petal orbits, movement, collisions, snapshot.
   regenerate_players(world, delta_milliseconds);
   expire_projectiles(world, delta_milliseconds);
   world.record_phase("regenerate-players");
@@ -109,10 +108,9 @@ void tick(World& world, double delta_milliseconds) {
   world.record_phase("petal-behaviors");
   constrain_linked_entities(world);
   world.record_phase("linked-constraints");
-  // Original advanceTimedEntitiesAndAi replenishes the population *before* the
-  // AI steering/timer draws (call 400 at simulation-tick ~1416, AI loop later),
-  // so spawn selection consumes RNG before any AI timer redraw in the same
-  // tick. The refill also precedes the corpse sweep, so a mob whose one-second
+  // Population replenishment runs *before* the AI steering/timer draws, so
+  // spawn selection consumes RNG before any AI timer redraw in the same tick.
+  // The refill also precedes the corpse sweep, so a mob whose one-second
   // corpse expires this tick is not replaced until the next tick.
   if (world.auto_populate()) {
     static const SpawnTable table = SpawnTable::from_catalog();
@@ -127,9 +125,9 @@ void tick(World& world, double delta_milliseconds) {
   world.record_phase("effects");
   (void)world.update_area_effects();
   world.record_phase("area-effects");
-  // Original updateEquippedPetals computes the overlevel zone countdown first.
-  // At the limit it skips the ring phase, slot recharge and all spawning, then
-  // damages the petals that are still equipped.
+  // The overlevel zone countdown is computed first. At the limit it skips the
+  // ring phase, slot recharge and all spawning, then damages the petals that
+  // are still equipped.
   world.players().for_each(
       [&](PlayerState& state) { update_zone_restriction(world, state, delta_milliseconds); });
   bool has_enabled_player = false;
@@ -140,7 +138,7 @@ void tick(World& world, double delta_milliseconds) {
     has_enabled_player = true;
     advance_loadout_orbit_phase(state, delta_milliseconds);
   });
-  // Preserve the legacy phase trace for empty/single-player worlds too.
+  // Record the phase for empty and single-player worlds too.
   if (has_enabled_player || world.players().size() == 0) {
     world.record_phase("petal-phase");
   }
@@ -159,10 +157,9 @@ void tick(World& world, double delta_milliseconds) {
   world.record_phase("player-controls");
   integrate_movement(world, delta_milliseconds);
   world.record_phase("movement");
-  // Original tick finishes the entity movement loop, then drains each ant
-  // hole's 4848/4852 release table using the health ratio it has reached.
-  // Contact damage for this tick resolves afterwards, so a hit taken in this
-  // tick releases on the next one, matching the original phase order.
+  // After the entity movement loop, each Ant Hole drains its release table
+  // using the health ratio it has reached. Contact damage for this tick
+  // resolves afterwards, so a hit taken in this tick releases on the next one.
   release_ant_hole_ants(world);
   world.record_phase("ant-hole-release");
   world.record_phase("broadphase");

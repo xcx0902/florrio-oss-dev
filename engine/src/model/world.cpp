@@ -50,8 +50,8 @@ void World::initialize(std::uint64_t handle_seed) {
     entities_.entities()[index].handle = EntityHandle::from_parts(index, generation);
     entities_.entities()[index].active = false;
   }
-  // Slots 0..2 are the original world's three storage records. They keep
-  // their generated handles but are never handed out to gameplay entities.
+  // Slots 0..2 are reserved storage records. They keep their generated handles
+  // but are never handed out to gameplay entities.
   entities_.reserve_front(3);
   rng_.seed(rng.state());
   initialized_ = true;
@@ -72,11 +72,7 @@ bool World::destroy(EntityHandle handle) {
         if (loadout.handle(slot, instance) != handle) {
           continue;
         }
-        loadout.clear_handle(slot, instance);
-        loadout.slots()[slot].instances[instance] = {};
-        if (const auto* combat = Catalog::instance().petal_combat(loadout.slots()[slot].type_id)) {
-          loadout.slots()[slot].recharge_remaining_ms = combat->rechargeMilliseconds;
-        }
+        loadout.retire_handle(slot, instance);
       }
     }
   }
@@ -110,8 +106,8 @@ bool World::destroy(EntityHandle handle) {
     players_.unbind_body(handle);
   }
   detach_linked_entities(handle);
-  // Original404 reparents ordinary ownership only. It must not reconnect
-  // constraint links that original43/424 already detached at health death.
+  // Re-parenting applies to ordinary ownership only. It must not reconnect
+  // constraint links already detached at health death.
   const bool owned = has_flag(entity->entity_flags, EntityFlag::kOwned);
   const std::uint32_t inherited_owner = owned ? entity->owner : kInvalidEntity;
   const EntityHandle inherited_owner_handle{inherited_owner == kInvalidEntity ? 0U
@@ -135,9 +131,8 @@ bool World::destroy(EntityHandle handle) {
                              parent->children.end());
     }
   }
-  // Release shared effect payloads immediately. The original effect slots
-  // own a reference to the payload; a dead entity must not keep an area
-  // effect alive until its slot is reused.
+  // Release shared effect payloads immediately: a dead entity must not keep an
+  // area effect alive until its slot is reused.
   for (auto& effect : entity->effects) {
     if (effect.payload && effect.payload->refcount > 0U) {
       --effect.payload->refcount;

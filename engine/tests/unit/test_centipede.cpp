@@ -47,7 +47,7 @@ void passive_chain() {
     world.entities().get(segment)->position = at(0);
   }
   update_ai(world, 50);
-  // Original205 clears both gates; original423 rechecks them recursively.
+  // Passivity gates start clear; the recursive check re-validates them per segment.
   for (auto struck : {head, segments[3]}) {
     (void)damage_entity(world, struck, f32(1.0F), player);
     for (auto segment : segments) {
@@ -81,13 +81,13 @@ void evil_chain(bool hit) {
     (void)damage_entity(world, head, f32(1.0F), player);
     for (auto segment : segments) {
       require(world.entities().get(segment)->ai.target == player,
-              "original423 alerts every evil descendant immediately");
+              "every evil descendant alerts immediately");
     }
   }
   update_ai(world, 50);
   for (auto segment : segments) {
     require(world.entities().get(segment)->ai.target == player,
-            "original654 inherits predecessor target each tick");
+            "segment inherits predecessor target each tick");
   }
   // Outside the 600-unit acquisition radius, inside its 900-unit retention
   // radius. A missing inherited target cannot be hidden by reacquisition.
@@ -107,14 +107,14 @@ void evil_chain(bool hit) {
   require(world.destroy(segments[3]), "middle segment removal");
   update_ai(world, 50);
   require(!world.entities().get(segments[4])->ai.predecessor.valid(),
-          "original424 splits the chain at a removed segment");
+          "removing a segment splits the chain");
   require(world.entities().get(segments[4])->ai.target == player,
           "relinked body retains pursuit target");
 }
 
-// Match the original43 fixture in centipede-death-evidence.mjs. Keep the
-// corpse alive through its full one-second window; destroying it directly
-// bypasses precisely the interval that previously stopped the chase.
+// Lethal-head fixture: keep the corpse alive through its full one-second
+// window; destroying it directly would skip the interval where the chase must
+// keep running.
 void lethal_head(bool trace) {
   World world;
   world.initialize();
@@ -136,7 +136,7 @@ void lethal_head(bool trace) {
   (void)damage_entity(world, head, world.entities().get(head)->health, player);
   require(world.entities().get(head)->death_processed, "real lethal damage leaves a corpse");
   require(!world.entities().get(promoted)->ai.predecessor.valid(),
-          "original43/424 detaches next head at death, before removal");
+          "death detaches the next head before removal");
   require(world.entities().get(promoted)->owner == head.raw,
           "ordinary ownership lasts through corpse lifetime");
   // Isolate steering/movement from contacts with the rest of the chain.

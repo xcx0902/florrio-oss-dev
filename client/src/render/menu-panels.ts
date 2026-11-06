@@ -1,4 +1,4 @@
-/** Native menu panels (func1095), sharing geometry with pointer hit tests. */
+/** Menu panels, sharing geometry with pointer hit tests. */
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
 import { MOB_INFO, RARITY_NAMES } from '../schema/petals.js';
 import { SpeciesId } from '../schema/catalog-ids.js';

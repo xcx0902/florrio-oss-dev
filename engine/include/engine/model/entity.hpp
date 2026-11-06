@@ -57,8 +57,8 @@ enum class EntityKind : std::uint8_t {
   kProjectile = 5,
 };
 
-/** Recovered server effect families. The tick publishes three flags: damage
- * (poison), healing suppression and movement slow. */
+/** Effect families. The tick publishes three flags: damage (poison),
+ * healing suppression and movement slow. */
 enum class EffectType : std::uint8_t {
   kPoison = 1,
   kHealBlock = 2,
@@ -83,7 +83,7 @@ inline constexpr std::size_t kCollisionLayerCount = 30;
 /** One timed effect instance. `intensity` is damage per second for poison and a
  * 0..1 speed multiplier for slow; remaining time is milliseconds. The optional
  * payload is the shared area-effect object: every target in an area holds the
- * same pointer, matching the original unique-owner transfer in function 271. */
+ * same pointer, following the unique-owner transfer rule. */
 struct Effect {
   EffectType type = EffectType::kPoison;
   EntityHandle source{};
@@ -94,8 +94,8 @@ struct Effect {
   DamageSource attribution;
 };
 
-/** Recovered AI family profiles. Family-specific parameters are written by
- * original 205/208/210/415; the names here are domain names, not offsets. */
+/** AI family profiles. Each family's parameters are written by its own
+ * `configure_*` initializer; the enumerator names are domain names. */
 enum class AiFamily : std::uint8_t {
   kNone = 0,
   kLadybug = 1,
@@ -104,61 +104,59 @@ enum class AiFamily : std::uint8_t {
   kBeetle = 4,
 };
 
-/** Server AI record. A 92-byte behavior struct lives at AI+60 and keeps the
- * target as an intrusive handle. The field names below are domain names for
- * the protocol offsets; see docs/semantics/ai.md for the offset table. */
-/** Behavior-modifier multipliers applied by the AI update. Defaults are 1 so
- * shipped mobs are unchanged; the original vtable exposes speed/turn/attack
- * modifiers for buffs/debuffs and scripted variants. */
+/** Behavior-modifier multipliers applied by the AI update. Defaults are 1, so
+ * a profile without modifiers keeps its authored speed, turn and attack
+ * numbers; buffs and debuffs scale those values. */
 struct AiModifiers {
   f32 speed = f32(1.0F);
   f32 turn = f32(1.0F);
   f32 attack = f32(1.0F);
 };
 
+/** Per-mob AI record: numbers are domain units (ms, radians, px) and the
+ * target/owner links are entity handles. */
 struct AiState {
-  std::uint8_t activity_flags = 0;  // Original AI+8 / snapshot36, latched in AI.
+  std::uint8_t activity_flags = 0;  // Activity bits latched by the AI and published as field 36.
   bool enabled = false;
-  bool aggressive = false;           // AI+108: seek targets
-  bool can_alert = false;            // AI+109: accept attacker aggro
-  bool chase = false;                // AI+110: lead-prediction movement
-  bool angle_locked = true;          // AI+64: face the computed direction directly
-  bool wave_enabled = false;         // AI+76: idle wave speed/turn modulation
-  bool sine_enabled = false;         // AI+88: idle sine angle wobble
-  bool guard_active = false;         // AI+184: moving to the guard point
-  bool timer_active = false;         // AI+32: random-angle timer armed
-  f32 turn_rate = f32(0.0F);         // AI+60
-  f32 drift_rate = f32(0.2F);        // AI+68
-  f32 idle_speed = f32(1.0F);        // AI+72
-  f32 wave_frequency = f32(0.0F);    // AI+80
-  f32 wave_power = f32(2.0F);        // AI+84
-  f32 wave_amplitude = f32(1.0F);    // AI+76
-  f32 sine_frequency = f32(0.0F);    // AI+92
-  f32 sine_amplitude = f32(0.0F);    // AI+96
-  double timer_interval_ms = 0.0;    // AI+100
-  f32 territory = f32(0.0F);         // AI+104: arena threshold fraction
-  f32 lead_divisor = f32(1.0F);      // AI+112
-  f32 chase_speed = f32(2.4F);       // AI+116
-  f32 radius = f32(0.0F);            // AI+120: acquisition radius
-  f32 range_multiplier = f32(1.5F);  // AI+124
-  f32 attack_range = f32(0.0F);      // AI+128: strafe/attack distance
-  f32 attack_speed = f32(0.0F);      // AI+132: speed inside attack range
-  f32 guard_radius = f32(500.0F);    // AI+136
-  f32 leash = f32(1000.0F);          // AI+140
+  bool aggressive = false;   // Seeks targets instead of following the idle path.
+  bool can_alert = false;    // Accepts an attacker as target when damaged.
+  bool chase = false;        // Closes in with lead prediction.
+  bool angle_locked = true;  // Faces the computed direction directly; otherwise turns at turn_rate.
+  bool wave_enabled = false;       // Modulates idle speed and turn as a wave.
+  bool sine_enabled = false;       // Adds an idle sine wobble to the angle.
+  bool guard_active = false;       // Moving back to the guard point.
+  bool timer_active = false;       // Random-angle timer armed.
+  f32 turn_rate = f32(0.0F);       // Maximum turn per ms (radians).
+  f32 drift_rate = f32(0.2F);      // Idle drift rate.
+  f32 idle_speed = f32(1.0F);      // Speed along the idle path.
+  f32 wave_frequency = f32(0.0F);  // Wave cycles per ms.
+  f32 wave_power = f32(2.0F);      // Wave curvature.
+  f32 wave_amplitude = f32(1.0F);  // Wave amplitude.
+  f32 sine_frequency = f32(0.0F);  // Sine wobble cycles per ms.
+  f32 sine_amplitude = f32(0.0F);  // Sine wobble amplitude (radians).
+  double timer_interval_ms = 0.0;  // Random-angle timer interval (ms).
+  f32 territory = f32(0.0F);       // Arena threshold fraction.
+  f32 lead_divisor = f32(1.0F);    // Divisor applied to the target's velocity for lead prediction.
+  f32 chase_speed = f32(2.4F);     // Speed while chasing.
+  f32 radius = f32(0.0F);          // Target acquisition radius.
+  f32 range_multiplier = f32(1.5F);  // Multiplier on the catalog attack range.
+  f32 attack_range = f32(0.0F);      // Strafe/attack distance from the target.
+  f32 attack_speed = f32(0.0F);      // Speed while inside attack range.
+  f32 guard_radius = f32(500.0F);    // Radius around the guard point.
+  f32 leash = f32(1000.0F);          // Distance from home that triggers a return.
   AttackBehavior attack = AttackBehavior::kNone;
-  f32 attack_cooldown_gain = f32(1000.0F);  // AI+148
-  f32 attack_cooldown_ms = f32(0.0F);       // AI+56
-  f32 current_angle = f32(0.0F);            // AI+52: generic-AI drift angle
-  std::uint8_t behavior_choice = 0;         // AI+48: configureBehavior(0,1) draw
-  double timer_deadline_ms = 0.0;           // AI+40
-  double clock_ms = 0.0;                    // AI+24
-  EntityHandle owner{};                     // AI+164
-  /** Linked-segment predecessor (original entity+212 links). Only segments
-   * with a live predecessor AI adopt its target; a plain owner does not gate
-   * the AI update. */
+  f32 attack_cooldown_gain = f32(1000.0F);  // Cooldown added per attack (ms).
+  f32 attack_cooldown_ms = f32(0.0F);       // Remaining attack cooldown (ms).
+  f32 current_angle = f32(0.0F);            // Current drift angle (radians).
+  std::uint8_t behavior_choice = 0;  // Configure-time draw between the two behavior variants.
+  double timer_deadline_ms = 0.0;    // Deadline of the random-angle timer.
+  double clock_ms = 0.0;             // AI clock advanced by the tick.
+  EntityHandle owner{};              // Owner of a summoned body, if any.
+  /** Linked-segment predecessor. Only a segment whose predecessor AI is alive
+   * adopts its target; a plain owner does not gate the AI update. */
   EntityHandle predecessor{};
   EntityHandle target{};
-  Vec2 guard_point;  // AI+176/+180
+  Vec2 guard_point;  // Guard point (x, y).
   Vec2 home;
   bool returning = false;
   AiFamily family = AiFamily::kNone;
@@ -171,7 +169,7 @@ struct AiState {
   bool rare = false;
 };
 
-/** Cached collision rectangle including attached children (original 167). */
+/** Cached collision rectangle including attached children. */
 struct EntityBounds {
   f32 min_x = f32(0.0F);
   f32 min_y = f32(0.0F);
@@ -181,14 +179,14 @@ struct EntityBounds {
   std::uint64_t epoch = 0;
 };
 
-/** Domain entity. This is deliberately not a view over the original 496-byte
- * record; protocol offsets live only in the generated protocol views. */
+/** Domain entity. Protocol offsets exist only in the generated protocol
+ * views; this struct is the simulation's own representation. */
 struct Entity {
   EntityHandle handle;
   EntityKind kind = EntityKind::kNone;
   std::uint16_t type_id = 0;
-  // Original avatar bytes: field 2 is packed aim, field 31 carries action
-  // bits in its low two bits. Keep these separate from semantic species.
+  // The look byte packs the aim direction; the expression byte carries action
+  // bits in its low two bits. Both stay separate from the semantic species id.
   std::uint8_t player_look = 0;
   std::uint8_t player_expression = 0;
   Vec2 position;
@@ -212,41 +210,40 @@ struct Entity {
     set_position_x(value.x);
     set_position_y(value.y);
   }
-  Vec2d velocity;      // original transform +40/+48 (f64, px per ms)
-  Vec2d acceleration;  // original transform +56/+64 (f64 per-tick impulse)
+  Vec2d velocity;      // Position change per ms (f64).
+  Vec2d acceleration;  // Per-tick impulse applied to velocity (f64).
   f32 angle;
-  f32 angular_velocity = f32(0.0F);  // original transform +72 (radians per ms)
+  f32 angular_velocity = f32(0.0F);  // Radians per ms.
   f32 radius;                        // draw radius from the catalog record
-  f32 collision_radius;              // physics +8
-  /** Product of the entity's behavior modifier callbacks (original entity+192).
-   * The native vtable is not reconstructed; this retains the multiplicative
-   * effect on AI speed. */
+  f32 collision_radius;              // Radius used by the contact solver.
+  /** Product of the entity's behavior modifiers. Keeps the multiplicative
+   * effect on AI speed without reconstructing a vtable. */
   f32 behavior_speed_multiplier = f32(1.0F);
   /** Web tag projectiles skip the ordinary contact response. */
   bool skips_contact_response = false;
   /** Contact solver uses both bodies' mass-weighted response. Cleared for
    * Rock/Boulder/Cactus and Ant Hole, which use the full-overlap push. */
   bool uses_mass_weighted_response = true;
-  /** Physics +40 mass (every shipped body keeps 1.0). */
+  /** Mass used by the mass-weighted contact response (every body keeps 1.0). */
   f32 mass = f32(1.0F);
-  /** Entity+184 score component. The original allocates a 16-byte record with
-   * epoch/score fields for Web tags and death scoring. */
+  /** Score component used by Web tags and death scoring. */
   bool has_score_component = false;
   std::uint32_t score_epoch = 0;
   f32 score_value = f32(0.0F);
-  /** Entity+140 Web tag component and entity+208 effect-area component. */
+  /** Presence of the Web tag component and the effect-area component. */
   bool has_tag_component = false;
   bool has_effect_area = false;
-  /** Packet-cache epochs written by the component setters (entity+344/+348). */
+  /** Packet-cache epochs written by the component setters. */
   std::uint32_t packet_epoch_a = 0;
   std::uint32_t packet_epoch_b = 0;
   f32 health = f32(1.0F);
   f32 max_health = f32(1.0F);
-  f32 contact_damage;                  // physics +44
-  double lifetime_remaining_ms = 0.0;  // pickup +32 countdown
+  f32 contact_damage;                  // Damage dealt to bodies touching this one.
+  double lifetime_remaining_ms = 0.0;  // Pickup expiry countdown (ms).
   std::uint32_t owner = std::numeric_limits<std::uint32_t>::max();
   /** Creation-time control identity for attacks whose physical parent can
-   * disappear. Ordinary live ownership chains retain their original rules. */
+   * disappear. Ordinary live ownership chains still resolve through the
+   * parent link. */
   EntityHandle control_root{};
   bool world_controlled = false;
   /** Raw flag bytes are published in the snapshot. The domain interprets only
@@ -257,7 +254,7 @@ struct Entity {
   std::uint8_t loadout_slot = 0xFF;
   std::uint8_t loadout_instance = 0;
   std::uint8_t spawn_band = 0xFF;
-  /** Loot entries attached at spawn by the component draws (original loot+8/+9). */
+  /** Loot table entries attached at spawn. */
   std::array<std::uint16_t, 8> loot_petals{};
   std::uint8_t loot_count = 0;
   EntityHandle last_attacker{};
@@ -268,7 +265,7 @@ struct Entity {
   std::array<Effect, kMaxEffects> effects{};
   std::uint8_t effect_count = 0;
   std::uint8_t effect_flags = 0;
-  /** Original effects+40/+48: last poison feedback, independent of damage. */
+  /** Last poison feedback time; independent of the damage tick. */
   double poison_hit_time_ms = -std::numeric_limits<double>::infinity();
   std::array<std::uint8_t, 4> layer_flags{};
   std::array<std::uint32_t, kCollisionLayerCount> layer_thresholds{};
@@ -289,17 +286,15 @@ struct Entity {
   bool death_processed = false;
   bool death_flag = false;
   double death_time_ms = 0.0;
-  /** Intrusive attached-child list used by collision bounds and the death
-   * recursion. The original links entities through +84; domain code uses the
-   * handle list directly. */
+  /** Attached-child list used by collision bounds and the death recursion. */
   std::vector<EntityHandle> children;
   EntityBounds bounds_cache;
   bool bounds_dirty = true;
-  /** Pickup intrusive list links (world +36/+44 in the original). */
+  /** Intrusive pickup-list links. */
   EntityHandle pickup_prev{};
   EntityHandle pickup_next{};
   bool pickup_listed = false;
-  /** Original pickup+9 bit 0 and +32 absolute expiry after a slot transfer. */
+  /** Set once the pickup is collected; the deadline expires a transferred pickup. */
   bool pickup_collected = false;
   PlayerId pickup_recipient{};
   double pickup_transfer_deadline_ms = 0.0;

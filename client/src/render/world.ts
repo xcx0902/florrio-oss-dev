@@ -1,5 +1,6 @@
 import { FrameContext } from './frame-context.js';
 import { EntityKind } from '../state/snapshot-types.js';
+import { byteField } from '../state/snapshot-fields.js';
 import { EntityFlag, PlayerExpressionFlag } from '../schema/state-flags.js';
 import { PetalId } from '../schema/catalog-ids.js';
 import { isBackgroundSpecies, usesActivityAnimation } from './species-groups.js';
@@ -116,7 +117,7 @@ export function worldVisualCounts(world: WorldState) {
   };
 }
 
-/** Original fillRectangle emits a transformed unit rectangle and caches its
+/** Rectangles are emitted as a transformed unit rectangle with a cached
  * matrix. Keep zero-sized rectangles: they are part of the Canvas contract. */
 function drawArena(
   context: Canvas2DContext,
@@ -143,9 +144,9 @@ function drawArena(
   const projectY = (y: number): number => f(height * 0.5 + f(f(y - f(camera.y)) * zoom));
   const clampX = (x: number): number => Math.max(0, Math.min(width, projectX(x)));
   context.setGlobalCompositeOperation?.('source-over');
-  // clientFrame clears the menu's 1x1 renderer before func763. Its visible
-  // background has already been submitted to the main canvas, so this pass
-  // begins with the arena bands, preserving the renderer's identity matrix.
+  // The menu preview's 1x1 renderer was already cleared, and its visible
+  // background was submitted to the main canvas. This pass therefore begins
+  // with the arena bands, preserving the renderer's identity matrix.
   if (!menuPreview) {
     context.setFillRgb(30, 167, 97);
     rectangle(0, 0, width, height);
@@ -173,7 +174,7 @@ function drawArena(
     }
     left = right;
   }
-  // Native boundary scalars belong to the render session. Metadata creates
+  // Boundary scalars belong to the render session. Metadata creates
   // the control record before a player body exists, so hidden menu passes
   // already advance these values and the gameplay camera inherits them.
   let boundary = arenaBoundaries.get(world);
@@ -230,7 +231,7 @@ function drawArena(
   context.restore();
 }
 
-/** One recovered entity block: a save/restore pair around a single
+/** One entity block: a save/restore pair around a single
  * screen-space setTransform, followed by local-coordinate artwork. */
 interface VisibleEntity {
   entity: EntityState;
@@ -265,8 +266,8 @@ function petalRenderComponent(entity: EntityState): number {
   return entity.kind === EntityKind.Petal ? 76 : 108;
 }
 
-/** Entities that belong to the static background layer in the archived
- * renderer: rocks, boulders, cacti, ant holes and squares. */
+/** Entities that belong to the static background layer: rocks, boulders,
+ * cacti, ant holes and squares. */
 function isBackgroundEntity(entity: EntityState): boolean {
   return isBackgroundSpecies(speciesOf(entity));
 }
@@ -290,9 +291,9 @@ function drawLayer(entity: EntityState): number {
   return 3;
 }
 
-/** Original garden grid: 50-world-unit cells, black at alpha 0.06, drawn in
- * screen space over the background. The archived client emits one path with
- * every vertical then every horizontal line. */
+/** Garden grid: 50-world-unit cells, black at alpha 0.06, drawn in
+ * screen space over the background. One path holds every vertical, then every
+ * horizontal, line. */
 function drawGrid(context: Canvas2DContext, camera: CameraState): void {
   const ratio = camera.pixelRatio;
   const width = camera.viewportWidth;
@@ -305,8 +306,8 @@ function drawGrid(context: Canvas2DContext, camera: CameraState): void {
   if (!(step >= 2)) {
     return;
   }
-  // function_763 projects the camera centre through f32 *before* taking
-  // fmod. Rewriting this as (gridWorld - origin) * zoom loses the original
+  // The camera centre is projected through f32 *before* taking
+  // fmod. Rewriting this as (gridWorld - origin) * zoom loses that
   // rounding at large world coordinates and shifts every grid edge.
   const phase = (centre: number, extent: number): number => {
     const projected = Math.fround(extent * 0.5 - Math.fround(zoom * Math.fround(centre)));
@@ -319,10 +320,10 @@ function drawGrid(context: Canvas2DContext, camera: CameraState): void {
   context.save();
   context.setStrokeRgb(0, 0, 0);
   context.setGlobalAlpha(Math.fround(zoom * Math.fround(0.1)));
-  // The archived client keeps the 30.010254 px step and emits every line at
-  // `start + 0.5`: the half-pixel offset is what makes a 1 px stroke cover both
-  // neighbouring pixels (golden frame 59 first line 27.796 = 27.297 + 0.5).
-  // It never emits a lineWidth setter (the default 1 is used).
+  // Every line lands at `start + 0.5` with the 30.010254 px step: the
+  // half-pixel offset is what makes a 1 px stroke cover both neighbouring
+  // pixels (golden frame 59 first line 27.796 = 27.297 + 0.5).
+  // No lineWidth setter is emitted (the default 1 is used).
   context.beginPath();
   context.setTransform(ratio, 0, 0, ratio, 0, 0);
   for (let x = startX; x < endX; x = Math.fround(x + step)) {
@@ -365,7 +366,7 @@ function collectVisible(
     }
     const entity = world.get(handle)!;
     const transform = frame.transform(entity, now);
-    // The archived local-player block is drawn with the mouse-pan/shake offset;
+    // The local player block is drawn with the mouse-pan/shake offset;
     // other entities use the unshifted world projection.
     const panX = entity.handle === frame.player?.handle ? camera.entityOffsetX : 0;
     const panY = entity.handle === frame.player?.handle ? camera.entityOffsetY : 0;
@@ -456,8 +457,7 @@ function drawEntityBlock(
   if (renderComponent === 108) {
     drawHornetMissile(context, flash);
   } else if (renderComponent === 68) {
-    const flags =
-      entity.byteFields?.[9] ?? entity.denseByteFields?.[9] ?? entity.denseFields?.[9] ?? 0;
+    const flags = byteField(entity, 9) ?? 0;
     drawLaunchedPea(context, species, flash, typeof flags === 'number' ? flags : 0);
   } else if (renderComponent === 92) {
     const progress = petalVisual.webProgress;
@@ -470,16 +470,9 @@ function drawEntityBlock(
   } else {
     switch (entity.kind) {
       case 1: {
-        const field = (index: number): number => {
-          const value =
-            entity.byteFields?.[index] ??
-            entity.denseByteFields?.[index] ??
-            entity.denseFields?.[index];
-          return typeof value === 'number' ? value : 0;
-        };
-        // Native player rendering reads ctor 756 (entity+144), protocol field
-        // 14. These effect flags are independent of the field-31 expression
-        // byte and field-22 pickup type.
+        const field = (index: number): number => byteField(entity, index) ?? 0;
+        // Player effect flags come from the protocol action byte, independent
+        // of the expression byte and the drop species byte.
         const actions = field(14);
         drawPlayerFace(context, {
           state: playerVisual?.face,
@@ -508,15 +501,7 @@ function drawEntityBlock(
         break;
       }
       case 4:
-        drawDrop(
-          context,
-          entity.byteFields?.[22] ??
-            entity.denseByteFields?.[22] ??
-            (typeof entity.denseFields?.[22] === 'number' ? entity.denseFields[22] : undefined) ??
-            species,
-          Infinity,
-          dropVisual,
-        );
+        drawDrop(context, byteField(entity, 22) ?? species, Infinity, dropVisual);
         break;
       default: {
         // Entity-table artwork seeds use the packed index/generation handle;
@@ -534,7 +519,7 @@ function drawEntityBlock(
 
 /** World pass: arena, grid, health bars, background, petals, mobs and player.
  * Each entity block is a save/restore pair around one screen-space transform,
- * matching the archived renderer's command structure. */
+ * so every block starts from a known matrix. */
 export function drawWorld(
   context: Canvas2DContext,
   world: WorldState,
@@ -576,11 +561,10 @@ export function drawWorld(
   const deltaMs = Math.max(0, now - visuals.at);
   visuals.at = now;
   worldVisuals.set(world, visuals);
-  // The archived pickup pass visits the whole component pool, including
-  // offscreen drops. Retain its state while the camera moves away and back.
+  // The pickup pass visits the whole component pool, including offscreen
+  // drops. Retain their state while the camera moves away and back.
   for (const entity of world.entitiesOfKind(4)) {
-    const pickupFlags =
-      entity.byteFields?.[54] ?? entity.denseByteFields?.[54] ?? entity.denseFields?.[54] ?? 0;
+    const pickupFlags = byteField(entity, 54) ?? 0;
     const collected = typeof pickupFlags === 'number' && (pickupFlags & 1) !== 0;
     let drop = visuals.drops.get(entity.handle);
     if (!drop) {
@@ -632,7 +616,7 @@ export function drawWorld(
     }
   }
 
-  // Health bars are the first entity layer in the archived frame.
+  // Health bars are the first entity layer in the frame.
   context.save();
   for (const player of visible) {
     if (player.entity.kind !== EntityKind.Player) {

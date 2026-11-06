@@ -29,7 +29,7 @@ void require(bool condition, const char* message) {
   std::exit(1);
 }
 }  // namespace
-// Use the existing independent archived decoder; it never calls writer/decrypt.
+// Route CHECK through the local require helper: a failure prints the condition text.
 #define CHECK(condition) require(static_cast<bool>(condition), #condition)
 #undef CHECK
 namespace {
@@ -147,7 +147,7 @@ void web_death_and_area() {
     require(ground != nullptr && ground->position.x.value == 30 && ground->position.y.value == 40,
             "ground area uses dying projectile position");
     require(ground->lifetime_remaining_ms == 12000 && ground->collision_radius.value == 50,
-            "ground Web lifetime and area radius match original");
+            "ground Web lifetime and area radius");
     require(ground->skips_contact_response && ground->has_tag_component && ground->has_effect_area,
             "ground Web carries one-shot marker and area components");
     require(area.payload->intensity.value == 0.25F && std::isinf(area.payload->remaining_ms),

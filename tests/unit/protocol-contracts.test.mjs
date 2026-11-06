@@ -232,18 +232,18 @@ for (const [name, change, expected] of [
     /indexed\/scalar/,
   ],
   [
-    'wrong domain field26 role',
+    'wrong domain entity-kind role',
     (s) => {
       s.sparseModes.domainSparse.field26Role = 'legacy-model';
     },
-    /field26 role/,
+    /entity-kind role/,
   ],
   [
     'removed permanent kind',
     (s) => {
       s.domainExtensions[0].permanent = false;
     },
-    /permanent byte kind/,
+    /permanent byte extension/,
   ],
 ]) {
   test(`protocol compilation rejects ${name}`, () => {
@@ -329,6 +329,7 @@ int main() {
       'state/field-types.ts',
       'schema/protocol.ts',
       'state/snapshot-projection.ts',
+      'state/snapshot-fields.ts',
       'state/loadout-limits.ts',
       'schema/loadout.ts',
       'net/snapshot-decoder.ts',
@@ -394,8 +395,8 @@ test('actual domain writers and TS decoder retain scalar4/33/35 and raw field te
   const { packets, decoded, fields } = await wireFixture();
   const snapshot = new decoded.SnapshotDecoder().decode(packets[2]);
   assert.ok(snapshot);
-  assert.equal(snapshot.entities[0].stringField4, 'domain');
+  assert.equal(snapshot.entities[0].stringFields?.[4], 'domain');
   assert.equal(snapshot.entities[1].bitFields[33], 1);
-  assert.equal(snapshot.entities[2].doubleField35, 3.5);
+  assert.equal(snapshot.entities[2].doubleFields?.[35], 3.5);
   assert.equal(fields.SPARSE_MODES.domainSparse.fieldDeltaXor, 0);
 });

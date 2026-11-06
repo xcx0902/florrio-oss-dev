@@ -1,4 +1,4 @@
-/** Native4355 Unique Basic trail. State belongs to the visual's lifetime,
+/** Unique Basic trail. State belongs to the visual's lifetime,
  * including world positions, a 50 ms emission budget and swap-removal. */
 import type { Canvas2DContext } from './canvas2d/context.js';
 
@@ -15,8 +15,8 @@ export interface UniqueTrail {
 }
 export const createUniqueTrail = (): UniqueTrail => ({ budget: 0, particles: [] });
 
-/** The native client shares this Park–Miller stream among artwork instances.
- * Return the original f32 angle, including the two rounded multiplications. */
+/** The Park–Miller stream is shared among artwork instances. Returns the f32
+ * angle, including the two rounded multiplications. */
 export function createArtRandom(seed = 1): () => number {
   let state = seed;
   return () => {
@@ -79,6 +79,6 @@ export function drawUniqueTrail(
       break;
     }
     state.particles[index] = last;
-    // Native swap-removal advances the cursor after moving the last record.
+    // Swap-removal advances the cursor after moving the last record.
   }
 }

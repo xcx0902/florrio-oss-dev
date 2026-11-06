@@ -11,8 +11,9 @@ struct LayerSpec {
   std::int8_t side;
 };
 
-// Order follows the recovered 30-layer table. Threshold and side indices are
-// domain-local; the original memory offsets live only in the probe report.
+// The 30-layer table. Order is the layer index, so a layer's position in this
+// array is its domain index; each entry names a flag bit, a threshold slot and
+// an optional side slot.
 constexpr std::array<LayerSpec, kCollisionLayerCount> kLayers{{
     {0, 1, 0, 0},    {0, 2, 1, 1},    {0, 4, 2, -1},   {0, 8, 3, -1},    {0, 16, 4, 2},
     {0, 32, 5, 3},   {0, 64, 6, 4},   {0, 128, 7, 5},  {1, 1, 8, -1},    {1, 2, 9, 6},

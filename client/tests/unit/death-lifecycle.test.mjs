@@ -222,7 +222,7 @@ test('death overlay slides both groups, draws real petals and retains reserve ca
     assert.notEqual(a, b, `${text} moves into view`);
     assert.ok(Math.abs(c - (a + b) / 2) < 0.001, `${text} follows supplied progress`);
   }
-  // Original1095 box tops, not approximate text baselines from a screenshot.
+  // Box tops, not approximate text baselines from a screenshot.
   // The non-raster fallback paints at each box's centre.
   const { logicalHeight: height, scale } = getHudLayout(1280, 720, 45);
   for (const [text, top, font] of [

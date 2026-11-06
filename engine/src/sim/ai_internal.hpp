@@ -8,7 +8,7 @@ constexpr double kHalfPi = 1.5707963267948966192313216916398;
 // Exact shipped f32 0x1.9999ap-34. Its low bits differ from f32(0.2 / 2^31),
 // enough to alter some ants' turn speeds and subsequent simulation state.
 constexpr double kAntRandomTurnScale = (0x19999a / 1048576.0) * 0x1p-34;
-// f32(2 * pi / 2^31), the original random-angle scale.
+// f32(2 * pi / 2^31): maps a 31-bit random draw to a full-turn angle.
 constexpr float kRandomAngleScale = 2.925836239953128e-09F;
 
 inline bool is_actor(const Entity& entity) {
@@ -42,7 +42,7 @@ inline f32 random_fraction(ServerRng& rng) {
   return f32(static_cast<float>(rng.next() - 1U)) * f32(0x1p-31f);
 }
 
-/** Common behavior defaults from original 115 / writeDefaultAi. */
+/** Common behavior defaults for a freshly enabled AI record. */
 inline void apply_default_ai(Entity& entity, AiFamily family) {
   AiState& ai = entity.ai;
   ai.enabled = true;
@@ -50,9 +50,8 @@ inline void apply_default_ai(Entity& entity, AiFamily family) {
   ai.aggressive = false;
   ai.can_alert = false;
   ai.chase = false;
-  // Runtime probes of the shipped AI records show AI+64 set and AI+60 zero for
-  // the generic/default behavior; only Square and Centipede write a non-zero
-  // turn rate.
+  // The generic/default behavior locks the facing angle and leaves the turn
+  // rate at zero; only Square and Centipede write a non-zero turn rate.
   ai.angle_locked = true;
   ai.wave_enabled = false;
   ai.sine_enabled = false;
@@ -83,17 +82,16 @@ inline void apply_default_ai(Entity& entity, AiFamily family) {
 }
 
 inline void arm_timer(AiState& ai, double now_ms) {
-  // Original 114 reads the binary32 settings interval for the first deadline
-  // as well as every subsequent re-arm.
+  // The interval is narrowed to binary32 for the first deadline as well as
+  // every subsequent re-arm.
   ai.timer_interval_ms = static_cast<double>(f32::from_double(ai.timer_interval_ms).value);
   ai.timer_active = ai.timer_interval_ms > 0.0;
   ai.timer_deadline_ms = ai.timer_active ? now_ms + ai.timer_interval_ms : 0.0;
 }
 
-/** Original 114 configureBehavior RNG sequence: one orientation draw, the
- * libc++ uniform_int_distribution(0,1) call (exactly one 31-bit draw for this
- * range), and a second orientation draw only when the settings byte at +4 is
- * clear. The drawn bit and angle are stored for behavior parity. */
+/** Behavior configuration RNG sequence: one orientation draw, one 31-bit draw
+ * for the 0/1 behavior choice, and a second orientation draw only when
+ * `same_angle` is false. The drawn bit and angle are stored on the AI state. */
 inline void configure_behavior_draws(ServerRng& rng, AiState& ai, bool same_angle) {
   const auto orientation = [&rng]() {
     const f32 sample(static_cast<float>(rng.next() - 1U));

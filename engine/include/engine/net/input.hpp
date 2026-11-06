@@ -23,7 +23,7 @@ struct InputCommand {
   std::vector<std::uint8_t> payload;
 };
 
-/** Original sequence gate: sequence 0 is always accepted; otherwise the value
+/** Input sequence gate: sequence 0 is always accepted; otherwise the value
  * must be strictly greater than the last accepted sequence. */
 [[nodiscard]] inline bool accept_input_sequence(std::uint32_t& last, std::uint32_t sequence) {
   if (sequence == 0U) {
@@ -36,9 +36,9 @@ struct InputCommand {
   return true;
 }
 
-/** One worker message inside a send buffer. The original sp_server_send loops
- * over (sequence, command) pairs until the buffer is exhausted, so one send can
- * carry several messages with independent sequence numbers. */
+/** One worker message inside a send buffer. A buffer carries repeated
+ * (sequence, command) pairs until it is exhausted, so one send can hold several
+ * messages with independent sequence numbers. */
 struct InputMessage {
   std::uint32_t sequence = 0;
   InputCommand command;

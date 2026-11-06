@@ -17,7 +17,7 @@ import { PRODUCT_ROOT } from './lib/format-tools.mjs';
 
 const BASELINE = 'tools/refactor/legacy-baseline.json';
 const BASELINE_NOTE =
-  'Known legacy occurrences at the P1 formatting baseline. Later phases must reduce them; P7 requires an empty ledger. Never raise an entry to hide new code.';
+  'Historical-representation ledger. P6 removed the last occurrence, so patterns stays empty: any entry is a regression and P7 rejects the ledger. Never raise an entry to hide new code.';
 const IGNORED_DIRECTORIES = new Set([
   'archive',
   'node_modules',
@@ -305,14 +305,18 @@ export function main(argv = process.argv.slice(2)) {
 
   const actual = scan();
   if (update) {
+    // Empty pattern objects are dropped so an empty ledger stays empty instead
+    // of listing every rule with no occurrences.
     const sorted = {};
     for (const id of Object.keys(LEGACY_PATTERNS).sort()) {
-      const files = actual.patterns[id] ?? {};
-      sorted[id] = Object.fromEntries(
-        Object.entries(files)
+      const files = Object.fromEntries(
+        Object.entries(actual.patterns[id] ?? {})
           .filter(([, count]) => count > 0)
           .sort(([left], [right]) => left.localeCompare(right)),
       );
+      if (Object.keys(files).length > 0) {
+        sorted[id] = files;
+      }
     }
     const baseline = {
       schema: 1,

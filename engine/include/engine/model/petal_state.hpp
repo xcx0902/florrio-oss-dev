@@ -13,17 +13,17 @@ struct PetalOrbitState {
   Vec2 center;
   f32 orbit_radius;
   f32 angle;
-  /** Orbit slot assigned by original function 85 (`petal +18`). The angle is
+  /** Orbit slot assigned when the petal is equipped. The angle is
    * recomputed every tick as index*2*pi/unlockedSlots + loadout phase. */
   std::uint8_t orbit_index = 0;
-  /** Full-width orbit angle used by sin/cos (the original keeps it in f64; only
-   * the loadout phase is binary32). */
+  /** Full-width orbit angle fed to sin/cos; only the loadout phase narrows to
+   * binary32. */
   double orbit_angle = 0.0;
   f32 phase = f32(0.0F);
   std::uint8_t slot = 0xFF;
   std::uint8_t instance = 0;
   std::uint8_t profile = 0;  // engine::OrbitProfile
-  /** Catalog behavior for this petal; replaces the former function number. */
+  /** Catalog behavior for this petal, taken from its catalog entry. */
   catalog::PetalBehavior behavior = catalog::PetalBehavior::kOrbit;
   /** Heal amount used only by PetalBehavior::kRoseHeal. */
   f32 heal_amount = f32(0.0F);

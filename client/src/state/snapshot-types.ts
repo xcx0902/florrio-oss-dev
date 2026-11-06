@@ -1,4 +1,5 @@
 import { SNAPSHOT_EVENT } from '../schema/protocol.js';
+import type { DenseFieldSpec } from './field-types.js';
 
 /** Wire values of protocol field 26; keep in lockstep with engine::EntityKind. */
 export const EntityKind = {
@@ -10,7 +11,7 @@ export const EntityKind = {
   Projectile: 5,
 } as const;
 export type EntityKind = (typeof EntityKind)[keyof typeof EntityKind];
-import type { DenseFieldSpec } from './field-types.js';
+
 export type DenseValue = number | string | readonly number[] | readonly string[];
 
 /** Event opcodes decoded by the snapshot reader. */
@@ -23,6 +24,12 @@ export type SnapshotEvent =
       readonly index: number;
     };
 
+/**
+ * One decoded entity record. Value maps are keyed by wire field id; a field is
+ * stored in exactly one map according to its protocol type, and the dense map
+ * carries the fields of the components that arrived densely. There is no second
+ * named copy of any field.
+ */
 export interface EntitySnapshot {
   readonly handle: number;
   readonly ownerPlayerId?: number;
@@ -52,34 +59,25 @@ export interface EntitySnapshot {
   readonly levelProgress?: number;
   readonly score?: number;
   readonly flags: number;
-  readonly byteField1?: number;
-  readonly floatField5?: number;
   readonly floatFields?: Readonly<Record<number, number>>;
-  readonly doubleField35?: number;
-  readonly doubleField18?: number;
-  readonly floatField27?: number;
-  readonly stringField4?: string;
+  readonly doubleFields?: Readonly<Record<number, number>>;
   readonly byteFields?: Readonly<Record<number, number>>;
   readonly byteArrayFields?: Readonly<Record<number, readonly { index: number; value: number }[]>>;
   readonly varintArrayFields?: Readonly<
     Record<number, readonly { index: number; value: number }[]>
   >;
   readonly shortArrayFields?: Readonly<Record<number, readonly { index: number; value: number }[]>>;
-  readonly inventory?: readonly { index: number; value: number }[];
   readonly varintFields?: Readonly<Record<number, number>>;
   readonly referenceFields?: Readonly<Record<number, number>>;
   readonly stringFields?: Readonly<Record<number, string>>;
   readonly stringArrayFields?: Readonly<
     Record<number, readonly { index: number; value: string }[]>
   >;
-  readonly floatField45?: number;
   readonly declaredComponents?: readonly number[];
   readonly bitFields?: Readonly<Record<number, number>>;
-  readonly angleField8?: number;
   readonly handleArrayFields?: Readonly<
     Record<number, readonly { index: number; handle: number }[]>
   >;
-  readonly denseByteFields?: Readonly<Record<number, number>>;
   readonly denseFields?: Readonly<Record<number, DenseValue>>;
   readonly componentMask?: number;
 }

@@ -11,11 +11,11 @@ void attach_child(World& world, EntityHandle parent, EntityHandle child);
 void detach_child(World& world, EntityHandle parent, EntityHandle child);
 
 /** Mark an entity's cached collision rectangle dirty and propagate to owners.
- * Original 167 memoizes the union of the body circle and every attached child;
- * any transform/radius change invalidates the chain. */
+ * Collision bounds are the union of the body circle and every attached child;
+ * any transform or radius change invalidates the chain. */
 void invalidate_bounds(World& world, EntityHandle handle);
 
-/** Memoized collision rectangle including attached children (original 167).
+/** Memoized collision rectangle including attached children.
  * The returned rectangle is expressed as min/max and stays binary32. */
 [[nodiscard]] EntityBounds collision_bounds(World& world, EntityHandle handle);
 

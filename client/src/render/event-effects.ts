@@ -1,8 +1,7 @@
 /** Snapshot event 14: a collected petal becomes its HUD slot visual.
- * Decoder defaults/payload: snapshot-decoder.mjs 288–320, 465–505.
- * Flight/retirement, slot attachment and the
- * clientFrame retired-list cleanup. render-frame's similarly named pass
- * draws the world pickup marker, not this screen-space transfer.
+ * Covers flight/retirement, slot attachment and the retired-list cleanup that
+ * drops an effect after two visits at near-zero opacity. The world pass draws
+ * the pickup marker, not this screen-space transfer.
  */
 import { PETAL_INFO } from '../schema/petals.js';
 import { PetalId } from '../schema/catalog-ids.js';
@@ -21,7 +20,7 @@ import { getHudLayout } from './hud.js';
 export interface Event14Payload {
   readonly index: number;
   readonly type: number;
-  /** Native decoder screen units: CSS pixels divided by the HUD UI scale.
+  /** Decoder screen units: CSS pixels divided by the HUD UI scale.
    * The caller projects the pickup once, at receipt; camera motion does not
    * subsequently move the transfer's starting point. */
   readonly startScreenX: number;
@@ -44,7 +43,7 @@ export interface Event14Frame extends Event14Viewport {
   readonly nowMilliseconds: number;
   /** Actual first-frame delta; later calls can derive it from the clock. */
   readonly deltaMilliseconds?: number;
-  /** False when the slot no longer owns this petal. Native slot visuals do
+  /** False when the slot no longer owns this petal. Slot visuals do
    * not have an arbitrary lifetime: they fade/shrink only after retirement. */
   readonly active?: boolean;
   readonly recharge?: number;
@@ -68,7 +67,7 @@ export interface Event14Effect {
 }
 
 const f = Math.fround;
-// Each native803 owns its label bitmap, including a retired visual and its
+// Each effect owns its label bitmap, including a retired visual and its
 // replacement at the same slot. Repeated draws of one effect reuse its owner.
 const labelOwners = new WeakMap<Event14Effect, string>();
 let nextLabelOwner = 0;
@@ -86,7 +85,7 @@ const amount = (base: number, delta: number): number => clamp(1 - Math.pow(base,
 const approach = (current: number, target: number, step: number): number =>
   f(Math.abs(current - target) < 1e-7 ? target : current + (target - current) * step);
 
-/** Fresh native visual: zero size/opacity, decoded position and recharge. */
+/** Fresh visual: zero size/opacity, decoded position and recharge. */
 export function createEvent14Effect(payload: Event14Payload): Event14Effect {
   if (!Number.isInteger(payload.index) || payload.index < 0 || payload.index >= 16) {
     throw new RangeError('Event 14 index must identify one of the sixteen petal slots');
@@ -115,7 +114,7 @@ export function createEvent14Effect(payload: Event14Payload): Event14Effect {
   };
 }
 
-/** Advance once per frame; return false when native retirement is complete.
+/** Advance once per frame; return false when retirement is complete.
  * Positions, size and opacity use pow(.8, f32(delta) * .06), with f32 stores.
  * No recorded positions, sample fractions, elapsed-time TTL or hit pulses.
  */
@@ -162,7 +161,7 @@ export function updateEvent14Effect(effect: Event14Effect, frame: Event14Frame):
     effect.targetRecharge = f(clamp(frame.recharge));
   }
   const recharge = equipped ? effect.targetRecharge : 1;
-  // Native func587 resets a falling recharge immediately, then smooths up.
+  // A falling recharge resets immediately, then smooths up.
   effect.recharge = approach(Math.min(effect.recharge, recharge), recharge, step);
   effect.rechargeFade = approach(
     effect.rechargeFade,
@@ -171,7 +170,7 @@ export function updateEvent14Effect(effect: Event14Effect, frame: Event14Frame):
   );
   if (!active) {
     effect.retiredFrames++;
-    // clientFrame removes retired entries only after two visits and opacity
+    // Retired entries are removed only after two visits and opacity
     // <= 1e-4; drawing at zero delta never skips that ownership boundary.
     if (effect.retiredFrames > 1 && effect.opacity <= 0.0001) {
       effect.phase = 'done';
@@ -227,7 +226,7 @@ function petalArtwork(type: number, raster: number): RasterCanvas | undefined {
 }
 
 /** Draw in screen space, after the world pass. Drawing never advances state.
- * The slot is a rarity card with petal artwork/name and the native recharge
+ * The slot is a rarity card with petal artwork/name and its recharge
  * sector, rather than a generic expanding hit circle.
  */
 export function drawEvent14Effect(
@@ -312,7 +311,7 @@ export function drawEvent14Effect(
   };
   const label = getLabel(spec);
   if (label) {
-    // The shared lazy context intentionally has no native getTransform;
+    // The shared lazy context intentionally has no getTransform;
     // compose the cached label through this pass's known logical matrix.
     const width = f(label.boxWidth),
       height = f(spec.font * 1.4);

@@ -8,8 +8,8 @@
 
 namespace engine {
 
-/** Original server petal orbit tracks. Input bit 0 means outward (attack) and
- * takes priority over bit 1 (inward/defend). */
+/** Petal orbit tracks. Input bit 0 (attack) means outward and takes priority
+ * over bit 1 (defend, inward). */
 enum class OrbitProfile : std::uint8_t {
   kDefault = 0,
   kBasic,
@@ -70,8 +70,6 @@ struct OrbitRadii {
   return radii.rest;
 }
 
-/** Wing/Dandelion-style wave track: rest 65 + 10*wave, outward
- * 140 + 50*wave, inward 40 + 5*wave. Input bit 0 wins over bit 1. */
 /** Map the generated catalog's orbit-profile name to the enum. */
 [[nodiscard]] inline OrbitProfile orbit_profile_from_name(const char* name) {
   if (name == nullptr) {
@@ -102,6 +100,8 @@ struct OrbitRadii {
   return OrbitProfile::kDefault;
 }
 
+/** Wing/Dandelion-style wave track: rest 65 + 10*wave, outward
+ * 140 + 50*wave, inward 40 + 5*wave. Input bit 0 wins over bit 1. */
 [[nodiscard]] inline f32 wing_orbit_radius(std::uint32_t inputs, f32 phase) {
   const f32 wave = f32::from_double(std::sin(static_cast<double>(phase.value)));
   if (has_flag(inputs, InputButton::kAttack)) {

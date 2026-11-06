@@ -8,14 +8,14 @@
 
 namespace engine {
 
-/** Leaf geometry checked by original function 161. The original walks a
- * quadtree; a linear scan over the same bodies returns the same occupied
- * predicate, which is all the spawn retry loop needs. */
+/** Broad-phase body geometry. The occupied predicate walks these bodies; a
+ * linear scan and a quadtree rectangle query answer the same question, and the
+ * spawn retry loop only needs the predicate. */
 struct CollisionBody {
-  Vec2 position;                  // transform center (f32 demoted from the original f64)
-  f32 radius;                     // physics +8
-  std::uint8_t world_flags = 0;   // entity +95
-  std::uint8_t entity_flags = 0;  // entity +93
+  Vec2 position;                  // transform centre
+  f32 radius;                     // collision radius
+  std::uint8_t world_flags = 0;   // world-level flags
+  std::uint8_t entity_flags = 0;  // entity-level flags
   EntityHandle handle{};
 };
 
@@ -36,10 +36,11 @@ class SpatialQuery {
   void rebuild();
   [[nodiscard]] std::size_t size() const { return bodies_.size(); }
 
-  /** The original 600x600 half-extent spawn query. */
+  /** Spawn rejection: true when an existing body is inside the 600x600
+   * half-extent of the candidate position. */
   [[nodiscard]] bool occupied(const SpawnPosition& candidate, f32 half_extent = f32(600.0F)) const;
 
-  /** Quadtree rectangle query in the recovered 0,2,1,3 traversal order. */
+  /** Quadtree rectangle query in the children order 0, 2, 1, 3. */
   void query_box(const Aabb& area, std::vector<EntityHandle>& out) const;
   /** Circle query: AABB candidates followed by the exact radius predicate. */
   void query_circle(Vec2 center, f32 radius, std::vector<EntityHandle>& out) const;
@@ -52,27 +53,20 @@ class SpatialQuery {
   mutable std::vector<std::size_t> candidates_;
 };
 
-/** Spawn a band with component-drop defaults: Rock/Boulder use the dynamic
- * pre-draw path, other species use the catalog defaults. */
+/** Spawn one band entry with the shared population factory (see
+ * `spawn_band_entity`). */
 template <typename Occupied>
-[[nodiscard]] EntityHandle spawn_from_band_with_drop_draws(World& world, const SpawnTable& table,
-                                                           std::uint8_t band, Occupied&& occupied) {
+[[nodiscard]] EntityHandle spawn_from_band(World& world, const SpawnTable& table, std::uint8_t band,
+                                           Occupied&& occupied) {
   return table.spawn_from_band(
       world, band, std::forward<Occupied>(occupied),
       [&world](const SpawnBandEntry& entry, const SpawnPosition& position) {
-        if (entry.entity_type == 1 || entry.entity_type == 2) {
-          return spawn_rock_with_drop_draws(world, Vec2(position.x, position.y),
-                                            entry.entity_type == 2, world.random());
-        }
-        if (entry.entity_type == 3) {
-          return spawn_cactus_with_drop_draws(world, Vec2(position.x, position.y), world.random());
-        }
-        return spawn_entity_from_defaults(world, EntityKind::kMob, entry.entity_type,
-                                          Vec2(position.x, position.y));
+        return spawn_band_entity(world, entry, position);
       });
 }
 
-/** Spawn using the live SpatialQuery as the occupied predicate. */
+/** Spawn using the live SpatialQuery as the occupied predicate and a caller
+ * supplied factory. */
 template <typename Factory>
 [[nodiscard]] EntityHandle spawn_from_band(World& world, const SpawnTable& table, std::uint8_t band,
                                            const SpatialQuery& query, Factory&& factory) {

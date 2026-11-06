@@ -18,23 +18,22 @@ struct LootResult {
   std::uint8_t lost_count = 0;
 };
 
-/** Original entity drop roll: for each finalized drop entry draw one server
- * RNG fraction and compare it with base * chance. `base` is 1 in the compact
- * world and 3 otherwise (the initializer writes 1.0 / 3.0). */
+/** Entity drop roll: for each finalized drop entry draw one server RNG
+ * fraction and compare it with base * chance. `base` is 1 in the compact world
+ * and 3 otherwise. */
 [[nodiscard]] std::vector<std::uint16_t> roll_entity_loot(ServerRng& rng, std::uint16_t type_id,
                                                           bool compact);
 
-/** Original player death retention pass: group equipped/inventory petals by
- * rarity, shuffle each group, skip Basic and a 10% roll, drop the first three,
- * save the next ten for respawn, and convert 1% of ground rarity>=2 petals to
- * Pollen (19). The profile argument is scratch storage; pass a copy at death. */
+/** Player death retention pass: group equipped and inventory petals by rarity,
+ * shuffle each group, skip Basic and a 10% roll, drop the first three, save the
+ * next ten for respawn, and convert 1% of ground drops of rarity 2 or above to
+ * Pollen. The profile argument is scratch storage; pass a copy at death. */
 [[nodiscard]] LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng,
                                             ServerRng& shuffle_rng);
 
-/** Spawn one pickup entity for a petal type with the original pickup radius
- * (35), lifetime (32s, or 42/52/62/62s by rarity 2..5) and radial impulse.
- * `base_velocity` is the dead entity's velocity + acceleration (original
- * transform +40/+48 plus +56/+64); the drop inherits it additively. */
+/** Spawn one pickup entity for a petal type with radius 35 px, lifetime 32 s
+ * (42/52/62/62 s for rarity 2..5) and a radial impulse. `base_velocity` is the
+ * dead entity's velocity plus acceleration; the drop inherits it additively. */
 [[nodiscard]] EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 position,
                                            Vec2 impulse = Vec2{}, Vec2d base_velocity = Vec2d{});
 

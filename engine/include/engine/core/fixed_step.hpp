@@ -13,7 +13,8 @@ class FixedStepClock {
   explicit constexpr FixedStepClock(double start_milliseconds = 0.0) : now_(start_milliseconds) {}
 
   /** Advance to `now_milliseconds`, returning the number of whole ticks due.
-   * Deltas are clamped to kMaxStepMilliseconds, matching the original server. */
+   * Deltas are clamped to kMaxStepMilliseconds so a long stall cannot queue a
+   * burst of catch-up ticks. */
   [[nodiscard]] std::uint32_t advance(double now_milliseconds) {
     if (now_milliseconds < now_) {
       now_ = now_milliseconds;

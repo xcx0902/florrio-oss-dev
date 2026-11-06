@@ -26,9 +26,9 @@ function cardColor(rarity: number): {
   }
   return cached;
 }
-/** Native pickup visual owned by the world marker, separate from its HUD
- * transfer. A newly spawned pickup grows/spins in; a scene's existing pickups
- * start at full size. The protocol's flags&128 distinguishes those cases. */
+/** Pickup visual owned by the world marker, separate from its HUD transfer.
+ * A newly spawned pickup grows/spins in; a scene's existing pickups start at
+ * full size. The protocol's flags&128 distinguishes those cases. */
 export interface DropVisualState {
   progress: number;
   readonly phase: number;
@@ -62,9 +62,9 @@ export function advanceDropVisualState(
   );
   state.now = now;
 }
-/** func763's pickup pass draws a black square rim around a rarity card.
- * func587 supplies that card, the catalogue icon and its outlined name.
- * `ageMs` drives the arrival progress when no retained native state exists;
+/** The pickup pass draws a black square rim around a rarity card; the card
+ * itself supplies the catalogue icon and its outlined name.
+ * `ageMs` drives the arrival progress when no retained drop state exists;
  * live world rendering supplies that state on every frame. */
 export function drawDrop(
   context: Canvas2DContext,
@@ -88,7 +88,7 @@ export function drawDrop(
   const inherited = context.getGlobalAlpha?.() ?? 1;
   const alpha = inherited * f(Math.sqrt(progress));
   context.setGlobalAlpha(alpha);
-  // Keep the three native f32 scale stores separate before rotating. Folding
+  // Keep the three f32 scale stores separate before rotating. Folding
   // them into one scale changes the marker matrix during its arrival frames.
   let local: Canvas2DContext;
   if (context.transform) {
@@ -110,7 +110,7 @@ export function drawDrop(
   drawPetalCard(local, type, 70, visual ? dropLabelOwner(visual) : undefined);
   context.restore();
 }
-/** Native func587 card shared by pickups and both galleries. */
+/** Petal rarity card shared by pickups and both galleries. */
 export function drawPetalCard(
   context: Canvas2DContext,
   type: number,

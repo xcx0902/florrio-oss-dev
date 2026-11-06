@@ -25,8 +25,9 @@ void reserve_spawn_placeholder(World& world) {
 }
 }
 void WorkerApi::init(bool populate) {
-  // The offline API historically keeps its independent death-shuffle stream
-  // across init() on the same object. A new native World uses config's seed.
+  // The offline API keeps its independent death-shuffle stream across init()
+  // on the same object: the seed is carried over from the existing world
+  // instead of being reset.
   initialize_world(world_,
                    WorldConfig{.populate = populate,
                                .death_shuffle_seed = world_.death_shuffle_random().state()});
@@ -50,7 +51,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
   }
   // All input-driven destruction reaches World::destroy and its notification queue.
   for (const auto& message : messages) {
-    // The original applies the sequence gate per message, not per buffer.
+    // The sequence gate applies per message, not per buffer.
     if (!accept_input_sequence(last_sequence_, message.sequence)) {
       continue;
     }
@@ -96,8 +97,8 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
     if (opcode != protocol::InputOpcode::kInputButtonsAngleStrength) {
       continue;
     }
-    // Original 655 stores both angle and strength on the player record; the
-    // next applyPlayerControls tick consumes the latest values.
+    // The player record keeps both angle and strength; the next
+    // applyPlayerControls tick consumes the latest values.
     world_.apply_input(local_player_id_, state->life_epoch, command.buttons, f32(command.angle),
                        f32(command.strength), kOfflineInputTtl);
   }

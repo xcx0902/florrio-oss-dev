@@ -46,8 +46,8 @@ struct Vec2 {
   }
 };
 
-/** Double-precision vector for fields the original keeps as f64 (transform
- * velocity +40/+48 and acceleration +56/+64). Positions and radii stay f32. */
+/** Double-precision vector for the fields that stay f64: body velocity and the
+ * additive acceleration below it. Positions and radii stay f32. */
 struct Vec2d {
   double x = 0.0;
   double y = 0.0;

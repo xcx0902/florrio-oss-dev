@@ -59,8 +59,9 @@ class ServerRng {
     return fraction(state_);
   }
 
-  /** Two draws used by one spawn position trial; the second becomes the new
-   * state, matching the original peek/advance sequence. */
+  /** Two draws used by one spawn position trial. Both values are the successors
+   * of the current state; the second becomes the new state, so one trial
+   * advances the stream exactly twice. */
   [[nodiscard]] constexpr std::pair<f32, f32> next_fraction_pair() {
     draws_ += 2U;
     const std::uint32_t first = successor(state_);
@@ -82,7 +83,7 @@ class ServerRng {
   std::uint32_t draws_ = 0U;
 };
 
-/** Park-Miller minimal standard generator (client-side reference). */
+/** Park-Miller minimal standard generator (16807 multiplier, 2^31-1 modulus). */
 class ParkMillerRng {
  public:
   explicit constexpr ParkMillerRng(std::int32_t seed = 1) : state_(seed == 0 ? 1 : seed) {}

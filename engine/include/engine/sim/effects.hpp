@@ -24,7 +24,7 @@ bool apply_effect(World& world, EntityHandle target, EffectType type, f32 intens
                   double duration_ms, EntityHandle source = EntityHandle{},
                   const DamageSource* attribution = nullptr);
 
-/** Create a shared payload (original effect object) for an area or callback. */
+/** Create the reference-counted payload shared by an area or callback. */
 [[nodiscard]] std::shared_ptr<EffectPayload> make_effect_payload(World&, EffectType type,
                                                                  f32 intensity, double duration_ms,
                                                                  EntityHandle source);

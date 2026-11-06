@@ -260,7 +260,7 @@ async function startWithEnter(page, name = 'UI regression') {
   await frames(page);
   const state = await readState(page);
   assert.equal(state.playerCount, 1);
-  assert.ok(Array.isArray(state.player.slots), 'loadout must come from server field60');
+  assert.ok(Array.isArray(state.player.slots), 'loadout must come from the server loadout array');
   return state.player;
 }
 
@@ -304,7 +304,7 @@ async function drag(page, source, target) {
 
 async function expectSlots(page, expected, description) {
   // Playwright 1.49 treats an async predicate's Promise as truthy. Keep this
-  // polling predicate synchronous and read the actual field60 indices.
+  // polling predicate synchronous and read the actual loadout indices.
   await waitForState(
     page,
     (expected) => {
@@ -314,7 +314,7 @@ async function expectSlots(page, expected, description) {
       if (!player) {
         return false;
       }
-      const sparse = player.byteArrayFields?.[60] ?? player.inventory;
+      const sparse = player.byteArrayFields?.[60];
       const dense = player.denseFields?.[60];
       if (!sparse && !Array.isArray(dense)) {
         return false;
@@ -335,7 +335,7 @@ async function expectSlots(page, expected, description) {
 }
 
 test(
-  'menu tabs follow the original bottom anchor and gaps after viewport and DPR changes',
+  'menu tabs follow the bottom anchor and gaps after viewport and DPR changes',
   { timeout: 30000 },
   async (t) => {
     const page = await openClient(t, { width: 1440, height: 900 }, 2);
@@ -347,7 +347,7 @@ test(
     ]) {
       await page.setViewportSize(dimensions);
       await frames(page);
-      // Frozen func1095: logical viewport=ceil(f32(css/scale)), tab y=h-45,
+      // Menu tab layout: logical viewport=ceil(f32(css/scale)), tab y=h-45,
       // widths=100/100/100/120 and left edges=10/120/230/340.
       const scale = Math.fround(
         Math.max(
@@ -392,7 +392,7 @@ test(
 );
 
 test(
-  'menu tabs and equipped petals use a hand cursor while gallery petals retain the original default cursor',
+  'menu tabs and equipped petals use a hand cursor while gallery petals retain the default cursor',
   { timeout: 15000 },
   async (t) => {
     const page = await openClient(t, viewport, 1, { petals: [1], mobs: [] });
@@ -408,7 +408,7 @@ test(
     assert.equal(
       await page.locator('#canvas').evaluate((canvas) => getComputedStyle(canvas).cursor),
       'default',
-      'both live and frozen originals keep the default cursor over discovered gallery Basic',
+      'discovered gallery Basic keeps the default cursor',
     );
     await page.mouse.move(95, 488);
     await frames(page);
@@ -425,7 +425,7 @@ test(
     assert.equal(
       await page.locator('#canvas').evaluate((canvas) => getComputedStyle(canvas).cursor),
       'pointer',
-      'the equipped Basic uses a hand cursor, as observed in the live original',
+      'the equipped Basic uses a hand cursor',
     );
     await page.mouse.move(1000, 100);
     await frames(page);
@@ -575,7 +575,7 @@ test(
     assert.equal(spawns[0].name, name);
     // The domain snapshot can omit names. Do not confuse the local control's
     // empty string4 with a player name: exact name-to-server coverage is the
-    // real opcode6 sent above; when replicated, the name is string field48.
+    // real opcode6 sent above; when replicated, the name is the petal name string.
     await page.locator('#player-name').waitFor({ state: 'hidden' });
     assert.equal(
       await page.locator('#player-name').isVisible(),
@@ -708,7 +708,7 @@ test(
     [expected[0], expected[5]] = [expected[5], expected[0]];
     let marker = (await commands(page)).length;
     await drag(page, points.equipment[0], points.reserves[0]);
-    await expectSlots(page, expected, 'drag 0 -> 5 must change authoritative field60');
+    await expectSlots(page, expected, 'drag 0 -> 5 must change the authoritative loadout array');
     let actions = (await commands(page))
       .slice(marker)
       .filter((packet) => [8, 10, 13].includes(packet.opcode));
@@ -998,7 +998,7 @@ test(
           (entity) => entity.kind === 1 && entity.handle !== previous && entity.health > 0,
         ),
       first.handle,
-      'immediate second Enter must eventually spawn after corpse deletion and the original cooldown',
+      'immediate second Enter must eventually spawn after corpse deletion and the spawn cooldown',
     );
     state = await readState(page);
     const second = state.player;

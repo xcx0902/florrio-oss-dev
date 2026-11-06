@@ -1,4 +1,4 @@
-void test_ai_recovered_species_profiles() {
+void test_ai_species_profiles() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
@@ -114,7 +114,7 @@ void test_hornet_stinger_callback() {
       continue;
     }
     stinger = entity.handle;
-    CHECK(entity.type_id == 14U);
+    CHECK(entity.type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kHornet));
     CHECK(entity.owner == hornet.raw);
     CHECK(entity.contact_damage.value == 10.0F);
     CHECK(entity.lifetime_remaining_ms == 2000.0);
@@ -227,7 +227,8 @@ void test_ai_target_motion_and_guard() {
   CHECK(hole.valid());
   engine::EntityHandle ant{};
   for (const auto& entity : guarded.entities().entities()) {
-    if (entity.active && entity.kind == engine::EntityKind::kMob && entity.type_id == 7U) {
+    if (entity.active && entity.kind == engine::EntityKind::kMob &&
+        entity.type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kBabyAnt)) {
       ant = entity.handle;
       break;
     }
@@ -371,7 +372,8 @@ void test_ai_round_before_remainder() {
   entity->ai.timer_active = false;
   entity->velocity = {};
   engine::update_ai(world, 50.0);
-  // Shipped original func654, garden head3572024024 first tick.
+  // The first AI tick integrates the turn step into current_angle and wraps it
+  // into [-pi, pi].
   CHECK(entity->ai.current_angle.value == -0.32139188051223755F);
   CHECK(entity->velocity.x ==
         static_cast<double>(engine::f32(std::cos(entity->angle.value) * 0.01F).value));
@@ -389,7 +391,7 @@ void test_ai_activity_branch_and_wire() {
   const auto mob = engine::spawn_entity_from_defaults(
       world, engine::EntityKind::kMob, 22U, engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
   auto* entity = world.entities().get(mob);
-  entity->ai.activity_flags = 0x80U;  // preserve the other original byte bits
+  entity->ai.activity_flags = 0x80U;  // preserve the other activity bits
   engine::update_ai(world, 50.0);
   CHECK(entity->ai.target == player);
   CHECK(entity->ai.activity_flags == 0x81U);
@@ -484,7 +486,9 @@ void test_ant_hole_exact_children() {
     if (entity.type_id < counts.size()) {
       ++counts[entity.type_id];
     }
-    if (entity.type_id >= 7U && entity.type_id <= 9U) {
+    if (entity.type_id >= engine::catalog::species_type_id(engine::catalog::SpeciesId::kBabyAnt) &&
+        entity.type_id <=
+            engine::catalog::species_type_id(engine::catalog::SpeciesId::kSoldierAnt)) {
       CHECK(entity.owner == hole.raw);
       CHECK(entity.ai.owner == hole);
       CHECK(entity.position.x.value == 100.0F);
@@ -551,7 +555,8 @@ void test_ant_hole_release() {
     if (!entity.active || entity.kind != engine::EntityKind::kMob) {
       continue;
     }
-    if (entity.type_id < 7U || entity.type_id > 8U) {
+    if (entity.type_id < engine::catalog::species_type_id(engine::catalog::SpeciesId::kBabyAnt) ||
+        entity.type_id > engine::catalog::species_type_id(engine::catalog::SpeciesId::kWorkerAnt)) {
       continue;
     }
     if (entity.position.x.value != 100.0F || entity.position.y.value != 100.0F) {
@@ -594,7 +599,8 @@ void test_ant_hole_release() {
     if (!entity.active || entity.kind != engine::EntityKind::kMob) {
       continue;
     }
-    if (entity.type_id >= 7U && entity.type_id <= 10U) {
+    if (entity.type_id >= engine::catalog::species_type_id(engine::catalog::SpeciesId::kBabyAnt) &&
+        entity.type_id <= engine::catalog::species_type_id(engine::catalog::SpeciesId::kQueenAnt)) {
       ++ants;
     }
   }
@@ -663,11 +669,12 @@ void test_web_tag_domain_side_effects() {
   petal_entity->owner = player.raw;
   engine::on_petal_hit(world, petal, target, player);
   CHECK(world.area_effects().empty());
-  petal_entity->petal_launched = true;  // state1 set by original733 on release
+  petal_entity->petal_launched = true;  // the launch flag a released Web carries
   (void)engine::damage_entity(world, petal, petal_entity->health, player);
   engine::EntityHandle tag{};
   for (const auto& entity : world.entities().entities()) {
-    if (entity.active && entity.kind == engine::EntityKind::kProjectile && entity.type_id == 29U) {
+    if (entity.active && entity.kind == engine::EntityKind::kProjectile &&
+        entity.type_id == engine::catalog::petal_type_id(engine::catalog::PetalId::kWebRare)) {
       tag = entity.handle;
       break;
     }

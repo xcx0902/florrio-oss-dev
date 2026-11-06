@@ -16,8 +16,8 @@
 
 namespace engine {
 
-/** Domain-facing server API behind the four wasm exports. Keeping the mutable
- * world/clock/queue here lets native tests exercise the same path as the ABI
+/** Server API behind the four wasm exports. Keeping the mutable
+ * world/clock/queue here lets the C++ tests exercise the same path as the ABI
  * without duplicating the worker contract. */
 class WorkerApi {
  public:

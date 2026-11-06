@@ -1,5 +1,5 @@
 import { renderResources } from './resources.js';
-/** Native clientFrame menu: resources.preview world/HUD, then floating petals and UI.
+/** Menu frame: resources.preview world/HUD, then floating petals and UI.
  * Layout and pass ownership follow the menu resources.animation; tests verify it.
  */
 import { MOB_GALLERY } from '../schema/mob-gallery.js';
@@ -37,7 +37,7 @@ export interface MenuPreviewFrame {
   readonly height: number;
   readonly pixelRatio: number;
   readonly nowMilliseconds: number;
-  /** Native menu camera projection, before player zoom/follow. */
+  /** Menu camera projection, before player zoom/follow. */
   readonly cameraX: number;
   readonly cameraY: number;
   readonly zoom: number;
@@ -78,8 +78,8 @@ function previewContext(): Canvas2DContext | undefined {
   resources.preview = { context: wrapContext(native) };
   return resources.preview.context;
 }
-/** The menu branch. The world callback owns the native
- * world pass, including its composite and balanced saves. It receives the
+/** The menu branch. The world callback owns the world
+ * pass, including its composite and balanced saves. It receives the
  * cleared 1x1 renderer; viewport dimensions remain those of the main canvas.
  * Main canvas identity/clear belongs to the frame owner, as for gameplay.
  */
@@ -183,7 +183,7 @@ export function drawMenu(
         f(x * pixelRatio),
         f(y * pixelRatio),
       );
-      // The original menu owns one catalogue visual per floating object.
+      // The menu owns one catalogue visual per floating object.
       // Slot multiplicity belongs to cards; Peas' cluster is one visual.
       drawPetalInstance(context, type);
       context.restore();
@@ -203,11 +203,11 @@ export function drawMenu(
   base();
   const centerX = Math.trunc(w / 2);
   if (respawn) {
-    // Original menu respawn block: centered under the name input. The item
-    // row uses the same 60-unit cards and 70-unit pitch as the galleries.
+    // Respawn block: centered under the name input. The item row uses the
+    // same 60-unit cards and 70-unit pitch as the galleries.
     const items = respawn.items.filter((type) => PETAL_INFO[type]);
-    // String 23467 ("... with:") is selected only when the survivor count is
-    // nonzero; otherwise the original draws 18891 ("...at level %d").
+    // The "... with:" suffix is selected only when the survivor count is
+    // nonzero; otherwise the label shows only the level.
     const survivors = items.length > 0 ? ' with:' : '';
     label(`You will respawn at level ${respawn.level}${survivors}`, 16, centerX, f(h / 2 + 65.7));
     for (const [index, type] of items.entries()) {
@@ -384,8 +384,8 @@ export function drawMenuRespawnTooltips(
   context.restore();
 }
 
-/** Kept separate from the captured menu iris so the input can continue its
- * native upward motion over gameplay, and descend on returning to the menu. */
+/** Kept separate from the menu iris so the input can continue its upward
+ * motion over gameplay, and descend on returning to the menu. */
 export function drawMenuInput(
   native: Canvas2DContext,
   width: number,

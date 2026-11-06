@@ -38,7 +38,7 @@ export function connectionConfig(
     url: url.href,
   };
   config.prediction = value.prediction ?? page.searchParams.get('prediction') !== 'off';
-  // An explicit offline profile is retained for diagnostics and legacy regressions.
+  // An explicit offline profile is retained for diagnostics and compatibility regressions.
   if (page.searchParams.get('profile') === 'offline') {
     config.profile = 'local';
   }

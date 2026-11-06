@@ -7,16 +7,16 @@ namespace engine {
  * record; false leaves the caller to apply the ordinary spring this frame. */
 bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::uint8_t buttons);
 
-/** Original virtual slot6: a launched Web creates its ground area on death. */
+/** A launched Web creates its ground area when the petal dies. */
 void on_petal_death(World& world, EntityHandle petal);
 
-/** Apply the recovered petal-on-hit family: Iris/Peas/Cactus poison, Dandelion
+/** Apply the petal-on-hit family: Iris/Peas/Cactus poison, Dandelion
  * healing suppression, Honey slow. Peas splitting belongs to the orbit callback and Web to death.
- * The cooldown is the original `behavior+4` gate that prevents one contact from firing every tick.
+ * A per-petal cooldown gates the effect so one contact cannot fire every tick.
  */
 void on_petal_hit(World& world, EntityHandle petal, EntityHandle target, EntityHandle attacker);
 
-/** Apply the Cactus incoming-hit poison family (original function 691). */
+/** Apply the Cactus incoming-hit poison family. */
 void on_petal_incoming_hit(World& world, EntityHandle petal, EntityHandle attacker);
 
 /** Advance temporary petals, Peas split cooldowns and Egg hatch timers. */

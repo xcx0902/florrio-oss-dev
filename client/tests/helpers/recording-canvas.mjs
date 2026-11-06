@@ -1,7 +1,7 @@
 /** Minimal recording 2D context used by product rendering tests.
  *
  * It records path commands, paint state and style setters without depending on
- * a browser canvas, an archived rendering probe or original function numbers. */
+ * a browser canvas, a saved rendering probe or numbered function references. */
 export class RenderingCanvas {
   constructor() {
     this.paints = [];

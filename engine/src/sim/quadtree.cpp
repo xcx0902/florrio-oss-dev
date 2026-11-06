@@ -187,7 +187,8 @@ void QuadTree::compact_at(std::size_t node_index) {
   if (count > capacity_) {
     return;
   }
-  // Original163 uses 0,1,2,3 for merging, independently of query order0,2,1,3.
+  // Merging visits children in 0,1,2,3 order, independently of the 0,2,1,3
+  // query order.
   for (const int child : children) {
     Node& node = nodes_[static_cast<std::size_t>(child)];
     for (const Item& item : node.items) {
@@ -221,9 +222,8 @@ void QuadTree::query_at(std::size_t node_index, const Aabb& area,
   if (node.leaf()) {
     return;
   }
-  // Original walk order: NW, SW, NE, SE (indices 0, 2, 1, 3). The first two
-  // quadrants are recursive calls and the last is a tail jump, but the visit
-  // order is identical.
+  // Walk order: NW, SW, NE, SE (indices 0, 2, 1, 3). Candidate order follows
+  // this walk, so the visit order stays fixed.
   static constexpr std::array<std::size_t, 4> kOrder{{0, 2, 1, 3}};
   for (const std::size_t index : kOrder) {
     const int child = node.children[index];

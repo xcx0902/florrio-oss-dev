@@ -106,7 +106,7 @@ test('creation-marked drops grow and rotate; existing drops keep their settled a
   const settled = [100, 150, 2000].map((now) => angle(rim(old.draw(now))));
   assert.ok(
     settled.every((value) => Math.abs(value - settled[0]) < 1e-6),
-    'the original idle effect pulses without a continuous spin',
+    'the idle effect pulses without a continuous spin',
   );
 });
 

@@ -6,13 +6,16 @@
 #include <vector>
 
 namespace engine {
-// The original host call fmod(angle, 2*pi); 6924 is the signature pointer,
-// not a modulus.
+// Direction packing constants: one full turn as a double, and the 2*pi -> 255
+// scale that maps a wrapped angle onto the direction byte range.
 inline constexpr double kInputTau = 0x1921fb54442d18ULL * 0x1p-50;
 inline constexpr double kInputAngleModulus = kInputTau;
 inline constexpr double kDirectionScale = 0x144ad13d5bfebaULL * 0x1p-47;
 
-/** Original inputButtons direction packing. */
+/** Pack a float angle into the inputButtons direction word: take the remainder
+ * in f64 and narrow it to f32, wrap the narrowed value to [0, 2*pi) in f64,
+ * scale by 255/2*pi, truncate, and yield zero when the scaled value leaves the
+ * u32 range. */
 [[nodiscard]] inline std::uint32_t pack_direction(f32 angle) {
   const f32 normalized(
       static_cast<float>(std::fmod(static_cast<double>(angle.value), kInputAngleModulus)));
@@ -38,7 +41,7 @@ struct HitEvent {
 };
 
 /** One area-effect owner. Targets share `payload`; the vector is rebuilt from
- * the spatial query each tick, matching original 271/updateAreaEffectTargets. */
+ * the spatial query each time the area is refreshed. */
 struct AreaEffect {
   EntityHandle owner{};
   f32 scale = f32(0.0F);
@@ -46,7 +49,8 @@ struct AreaEffect {
   std::vector<EntityHandle> targets;
 };
 
-/** Deferred Peas radial launch (original scheduler entry +1 ms). */
+/** Deferred Peas radial launch: entries become due one millisecond after they are
+ * scheduled. */
 struct DeferredLaunch {
   double due_ms = 0.0;
   f32 phase = f32(0.0F);
@@ -55,9 +59,9 @@ struct DeferredLaunch {
   std::uint64_t sequence = 0;
 };
 
-/** Original ant-hole species component (species+136, 12-byte pool record).
- * The world keeps the same append/swap-remove order as the original dense
- * component vector; `release_index` is the next entry in the 4848/4852 table. */
+/** Ant-hole release cursor. `release_index` is the next entry of the 33-step
+ * health-ratio table; entries are appended on registration and removed by
+ * swap-with-last, so the order is stable only while nothing unregisters. */
 struct AntHoleRelease {
   EntityHandle entity{};
   std::uint32_t release_index = 0;

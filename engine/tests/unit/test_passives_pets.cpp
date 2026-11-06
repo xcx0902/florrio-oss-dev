@@ -66,7 +66,7 @@ void rotation_and_heaviest() {
     const auto direction = yin == 0U ? 1.0 : yin == 1U ? -1.0 : 0.0;
     require(engine::test::player(world).loadout().orbit_phase() ==
                 f32::from_double((2.5 + 0.8 * faster) * direction * 0.05),
-            "original shared phase including Faster and unchanged Heaviest");
+            "shared phase including Faster and unchanged Heaviest");
     if (*types.begin() == 14U) {
       engine::test::player(world).loadout().set_pending(0, 0, true);
       engine::test::player(world).loadout().set_orbit_phase(f32(0.0F));
@@ -80,7 +80,7 @@ void rotation_and_heaviest() {
   setup(world, {26});
   require(world.entities().get(engine::test::player(world).loadout().handle(0, 0))->mass ==
               f32(4.0F),
-          "original Heaviest mass is four");
+          "Heaviest mass is four");
   engine::test::input(world, 1U, f32(0.0F), f32(0.0F));
   update_petal_orbits(world, engine::test::player(world), 50.0);
   require(engine::test::player(world).petals()[0].orbit_radius == f32(100.0F),
@@ -92,7 +92,7 @@ void passive_health() {
     float maximum;
     float health;
   };
-  // Direct original 145 + one 654 tick; health starts at 50/100.
+  // Health starts at 50/100, then one regeneration tick applies the passives.
   for (const auto fixture :
        {Case{1, 100.0F, 50.02083206176758F}, Case{32, 100.0F, 50.07083511352539F},
         Case{13, 120.0F, 60.025001525878906F}, Case{21, 120.0F, 60.025001525878906F},
@@ -102,8 +102,8 @@ void passive_health() {
     auto* player = world.entities().get(owner);
     player->health = f32(50.0F);
     regenerate_players(world, 50.0);
-    require(player->max_health == f32(fixture.maximum), "original Cactus max health per slot");
-    require(player->health == f32(fixture.health), "original rounded rescale and passive healing");
+    require(player->max_health == f32(fixture.maximum), "Cactus max health per slot");
+    require(player->health == f32(fixture.health), "rounded rescale and passive healing");
     engine::test::player(world).loadout().set_pending(0, 0, true);
     const auto old_health = player->health, old_maximum = player->max_health;
     regenerate_players(world, 50.0);
@@ -165,12 +165,12 @@ void egg_slot_and_recharge(std::uint16_t type, double delay, std::uint16_t mob_t
   const auto* hatchling = world.entities().get(pet);
   require(hatchling != nullptr && hatchling->kind == EntityKind::kMob &&
               hatchling->type_id == mob_type,
-          "original hatchling species");
+          "hatchling species matches the Egg's pet type");
   require(hatchling->owner == owner.raw && hatchling->ai.owner == owner,
           "pet owner and AI leash owner are the player");
   require(hatchling->ai.radius == f32(1000.0F) && hatchling->ai.guard_radius == f32(300.0F) &&
               hatchling->ai.leash == f32(1000.0F),
-          "original Egg AI overrides");
+          "Egg AI leash overrides");
   require(world.entities().get(egg)->health == f32(0.0F), "Egg health is consumed");
   require(engine::test::player(world).petals().empty(), "pet does not orbit as an Egg");
   require(refresh_loadout_petals(world, engine::test::player(world), 5000.0) == 0U &&
@@ -354,12 +354,12 @@ void zone_disables_equipped_pets() {
     require(corpse != nullptr && corpse->health == f32(0.0F) && corpse->death_processed,
             "full-tick zone disable kills the pet through the ordinary corpse path");
     require(!engine::test::player(world).loadout().handle(0, 0).valid() &&
-                !engine::test::player(world).loadout().slots()[0].instances[0].valid(),
+                !engine::test::player(world).loadout().handle(0, 0).valid(),
             "zone sweep releases both equipped pet handle views");
     require(engine::test::player(world).loadout().slots()[0].recharge_remaining_ms == 950.0,
-            "zone defeat starts the original 50-ms recharge tick");
+            "zone defeat starts the 50-ms recharge tick");
     require(engine::test::player(world).loadout().recharge_progress()[0] == 0U,
-            "disabled-zone field61 cache publishes zero even as Egg recharge advances");
+            "disabled-zone recharge cache publishes zero even as Egg recharge advances");
     for (int index = 0; index < 19; ++index) {
       tick(world, 50.0);
     }
@@ -374,12 +374,12 @@ void zone_disables_equipped_pets() {
     const auto replacement = engine::test::player(world).loadout().handle(0, 0);
     require(!engine::test::player(world).zone_petals_disabled() &&
                 engine::test::player(world).zone_timer_ms() == f32(44995.0F),
-            "safe-zone timer keeps its original 0.1 decay");
+            "safe-zone timer keeps its 0.1 decay");
     require(replacement.valid() && world.entities().get(replacement)->kind == EntityKind::kPetal &&
                 world.entities().get(replacement)->type_id == type,
             "leaving zone restriction permits the recharged Egg to spawn");
     require(engine::test::player(world).loadout().recharge_progress()[0] == 65535U,
-            "re-enabling a charged Egg restores the ready field61 cache");
+            "re-enabling a charged Egg restores the ready recharge cache");
   }
 }
 
@@ -419,7 +419,8 @@ void discard_hatched_pet_before_owner_death() {
     require(corpse != nullptr && corpse->health == f32(0.0F) && corpse->death_processed,
             "opcode8 damages the hatchling before clearing its equipped handle");
     require(!engine::test::player(world).loadout().handle(0U, 0U).valid() &&
-                engine::test::player(world).loadout().slots()[0].type_id == 0U &&
+                engine::test::player(world).loadout().slots()[0].type_id ==
+                    catalog::petal_type_id(catalog::PetalId::kNone) &&
                 engine::test::player(world).profile().inventory(0U) == 0U,
             "discard clears the slot and profile");
     require(engine::test::player(world).profile().backpack_count() == 1U &&
@@ -483,7 +484,7 @@ int main(int argc, char** argv) {
     return 0;
   }
   rotation_and_heaviest();
-  std::puts("ok 1 - original Faster phase and Heaviest mass/orbit");
+  std::puts("ok 1 - Faster phase and Heaviest mass/orbit");
   passive_health();
   std::puts("ok 2 - Leaf and Cactus exact health, readiness, stacking and veto");
   egg_slot_and_recharge(22U, 1000.0, 9U);

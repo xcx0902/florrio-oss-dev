@@ -31,18 +31,18 @@ class SpawnTable {
   [[nodiscard]] static SpawnTable from_catalog();
   [[nodiscard]] const SpawnBand& band(std::uint8_t index) const { return bands_[index & 7U]; }
 
-  /** Original113 selection: draw one server RNG value, scale the band total,
-   * then subtract entry weights in order. */
+  /** Band selection: draw one server RNG value, scale the band total, then
+   * subtract entry weights in order. */
   [[nodiscard]] const SpawnBandEntry* choose(std::uint8_t index, ServerRng& rng) const;
 
-  /** One position trial from original113: two RNG draws and the band's
-   * normalized x-range. Collision retries are the caller's responsibility. */
+  /** One position trial: two RNG draws and the band's normalized x-range.
+   * Collision retries are the caller's responsibility. */
   [[nodiscard]] SpawnPosition sample_position(std::uint8_t index, ServerRng& rng,
                                               f32 width = f32(50000.0F),
                                               f32 height = f32(4000.0F)) const;
 
-  /** Original113's up-to-100-trial loop. `occupied` is the spatial query
-   * (original function 161); it returns true when the trial must be retried. */
+  /** Up-to-100-trial position search. `occupied` is the broad-phase predicate;
+   * it returns true when the trial must be retried. */
   template <typename Occupied>
   [[nodiscard]] std::optional<SpawnPosition>
   find_clear_position(std::uint8_t index, ServerRng& rng, Occupied&& occupied,
@@ -84,27 +84,34 @@ class SpawnTable {
                                         Vec2 position, f32 radius, std::uint8_t world_flags = 0,
                                         std::uint8_t entity_flags = 0);
 
-/** Construct from the probed catalog defaults. Dynamic-radius species (Rock /
- * Boulder) are rejected here; use configure_rock / spawn_rock when the caller
- * owns the RNG order. */
+/** Construct a catalog species for diagnostic and pet spawns. Rock, Boulder and
+ * Cactus use their dynamic-radius initializers without the extra spawn-loot
+ * draws; band spawns use `spawn_band_entity`, which draws them first. */
 [[nodiscard]] EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind,
                                                       std::uint16_t type_id, Vec2 position);
+
+/** Construct one band entry at an accepted spawn position. Every species draws
+ * its spawn-loot candidates before the body initializer; Rock/Boulder/Cactus
+ * then draw their dynamic radius. */
+[[nodiscard]] EntityHandle spawn_band_entity(World& world, const SpawnBandEntry& entry,
+                                             const SpawnPosition& position);
 
 struct RockBody {
   f32 radius;
   f32 health;
 };
 
-/** Original 417 configureRock: one server RNG draw, then radius/health. */
+/** Rock body initializer: one server RNG draw, then radius and health. */
 [[nodiscard]] RockBody configure_rock(ServerRng& rng, bool massive);
 [[nodiscard]] EntityHandle spawn_rock(World& world, Vec2 position, bool massive, ServerRng& rng);
 
-/** Function 144's Rock path: three pre-configure draws, then configureRock. */
+/** Rock spawn used by population fills: three spawn-loot draws, then
+ * `configure_rock`. */
 [[nodiscard]] EntityHandle spawn_rock_with_drop_draws(World& world, Vec2 position, bool massive,
                                                       ServerRng& rng);
 
 /** Cactus initializer: one RNG draw, radius 40..60, max health radius * 0.7,
- * contact damage 30, physics flag 48 = 0. */
+ * contact damage 30, no mass-weighted contact response. */
 struct CactusBody {
   f32 radius;
   f32 health;
@@ -115,20 +122,20 @@ struct CactusBody {
                                                         ServerRng& rng);
 
 /** Spawn the explicit per-band counts using the live world as the occupied
- * predicate. Counts are caller-supplied; the original initializer's counts are
+ * predicate. Counts are caller-supplied; the world initializer's own counts are
  * not asserted here. */
 [[nodiscard]] std::vector<EntityHandle> populate_world(World& world, const SpawnTable& table,
                                                        const std::array<std::uint8_t, 8>& counts);
 
-/** Original400 area targets: floor(width * height * scale) for the eight bands.
- * The recovered scales are 6e-7 for bands 0..5 and 2e-7 for bands 6/7. */
+/** Area targets: floor(width * height * scale) for the eight bands. The scales
+ * are 6e-7 for bands 0..5 and 2e-7 for bands 6/7. */
 [[nodiscard]] std::array<std::uint32_t, 8> population_targets(f32 width, f32 height);
 
 /** Fill the eight ordinary bands to their area targets. Existing mobs are
  * counted by `Entity::spawn_band`; only the deficit is spawned. */
 std::vector<EntityHandle> replenish_population(World& world, const SpawnTable& table);
-/** Original tick's ant-hole release loop. Reads the live health ratio and
- * spawns the remaining table entries at the hole position, in spawn order. */
+/** Ant-hole release loop: read the live health ratio and spawn the remaining
+ * table entries at the hole position, in spawn order. */
 void release_ant_hole_ants(World& world);
 /** Initial population fill: spawn exactly the area target per band, counting
  * parent spawns only (children carry spawn_band 255). */

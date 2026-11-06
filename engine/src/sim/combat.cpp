@@ -112,11 +112,11 @@ std::size_t resolve_contacts(World& world) {
   context.prepared = false;
   const auto& bodies = context.bodies;
   std::size_t contacts = 0;
-  // The original broad phase is a loose quadtree: a body descends into a
-  // child only when its AABB is fully contained by that child, otherwise it
-  // stays at the parent. The tree is traversed in node order, so a body's own
-  // cell is visited before its siblings. This is the candidate order used by
-  // the product contact strategy 6.
+  // The broad phase is a loose quadtree: a body descends into a child only
+  // when its AABB is fully contained by that child, otherwise it stays at the
+  // parent. The tree is traversed in node order, so a body's own cell is
+  // visited before its siblings; that order defines the contact candidate
+  // sequence.
   auto body_box = [](const Entity& entity) {
     const float radius = entity.collision_radius.value;
     return Aabb{f32(entity.position.x.value - radius), f32(entity.position.y.value - radius),
@@ -165,8 +165,8 @@ std::size_t resolve_contacts(World& world) {
   }
 
   for (std::size_t first = 0; first < bodies.size(); ++first) {
-    // The original outer body loop checks health immediately before querying;
-    // the body may have died after the initial broadphase snapshot.
+    // Health is checked again immediately before querying: the body may have
+    // died after the initial broadphase snapshot.
     if (!bodies[first].entity->active || bodies[first].entity->health.value <= 0.0F) {
       continue;
     }
@@ -206,8 +206,8 @@ std::size_t resolve_contacts(World& world) {
       if (b.kind == EntityKind::kPlayer && a_owned && EntityHandle{a.owner} == b.handle) {
         continue;
       }
-      // Original 390 skips the whole pair when either physics record has the
-      // +50 one-shot marker.
+      // The whole pair is skipped when either body carries the contact-skip
+      // marker (Web tag projectiles).
       if (a.skips_contact_response || b.skips_contact_response) {
         continue;
       }
@@ -221,9 +221,9 @@ std::size_t resolve_contacts(World& world) {
       const double reach = static_cast<double>(a.collision_radius.value) +
                            static_cast<double>(b.collision_radius.value);
       const double distance_squared = dx * dx + dy * dy;
-      // Original 162 admits a pair with binary32 subtraction, products and
-      // sum. The response (390) then uses binary64. A binary64 admission test
-      // resolves extra near-tangent chain contacts and accumulates drift.
+      // Pair admission uses binary32 subtraction, products and sum, while the
+      // response below uses binary64. A binary64 admission test resolves extra
+      // near-tangent chain contacts and accumulates drift.
       const f32 admission_x = b.position.x - a.position.x;
       const f32 admission_y = b.position.y - a.position.y;
       const f32 admission_reach = a.collision_radius + b.collision_radius;
@@ -239,20 +239,20 @@ std::size_t resolve_contacts(World& world) {
         normal_y = dy / distance;
       }
       const double overlap = distance_squared < reach * reach ? reach - distance : 0.0;
-      // Original 162/390 response. 162 snapshots velocity + acceleration for
-      // both bodies, then calls 390 twice with the pair swapped:
-      //   call(p1, p2):  dot = (v1 + a1 - v2 - a2) . (p1 - p2)
-      //     mass path (both physics +48 set):
-      //       v1 += (p1 - p2) * (-2 * dot * eff2) / (|d|^2 * (eff1 + eff2))
-      //       no position change; 162 then splits the overlap by mass.
-      //     otherwise:
-      //       v1 += (p1 - p2) * (-2 * dot / |d|^2)
-      //       p1 is pushed fully out of p2 along the world-space normal.
-      // Because both calls reuse the pre-call velocity snapshot, the pair is
-      // one equal-and-opposite impulse with per-body mass weights.
-      // A body whose physics +48 byte is clear (Rock, Boulder, Cactus, Ant
-      // Hole) never receives contact response: the call with that body as p1
-      // returns before touching velocity or position.
+      // Contact response: velocity and acceleration are read for both bodies
+      // before either is updated, then the impulse is applied to each:
+      //   dot = (v1 + a1 - v2 - a2) . (p1 - p2)
+      //   mass path (both bodies mass-weighted):
+      //     v1 += (p1 - p2) * (-2 * dot * eff2) / (|d|^2 * (eff1 + eff2))
+      //     no position change; the overlap is then split by mass.
+      //   otherwise:
+      //     v1 += (p1 - p2) * (-2 * dot / |d|^2)
+      //     p1 is pushed fully out of p2 along the world-space normal.
+      // Both applications reuse the same pre-update velocity, so the pair
+      // receives one equal-and-opposite impulse with per-body mass weights.
+      // A body without mass-weighted response (Rock, Boulder, Cactus, Ant
+      // Hole) never receives contact response: its velocity and position are
+      // left untouched.
       const bool mass_path = a.uses_mass_weighted_response && b.uses_mass_weighted_response;
       const double effective_a = static_cast<double>(a.collision_radius.value) *
                                  static_cast<double>(a.collision_radius.value) *
@@ -267,7 +267,7 @@ std::size_t resolve_contacts(World& world) {
           (a.velocity.x + a.acceleration.x) - (b.velocity.x + b.acceleration.x);
       const double relative_y =
           (a.velocity.y + a.acceleration.y) - (b.velocity.y + b.acceleration.y);
-      // Preserve 390's dot/mass/division grouping before multiplying the
+      // Preserve the dot/mass/division grouping before multiplying the
       // unnormalised separation. Normalising first changes the low f64 bits.
       const double dot = relative_x * -dx + relative_y * -dy;
       const double response_a =
@@ -311,10 +311,10 @@ std::size_t resolve_contacts(World& world) {
           }
         }
       }
-      // Original 390 tail: a body carrying world flag 32 (the player) receives
-      // a fixed 0.2 normal impulse along (self - other). The vector is the
-      // pre-correction separation captured at entry, so it is evaluated from
-      // dx/dy/distance rather than the already-pushed positions.
+      // A player body receives an extra fixed 0.2 normal impulse along
+      // (self - other). The vector is the pre-correction separation captured at
+      // entry, so it is evaluated from dx/dy/distance rather than the
+      // already-pushed positions.
       if (distance > 0.0) {
         if (has_flag(a.world_flags, WorldFlag::kPlayerBody)) {
           a.velocity.x += -dx * 0.2 / distance;
@@ -327,11 +327,11 @@ std::size_t resolve_contacts(World& world) {
       }
 
       const f32 scale = level_damage_scale(world, a.handle, b.handle);
-      // Original 162 passes controlling-root equality to 390; its damage
-      // tail has no attack-button, movement or AI-aggression gate. Production
-      // move tick305 proves an idle Basic petal and worker Ant kill each other.
-      // Ordinary mobs share the world's manager root, so their contacts remain
-      // non-damaging even when the bodies have different immediate owners.
+      // Damage is gated only by controlling-root equality; there is no
+      // attack-button, movement or AI-aggression gate. An idle Basic petal and
+      // a worker Ant therefore damage each other. Ordinary mobs all count as
+      // world-controlled, so their contacts remain non-damaging even when the
+      // bodies have different immediate owners.
       const bool suppress_damage = same_controlling_root(world, a.handle, b.handle);
       const f32 damage_to_a = suppress_damage ? f32(0.0F) : b.contact_damage * scale;
       const f32 damage_to_b = suppress_damage ? f32(0.0F) : a.contact_damage * scale;
@@ -360,9 +360,9 @@ std::size_t resolve_contacts(World& world) {
         on_petal_incoming_hit(world, b_handle, a_handle);
       }
       if (mass_path && overlap > 0.0) {
-        // Original 390 applies damage/death (including spawning loot) before
-        // returning to 162 for this split. A newly created drop must retain
-        // the dying body's pre-separation position, not its final corpse pose.
+        // Damage/death (including spawning loot) is applied before this split.
+        // A newly created drop must retain the dying body's pre-separation
+        // position, not its final corpse pose.
         a.set_position_x(f32::from_double(static_cast<double>(a.position.x.value) -
                                           normal_x * overlap * weight_a));
         a.set_position_y(f32::from_double(static_cast<double>(a.position.y.value) -

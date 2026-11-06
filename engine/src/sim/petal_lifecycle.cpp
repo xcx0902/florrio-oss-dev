@@ -13,6 +13,7 @@
 #include "pickups.hpp"
 #include <algorithm>
 #include <cmath>
+#include <optional>
 
 namespace engine {
 namespace {
@@ -27,6 +28,23 @@ PlayerState* orbit_owner(World& world, EntityHandle handle) {
     }
   });
   return owner;
+}
+
+/** Remove the orbit record bound to `handle` and release its loadout slot
+ * instance. Returns the removed record so the caller can decide between an
+ * immediate respawn and a recharge. */
+std::optional<PetalOrbitState> take_orbit(PlayerState& state, EntityHandle handle) {
+  auto& petals = state.petals();
+  const auto it =
+      std::find_if(petals.begin(), petals.end(),
+                   [handle](const PetalOrbitState& orbit) { return orbit.handle == handle; });
+  if (it == petals.end()) {
+    return std::nullopt;
+  }
+  PetalOrbitState orbit = *it;
+  petals.erase(it);
+  state.loadout().clear_handle(orbit.slot, orbit.instance);
+  return orbit;
 }
 }  // namespace
 
@@ -52,8 +70,9 @@ EntityHandle spawn_drop(World& world, std::uint16_t type_id, Vec2 position) {
     drop->collision_radius = f32(35.0F);
     drop->lifetime_remaining_ms = loot_lifetime_ms(type_id);
     drop->pickup_transfer_deadline_ms = world.time_ms() + drop->lifetime_remaining_ms;
-    // A drop has no AI/attack behavior. Its generic behavior timer holds the
-    // original pickup+48 spawn grace, and its target handle holds pickup+56.
+    // A drop has no AI/attack behavior. Its generic behavior timer stores the
+    // 500 ms pickup grace deadline; its target handle is later set to the
+    // collecting entity so the drop can follow it.
     drop->behavior_cooldown_ms = world.time_ms() + 500.0;
     world.register_pickup(handle);
   }
@@ -67,8 +86,8 @@ EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id
   if (combat == nullptr || combat->drawRadius <= 0.0F) {
     return EntityHandle{};
   }
-  // Original 397 copies the owner's world position into the petal transform;
-  // the orbit spring then accelerates it outward to the profile radius.
+  // The petal starts at the owner's world position; the orbit spring then
+  // accelerates it outward to the profile radius.
   const EntityHandle handle =
       spawn_entity(world, EntityKind::kPetal, type_id, center, f32(combat->drawRadius));
   if (!handle.valid()) {
@@ -79,7 +98,7 @@ EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id
   entity->contact_damage = f32(combat->damage);
   entity->health = f32(combat->health);
   entity->max_health = f32(combat->health);
-  // Original 726 writes physics+40 mass 4 for Heaviest (other petals use 1).
+  // Heaviest petals carry mass 4; every other petal keeps the default of 1.
   if (catalog::petal_id(type_id) == catalog::PetalId::kHeaviestEpic) {
     entity->mass = f32(4.0F);
   }
@@ -125,14 +144,13 @@ std::size_t spawn_loadout_petals(World& world, PlayerState& state) {
   auto& slots = state.loadout().slots();
   for (std::uint8_t slot = 0; slot < active && slot < slots.size(); ++slot) {
     PetalSlot& value = slots[slot];
-    // Original petal flag +40 disables the orbit entity completely. Antennae
-    // is worn on the flower instead: it contributes only its appearance bit
-    // and the widened camera. Spawning a petal here would make it orbit.
+    // An orbit-hidden petal has no equipped entity at all. Antennae is worn on
+    // the flower instead: it contributes only its appearance bit and the
+    // widened camera. Spawning a petal here would make it orbit.
     bool hidden = false;
     const auto* definition = Catalog::instance().petal(value.type_id);
     hidden = definition != nullptr && definition->orbitHidden;
     if (hidden) {
-      value.instances.fill(EntityHandle{});
       for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
         state.loadout().clear_handle(slot, instance);
       }
@@ -146,7 +164,7 @@ std::size_t spawn_loadout_petals(World& world, PlayerState& state) {
       if (state.loadout().pending(slot, instance)) {
         continue;
       }
-      if (world.entities().get(value.instances[instance]) != nullptr) {
+      if (world.entities().get(state.loadout().handle(slot, instance)) != nullptr) {
         continue;
       }
       const std::uint8_t orbit_index = petal_orbit_index(state, slot, instance);
@@ -164,7 +182,6 @@ std::size_t spawn_loadout_petals(World& world, PlayerState& state) {
         entity->owner = state.player().raw;
         attach_child(world, state.player(), handle);
       }
-      value.instances[instance] = handle;
       state.loadout().set_handle(slot, instance, handle);
       state.loadout().set_pending(slot, instance, false);
       state.loadout().set_pending_timer(slot, instance, 0U);
@@ -196,87 +213,49 @@ std::size_t refresh_loadout_petals(World& world, PlayerState& state, double step
 }
 
 bool detach_petal_from_slot(World& world, EntityHandle handle) {
-  auto* owner = orbit_owner(world, handle);
+  PlayerState* owner = orbit_owner(world, handle);
   if (owner == nullptr) {
     return false;
   }
-  auto& state = *owner;
-  auto& petals = state.petals();
-  const auto it =
-      std::find_if(petals.begin(), petals.end(),
-                   [handle](const PetalOrbitState& state) { return state.handle == handle; });
-  if (it == petals.end()) {
-    return false;
-  }
-  const std::uint8_t slot_index = it->slot;
-  const std::uint8_t instance = it->instance;
-  petals.erase(it);
-  auto& slots = state.loadout().slots();
-  if (slot_index < slots.size()) {
-    PetalSlot& slot = slots[slot_index];
-    if (instance < slot.instances.size()) {
-      slot.instances[instance] = EntityHandle{};
-    }
-    state.loadout().clear_handle(slot_index, instance);
-    // No recharge: the original immediately respawns another instance.
-  }
-  return true;
+  // No recharge and no respawn delay: the slot spawns a replacement instance on
+  // the next loadout pass.
+  return take_orbit(*owner, handle).has_value();
 }
 
 bool on_petal_destroyed(World& world, EntityHandle handle) {
-  // Original 43 invokes petal virtual slot6 even after a launched Web has
-  // detached its equipped handle. Dispatch before looking up the orbit.
+  // The death effect runs even when a launched Web has already detached its
+  // equipped handle, so dispatch before looking up the orbit record.
   const Entity* entity = world.entities().get(handle);
   if (entity != nullptr && entity->health.value <= 0.0F) {
     on_petal_death(world, handle);
   }
-  auto* owner = orbit_owner(world, handle);
+  PlayerState* owner = orbit_owner(world, handle);
   if (owner == nullptr) {
     return false;
   }
-  auto& state = *owner;
-  auto& petals = state.petals();
-  const auto it =
-      std::find_if(petals.begin(), petals.end(),
-                   [handle](const PetalOrbitState& state) { return state.handle == handle; });
-  if (it == petals.end()) {
+  const auto orbit = take_orbit(*owner, handle);
+  if (!orbit) {
     return false;
   }
-  const std::uint8_t slot_index = it->slot;
-  const std::uint8_t instance = it->instance;
-  const std::uint16_t type_id = it->type_id;
-  petals.erase(it);
-  auto& slots = state.loadout().slots();
-  if (slot_index < slots.size()) {
-    PetalSlot& slot = slots[slot_index];
-    if (instance < slot.instances.size()) {
-      slot.instances[instance] = EntityHandle{};
-    }
-    state.loadout().clear_handle(slot_index, instance);
-    const auto* combat = Catalog::instance().petal_combat(type_id);
-    if (combat != nullptr) {
-      slot.recharge_remaining_ms = combat->rechargeMilliseconds;
-    }
-  }
+  owner->loadout().retire_handle(orbit->slot, orbit->instance);
   return true;
 }
 
 void remove_slot_petals(World& world, PlayerState& state, std::uint8_t slot) {
-  auto& petals = state.petals();
   std::vector<EntityHandle> removed;
-  for (const auto& orbit : petals) {
+  for (const auto& orbit : state.petals()) {
     if (orbit.slot == slot) {
       removed.push_back(orbit.handle);
     }
   }
-  for (auto handle : removed) {
+  // Destruction retires the orbit record and its loadout instance through
+  // `on_petal_destroyed`.
+  for (const EntityHandle handle : removed) {
     (void)world.destroy(handle);
   }
-  if (slot < state.loadout().slots().size()) {
-    state.loadout().slots()[slot].instances.fill(EntityHandle{});
-    for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
-      state.loadout().clear_handle(slot, instance);
-    }
+  // A hatched Egg's mob handle has no orbit record; release it here.
+  for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {
+    state.loadout().clear_handle(slot, instance);
   }
 }
 

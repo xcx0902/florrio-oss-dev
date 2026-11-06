@@ -15,7 +15,7 @@ import { browser, origin, start, stop } from '../support/worker-fixture.mjs';
 before(start);
 after(stop);
 
-test('original snapshot header decoder reads type, sequence and ack', async () => {
+test('snapshot header decoder reads type, sequence and ack', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
@@ -26,7 +26,7 @@ test('original snapshot header decoder reads type, sequence and ack', async () =
   assert.deepEqual(result, { sequence: 9, reliableAck: 3 });
 });
 
-test('original bare update decoder reads handle and flags', async () => {
+test('bare update decoder reads handle and flags', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
@@ -37,10 +37,10 @@ test('original bare update decoder reads handle and flags', async () => {
       1, 13, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 0,
     ]);
     const maskSnapshot = new SnapshotDecoder().decode(maskBytes);
-    const fieldBytes = new Uint8Array([
+    const byte1Bytes = new Uint8Array([
       1, 14, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 1, 0x7a, 0,
     ]);
-    const fieldSnapshot = new SnapshotDecoder().decode(fieldBytes);
+    const byte1Snapshot = new SnapshotDecoder().decode(byte1Bytes);
     const floatBytes = new Uint8Array([
       1, 15, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 5, 0, 0, 0xc0, 0x3f, 2, 0, 0, 0x20,
       0x40, 17, 0, 0, 0x60, 0x40, 0,
@@ -55,19 +55,19 @@ test('original bare update decoder reads handle and flags', async () => {
       0,
     ]);
     const doubleSnapshot = new SnapshotDecoder().decode(doubleBytes);
-    const field18Bytes = new Uint8Array([
+    const double18Bytes = new Uint8Array([
       1, 18, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0x0a, 0x40,
       0,
     ]);
-    const field18Snapshot = new SnapshotDecoder().decode(field18Bytes);
-    const field27Bytes = new Uint8Array([
+    const double18Snapshot = new SnapshotDecoder().decode(double18Bytes);
+    const float27Bytes = new Uint8Array([
       1, 19, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 27, 0, 0, 0xb0, 0x40, 0,
     ]);
-    const field27Snapshot = new SnapshotDecoder().decode(field27Bytes);
-    const stringBytes = new Uint8Array([
+    const float27Snapshot = new SnapshotDecoder().decode(float27Bytes);
+    const string4Bytes = new Uint8Array([
       1, 20, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 4, 0x68, 0x69, 0, 0,
     ]);
-    const stringSnapshot = new SnapshotDecoder().decode(stringBytes);
+    const string4Snapshot = new SnapshotDecoder().decode(string4Bytes);
     const byte2Bytes = new Uint8Array([
       1, 21, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 2, 0xab, 0,
     ]);
@@ -122,10 +122,10 @@ test('original bare update decoder reads handle and flags', async () => {
       1, 36, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 5, 0, 0, 0xc0, 0x3f, 3, 0, 0x40, 0,
     ]);
     const mixedSnapshot = new SnapshotDecoder().decode(mixedBytes);
-    const field13Bytes = new Uint8Array([
+    const float13Bytes = new Uint8Array([
       1, 39, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 55, 5, 0, 0, 0, 13, 0, 0, 0xf0, 0x40, 0,
     ]);
-    const field13Snapshot = new SnapshotDecoder().decode(field13Bytes);
+    const float13Snapshot = new SnapshotDecoder().decode(float13Bytes);
     const eventsBytes = new Uint8Array([
       1, 40, 4, 0, 0, 3, 9, 0x68, 0x69, 0, 11, 0x78, 0x56, 0x34, 0x12, 14, 0x78, 0x56, 0x34, 0x12,
       2,
@@ -139,9 +139,9 @@ test('original bare update decoder reads handle and flags', async () => {
         maskSnapshot?.entities.map((entity) => ({ handle: entity.handle, flags: entity.flags })) ??
         null,
       field:
-        fieldSnapshot?.entities.map((entity) => ({
+        byte1Snapshot?.entities.map((entity) => ({
           flags: entity.flags,
-          field1: entity.byteField1,
+          byte1: entity.byteFields?.[1],
         })) ?? null,
       float:
         floatSnapshot?.entities.map((entity) => ({
@@ -149,12 +149,12 @@ test('original bare update decoder reads handle and flags', async () => {
           fields: entity.floatFields,
         })) ?? null,
       staticFloat: staticSnapshot?.entities.map((entity) => entity.floatFields) ?? null,
-      double35: doubleSnapshot?.entities.map((entity) => entity.doubleField35) ?? null,
-      field18: field18Snapshot?.entities.map((entity) => entity.doubleField18) ?? null,
-      field27: field27Snapshot?.entities.map((entity) => entity.floatField27) ?? null,
-      field4: stringSnapshot?.entities.map((entity) => entity.stringField4) ?? null,
+      double35: doubleSnapshot?.entities.map((entity) => entity.doubleFields?.[35]) ?? null,
+      double18: double18Snapshot?.entities.map((entity) => entity.doubleFields?.[18]) ?? null,
+      float27: float27Snapshot?.entities.map((entity) => entity.floatFields?.[27]) ?? null,
+      string4: string4Snapshot?.entities.map((entity) => entity.stringFields?.[4]) ?? null,
       byte2: byte2Snapshot?.entities.map((entity) => entity.byteFields) ?? null,
-      array60: arraySnapshot?.entities.map((entity) => entity.inventory) ?? null,
+      array60: arraySnapshot?.entities.map((entity) => entity.byteArrayFields?.[60]) ?? null,
       varint39: varintArraySnapshot?.entities.map((entity) => entity.varintArrayFields) ?? null,
       short61: shortArraySnapshot?.entities.map((entity) => entity.shortArrayFields) ?? null,
       varint30: varint30Snapshot?.entities.map((entity) => entity.varintFields) ?? null,
@@ -162,17 +162,17 @@ test('original bare update decoder reads handle and flags', async () => {
       string48: string48Snapshot?.entities.map((entity) => entity.stringFields) ?? null,
       stringArray25:
         stringArray25Snapshot?.entities.map((entity) => entity.stringArrayFields) ?? null,
-      float45: float45Snapshot?.entities.map((entity) => entity.floatField45) ?? null,
+      float45: float45Snapshot?.entities.map((entity) => entity.floatFields?.[45]) ?? null,
       sparseOrdinals: sparseSnapshot?.entities.map((entity) => entity.declaredComponents) ?? null,
       bit33: bitSnapshot?.entities.map((entity) => entity.bitFields) ?? null,
-      angle8: angleSnapshot?.entities.map((entity) => entity.angleField8) ?? null,
+      angle8: angleSnapshot?.entities.map((entity) => entity.floatFields?.[8]) ?? null,
       handleArray3: handleArraySnapshot?.entities.map((entity) => entity.handleArrayFields) ?? null,
       mixed:
         mixedSnapshot?.entities.map((entity) => ({
           fields: entity.floatFields,
-          angle: entity.angleField8,
+          angle: entity.floatFields?.[8],
         })) ?? null,
-      field13: field13Snapshot?.entities.map((entity) => entity.floatFields) ?? null,
+      float13: float13Snapshot?.entities.map((entity) => entity.floatFields) ?? null,
       eventsOnly: eventsSnapshot !== null && eventsSnapshot.entities.length === 0,
     };
   });
@@ -180,13 +180,13 @@ test('original bare update decoder reads handle and flags', async () => {
   assert.deepEqual(result, {
     bare: [{ handle: 0x12345678, typeId: 0 }],
     mask: [{ handle: 0x12345678, flags: 1 }],
-    field: [{ flags: 1, field1: 0x7a }],
+    field: [{ flags: 1, byte1: 0x7a }],
     float: [{ flags: 1, fields: { 5: 1.5, 7: 2.5, 24: 3.5 } }],
     staticFloat: [{ 19: 4.5 }],
     double35: [2.25],
-    field18: [3.25],
-    field27: [5.5],
-    field4: ['hi'],
+    double18: [3.25],
+    float27: [5.5],
+    string4: ['hi'],
     byte2: [{ 2: 0xab }],
     array60: [[{ index: 2, value: 0xcd }]],
     varint39: [{ 39: [{ index: 1, value: 200 }] }],
@@ -200,8 +200,13 @@ test('original bare update decoder reads handle and flags', async () => {
     bit33: [{ 33: 1 }],
     angle8: [(2 * Math.PI * 32768) / 65535],
     handleArray3: [{ 3: [{ index: 0, handle: 0xcafebabe }] }],
-    mixed: [{ fields: { 5: 1.5 }, angle: (2 * Math.PI * 16384) / 65535 }],
-    field13: [{ 13: 7.5 }],
+    mixed: [
+      {
+        fields: { 5: 1.5, 8: (2 * Math.PI * 16384) / 65535 },
+        angle: (2 * Math.PI * 16384) / 65535,
+      },
+    ],
+    float13: [{ 13: 7.5 }],
     eventsOnly: true,
   });
 });
@@ -285,10 +290,13 @@ test('dense group 52 decoder reads two byte fields', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseGroup52Decoder } = await import('/test-support/dense-codec.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const bytes = new Uint8Array([1, 41, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x11, 0x22]);
-    const snapshot = new DenseGroup52Decoder().decode(bytes);
-    return snapshot?.entities.map((entity) => entity.denseByteFields) ?? null;
+    const snapshot = new DenseGroupDecoder([
+      { field: 22, type: 'byte' },
+      { field: 54, type: 'byte' },
+    ]).decode(bytes);
+    return snapshot?.entities.map((entity) => entity.denseFields) ?? null;
   });
   await page.close();
   assert.deepEqual(result, [{ 22: 0x11, 54: 0x22 }]);
@@ -298,10 +306,10 @@ test('dense byte group decoder reads configured fields', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseByteGroupDecoder } = await import('/test-support/dense-codec.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([1, 42, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x33]);
-    const snapshot = new DenseByteGroupDecoder([36]).decode(packet);
-    return snapshot?.entities.map((entity) => entity.denseByteFields) ?? null;
+    const snapshot = new DenseGroupDecoder([{ field: 36, type: 'byte' }]).decode(packet);
+    return snapshot?.entities.map((entity) => entity.denseFields) ?? null;
   });
   await page.close();
   assert.deepEqual(result, [{ 36: 0x33 }]);
@@ -311,11 +319,14 @@ test('dense float group decoder reads configured fields', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseFloatGroupDecoder } = await import('/test-support/dense-codec.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const packet = new Uint8Array([
       1, 43, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0, 0xa0, 0x3f, 0, 0, 0x20, 0x40,
     ]);
-    const snapshot = new DenseFloatGroupDecoder([53, 55]).decode(packet);
+    const snapshot = new DenseGroupDecoder([
+      { field: 53, type: 'f32' },
+      { field: 55, type: 'f32' },
+    ]).decode(packet);
     return snapshot?.entities.map((entity) => entity.denseFields) ?? null;
   });
   await page.close();
@@ -326,15 +337,16 @@ test('dense string and mixed groups decode by spec', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
-    const { DenseStringGroupDecoder, DenseGroupDecoder } =
-      await import('/test-support/dense-codec.js');
+    const { DenseGroupDecoder } = await import('/test-support/dense-codec.js');
     const stringPacket = new Uint8Array([
       1, 44, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0x61, 0x62, 0x63, 0,
     ]);
     const mixedPacket = new Uint8Array([
       1, 45, 4, 0, 1, 0, 0x78, 0x56, 0x34, 0x12, 62, 0, 0x40, 0, 0, 0xc0, 0x3f, 0, 0, 0x20, 0x40,
     ]);
-    const stringSnapshot = new DenseStringGroupDecoder([48]).decode(stringPacket);
+    const stringSnapshot = new DenseGroupDecoder([{ field: 48, type: 'string' }]).decode(
+      stringPacket,
+    );
     const mixedSnapshot = new DenseGroupDecoder([
       { field: 8, type: 'angle' },
       { field: 28, type: 'f32' },
@@ -939,7 +951,7 @@ test('dense plan decodes live group 152 extended fields', async () => {
   });
 });
 
-test('original decoder mixes bare and dense updates', async () => {
+test('decoder mixes bare and dense updates', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
@@ -974,7 +986,7 @@ test('original decoder mixes bare and dense updates', async () => {
   ]);
 });
 
-test('original decoder converts mask angle field 8 to radians', async () => {
+test('decoder converts the mask angle field to radians', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
@@ -1009,7 +1021,7 @@ test('snapshot decoder rejects out-of-range fields without changing dense presen
   assert.deepEqual(result, { before: null, invalid: null, after: null });
 });
 
-test('original decoder maps fields 5/24 to world position', async () => {
+test('decoder maps fields 5/24 to world position', async () => {
   const page = await browser.newPage();
   await page.goto(origin + '/index.html?profile=offline&test=1', { waitUntil: 'load' });
   const result = await page.evaluate(async () => {
@@ -1055,7 +1067,7 @@ test('WorldState.applyPartial preserves missing gameplay fields', async () => {
             health: 0,
             maxHealth: 0,
             flags: 0,
-            angleField8: Math.PI / 2,
+            floatFields: { 8: Math.PI / 2 },
           },
         ],
       },

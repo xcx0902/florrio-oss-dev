@@ -10,15 +10,16 @@ void test_petals() {
   engine::Entity* entity = world.entities().get(handle);
   CHECK(entity != nullptr);
   CHECK(entity->kind == engine::EntityKind::kPetal);
-  CHECK(entity->type_id == 1);
+  CHECK(entity->type_id == engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(entity->radius.to_float() == 14.0F);
-  // Original 397 spawns the petal at the owner's position; the orbit spring
-  // pulls it outward afterwards.
+  // The petal spawns at the owner's position; the orbit spring pulls it
+  // outward afterwards.
   CHECK(entity->position.x.to_float() == 0.0F);
   CHECK(std::fabs(entity->position.y.to_float()) < 1e-6F);
   CHECK(engine::test::player(world).petals().size() == 1);
   CHECK(engine::test::player(world).petals()[0].handle == handle);
-  CHECK(engine::test::player(world).petals()[0].type_id == 1);
+  CHECK(engine::test::player(world).petals()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(engine::test::player(world).petals()[0].orbit_radius.to_float() == 10.0F);
   entity->position = engine::Vec2(engine::f32(0.0F), engine::f32(0.0F));
   entity->velocity = engine::Vec2d(0.0, 0.0);
@@ -36,9 +37,11 @@ void test_petals() {
   const engine::Entity* drop_entity = world.entities().get(drop);
   CHECK(drop_entity != nullptr);
   CHECK(drop_entity->kind == engine::EntityKind::kDrop);
-  CHECK(drop_entity->type_id == 1);
+  CHECK(drop_entity->type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(drop_entity->radius.to_float() == 14.0F);
-  engine::PetalSlot slot = engine::make_petal_slot(1);
+  engine::PetalSlot slot = engine::make_petal_slot(
+      engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(slot.count == 1);
   CHECK(slot.ready());
   slot.recharge_remaining_ms = 2500.0;
@@ -67,11 +70,15 @@ void test_player_loadout() {
   engine::PlayerLoadout loadout;
   CHECK(loadout.equip(0, 1));
   CHECK(loadout.equip(1, 2));
-  CHECK(loadout.slots()[0].type_id == 1);
-  CHECK(loadout.slots()[1].type_id == 2);
+  CHECK(loadout.slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+  CHECK(loadout.slots()[1].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
   CHECK(loadout.swap(0, 1, 1, 2));
-  CHECK(loadout.slots()[0].type_id == 2);
-  CHECK(loadout.slots()[1].type_id == 1);
+  CHECK(loadout.slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
+  CHECK(loadout.slots()[1].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(!loadout.swap(0, 1, 1, 2));
   CHECK(loadout.discard(0, 2));
   CHECK(loadout.slots()[0].count == 0);
@@ -119,7 +126,7 @@ void test_discard_removes_petals() {
   engine::test::player(world).loadout().clear();
   CHECK(engine::test::player(world).loadout().equip(0, 1));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 1);
-  const engine::EntityHandle petal = engine::test::player(world).loadout().slots()[0].instances[0];
+  const engine::EntityHandle petal = engine::test::player(world).loadout().handle(0, 0);
   CHECK(petal.valid());
   CHECK(engine::test::player(world).loadout().discard(engine::test::player(world).profile(), 0, 1));
   engine::remove_slot_petals(world, engine::test::player(world), 0);
@@ -140,7 +147,7 @@ void test_cactus_construction() {
   CHECK(handle.valid());
   const auto* entity = world.entities().get(handle);
   CHECK(entity != nullptr);
-  CHECK(entity->type_id == 3);
+  CHECK(entity->type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kCactus));
   CHECK(entity->contact_damage.value == 30.0F);
   CHECK(entity->world_flags == 75);
   CHECK(entity->entity_flags == 96);
@@ -185,8 +192,9 @@ void test_drop_pickup() {
   const auto drop =
       engine::spawn_drop(world, 1, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(drop.valid());
-  // Original pickup+48 stores spawn time; collection is gated until +500ms.
-  // Keep the transfer assertions, and also reject any premature publication.
+  // The drop records its spawn time; collection is gated until 500 ms after it
+  // appears. Keep the transfer assertions, and also reject any premature
+  // publication.
   for (unsigned step = 0; step < 9U; ++step) {
     engine::tick(world, 50.0);
     CHECK(!world.entities().get(drop)->pickup_collected);
@@ -201,7 +209,8 @@ void test_drop_pickup() {
   }
   CHECK(engine::test::player(world).loadout().pickup_transfers()[0].drop == drop);
   CHECK(engine::test::player(world).loadout().pickup_transfers()[0].slot == 0U);
-  CHECK(engine::test::player(world).loadout().slots()[0].type_id == 1);
+  CHECK(engine::test::player(world).loadout().slots()[0].type_id ==
+        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
   CHECK(engine::test::player(world).loadout().slots()[0].count == 1);
   engine::tick(world, 1950.0);
   CHECK(world.entities().get(drop) != nullptr);
@@ -267,7 +276,7 @@ void test_spawn_table() {
   const auto* last = table.choose(0, rng);
   CHECK(last != nullptr);
   CHECK(last->entity_type == 15);
-  rng.seed(787621659U);  // original sp_server_init RNG state
+  rng.seed(787621659U);  // server-init RNG state
   const auto* initial = table.choose(0, rng);
   CHECK(initial != nullptr);
   CHECK(initial->entity_type == 1);
@@ -312,7 +321,7 @@ void test_spawn_table() {
 
   engine::World world;
   world.initialize();
-  world.random().seed(787621659U);  // observed original post-population state
+  world.random().seed(787621659U);  // observed post-population RNG state
   int occupancy_calls = 0;
   const engine::EntityHandle spawned = table.spawn_from_band(
       world, 0, [&](const engine::SpawnPosition&) { return ++occupancy_calls <= 2; },
@@ -325,7 +334,8 @@ void test_spawn_table() {
   const auto* spawned_entity = world.entities().get(spawned);
   CHECK(spawned_entity != nullptr);
   CHECK(spawned_entity->active);
-  CHECK(spawned_entity->type_id == 1);
+  CHECK(spawned_entity->type_id ==
+        engine::catalog::species_type_id(engine::catalog::SpeciesId::kRock));
   engine::ServerRng expected_spawn_rng(787621659U);
   (void)table.choose(0, expected_spawn_rng);
   (void)table.sample_position(0, expected_spawn_rng);
@@ -345,7 +355,7 @@ void test_spawn_and_movement() {
   engine::Entity* entity = world.entities().get(handle);
   CHECK(entity != nullptr);
   CHECK(entity->kind == engine::EntityKind::kMob);
-  CHECK(entity->type_id == 4);
+  CHECK(entity->type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kLadybug));
   entity->velocity = engine::Vec2d(2.0, 0.0);
   engine::integrate_positions(world, 0.5);
   CHECK(std::fabs(entity->position.x.to_float() - 11.0F) < 1e-6F);

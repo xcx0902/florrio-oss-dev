@@ -123,7 +123,7 @@ int main() {
       }
     });
     check(candidates == engine::kEntitySlotCount && live == pool.active_count(),
-          "dense candidate scan retains original active filtering");
+          "dense candidate scan keeps active-only filtering");
     count = 0;
     for (auto& e : pool.active_entities()) {
       if (e.handle.index() == 0) {
@@ -151,12 +151,30 @@ int main() {
     const auto table = engine::SpawnTable::from_catalog();
     const std::array<std::uint8_t, 8> counts{{8, 8, 8, 8, 8, 8, 8, 8}};
     const auto actual = engine::populate_world(batch, table, counts);
+    // Independent band-entry reference: each spawn rebuilds the broad-phase
+    // query from the live world, and the species initializers are spelled out
+    // here so the population comparison cannot hide a factory regression.
+    const auto reference_factory = [&reference](const engine::SpawnBandEntry& entry,
+                                                const engine::SpawnPosition& position) {
+      const engine::Vec2 point(position.x, position.y);
+      switch (engine::catalog::species_id(entry.entity_type)) {
+        case engine::catalog::SpeciesId::kRock:
+          return engine::spawn_rock_with_drop_draws(reference, point, false, reference.random());
+        case engine::catalog::SpeciesId::kBoulder:
+          return engine::spawn_rock_with_drop_draws(reference, point, true, reference.random());
+        case engine::catalog::SpeciesId::kCactus:
+          return engine::spawn_cactus_with_drop_draws(reference, point, reference.random());
+        default:
+          return engine::spawn_entity_from_defaults(reference, engine::EntityKind::kMob,
+                                                    entry.entity_type, point);
+      }
+    };
     std::vector<engine::EntityHandle> expected;
     for (std::uint8_t band = 0; band < 8; ++band) {
       for (unsigned i = 0; i < counts[band]; ++i) {
         const auto query = engine::SpatialQuery::from_world(reference);
-        const auto h = engine::spawn_from_band_with_drop_draws(
-            reference, table, band, [&](const auto& p) { return query.occupied(p); });
+        const auto h = table.spawn_from_band(
+            reference, band, [&](const auto& p) { return query.occupied(p); }, reference_factory);
         if (h.valid()) {
           reference.entities().get(h)->spawn_band = band;
           expected.push_back(h);

@@ -1,6 +1,33 @@
 import { BinaryReader as Reader } from '../../../build/client/net/binary-reader.js';
 import { projectDomain } from '../../../build/client/state/snapshot-projection.js';
 import { decodeSnapshotEvents } from '../../../build/client/net/snapshot-decoder.js';
+
+/** Independent reference readers for dense group payloads. One table instead of
+ * a decoder branch per dense type; the expected bytes in the tests are written
+ * by hand, so this decoder is checked against them rather than against the
+ * production decoder. */
+const DENSE_READERS = {
+  byte: (reader) => reader.u8(),
+  f32: (reader) => reader.f32(),
+  f64: (reader) => reader.f64(),
+  varint: (reader) => reader.varint(),
+  string: (reader) => reader.string(),
+  bit: (reader) => reader.bit(),
+  reference: (reader) => reader.u32(),
+  angle: (reader) => reader.u16(),
+  byteArray16: (reader) => Array.from({ length: 16 }, () => reader.u8()),
+  shortArray8: (reader) => Array.from({ length: 8 }, () => reader.varint() & 0xffff),
+  byteArray10: (reader) => Array.from({ length: 10 }, () => reader.u8()),
+  handleArray10: (reader) => Array.from({ length: 10 }, () => reader.u32()),
+  stringArray10: (reader) => Array.from({ length: 10 }, () => reader.string()),
+  varintArray10: (reader) => Array.from({ length: 10 }, () => reader.varint()),
+};
+
+/**
+ * Decode one snapshot packet whose updates carry only dense group payloads.
+ * `specs` is the ordered list of `{ field, type }` entries the packet encodes;
+ * `type` is one of the DENSE_READERS keys.
+ */
 export class DenseGroupDecoder {
   specs;
   constructor(specs) {
@@ -27,35 +54,11 @@ export class DenseGroupDecoder {
         }
         const denseFields = {};
         for (const spec of this.specs) {
-          if (spec.type === 'byte') {
-            denseFields[spec.field] = reader.u8();
-          } else if (spec.type === 'f32') {
-            denseFields[spec.field] = reader.f32();
-          } else if (spec.type === 'f64') {
-            denseFields[spec.field] = reader.f64();
-          } else if (spec.type === 'varint') {
-            denseFields[spec.field] = reader.varint();
-          } else if (spec.type === 'string') {
-            denseFields[spec.field] = reader.string();
-          } else if (spec.type === 'byteArray16') {
-            denseFields[spec.field] = Array.from({ length: 16 }, () => reader.u8());
-          } else if (spec.type === 'shortArray8') {
-            denseFields[spec.field] = Array.from({ length: 8 }, () => reader.varint() & 0xffff);
-          } else if (spec.type === 'bit') {
-            denseFields[spec.field] = reader.bit();
-          } else if (spec.type === 'reference') {
-            denseFields[spec.field] = reader.u32();
-          } else if (spec.type === 'byteArray10') {
-            denseFields[spec.field] = Array.from({ length: 10 }, () => reader.u8());
-          } else if (spec.type === 'handleArray10') {
-            denseFields[spec.field] = Array.from({ length: 10 }, () => reader.u32());
-          } else if (spec.type === 'stringArray10') {
-            denseFields[spec.field] = Array.from({ length: 10 }, () => reader.string());
-          } else if (spec.type === 'varintArray10') {
-            denseFields[spec.field] = Array.from({ length: 10 }, () => reader.varint());
-          } else {
-            denseFields[spec.field] = reader.u16();
+          const read = DENSE_READERS[spec.type];
+          if (read === undefined) {
+            return null;
           }
+          denseFields[spec.field] = read(reader);
         }
         const angleRaw = denseFields[8];
         const angle = typeof angleRaw === 'number' ? angleRaw * ((2 * Math.PI) / 65535) : 0;
@@ -73,7 +76,6 @@ export class DenseGroupDecoder {
           angle,
           flags,
           denseFields,
-          denseByteFields: denseFields,
         });
       }
       const decodedEvents = decodeSnapshotEvents(reader, events);
@@ -84,26 +86,5 @@ export class DenseGroupDecoder {
     } catch {
       return null;
     }
-  }
-}
-export class DenseByteGroupDecoder extends DenseGroupDecoder {
-  constructor(fields) {
-    super(fields.map((field) => ({ field, type: 'byte' })));
-  }
-}
-export class DenseFloatGroupDecoder extends DenseGroupDecoder {
-  constructor(fields) {
-    super(fields.map((field) => ({ field, type: 'f32' })));
-  }
-}
-export class DenseStringGroupDecoder extends DenseGroupDecoder {
-  constructor(fields) {
-    super(fields.map((field) => ({ field, type: 'string' })));
-  }
-}
-/** Group 52 convenience wrapper (fields 22/54). */
-export class DenseGroup52Decoder extends DenseByteGroupDecoder {
-  constructor() {
-    super([22, 54]);
   }
 }

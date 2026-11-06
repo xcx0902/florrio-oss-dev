@@ -21,7 +21,7 @@ std::size_t alert_to_attacker(World& world, EntityHandle target, EntityHandle at
   if (!attacker.valid()) {
     return 0;
   }
-  // Original 426 first requires the attacker to resolve to a player root.
+  // The attacker must first resolve to a player root.
   EntityHandle controller = attacker;
   for (std::uint32_t guard = 0; guard < 16U; ++guard) {
     Entity* entity = world.entities().get(controller);
@@ -66,8 +66,8 @@ std::size_t alert_to_attacker(World& world, EntityHandle target, EntityHandle at
     damaged->ai.returning = false;
     ++changed;
   }
-  // Original423 recursively checks the same aggression gates on every
-  // descendant. Passive centipede segments must not acquire attacker aggro.
+  // The same aggression gates apply recursively to every descendant. Passive
+  // centipede segments must not acquire attacker aggro.
   std::vector<EntityHandle> descendants(damaged->children.begin(), damaged->children.end());
   for (std::size_t index = 0; index < descendants.size(); ++index) {
     const EntityHandle child = descendants[index];
@@ -109,12 +109,12 @@ void update_ai(World& world, double delta_milliseconds) {
     }
     AiState& ai = entity->ai;
 
-    // Original 654: a linked segment with a predecessor is removed from the
-    // per-entity steering list and attached to the predecessor's AI record, so
-    // it never runs its own target/guard/velocity update. Its position and
-    // facing come from the 401 chain constraint instead. This applies even
-    // when the predecessor has no live AI record (the original then skips the
-    // segment for this tick as well).
+    // A linked segment with a predecessor is dropped from the per-entity
+    // steering list and attached to the predecessor's AI record, so it never
+    // runs its own target/guard/velocity update. Its position and facing come
+    // from the chain constraint instead. This applies even when the
+    // predecessor has no live AI record; the segment is then skipped for this
+    // tick as well.
     if (ai.predecessor.valid()) {
       const Entity* predecessor = world.entities().get(ai.predecessor);
       if (predecessor != nullptr && predecessor->ai.enabled) {
@@ -243,7 +243,7 @@ void update_ai(World& world, double delta_milliseconds) {
         ai.guard_point.y = f32(std::clamp(ai.guard_point.y.value, min_y.value, max_y.value));
         const double distance = distance_squared_d(entity->position, ai.guard_point);
         if (distance < 2500.0) {
-          // Original 654 clears AI+184 on arrival, before idle wave/turn.
+          // The guard state clears on arrival, before idle wave/turn.
           ai.guard_active = false;
           move_speed = ai.idle_speed;
         } else {
@@ -257,13 +257,13 @@ void update_ai(World& world, double delta_milliseconds) {
       } else {
         move_speed = ai.idle_speed;
       }
-      // Original 654 selects the turn sign from the AI+48 behavior draw:
+      // The turn sign comes from the behavior draw:
       // select(turn_rate, -turn_rate, choice) yields +turn_rate when the draw
       // is non-zero and the negated rate otherwise.
       f32 turn = ai.behavior_choice != 0U ? ai.turn_rate : f32(-ai.turn_rate.value);
-      // Original 654 applies the wave envelope only outside the guard state
-      // (Done42 is skipped when AI+184 is set). It scales both the speed and
-      // the steering angle; the shipped mobs use this as their idle pulse.
+      // The wave envelope applies only outside the guard state. It scales both
+      // the speed and the steering angle; the shipped mobs use this as their
+      // idle pulse.
       if (ai.wave_enabled && !ai.guard_active) {
         const double elapsed = now_ms - ai.clock_ms;
         const double cosine = std::cos(elapsed * static_cast<double>(ai.wave_frequency.value));
@@ -282,13 +282,13 @@ void update_ai(World& world, double delta_milliseconds) {
       } else {
         move_angle = turn;
       }
-      // The original timer runs only in the idle/guard branch and after
-      // guard-point RNG. A retained target bypasses it until wandering resumes.
-      // Original AI+32/+40/+100 random-angle timer. The redraw is a full-turn
-      // angle: f32(f32(rng-1) * 2*pi/2^31), not a [0,1) fraction (the idle
-      // integration wraps it into [-pi,pi] later in the same tick). The original
-      // loops until the deadline is in the future, adding the binary32 interval
-      // (AI+100) each time, so a large clock jump consumes multiple draws.
+      // The random-angle timer runs only in the idle/guard branch and after
+      // guard-point RNG; a retained target bypasses it until wandering resumes.
+      // The redraw is a full-turn angle: f32(f32(rng-1) * 2*pi/2^31), not a
+      // [0,1) fraction (the idle integration wraps it into [-pi,pi] later in
+      // the same tick). The loop continues until the deadline is in the future,
+      // adding the binary32 interval each time, so a large clock jump consumes
+      // multiple draws.
       if (ai.timer_active && ai.timer_interval_ms > 0.0) {
         const double interval =
             static_cast<double>(f32(static_cast<float>(ai.timer_interval_ms)).value);
@@ -301,21 +301,21 @@ void update_ai(World& world, double delta_milliseconds) {
         }
       }
 
-      // AI+52 integrates the (wave-scaled) steering angle every tick; the
-      // shipped default behavior relies on this integration (angle_locked
-      // entities face AI+52 rather than the raw steering value).
-      // Original 654 rounds (steering * dt) to f32 before scaling by 0.001 and
+      // `current_angle` integrates the (wave-scaled) steering angle every
+      // tick; the shipped default behavior relies on this integration
+      // (angle_locked entities face the integrated angle, not the raw value).
+      // The (steering * dt) product rounds to f32 before scaling by 0.001 and
       // adding the f64 sum; the grouping is observable at f32 ULP level.
       const f32 raw_step = f32(move_angle.value * static_cast<float>(delta_milliseconds));
-      // AI+52 is written as f32 *before* the remainder bridge. In particular,
-      // a freshly drawn angle above pi must round the sum at that magnitude,
-      // rather than round its much smaller wrapped result (original 654).
+      // The angle is written as f32 *before* the remainder bridge. In
+      // particular, a freshly drawn angle above pi must round the sum at that
+      // magnitude, rather than round its much smaller wrapped result.
       const f32 unwrapped = f32::from_double(static_cast<double>(ai.current_angle.value) +
                                              static_cast<double>(raw_step.value) * 0.001);
       ai.current_angle = f32::from_double(wrap_pi(static_cast<double>(unwrapped.value)));
-      // Original 654 reflects the idle steering angle near the arena edges so
-      // wanderers turn back inside instead of grinding along a wall. The four
-      // tests are ordered left/bottom/right/top and each rewrites AI+52.
+      // The idle steering angle reflects near the arena edges so wanderers turn
+      // back inside instead of grinding along a wall. The four tests are ordered
+      // left/bottom/right/top and each rewrites the angle.
       {
         constexpr double kHalfPi = 1.5707963267948966;
         constexpr double kPi = 3.141592653589793;
@@ -365,25 +365,25 @@ void update_ai(World& world, double delta_milliseconds) {
 
     if (move_speed.value != 0.0F) {
       const f32 multiplier = entity->behavior_speed_multiplier * slow_multiplier(*entity);
-      // Original 654 promotes the f32 speed*dt product before multiplying by
-      // the f64 literal 0.001, then demotes. A binary32 0.001F adds an ULP to
-      // e.g. the Centipede's 0.2*50 impulse on every tick.
+      // The f32 speed*dt product promotes to double before multiplying by the
+      // f64 literal 0.001, then demotes. A binary32 0.001F adds an ULP to e.g.
+      // the Centipede's 0.2*50 impulse on every tick.
       const f32 delta = f32::from_double(
           static_cast<double>(
               f32(move_speed.value * static_cast<float>(delta_milliseconds)).value) *
           0.001);
       const f32 scaled = f32(f32(delta.value * multiplier.value).value * ai.modifiers.speed.value);
-      // Original 654 stores velocity as f64 and adds f64(f32(cosf * speed)).
+      // Velocity is stored as f64 and accumulates f64(f32(cosf * speed)).
       entity->velocity.x +=
           static_cast<double>(f32(std::cos(move_angle.value) * scaled.value).value);
       entity->velocity.y +=
           static_cast<double>(f32(std::sin(move_angle.value) * scaled.value).value);
     }
 
-    // Original 654 invokes the callback in the live-target branch, after
-    // either the in-range strafe or the out-of-range chase velocity update.
-    // attack_range selects steering; it does not gate firing (oracle fixture
-    // covers both 300 and 800 units with a retained target).
+    // The attack fires in the live-target branch, after either the in-range
+    // strafe or the out-of-range chase velocity update. attack_range selects
+    // steering; it does not gate firing (fixtures cover both 300 and 800 units
+    // with a retained target).
     if (ai.target.valid() && ai.attack != AttackBehavior::kNone &&
         ai.attack_cooldown_ms.value <= 0.0F) {
       pending_attacks.push_back(handle);
@@ -392,9 +392,9 @@ void update_ai(World& world, double delta_milliseconds) {
               f32(ai.attack_cooldown_gain.value * ai.modifiers.attack.value).value);
     }
   }
-  // Spawning is deferred until the steering list has been walked: the original
-  // callback mutates the entity pool, but the domain keeps the AI iteration
-  // vector stable by collecting due callbacks first.
+  // Spawning is deferred until the steering list has been walked: the callback
+  // mutates the entity pool, while collecting due callbacks first keeps the AI
+  // iteration vector stable.
   for (const EntityHandle handle : pending_attacks) {
     (void)dispatch_attack(world, handle);
   }

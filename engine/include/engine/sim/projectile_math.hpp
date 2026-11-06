@@ -3,8 +3,8 @@
 #include <cstdint>
 
 namespace engine::projectile_math {
-// Shipped WASM77/78, kernels80/81 and the small-argument branch of284.
-// Peas angles are bounded by [0,4*pi]; native libm differs by an ULP here.
+// Polynomial kernels for cosine and sine, with the small-argument branch.
+// Peas angles are bounded by [0,4*pi]; a library libm differs by an ULP here.
 inline float cosine_kernel(double x) {
   const double z = x * x, w = z * z;
   return static_cast<float>((z * -0x1.ffffffd0c5e81p-2 + 1.0) + w * 0x1.55553e1053a42p-5 +

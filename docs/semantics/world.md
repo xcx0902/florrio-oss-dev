@@ -63,4 +63,4 @@ The unit test checks 16,384 unique handles and the final LCG state
 
 The archived layout files and probe are historical evidence only. Current C++
 layout is governed by `engine/src/core/contracts.cpp` (fundamental invariants and
-handle constants), not by absolute offsets copied from the original binary.
+handle constants), not by packed struct offsets.
