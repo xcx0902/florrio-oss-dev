@@ -147,6 +147,8 @@ npm run build:server
 
 默认本机端口 8787，房间默认两人；浏览器 Origin 需要在完整配置副本中显式允许。
 
+模块边界、依赖方向、入口链与索引统计见 [框架结构](docs/framework-structure.md)。
+
 ## 仓库结构
 
 ```
