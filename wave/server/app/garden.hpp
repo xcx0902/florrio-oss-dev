@@ -4,6 +4,7 @@
 #include "wire/bootstrap.hpp"
 
 #include <map>
+#include <deque>
 #include <memory>
 #include <optional>
 #include <string>
@@ -25,6 +26,13 @@ struct Room {
   bool private_room = true;
   std::vector<std::string> members;
   std::unique_ptr<sim::Match> match;
+  struct Hit {
+    std::uint64_t sequence;
+    sim::HealthChange change;
+  };
+  // Survives the ticks between broadcasts; each socket advances its own cursor.
+  std::deque<Hit> hits;
+  std::uint64_t hit_sequence = 0;
 };
 
 // Owned by the single Asio executor. A room advances once per host tick,

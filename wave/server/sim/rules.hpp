@@ -65,6 +65,9 @@ struct Rules {
   std::array<BodyRules, 2> petals;
   Tick petal_reload = 1;
   double orbit_radius = 14;
+  // Explicit local reconstruction; defending takes priority when both buttons are held.
+  double attack_orbit_multiplier = 1.8;
+  double defend_orbit_multiplier = 0.6;
   double orbit_rad_per_second = 4;
   double knockback_retention = 0.75;
   double contact_knockback_speed = 0;

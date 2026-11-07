@@ -22,6 +22,7 @@ void validate(const Rules& rules) {
       rules.arena_radius == 0 || !valid_body(rules.player) ||
       !std::ranges::all_of(rules.petals, valid_body) || rules.petal_reload == 0 ||
       !nonnegative(rules.orbit_radius) || !nonnegative(rules.orbit_rad_per_second) ||
+      !nonnegative(rules.attack_orbit_multiplier) || !nonnegative(rules.defend_orbit_multiplier) ||
       !nonnegative(rules.knockback_retention) || rules.knockback_retention > 1 ||
       !nonnegative(rules.contact_knockback_speed) || !nonnegative(rules.special_chance) ||
       rules.special_chance > 1 || rules.waves.empty() || rules.spawn_attempts == 0 ||
@@ -122,6 +123,8 @@ void Match::apply_commands() {
           entry.view.state == LifeState::alive) {
         const double length = input->move.length();
         entry.move = length > 1 ? input->move * (1 / length) : input->move;
+        entry.attack = input->attack;
+        entry.defend = input->defend;
       }
     } else {
       const auto& connection = std::get<Connection>(command);
@@ -129,6 +132,7 @@ void Match::apply_commands() {
       if (entry.view.connected != connection.connected) {
         entry.view.connected = connection.connected;
         entry.move = {};
+        entry.attack = entry.defend = false;
       }
     }
   }
@@ -146,6 +150,7 @@ EntityId Match::add_entity(EntityView view, BodyRules body) {
 }
 
 void Match::spawn_player(Player& entry) {
+  entry.attack = entry.defend = false;
   ++entry.view.life.generation;
   EntityView body;
   body.group = Group::player;
@@ -196,6 +201,7 @@ void Match::reap_player(Player& entry, LifeState state) {
   }
   entry.view.body.reset();
   entry.move = {};
+  entry.attack = entry.defend = false;
   entry.view.state = state;
   emit(LifeChange{entry.view.life, old_body, state});
 }
@@ -243,6 +249,7 @@ MatchView Match::view() const {
       .step = rules_.timing.step,
       .broadcast_interval = rules_.timing.broadcast_interval,
       .arena_radius = rules_.arena_radius,
+      .petal_reload = rules_.petal_reload,
       .phase = phase_,
       .wave = wave_,
       .previous_wave = previous_wave_,

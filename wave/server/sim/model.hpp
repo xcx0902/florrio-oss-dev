@@ -214,6 +214,7 @@ struct MatchView {
   Microseconds step{};
   Microseconds broadcast_interval{};
   double arena_radius = 0;
+  Tick petal_reload = 1;
   Phase phase = Phase::waiting;
   WaveView wave;
   std::optional<WaveView> previous_wave;
@@ -225,6 +226,8 @@ struct MatchView {
 struct Input {
   LifeId life;
   Vec2 move;
+  bool attack = false;
+  bool defend = false;
 };
 
 struct Connection {

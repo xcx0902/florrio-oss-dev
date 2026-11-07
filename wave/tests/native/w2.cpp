@@ -77,6 +77,29 @@ int main() {
   short_frame.pop_back();
   check(!malformed.receive(short_frame), "Startup blob truncated within declared length");
 
+  // Synthetic encrypted envelopes for commands observed in the untouched client.
+  // Death Continue (21), live Exit (11), squad Leave (38) and ad completion (34).
+  wire::Bootstrap exit;
+  const auto leaving = exit.receive(bytes("051eab7c7e67"));
+  check(leaving && std::holds_alternative<wire::Startup>(*leaving), "Live Exit batch parses");
+  const auto& leave_batch = std::get<wire::Startup>(*leaving);
+  check(leave_batch.requests.size() == 2 &&
+            std::holds_alternative<wire::Leave>(leave_batch.requests[0].action) &&
+            std::holds_alternative<std::monostate>(leave_batch.requests[1].action),
+        "Exit leaves the match; notification consumes its own reliable sequence");
+  wire::Bootstrap continued;
+  const auto continuation = continued.receive(bytes("051eab62"));
+  check(continuation && std::holds_alternative<wire::Startup>(*continuation) &&
+            std::holds_alternative<wire::Leave>(
+                std::get<wire::Startup>(*continuation).requests.front().action),
+        "Death Continue leaves the finished match instead of causing a protocol reload");
+  wire::Bootstrap squad;
+  const auto squad_leave = squad.receive(bytes("051eab51"));
+  check(squad_leave && std::holds_alternative<wire::Startup>(*squad_leave) &&
+            std::holds_alternative<wire::Leave>(
+                std::get<wire::Startup>(*squad_leave).requests.front().action),
+        "Original squad Leave has no fields and leaves without a protocol reload");
+
   app::BootstrapSession early_session("guest-early");
   const auto early = early_session.receive({0x20, 0x1e, 0xb8});
   check(early.close && early.frames == std::vector<wire::Bytes>{{0, 0}}, "Reject early ACK");

@@ -31,7 +31,7 @@ wire::Bytes GardenSession::snapshot() {
   while (sent_lives_.size() > 256) {
     sent_lives_.erase(sent_lives_.begin());
   }
-  return wire_.snapshot(last_tick_, acknowledged_, frame.records, frame.removed);
+  return wire_.snapshot(last_tick_, acknowledged_, frame.records, frame.removed, frame.commands);
 }
 
 Reply GardenSession::publish() {

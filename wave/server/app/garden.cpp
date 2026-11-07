@@ -154,8 +154,11 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
     }
     // Local reconstruction: 100 client aim-distance units select full W1 speed.
     const double amount = move->strength < 2 ? 0 : std::min(1.0, double(move->strength) / 100);
-    const bool accepted = it->second.match->queue(sim::Input{
-        *acknowledged_life, {std::cos(move->angle) * amount, std::sin(move->angle) * amount}});
+    const bool accepted = it->second.match->queue(
+        sim::Input{*acknowledged_life,
+                   {std::cos(move->angle) * amount, std::sin(move->angle) * amount},
+                   (move->buttons & 1) != 0,
+                   (move->buttons & 2) != 0});
     if (accepted) {
       ++accepted_inputs;
     } else {
@@ -172,6 +175,13 @@ void Garden::step() {
       ++steps;
       for (const auto& event : room.match->events()) {
         trace.push_back(event);
+        if (const auto* hit = std::get_if<sim::HealthChange>(&event.data);
+            hit && hit->kind != sim::HealthKind::heal) {
+          room.hits.push_back({++room.hit_sequence, *hit});
+          if (room.hits.size() > 4096) {
+            room.hits.pop_front();
+          }
+        }
       }
       if (trace.size() > 2048) {
         trace.erase(trace.begin(), trace.begin() + (trace.size() - 2048));

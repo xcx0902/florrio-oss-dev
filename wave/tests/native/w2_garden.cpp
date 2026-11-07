@@ -101,6 +101,36 @@ void session_life_boundary() {
   check(session.publish().close && garden.active(member.token, 3),
         "Displaced socket cannot publish or disconnect its replacement");
 }
+
+void orbit_buttons() {
+  using namespace wave;
+  auto rules = fixtures::wire_garden_rules();
+  rules.lifecycle.end_on_last_disconnect = false;
+  app::Garden garden(rules);
+  auto& member = garden.admit("", 1);
+  check(garden.command(member, wire::Ready{true}, {}), "Solo orbit fixture ready");
+  garden.step();
+  const auto life = garden.room(member)->match->view().players.front().life;
+  const auto distance = [&] {
+    const auto view = garden.room(member)->match->view();
+    const auto body = std::ranges::find(view.entities, sim::Group::player, &sim::EntityView::group);
+    const auto petal = std::ranges::find(view.entities, sim::Group::petal, &sim::EntityView::group);
+    check(body != view.entities.end() && petal != view.entities.end(), "Live orbit entities");
+    return (petal->position - body->position).length();
+  };
+  for (const auto& [buttons, multiplier] :
+       std::vector<std::pair<unsigned, double>>{{0, 1}, {1, 1.8}, {2, 0.6}, {3, 0.6}, {256, 1}}) {
+    check(garden.command(member, wire::Move{buttons, 0, 0}, life), "Orbit button input accepted");
+    garden.step();
+    check(std::abs(distance() - rules.orbit_radius * multiplier) < 1e-8,
+          "Attack/defend changes authoritative collision orbit; other bits do not");
+  }
+  garden.command(member, wire::Move{1, 0, 0}, life);
+  garden.step();
+  garden.disconnect(member.token, 1);
+  garden.step();
+  check(std::abs(distance() - rules.orbit_radius) < 1e-8, "Disconnect clears held orbit mode");
+}
 }  // namespace
 
 int main() {
@@ -149,7 +179,14 @@ int main() {
   check(player(view, a.id).state == sim::LifeState::waiting, "W1 contact damage kills A");
   check(player(view, b.id).state == sim::LifeState::alive, "B survives independently");
   const auto dead = projection.build(garden, a);
-  check(!dead.control && !dead.removed.empty(), "Death removes controlled body and petals");
+  check(!dead.control && dead.removed.empty(), "Death clears control while retaining native fade");
+  check(!dead.commands.empty(), "Damage journal survives simulation ticks until socket publishes");
+  check(projection.build(garden, a).commands.empty(), "Each socket emits a damage event only once");
+  wire::GardenProjection reconnected;
+  check(reconnected.build(garden, b).commands.empty(), "Reconnect does not replay old damage");
+  const auto expired = projection.build(
+      garden, a, std::chrono::steady_clock::now() + std::chrono::milliseconds(500));
+  check(!expired.removed.empty(), "Faded entities expire and release their handles");
   check(!garden.command(a, wire::Move{0, 0, 100}, life), "Old life rejected while waiting");
   while (view.wave.number == 1 || view.phase == sim::Phase::waiting) {
     garden.step();
@@ -186,6 +223,7 @@ int main() {
   check(garden.room(a)->match->view().id != garden.room(c)->match->view().id,
         "Distinct authoritative match identities");
   session_life_boundary();
+  orbit_buttons();
   std::cout
       << "W2 rooms, batched spawns, life bindings, projection removals, reconnect and isolation passed\n";
 }

@@ -29,6 +29,8 @@ class Match {
     PlayerView view;
     Vec2 spawn;
     Vec2 move;
+    bool attack = false;
+    bool defend = false;
     std::vector<Tick> petal_ready;
   };
 

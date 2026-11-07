@@ -7,6 +7,8 @@ import { parseArgs } from 'node:util';
 import { chromium } from 'playwright-core';
 import { defaultNative, root, startHost } from './host.mjs';
 import { onlineCases } from './online.mjs';
+import { playabilityCases, modeRecoveryCase } from './playability.mjs';
+import { protocolEffectsCase } from './protocol-effects.mjs';
 
 const { values } = parseArgs({
   options: {
@@ -70,13 +72,23 @@ const sources = [
   'tools/w2/host.mjs',
   'tools/w2/codec.mjs',
   'tools/w2/online.mjs',
+  'tools/w2/playability.mjs',
+  'tools/w2/protocol-effects.mjs',
+  'web/ubuntu-700.css',
+  'web/ubuntu-LICENCE.txt',
+  'web/4iCv6KVjbNBYlgoCxCvjvWyNL4U.woff2',
+  'web/4iCv6KVjbNBYlgoCxCvjtGyNL4U.woff2',
+  'web/4iCv6KVjbNBYlgoCxCvjvGyNL4U.woff2',
+  'web/4iCv6KVjbNBYlgoCxCvjs2yNL4U.woff2',
+  'web/4iCv6KVjbNBYlgoCxCvjvmyNL4U.woff2',
+  'web/4iCv6KVjbNBYlgoCxCvjsGyN.woff2',
   'tools/w2/test-wire.mjs',
   'web/index.html',
   'web/local.js',
   'web/reference.css',
   'web/resources-20221030.json',
 ];
-const openCases = ['W2-02', 'W2-03', 'W2-04', 'W2-05'];
+const openCases = ['W2-02', 'W2-03', 'W2-04', 'W2-05', 'W2-07', 'W2-08', 'W2-09', 'W2-10', 'W2-11'];
 
 async function observeLabels(page) {
   await page.addInitScript(() => {
@@ -353,6 +365,27 @@ try {
     report.fixtureBinary = hash(
       await readFile(path.resolve(values['native-dir'], 'wave_host_fixture')),
     );
+    await playabilityCases({
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: values['native-dir'],
+      output,
+      report,
+    });
+    await modeRecoveryCase({
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: values['native-dir'],
+      output,
+      report,
+    });
+    await protocolEffectsCase({
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: values['native-dir'],
+      output,
+      report,
+    });
     await onlineCases({
       browser,
       snapshot: values.snapshot,

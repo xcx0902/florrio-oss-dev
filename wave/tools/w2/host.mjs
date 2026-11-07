@@ -53,6 +53,23 @@ export async function startHost({ snapshot, nativeDir, port, fixture = false }) 
       },
       { file: 'reference.css', body: await readFile(path.join(web, 'reference.css')) },
       { file: 'local.js', body: await readFile(path.join(web, 'local.js')) },
+      { file: 'ubuntu-LICENCE.txt', body: await readFile(path.join(web, 'ubuntu-LICENCE.txt')) },
+      ...(await Promise.all(
+        manifest.archive
+          .filter(({ role }) => role === 'archived-font' || role === 'archived-font-css')
+          .map(async ({ file, role, bytes, sha256 }) => {
+            const body = await readFile(path.join(web, file));
+            if (role === 'archived-font') {
+              assert.equal(body.length, bytes, `${file} byte count`);
+              assert.equal(
+                createHash('sha256').update(body).digest('hex'),
+                sha256,
+                `${file} SHA-256`,
+              );
+            }
+            return { file, body };
+          }),
+      )),
     );
     await Promise.all(
       resources.map(({ file, body }) => writeFile(path.join(directory, file), body)),

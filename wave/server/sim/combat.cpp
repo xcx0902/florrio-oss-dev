@@ -93,9 +93,13 @@ void Match::update_orbits() {
     const double heading =
         std::fmod(rules_.orbit_rad_per_second * seconds * tick_ + petal.orbit_offset, turn);
     const Vec2 offset{std::cos(heading), std::sin(heading)};
+    const auto& owner = *player(petal.view.owner->player);
+    const double radius = rules_.orbit_radius * (owner.defend   ? rules_.defend_orbit_multiplier
+                                                 : owner.attack ? rules_.attack_orbit_multiplier
+                                                                : 1);
     petal.view.heading_rad = heading;
-    petal.view.position = clamp_center(body.position + offset * rules_.orbit_radius,
-                                       rules_.arena_radius, petal.view.radius);
+    petal.view.position =
+        clamp_center(body.position + offset * radius, rules_.arena_radius, petal.view.radius);
   }
 }
 

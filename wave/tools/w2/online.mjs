@@ -59,7 +59,7 @@ function requests(plain) {
       entry.angle = r.real();
       entry.strength = r.real();
     } else {
-      assert.equal(opcode, 25, `Unrecognized original command ${opcode}`);
+      assert.ok([11, 21, 25, 34, 38].includes(opcode), `Unrecognized original command ${opcode}`);
     }
     result.push(entry);
   }
@@ -93,14 +93,22 @@ function world(plain, baseline) {
     if (!id) {
       break;
     }
-    assert.equal(r.byte(), 0xcc);
+    const header = r.byte();
+    assert.ok([0xcc, 0xc4].includes(header));
     const mask = r.byte() | (r.byte() << 8) | (r.byte() << 16),
       entity = { id, mask };
     if (mask & 1) {
       r.byte();
     }
     if (mask & 0x20) {
-      r.skip(4);
+      entity.flowerState = [r.byte(), r.byte(), r.byte(), r.byte()];
+      if ((header ^ 0xac) & 8) {
+        entity.equipment = Array.from({ length: 16 }, () => {
+          const type = r.vu();
+          return { type, rarity: type ? r.byte() : 0 };
+        });
+        entity.slotValues = Array.from({ length: 8 }, () => r.vu());
+      }
     }
     if (mask & 8) {
       entity.flowers = r.vu();
@@ -122,23 +130,24 @@ function world(plain, baseline) {
       r.skip(88);
     }
     if (mask & 0x400) {
-      r.skip(2);
+      entity.angle = r.byte() | (r.byte() << 8);
       entity.x = r.real();
       entity.y = r.real();
     }
     if (mask & 0x800) {
-      r.byte();
+      entity.deadlineProgress = r.byte();
       entity.wave = r.vu() + 1;
       wave = entity.wave;
-      r.vu();
-      r.skip(217);
+      entity.biome = r.vu();
+      entity.mobCounts = Array.from({ length: 216 }, () => r.vu());
+      entity.clearProgress = r.byte();
     }
     if (mask & 0x1000) {
       entity.radius = r.real();
     }
     if (mask & 0x2000) {
-      entity.health = r.real();
-      r.skip(3);
+      entity.arenaRadius = r.real();
+      entity.background = [r.byte(), r.byte(), r.byte()];
     }
     if (mask & 0x8000) {
       entity.control = plain.readUInt32LE(r.cursor.offset + 323);
@@ -152,7 +161,7 @@ function world(plain, baseline) {
       }
     }
     if (mask & 0x80000) {
-      r.byte();
+      entity.renderFlags = r.byte();
     }
     if (mask & 0x100000) {
       entity.mob = r.byte();
@@ -162,16 +171,23 @@ function world(plain, baseline) {
     if (mask & 0x200000) {
       r.byte();
       r.byte();
-      entity.alive = r.byte();
+      entity.health = r.byte();
     }
     baseline.set(id, entity);
   }
-  assert.equal(r.byte(), 0);
+  const hits = [];
+  assert.equal(r.byte(), 0, '$601 delimiter after the u32 entity terminator');
+  // The captured initial empty world ends at the delimiter (implicit empty list).
+  for (let envelope = r.cursor.offset < plain.length ? r.vu() : 0; envelope; envelope = r.vu()) {
+    assert.equal(envelope, 1);
+    assert.equal(r.vu(), 32, 'Recovered native hit event');
+    hits.push({ id: r.word(), strength: r.byte() });
+  }
   assert.equal(r.cursor.offset, plain.length);
-  return { tick, ack, control, wave, removed };
+  return { tick, ack, control, wave, removed, hits };
 }
 
-async function client(browser, url, name, storageState) {
+export async function client(browser, url, name, storageState) {
   const context = await browser.newContext({
     viewport: { width: 1024, height: 768 },
     locale: 'en-US',
@@ -188,6 +204,9 @@ async function client(browser, url, name, storageState) {
     commands: [],
     snapshots: [],
     errors: [],
+    navigations: [],
+    documentLoads: [],
+    requests: [],
     baseline: new Map(),
   };
   await page.addInitScript(() => {
@@ -207,7 +226,14 @@ async function client(browser, url, name, storageState) {
       }
     }
   });
+  page.on('framenavigated', (frame) => {
+    if (frame === page.mainFrame()) {
+      result.navigations.push(frame.url());
+    }
+  });
   page.on('pageerror', (error) => result.errors.push(error.message));
+  page.on('domcontentloaded', () => result.documentLoads.push(page.url()));
+  page.on('request', (request) => result.requests.push(request.url()));
   page.on('websocket', (socket) => {
     const receive = new CaptureCodec(),
       send = new CaptureCodec(true);
@@ -263,6 +289,39 @@ async function client(browser, url, name, storageState) {
   return result;
 }
 
+export async function aim(entry, direction, strength = 200) {
+  // Recover the rendered body center from two real mouse bearings. This reads
+  // original outbound commands and never writes Wasm memory or socket data.
+  const bearings = [];
+  for (const point of [
+    [850, 384],
+    [512, 680],
+  ]) {
+    await entry.page.mouse.move(...point);
+    await new Promise((resolve) => setTimeout(resolve, 65));
+    assert.ok(entry.move && Number.isFinite(entry.move.angle));
+    bearings.push({ point, angle: entry.move.angle });
+  }
+  const [a, b] = bearings;
+  const u = [Math.cos(a.angle), Math.sin(a.angle)],
+    v = [Math.cos(b.angle), Math.sin(b.angle)];
+  const delta = [b.point[0] - a.point[0], b.point[1] - a.point[1]];
+  const cross = u[0] * v[1] - u[1] * v[0];
+  assert.ok(Math.abs(cross) > 0.2, 'Original mouse bearings intersect');
+  const distance = (delta[0] * v[1] - delta[1] * v[0]) / cross;
+  const center = [a.point[0] + distance * u[0], a.point[1] + distance * u[1]];
+  assert.ok(center.every(Number.isFinite));
+  await entry.page.mouse.move(
+    center[0] + (direction ? strength * direction[0] : 0),
+    center[1] + (direction ? strength * direction[1] : 0),
+  );
+  await new Promise((resolve) => setTimeout(resolve, 65));
+  if (!direction) {
+    assert.ok(entry.move.strength < 2, `Original stop strength ${entry.move.strength}`);
+  }
+  return center;
+}
+
 export async function onlineCases({ browser, snapshot, nativeDir, output, report }) {
   const host = await startHost({ snapshot, nativeDir, port: 0, fixture: true });
   const clients = [];
@@ -282,38 +341,6 @@ export async function onlineCases({ browser, snapshot, nativeDir, output, report
   };
   const roomOf = (s) => s.rooms.find((room) => room.match);
   const bodyOf = (s, id) => roomOf(s).entities.find((e) => e.group === 0 && e.owner === id);
-  async function aim(entry, direction, strength = 200) {
-    // Recover the rendered body center from two real mouse bearings. This reads
-    // original outbound commands and never writes Wasm memory or socket data.
-    const bearings = [];
-    for (const point of [
-      [850, 384],
-      [512, 680],
-    ]) {
-      await entry.page.mouse.move(...point);
-      await new Promise((resolve) => setTimeout(resolve, 65));
-      assert.ok(entry.move && Number.isFinite(entry.move.angle));
-      bearings.push({ point, angle: entry.move.angle });
-    }
-    const [a, b] = bearings;
-    const u = [Math.cos(a.angle), Math.sin(a.angle)],
-      v = [Math.cos(b.angle), Math.sin(b.angle)];
-    const delta = [b.point[0] - a.point[0], b.point[1] - a.point[1]];
-    const cross = u[0] * v[1] - u[1] * v[0];
-    assert.ok(Math.abs(cross) > 0.2, 'Original mouse bearings intersect');
-    const distance = (delta[0] * v[1] - delta[1] * v[0]) / cross;
-    const center = [a.point[0] + distance * u[0], a.point[1] + distance * u[1]];
-    assert.ok(center.every(Number.isFinite));
-    await entry.page.mouse.move(
-      center[0] + (direction ? strength * direction[0] : 0),
-      center[1] + (direction ? strength * direction[1] : 0),
-    );
-    await new Promise((resolve) => setTimeout(resolve, 65));
-    if (!direction) {
-      assert.ok(entry.move.strength < 2, `Original stop strength ${entry.move.strength}`);
-    }
-    return center;
-  }
   async function travel(entry, id, target, stop = 0.5) {
     for (let attempt = 0; attempt < 80; ++attempt) {
       const s = await state(),

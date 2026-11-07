@@ -147,6 +147,12 @@ std::optional<Command> read_startup(std::span<const std::uint8_t> bytes) {
     const auto opcode = read_varint(bytes).value_or(0);
     switch (opcode) {
       case 25:
+      case 34:  // $456: no-argument completion of the optional pre-roll ad attempt.
+        break;
+      case 11:  // Original live-game Exit.
+      case 21:  // Original death-screen Continue / Enter.
+      case 38:  // Original squad panel close / Leave squad.
+        action = Leave{};
         break;
       case 13: {
         if (bytes.empty() || bytes.front() != 1) {
@@ -314,8 +320,9 @@ Bytes Bootstrap::world(std::uint32_t tick, std::uint32_t acknowledged_request,
     // Entity 8193 uses the full form with the local profile component.
     constexpr std::array<std::uint8_t, 8> profile{1, 32, 0, 0, 0xcc, 0, 0x80, 0};
     bytes.insert(bytes.end(), profile.begin(), profile.end());
-    // Zero profile fields select the original client's guest defaults.
-    bytes.insert(bytes.end(), 607, 0);
+    // Match $140's level-one guest default, not an invalid level-zero flower.
+    bytes.push_back(1);
+    bytes.insert(bytes.end(), 606, 0);
   }
   // End the entity list and the bundled command section.
   bytes.insert(bytes.end(), 5, 0);
@@ -324,7 +331,8 @@ Bytes Bootstrap::world(std::uint32_t tick, std::uint32_t acknowledged_request,
 
 Bytes Bootstrap::snapshot(std::uint32_t tick, std::uint32_t acknowledged_request,
                           std::span<const std::uint8_t> records,
-                          std::span<const std::uint32_t> removed) {
+                          std::span<const std::uint32_t> removed,
+                          std::span<const std::uint8_t> commands) {
   Bytes bytes{1, 0};
   append_varint(bytes, tick);
   const auto offset = bytes.size();
@@ -340,7 +348,10 @@ Bytes Bootstrap::snapshot(std::uint32_t tick, std::uint32_t acknowledged_request
   }
   bytes.push_back(0);
   bytes.insert(bytes.end(), records.begin(), records.end());
+  // $601 skips a byte after the u32 entity terminator before reading commands.
   bytes.insert(bytes.end(), 5, 0);
+  bytes.insert(bytes.end(), commands.begin(), commands.end());
+  bytes.push_back(0);
   return seal(std::move(bytes), server_state_, offset);
 }
 

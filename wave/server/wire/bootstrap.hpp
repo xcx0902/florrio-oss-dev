@@ -65,8 +65,8 @@ class Bootstrap {
   Bytes guest_id(std::string_view id);
   Bytes world(std::uint32_t tick, std::uint32_t acknowledged_request, bool initial_profile = false);
   Bytes snapshot(std::uint32_t tick, std::uint32_t acknowledged_request,
-                 std::span<const std::uint8_t> records,
-                 std::span<const std::uint32_t> removed = {});
+                 std::span<const std::uint8_t> records, std::span<const std::uint32_t> removed = {},
+                 std::span<const std::uint8_t> commands = {});
   Bytes disconnect();
 
  private:
