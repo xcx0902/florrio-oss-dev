@@ -48,7 +48,7 @@ std::optional<PetalOrbitState> take_orbit(PlayerState& state, EntityHandle handl
 }
 }  // namespace
 
-PetalSlot make_petal_slot(std::uint16_t type_id) {
+PetalSlot make_petal_slot(catalog::PetalId type_id) {
   PetalSlot slot;
   slot.type_id = type_id;
   const auto* petal = Catalog::instance().petal(type_id);
@@ -59,7 +59,7 @@ PetalSlot make_petal_slot(std::uint16_t type_id) {
   return slot;
 }
 
-EntityHandle spawn_drop(World& world, std::uint16_t type_id, Vec2 position) {
+EntityHandle spawn_drop(World& world, catalog::PetalId type_id, Vec2 position) {
   const f32 radius = petal_radius(type_id);
   if (radius.value <= 0.0F) {
     return EntityHandle{};
@@ -79,7 +79,7 @@ EntityHandle spawn_drop(World& world, std::uint16_t type_id, Vec2 position) {
   return handle;
 }
 
-EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id, Vec2 center,
+EntityHandle spawn_petal(World& world, PlayerState& state, catalog::PetalId type_id, Vec2 center,
                          f32 orbit_radius, f32 angle, std::uint8_t slot, std::uint8_t instance,
                          std::uint8_t instance_count, std::uint8_t orbit_index) {
   const auto* combat = Catalog::instance().petal_combat(type_id);
@@ -99,7 +99,7 @@ EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id
   entity->health = f32(combat->health);
   entity->max_health = f32(combat->health);
   // Heaviest petals carry mass 4; every other petal keeps the default of 1.
-  if (catalog::petal_id(type_id) == catalog::PetalId::kHeaviestEpic) {
+  if (type_id == catalog::PetalId::kHeaviestEpic) {
     entity->mass = f32(4.0F);
   }
   entity->loadout_slot = slot;
@@ -115,14 +115,14 @@ EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id
   orbit.orbit_index = orbit_index;
   orbit.slot = slot;
   orbit.instance = instance;
-  orbit.profile = static_cast<std::uint8_t>(orbit_profile_from_name(combat->orbitProfile));
+  orbit.profile = orbit_profile_from_name(combat->orbitProfile);
   orbit.behavior = combat->behavior;
   orbit.heal_amount = f32(combat->healAmount);
   orbit.behavior_started_at_ms = world.time_ms();
   orbit.instance_count = instance_count == 0 ? 1 : instance_count;
-  if (catalog::petal_id(type_id) == catalog::PetalId::kEggEpic) {
+  if (type_id == catalog::PetalId::kEggEpic) {
     entity->behavior_cooldown_ms = 1000.0;
-  } else if (catalog::petal_id(type_id) == catalog::PetalId::kEggLegendary) {
+  } else if (type_id == catalog::PetalId::kEggLegendary) {
     entity->behavior_cooldown_ms = 2500.0;
   }
   const auto* petal = Catalog::instance().petal(type_id);
@@ -204,8 +204,7 @@ std::size_t refresh_loadout_petals(World& world, PlayerState& state, double step
     const auto& slots = state.loadout().slots();
     for (std::size_t slot = 0; slot < state.profile().active_slots() && slot < slots.size();
          ++slot) {
-      antennae = antennae ||
-                 catalog::petal_id(slots[slot].type_id) == catalog::PetalId::kAntennaeLegendary;
+      antennae = antennae || slots[slot].type_id == catalog::PetalId::kAntennaeLegendary;
     }
     set_flag(player->player_expression, PlayerExpressionFlag::kAntennae, antennae);
   }

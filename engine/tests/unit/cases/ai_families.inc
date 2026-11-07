@@ -3,7 +3,8 @@ void test_ai_species_profiles() {
   world.initialize();
   world.set_auto_populate(false);
   const auto bee = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 6, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kBee,
+      engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   const engine::Entity* bee_entity = world.entities().get(bee);
   CHECK(bee_entity != nullptr);
   CHECK(bee_entity->ai.wave_frequency.bits() == 993803864U);
@@ -15,7 +16,8 @@ void test_ai_species_profiles() {
   CHECK(bee_entity->max_health.value == 15.0F);
 
   const auto hornet = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 14, engine::Vec2(engine::f32(500.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kHornet,
+      engine::Vec2(engine::f32(500.0F), engine::f32(0.0F)));
   const engine::Entity* hornet_entity = world.entities().get(hornet);
   CHECK(hornet_entity != nullptr);
   CHECK(hornet_entity->ai.aggressive);
@@ -27,7 +29,8 @@ void test_ai_species_profiles() {
   CHECK(hornet_entity->ai.radius.value == 600.0F);
 
   const auto spider = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 22, engine::Vec2(engine::f32(-500.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kSpider,
+      engine::Vec2(engine::f32(-500.0F), engine::f32(0.0F)));
   const engine::Entity* spider_entity = world.entities().get(spider);
   CHECK(spider_entity != nullptr);
   CHECK(spider_entity->ai.aggressive);
@@ -36,7 +39,8 @@ void test_ai_species_profiles() {
   CHECK(spider_entity->ai.radius.value == 600.0F);
 
   const auto square = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 19, engine::Vec2(engine::f32(0.0F), engine::f32(500.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kSquare,
+      engine::Vec2(engine::f32(0.0F), engine::f32(500.0F)));
   const engine::Entity* square_entity = world.entities().get(square);
   CHECK(square_entity != nullptr);
   CHECK(!square_entity->ai.angle_locked);
@@ -53,7 +57,8 @@ void test_ai_behavior_modifiers() {
       world, engine::test::player(world), "p", engine::make_default_profile(), false);
   world.entities().get(player)->position = engine::Vec2(engine::f32(0.0F), engine::f32(0.0F));
   const engine::EntityHandle spider = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 22, engine::Vec2(engine::f32(300.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kSpider,
+      engine::Vec2(engine::f32(300.0F), engine::f32(0.0F)));
   engine::Entity* spider_entity = world.entities().get(spider);
   CHECK(spider_entity != nullptr);
   engine::update_ai(world, 50.0);
@@ -71,9 +76,9 @@ void test_ai_behavior_modifiers() {
       hornet_world, engine::test::player(hornet_world), "p", engine::make_default_profile(), false);
   hornet_world.entities().get(hornet_player)->position =
       engine::Vec2(engine::f32(10000.0F), engine::f32(0.0F));
-  const engine::EntityHandle hornet =
-      engine::spawn_entity_from_defaults(hornet_world, engine::EntityKind::kMob, 14,
-                                         engine::Vec2(engine::f32(10300.0F), engine::f32(0.0F)));
+  const engine::EntityHandle hornet = engine::spawn_entity_from_defaults(
+      hornet_world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kHornet,
+      engine::Vec2(engine::f32(10300.0F), engine::f32(0.0F)));
   engine::Entity* hornet_entity = hornet_world.entities().get(hornet);
   CHECK(hornet_entity != nullptr);
   hornet_entity->ai.target = hornet_player;
@@ -95,7 +100,8 @@ void test_hornet_stinger_callback() {
   world.entities().get(player)->position = engine::Vec2(engine::f32(10000.0F), engine::f32(0.0F));
   world.entities().get(player)->bounds_dirty = true;
   const engine::EntityHandle hornet = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 14, engine::Vec2(engine::f32(10300.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kHornet,
+      engine::Vec2(engine::f32(10300.0F), engine::f32(0.0F)));
   engine::Entity* hornet_entity = world.entities().get(hornet);
   CHECK(hornet_entity != nullptr);
   // First pass acquires the player and arms the 500 ms acquire cooldown.
@@ -114,7 +120,7 @@ void test_hornet_stinger_callback() {
       continue;
     }
     stinger = entity.handle;
-    CHECK(entity.type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kHornet));
+    CHECK(entity.species_id == engine::catalog::SpeciesId::kHornet);
     CHECK(entity.owner == hornet.raw);
     CHECK(entity.contact_damage.value == 10.0F);
     CHECK(entity.lifetime_remaining_ms == 2000.0);
@@ -142,7 +148,8 @@ void test_hornet_stinger_callback() {
   far.entities().get(far_player)->position = engine::Vec2(engine::f32(10000.0F), engine::f32(0.0F));
   far.entities().get(far_player)->bounds_dirty = true;
   const engine::EntityHandle far_hornet = engine::spawn_entity_from_defaults(
-      far, engine::EntityKind::kMob, 14, engine::Vec2(engine::f32(10800.0F), engine::f32(0.0F)));
+      far, engine::EntityKind::kMob, engine::catalog::SpeciesId::kHornet,
+      engine::Vec2(engine::f32(10800.0F), engine::f32(0.0F)));
   engine::Entity* far_entity = far.entities().get(far_hornet);
   CHECK(far_entity != nullptr);
   engine::update_ai(far, 50.0);
@@ -170,7 +177,7 @@ void test_hornet_stinger_lifecycle() {
   const auto player = engine::spawn_player_default(world, engine::test::player(world), "p",
                                                    engine::make_default_profile(), false);
   const auto hornet = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 14,
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kHornet,
       engine::Vec2(engine::f32(10000.0F), engine::f32(50000.0F)));
   auto* body = world.entities().get(hornet);
   body->angle = engine::f32(1.5707963705062866F);
@@ -206,7 +213,8 @@ void test_ai_target_motion_and_guard() {
   CHECK(player_entity != nullptr);
   player_entity->position = engine::Vec2(engine::f32(0.0F), engine::f32(0.0F));
   const engine::EntityHandle spider = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 22, engine::Vec2(engine::f32(300.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kSpider,
+      engine::Vec2(engine::f32(300.0F), engine::f32(0.0F)));
   engine::Entity* spider_entity = world.entities().get(spider);
   CHECK(spider_entity != nullptr);
   engine::update_ai(world, 50.0);
@@ -223,12 +231,13 @@ void test_ai_target_motion_and_guard() {
   guarded.initialize();
   guarded.set_auto_populate(false);
   const engine::EntityHandle hole = engine::spawn_entity_from_defaults(
-      guarded, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(1000.0F), engine::f32(0.0F)));
+      guarded, engine::EntityKind::kMob, engine::catalog::SpeciesId::kAntHole,
+      engine::Vec2(engine::f32(1000.0F), engine::f32(0.0F)));
   CHECK(hole.valid());
   engine::EntityHandle ant{};
   for (const auto& entity : guarded.entities().entities()) {
     if (entity.active && entity.kind == engine::EntityKind::kMob &&
-        entity.type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kBabyAnt)) {
+        entity.species_id == engine::catalog::SpeciesId::kBabyAnt) {
       ant = entity.handle;
       break;
     }
@@ -265,7 +274,8 @@ void test_centipede_exact_chain_and_rare() {
   const engine::f32 angle_sample(static_cast<float>(static_cast<std::uint32_t>(after_angle - 1U)));
   const engine::f32 angle(angle_sample.value * 2.925836239953128e-09F);
   const engine::EntityHandle head = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 15, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kCentipedeHead,
+      engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(head.valid());
   const engine::Entity* head_entity = world.entities().get(head);
   CHECK(head_entity != nullptr);
@@ -343,7 +353,8 @@ void test_centipede_exact_chain_and_rare() {
   rare_world.set_dimensions(engine::f32(50000.0F), engine::f32(50000.0F));
   rare_world.random().seed(rare_seed);
   const engine::EntityHandle rare_head = engine::spawn_entity_from_defaults(
-      rare_world, engine::EntityKind::kMob, 15, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+      rare_world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kCentipedeHead,
+      engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(rare_head.valid());
   const engine::Entity* rare_entity = rare_world.entities().get(rare_head);
   CHECK(rare_entity != nullptr);
@@ -365,7 +376,8 @@ void test_ai_round_before_remainder() {
   engine::World world;
   world.initialize();
   world.set_auto_populate(false);
-  const auto handle = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 15U, {});
+  const auto handle = engine::spawn_entity_from_defaults(
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kCentipedeHead, {});
   auto* entity = world.entities().get(handle);
   entity->ai.current_angle = engine::f32(5.961493492126465F);
   entity->ai.behavior_choice = 1U;
@@ -389,7 +401,8 @@ void test_ai_activity_branch_and_wire() {
                                                    engine::make_default_profile(), false);
   world.entities().get(player)->position = {};
   const auto mob = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 22U, engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kSpider,
+      engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
   auto* entity = world.entities().get(mob);
   entity->ai.activity_flags = 0x80U;  // preserve the other activity bits
   engine::update_ai(world, 50.0);
@@ -468,7 +481,8 @@ void test_ant_hole_exact_children() {
   world.set_auto_populate(false);
   const std::uint32_t before = world.random().state();
   const engine::EntityHandle hole = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kAntHole,
+      engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
   CHECK(hole.valid());
   std::uint32_t expected = before;
   // 3 definition-component draws for the hole, then each of six children draws
@@ -483,12 +497,11 @@ void test_ant_hole_exact_children() {
     if (!entity.active || entity.kind != engine::EntityKind::kMob) {
       continue;
     }
-    if (entity.type_id < counts.size()) {
-      ++counts[entity.type_id];
+    if (static_cast<std::size_t>(entity.species_id) < counts.size()) {
+      ++counts[static_cast<std::size_t>(entity.species_id)];
     }
-    if (entity.type_id >= engine::catalog::species_type_id(engine::catalog::SpeciesId::kBabyAnt) &&
-        entity.type_id <=
-            engine::catalog::species_type_id(engine::catalog::SpeciesId::kSoldierAnt)) {
+    if (entity.species_id >= engine::catalog::SpeciesId::kBabyAnt &&
+        entity.species_id <= engine::catalog::SpeciesId::kSoldierAnt) {
       CHECK(entity.owner == hole.raw);
       CHECK(entity.ai.owner == hole);
       CHECK(entity.position.x.value == 100.0F);
@@ -510,7 +523,8 @@ void test_ant_hole_release() {
   world.set_auto_populate(false);
   world.random().seed(787621659U);
   const engine::EntityHandle hole = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kAntHole,
+      engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
   CHECK(hole.valid());
   CHECK(world.random().state() == 52603575U);
   CHECK(world.ant_hole_releases().size() == 1U);
@@ -521,8 +535,8 @@ void test_ant_hole_release() {
     counts.fill(0);
     for (const auto& entity : world.entities().entities()) {
       if (entity.active && entity.kind == engine::EntityKind::kMob &&
-          entity.type_id < counts.size()) {
-        ++counts[entity.type_id];
+          static_cast<std::size_t>(entity.species_id) < counts.size()) {
+        ++counts[static_cast<std::size_t>(entity.species_id)];
       }
     }
   };
@@ -555,8 +569,8 @@ void test_ant_hole_release() {
     if (!entity.active || entity.kind != engine::EntityKind::kMob) {
       continue;
     }
-    if (entity.type_id < engine::catalog::species_type_id(engine::catalog::SpeciesId::kBabyAnt) ||
-        entity.type_id > engine::catalog::species_type_id(engine::catalog::SpeciesId::kWorkerAnt)) {
+    if (entity.species_id < engine::catalog::SpeciesId::kBabyAnt ||
+        entity.species_id > engine::catalog::SpeciesId::kWorkerAnt) {
       continue;
     }
     if (entity.position.x.value != 100.0F || entity.position.y.value != 100.0F) {
@@ -599,8 +613,8 @@ void test_ant_hole_release() {
     if (!entity.active || entity.kind != engine::EntityKind::kMob) {
       continue;
     }
-    if (entity.type_id >= engine::catalog::species_type_id(engine::catalog::SpeciesId::kBabyAnt) &&
-        entity.type_id <= engine::catalog::species_type_id(engine::catalog::SpeciesId::kQueenAnt)) {
+    if (entity.species_id >= engine::catalog::SpeciesId::kBabyAnt &&
+        entity.species_id <= engine::catalog::SpeciesId::kQueenAnt) {
       ++ants;
     }
   }
@@ -612,15 +626,16 @@ void test_ant_hole_release() {
   ticked.set_auto_populate(false);
   ticked.random().seed(787621659U);
   const engine::EntityHandle ticked_hole = engine::spawn_entity_from_defaults(
-      ticked, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
+      ticked, engine::EntityKind::kMob, engine::catalog::SpeciesId::kAntHole,
+      engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
   CHECK(ticked_hole.valid());
   ticked.entities().get(ticked_hole)->health = engine::f32(280.0F);
   engine::tick(ticked, 50.0);
   std::array<int, 23> ticked_counts{};
   for (const auto& entity : ticked.entities().entities()) {
     if (entity.active && entity.kind == engine::EntityKind::kMob &&
-        entity.type_id < ticked_counts.size()) {
-      ++ticked_counts[entity.type_id];
+        static_cast<std::size_t>(entity.species_id) < ticked_counts.size()) {
+      ++ticked_counts[static_cast<std::size_t>(entity.species_id)];
     }
   }
   CHECK(ticked_counts[7] == 4);
@@ -636,7 +651,8 @@ void test_ant_hole_release() {
   edge.initialize();
   edge.set_auto_populate(false);
   const engine::EntityHandle edge_hole = engine::spawn_entity_from_defaults(
-      edge, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
+      edge, engine::EntityKind::kMob, engine::catalog::SpeciesId::kAntHole,
+      engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
   CHECK(edge_hole.valid());
   edge.entities().get(edge_hole)->health = engine::f32(292.0F);
   engine::release_ant_hole_ants(edge);
@@ -658,10 +674,11 @@ void test_web_tag_domain_side_effects() {
   world.entities().get(player)->set_position_x(engine::f32(0.0F));
   world.entities().get(player)->set_position_y(engine::f32(0.0F));
   const engine::EntityHandle target = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(40.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(40.0F), engine::f32(0.0F)));
   CHECK(target.valid());
   const engine::EntityHandle petal =
-      engine::spawn_entity(world, engine::EntityKind::kPetal, 29,
+      engine::spawn_entity(world, engine::EntityKind::kPetal, engine::catalog::PetalId::kWebRare,
                            engine::Vec2(engine::f32(30.0F), engine::f32(0.0F)), engine::f32(20.0F));
   CHECK(petal.valid());
   engine::Entity* petal_entity = world.entities().get(petal);
@@ -674,7 +691,7 @@ void test_web_tag_domain_side_effects() {
   engine::EntityHandle tag{};
   for (const auto& entity : world.entities().entities()) {
     if (entity.active && entity.kind == engine::EntityKind::kProjectile &&
-        entity.type_id == engine::catalog::petal_type_id(engine::catalog::PetalId::kWebRare)) {
+        entity.petal_id == engine::catalog::PetalId::kWebRare) {
       tag = entity.handle;
       break;
     }

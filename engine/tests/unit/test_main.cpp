@@ -1,3 +1,4 @@
+#include "engine/net/catalog_id.hpp"
 #include "../support/single_player.hpp"
 #include "engine/abi.h"
 #include "engine/core/byte_reader.hpp"

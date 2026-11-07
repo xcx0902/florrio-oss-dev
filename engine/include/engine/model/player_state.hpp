@@ -28,7 +28,7 @@ struct DeathState {
   f32 view_scale{0.9F};
   f32 score{};
   std::uint8_t level = 0;
-  std::array<std::uint16_t, 10> kept{};
+  std::array<catalog::PetalId, 10> kept{};
   std::uint8_t kept_count = 0;
   EntityHandle killer{};
   std::string killer_name;
@@ -65,8 +65,8 @@ class PlayerState {
     death.score = score;
     death.level = level;
   }
-  void set_last_death_kept(std::span<const std::uint16_t> kept) {
-    death.kept.fill(0);
+  void set_last_death_kept(std::span<const catalog::PetalId> kept) {
+    death.kept.fill(catalog::PetalId::kNone);
     death.kept_count = static_cast<std::uint8_t>(std::min(kept.size(), death.kept.size()));
     std::copy_n(kept.begin(), death.kept_count, death.kept.begin());
   }

@@ -6,6 +6,12 @@ disjoint source lists. Rules remain deterministic with a fixed 50ms tick and f32
 positions/angles. `schema/` owns protocol and catalogs; committed generated views
 let native compilation run without invoking Node.
 
+Catalog APIs, loadouts and loot carry `catalog::PetalId`, `catalog::SpeciesId`
+and `catalog::Rarity` directly. Entities and damage attribution keep separate
+`petal_id` and `species_id` fields; an unused namespace stays `kNone`. Integer
+conversion belongs to the protocol/C ABI adapters (and array indexing), with
+`net/catalog_id.hpp` encoding the shared legacy entity type field.
+
 ```sh
 npm run build:engine         # incremental native Release configure/build
 npm run build:engine:clean   # explicit fresh configure/build

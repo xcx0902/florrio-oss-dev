@@ -1,3 +1,4 @@
+#include "engine/net/catalog_id.hpp"
 #include "../../../../engine/tests/support/single_player.hpp"
 #include "engine/net/worker_api.hpp"
 #include "engine/sim/combat.hpp"
@@ -43,7 +44,7 @@ void array(const Container& values) {
       std::cout << ',';
     }
     first = false;
-    std::cout << +value;
+    std::cout << static_cast<unsigned>(value);
   }
   std::cout << ']';
 }
@@ -65,7 +66,7 @@ void checkpoint(engine::WorkerApi& api, const char* label) {
     if (i != 0) {
       std::cout << ',';
     }
-    std::cout << engine::test::player(world).loadout().slots()[i].type_id;
+    std::cout << static_cast<unsigned>(engine::test::player(world).loadout().slots()[i].type_id);
   }
   std::cout << "],\"lastDeathLevel\":" << +engine::test::player(world).last_death_level()
             << ",\"retained\":[";
@@ -73,7 +74,7 @@ void checkpoint(engine::WorkerApi& api, const char* label) {
     if (i != 0) {
       std::cout << ',';
     }
-    std::cout << engine::test::player(world).last_death_kept()[i];
+    std::cout << static_cast<unsigned>(engine::test::player(world).last_death_kept()[i]);
   }
   std::cout << "],\"drops\":[";
   bool first = true;
@@ -84,7 +85,7 @@ void checkpoint(engine::WorkerApi& api, const char* label) {
     first = false;
     const auto* drop = world.entities().get(handle);
     require(drop != nullptr, "pickup registry contains a stale handle");
-    std::cout << '[' << handle.raw << ',' << drop->type_id << ']';
+    std::cout << '[' << handle.raw << ',' << static_cast<unsigned>(drop->petal_id) << ']';
   }
   std::cout << "],\"entities\":[";
   first = true;
@@ -95,10 +96,10 @@ void checkpoint(engine::WorkerApi& api, const char* label) {
       }
       first = false;
       std::cout << '[' << entity.handle.raw << ',' << static_cast<unsigned>(entity.kind) << ','
-                << entity.type_id << ',' << entity.owner << ',' << entity.position.x.bits() << ','
-                << entity.position.y.bits() << ',' << entity.health.bits() << ','
-                << entity.max_health.bits() << ',' << entity.death_processed << ','
-                << entity.death_time_ms << ']';
+                << engine::net::catalog_type_id(entity) << ',' << entity.owner << ','
+                << entity.position.x.bits() << ',' << entity.position.y.bits() << ','
+                << entity.health.bits() << ',' << entity.max_health.bits() << ','
+                << entity.death_processed << ',' << entity.death_time_ms << ']';
     }
   }
   std::cout << "]}";
@@ -127,7 +128,8 @@ int main() {
   checkpoint(*api, "movement");
   auto position = world.entities().get(original)->position;
   position.x += engine::f32(1000);
-  const auto mob = api->spawn(engine::EntityKind::kMob, 4, position);
+  const auto mob =
+      api->spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug, position);
   require(mob.valid(), "combat mob spawn failed");
   const auto hit = engine::damage_entity(world, original, engine::f32(12.5F), mob);
   require(!hit.died && hit.remaining.value < world.entities().get(original)->max_health.value,
@@ -139,8 +141,15 @@ int main() {
   std::cout << ',';
   checkpoint(*api, "combat");
   // Same carried items and streams as the existing level-30 death regression.
-  const std::array<std::uint16_t, 16> carried{1,  2,  6,  7,  8,  9,  10, 12,
-                                              15, 18, 19, 22, 25, 29, 34, 36};
+  const std::array<engine::catalog::PetalId, 16> carried{
+      engine::catalog::PetalId::kBasicCommon,       engine::catalog::PetalId::kFastCommon,
+      engine::catalog::PetalId::kRoseUnusual,       engine::catalog::PetalId::kStingerUnusual,
+      engine::catalog::PetalId::kIrisUnusual,       engine::catalog::PetalId::kWingRare,
+      engine::catalog::PetalId::kMissileRare,       engine::catalog::PetalId::kPeasEpic,
+      engine::catalog::PetalId::kRoseEpic,          engine::catalog::PetalId::kBubbleRare,
+      engine::catalog::PetalId::kPollenEpic,        engine::catalog::PetalId::kEggEpic,
+      engine::catalog::PetalId::kAntennaeLegendary, engine::catalog::PetalId::kWebRare,
+      engine::catalog::PetalId::kPeasLegendary,     engine::catalog::PetalId::kSaltRare};
   engine::test::player(world).profile().set_level(30);
   engine::test::player(world).profile().set_experience(engine::f32(2.5F));
   for (std::uint8_t i = 0; i < carried.size(); ++i) {
@@ -160,9 +169,11 @@ int main() {
   require(world.entities().get(original)->death_processed, "suicide did not settle immediately");
   require(world.entities().get(original)->death_time_ms == 1500, "corpse deadline changed");
   require(world.pickups().size() == 3, "level-30 death no longer makes three drops");
-  const std::array<std::uint16_t, 3> expected_drops{34, 15, 19};
+  const std::array<engine::catalog::PetalId, 3> expected_drops{
+      engine::catalog::PetalId::kPeasLegendary, engine::catalog::PetalId::kRoseEpic,
+      engine::catalog::PetalId::kPollenEpic};
   for (std::size_t i = 0; i < expected_drops.size(); ++i) {
-    require(world.entities().get(world.pickups()[i])->type_id == expected_drops[i],
+    require(world.entities().get(world.pickups()[i])->petal_id == expected_drops[i],
             "death drop order changed");
   }
   std::cout << ',';

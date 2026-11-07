@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
   }
 
   const engine::EntityHandle mob =
-      api.spawn(engine::EntityKind::kMob, 1U,
+      api.spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
                 engine::Vec2{engine::f32(body->position.x.value + 200.0F), body->position.y});
   if (!mob.valid()) {
     return 7;

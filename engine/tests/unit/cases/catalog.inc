@@ -19,9 +19,9 @@ void test_progression() {
   CHECK(engine::experience_threshold(0).to_float() == 3.0F);
   CHECK(engine::experience_threshold(1).to_float() == 4.0F);
   CHECK(engine::experience_threshold(2).to_float() == 5.0F);
-  CHECK(engine::rarity_experience(0).to_float() == 2.0F);
-  CHECK(engine::rarity_experience(5).to_float() == 2500.0F);
-  CHECK(engine::rarity_experience(6).to_float() == 0.0F);
+  CHECK(engine::rarity_experience(engine::catalog::Rarity::kCommon).to_float() == 2.0F);
+  CHECK(engine::rarity_experience(engine::catalog::Rarity::kUnique).to_float() == 2500.0F);
+  CHECK(engine::rarity_experience(engine::catalog::Rarity::kUltra).to_float() == 0.0F);
   engine::PlayerProfile profile;
   CHECK(profile.level() == 0);
   profile.add_experience(engine::f32(3.0F));
@@ -88,11 +88,12 @@ void test_player_default_spawn() {
   CHECK(entity->contact_damage.to_float() == 25.0F);
   CHECK(engine::test::player(world).profile().level() == 1);
   CHECK(engine::test::player(world).profile().inventory_count() == 5);
-  CHECK(engine::test::player(world).profile().inventory(0) == 1);
+  CHECK(engine::test::player(world).profile().inventory(0) ==
+        engine::catalog::PetalId::kBasicCommon);
   CHECK(engine::test::player(world).loadout().slots()[0].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+        engine::catalog::PetalId::kBasicCommon);
   CHECK(engine::test::player(world).loadout().slots()[4].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+        engine::catalog::PetalId::kBasicCommon);
   CHECK(engine::test::player(world).loadout().slots()[5].count == 0);
   CHECK(entity->position.x.to_float() >= -25000.0F);
   CHECK(entity->position.x.to_float() <= -25000.0F + 15000.0F);
@@ -101,86 +102,93 @@ void test_player_default_spawn() {
   const std::size_t petals = engine::spawn_loadout_petals(world, engine::test::player(world));
   CHECK(petals == 5);
   CHECK(engine::test::player(world).petals().size() == 5);
-  CHECK(engine::test::player(world).petals()[0].profile ==
-        static_cast<std::uint8_t>(engine::OrbitProfile::kBasic));
+  CHECK(engine::test::player(world).petals()[0].profile == engine::OrbitProfile::kBasic);
 }
 
 void test_petal_combat_catalog() {
-  const auto* basic = engine::Catalog::instance().petal_combat(1);
+  const auto* basic =
+      engine::Catalog::instance().petal_combat(engine::catalog::PetalId::kBasicCommon);
   CHECK(basic != nullptr);
   CHECK(basic->collisionRadius == 10.0F);
   CHECK(basic->damage == 10.0F);
   CHECK(basic->health == 10.0F);
   CHECK(std::string(basic->orbitProfile) == "basic");
-  CHECK(engine::Catalog::instance().petal(1)->instancesPerSlot == 1);
-  const auto* rock = engine::Catalog::instance().petal_combat(4);
+  CHECK(
+      engine::Catalog::instance().petal(engine::catalog::PetalId::kBasicCommon)->instancesPerSlot ==
+      1);
+  const auto* rock = engine::Catalog::instance().petal_combat(engine::catalog::PetalId::kRockRare);
   CHECK(rock != nullptr);
-  CHECK(engine::Catalog::instance().petal(4)->rarityIndex == 2);
+  CHECK(engine::Catalog::instance().petal(engine::catalog::PetalId::kRockRare)->rarityIndex ==
+        engine::catalog::Rarity::kRare);
   CHECK(rock->collisionRadius == 14.0F);
   CHECK(rock->health == 90.0F);
-  const auto* corn = engine::Catalog::instance().petal_combat(38);
+  const auto* corn = engine::Catalog::instance().petal_combat(engine::catalog::PetalId::kCornEpic);
   CHECK(corn != nullptr);
   CHECK(corn->health == 2000.0F);
-  CHECK(engine::Catalog::instance().petal(38)->rechargeMilliseconds == 45000.0F);
-  const auto* rose = engine::Catalog::instance().petal_combat(6);
+  CHECK(engine::Catalog::instance()
+            .petal(engine::catalog::PetalId::kCornEpic)
+            ->rechargeMilliseconds == 45000.0F);
+  const auto* rose =
+      engine::Catalog::instance().petal_combat(engine::catalog::PetalId::kRoseUnusual);
   CHECK(rose != nullptr);
   CHECK(rose->behavior == engine::catalog::PetalBehavior::kRoseHeal);
   CHECK(rose->healAmount == 10.0F);
-  CHECK(engine::Catalog::instance().petal_combat(99) == nullptr);
+  CHECK(engine::Catalog::instance().petal_combat(static_cast<engine::catalog::PetalId>(99)) ==
+        nullptr);
 }
 
 void test_drop_chances() {
-  const auto* rock = engine::Catalog::instance().drop_table(1);
+  const auto* rock = engine::Catalog::instance().drop_table(engine::catalog::SpeciesId::kRock);
   CHECK(rock != nullptr);
   CHECK(rock->dropCount == 3);
-  CHECK(rock->drops[0].petalTypeId ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kRockRare));
+  CHECK(rock->drops[0].petalTypeId == engine::catalog::PetalId::kRockRare);
   CHECK(std::fabs(rock->drops[0].chance - 0.00522140646353364) < 1e-12);
-  CHECK(rock->drops[2].petalTypeId ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
+  CHECK(rock->drops[2].petalTypeId == engine::catalog::PetalId::kHeavyCommon);
   CHECK(std::fabs(rock->drops[2].chance - 0.10442813485860825) < 1e-12);
-  const auto* alias = engine::Catalog::instance().drop_table(
-      engine::catalog::species_type_id(engine::catalog::SpeciesId::kCentipedeSegment));
+  const auto* alias =
+      engine::Catalog::instance().drop_table(engine::catalog::SpeciesId::kCentipedeSegment);
   CHECK(alias != nullptr);
-  CHECK(alias->aliasOf ==
-        engine::catalog::species_type_id(engine::catalog::SpeciesId::kCentipedeHead));
+  CHECK(alias->aliasOf == engine::catalog::SpeciesId::kCentipedeHead);
   CHECK(alias->dropCount == 6);
   engine::ServerRng rng(1);
-  const auto loot = engine::roll_entity_loot(rng, 1, false);
+  const auto loot = engine::roll_entity_loot(rng, engine::catalog::SpeciesId::kRock, false);
   for (const auto petal : loot) {
-    CHECK(petal == 2 || petal == 3 || petal == 4);
+    CHECK(petal == engine::catalog::PetalId::kFastCommon ||
+          petal == engine::catalog::PetalId::kHeavyCommon ||
+          petal == engine::catalog::PetalId::kRockRare);
   }
   engine::ServerRng compact_rng(1);
-  const auto compact_loot = engine::roll_entity_loot(compact_rng, 1, true);
+  const auto compact_loot =
+      engine::roll_entity_loot(compact_rng, engine::catalog::SpeciesId::kRock, true);
   CHECK(compact_loot.size() <= loot.size() + 3);
 }
 
 void test_loot_retention() {
   engine::PlayerProfile profile;
   profile.set_level(10);
-  profile.set_inventory(0, 4);
-  profile.set_inventory(1, 1);
-  profile.set_inventory(2, 15);
-  profile.set_inventory(3, 24);
-  profile.set_inventory(4, 2);
+  profile.set_inventory(0, engine::catalog::PetalId::kRockRare);
+  profile.set_inventory(1, engine::catalog::PetalId::kBasicCommon);
+  profile.set_inventory(2, engine::catalog::PetalId::kRoseEpic);
+  profile.set_inventory(3, engine::catalog::PetalId::kRoseRare);
+  profile.set_inventory(4, engine::catalog::PetalId::kFastCommon);
   profile.set_inventory_count(5);
-  profile.push_backpack(2);
+  profile.push_backpack(engine::catalog::PetalId::kFastCommon);
   engine::ServerRng rng(7);
   engine::ServerRng shuffle_rng(1);
   const engine::LootResult result = engine::retain_player_loot(profile, rng, shuffle_rng);
   CHECK(result.retained_count <= 3);
   CHECK(result.lost_count <= 10);
   for (std::uint8_t index = 0; index < result.retained_count; ++index) {
-    CHECK(result.retained[index] != 1);
+    CHECK(result.retained[index] != engine::catalog::PetalId::kBasicCommon);
   }
   CHECK(profile.lost_count() == result.lost_count);
   CHECK(profile.inventory_count() == result.retained_count);
   CHECK(profile.backpack_count() == 0);
-  CHECK(engine::loot_lifetime_ms(1) == 32000.0);
-  CHECK(engine::loot_lifetime_ms(4) == 42000.0);
-  CHECK(engine::loot_lifetime_ms(15) == 52000.0);
-  CHECK(engine::loot_lifetime_ms(24) == 42000.0);
-  CHECK(engine::loot_lifetime_ms(35) == 62000.0);
+  CHECK(engine::loot_lifetime_ms(engine::catalog::PetalId::kBasicCommon) == 32000.0);
+  CHECK(engine::loot_lifetime_ms(engine::catalog::PetalId::kRockRare) == 42000.0);
+  CHECK(engine::loot_lifetime_ms(engine::catalog::PetalId::kRoseEpic) == 52000.0);
+  CHECK(engine::loot_lifetime_ms(engine::catalog::PetalId::kRoseRare) == 42000.0);
+  CHECK(engine::loot_lifetime_ms(engine::catalog::PetalId::kBasicUnique) == 62000.0);
 }
 
 void test_healing_clamp() {
@@ -203,7 +211,8 @@ void test_contact_combat_and_loot() {
   engine::Entity* player_entity = world.entities().get(player);
   player_entity->position = engine::Vec2(engine::f32(0.0F), engine::f32(0.0F));
   const engine::EntityHandle mob = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(mob.valid());
   engine::Entity* mob_entity = world.entities().get(mob);
   const engine::f32 player_health = player_entity->health;
@@ -227,10 +236,10 @@ void test_multi_instance_orbit_spacing() {
   CHECK(engine::spawn_player_default(world, engine::test::player(world), "orbit",
                                      engine::make_default_profile())
             .valid());
-  engine::test::player(world).profile().set_inventory(0, 24);
+  engine::test::player(world).profile().set_inventory(0, engine::catalog::PetalId::kRoseRare);
   engine::test::player(world).profile().set_inventory_count(1);
   engine::test::player(world).loadout().clear();
-  CHECK(engine::test::player(world).loadout().equip(0, 24));
+  CHECK(engine::test::player(world).loadout().equip(0, engine::catalog::PetalId::kRoseRare));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 3);
   CHECK(engine::test::player(world).petals().size() == 3);
   CHECK(engine::test::player(world).petals()[0].extra_radius.to_float() == 11.0F);
@@ -255,16 +264,19 @@ void test_orbit_reindex_after_removal() {
                                      engine::make_default_profile())
             .valid());
   for (std::uint8_t slot = 0; slot < 5; ++slot) {
-    engine::test::player(world).profile().set_inventory(slot, static_cast<std::uint16_t>(slot + 1));
+    engine::test::player(world).profile().set_inventory(
+        slot, static_cast<engine::catalog::PetalId>(slot + 1));
   }
   engine::test::player(world).profile().set_inventory_count(5);
   engine::test::player(world).loadout().clear();
   for (std::uint8_t slot = 0; slot < 5; ++slot) {
-    CHECK(engine::test::player(world).loadout().equip(slot, static_cast<std::uint16_t>(slot + 1)));
+    CHECK(engine::test::player(world).loadout().equip(
+        slot, static_cast<engine::catalog::PetalId>(slot + 1)));
   }
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 5U);
   CHECK(engine::test::player(world).loadout().change_slot_type(
-      world, engine::test::player(world), engine::test::player(world).profile(), 2, 0));
+      world, engine::test::player(world), engine::test::player(world).profile(), 2,
+      engine::catalog::PetalId::kNone));
   engine::assign_petal_orbit_indices(engine::test::player(world));
   CHECK(engine::test::player(world).petals().size() == 4U);
   CHECK(engine::test::player(world).loadout().orbit_positions() == 4U);
@@ -282,19 +294,19 @@ void test_shared_orbit_slot_without_component_keeps_shared_position() {
   CHECK(engine::spawn_player_default(world, engine::test::player(world), "rose-slot",
                                      engine::make_default_profile())
             .valid());
-  engine::test::player(world).profile().set_inventory(0, 24);
-  engine::test::player(world).profile().set_inventory(1, 1);
+  engine::test::player(world).profile().set_inventory(0, engine::catalog::PetalId::kRoseRare);
+  engine::test::player(world).profile().set_inventory(1, engine::catalog::PetalId::kBasicCommon);
   engine::test::player(world).profile().set_inventory_count(2);
   engine::test::player(world).loadout().clear();
-  CHECK(engine::test::player(world).loadout().equip(0, 24));
-  CHECK(engine::test::player(world).loadout().equip(1, 1));
+  CHECK(engine::test::player(world).loadout().equip(0, engine::catalog::PetalId::kRoseRare));
+  CHECK(engine::test::player(world).loadout().equip(1, engine::catalog::PetalId::kBasicCommon));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 4U);
   // Replace Rose's third instance with a live entity that has no petal
   // component. Its shared position is already taken, so Basic remains at
   // orbit 1 instead of jumping to 2.
   const engine::EntityHandle componentless = engine::spawn_entity(
-      world, engine::EntityKind::kPetal, 1U, engine::Vec2{engine::f32(20.0F), engine::f32(0.0F)},
-      engine::f32(14.0F), 0U, 0U);
+      world, engine::EntityKind::kPetal, engine::catalog::PetalId::kBasicCommon,
+      engine::Vec2{engine::f32(20.0F), engine::f32(0.0F)}, engine::f32(14.0F), 0U, 0U);
   CHECK(componentless.valid());
   engine::test::player(world).loadout().set_handle(0, 2, componentless);
   engine::assign_petal_orbit_indices(engine::test::player(world));
@@ -315,10 +327,10 @@ void test_peas_attack_consumes_petal() {
   CHECK(engine::spawn_player_default(world, engine::test::player(world), "peas",
                                      engine::make_default_profile())
             .valid());
-  engine::test::player(world).profile().set_inventory(0, 11);
+  engine::test::player(world).profile().set_inventory(0, engine::catalog::PetalId::kPeasRare);
   engine::test::player(world).profile().set_inventory_count(1);
   engine::test::player(world).loadout().clear();
-  CHECK(engine::test::player(world).loadout().equip(0, 11));
+  CHECK(engine::test::player(world).loadout().equip(0, engine::catalog::PetalId::kPeasRare));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 1U);
   const engine::EntityHandle pea = engine::test::player(world).petals()[0].handle;
   world.advance_tick(600.0);
@@ -328,7 +340,7 @@ void test_peas_attack_consumes_petal() {
   std::uint32_t children = 0;
   for (const auto& entity : world.entities().entities()) {
     if (entity.active && entity.kind == engine::EntityKind::kPetal &&
-        entity.type_id == engine::catalog::petal_type_id(engine::catalog::PetalId::kPeasRare)) {
+        entity.petal_id == engine::catalog::PetalId::kPeasRare) {
       ++children;
     }
   }
@@ -342,12 +354,12 @@ void test_twin_widens_orbit_spacing() {
   CHECK(engine::spawn_player_default(world, engine::test::player(world), "twin-space",
                                      engine::make_default_profile())
             .valid());
-  engine::test::player(world).profile().set_inventory(0, 16);
-  engine::test::player(world).profile().set_inventory(1, 1);
+  engine::test::player(world).profile().set_inventory(0, engine::catalog::PetalId::kTwinUnusual);
+  engine::test::player(world).profile().set_inventory(1, engine::catalog::PetalId::kBasicCommon);
   engine::test::player(world).profile().set_inventory_count(2);
   engine::test::player(world).loadout().clear();
-  CHECK(engine::test::player(world).loadout().equip(0, 16));
-  CHECK(engine::test::player(world).loadout().equip(1, 1));
+  CHECK(engine::test::player(world).loadout().equip(0, engine::catalog::PetalId::kTwinUnusual));
+  CHECK(engine::test::player(world).loadout().equip(1, engine::catalog::PetalId::kBasicCommon));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 3U);
   // Twin reserves two positions; Basic therefore sits at 4*pi/3 rather than
   // the old five-slot 2*pi/5 that left the Twin pair overlapping it.
@@ -365,10 +377,10 @@ void test_rose_healing() {
   CHECK(engine::spawn_player_default(world, engine::test::player(world), "rose",
                                      engine::make_default_profile())
             .valid());
-  engine::test::player(world).profile().set_inventory(0, 6);
+  engine::test::player(world).profile().set_inventory(0, engine::catalog::PetalId::kRoseUnusual);
   engine::test::player(world).profile().set_inventory_count(1);
   engine::test::player(world).loadout().clear();
-  CHECK(engine::test::player(world).loadout().equip(0, 6));
+  CHECK(engine::test::player(world).loadout().equip(0, engine::catalog::PetalId::kRoseUnusual));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 1);
   engine::Entity* player = world.entities().get(engine::test::player(world).player());
   CHECK(player != nullptr);
@@ -389,10 +401,10 @@ void test_rose_contracts_orbit_and_heals_promptly() {
   CHECK(engine::spawn_player_default(world, engine::test::player(world), "rose-orbit",
                                      engine::make_default_profile())
             .valid());
-  engine::test::player(world).profile().set_inventory(0, 6);
+  engine::test::player(world).profile().set_inventory(0, engine::catalog::PetalId::kRoseUnusual);
   engine::test::player(world).profile().set_inventory_count(1);
   engine::test::player(world).loadout().clear();
-  CHECK(engine::test::player(world).loadout().equip(0, 6));
+  CHECK(engine::test::player(world).loadout().equip(0, engine::catalog::PetalId::kRoseUnusual));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 1);
   engine::Entity* player = world.entities().get(engine::test::player(world).player());
   CHECK(player != nullptr);
@@ -423,10 +435,10 @@ void test_rose_timer_arms_at_full_health() {
   CHECK(engine::spawn_player_default(world, engine::test::player(world), "rose-armed",
                                      engine::make_default_profile())
             .valid());
-  engine::test::player(world).profile().set_inventory(0, 6);
+  engine::test::player(world).profile().set_inventory(0, engine::catalog::PetalId::kRoseUnusual);
   engine::test::player(world).profile().set_inventory_count(1);
   engine::test::player(world).loadout().clear();
-  CHECK(engine::test::player(world).loadout().equip(0, 6));
+  CHECK(engine::test::player(world).loadout().equip(0, engine::catalog::PetalId::kRoseUnusual));
   CHECK(engine::spawn_loadout_petals(world, engine::test::player(world)) == 1);
   engine::Entity* player = world.entities().get(engine::test::player(world).player());
   CHECK(player != nullptr);
@@ -447,7 +459,8 @@ void test_petal_recharge() {
   const engine::EntityHandle player = engine::spawn_player_default(
       world, engine::test::player(world), "p", engine::make_default_profile());
   CHECK(player.valid());
-  engine::test::player(world).loadout().equip(0, 2);  // Fast: 500 ms recharge, one instance.
+  engine::test::player(world).loadout().equip(
+      0, engine::catalog::PetalId::kFastCommon);  // Fast: 500 ms recharge, one instance.
   const std::size_t spawned = engine::spawn_loadout_petals(world, engine::test::player(world));
   CHECK(spawned >= 1);
   const engine::EntityHandle petal = engine::test::player(world).loadout().handle(0, 0);
@@ -483,15 +496,16 @@ void test_ant_hole_children() {
   engine::World world;
   world.initialize();
   const engine::EntityHandle hole = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 11, engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kAntHole,
+      engine::Vec2(engine::f32(100.0F), engine::f32(100.0F)));
   CHECK(hole.valid());
   std::array<int, 23> counts{};
   for (const auto& entity : world.entities().entities()) {
     if (!entity.active || entity.kind != engine::EntityKind::kMob) {
       continue;
     }
-    if (entity.type_id < counts.size()) {
-      ++counts[entity.type_id];
+    if (static_cast<std::size_t>(entity.species_id) < counts.size()) {
+      ++counts[static_cast<std::size_t>(entity.species_id)];
     }
   }
   CHECK(counts[7] == 3);
@@ -531,7 +545,7 @@ void test_worker_api_default_spawn() {
   CHECK(engine::test::player(api.world()).profile().level() == 1);
   CHECK(engine::test::player(api.world()).profile().inventory_count() == 5);
   CHECK(engine::test::player(api.world()).loadout().slots()[0].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+        engine::catalog::PetalId::kBasicCommon);
   const engine::Entity* entity =
       api.world().entities().get(engine::test::player(api.world()).player());
   CHECK(entity != nullptr);

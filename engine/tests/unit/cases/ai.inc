@@ -7,7 +7,8 @@ void test_ai_target_selection() {
   CHECK(player_entity != nullptr);
   player_entity->position = engine::Vec2(engine::f32(0.0F), engine::f32(0.0F));
   const engine::EntityHandle mob = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(300.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(300.0F), engine::f32(0.0F)));
   engine::Entity* mob_entity = world.entities().get(mob);
   CHECK(mob_entity != nullptr);
   mob_entity->ai.can_alert = true;
@@ -18,7 +19,8 @@ void test_ai_target_selection() {
   CHECK(alerted >= 1);
   CHECK(mob_entity->ai.target == player);
   const engine::EntityHandle drop =
-      engine::spawn_drop(world, 2, engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)));
+      engine::spawn_drop(world, engine::catalog::PetalId::kFastCommon,
+                         engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)));
   CHECK(drop.valid());
   CHECK(engine::find_pickup_recipient(world, drop) == player);
   player_entity->position = engine::Vec2(engine::f32(5000.0F), engine::f32(0.0F));
@@ -56,9 +58,11 @@ void test_status_effects_and_slow() {
   const engine::EntityHandle player = engine::spawn_player_default(
       world, engine::test::player(world), "p", engine::make_default_profile());
   const engine::EntityHandle mob = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
   const engine::EntityHandle mob2 = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(200.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(200.0F), engine::f32(0.0F)));
   engine::Entity* player_entity = world.entities().get(player);
   CHECK(player_entity != nullptr);
   CHECK(engine::apply_effect(world, player, engine::EffectType::kPoison, engine::f32(10.0F), 1000.0,
@@ -94,7 +98,8 @@ void test_slow_scales_player_control_impulse() {
   const engine::EntityHandle player = engine::spawn_player_default(
       world, engine::test::player(world), "p", engine::make_default_profile());
   const engine::EntityHandle source = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
   engine::Entity* entity = world.entities().get(player);
   CHECK(entity != nullptr);
   engine::test::input(world, 0, engine::f32(0.0F), engine::f32(100.0F));
@@ -118,9 +123,11 @@ void test_slow_does_not_scale_integrate_movement() {
   engine::World world;
   world.initialize();
   const engine::EntityHandle mob = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   const engine::EntityHandle source = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
   engine::Entity* entity = world.entities().get(mob);
   CHECK(entity != nullptr);
   entity->acceleration.x = 0.01;
@@ -142,7 +149,8 @@ void test_attribution_and_legendary() {
   const engine::EntityHandle player = engine::spawn_player_default(
       world, engine::test::player(world), "p", engine::make_default_profile());
   const engine::EntityHandle mob = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(100.0F), engine::f32(0.0F)));
   CHECK(player.valid());
   CHECK(mob.valid());
   world.record_hit(mob, player, engine::f32(2.0F), engine::f32(8.0F));
@@ -167,36 +175,36 @@ void test_attribution_and_legendary() {
   legendary_world.initialize();
   (void)engine::spawn_player_default(legendary_world, engine::test::player(legendary_world), "q",
                                      engine::make_default_profile());
-  CHECK(engine::test::player(legendary_world).loadout().equip(0, 35));
-  CHECK(engine::legendary_exists(legendary_world, engine::EntityHandle{}, 35));
+  CHECK(engine::test::player(legendary_world)
+            .loadout()
+            .equip(0, engine::catalog::PetalId::kBasicUnique));
+  CHECK(engine::legendary_exists(legendary_world, engine::EntityHandle{},
+                                 engine::catalog::PetalId::kBasicUnique));
   const auto spawned =
-      engine::spawn_loot_drops(legendary_world, {35}, engine::Vec2{}, engine::EntityHandle{});
+      engine::spawn_loot_drops(legendary_world, {engine::catalog::PetalId::kBasicUnique},
+                               engine::Vec2{}, engine::EntityHandle{});
   CHECK(spawned.empty());
   CHECK(!engine::legendary_exists(legendary_world, engine::test::player(legendary_world).player(),
-                                  35));
+                                  engine::catalog::PetalId::kBasicUnique));
 }
 
 void test_loadout_restore_and_backpack() {
   engine::PlayerProfile profile;
   profile.set_level(20);
-  profile.set_inventory(0, 1);
-  profile.set_inventory(1, 2);
-  profile.set_inventory(5, 3);
+  profile.set_inventory(0, engine::catalog::PetalId::kBasicCommon);
+  profile.set_inventory(1, engine::catalog::PetalId::kFastCommon);
+  profile.set_inventory(5, engine::catalog::PetalId::kHeavyCommon);
   profile.set_inventory_count(6);
   engine::PlayerLoadout loadout;
   loadout.restore_from_profile(profile);
-  CHECK(loadout.slots()[0].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
-  CHECK(loadout.slots()[1].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
-  CHECK(loadout.slots()[5].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
+  CHECK(loadout.slots()[0].type_id == engine::catalog::PetalId::kBasicCommon);
+  CHECK(loadout.slots()[1].type_id == engine::catalog::PetalId::kFastCommon);
+  CHECK(loadout.slots()[5].type_id == engine::catalog::PetalId::kHeavyCommon);
   CHECK(loadout.slots()[6].count == 0);
-  CHECK(loadout.set_slot_type(profile, 0, 4));
-  CHECK(loadout.slots()[0].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kRockRare));
-  CHECK(profile.inventory(0) == 4);
-  CHECK(!loadout.set_slot_type(profile, 0, 4));
+  CHECK(loadout.set_slot_type(profile, 0, engine::catalog::PetalId::kRockRare));
+  CHECK(loadout.slots()[0].type_id == engine::catalog::PetalId::kRockRare);
+  CHECK(profile.inventory(0) == engine::catalog::PetalId::kRockRare);
+  CHECK(!loadout.set_slot_type(profile, 0, engine::catalog::PetalId::kRockRare));
 
   engine::World world;
   world.initialize();
@@ -209,36 +217,42 @@ void test_loadout_restore_and_backpack() {
   // backpack. Keep grace, capacity and strict range failures isolated.
   for (std::uint8_t slot = 0; slot < engine::test::player(world).profile().inventory_size();
        ++slot) {
-    CHECK(engine::test::player(world).loadout().equip(slot, 1));
-    engine::test::player(world).profile().set_inventory(slot, 1);
+    CHECK(
+        engine::test::player(world).loadout().equip(slot, engine::catalog::PetalId::kBasicCommon));
+    engine::test::player(world).profile().set_inventory(slot,
+                                                        engine::catalog::PetalId::kBasicCommon);
   }
   engine::test::player(world).profile().set_inventory_count(
       engine::test::player(world).profile().inventory_size());
-  const auto drop =
-      engine::spawn_drop(world, 2, engine::Vec2(engine::f32(65.0F), engine::f32(0.0F)));
+  const auto drop = engine::spawn_drop(world, engine::catalog::PetalId::kFastCommon,
+                                       engine::Vec2(engine::f32(65.0F), engine::f32(0.0F)));
   CHECK(drop.valid());
   if (!drop.valid()) {
     return;
   }
   const auto free_slot =
       static_cast<std::uint8_t>(engine::test::player(world).profile().inventory_size() - 1U);
-  CHECK(engine::test::player(world).loadout().discard(free_slot, 1));
-  engine::test::player(world).profile().set_inventory(free_slot, 0);
+  CHECK(engine::test::player(world).loadout().discard(free_slot,
+                                                      engine::catalog::PetalId::kBasicCommon));
+  engine::test::player(world).profile().set_inventory(free_slot, engine::catalog::PetalId::kNone);
   world.set_time_ms(499.0);
   CHECK(engine::collect_drops(world) == 0U);
   CHECK(!world.entities().get(drop)->pickup_collected);
   CHECK(engine::test::player(world).loadout().pickup_transfers().empty());
 
-  CHECK(engine::test::player(world).loadout().equip(free_slot, 1));
-  engine::test::player(world).profile().set_inventory(free_slot, 1);
+  CHECK(engine::test::player(world).loadout().equip(free_slot,
+                                                    engine::catalog::PetalId::kBasicCommon));
+  engine::test::player(world).profile().set_inventory(free_slot,
+                                                      engine::catalog::PetalId::kBasicCommon);
   world.set_time_ms(500.0);
   CHECK(engine::collect_drops(world) == 0U);
   CHECK(!world.entities().get(drop)->pickup_collected);
   CHECK(engine::test::player(world).profile().backpack_count() == 0U);
   CHECK(engine::test::player(world).loadout().pickup_transfers().empty());
 
-  CHECK(engine::test::player(world).loadout().discard(free_slot, 1));
-  engine::test::player(world).profile().set_inventory(free_slot, 0);
+  CHECK(engine::test::player(world).loadout().discard(free_slot,
+                                                      engine::catalog::PetalId::kBasicCommon));
+  engine::test::player(world).profile().set_inventory(free_slot, engine::catalog::PetalId::kNone);
   world.entities().get(drop)->position.x = engine::f32(70.0F);
   CHECK(engine::collect_drops(world) == 0U);
   CHECK(!world.entities().get(drop)->pickup_collected);
@@ -247,8 +261,9 @@ void test_loadout_restore_and_backpack() {
   CHECK(engine::collect_drops(world) == 1U);
   CHECK(world.entities().get(drop)->pickup_collected);
   CHECK(engine::test::player(world).loadout().slots()[free_slot].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
-  CHECK(engine::test::player(world).profile().inventory(free_slot) == 2U);
+        engine::catalog::PetalId::kFastCommon);
+  CHECK(engine::test::player(world).profile().inventory(free_slot) ==
+        engine::catalog::PetalId::kFastCommon);
   CHECK(engine::test::player(world).profile().backpack_count() == 0U);
   CHECK(engine::test::player(world).loadout().pickup_transfers().size() == 1U);
   if (engine::test::player(world).loadout().pickup_transfers().size() != 1U) {
@@ -267,13 +282,14 @@ void test_petal_special_effects() {
       world, engine::test::player(world), "p", engine::make_default_profile());
   CHECK(player.valid());
   const engine::EntityHandle mob = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
   engine::Entity* mob_entity = world.entities().get(mob);
   CHECK(mob_entity != nullptr);
 
-  const engine::EntityHandle iris =
-      engine::spawn_petal(world, engine::test::player(world), 8, engine::Vec2{}, engine::f32(65.0F),
-                          engine::f32(0.0F), 0, 0, 1);
+  const engine::EntityHandle iris = engine::spawn_petal(
+      world, engine::test::player(world), engine::catalog::PetalId::kIrisUnusual, engine::Vec2{},
+      engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
   CHECK(iris.valid());
   if (engine::Entity* petal = world.entities().get(iris)) {
     petal->owner = player.raw;
@@ -282,8 +298,8 @@ void test_petal_special_effects() {
   CHECK(engine::has_effect(*mob_entity, engine::EffectType::kPoison));
 
   const engine::EntityHandle honey =
-      engine::spawn_petal(world, engine::test::player(world), 31, engine::Vec2{},
-                          engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
+      engine::spawn_petal(world, engine::test::player(world), engine::catalog::PetalId::kHoneyRare,
+                          engine::Vec2{}, engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
   CHECK(honey.valid());
   if (engine::Entity* petal = world.entities().get(honey)) {
     petal->owner = player.raw;
@@ -292,8 +308,8 @@ void test_petal_special_effects() {
   CHECK(engine::has_effect(*mob_entity, engine::EffectType::kSlow));
 
   const engine::EntityHandle web =
-      engine::spawn_petal(world, engine::test::player(world), 29, engine::Vec2{},
-                          engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
+      engine::spawn_petal(world, engine::test::player(world), engine::catalog::PetalId::kWebRare,
+                          engine::Vec2{}, engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
   CHECK(web.valid());
   if (engine::Entity* petal = world.entities().get(web)) {
     petal->owner = player.raw;
@@ -328,8 +344,8 @@ void test_petal_special_effects() {
   CHECK(engine::slow_multiplier(*mob_entity).value == 0.125F);
 
   const engine::EntityHandle cactus =
-      engine::spawn_petal(world, engine::test::player(world), 21, engine::Vec2{},
-                          engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
+      engine::spawn_petal(world, engine::test::player(world), engine::catalog::PetalId::kCactusEpic,
+                          engine::Vec2{}, engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
   CHECK(cactus.valid());
   if (engine::Entity* petal = world.entities().get(cactus)) {
     petal->owner = player.raw;
@@ -338,8 +354,8 @@ void test_petal_special_effects() {
   CHECK(engine::has_effect(*mob_entity, engine::EffectType::kPoison));
 
   const engine::EntityHandle peas =
-      engine::spawn_petal(world, engine::test::player(world), 11, engine::Vec2{},
-                          engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
+      engine::spawn_petal(world, engine::test::player(world), engine::catalog::PetalId::kPeasRare,
+                          engine::Vec2{}, engine::f32(65.0F), engine::f32(0.0F), 0, 0, 1);
   CHECK(peas.valid());
   if (engine::Entity* petal = world.entities().get(peas)) {
     petal->owner = player.raw;
@@ -365,7 +381,7 @@ void test_petal_special_effects() {
   const auto egg_owner = engine::spawn_player_default(eggs, engine::test::player(eggs), "egg",
                                                       engine::make_default_profile(), false);
   engine::test::player(eggs).loadout().clear();
-  CHECK(engine::test::player(eggs).loadout().equip(0U, 22U));
+  CHECK(engine::test::player(eggs).loadout().equip(0U, engine::catalog::PetalId::kEggEpic));
   CHECK(engine::spawn_loadout_petals(eggs, engine::test::player(eggs)) == 1U);
   const auto egg = engine::test::player(eggs).loadout().handle(0U, 0U);
   for (unsigned frame = 0; frame < 20U; ++frame) {
@@ -379,8 +395,7 @@ void test_petal_special_effects() {
   CHECK(hatchling != nullptr);
   if (hatchling != nullptr) {
     CHECK(hatchling->kind == engine::EntityKind::kMob &&
-          hatchling->type_id ==
-              engine::catalog::species_type_id(engine::catalog::SpeciesId::kSoldierAnt));
+          hatchling->species_id == engine::catalog::SpeciesId::kSoldierAnt);
     CHECK(hatchling->owner == egg_owner.raw);
   }
   CHECK(eggs.entities().get(egg) != nullptr && eggs.entities().get(egg)->health.value == 0.0F);

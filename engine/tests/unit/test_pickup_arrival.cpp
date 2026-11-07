@@ -24,13 +24,14 @@ int main() {
   CHECK(api.send(join, {}));
   const Vec2 position =
       api.world().entities().get(engine::test::player(api.world()).player())->position;
-  const auto old =
-      spawn_loot_drop(api.world(), 7U, position + Vec2(f32(5000.0F), f32(0.0F)), Vec2{});
+  const auto old = spawn_loot_drop(api.world(), engine::catalog::PetalId::kStingerUnusual,
+                                   position + Vec2(f32(5000.0F), f32(0.0F)), Vec2{});
   for (int i = 0; i < 3; ++i) {
     api.think();
   }
   api.world().entities().get(old)->set_position(position);
-  const auto fresh = spawn_loot_drop(api.world(), 7U, position, Vec2{});
+  const auto fresh =
+      spawn_loot_drop(api.world(), engine::catalog::PetalId::kStingerUnusual, position, Vec2{});
   const auto marked = api.domain_snapshot_bytes(1U, 0U);
   const auto has_marked_record = [](const std::vector<std::uint8_t>& bytes, std::uint32_t wire) {
     for (std::size_t index = 0; index + 4 < bytes.size(); ++index) {

@@ -31,28 +31,28 @@ class PlayerLoadout {
   static constexpr std::size_t kInstances = catalog::kInstancesPerSlot;
   static constexpr std::size_t kRechargeProgressSlots = kActiveSlots;
 
-  bool equip(std::uint8_t slot, std::uint16_t type_id);
-  bool discard(std::uint8_t slot, std::uint16_t expected_type);
-  bool discard(PlayerProfile& profile, std::uint8_t slot, std::uint16_t expected_type);
+  bool equip(std::uint8_t slot, catalog::PetalId type_id);
+  bool discard(std::uint8_t slot, catalog::PetalId expected_type);
+  bool discard(PlayerProfile& profile, std::uint8_t slot, catalog::PetalId expected_type);
   /** Retire the equipped occupant before resetting the slot, including a
    * hatched Egg's mob handle. */
   bool discard(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t slot,
-               std::uint16_t expected_type);
-  bool swap(std::uint8_t first, std::uint16_t first_type, std::uint8_t second,
-            std::uint16_t second_type);
-  bool swap(PlayerProfile& profile, std::uint8_t first, std::uint16_t first_type,
-            std::uint8_t second, std::uint16_t second_type);
+               catalog::PetalId expected_type);
+  bool swap(std::uint8_t first, catalog::PetalId first_type, std::uint8_t second,
+            catalog::PetalId second_type);
+  bool swap(PlayerProfile& profile, std::uint8_t first, catalog::PetalId first_type,
+            std::uint8_t second, catalog::PetalId second_type);
   bool swap(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t first,
-            std::uint16_t first_type, std::uint8_t second, std::uint16_t second_type);
+            catalog::PetalId first_type, std::uint8_t second, catalog::PetalId second_type);
   /** Restore carried types, including reserve slots; only active slots spawn
    * equipped entities. Backpack contents stay in the profile. */
   void restore_from_profile(const PlayerProfile& profile);
   /** Change a slot type: retire its three equipped handles (damaging live
    * petals to zero), mark pending bytes and bump the replication epoch. */
   bool change_slot_type(World& world, PlayerState& state, PlayerProfile& profile, std::uint8_t slot,
-                        std::uint16_t type_id);
+                        catalog::PetalId type_id);
   /** Profile-only slot update used by reserve/backpack helpers. */
-  bool set_slot_type(PlayerProfile& profile, std::uint8_t slot, std::uint16_t type_id);
+  bool set_slot_type(PlayerProfile& profile, std::uint8_t slot, catalog::PetalId type_id);
   /** Fill the reserve slots (active..capacity-1) with the rotating petal types
    * used by the inventory-cycle input. */
   bool cycle_reserve_slots(World& world, PlayerState& state, PlayerProfile& profile);

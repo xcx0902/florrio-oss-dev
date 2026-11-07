@@ -12,17 +12,17 @@ namespace engine {
  * is the controller's respawn survivors (at most ten). Neither list replaces
  * the corpse's carried inventory. */
 struct LootResult {
-  std::array<std::uint16_t, 3> retained{};
+  std::array<catalog::PetalId, 3> retained{};
   std::uint8_t retained_count = 0;
-  std::array<std::uint16_t, PlayerProfile::kMaxLost> lost{};
+  std::array<catalog::PetalId, PlayerProfile::kMaxLost> lost{};
   std::uint8_t lost_count = 0;
 };
 
 /** Entity drop roll: for each finalized drop entry draw one server RNG
  * fraction and compare it with base * chance. `base` is 1 in the compact world
  * and 3 otherwise. */
-[[nodiscard]] std::vector<std::uint16_t> roll_entity_loot(ServerRng& rng, std::uint16_t type_id,
-                                                          bool compact);
+[[nodiscard]] std::vector<catalog::PetalId>
+roll_entity_loot(ServerRng& rng, catalog::SpeciesId type_id, bool compact);
 
 /** Player death retention pass: group equipped and inventory petals by rarity,
  * shuffle each group, skip Basic and a 10% roll, drop the first three, save the
@@ -34,22 +34,23 @@ struct LootResult {
 /** Spawn one pickup entity for a petal type with radius 35 px, lifetime 32 s
  * (42/52/62/62 s for rarity 2..5) and a radial impulse. `base_velocity` is the
  * dead entity's velocity plus acceleration; the drop inherits it additively. */
-[[nodiscard]] EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 position,
+[[nodiscard]] EntityHandle spawn_loot_drop(World& world, catalog::PetalId petal_type, Vec2 position,
                                            Vec2 impulse = Vec2{}, Vec2d base_velocity = Vec2d{});
 
 /** Convenience: spawn every petal in a loot list at `position`, spreading
  * multi-drop impulses over the circle. Tier-5 (legendary) petals are skipped
  * when another active loadout or pickup already holds the same type. `dead`
  * identifies the dying owner so its own loadout is not treated as a duplicate. */
-std::vector<EntityHandle> spawn_loot_drops(World& world, const std::vector<std::uint16_t>& petals,
+std::vector<EntityHandle> spawn_loot_drops(World& world,
+                                           const std::vector<catalog::PetalId>& petals,
                                            Vec2 position, EntityHandle dead = EntityHandle{});
 
 /** True when a legendary petal type already exists in another active loadout or
  * as an active pickup. */
 [[nodiscard]] bool legendary_exists(const World& world, EntityHandle dead,
-                                    std::uint16_t petal_type);
+                                    catalog::PetalId petal_type);
 
 /** Lifetime in milliseconds for a pickup of the given petal type. */
-[[nodiscard]] double loot_lifetime_ms(std::uint16_t petal_type);
+[[nodiscard]] double loot_lifetime_ms(catalog::PetalId petal_type);
 
 }  // namespace engine

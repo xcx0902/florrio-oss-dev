@@ -14,10 +14,10 @@ inline constexpr std::uint64_t kSpawnCooldownTicks = 50;
                                       std::uint32_t buttons, f32 angle, f32 strength,
                                       std::uint64_t ttl_ticks = kInputTtlTicks);
 [[nodiscard]] bool discard_player_slot(World& world, PlayerId id, LifeEpoch life, std::uint8_t slot,
-                                       std::uint16_t expected_type);
+                                       catalog::PetalId expected_type);
 [[nodiscard]] bool swap_player_slots(World& world, PlayerId id, LifeEpoch life, std::uint8_t first,
-                                     std::uint16_t first_type, std::uint8_t second,
-                                     std::uint16_t second_type);
+                                     catalog::PetalId first_type, std::uint8_t second,
+                                     catalog::PetalId second_type);
 [[nodiscard]] bool leave_player(World& world, PlayerId id);
 /** Tick-boundary input expiry/lifecycle gates, before any player phase. */
 void prepare_players(World& world);

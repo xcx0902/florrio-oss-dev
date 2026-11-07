@@ -13,25 +13,20 @@
 namespace engine {
 namespace catalog {
 
-[[nodiscard]] constexpr bool is_peas_petal(std::uint16_t type_id) {
-  const PetalId id = petal_id(type_id);
+[[nodiscard]] constexpr bool is_peas_petal(PetalId id) {
   return id == PetalId::kPeasRare || id == PetalId::kPeasEpic || id == PetalId::kPeasLegendary;
 }
-[[nodiscard]] constexpr bool is_web_petal(std::uint16_t type_id) {
-  const PetalId id = petal_id(type_id);
+[[nodiscard]] constexpr bool is_web_petal(PetalId id) {
   return id == PetalId::kWebRare || id == PetalId::kWebLegendary;
 }
-[[nodiscard]] constexpr bool is_egg_petal(std::uint16_t type_id) {
-  const PetalId id = petal_id(type_id);
+[[nodiscard]] constexpr bool is_egg_petal(PetalId id) {
   return id == PetalId::kEggEpic || id == PetalId::kEggLegendary;
 }
-[[nodiscard]] constexpr bool is_centipede_species(std::uint16_t type_id) {
-  const SpeciesId id = species_id(type_id);
+[[nodiscard]] constexpr bool is_centipede_species(SpeciesId id) {
   return id == SpeciesId::kCentipedeHead || id == SpeciesId::kCentipedeSegment ||
          id == SpeciesId::kEvilCentipedeHead || id == SpeciesId::kEvilCentipedeSegment;
 }
-[[nodiscard]] constexpr bool is_ant_species(std::uint16_t type_id) {
-  const SpeciesId id = species_id(type_id);
+[[nodiscard]] constexpr bool is_ant_species(SpeciesId id) {
   return id == SpeciesId::kBabyAnt || id == SpeciesId::kWorkerAnt || id == SpeciesId::kSoldierAnt ||
          id == SpeciesId::kQueenAnt;
 }
@@ -60,7 +55,7 @@ class Catalog {
     return catalog::kSpawnRules;
   }
   /** Catalog order of a petal id, independent of numeric id density. */
-  [[nodiscard]] std::size_t petal_ordinal(std::uint16_t type_id) const {
+  [[nodiscard]] std::size_t petal_ordinal(catalog::PetalId type_id) const {
     for (std::size_t index = 0; index < petals().size(); ++index) {
       if (petals()[index].typeId == type_id) {
         return index;
@@ -69,19 +64,20 @@ class Catalog {
     return petals().size();
   }
 
-  [[nodiscard]] const catalog::PetalCatalogEntry* petal(std::uint16_t type_id) const {
+  [[nodiscard]] const catalog::PetalCatalogEntry* petal(catalog::PetalId type_id) const {
     return lookup(petals_by_id_, type_id);
   }
-  [[nodiscard]] const catalog::EntityCatalogEntry* entity(std::uint16_t type_id) const {
+  [[nodiscard]] const catalog::EntityCatalogEntry* entity(catalog::SpeciesId type_id) const {
     return lookup(entities_by_id_, type_id);
   }
-  [[nodiscard]] const catalog::EntitySpawnDefaults* spawn_defaults(std::uint16_t type_id) const {
+  [[nodiscard]] const catalog::EntitySpawnDefaults*
+  spawn_defaults(catalog::SpeciesId type_id) const {
     return lookup(spawn_defaults_by_id_, type_id);
   }
-  [[nodiscard]] const catalog::PetalCombat* petal_combat(std::uint16_t type_id) const {
+  [[nodiscard]] const catalog::PetalCombat* petal_combat(catalog::PetalId type_id) const {
     return lookup(petal_combat_by_id_, type_id);
   }
-  [[nodiscard]] const catalog::EntityDropTable* drop_table(std::uint16_t type_id) const {
+  [[nodiscard]] const catalog::EntityDropTable* drop_table(catalog::SpeciesId type_id) const {
     return lookup(drop_tables_by_id_, type_id);
   }
 
@@ -89,7 +85,7 @@ class Catalog {
   template <typename Rows>
   static auto index(const Rows& rows) {
     using Entry = std::remove_cv_t<std::remove_reference_t<decltype(rows[0])>>;
-    std::unordered_map<std::uint16_t, const Entry*> result;
+    std::unordered_map<decltype(Entry::typeId), const Entry*> result;
     result.reserve(std::size(rows));
     for (const auto& entry : rows) {
       result.emplace(entry.typeId, &entry);
@@ -97,9 +93,9 @@ class Catalog {
     return result;
   }
 
-  template <typename Entry>
-  [[nodiscard]] static const Entry*
-  lookup(const std::unordered_map<std::uint16_t, const Entry*>& index, std::uint16_t type_id) {
+  template <typename Id, typename Entry>
+  [[nodiscard]] static const Entry* lookup(const std::unordered_map<Id, const Entry*>& index,
+                                           Id type_id) {
     const auto found = index.find(type_id);
     return found == index.end() ? nullptr : found->second;
   }
@@ -110,11 +106,11 @@ class Catalog {
         petal_combat_by_id_(index(catalog::kPetalCombat)),
         drop_tables_by_id_(index(catalog::kEntityDropTables)) {}
 
-  std::unordered_map<std::uint16_t, const catalog::PetalCatalogEntry*> petals_by_id_;
-  std::unordered_map<std::uint16_t, const catalog::EntityCatalogEntry*> entities_by_id_;
-  std::unordered_map<std::uint16_t, const catalog::EntitySpawnDefaults*> spawn_defaults_by_id_;
-  std::unordered_map<std::uint16_t, const catalog::PetalCombat*> petal_combat_by_id_;
-  std::unordered_map<std::uint16_t, const catalog::EntityDropTable*> drop_tables_by_id_;
+  std::unordered_map<catalog::PetalId, const catalog::PetalCatalogEntry*> petals_by_id_;
+  std::unordered_map<catalog::SpeciesId, const catalog::EntityCatalogEntry*> entities_by_id_;
+  std::unordered_map<catalog::SpeciesId, const catalog::EntitySpawnDefaults*> spawn_defaults_by_id_;
+  std::unordered_map<catalog::PetalId, const catalog::PetalCombat*> petal_combat_by_id_;
+  std::unordered_map<catalog::SpeciesId, const catalog::EntityDropTable*> drop_tables_by_id_;
 };
 
 }  // namespace engine

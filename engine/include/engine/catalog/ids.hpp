@@ -90,18 +90,6 @@ enum class PetalBehavior : std::uint8_t {
   kRoseHeal = 1,
 };
 
-[[nodiscard]] constexpr PetalId petal_id(std::uint16_t type_id) {
-  return static_cast<PetalId>(type_id);
-}
-[[nodiscard]] constexpr SpeciesId species_id(std::uint16_t type_id) {
-  return static_cast<SpeciesId>(type_id);
-}
-[[nodiscard]] constexpr std::uint16_t petal_type_id(PetalId id) {
-  return static_cast<std::uint16_t>(id);
-}
-[[nodiscard]] constexpr std::uint16_t species_type_id(SpeciesId id) {
-  return static_cast<std::uint16_t>(id);
-}
 [[nodiscard]] constexpr std::uint8_t rarity_index(Rarity rarity) {
   return static_cast<std::uint8_t>(rarity);
 }

@@ -86,12 +86,13 @@ void test_player_loadout_replication() {
   api.init(false);
   api.set_default_dense_groups(false);
   auto profile = engine::make_default_profile();
-  profile.set_inventory(9U, 3U);  // reserve type survives profile restoration
+  profile.set_inventory(
+      9U, engine::catalog::PetalId::kHeavyCommon);  // reserve type survives profile restoration
   const auto player = engine::spawn_player_default(api.world(), engine::test::player(api.world()),
                                                    "inventory", profile, false);
   CHECK(player.valid());
   CHECK(engine::test::player(api.world()).loadout().slots()[9].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
+        engine::catalog::PetalId::kHeavyCommon);
   (void)engine::refresh_loadout_petals(api.world(), engine::test::player(api.world()), 0.0);
   const auto basic = engine::test::player(api.world()).loadout().handle(0U, 0U);
   CHECK(basic.valid());
@@ -191,7 +192,7 @@ void test_player_loadout_replication() {
   CHECK(engine::test::player(api.world()).loadout().handle(0U, 0U).valid());
   for (std::uint8_t slot = 0; slot < 16U; ++slot) {
     const auto type = engine::test::player(api.world()).loadout().slots()[slot].type_id;
-    if (type != 0U) {
+    if (type != engine::catalog::PetalId::kNone) {
       CHECK(engine::test::player(api.world())
                 .loadout()
                 .discard(engine::test::player(api.world()).profile(), slot, type));
@@ -206,7 +207,9 @@ void test_player_loadout_replication() {
   CHECK(values.score_count == 1U && values.score == 0.0F);
   // Recharge aggregation takes the least ready missing instance, rather than
   // hiding recharge behind any one surviving petal in a multi-instance slot.
-  CHECK(engine::test::player(api.world()).loadout().equip(0U, 17U));
+  CHECK(engine::test::player(api.world())
+            .loadout()
+            .equip(0U, engine::catalog::PetalId::kTripletEpic));
   engine::test::player(api.world()).loadout().slots()[0].recharge_remaining_ms = 250.0;
   engine::test::player(api.world()).loadout().set_pending(0U, 1U, true);
   engine::test::player(api.world()).loadout().set_pending_timer(0U, 1U, 2000U);
@@ -233,8 +236,8 @@ void test_snapshot_angle_quantization() {
 void test_camera_snapshot_deltas() {
   engine::WorkerApi api;
   api.init(false);
-  const auto handle =
-      api.spawn(engine::EntityKind::kMob, 4U, engine::Vec2(engine::f32(7.0F), engine::f32(8.0F)));
+  const auto handle = api.spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+                                engine::Vec2(engine::f32(7.0F), engine::f32(8.0F)));
   const auto check = [&api](unsigned sequence, bool camera_x, bool camera_y, bool dense_expected,
                             bool angle_expected = false) {
     const auto bytes = api.domain_snapshot_bytes(sequence, 0U);
@@ -312,7 +315,8 @@ void test_pickup_transfer_snapshot() {
   CHECK(engine::spawn_player(api.world(), engine::test::player(api.world()), "pickup",
                              engine::Vec2{}, engine::PlayerConfig{})
             .valid());
-  const auto drop = engine::spawn_drop(api.world(), 2U, engine::Vec2{});
+  const auto drop =
+      engine::spawn_drop(api.world(), engine::catalog::PetalId::kFastCommon, engine::Vec2{});
   CHECK(drop.valid());
   (void)api.domain_snapshot_bytes(1U, 0U);
   // simulation-tick.mjs:925 gates collection at spawn+500ms. The first
@@ -345,7 +349,7 @@ void test_pickup_transfer_snapshot() {
   CHECK(event.eof());
   CHECK(api.world().entities().get(drop)->pickup_collected);
   CHECK(engine::test::player(api.world()).loadout().slots()[0].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
+        engine::catalog::PetalId::kFastCommon);
   CHECK(engine::test::player(api.world()).loadout().pickup_transfers().empty());
   const auto next = api.domain_snapshot_bytes(12U, 0U);
   engine::ByteReader next_header(next);
@@ -465,7 +469,7 @@ void test_domain_boot_visibility() {
           break;
         case 50:
           CHECK(entity != nullptr && entity->kind == engine::EntityKind::kPetal);
-          CHECK(reader.read_u8().value() == entity->type_id);
+          CHECK(reader.read_u8().value() == engine::net::catalog_type_id(*entity));
           break;
         case 5:
         case 7:
@@ -510,8 +514,9 @@ void test_domain_snapshot() {
   engine::WorkerApi api;
   api.init();
   api.set_default_dense_groups(false);
-  const engine::EntityHandle mob = api.spawn(
-      engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(123.0F), engine::f32(-45.0F)));
+  const engine::EntityHandle mob =
+      api.spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+                engine::Vec2(engine::f32(123.0F), engine::f32(-45.0F)));
   CHECK(mob.valid());
   engine::Entity* entity = api.world().entities().get(mob);
   entity->health = engine::f32(17.0F);

@@ -34,7 +34,11 @@ struct NetworkTestAccess {
         // Fixed catalog equipment makes Alice win through real contact damage.
         // Bob's reserve items exercise the native death/drop transaction.
         for (std::uint8_t slot = 0; slot < 10; ++slot) {
-          profile.set_inventory(slot, attacker ? 26 : (slot == 0 || slot >= 5 ? 1 : 25));
+          profile.set_inventory(slot, attacker
+                                          ? engine::catalog::PetalId::kHeaviestEpic
+                                          : (slot == 0 || slot >= 5
+                                                 ? engine::catalog::PetalId::kBasicCommon
+                                                 : engine::catalog::PetalId::kAntennaeLegendary));
         }
         profile.set_inventory_count(10);
         player.profile() = profile;

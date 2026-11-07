@@ -152,7 +152,7 @@ void constrain_linked_entities(World& world) {
       if (entity.ai.predecessor.valid()) {
         continue;
       }
-      if (!catalog::is_centipede_species(entity.type_id)) {
+      if (!catalog::is_centipede_species(entity.species_id)) {
         continue;
       }
       roots.push_back(entity.handle);
@@ -168,7 +168,7 @@ std::uint32_t debug_linked_roots(const World& world) {
   world.entities().with_ordered_slots([&](auto&& slots) {
     for (const auto& entity : slots) {
       if (entity.active && !entity.children.empty() && !entity.ai.predecessor.valid() &&
-          catalog::is_centipede_species(entity.type_id)) {
+          catalog::is_centipede_species(entity.species_id)) {
         ++count;
       }
     }

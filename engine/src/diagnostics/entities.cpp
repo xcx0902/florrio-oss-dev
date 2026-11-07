@@ -30,22 +30,20 @@ bool set_entity_field(World& world, EntityHandle handle, std::uint32_t field, do
   entity->bounds_dirty = true;
   return true;
 }
-EntityHandle spawn_mob(World& world, std::uint16_t type_id, Vec2 position) {
+EntityHandle spawn_mob(World& world, catalog::SpeciesId type_id, Vec2 position) {
   return spawn_entity_from_defaults(world, EntityKind::kMob, type_id, position);
 }
-bool set_loadout_slot(World& world, PlayerId id, std::uint32_t slot, std::uint32_t type_id) {
+bool set_loadout_slot(World& world, PlayerId id, std::uint32_t slot, catalog::PetalId type_id) {
   auto* owner = world.players().get(id);
   if (owner == nullptr) {
     return false;
   }
   auto& state = *owner;
-  if (slot >= PlayerLoadout::kActiveSlots || type_id > std::numeric_limits<std::uint16_t>::max() ||
-      !state.player().valid()) {
+  if (slot >= PlayerLoadout::kActiveSlots || !state.player().valid()) {
     return false;
   }
   if (!state.loadout().change_slot_type(world, state, state.profile(),
-                                        static_cast<std::uint8_t>(slot),
-                                        static_cast<std::uint16_t>(type_id))) {
+                                        static_cast<std::uint8_t>(slot), type_id)) {
     return false;
   }
   for (std::uint8_t instance = 0; instance < PlayerLoadout::kInstances; ++instance) {

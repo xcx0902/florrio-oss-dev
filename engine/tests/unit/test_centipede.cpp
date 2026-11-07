@@ -39,7 +39,8 @@ void passive_chain() {
   const auto player =
       spawn_player(world, engine::test::player(world), "target", at(750), PlayerConfig{});
   world.random().seed(787621659U);
-  const auto head = spawn_entity_from_defaults(world, EntityKind::kMob, 15, at(0));
+  const auto head = spawn_entity_from_defaults(world, EntityKind::kMob,
+                                               engine::catalog::SpeciesId::kCentipedeHead, at(0));
   world.entities().get(player)->position = at(100);
   const auto segments = chain(world, head);
   require(segments.size() == 10, "ordinary ten-segment fixture");
@@ -70,7 +71,8 @@ void evil_chain(bool hit) {
   const auto player =
       spawn_player(world, engine::test::player(world), "target", at(750), PlayerConfig{});
   world.random().seed(787621659U);
-  const auto head = spawn_entity_from_defaults(world, EntityKind::kMob, 17, at(0));
+  const auto head = spawn_entity_from_defaults(
+      world, EntityKind::kMob, engine::catalog::SpeciesId::kEvilCentipedeHead, at(0));
   world.entities().get(player)->position = at(100);
   const auto segments = chain(world, head);
   require(segments.size() == 10, "evil ten-segment fixture");
@@ -123,7 +125,8 @@ void lethal_head(bool trace) {
   const auto player =
       spawn_player(world, engine::test::player(world), "target", at(750), PlayerConfig{});
   world.random().seed(787621659U);
-  const auto head = spawn_entity_from_defaults(world, EntityKind::kMob, 17, at(0));
+  const auto head = spawn_entity_from_defaults(
+      world, EntityKind::kMob, engine::catalog::SpeciesId::kEvilCentipedeHead, at(0));
   const auto segments = chain(world, head);
   require(segments.size() == 10, "lethal head fixture has ten segments");
   for (auto segment : segments) {
@@ -176,7 +179,8 @@ void lethal_middle() {
   const auto player =
       spawn_player(world, engine::test::player(world), "target", at(750), PlayerConfig{});
   world.random().seed(787621659U);
-  const auto head = spawn_entity_from_defaults(world, EntityKind::kMob, 17, at(0));
+  const auto head = spawn_entity_from_defaults(
+      world, EntityKind::kMob, engine::catalog::SpeciesId::kEvilCentipedeHead, at(0));
   const auto segments = chain(world, head);
   for (auto segment : segments) {
     world.entities().get(segment)->position = at(0);

@@ -15,7 +15,7 @@ void test_loadout_reserve_cycle_and_packet_cache() {
   engine::PlayerProfile profile;
   profile.set_level(20);
   for (std::uint8_t slot = 0; slot < 6; ++slot) {
-    profile.set_inventory(slot, 1);
+    profile.set_inventory(slot, engine::catalog::PetalId::kBasicCommon);
   }
   profile.set_inventory_count(6);
   const engine::EntityHandle player = engine::spawn_player(
@@ -29,13 +29,13 @@ void test_loadout_reserve_cycle_and_packet_cache() {
       world, engine::test::player(world), engine::test::player(world).profile()));
   CHECK(engine::test::player(world).loadout().packet_cache_epoch() > epoch_before);
   CHECK(engine::test::player(world).loadout().slots()[6].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+        engine::catalog::PetalId::kBasicCommon);
   CHECK(engine::test::player(world).loadout().slots()[7].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+        engine::catalog::PetalId::kBasicCommon);
   CHECK(engine::test::player(world).loadout().slots()[8].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kFastCommon));
+        engine::catalog::PetalId::kFastCommon);
   CHECK(engine::test::player(world).loadout().slots()[13].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kStingerUnusual));
+        engine::catalog::PetalId::kStingerUnusual);
   const engine::Entity* player_entity = world.entities().get(player);
   CHECK(player_entity != nullptr);
   CHECK(player_entity->packet_epoch_a ==
@@ -44,21 +44,25 @@ void test_loadout_reserve_cycle_and_packet_cache() {
         engine::test::player(world).loadout().packet_cache_epoch());
   // A full backpack shifts its oldest entry before appending the discarded petal.
   for (std::uint16_t item = 1; item <= 16; ++item) {
-    engine::test::player(world).profile().push_backpack(item);
+    engine::test::player(world).profile().push_backpack(
+        static_cast<engine::catalog::PetalId>(item));
   }
   CHECK(engine::test::player(world).profile().backpack_count() == 16U);
-  CHECK(engine::test::player(world).profile().backpack()[0] == 1U);
-  engine::test::player(world).profile().push_backpack(30U);
+  CHECK(engine::test::player(world).profile().backpack()[0] ==
+        engine::catalog::PetalId::kBasicCommon);
+  engine::test::player(world).profile().push_backpack(engine::catalog::PetalId::kWebLegendary);
   CHECK(engine::test::player(world).profile().backpack_count() == 16U);
-  CHECK(engine::test::player(world).profile().backpack()[0] == 2U);
-  CHECK(engine::test::player(world).profile().backpack()[15] == 30U);
+  CHECK(engine::test::player(world).profile().backpack()[0] ==
+        engine::catalog::PetalId::kFastCommon);
+  CHECK(engine::test::player(world).profile().backpack()[15] ==
+        engine::catalog::PetalId::kWebLegendary);
 }
 
 void test_contact_nearest_candidate_first() {
   engine::World world;
   world.initialize();
   const auto spawn = [&world](float x) {
-    return engine::spawn_entity(world, engine::EntityKind::kMob, 1,
+    return engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
                                 engine::Vec2(engine::f32(x), engine::f32(0.0F)),
                                 engine::f32(10.0F));
   };
@@ -87,7 +91,8 @@ void test_chain_constraint_clamps_segments() {
   engine::World world;
   world.initialize();
   const engine::EntityHandle head = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 15, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kCentipedeHead,
+      engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(head.valid());
   engine::Entity* head_entity = world.entities().get(head);
   CHECK(head_entity != nullptr);
@@ -125,8 +130,8 @@ void test_collision_bounds_cache_rebuild_counter() {
   engine::World world;
   world.initialize();
   const engine::EntityHandle handle = engine::spawn_entity(
-      world, engine::EntityKind::kMob, 1, engine::Vec2(engine::f32(12.0F), engine::f32(-4.0F)),
-      engine::f32(18.0F));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
+      engine::Vec2(engine::f32(12.0F), engine::f32(-4.0F)), engine::f32(18.0F));
   CHECK(handle.valid());
   const std::uint64_t before = world.bounds_rebuilds();
   const engine::EntityBounds first = engine::collision_bounds(world, handle);
@@ -148,13 +153,13 @@ void test_loadout_shared_orbit_pending_cache() {
   engine::PlayerLoadout loadout;
   // Rose (24) has sharedOrbit and three instances: the special branch gives every
   // live instance the same cache index and advances once for the slot.
-  CHECK(loadout.equip(0, 24));
+  CHECK(loadout.equip(0, engine::catalog::PetalId::kRoseRare));
   CHECK(loadout.pending_cache_count() == 1U);
   CHECK(loadout.pending_cache(0, 0) == 0U);
   CHECK(loadout.pending_cache(0, 1) == 0U);
   CHECK(loadout.pending_cache(0, 2) == 0U);
   loadout.set_handle(0, 0, engine::EntityHandle::from_parts(7, 1));
-  CHECK(loadout.equip(1, 1));
+  CHECK(loadout.equip(1, engine::catalog::PetalId::kBasicCommon));
   CHECK(loadout.pending_cache(0, 0) == 0U);
   CHECK(loadout.pending_cache(0, 1) == 0U);
   CHECK(loadout.pending_cache(0, 2) == 0U);
@@ -162,46 +167,48 @@ void test_loadout_shared_orbit_pending_cache() {
   CHECK(loadout.pending_cache_count() == 2U);
   // The function-85 total is captured at the active-slot band, not at slot 8.
   loadout.set_active_slots(5);
-  CHECK(loadout.equip(2, 1));
-  CHECK(loadout.equip(3, 1));
-  CHECK(loadout.equip(4, 1));
-  CHECK(loadout.equip(5, 1));
+  CHECK(loadout.equip(2, engine::catalog::PetalId::kBasicCommon));
+  CHECK(loadout.equip(3, engine::catalog::PetalId::kBasicCommon));
+  CHECK(loadout.equip(4, engine::catalog::PetalId::kBasicCommon));
+  CHECK(loadout.equip(5, engine::catalog::PetalId::kBasicCommon));
   CHECK(loadout.pending_cache(5, 0) == 5U);    // still gets an order
   CHECK(loadout.pending_cache_count() == 5U);  // captured after slot 4
 }
 
 void test_loadout_slot_epochs_bump_on_change() {
   engine::PlayerLoadout loadout;
-  CHECK(loadout.equip(0, 1));
+  CHECK(loadout.equip(0, engine::catalog::PetalId::kBasicCommon));
   const std::uint32_t first = loadout.slot_epoch(0);
   CHECK(first > 0U);
-  CHECK(loadout.equip(1, 6));
+  CHECK(loadout.equip(1, engine::catalog::PetalId::kRoseUnusual));
   const std::uint32_t second = loadout.slot_epoch(1);
   CHECK(second > first);
   CHECK(loadout.slot_epoch(0) == first);  // untouched slot keeps its epoch
-  CHECK(loadout.discard(0, 1));
+  CHECK(loadout.discard(0, engine::catalog::PetalId::kBasicCommon));
   CHECK(loadout.slot_epoch(0) > first);
-  CHECK(loadout.equip(2, 1));
+  CHECK(loadout.equip(2, engine::catalog::PetalId::kBasicCommon));
   const std::uint32_t third = loadout.slot_epoch(2);
-  CHECK(loadout.swap(1, 6, 2, 1));
+  CHECK(loadout.swap(1, engine::catalog::PetalId::kRoseUnusual, 2,
+                     engine::catalog::PetalId::kBasicCommon));
   CHECK(loadout.slot_epoch(1) > second);
   CHECK(loadout.slot_epoch(2) > third);
 }
 
 void test_loadout_pending_cache_order() {
   engine::PlayerLoadout loadout;
-  CHECK(loadout.equip(0, 17));  // Triplet: three instances per slot
+  CHECK(loadout.equip(
+      0, engine::catalog::PetalId::kTripletEpic));  // Triplet: three instances per slot
   CHECK(loadout.pending_cache_count() == 3U);
   CHECK(loadout.pending_cache(0, 0) == 0U);
   CHECK(loadout.pending_cache(0, 1) == 1U);
   CHECK(loadout.pending_cache(0, 2) == 2U);
   loadout.set_handle(0, 0, engine::EntityHandle::from_parts(5, 1));
-  CHECK(loadout.equip(1, 1));  // Basic: one instance per slot
+  CHECK(loadout.equip(1, engine::catalog::PetalId::kBasicCommon));  // Basic: one instance per slot
   CHECK(loadout.pending_cache_count() == 4U);
   CHECK(loadout.pending_cache(1, 0) == 3U);
   CHECK(loadout.pending_cache(1, 1) == 0U);
   CHECK(loadout.pending_cache(1, 2) == 0U);
-  CHECK(loadout.equip(2, 1));
+  CHECK(loadout.equip(2, engine::catalog::PetalId::kBasicCommon));
   CHECK(loadout.pending_cache(2, 0) == 4U);
   loadout.clear();
   CHECK(loadout.pending_cache_count() == 0U);
@@ -212,7 +219,7 @@ void test_effect_payload_released_on_destroy() {
   engine::World world;
   world.initialize();
   const engine::EntityHandle target =
-      engine::spawn_entity(world, engine::EntityKind::kMob, 1,
+      engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
                            engine::Vec2(engine::f32(10.0F), engine::f32(0.0F)), engine::f32(20.0F));
   CHECK(target.valid());
   engine::Entity* entity = world.entities().get(target);
@@ -259,8 +266,8 @@ void test_tick_phase_trace() {
     const auto player = engine::spawn_player(pickup_world, engine::test::player(pickup_world),
                                              "phase", engine::Vec2{}, {});
     const float drop_x = entering ? 74.0F : 69.0F;
-    const auto drop =
-        engine::spawn_drop(pickup_world, 2, engine::Vec2(engine::f32(drop_x), engine::f32(0.0F)));
+    const auto drop = engine::spawn_drop(pickup_world, engine::catalog::PetalId::kFastCommon,
+                                         engine::Vec2(engine::f32(drop_x), engine::f32(0.0F)));
     CHECK(player.valid() && drop.valid());
     if (!player.valid() || !drop.valid()) {
       return;
@@ -279,7 +286,8 @@ void test_tick_phase_trace() {
     CHECK(pickup->pickup_collected == !entering);
     CHECK(engine::test::player(pickup_world).loadout().pickup_transfers().size() ==
           (entering ? 0U : 1U));
-    CHECK(engine::test::player(pickup_world).profile().inventory(0) == (entering ? 0U : 2U));
+    CHECK(engine::test::player(pickup_world).profile().inventory(0) ==
+          (entering ? engine::catalog::PetalId::kNone : engine::catalog::PetalId::kFastCommon));
   }
 }
 
@@ -298,7 +306,7 @@ void test_deferred_launch_due_order() {
   engine::World world;
   world.initialize();
   const engine::EntityHandle child =
-      engine::spawn_entity(world, engine::EntityKind::kPetal, 11,
+      engine::spawn_entity(world, engine::EntityKind::kPetal, engine::catalog::PetalId::kPeasRare,
                            engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::f32(5.0F));
   CHECK(child.valid());
   world.schedule_deferred_launch(100.0, engine::f32(0.0F), {child});

@@ -20,7 +20,7 @@ void require(bool condition, const char* message) {
   std::exit(1);
 }
 
-engine::EntityHandle setup(engine::World& world, std::uint16_t type) {
+engine::EntityHandle setup(engine::World& world, engine::catalog::PetalId type) {
   world.initialize();
   world.set_auto_populate(false);
   const auto owner = engine::spawn_player_default(world, engine::test::player(world), "rose",
@@ -36,14 +36,16 @@ engine::EntityHandle setup(engine::World& world, std::uint16_t type) {
   return owner;
 }
 
-void recharge_cycles(std::uint16_t type) {
+void recharge_cycles(engine::catalog::PetalId type) {
   engine::World world;
   const auto owner = setup(world, type);
   const auto old = engine::test::player(world).loadout().handles(0);
   const auto count = engine::test::player(world).loadout().slots()[0].count;
   const auto* combat = engine::Catalog::instance().petal_combat(type);
   require(combat != nullptr, "catalog exists");
-  const float heal = type == 6U ? 10.0F : type == 15U ? 22.0F : 3.5F;
+  const float heal = type == engine::catalog::PetalId::kRoseUnusual ? 10.0F
+                     : type == engine::catalog::PetalId::kRoseEpic  ? 22.0F
+                                                                    : 3.5F;
   for (int cycle = 0; cycle < 2; ++cycle) {
     const auto handles = engine::test::player(world).loadout().handles(0);
     const double start = world.time_ms();
@@ -97,7 +99,8 @@ void timer_boundary() {
   const auto owner = engine::spawn_player_default(world, engine::test::player(world), "late",
                                                   engine::make_default_profile());
   engine::test::player(world).loadout().clear();
-  require(engine::test::player(world).loadout().equip(0, 6), "late Rose equips");
+  require(engine::test::player(world).loadout().equip(0, engine::catalog::PetalId::kRoseUnusual),
+          "late Rose equips");
   require(engine::spawn_loadout_petals(world, engine::test::player(world)) == 1U,
           "late Rose spawns");
   auto* player = world.entities().get(owner);
@@ -120,9 +123,11 @@ void timer_boundary() {
 // movement or regeneration pass obscures the callback.
 void trace() {
   std::printf("[");
-  for (const auto type : {6U, 15U, 24U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kRoseUnusual, engine::catalog::PetalId::kRoseEpic,
+        engine::catalog::PetalId::kRoseRare}) {
     engine::World world;
-    const auto owner = setup(world, static_cast<std::uint16_t>(type));
+    const auto owner = setup(world, type);
     // The callback comparison uses one instance for each variant.
     while (engine::test::player(world).petals().size() > 1U) {
       engine::test::player(world).petals().pop_back();
@@ -134,7 +139,8 @@ void trace() {
     auto* petal = world.entities().get(petal_handle);
     petal->set_position_x(engine::f32(3.0F));
     petal->set_position_y(engine::f32(4.0F));
-    std::printf("%s{\"type\":%u,\"frames\":[", type == 6U ? "" : ",", type);
+    std::printf("%s{\"type\":%u,\"frames\":[",
+                type == engine::catalog::PetalId::kRoseUnusual ? "" : ",", type);
     for (int frame = 1; frame <= 29; ++frame) {
       world.set_time_ms(frame * 50.0);
       engine::update_petal_orbits(world, engine::test::player(world), 50.0);
@@ -155,10 +161,13 @@ void trace() {
 
 void lifecycle_trace() {
   std::printf("[");
-  for (const auto type : {6U, 15U, 24U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kRoseUnusual, engine::catalog::PetalId::kRoseEpic,
+        engine::catalog::PetalId::kRoseRare}) {
     engine::World world;
-    const auto owner = setup(world, static_cast<std::uint16_t>(type));
-    std::printf("%s{\"type\":%u,\"frames\":[", type == 6U ? "" : ",", type);
+    const auto owner = setup(world, type);
+    std::printf("%s{\"type\":%u,\"frames\":[",
+                type == engine::catalog::PetalId::kRoseUnusual ? "" : ",", type);
     for (int frame = 1; frame <= 200; ++frame) {
       engine::tick(world, 50.0);
       unsigned alive = 0;
@@ -190,8 +199,10 @@ int main(int argc, char** argv) {
     lifecycle_trace();
     return 0;
   }
-  for (const auto type : {6U, 15U, 24U}) {
-    recharge_cycles(static_cast<std::uint16_t>(type));
+  for (const auto type :
+       {engine::catalog::PetalId::kRoseUnusual, engine::catalog::PetalId::kRoseEpic,
+        engine::catalog::PetalId::kRoseRare}) {
+    recharge_cycles(type);
   }
   timer_boundary();
   std::puts("Rose variants, repeated recharge, simultaneous consumption and strict timer: passed");

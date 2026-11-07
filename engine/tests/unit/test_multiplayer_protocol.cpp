@@ -204,8 +204,7 @@ void commands_are_bounded_idempotent_and_life_scoped() {
   CHECK(peer.queue_command(*world, c, 7).code == ResultCode::Ok);
   ++world->players().get(id)->life_epoch;
   CHECK(peer.execute_commands(*world, chats).front().code == ResultCode::StaleLife);
-  CHECK(world->players().get(id)->loadout().slots()[0].type_id ==
-        catalog::petal_type_id(catalog::PetalId::kBasicCommon));
+  CHECK(world->players().get(id)->loadout().slots()[0].type_id == catalog::PetalId::kBasicCommon);
   c.kind = CommandKind::Chat;
   c.text = "x";
   for (unsigned i = 3; i < 131; i++) {

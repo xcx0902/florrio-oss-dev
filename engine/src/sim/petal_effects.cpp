@@ -32,24 +32,24 @@ struct PetalEffectSpec {
 //   31 HoneyR2 slot4       slow 4000
 //   34 PeasR4 slot4        poison 16000/9
 //   29/30 WebR2/R4 slot6   ground area with permanent 0.25 speed multiplier
-constexpr bool effect_for_type(std::uint16_t type, PetalEffectSpec& spec) {
+constexpr bool effect_for_type(catalog::PetalId type, PetalEffectSpec& spec) {
   switch (type) {
-    case 8:
+    case catalog::PetalId::kIrisUnusual:
       spec = {EffectType::kPoison, 20000.0 / 3.0, false};
       return true;
-    case 12:
+    case catalog::PetalId::kPeasEpic:
       spec = {EffectType::kPoison, 8000.0 / 9.0, false};
       return true;
-    case 20:
+    case catalog::PetalId::kDandelionRare:
       spec = {EffectType::kHealBlock, 10000.0, false};
       return true;
-    case 21:
+    case catalog::PetalId::kCactusEpic:
       spec = {EffectType::kPoison, 20000.0 / 3.0, false};
       return true;
-    case 31:
+    case catalog::PetalId::kHoneyRare:
       spec = {EffectType::kSlow, 4000.0, false};
       return true;
-    case 34:
+    case catalog::PetalId::kPeasLegendary:
       spec = {EffectType::kPoison, 16000.0 / 9.0, false};
       return true;
     default:
@@ -57,7 +57,7 @@ constexpr bool effect_for_type(std::uint16_t type, PetalEffectSpec& spec) {
   }
 }
 
-f32 poison_intensity(std::uint16_t type) {
+f32 poison_intensity(catalog::PetalId type) {
   const auto* combat = Catalog::instance().petal_combat(type);
   if (combat == nullptr || !(combat->damage > 0.0F)) {
     return f32(1.0F);
@@ -70,7 +70,7 @@ void split_peas(World& world, EntityHandle petal_handle) {
   if (petal == nullptr) {
     return;
   }
-  const std::uint16_t type = petal->type_id;
+  const catalog::PetalId type = petal->petal_id;
   const Vec2 position = petal->position;
   const auto* combat = Catalog::instance().petal_combat(type);
   if (combat == nullptr) {
@@ -98,10 +98,10 @@ void split_peas(World& world, EntityHandle petal_handle) {
     entity->lifetime_remaining_ms = 1000.0;
     entity->petal_launched = true;
     entity->petal_variant_flags = 0U;
-    if (catalog::petal_id(type) == catalog::PetalId::kPeasLegendary) {
+    if (type == catalog::PetalId::kPeasLegendary) {
       set_flag(entity->petal_variant_flags, PetalVariantFlag::kEpicColor, true);
       set_flag(entity->petal_variant_flags, PetalVariantFlag::kLarge, true);
-    } else if (catalog::petal_id(type) == catalog::PetalId::kPeasEpic) {
+    } else if (type == catalog::PetalId::kPeasEpic) {
       set_flag(entity->petal_variant_flags, PetalVariantFlag::kEpicColor, true);
     }
     children.push_back(child);
@@ -141,7 +141,7 @@ void spawn_web_tag(World& world, EntityHandle petal_handle, Vec2 position) {
                                  ? EntityHandle{}
                                  : EntityHandle{petal->owner};
   const EntityHandle tag =
-      spawn_entity(world, EntityKind::kProjectile, petal->type_id, position, f32(50.0F));
+      spawn_entity(world, EntityKind::kProjectile, petal->petal_id, position, f32(50.0F));
   if (!tag.valid()) {
     return;
   }
@@ -177,10 +177,10 @@ void spawn_web_tag(World& world, EntityHandle petal_handle, Vec2 position) {
 bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::uint8_t buttons) {
   const auto type = state.type_id;
   const bool peas = catalog::is_peas_petal(type);
-  const bool aimed = catalog::petal_id(type) == catalog::PetalId::kMissileRare ||
-                     catalog::petal_id(type) == catalog::PetalId::kDandelionRare;
+  const bool aimed =
+      type == catalog::PetalId::kMissileRare || type == catalog::PetalId::kDandelionRare;
   const bool web = catalog::is_web_petal(type);
-  const bool pollen = catalog::petal_id(type) == catalog::PetalId::kPollenEpic;
+  const bool pollen = type == catalog::PetalId::kPollenEpic;
   if (!peas && !aimed && !web && !pollen) {
     return false;
   }
@@ -224,7 +224,7 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::ui
     petal->lifetime_remaining_ms =
         f32(f32(draw.value * f32(1000.0 / 2147483648.0).value).value + 4500.0F).value;
   } else {
-    const bool round = web || catalog::petal_id(type) == catalog::PetalId::kDandelionRare;
+    const bool round = web || type == catalog::PetalId::kDandelionRare;
     if (round) {
       ux = f32(ux).value;
       uy = f32(uy).value;
@@ -247,7 +247,7 @@ bool update_projectile_petal_orbit(World& world, PetalOrbitState& state, std::ui
 
 void on_petal_death(World& world, EntityHandle handle) {
   Entity* petal = world.entities().get(handle);
-  if (petal == nullptr || !petal->petal_launched || !catalog::is_web_petal(petal->type_id)) {
+  if (petal == nullptr || !petal->petal_launched || !catalog::is_web_petal(petal->petal_id)) {
     return;
   }
   petal->petal_launched = false;
@@ -259,7 +259,7 @@ bool consume_peas_attack(World& world, EntityHandle petal_handle, EntityHandle o
   if (petal == nullptr) {
     return false;
   }
-  if (!catalog::is_peas_petal(petal->type_id)) {
+  if (!catalog::is_peas_petal(petal->petal_id)) {
     return false;
   }
   if (EntityHandle{petal->owner} != owner) {
@@ -282,7 +282,7 @@ void on_petal_hit(World& world, EntityHandle petal_handle, EntityHandle target_h
   if (target->health.value <= 0.0F) {
     return;
   }
-  const std::uint16_t type = petal->type_id;
+  const catalog::PetalId type = petal->petal_id;
   PetalEffectSpec spec{};
   if (effect_for_type(type, spec)) {
     const f32 intensity = spec.type == EffectType::kPoison ? poison_intensity(type)
@@ -297,7 +297,7 @@ void on_petal_hit(World& world, EntityHandle petal_handle, EntityHandle target_h
 
 void on_petal_incoming_hit(World& world, EntityHandle petal_handle, EntityHandle attacker) {
   Entity* petal = world.entities().get(petal_handle);
-  if (petal == nullptr || catalog::petal_id(petal->type_id) != catalog::PetalId::kCactusEpic) {
+  if (petal == nullptr || petal->petal_id != catalog::PetalId::kCactusEpic) {
     return;
   }
   if (!attacker.valid() || same_controlling_root(world, petal_handle, attacker)) {

@@ -1,3 +1,4 @@
+#include "engine/net/catalog_id.hpp"
 #include "engine/core/perf.hpp"
 #include "engine/net/snapshot_codec.hpp"
 #include "engine/catalog/loadout_rules.hpp"
@@ -502,7 +503,7 @@ void SnapshotEncoder::write_dense_default_groups(const Entity& entity) {
   updates_.write_u8(62U);  // flags=8 (dense) XOR 54
   // drop-state, then ai-activity.
   updates_.write_u8(entity.kind == EntityKind::kDrop
-                        ? static_cast<std::uint8_t>(entity.type_id)
+                        ? static_cast<std::uint8_t>(net::catalog_type_id(entity))
                         : static_cast<std::uint8_t>(entity.entity_flags));
   updates_.write_u8(entity.kind == EntityKind::kDrop
                         ? (entity.pickup_collected ? 1U : 0U)
@@ -531,8 +532,9 @@ void SnapshotEncoder::write_dense_default_groups(const Entity& entity) {
   // collision-radius: the interpolated collider radius (field 7).
   updates_.write_f32_le(entity.collision_radius.value);
   // identity base (flags bit 64 is clear).
-  updates_.write_u8(entity.kind == EntityKind::kPlayer ? entity.player_look
-                                                       : static_cast<std::uint8_t>(entity.type_id));
+  updates_.write_u8(entity.kind == EntityKind::kPlayer
+                        ? entity.player_look
+                        : static_cast<std::uint8_t>(net::catalog_type_id(entity)));
   updates_.write_u8(static_cast<std::uint8_t>(entity.kind));
   updates_.write_u8(entity.kind == EntityKind::kPlayer ? entity.player_expression
                                                        : entity.loadout_instance);
@@ -549,8 +551,9 @@ void SnapshotEncoder::write_dense_public_groups(const Entity& entity) {
   updates_.write_f32_le(entity.position.y.value);
   updates_.write_f32_le(entity.position.x.value);
   updates_.write_f32_le(entity.collision_radius.value);
-  updates_.write_u8(entity.kind == EntityKind::kPlayer ? entity.player_look
-                                                       : static_cast<std::uint8_t>(entity.type_id));
+  updates_.write_u8(entity.kind == EntityKind::kPlayer
+                        ? entity.player_look
+                        : static_cast<std::uint8_t>(net::catalog_type_id(entity)));
   updates_.write_u8(static_cast<std::uint8_t>(entity.kind));
   updates_.write_u8(entity.kind == EntityKind::kPlayer ? entity.player_expression
                                                        : entity.loadout_instance);

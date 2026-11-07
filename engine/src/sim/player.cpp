@@ -26,11 +26,11 @@ constexpr auto kRareStarterPetal = catalog::PetalId::kBasicUnique;
 void PlayerProfile::clear() {
   level_ = 0;
   experience_ = f32(0.0F);
-  inventory_.fill(0);
+  inventory_.fill(catalog::PetalId::kNone);
   inventory_count_ = 0;
-  lost_items_.fill(0);
+  lost_items_.fill(catalog::PetalId::kNone);
   lost_count_ = 0;
-  backpack_.fill(0);
+  backpack_.fill(catalog::PetalId::kNone);
   backpack_count_ = 0;
 }
 
@@ -86,9 +86,9 @@ EntityHandle spawn_player(World& world, PlayerState& state, std::string_view nam
   if (!can_spawn_player(world, state)) {
     return {};
   }
-  const EntityHandle handle = spawn_entity(
-      world, EntityKind::kPlayer, catalog::species_type_id(catalog::SpeciesId::kNone), position,
-      config.radius, kPlayerSpawnWorldFlags, static_cast<std::uint8_t>(EntityFlag::kOwned));
+  const EntityHandle handle =
+      spawn_entity(world, EntityKind::kPlayer, catalog::SpeciesId::kNone, position, config.radius,
+                   kPlayerSpawnWorldFlags, static_cast<std::uint8_t>(EntityFlag::kOwned));
   if (!handle.valid()) {
     return EntityHandle{};
   }
@@ -118,7 +118,7 @@ PlayerProfile make_default_profile() {
   profile.set_experience(f32(0.0F));
   const std::uint8_t active = profile.active_slots();
   for (std::uint8_t slot = 0; slot < active; ++slot) {
-    profile.set_inventory(slot, catalog::petal_type_id(kStarterPetal));
+    profile.set_inventory(slot, kStarterPetal);
   }
   profile.set_inventory_count(active);
   return profile;
@@ -133,7 +133,7 @@ PlayerProfile make_respawn_profile(const PlayerState& state) {
     profile.set_inventory(index, state.last_death_kept()[index]);
   }
   while (count < profile.active_slots()) {
-    profile.set_inventory(count++, catalog::petal_type_id(kStarterPetal));
+    profile.set_inventory(count++, kStarterPetal);
   }
   profile.set_inventory_count(count);
   return profile;
@@ -238,11 +238,11 @@ EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_
     // Spawn restores survivors first, then fills the active row. The rare
     // starter can replace the first filler, never a surviving petal.
     for (std::uint8_t slot = 0; slot < profile.active_slots(); ++slot) {
-      if (catalog::petal_id(profile.inventory(slot)) != kStarterPetal) {
+      if (profile.inventory(slot) != kStarterPetal) {
         continue;
       }
-      if (!legendary_exists(world, EntityHandle{}, catalog::petal_type_id(kRareStarterPetal))) {
-        profile.set_inventory(slot, catalog::petal_type_id(kRareStarterPetal));
+      if (!legendary_exists(world, EntityHandle{}, kRareStarterPetal)) {
+        profile.set_inventory(slot, kRareStarterPetal);
       }
       break;
     }

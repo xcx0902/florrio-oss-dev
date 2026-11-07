@@ -21,15 +21,67 @@ void require(bool condition, const char* message) {
 struct Case {
   std::uint8_t level, respawn_level;
   float score;
-  std::vector<std::uint16_t> survivors, drops;
+  std::vector<engine::catalog::PetalId> survivors, drops;
 };
 const std::array<Case, 6> cases{{
-    {1, 1, 0, {15, 9, 10, 18, 8, 7, 6, 2}, {19, 12, 22}},
-    {14, 10, 86, {15, 9, 10, 18, 8, 7, 6, 2}, {19, 12, 22}},
-    {15, 11, 105, {15, 9, 10, 18, 29, 6, 7, 8, 2}, {19, 12, 22}},
-    {30, 22, 577, {12, 22, 9, 29, 18, 10, 6, 7, 8}, {34, 15, 19}},
-    {45, 33, 2008, {12, 22, 9, 29, 18, 10, 36, 8, 7, 2}, {34, 15, 19}},
-    {99, 74, 66523, {12, 22, 9, 29, 18, 10, 36, 8, 7, 2}, {34, 15, 19}},
+    {1,
+     1,
+     0,
+     {engine::catalog::PetalId::kRoseEpic, engine::catalog::PetalId::kWingRare,
+      engine::catalog::PetalId::kMissileRare, engine::catalog::PetalId::kBubbleRare,
+      engine::catalog::PetalId::kIrisUnusual, engine::catalog::PetalId::kStingerUnusual,
+      engine::catalog::PetalId::kRoseUnusual, engine::catalog::PetalId::kFastCommon},
+     {engine::catalog::PetalId::kPollenEpic, engine::catalog::PetalId::kPeasEpic,
+      engine::catalog::PetalId::kEggEpic}},
+    {14,
+     10,
+     86,
+     {engine::catalog::PetalId::kRoseEpic, engine::catalog::PetalId::kWingRare,
+      engine::catalog::PetalId::kMissileRare, engine::catalog::PetalId::kBubbleRare,
+      engine::catalog::PetalId::kIrisUnusual, engine::catalog::PetalId::kStingerUnusual,
+      engine::catalog::PetalId::kRoseUnusual, engine::catalog::PetalId::kFastCommon},
+     {engine::catalog::PetalId::kPollenEpic, engine::catalog::PetalId::kPeasEpic,
+      engine::catalog::PetalId::kEggEpic}},
+    {15,
+     11,
+     105,
+     {engine::catalog::PetalId::kRoseEpic, engine::catalog::PetalId::kWingRare,
+      engine::catalog::PetalId::kMissileRare, engine::catalog::PetalId::kBubbleRare,
+      engine::catalog::PetalId::kWebRare, engine::catalog::PetalId::kRoseUnusual,
+      engine::catalog::PetalId::kStingerUnusual, engine::catalog::PetalId::kIrisUnusual,
+      engine::catalog::PetalId::kFastCommon},
+     {engine::catalog::PetalId::kPollenEpic, engine::catalog::PetalId::kPeasEpic,
+      engine::catalog::PetalId::kEggEpic}},
+    {30,
+     22,
+     577,
+     {engine::catalog::PetalId::kPeasEpic, engine::catalog::PetalId::kEggEpic,
+      engine::catalog::PetalId::kWingRare, engine::catalog::PetalId::kWebRare,
+      engine::catalog::PetalId::kBubbleRare, engine::catalog::PetalId::kMissileRare,
+      engine::catalog::PetalId::kRoseUnusual, engine::catalog::PetalId::kStingerUnusual,
+      engine::catalog::PetalId::kIrisUnusual},
+     {engine::catalog::PetalId::kPeasLegendary, engine::catalog::PetalId::kRoseEpic,
+      engine::catalog::PetalId::kPollenEpic}},
+    {45,
+     33,
+     2008,
+     {engine::catalog::PetalId::kPeasEpic, engine::catalog::PetalId::kEggEpic,
+      engine::catalog::PetalId::kWingRare, engine::catalog::PetalId::kWebRare,
+      engine::catalog::PetalId::kBubbleRare, engine::catalog::PetalId::kMissileRare,
+      engine::catalog::PetalId::kSaltRare, engine::catalog::PetalId::kIrisUnusual,
+      engine::catalog::PetalId::kStingerUnusual, engine::catalog::PetalId::kFastCommon},
+     {engine::catalog::PetalId::kPeasLegendary, engine::catalog::PetalId::kRoseEpic,
+      engine::catalog::PetalId::kPollenEpic}},
+    {99,
+     74,
+     66523,
+     {engine::catalog::PetalId::kPeasEpic, engine::catalog::PetalId::kEggEpic,
+      engine::catalog::PetalId::kWingRare, engine::catalog::PetalId::kWebRare,
+      engine::catalog::PetalId::kBubbleRare, engine::catalog::PetalId::kMissileRare,
+      engine::catalog::PetalId::kSaltRare, engine::catalog::PetalId::kIrisUnusual,
+      engine::catalog::PetalId::kStingerUnusual, engine::catalog::PetalId::kFastCommon},
+     {engine::catalog::PetalId::kPeasLegendary, engine::catalog::PetalId::kRoseEpic,
+      engine::catalog::PetalId::kPollenEpic}},
 }};
 
 void death_lifecycle(const Case& expected, bool restart_opcode) {
@@ -39,8 +91,15 @@ void death_lifecycle(const Case& expected, bool restart_opcode) {
   const std::array<std::uint8_t, 3> join{0, 6, 0};
   require(api.send(join, {}), "initial protocol spawn");
   const auto body = engine::test::player(world).player();
-  const std::array<std::uint16_t, 16> carried{1,  2,  6,  7,  8,  9,  10, 12,
-                                              15, 18, 19, 22, 25, 29, 34, 36};
+  const std::array<engine::catalog::PetalId, 16> carried{
+      engine::catalog::PetalId::kBasicCommon,       engine::catalog::PetalId::kFastCommon,
+      engine::catalog::PetalId::kRoseUnusual,       engine::catalog::PetalId::kStingerUnusual,
+      engine::catalog::PetalId::kIrisUnusual,       engine::catalog::PetalId::kWingRare,
+      engine::catalog::PetalId::kMissileRare,       engine::catalog::PetalId::kPeasEpic,
+      engine::catalog::PetalId::kRoseEpic,          engine::catalog::PetalId::kBubbleRare,
+      engine::catalog::PetalId::kPollenEpic,        engine::catalog::PetalId::kEggEpic,
+      engine::catalog::PetalId::kAntennaeLegendary, engine::catalog::PetalId::kWebRare,
+      engine::catalog::PetalId::kPeasLegendary,     engine::catalog::PetalId::kSaltRare};
   engine::test::player(world).profile().set_level(expected.level);
   engine::test::player(world).profile().set_experience(engine::f32(2.5F));
   for (std::uint8_t i = 0; i < carried.size(); ++i) {
@@ -72,7 +131,7 @@ void death_lifecycle(const Case& expected, bool restart_opcode) {
   }
   require(world.pickups().size() == expected.drops.size(), "ground drop count");
   for (std::size_t i = 0; i < expected.drops.size(); ++i) {
-    require(world.entities().get(world.pickups()[i])->type_id == expected.drops[i],
+    require(world.entities().get(world.pickups()[i])->petal_id == expected.drops[i],
             "ground drop order");
   }
   const std::array<std::uint8_t, 3> too_early{2, 6, 0};
@@ -109,8 +168,9 @@ void death_lifecycle(const Case& expected, bool restart_opcode) {
           "points rebuilt from level thresholds");
   for (std::uint8_t i = 0; i < carried.size(); ++i) {
     const auto type = i < expected.survivors.size() ? expected.survivors[i]
-                      : i < engine::test::player(world).profile().active_slots() ? 1
-                                                                                 : 0;
+                      : i < engine::test::player(world).profile().active_slots()
+                          ? engine::catalog::PetalId::kBasicCommon
+                          : engine::catalog::PetalId::kNone;
     require(engine::test::player(world).profile().inventory(i) == type,
             "survivors then Basic fillers, empty reserves otherwise");
     require(engine::test::player(world).loadout().slots()[i].type_id == type,
@@ -146,8 +206,10 @@ void basic_fillers_and_repeated_death() {
             "fresh minimum on repeated deaths");
     require(engine::test::player(world).profile().inventory_count() == 5, "five fresh fillers");
     for (std::uint8_t slot = 0; slot < 16; ++slot) {
-      require(engine::test::player(world).profile().inventory(slot) == (slot < 5 ? 1 : 0),
-              "no stale reserve petals");
+      require(
+          engine::test::player(world).profile().inventory(slot) ==
+              (slot < 5 ? engine::catalog::PetalId::kBasicCommon : engine::catalog::PetalId::kNone),
+          "no stale reserve petals");
     }
   }
 }
@@ -159,13 +221,32 @@ void persistent_death_shuffle() {
   auto& world = api.world();
   world.seed_death_shuffle(2147483647U);  // Normalization: modulo, zero->1.
   const std::array<std::uint32_t, 3> states{192302371U, 914937185U, 662405787U};
-  const std::array<std::array<std::uint16_t, 10>, 3> survivors{{
-      {12, 22, 9, 29, 18, 10, 36, 8, 7, 2},
-      {12, 22, 18, 10, 29, 9, 36, 8, 6, 2},
-      {22, 12, 10, 36, 9, 29, 18, 6, 8, 2},
+  const std::array<std::array<engine::catalog::PetalId, 10>, 3> survivors{{
+      {engine::catalog::PetalId::kPeasEpic, engine::catalog::PetalId::kEggEpic,
+       engine::catalog::PetalId::kWingRare, engine::catalog::PetalId::kWebRare,
+       engine::catalog::PetalId::kBubbleRare, engine::catalog::PetalId::kMissileRare,
+       engine::catalog::PetalId::kSaltRare, engine::catalog::PetalId::kIrisUnusual,
+       engine::catalog::PetalId::kStingerUnusual, engine::catalog::PetalId::kFastCommon},
+      {engine::catalog::PetalId::kPeasEpic, engine::catalog::PetalId::kEggEpic,
+       engine::catalog::PetalId::kBubbleRare, engine::catalog::PetalId::kMissileRare,
+       engine::catalog::PetalId::kWebRare, engine::catalog::PetalId::kWingRare,
+       engine::catalog::PetalId::kSaltRare, engine::catalog::PetalId::kIrisUnusual,
+       engine::catalog::PetalId::kRoseUnusual, engine::catalog::PetalId::kFastCommon},
+      {engine::catalog::PetalId::kEggEpic, engine::catalog::PetalId::kPeasEpic,
+       engine::catalog::PetalId::kMissileRare, engine::catalog::PetalId::kSaltRare,
+       engine::catalog::PetalId::kWingRare, engine::catalog::PetalId::kWebRare,
+       engine::catalog::PetalId::kBubbleRare, engine::catalog::PetalId::kRoseUnusual,
+       engine::catalog::PetalId::kIrisUnusual, engine::catalog::PetalId::kFastCommon},
   }};
-  const std::array<std::uint16_t, 16> carried{1,  2,  6,  7,  8,  9,  10, 12,
-                                              15, 18, 19, 22, 25, 29, 34, 36};
+  const std::array<engine::catalog::PetalId, 16> carried{
+      engine::catalog::PetalId::kBasicCommon,       engine::catalog::PetalId::kFastCommon,
+      engine::catalog::PetalId::kRoseUnusual,       engine::catalog::PetalId::kStingerUnusual,
+      engine::catalog::PetalId::kIrisUnusual,       engine::catalog::PetalId::kWingRare,
+      engine::catalog::PetalId::kMissileRare,       engine::catalog::PetalId::kPeasEpic,
+      engine::catalog::PetalId::kRoseEpic,          engine::catalog::PetalId::kBubbleRare,
+      engine::catalog::PetalId::kPollenEpic,        engine::catalog::PetalId::kEggEpic,
+      engine::catalog::PetalId::kAntennaeLegendary, engine::catalog::PetalId::kWebRare,
+      engine::catalog::PetalId::kPeasLegendary,     engine::catalog::PetalId::kSaltRare};
   for (std::size_t life = 0; life < states.size(); ++life) {
     engine::test::player(world).profile().set_level(45);
     for (std::uint8_t slot = 0; slot < carried.size(); ++slot) {

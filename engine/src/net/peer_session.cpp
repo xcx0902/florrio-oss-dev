@@ -181,11 +181,12 @@ std::vector<CommandResult> PeerSession::execute_commands(World& world,
           break;
         case CommandKind::Swap:
           ok = swap_player_slots(world, identity_.player, command.lifeEpoch, command.slotA,
-                                 command.typeA, command.slotB, command.typeB);
+                                 static_cast<catalog::PetalId>(command.typeA), command.slotB,
+                                 static_cast<catalog::PetalId>(command.typeB));
           break;
         case CommandKind::Discard:
           ok = discard_player_slot(world, identity_.player, command.lifeEpoch, command.slotA,
-                                   command.typeA);
+                                   static_cast<catalog::PetalId>(command.typeA));
           break;
         case CommandKind::Suicide: {
           const auto* body = world.entities().get(state->player());

@@ -71,18 +71,19 @@ class World {
    * Read by native tests to explain count divergence. */
   struct DeathRecord {
     std::uint64_t tick = 0;
-    std::uint16_t type_id = 0;
-    std::uint16_t attacker_type = 0;
-    std::uint8_t kind = 0;
-    std::uint8_t attacker_kind = 0;
+    catalog::SpeciesId species_id = catalog::SpeciesId::kNone;
+    catalog::PetalId petal_id = catalog::PetalId::kNone;
+    catalog::SpeciesId attacker_species = catalog::SpeciesId::kNone;
+    catalog::PetalId attacker_petal = catalog::PetalId::kNone;
+    EntityKind kind = EntityKind::kNone;
+    EntityKind attacker_kind = EntityKind::kNone;
     float x = 0.0F;
     float y = 0.0F;
   };
-  void record_death(EntityKind kind, std::uint16_t type_id, Vec2 position,
-                    EntityKind attacker_kind = EntityKind::kNone, std::uint16_t attacker_type = 0) {
-    deaths_.push_back(DeathRecord{tick_, type_id, attacker_type, static_cast<std::uint8_t>(kind),
-                                  static_cast<std::uint8_t>(attacker_kind), position.x.value,
-                                  position.y.value});
+  void record_death(const Entity& entity, const DamageSource& attacker) {
+    deaths_.push_back(DeathRecord{tick_, entity.species_id, entity.petal_id, attacker.species_id,
+                                  attacker.petal_id, entity.kind, attacker.kind,
+                                  entity.position.x.value, entity.position.y.value});
     if (deaths_.size() > 128U) {
       deaths_.pop_front();
     }

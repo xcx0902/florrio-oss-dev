@@ -91,8 +91,7 @@ void release_ant_hole_ants_impl(World& world) {
   // creates another ant hole.
   for (AntHoleRelease& release : world.ant_hole_releases()) {
     Entity* hole = world.entities().get(release.entity);
-    if (hole == nullptr || !hole->active ||
-        catalog::species_id(hole->type_id) != catalog::SpeciesId::kAntHole) {
+    if (hole == nullptr || !hole->active || hole->species_id != catalog::SpeciesId::kAntHole) {
       continue;
     }
     while (release.release_index <= 32U) {
@@ -103,7 +102,7 @@ void release_ant_hole_ants_impl(World& world) {
       if (ratio > threshold) {
         break;
       }
-      const std::uint16_t type = catalog::species_type_id(kAntHoleSpecies[index]);
+      const catalog::SpeciesId type = kAntHoleSpecies[index];
       const EntityHandle child =
           spawn_entity_from_defaults(world, EntityKind::kMob, type, hole->position);
       if (!child.valid()) {
@@ -134,11 +133,11 @@ void release_ant_hole_ants_impl(World& world) {
  * `drop-chances.json`), not the definition's `petalTypeIds` order. Every
  * component consumes a draw regardless of whether it attaches loot. */
 void draw_drop_candidates(World& world, Entity& entity) {
-  const auto* definition = Catalog::instance().entity(entity.type_id);
+  const auto* definition = Catalog::instance().entity(entity.species_id);
   if (definition == nullptr) {
     return;
   }
-  const auto* table = Catalog::instance().drop_table(entity.type_id);
+  const auto* table = Catalog::instance().drop_table(entity.species_id);
   for (std::uint8_t index = 0; index < definition->dropDrawCount; ++index) {
     const f32 fraction = world.random().next_fraction();
     if (table == nullptr || table->drops == nullptr || index >= table->dropCount) {
@@ -162,8 +161,8 @@ void spawn_centipede_segments(World& world, EntityHandle head, bool evil, bool r
   if (head_entity == nullptr) {
     return;
   }
-  const std::uint16_t segment_type = catalog::species_type_id(
-      evil ? catalog::SpeciesId::kEvilCentipedeSegment : catalog::SpeciesId::kCentipedeSegment);
+  const catalog::SpeciesId segment_type =
+      evil ? catalog::SpeciesId::kEvilCentipedeSegment : catalog::SpeciesId::kCentipedeSegment;
   const std::uint32_t count = rare ? 49U : 9U;
   // The step stays double (2*pi/20, 2*pi/100) and is accumulated into the f32
   // angle: `angle = f32(angle + step)`. Rounding the step to f32 first is
@@ -290,8 +289,8 @@ namespace {
 
 EntityHandle spawn_rock_impl(World& world, Vec2 position, bool massive, ServerRng& rng,
                              bool drop_draws) {
-  const std::uint16_t type_id =
-      catalog::species_type_id(massive ? catalog::SpeciesId::kBoulder : catalog::SpeciesId::kRock);
+  const catalog::SpeciesId type_id =
+      massive ? catalog::SpeciesId::kBoulder : catalog::SpeciesId::kRock;
   const EntityHandle handle =
       spawn_entity(world, EntityKind::kMob, type_id, position, f32(massive ? 60.0F : 20.0F),
                    kMobSpawnWorldFlags, kMobSpawnEntityFlags);
@@ -335,8 +334,8 @@ namespace {
 
 EntityHandle spawn_cactus_impl(World& world, Vec2 position, ServerRng& rng, bool drop_draws) {
   const EntityHandle handle =
-      spawn_entity(world, EntityKind::kMob, catalog::species_type_id(catalog::SpeciesId::kCactus),
-                   position, f32(40.0F), kMobSpawnWorldFlags, kMobSpawnEntityFlags);
+      spawn_entity(world, EntityKind::kMob, catalog::SpeciesId::kCactus, position, f32(40.0F),
+                   kMobSpawnWorldFlags, kMobSpawnEntityFlags);
   if (!handle.valid()) {
     return handle;
   }
@@ -369,7 +368,7 @@ EntityHandle spawn_cactus_with_drop_draws(World& world, Vec2 position, ServerRng
 namespace {
 
 /** Allocate the body and draw its spawn-loot candidates. */
-EntityHandle spawn_body_with_loot(World& world, EntityKind kind, std::uint16_t type_id,
+EntityHandle spawn_body_with_loot(World& world, EntityKind kind, catalog::SpeciesId type_id,
                                   Vec2 position, f32 radius, std::uint8_t world_flags,
                                   std::uint8_t entity_flags) {
   const EntityHandle handle =
@@ -382,14 +381,14 @@ EntityHandle spawn_body_with_loot(World& world, EntityKind kind, std::uint16_t t
 
 }  // namespace
 
-EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint16_t type_id,
+EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, catalog::SpeciesId type_id,
                                         Vec2 position) {
   const auto* defaults = Catalog::instance().spawn_defaults(type_id);
   if (defaults == nullptr) {
     // Queen Ant and the two Centipede segment records are present in the entity
     // definition table but absent from the spawn-default table. Their family
     // initializers still define the complete body.
-    const catalog::SpeciesId species = catalog::species_id(type_id);
+    const catalog::SpeciesId species = type_id;
     if (species == catalog::SpeciesId::kQueenAnt) {
       const EntityHandle handle = spawn_body_with_loot(world, kind, type_id, position, f32(40.0F),
                                                        kMobSpawnWorldFlags, kMobSpawnEntityFlags);
@@ -417,7 +416,7 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
   if (defaults->dynamicRadius) {
     // Dynamic-radius species have no fixed spawn row. The diagnostic spawn path
     // must still create them through their real initializers.
-    switch (catalog::species_id(type_id)) {
+    switch (type_id) {
       case catalog::SpeciesId::kRock:
         return spawn_rock(world, position, false, world.random());
       case catalog::SpeciesId::kBoulder:
@@ -440,7 +439,7 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
   entity->max_health = f32(defaults->maxHealth);
   // Family and species initializers. Species without a dedicated initializer
   // keep the catalog defaults and the generic AI profile.
-  switch (catalog::species_id(type_id)) {
+  switch (type_id) {
     case catalog::SpeciesId::kLadybug:
       configure_ladybug(*entity, 0, world.random());
       break;
@@ -512,7 +511,7 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
   if (entity->ai.enabled) {
     world.register_ai(handle);
   }
-  if (catalog::species_id(type_id) == catalog::SpeciesId::kAntHole) {
+  if (type_id == catalog::SpeciesId::kAntHole) {
     // Register the hole before it spawns its six starting children.
     world.register_ant_hole(handle);
     // Child caste order: three baby ants, two workers, one soldier. Each child
@@ -527,8 +526,8 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
         catalog::SpeciesId::kSoldierAnt,
     }};
     for (const catalog::SpeciesId caste : kCastes) {
-      const EntityHandle child = spawn_entity_from_defaults(
-          world, EntityKind::kMob, catalog::species_type_id(caste), position);
+      const EntityHandle child =
+          spawn_entity_from_defaults(world, EntityKind::kMob, caste, position);
       if (!child.valid()) {
         break;
       }
@@ -545,11 +544,10 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
       }
     }
   }
-  if (catalog::species_id(type_id) == catalog::SpeciesId::kCentipedeHead ||
-      catalog::species_id(type_id) == catalog::SpeciesId::kEvilCentipedeHead) {
+  if (type_id == catalog::SpeciesId::kCentipedeHead ||
+      type_id == catalog::SpeciesId::kEvilCentipedeHead) {
     Entity* head_entity = world.entities().get(handle);
-    spawn_centipede_segments(world, handle,
-                             catalog::species_id(type_id) == catalog::SpeciesId::kEvilCentipedeHead,
+    spawn_centipede_segments(world, handle, type_id == catalog::SpeciesId::kEvilCentipedeHead,
                              head_entity != nullptr && head_entity->ai.rare);
   }
   return handle;
@@ -558,7 +556,7 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
 EntityHandle spawn_band_entity(World& world, const SpawnBandEntry& entry,
                                const SpawnPosition& position) {
   const Vec2 point(position.x, position.y);
-  switch (catalog::species_id(entry.entity_type)) {
+  switch (entry.entity_type) {
     case catalog::SpeciesId::kRock:
       return spawn_rock_with_drop_draws(world, point, false, world.random());
     case catalog::SpeciesId::kBoulder:
@@ -570,8 +568,9 @@ EntityHandle spawn_band_entity(World& world, const SpawnBandEntry& entry,
   }
 }
 
-EntityHandle spawn_entity(World& world, EntityKind kind, std::uint16_t type_id, Vec2 position,
-                          f32 radius, std::uint8_t world_flags, std::uint8_t entity_flags) {
+namespace {
+EntityHandle allocate_entity(World& world, EntityKind kind, Vec2 position, f32 radius,
+                             std::uint8_t world_flags, std::uint8_t entity_flags) {
   const auto handle = world.entities().allocate();
   if (!handle) {
     return EntityHandle{};
@@ -579,7 +578,6 @@ EntityHandle spawn_entity(World& world, EntityKind kind, std::uint16_t type_id, 
   Entity* entity = world.entities().get(*handle);
   entity->kind = kind;
   entity->spawn_tick = world.tick();
-  entity->type_id = type_id;
   entity->set_position(position);
   entity->radius = radius;
   entity->collision_radius = radius;
@@ -589,14 +587,31 @@ EntityHandle spawn_entity(World& world, EntityKind kind, std::uint16_t type_id, 
   entity->max_health = entity->health;
   entity->world_flags = world_flags;
   entity->entity_flags = entity_flags;
-  // Ant holes do not take mass-weighted contact response; every other body
-  // keeps the default mass 1.0.
-  if (catalog::species_id(type_id) == catalog::SpeciesId::kAntHole) {
-    entity->uses_mass_weighted_response = false;
-  }
   entity->active = true;
   entity->bounds_dirty = true;
   return *handle;
+}
+}  // namespace
+
+EntityHandle spawn_entity(World& world, EntityKind kind, catalog::SpeciesId type_id, Vec2 position,
+                          f32 radius, std::uint8_t world_flags, std::uint8_t entity_flags) {
+  const auto handle = allocate_entity(world, kind, position, radius, world_flags, entity_flags);
+  if (auto* entity = world.entities().get(handle)) {
+    entity->species_id = type_id;
+    if (type_id == catalog::SpeciesId::kAntHole) {
+      entity->uses_mass_weighted_response = false;
+    }
+  }
+  return handle;
+}
+
+EntityHandle spawn_entity(World& world, EntityKind kind, catalog::PetalId type_id, Vec2 position,
+                          f32 radius, std::uint8_t world_flags, std::uint8_t entity_flags) {
+  const auto handle = allocate_entity(world, kind, position, radius, world_flags, entity_flags);
+  if (auto* entity = world.entities().get(handle)) {
+    entity->petal_id = type_id;
+  }
+  return handle;
 }
 
 namespace {

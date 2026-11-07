@@ -35,8 +35,8 @@ f32 experience_threshold(std::uint8_t level) {
   return f32::from_double(std::floor(scaled) + 3.0);
 }
 
-f32 rarity_experience(std::uint32_t rarity_index) {
-  return f32(catalog::rarity_experience(rarity_index));
+f32 rarity_experience(catalog::Rarity rarity) {
+  return f32(catalog::rarity_experience(rarity));
 }
 
 }  // namespace engine

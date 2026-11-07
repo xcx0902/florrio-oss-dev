@@ -49,7 +49,7 @@ EntityHandle spawn_hornet_stinger(World& world, EntityHandle hornet_handle,
   hornet->velocity.x += static_cast<double>(f32(direction_x.value * kRecoil).value);
   hornet->velocity.y += static_cast<double>(f32(direction_y.value * kRecoil).value);
 
-  const EntityHandle stinger = spawn_entity(world, EntityKind::kProjectile, hornet->type_id,
+  const EntityHandle stinger = spawn_entity(world, EntityKind::kProjectile, hornet->species_id,
                                             Vec2{spawn_x, spawn_y}, f32(11.0F));
   if (!stinger.valid()) {
     return EntityHandle{};

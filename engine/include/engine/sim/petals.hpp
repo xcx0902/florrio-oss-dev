@@ -12,12 +12,12 @@ class PlayerState;
 [[nodiscard]] Vec2 orbit_position(Vec2 center, f32 radius, f32 angle);
 
 /** Catalog radius for a petal type id, or zero when unknown. */
-[[nodiscard]] f32 petal_radius(std::uint16_t type_id);
+[[nodiscard]] f32 petal_radius(catalog::PetalId type_id);
 
 /** Spawn a petal entity at its orbit position using the catalog draw radius,
  * collision radius, damage and maximum health.
  * `orbit_index` is the ring slot assigned by assign_petal_orbit_indices. */
-[[nodiscard]] EntityHandle spawn_petal(World& world, PlayerState& state, std::uint16_t type_id,
+[[nodiscard]] EntityHandle spawn_petal(World& world, PlayerState& state, catalog::PetalId type_id,
                                        Vec2 center, f32 orbit_radius, f32 angle,
                                        std::uint8_t slot = 0xFF, std::uint8_t instance = 0,
                                        std::uint8_t instance_count = 1,
@@ -76,7 +76,7 @@ void remove_slot_petals(World& world, PlayerState& state, std::uint8_t slot);
 void swap_slot_petals(World& world, PlayerState& state, std::uint8_t first, std::uint8_t second);
 
 /** Spawn a pickup/drop entity for a petal type using the catalog radius. */
-[[nodiscard]] EntityHandle spawn_drop(World& world, std::uint16_t type_id, Vec2 position);
+[[nodiscard]] EntityHandle spawn_drop(World& world, catalog::PetalId type_id, Vec2 position);
 
 /** Equip a touching pickup into its selected slot and queue the actual event-14
  * transfer. Collected pickups stay for the 2000 ms visual window. Eligibility
@@ -84,6 +84,6 @@ void swap_slot_petals(World& world, PlayerState& state, std::uint8_t first, std:
 std::size_t collect_drops(World& world);
 
 /** Initialize a slot from the petal catalog recharge and instance count. */
-[[nodiscard]] PetalSlot make_petal_slot(std::uint16_t type_id);
+[[nodiscard]] PetalSlot make_petal_slot(catalog::PetalId type_id);
 
 }  // namespace engine

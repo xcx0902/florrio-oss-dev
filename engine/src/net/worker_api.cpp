@@ -81,7 +81,7 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
     if (opcode == protocol::InputOpcode::kDiscardPetal && state->player().valid()) {
       const std::uint8_t slot = static_cast<std::uint8_t>(command.slot_a);
       if (state->loadout().discard(world_, *state, state->profile(), slot,
-                                   static_cast<std::uint16_t>(command.value_a))) {
+                                   static_cast<catalog::PetalId>(command.value_a))) {
         remove_slot_petals(world_, *state, slot);
       }
       continue;
@@ -90,8 +90,8 @@ bool WorkerApi::send(std::span<const std::uint8_t> packet, std::span<const std::
       const std::uint8_t first = static_cast<std::uint8_t>(command.slot_a);
       const std::uint8_t second = static_cast<std::uint8_t>(command.slot_b);
       (void)state->loadout().swap(world_, *state, state->profile(), first,
-                                  static_cast<std::uint16_t>(command.value_a), second,
-                                  static_cast<std::uint16_t>(command.value_b));
+                                  static_cast<catalog::PetalId>(command.value_a), second,
+                                  static_cast<catalog::PetalId>(command.value_b));
       continue;
     }
     if (opcode != protocol::InputOpcode::kInputButtonsAngleStrength) {
@@ -117,7 +117,7 @@ void WorkerApi::enqueue_domain_snapshot(std::uint32_t sequence) {
   (void)output_.enqueue(OutputPacket{domain_snapshot_bytes(sequence)});
 }
 
-EntityHandle WorkerApi::spawn(EntityKind kind, std::uint16_t type_id, Vec2 position) {
+EntityHandle WorkerApi::spawn(EntityKind kind, catalog::SpeciesId type_id, Vec2 position) {
   return spawn_entity_from_defaults(world_, kind, type_id, position);
 }
 

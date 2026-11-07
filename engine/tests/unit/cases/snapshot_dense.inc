@@ -16,7 +16,8 @@ void test_default_dense_groups() {
   engine::WorkerApi api;
   api.init();
   const engine::EntityHandle mob =
-      api.spawn(engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(7.0F), engine::f32(8.0F)));
+      api.spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+                engine::Vec2(engine::f32(7.0F), engine::f32(8.0F)));
   CHECK(mob.valid());
   CHECK(api.default_dense_groups());
   const auto bytes = api.domain_snapshot_bytes(62, 0);
@@ -40,10 +41,12 @@ void test_domain_dense_player_wire_boundaries() {
   const auto player = engine::spawn_player_default(api.world(), engine::test::player(api.world()),
                                                    "wire", engine::make_default_profile(), false);
   CHECK(player.valid());
-  const auto mob = api.spawn(engine::EntityKind::kMob, 14,
+  const auto mob = api.spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kHornet,
                              engine::Vec2(engine::f32(12345.0F), engine::f32(-321.0F)));
   CHECK(mob.valid());
-  CHECK(engine::test::player(api.world()).loadout().equip(2U, 3U));
+  CHECK(engine::test::player(api.world())
+            .loadout()
+            .equip(2U, engine::catalog::PetalId::kHeavyCommon));
   CHECK(engine::test::player(api.world())
             .loadout()
             .create_equipped_petal(api.world(), engine::test::player(api.world()), 2U, 0U));
@@ -111,7 +114,8 @@ void test_domain_dense_player_wire_boundaries() {
         CHECK(reader.read_f32_le().value() == entity->position.x.value);  // field 49
         CHECK(reader.read_f32_le().value() ==
               entity->collision_radius.value);  // field 7, group 140
-        CHECK(reader.read_u8().value() == (handle == player ? 40U : entity->type_id));
+        CHECK(reader.read_u8().value() ==
+              (handle == player ? 40U : engine::net::catalog_type_id(*entity)));
         CHECK(reader.read_u8().value() == static_cast<std::uint8_t>(entity->kind));
         CHECK(reader.read_u8().value() == (handle == player ? 3U : entity->loadout_instance));
         CHECK(reader.cursor() - start == 63U);
@@ -133,7 +137,7 @@ void test_domain_dense_player_wire_boundaries() {
               field == 36U || field == 38U || field == 50U || field == 62U) {
             const auto value = reader.read_u8().value();
             if (field == 2U) {
-              CHECK(value == (handle == player ? 40U : entity->type_id));
+              CHECK(value == (handle == player ? 40U : engine::net::catalog_type_id(*entity)));
             }
             if (field == 11U) {
               CHECK(handle == petal);
@@ -200,7 +204,9 @@ void test_domain_dense_player_wire_boundaries() {
               const auto value =
                   field == 60U ? reader.read_u8().value() : reader.read_varint32().value();
               if (field == 60U) {
-                CHECK(value == engine::test::player(api.world()).loadout().slots()[slot].type_id);
+                CHECK(value ==
+                      static_cast<std::uint8_t>(
+                          engine::test::player(api.world()).loadout().slots()[slot].type_id));
                 ++inventory_count;
               } else {
                 CHECK(value == 0U);
@@ -318,7 +324,7 @@ void test_input_discard_deletion_then_swap() {
   CHECK(!engine::test::player(api.world()).loadout().handle(2U, 0U).valid());
   CHECK(engine::test::player(api.world()).loadout().pending(2U, 0U));
   CHECK(engine::test::player(api.world()).loadout().slots()[2].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+        engine::catalog::PetalId::kBasicCommon);
   unsigned count = 0U, slot2 = 0U;
   for (const auto& entity : api.world().entities().entities()) {
     if (!entity.active || entity.health.value <= 0.0F ||

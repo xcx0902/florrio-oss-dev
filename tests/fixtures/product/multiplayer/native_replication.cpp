@@ -75,9 +75,10 @@ int main(int argc, char** argv) {
   pb->profile().set_experience(f32(456));
   pa->loadout().set_score(f32(1234));
   pb->loadout().set_score(f32(5678));
-  pa->loadout().slots()[8].type_id = 38;
-  pb->loadout().slots()[8].type_id = 2;
-  const auto mob = spawn_entity(*world, EntityKind::kMob, 1, {f32(0), f32(200)}, f32(10));
+  pa->loadout().slots()[8].type_id = engine::catalog::PetalId::kCornEpic;
+  pb->loadout().slots()[8].type_id = engine::catalog::PetalId::kFastCommon;
+  const auto mob = spawn_entity(*world, EntityKind::kMob, engine::catalog::SpeciesId::kRock,
+                                {f32(0), f32(200)}, f32(10));
   PeerSession peer(*world, context(a));
   net::ReplicationSession sb;
   std::vector<std::vector<std::uint8_t>> frames;
@@ -138,7 +139,7 @@ int main(int argc, char** argv) {
   emit(context(a, 8), reconnected, *freeze_tick_changes(*world));
   net::ReplicationSession sparse;
   emit(context(b, 7, false), sparse, *freeze_tick_changes(*world));
-  (void)spawn_loot_drop(*world, 7,
+  (void)spawn_loot_drop(*world, engine::catalog::PetalId::kStingerUnusual,
                         world->entities().get(pb->player())->position + Vec2{f32(150), {}}, {});
   auto pickup = publish(*world, *freeze_tick_changes(*world), context(b, 7, false), sparse);
   if (!pickup) {

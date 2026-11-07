@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/sim/petal_orbit.hpp"
 #include "engine/catalog/ids.hpp"
 #include "engine/core/vec2.hpp"
 #include "engine/model/entity.hpp"
@@ -9,7 +10,7 @@ namespace engine {
 /** Orbit bookkeeping for a spawned petal entity. */
 struct PetalOrbitState {
   EntityHandle handle;
-  std::uint16_t type_id = 0;
+  catalog::PetalId type_id = catalog::PetalId::kNone;
   Vec2 center;
   f32 orbit_radius;
   f32 angle;
@@ -22,7 +23,7 @@ struct PetalOrbitState {
   f32 phase = f32(0.0F);
   std::uint8_t slot = 0xFF;
   std::uint8_t instance = 0;
-  std::uint8_t profile = 0;  // engine::OrbitProfile
+  OrbitProfile profile = OrbitProfile::kDefault;
   /** Catalog behavior for this petal, taken from its catalog entry. */
   catalog::PetalBehavior behavior = catalog::PetalBehavior::kOrbit;
   /** Heal amount used only by PetalBehavior::kRoseHeal. */

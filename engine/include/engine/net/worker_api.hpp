@@ -37,7 +37,7 @@ class WorkerApi {
   [[nodiscard]] World& world() { return world_; }
   [[nodiscard]] const World& world() const { return world_; }
   [[nodiscard]] std::uint32_t last_sequence() const { return last_sequence_; }
-  [[nodiscard]] EntityHandle spawn(EntityKind kind, std::uint16_t type_id, Vec2 position);
+  [[nodiscard]] EntityHandle spawn(EntityKind kind, catalog::SpeciesId type_id, Vec2 position);
   [[nodiscard]] bool occupied(Vec2 position) const;
   [[nodiscard]] bool despawn(EntityHandle handle);
 

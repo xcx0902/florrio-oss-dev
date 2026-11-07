@@ -18,8 +18,10 @@ void body_contacts_use_both_actual_levels() {
   for (auto first : {1, 5, 6, 10}) {
     for (auto second : {1, 5, 6, 10}) {
       auto world = make_world();
-      const auto a = join_player(*world, "A", at(0), profile(0, first));
-      const auto b = join_player(*world, "B", at(30), profile(0, second));
+      const auto a =
+          join_player(*world, "A", at(0), profile(engine::catalog::PetalId::kNone, first));
+      const auto b =
+          join_player(*world, "B", at(30), profile(engine::catalog::PetalId::kNone, second));
       body(*world, a).contact_damage = f32(10);
       body(*world, b).contact_damage = f32(20);
       contacts(*world);
@@ -37,8 +39,10 @@ void body_contacts_use_both_actual_levels() {
 void opposing_petals_damage_bodies_at_level_one() {
   for (bool reverse : {false, true}) {
     auto world = make_world();
-    const auto a = join_player(*world, "A", at(-1000), profile(1));
-    const auto b = join_player(*world, "B", at(1000), profile(1));
+    const auto a =
+        join_player(*world, "A", at(-1000), profile(engine::catalog::PetalId::kBasicCommon));
+    const auto b =
+        join_player(*world, "B", at(1000), profile(engine::catalog::PetalId::kBasicCommon));
     const auto attacker = reverse ? b : a, target = reverse ? a : b;
     const auto handle = petal(*world, attacker);
     world->entities().get(handle)->set_position(body(*world, target).position + at(10));
@@ -54,8 +58,10 @@ void opposing_petals_damage_bodies_at_level_one() {
 
 void opposing_petals_trade_damage_and_own_petals_are_immune() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(-1000), profile(1));
-  const auto b = join_player(*world, "B", at(1000), profile(1));
+  const auto a =
+      join_player(*world, "A", at(-1000), profile(engine::catalog::PetalId::kBasicCommon));
+  const auto b =
+      join_player(*world, "B", at(1000), profile(engine::catalog::PetalId::kBasicCommon));
   const auto ha = petal(*world, a), hb = petal(*world, b);
   auto& pa = *world->entities().get(ha);
   auto& pb = *world->entities().get(hb);
@@ -75,8 +81,8 @@ void opposing_petals_trade_damage_and_own_petals_are_immune() {
   CHECK(!world->entities().get(hb) || world->entities().get(hb)->health == f32(0));
   CHECK(!petal(*world, a).valid() && !petal(*world, b).valid());
 
-  auto own = profile(1);
-  own.set_inventory(1, 1);
+  auto own = profile(engine::catalog::PetalId::kBasicCommon);
+  own.set_inventory(1, engine::catalog::PetalId::kBasicCommon);
   own.set_inventory_count(2);
   const auto c = join_player(*world, "C", at(2000), own);
   const auto hc = petal(*world, c), hd = state(*world, c).loadout().handle(1, 0);
@@ -89,14 +95,15 @@ void opposing_petals_trade_damage_and_own_petals_are_immune() {
 
 void self_petal_pet_projectile_and_wild_roots() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(0), profile(21));
+  const auto a = join_player(*world, "A", at(0), profile(engine::catalog::PetalId::kCactusEpic));
   const auto p = petal(*world, a);
   contacts(*world);
   CHECK(body(*world, a).health == f32(100));
   CHECK(body(*world, a).effect_count == 0);
   on_petal_incoming_hit(*world, p, state(*world, a).player());
   CHECK(body(*world, a).effect_count == 0);
-  const auto pet = spawn_entity_from_defaults(*world, EntityKind::kMob, 9, at(10));
+  const auto pet = spawn_entity_from_defaults(*world, EntityKind::kMob,
+                                              engine::catalog::SpeciesId::kSoldierAnt, at(10));
   inherit_entity_owner(*world, pet, state(*world, a).player());
   const auto shot = spawn_hornet_stinger(*world, pet, state(*world, a).player());
   CHECK(shot.valid());
@@ -109,8 +116,10 @@ void self_petal_pet_projectile_and_wild_roots() {
   world->entities().get(shot)->set_position(at(10));
   contacts(*world);
   CHECK(body(*world, a).health == f32(100) && body(*world, a).effect_count == 0);
-  const auto wild1 = spawn_entity_from_defaults(*world, EntityKind::kMob, 9, at(2000));
-  const auto wild2 = spawn_entity_from_defaults(*world, EntityKind::kMob, 12, at(2001));
+  const auto wild1 = spawn_entity_from_defaults(*world, EntityKind::kMob,
+                                                engine::catalog::SpeciesId::kSoldierAnt, at(2000));
+  const auto wild2 = spawn_entity_from_defaults(*world, EntityKind::kMob,
+                                                engine::catalog::SpeciesId::kBeetle, at(2001));
   const auto hp1 = world->entities().get(wild1)->health;
   const auto hp2 = world->entities().get(wild2)->health;
   CHECK(same_controlling_root(*world, wild1, wild2));
@@ -127,7 +136,7 @@ void self_petal_pet_projectile_and_wild_roots() {
 void catalog_equipment_ownership_and_recharge() {
   unsigned covered = 0;
   for (const auto& definition : Catalog::instance().petals()) {
-    if (definition.typeId == catalog::petal_type_id(catalog::PetalId::kNone)) {
+    if (definition.typeId == catalog::PetalId::kNone) {
       continue;
     }
     ++covered;
@@ -164,8 +173,9 @@ void catalog_equipment_ownership_and_recharge() {
     CHECK(state(*world, b).loadout().handles(0) == b_handles);
     CHECK(state(*world, b).loadout().orbit_phase() == b_phase);
     CHECK(state(*world, b).loadout().slots()[0].recharge_remaining_ms == 0);
-    CHECK(!discard_player_slot(*world, a, 1, 0, 65535));
-    CHECK(!swap_player_slots(*world, a, 1, 0, 65535, 1, 0));
+    CHECK(!discard_player_slot(*world, a, 1, 0, static_cast<engine::catalog::PetalId>(65535)));
+    CHECK(!swap_player_slots(*world, a, 1, 0, static_cast<engine::catalog::PetalId>(65535), 1,
+                             engine::catalog::PetalId::kNone));
     CHECK(discard_player_slot(*world, a, 1, 0, definition.typeId));
     CHECK(state(*world, b).profile().inventory(0) == definition.typeId);
   }
@@ -173,7 +183,8 @@ void catalog_equipment_ownership_and_recharge() {
 }
 
 void roses_heal_only_their_owner() {
-  for (auto type : {6, 15, 24}) {
+  for (auto type : {engine::catalog::PetalId::kRoseUnusual, engine::catalog::PetalId::kRoseEpic,
+                    engine::catalog::PetalId::kRoseRare}) {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(type));
     const auto b = join_player(*world, "B", at(1000), profile(type));
@@ -184,7 +195,9 @@ void roses_heal_only_their_owner() {
       world->set_time_ms(tick * 50);
       update_petal_orbits(*world, state(*world, a), 50);
     }
-    CHECK(body(*world, a).health == f32(type == 6 ? 60 : type == 15 ? 72 : 60.5));
+    CHECK(body(*world, a).health == f32(type == engine::catalog::PetalId::kRoseUnusual ? 60
+                                        : type == engine::catalog::PetalId::kRoseEpic  ? 72
+                                                                                       : 60.5));
     CHECK(body(*world, b).health == f32(50));
     CHECK(state(*world, b).loadout().handles(0) == b_handles);
     CHECK(state(*world, a).petals().empty());
@@ -192,30 +205,36 @@ void roses_heal_only_their_owner() {
 }
 
 void passives_orbit_modifiers_and_bubble_are_isolated() {
-  for (auto type : {13, 14, 18, 21, 28, 32, 33}) {
+  for (auto type : {engine::catalog::PetalId::kCactusRare, engine::catalog::PetalId::kFasterRare,
+                    engine::catalog::PetalId::kBubbleRare, engine::catalog::PetalId::kCactusEpic,
+                    engine::catalog::PetalId::kYinYangEpic, engine::catalog::PetalId::kLeafUnusual,
+                    engine::catalog::PetalId::kCactusLegendary}) {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(type));
-    const auto b = join_player(*world, "B", at(1000), profile(1));
+    const auto b =
+        join_player(*world, "B", at(1000), profile(engine::catalog::PetalId::kBasicCommon));
     body(*world, a).health = f32(50);
     body(*world, b).health = f32(50);
     regenerate_players(*world, 50);
-    CHECK(body(*world, a).max_health == f32(type == 33                 ? 140
-                                            : type == 13 || type == 21 ? 120
-                                                                       : 100));
+    CHECK(body(*world, a).max_health == f32(type == engine::catalog::PetalId::kCactusLegendary ? 140
+                                            : type == engine::catalog::PetalId::kCactusRare ||
+                                                    type == engine::catalog::PetalId::kCactusEpic
+                                                ? 120
+                                                : 100));
     CHECK(body(*world, b).max_health == f32(100));
-    if (type == 32) {
+    if (type == engine::catalog::PetalId::kLeafUnusual) {
       CHECK(body(*world, a).health.value > body(*world, b).health.value);
     }
     advance_loadout_orbit_phase(state(*world, a), 50);
     advance_loadout_orbit_phase(state(*world, b), 50);
     CHECK(state(*world, b).loadout().orbit_phase() == f32(0.125));
-    if (type == 14) {
+    if (type == engine::catalog::PetalId::kFasterRare) {
       CHECK(state(*world, a).loadout().orbit_phase() == f32(0.165));
     }
-    if (type == 28) {
+    if (type == engine::catalog::PetalId::kYinYangEpic) {
       CHECK(state(*world, a).loadout().orbit_phase() == f32(-0.125));
     }
-    if (type == 18) {
+    if (type == engine::catalog::PetalId::kBubbleRare) {
       CHECK(apply_player_input(*world, a, 1, 2, f32(0), f32(0)));
       world->set_time_ms(550);
       update_petal_orbits(*world, state(*world, a), 0);
@@ -226,7 +245,11 @@ void passives_orbit_modifiers_and_bubble_are_isolated() {
 }
 
 void launched_variants_keep_identity_and_independent_charge() {
-  for (auto type : {10, 11, 12, 19, 20, 29, 30, 34}) {
+  for (auto type :
+       {engine::catalog::PetalId::kMissileRare, engine::catalog::PetalId::kPeasRare,
+        engine::catalog::PetalId::kPeasEpic, engine::catalog::PetalId::kPollenEpic,
+        engine::catalog::PetalId::kDandelionRare, engine::catalog::PetalId::kWebRare,
+        engine::catalog::PetalId::kWebLegendary, engine::catalog::PetalId::kPeasLegendary}) {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(type));
     const auto b = join_player(*world, "B", at(1000), profile(type));
@@ -236,7 +259,9 @@ void launched_variants_keep_identity_and_independent_charge() {
     update_petal_orbits(*world, state(*world, a), 0);
     CHECK(!petal(*world, a).valid() && petal(*world, b) == other);
     CHECK(state(*world, b).loadout().slots()[0].recharge_remaining_ms == 0);
-    if (type == 11 || type == 12 || type == 34) {
+    if (type == engine::catalog::PetalId::kPeasRare ||
+        type == engine::catalog::PetalId::kPeasEpic ||
+        type == engine::catalog::PetalId::kPeasLegendary) {
       CHECK(world->entities().get(parent) == nullptr);
       CHECK(world->deferred_launches().size() == 1);
       const auto children = world->deferred_launches()[0].children;
@@ -255,18 +280,20 @@ void launched_variants_keep_identity_and_independent_charge() {
 
 void wing_and_zone_locked_pets_use_their_players_input_and_zone() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(-1000), profile(9));
-  const auto b = join_player(*world, "B", at(1000), profile(9));
+  const auto a = join_player(*world, "A", at(-1000), profile(engine::catalog::PetalId::kWingRare));
+  const auto b = join_player(*world, "B", at(1000), profile(engine::catalog::PetalId::kWingRare));
   CHECK(apply_player_input(*world, a, 1, 1, f32(0), f32(0)));
   CHECK(apply_player_input(*world, b, 1, 2, f32(0), f32(0)));
   update_petal_orbits(*world, state(*world, a), 50);
   update_petal_orbits(*world, state(*world, b), 50);
   CHECK(state(*world, a).petals()[0].orbit_radius.value > 140);
   CHECK(state(*world, b).petals()[0].orbit_radius.value < 45);
-  const auto c = join_player(*world, "C", at(22000), profile(22, 60));
-  const auto d = join_player(*world, "D", at(18000), profile(22, 60));
+  const auto c =
+      join_player(*world, "C", at(22000), profile(engine::catalog::PetalId::kEggEpic, 60));
+  const auto d =
+      join_player(*world, "D", at(18000), profile(engine::catalog::PetalId::kEggEpic, 60));
   for (auto id : {c, d}) {
-    CHECK(hatch_equipped_egg(*world, petal(*world, id), 9));
+    CHECK(hatch_equipped_egg(*world, petal(*world, id), engine::catalog::SpeciesId::kSoldierAnt));
   }
   const auto c_pet = petal(*world, c), d_pet = petal(*world, d);
   state(*world, c).set_zone_petals_disabled(true);
@@ -276,7 +303,10 @@ void wing_and_zone_locked_pets_use_their_players_input_and_zone() {
 }
 
 void collision_effects_reflection_and_web_source() {
-  for (auto type : {8, 12, 20, 21, 31, 34}) {
+  for (auto type :
+       {engine::catalog::PetalId::kIrisUnusual, engine::catalog::PetalId::kPeasEpic,
+        engine::catalog::PetalId::kDandelionRare, engine::catalog::PetalId::kCactusEpic,
+        engine::catalog::PetalId::kHoneyRare, engine::catalog::PetalId::kPeasLegendary}) {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(type));
     const auto b = join_player(*world, "B", at(1000), profile());
@@ -285,19 +315,20 @@ void collision_effects_reflection_and_web_source() {
     on_petal_hit(*world, handle, state(*world, b).player(), state(*world, b).player());
     CHECK(body(*world, b).effect_count == 1 && body(*world, a).effect_count == 0);
     CHECK(body(*world, b).effects[0].attribution.player == a);
-    if (type == 21) {
+    if (type == engine::catalog::PetalId::kCactusEpic) {
       on_petal_incoming_hit(*world, handle, state(*world, b).player());
       CHECK(body(*world, b).effects[0].attribution.player == a);
     }
     CHECK(world->destroy(handle));
     body(*world, b).health = f32(0.01);
-    if (type != 20 && type != 31) {
+    if (type != engine::catalog::PetalId::kDandelionRare &&
+        type != engine::catalog::PetalId::kHoneyRare) {
       CHECK(update_effects(*world, 50) == 1);
       CHECK(state(*world, b).last_killer_name() == "A");
       CHECK(state(*world, b).death.source.player == a);
     }
   }
-  for (auto type : {29, 30}) {
+  for (auto type : {engine::catalog::PetalId::kWebRare, engine::catalog::PetalId::kWebLegendary}) {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(type));
     const auto b = join_player(*world, "B", at(1000), profile());
@@ -311,7 +342,8 @@ void collision_effects_reflection_and_web_source() {
     CHECK(world->area_effects()[0].payload->attribution.player == a);
     body(*world, b).set_position(world->entities().get(tag)->position);
     (void)world->update_area_effects();
-    CHECK(slow_multiplier(body(*world, b)) == f32(type == 29 ? 0.25 : 0.015625));
+    CHECK(slow_multiplier(body(*world, b)) ==
+          f32(type == engine::catalog::PetalId::kWebRare ? 0.25 : 0.015625));
     std::vector<EntityHandle> tags;
     for (const auto& area : world->area_effects()) {
       tags.push_back(area.owner);
@@ -324,12 +356,15 @@ void collision_effects_reflection_and_web_source() {
 }
 
 void eggs_pets_and_nested_projectiles_keep_killer_name() {
-  for (auto type : {22, 23}) {
+  for (auto type : {engine::catalog::PetalId::kEggEpic, engine::catalog::PetalId::kEggLegendary}) {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-1000), profile(type));
     const auto b = join_player(*world, "B", at(1000), profile());
     const auto egg = petal(*world, a);
-    CHECK(hatch_equipped_egg(*world, egg, type == 22 ? 9 : 12));
+    CHECK(hatch_equipped_egg(*world, egg,
+                             type == engine::catalog::PetalId::kEggEpic
+                                 ? engine::catalog::SpeciesId::kSoldierAnt
+                                 : engine::catalog::SpeciesId::kBeetle));
     const auto pet = petal(*world, a);
     CHECK(world->entities().get(pet)->kind == EntityKind::kMob);
     CHECK(owning_player_id(*world, pet) == a);
@@ -349,13 +384,15 @@ void eggs_pets_and_nested_projectiles_keep_killer_name() {
 
 void dot_survives_body_removal_and_actual_slot_reuse() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(-1000), profile(8));
-  const auto b = join_player(*world, "B", at(1000), profile(22));
-  CHECK(hatch_equipped_egg(*world, petal(*world, b), 9));
+  const auto a =
+      join_player(*world, "A", at(-1000), profile(engine::catalog::PetalId::kIrisUnusual));
+  const auto b = join_player(*world, "B", at(1000), profile(engine::catalog::PetalId::kEggEpic));
+  CHECK(hatch_equipped_egg(*world, petal(*world, b), engine::catalog::SpeciesId::kSoldierAnt));
   const auto b_pet = petal(*world, b);
   const auto old_body = state(*world, a).player(), old_petal = petal(*world, a);
   on_petal_hit(*world, old_petal, state(*world, b).player(), old_body);
-  const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob, 1, at(5000));
+  const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob,
+                                              engine::catalog::SpeciesId::kRock, at(5000));
   CHECK(apply_effect(*world, mob, EffectType::kPoison, f32(100000), 1000, old_petal));
   CHECK(world->destroy(old_petal));
   CHECK(world->destroy(old_body));
@@ -394,8 +431,8 @@ void dot_survives_body_removal_and_actual_slot_reuse() {
 
 void effect_refresh_keys_and_payload_lifetime_survive_death_callbacks() {
   auto world = make_world();
-  auto items = profile(31);
-  items.set_inventory(1, 31);
+  auto items = profile(engine::catalog::PetalId::kHoneyRare);
+  items.set_inventory(1, engine::catalog::PetalId::kHoneyRare);
   items.set_inventory_count(2);
   const auto a = join_player(*world, "A", at(-1000), items);
   const auto b = join_player(*world, "B", at(1000), profile());
@@ -417,14 +454,16 @@ void effect_refresh_keys_and_payload_lifetime_survive_death_callbacks() {
 
 void delayed_monster_xp_goes_to_persistent_attacker_only() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(-1000), profile(8));
+  const auto a =
+      join_player(*world, "A", at(-1000), profile(engine::catalog::PetalId::kIrisUnusual));
   const auto b = join_player(*world, "B", at(1000), profile());
-  const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob, 1, at(4000));
+  const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob,
+                                              engine::catalog::SpeciesId::kRock, at(4000));
   const auto b_max = body(*world, b).max_health;
   CHECK(apply_effect(*world, mob, EffectType::kPoison, f32(100000), 1000, petal(*world, a)));
   CHECK(world->destroy(state(*world, a).player()));
   CHECK(update_effects(*world, 50) == 1);
-  const auto reward = f32(Catalog::instance().entity(1)->scale);
+  const auto reward = f32(Catalog::instance().entity(engine::catalog::SpeciesId::kRock)->scale);
   CHECK(state(*world, a).loadout().score() == reward);
   CHECK(state(*world, b).loadout().score() == f32(0));
   CHECK(state(*world, b).profile().level() == 1 && body(*world, b).max_health == b_max);
@@ -435,18 +474,21 @@ void delayed_monster_xp_goes_to_persistent_attacker_only() {
 
 void monster_kill_levels_only_the_actual_attacker() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(-1000), profile(1));
-  const auto b = join_player(*world, "B", at(1000), profile(1));
-  const auto reward = f32(Catalog::instance().entity(1)->scale);
+  const auto a =
+      join_player(*world, "A", at(-1000), profile(engine::catalog::PetalId::kBasicCommon));
+  const auto b =
+      join_player(*world, "B", at(1000), profile(engine::catalog::PetalId::kBasicCommon));
+  const auto reward = f32(Catalog::instance().entity(engine::catalog::SpeciesId::kRock)->scale);
   state(*world, a).profile().set_experience(experience_threshold(1) - reward);
   body(*world, a).health = f32(50);
   body(*world, b).health = f32(50);
-  const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob, 1, at(4000));
+  const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob,
+                                              engine::catalog::SpeciesId::kRock, at(4000));
   CHECK(damage_entity(*world, mob, f32(10000), petal(*world, a)).died);
   CHECK(state(*world, a).profile().level() == 2 && state(*world, b).profile().level() == 1);
   CHECK(body(*world, a).max_health.value > 100 && body(*world, a).health.value > 50);
   CHECK(body(*world, b).max_health == f32(100) && body(*world, b).health == f32(50));
-  CHECK(state(*world, b).profile().inventory(0) == 1);
+  CHECK(state(*world, b).profile().inventory(0) == engine::catalog::PetalId::kBasicCommon);
   CHECK(state(*world, b).loadout().score() == f32(0));
 }
 
@@ -454,7 +496,8 @@ void ai_finds_second_player_after_first_dies() {
   auto world = make_world();
   const auto a = join_player(*world, "A", at(100), profile());
   const auto b = join_player(*world, "B", at(200), profile());
-  const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob, 9, at(0));
+  const auto mob = spawn_entity_from_defaults(*world, EntityKind::kMob,
+                                              engine::catalog::SpeciesId::kSoldierAnt, at(0));
   auto& ai = world->entities().get(mob)->ai;
   ai.aggressive = true;
   ai.territory = f32(0);
@@ -467,8 +510,10 @@ void ai_finds_second_player_after_first_dies() {
 
 void invalid_cyclic_and_stale_owner_chains_are_bounded() {
   auto world = make_world();
-  const auto a = spawn_entity(*world, EntityKind::kProjectile, 1, at(0), f32(1));
-  const auto b = spawn_entity(*world, EntityKind::kProjectile, 1, at(0), f32(1));
+  const auto a = spawn_entity(*world, EntityKind::kProjectile, engine::catalog::SpeciesId::kRock,
+                              at(0), f32(1));
+  const auto b = spawn_entity(*world, EntityKind::kProjectile, engine::catalog::SpeciesId::kRock,
+                              at(0), f32(1));
   world->entities().get(a)->owner = b.raw;
   world->entities().get(b)->owner = a.raw;
   CHECK(!owning_player_id(*world, a).valid());

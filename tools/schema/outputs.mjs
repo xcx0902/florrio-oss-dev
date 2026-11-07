@@ -112,14 +112,21 @@ export async function buildOutputs(root = '.') {
       spawnRules: inputs.spawnRules.rules,
       strings: inputs.strings.strings,
       counts,
+      rarities: inputs.rarities.rarities,
     }),
   );
   outputs.set(
     'engine/include/engine/catalog/entity_spawn_defaults.hpp',
-    generateSpawnDefaultsHeader(inputs.spawnDefaults.defaults),
+    generateSpawnDefaultsHeader(inputs.spawnDefaults.defaults, inputs.entities.entities),
   );
-  outputs.set('engine/include/engine/catalog/petal_combat.hpp', generatePetalCombatHeader(petals));
-  outputs.set('engine/include/engine/catalog/drop_chances.hpp', generateDropChancesHeader(derived));
+  outputs.set(
+    'engine/include/engine/catalog/petal_combat.hpp',
+    generatePetalCombatHeader(petals, inputs.rarities.rarities),
+  );
+  outputs.set(
+    'engine/include/engine/catalog/drop_chances.hpp',
+    generateDropChancesHeader(derived, inputs.petals.petals, inputs.entities.entities),
+  );
   outputs.set(
     'client/src/schema/petals.ts',
     generateClientPetalsTs(petals, inputs.entities.entities, inputs.rarities.rarities),

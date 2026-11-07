@@ -62,7 +62,8 @@ void two_viewers_receive_same_tick_events() {
   auto a = test::join_player(*w, "Alice", {f32(-200), {}}),
        b = test::join_player(*w, "Bob", {f32(200), {}});
   net::ReplicationSession sa, sb;
-  const auto mob = spawn_entity(*w, EntityKind::kMob, 1, {}, f32(10));
+  const auto mob =
+      spawn_entity(*w, EntityKind::kMob, engine::catalog::SpeciesId::kRock, {}, f32(10));
   auto initial = freeze_tick_changes(*w);
   CHECK(initial);
   (void)snapshot(*w, *initial, viewer(a), sa);
@@ -94,7 +95,8 @@ void aoi_exit_reentry_and_handle_generation() {
   w->set_dimensions(f32(20000), f32(20000));
   const auto a = test::join_player(*w, "A", {f32(-4000), {}}),
              b = test::join_player(*w, "B", {f32(4000), {}});
-  const auto mob = spawn_entity(*w, EntityKind::kMob, 1, {f32(-4000), {}}, f32(10));
+  const auto mob = spawn_entity(*w, EntityKind::kMob, engine::catalog::SpeciesId::kRock,
+                                {f32(-4000), {}}, f32(10));
   net::ReplicationSession sa, sb;
   auto changes = *freeze_tick_changes(*w);
   CHECK(has(snapshot(*w, changes, viewer(a), sa), mob));
@@ -139,8 +141,8 @@ void public_and_self_are_separate_in_both_encodings() {
   pb->profile().set_level(9);
   pa->profile().set_experience(f32(123));
   pb->profile().set_experience(f32(456));
-  pa->loadout().slots()[8].type_id = 38;
-  pb->loadout().slots()[8].type_id = 2;
+  pa->loadout().slots()[8].type_id = engine::catalog::PetalId::kCornEpic;
+  pb->loadout().slots()[8].type_id = engine::catalog::PetalId::kFastCommon;
   for (bool dense : {false, true}) {
     net::ReplicationSession sa, sb;
     auto va = viewer(a), vb = viewer(b);
@@ -266,14 +268,16 @@ void newborn_drops_spin_but_old_aoi_reentry_and_resync_stay_settled() {
   for (bool dense : {false, true}) {
     auto w = test::make_world();
     const auto a = test::join_player(*w, "Alice", {});
-    const auto old = spawn_loot_drop(*w, 7, {f32(5000), {}}, {});
+    const auto old =
+        spawn_loot_drop(*w, engine::catalog::PetalId::kStingerUnusual, {f32(5000), {}}, {});
     test::advance_ticks(*w, 3);
     net::ReplicationSession session;
     auto view = viewer(a);
     view.dense = dense;
     (void)snapshot(*w, *freeze_tick_changes(*w), view, session);
     w->entities().get(old)->set_position({f32(50), {}});
-    const auto fresh = spawn_loot_drop(*w, 7, {f32(100), {}}, {});
+    const auto fresh =
+        spawn_loot_drop(*w, engine::catalog::PetalId::kStingerUnusual, {f32(100), {}}, {});
     const auto published = snapshot(*w, *freeze_tick_changes(*w), view, session);
     const auto arriving = [&](const Publication& p, EntityHandle h) {
       const auto it = std::find_if(p.snapshot.entities.begin(), p.snapshot.entities.end(),

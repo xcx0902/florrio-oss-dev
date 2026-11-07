@@ -1,5 +1,6 @@
 // Offline-only ABI thunks. Core mutations always take an explicit World.
 #include "engine/abi.h"
+#include <limits>
 #include "engine/diagnostics/entities.hpp"
 #include "engine/net/worker_api.hpp"
 
@@ -26,16 +27,22 @@ extern "C" std::uint32_t sp_server_debug_set_entity_field(std::uint32_t handle, 
              : 0U;
 }
 extern "C" std::uint32_t sp_server_debug_spawn_mob(std::uint32_t type_id, float x, float y) {
-  const auto handle = engine::diagnostics::spawn_mob(engine::current_worker_api().world(),
-                                                     static_cast<std::uint16_t>(type_id),
-                                                     engine::Vec2(engine::f32(x), engine::f32(y)));
+  if (type_id > std::numeric_limits<std::uint16_t>::max()) {
+    return 0U;
+  }
+  const auto handle = engine::diagnostics::spawn_mob(
+      engine::current_worker_api().world(), static_cast<engine::catalog::SpeciesId>(type_id),
+      engine::Vec2(engine::f32(x), engine::f32(y)));
   return handle.valid() ? handle.raw : 0U;
 }
 extern "C" std::uint32_t sp_server_debug_set_loadout_slot(std::uint32_t slot,
                                                           std::uint32_t type_id) {
+  if (type_id > std::numeric_limits<std::uint16_t>::max()) {
+    return 0U;
+  }
   return engine::diagnostics::set_loadout_slot(engine::current_worker_api().world(),
                                                engine::current_worker_api().local_player_id(), slot,
-                                               type_id)
+                                               static_cast<engine::catalog::PetalId>(type_id))
              ? 1U
              : 0U;
 }

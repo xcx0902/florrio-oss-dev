@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/catalog/ids.hpp"
 #include "engine/core/f32.hpp"
 #include <cstdint>
 
@@ -15,6 +16,6 @@ namespace engine {
 
 /** Experience awarded by a petal of the given rarity index, read from the
  * generated catalog table. */
-[[nodiscard]] f32 rarity_experience(std::uint32_t rarity_index);
+[[nodiscard]] f32 rarity_experience(catalog::Rarity rarity);
 
 }  // namespace engine

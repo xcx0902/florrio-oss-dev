@@ -33,7 +33,7 @@ void require(bool condition, const char* message) {
 #define CHECK(condition) require(static_cast<bool>(condition), #condition)
 #undef CHECK
 namespace {
-engine::EntityHandle setup(engine::World& world, std::uint16_t type) {
+engine::EntityHandle setup(engine::World& world, engine::catalog::PetalId type) {
   world.initialize();
   world.set_auto_populate(false);
   const auto owner = engine::spawn_player_default(world, engine::test::player(world), "projectile",
@@ -50,7 +50,11 @@ engine::EntityHandle setup(engine::World& world, std::uint16_t type) {
   return owner;
 }
 void release_and_recharge() {
-  for (const auto type : {10U, 11U, 12U, 19U, 20U, 29U, 30U, 34U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kMissileRare, engine::catalog::PetalId::kPeasRare,
+        engine::catalog::PetalId::kPeasEpic, engine::catalog::PetalId::kPollenEpic,
+        engine::catalog::PetalId::kDandelionRare, engine::catalog::PetalId::kWebRare,
+        engine::catalog::PetalId::kWebLegendary, engine::catalog::PetalId::kPeasLegendary}) {
     engine::World world;
     setup(world, type);
     const auto old = engine::test::player(world).loadout().handle(0, 0);
@@ -76,12 +80,14 @@ void release_and_recharge() {
   }
 }
 void peas_lifecycle() {
-  for (const auto type : {11U, 12U, 34U}) {
+  for (const auto type : {engine::catalog::PetalId::kPeasRare, engine::catalog::PetalId::kPeasEpic,
+                          engine::catalog::PetalId::kPeasLegendary}) {
     engine::World world;
     const auto owner = setup(world, type);
     const auto parent = engine::test::player(world).loadout().handle(0, 0);
-    const auto target = engine::spawn_entity(world, engine::EntityKind::kMob, 1,
-                                             {engine::f32(300), engine::f32(400)}, engine::f32(1));
+    const auto target =
+        engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
+                             {engine::f32(300), engine::f32(400)}, engine::f32(1));
     engine::on_petal_hit(world, parent, target, owner);
     require(world.entities().get(parent) != nullptr && world.deferred_launches().empty(),
             "contact does not split equipped Peas");
@@ -100,10 +106,10 @@ void peas_lifecycle() {
                   entity->max_health.value == 5,
               "split children keep owner and five health");
       const std::uint8_t expected_variant =
-          type == engine::catalog::petal_type_id(engine::catalog::PetalId::kPeasLegendary)
+          type == engine::catalog::PetalId::kPeasLegendary
               ? static_cast<std::uint8_t>(engine::PetalVariantFlag::kEpicColor) |
                     static_cast<std::uint8_t>(engine::PetalVariantFlag::kLarge)
-          : type == engine::catalog::petal_type_id(engine::catalog::PetalId::kPeasEpic)
+          : type == engine::catalog::PetalId::kPeasEpic
               ? static_cast<std::uint8_t>(engine::PetalVariantFlag::kEpicColor)
               : 0U;
       require(entity->petal_variant_flags == expected_variant, "variant render flags");
@@ -119,7 +125,8 @@ void peas_lifecycle() {
   }
 }
 void web_death_and_area() {
-  for (const auto type : {29U, 30U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kWebRare, engine::catalog::PetalId::kWebLegendary}) {
     engine::World world;
     const auto owner = setup(world, type);
     const auto web = engine::test::player(world).loadout().handle(0, 0);
@@ -131,8 +138,9 @@ void web_death_and_area() {
     }
 
     world.entities().get(web)->set_position({engine::f32(30), engine::f32(40)});
-    const auto target = engine::spawn_entity(world, engine::EntityKind::kMob, 1,
-                                             {engine::f32(500), engine::f32(400)}, engine::f32(1));
+    const auto target =
+        engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
+                             {engine::f32(500), engine::f32(400)}, engine::f32(1));
     engine::on_petal_hit(world, web, target, owner);
     require(world.area_effects().empty(), "orbiting Web contact creates no ground area");
     engine::test::input(world, 1, engine::f32(0), engine::f32(0));
@@ -173,7 +181,7 @@ void controlling_root_full_tick_contacts() {
   };
   for (const auto pair : {Pair::kPetWild, Pair::kSiblings, Pair::kOwner, Pair::kWildPair}) {
     engine::World world;
-    const auto owner = setup(world, 22);
+    const auto owner = setup(world, engine::catalog::PetalId::kEggEpic);
     world.set_time_ms(1001);
     engine::update_petal_orbits(world, engine::test::player(world), 1);
     const auto pet = engine::test::player(world).loadout().handle(0, 0);
@@ -184,13 +192,15 @@ void controlling_root_full_tick_contacts() {
     auto first = pet;
     if (pair == Pair::kWildPair) {
       world.entities().get(pet)->set_position({engine::f32(-500), engine::f32(0)});
-      first = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 9,
+      first = engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob,
+                                                 engine::catalog::SpeciesId::kSoldierAnt,
                                                  {engine::f32(300), engine::f32(0)});
     }
     const auto second =
         pair == Pair::kOwner
             ? owner
-            : engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 9,
+            : engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob,
+                                                 engine::catalog::SpeciesId::kSoldierAnt,
                                                  {engine::f32(310), engine::f32(0)});
     if (pair == Pair::kOwner) {
       world.entities().get(owner)->set_position({engine::f32(310), engine::f32(0)});
@@ -227,7 +237,10 @@ void controlling_root_full_tick_contacts() {
 void callback_trace() {
   std::printf("[");
   bool first = true;
-  for (const auto type : {10U, 19U, 20U, 29U, 30U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kMissileRare, engine::catalog::PetalId::kPollenEpic,
+        engine::catalog::PetalId::kDandelionRare, engine::catalog::PetalId::kWebRare,
+        engine::catalog::PetalId::kWebLegendary}) {
     for (unsigned buttons = 0; buttons < 4; ++buttons) {
       for (const double now : {500.0, 500.001, 550.0}) {
         for (const auto offset : {engine::Vec2{engine::f32(0), engine::f32(0)},
@@ -262,7 +275,8 @@ void callback_trace() {
 void split_trace() {
   std::printf("[");
   bool first = true;
-  for (const auto type : {11U, 12U, 34U}) {
+  for (const auto type : {engine::catalog::PetalId::kPeasRare, engine::catalog::PetalId::kPeasEpic,
+                          engine::catalog::PetalId::kPeasLegendary}) {
     for (const auto seed : {1U, 123456789U, 2147483646U}) {
       engine::World world;
       setup(world, type);
@@ -293,7 +307,11 @@ void split_trace() {
 void lifecycle_trace() {
   std::printf("[");
   bool first = true;
-  for (const auto type : {10U, 11U, 12U, 19U, 20U, 29U, 30U, 34U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kMissileRare, engine::catalog::PetalId::kPeasRare,
+        engine::catalog::PetalId::kPeasEpic, engine::catalog::PetalId::kPollenEpic,
+        engine::catalog::PetalId::kDandelionRare, engine::catalog::PetalId::kWebRare,
+        engine::catalog::PetalId::kWebLegendary, engine::catalog::PetalId::kPeasLegendary}) {
     engine::World world;
     setup(world, type);
     engine::test::input(world, 1, engine::f32(0), engine::f32(0));

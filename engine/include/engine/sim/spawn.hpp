@@ -10,7 +10,7 @@ namespace engine {
 
 struct SpawnBandEntry {
   f32 weight;
-  std::uint8_t entity_type;
+  catalog::SpeciesId entity_type;
 };
 
 struct SpawnBand {
@@ -80,7 +80,11 @@ class SpawnTable {
 
 /** Allocate an entity slot and initialize the domain fields. Returns an invalid
  * handle when the pool is exhausted. */
-[[nodiscard]] EntityHandle spawn_entity(World& world, EntityKind kind, std::uint16_t type_id,
+[[nodiscard]] EntityHandle spawn_entity(World& world, EntityKind kind, catalog::SpeciesId type_id,
+                                        Vec2 position, f32 radius, std::uint8_t world_flags = 0,
+                                        std::uint8_t entity_flags = 0);
+
+[[nodiscard]] EntityHandle spawn_entity(World& world, EntityKind kind, catalog::PetalId type_id,
                                         Vec2 position, f32 radius, std::uint8_t world_flags = 0,
                                         std::uint8_t entity_flags = 0);
 
@@ -88,7 +92,7 @@ class SpawnTable {
  * Cactus use their dynamic-radius initializers without the extra spawn-loot
  * draws; band spawns use `spawn_band_entity`, which draws them first. */
 [[nodiscard]] EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind,
-                                                      std::uint16_t type_id, Vec2 position);
+                                                      catalog::SpeciesId type_id, Vec2 position);
 
 /** Construct one band entry at an accepted spawn position. Every species draws
  * its spawn-loot candidates before the body initializer; Rock/Boulder/Cactus

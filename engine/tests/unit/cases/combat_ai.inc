@@ -3,7 +3,8 @@ void test_ai_family_profiles() {
   world.initialize();
   world.set_auto_populate(false);
   const engine::EntityHandle lady = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(lady.valid());
   engine::Entity* lady_entity = world.entities().get(lady);
   CHECK(lady_entity != nullptr);
@@ -16,7 +17,8 @@ void test_ai_family_profiles() {
   CHECK(std::fabs(static_cast<float>(lady_entity->ai.timer_interval_ms) - 3141.5927F) < 0.01F);
 
   const engine::EntityHandle massive = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 5, engine::Vec2(engine::f32(10.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kMassiveLadybug,
+      engine::Vec2(engine::f32(10.0F), engine::f32(0.0F)));
   engine::Entity* massive_entity = world.entities().get(massive);
   CHECK(massive_entity != nullptr);
   CHECK(massive_entity->health.value == 1000.0F);
@@ -25,7 +27,8 @@ void test_ai_family_profiles() {
   CHECK(massive_entity->ai.idle_speed.value == 0.2F);
 
   const engine::EntityHandle dark = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 20, engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybugDark,
+      engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)));
   engine::Entity* dark_entity = world.entities().get(dark);
   CHECK(dark_entity != nullptr);
   CHECK(dark_entity->health.value == 35.0F);
@@ -33,7 +36,8 @@ void test_ai_family_profiles() {
   CHECK(dark_entity->ai.worker);
 
   const engine::EntityHandle baby = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 7, engine::Vec2(engine::f32(30.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kBabyAnt,
+      engine::Vec2(engine::f32(30.0F), engine::f32(0.0F)));
   engine::Entity* baby_entity = world.entities().get(baby);
   CHECK(baby_entity != nullptr);
   CHECK(baby_entity->health.value == 10.0F);
@@ -43,7 +47,8 @@ void test_ai_family_profiles() {
         baby_entity->ai.wave_frequency.value <= 0.00221F);
 
   const engine::EntityHandle soldier = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 9, engine::Vec2(engine::f32(40.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kSoldierAnt,
+      engine::Vec2(engine::f32(40.0F), engine::f32(0.0F)));
   engine::Entity* soldier_entity = world.entities().get(soldier);
   CHECK(soldier_entity != nullptr);
   CHECK(soldier_entity->health.value == 40.0F);
@@ -53,7 +58,8 @@ void test_ai_family_profiles() {
   CHECK(soldier_entity->ai.territory.value == 0.3F);
 
   const engine::EntityHandle queen = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 10, engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kQueenAnt,
+      engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
   engine::Entity* queen_entity = world.entities().get(queen);
   CHECK(queen_entity != nullptr);
   CHECK(queen_entity->health.value == 200.0F);
@@ -61,7 +67,8 @@ void test_ai_family_profiles() {
   CHECK(queen_entity->ai.radius.value == 400.0F);
 
   const engine::EntityHandle beetle = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 12, engine::Vec2(engine::f32(60.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kBeetle,
+      engine::Vec2(engine::f32(60.0F), engine::f32(0.0F)));
   engine::Entity* beetle_entity = world.entities().get(beetle);
   CHECK(beetle_entity != nullptr);
   CHECK(beetle_entity->health.value == 40.0F);
@@ -70,7 +77,8 @@ void test_ai_family_profiles() {
   CHECK(beetle_entity->ai.radius.value == 600.0F);
 
   const engine::EntityHandle massive_beetle = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 13, engine::Vec2(engine::f32(70.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kMassiveBeetle,
+      engine::Vec2(engine::f32(70.0F), engine::f32(0.0F)));
   engine::Entity* massive_beetle_entity = world.entities().get(massive_beetle);
   CHECK(massive_beetle_entity != nullptr);
   CHECK(massive_beetle_entity->health.value == 300.0F);
@@ -79,7 +87,8 @@ void test_ai_family_profiles() {
   CHECK(massive_beetle_entity->ai.idle_speed.value == 1.1F);
 
   const engine::EntityHandle centipede = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 15, engine::Vec2(engine::f32(80.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kCentipedeHead,
+      engine::Vec2(engine::f32(80.0F), engine::f32(0.0F)));
   engine::Entity* centipede_entity = world.entities().get(centipede);
   CHECK(centipede_entity != nullptr);
   CHECK(centipede_entity->health.value == 50.0F);
@@ -106,13 +115,13 @@ void test_ai_family_profiles() {
     const engine::EntityHandle first_segment = world.entities().get(centipede)->children.front();
     engine::Entity* segment = world.entities().get(first_segment);
     CHECK(segment != nullptr);
-    CHECK(segment->type_id ==
-          engine::catalog::species_type_id(engine::catalog::SpeciesId::kCentipedeSegment));
+    CHECK(segment->species_id == engine::catalog::SpeciesId::kCentipedeSegment);
     CHECK(segment->owner == centipede.raw);
   }
 
   const engine::EntityHandle evil = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 17, engine::Vec2(engine::f32(3000.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kEvilCentipedeHead,
+      engine::Vec2(engine::f32(3000.0F), engine::f32(0.0F)));
   engine::Entity* evil_entity = world.entities().get(evil);
   CHECK(evil_entity != nullptr);
   CHECK(evil_entity->ai.evil);
@@ -181,7 +190,7 @@ void test_quadtree_order_and_collision_bounds() {
       world, engine::test::player(world), "bounds",
       engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
   const engine::EntityHandle child =
-      engine::spawn_entity(world, engine::EntityKind::kMob, 4,
+      engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
                            engine::Vec2(engine::f32(30.0F), engine::f32(0.0F)), engine::f32(10.0F));
   engine::Entity* child_entity = world.entities().get(child);
   CHECK(child_entity != nullptr);
@@ -213,11 +222,11 @@ void test_area_effects_and_deferred_launch() {
       engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
   CHECK(player.valid());
   const engine::EntityHandle inside =
-      engine::spawn_entity(world, engine::EntityKind::kMob, 4,
+      engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
                            engine::Vec2(engine::f32(10.0F), engine::f32(0.0F)), engine::f32(10.0F));
   const engine::EntityHandle outside = engine::spawn_entity(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(200.0F), engine::f32(0.0F)),
-      engine::f32(10.0F));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(200.0F), engine::f32(0.0F)), engine::f32(10.0F));
   world.entities().get(inside)->health = engine::f32(100.0F);
   world.entities().get(inside)->max_health = engine::f32(100.0F);
   const auto payload = engine::add_area_effect(
@@ -249,7 +258,7 @@ void test_area_effects_and_deferred_launch() {
   std::vector<engine::EntityHandle> children;
   for (std::uint32_t index = 0; index < 4U; ++index) {
     const engine::EntityHandle child =
-        engine::spawn_entity(world, engine::EntityKind::kPetal, 11,
+        engine::spawn_entity(world, engine::EntityKind::kPetal, engine::catalog::PetalId::kPeasRare,
                              engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::f32(5.0F));
     CHECK(child.valid());
     children.push_back(child);
@@ -277,7 +286,8 @@ void test_attribution_death_and_pickups() {
   engine::test::player(world).profile().set_level(7);
 
   const engine::EntityHandle attacker = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
   CHECK(attacker.valid());
   const std::size_t petal_count = engine::test::player(world).petals().size();
   std::vector<engine::EntityHandle> owned_petals;
@@ -332,7 +342,7 @@ void test_attribution_death_and_pickups() {
 
   // Coalesced hit messages carry an epoch and the number of merged hits.
   const engine::EntityHandle target =
-      engine::spawn_entity(world, engine::EntityKind::kMob, 4,
+      engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
                            engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::f32(10.0F));
   world.record_hit(target, attacker, engine::f32(3.0F), engine::f32(10.0F));
   world.record_hit(target, attacker, engine::f32(4.0F), engine::f32(6.0F));
@@ -349,7 +359,8 @@ void test_attribution_death_and_pickups() {
 
   // Pickup intrusive registry.
   const engine::EntityHandle drop =
-      engine::spawn_loot_drop(world, 1, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+      engine::spawn_loot_drop(world, engine::catalog::PetalId::kBasicCommon,
+                              engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(drop.valid());
   CHECK(world.entities().get(drop)->radius.value == 35.0F);
   CHECK(world.pickups().size() == 1U);
@@ -366,7 +377,8 @@ void test_killer_name_uses_attacker_identity() {
     const engine::EntityHandle player = engine::spawn_player_default(
         world, engine::test::player(world), "hero", engine::make_default_profile(), false);
     const engine::EntityHandle attacker = engine::spawn_entity_from_defaults(
-        world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
+        world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+        engine::Vec2(engine::f32(50.0F), engine::f32(0.0F)));
     CHECK(player.valid());
     CHECK(attacker.valid());
     // The recorded killer name is the attacker's own name, not the attacker's
@@ -397,14 +409,16 @@ void test_loadout_exact_layout() {
   CHECK(player.valid());
   engine::test::player(world).profile().set_level(30);
   for (std::uint8_t slot = 0; slot < 6; ++slot) {
-    engine::test::player(world).profile().set_inventory(slot, 1);
+    engine::test::player(world).profile().set_inventory(slot,
+                                                        engine::catalog::PetalId::kBasicCommon);
   }
   engine::test::player(world).profile().set_inventory(
-      2, 3);  // Heavy, so the final swap is a real type change.
+      2,
+      engine::catalog::PetalId::kHeavyCommon);  // Heavy, so the final swap is a real type change.
   engine::test::player(world).profile().set_inventory_count(6);
   engine::test::player(world).loadout().restore_from_profile(engine::test::player(world).profile());
   CHECK(engine::test::player(world).loadout().slots()[0].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+        engine::catalog::PetalId::kBasicCommon);
   CHECK(!engine::test::player(world).loadout().handle(0, 0).valid());
 
   const std::size_t spawned = engine::spawn_loadout_petals(world, engine::test::player(world));
@@ -427,14 +441,16 @@ void test_loadout_exact_layout() {
 
   const engine::EntityHandle old = engine::test::player(world).loadout().handle(0, 0);
   CHECK(engine::test::player(world).loadout().change_slot_type(
-      world, engine::test::player(world), engine::test::player(world).profile(), 0, 3));
+      world, engine::test::player(world), engine::test::player(world).profile(), 0,
+      engine::catalog::PetalId::kHeavyCommon));
   const engine::Entity* old_corpse = world.entities().get(old);
   CHECK(old_corpse != nullptr);
   CHECK(old_corpse->death_processed);
   CHECK(!engine::test::player(world).loadout().handle(0, 0).valid());
   CHECK(engine::test::player(world).loadout().slots()[0].type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
-  CHECK(engine::test::player(world).profile().inventory(0) == 3U);
+        engine::catalog::PetalId::kHeavyCommon);
+  CHECK(engine::test::player(world).profile().inventory(0) ==
+        engine::catalog::PetalId::kHeavyCommon);
   CHECK(engine::test::player(world).loadout().pending(0, 0));
   CHECK(engine::test::player(world).loadout().pending(0, 1));
   CHECK(engine::test::player(world).loadout().pending(0, 2));
@@ -453,15 +469,15 @@ void test_loadout_exact_layout() {
       world, engine::test::player(world), 0, 0));
   const engine::EntityHandle created = engine::test::player(world).loadout().handle(0, 0);
   CHECK(created.valid());
-  CHECK(world.entities().get(created)->type_id ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
+  CHECK(world.entities().get(created)->petal_id == engine::catalog::PetalId::kHeavyCommon);
   CHECK(world.entities().get(created)->owner == player.raw);
   CHECK(!engine::test::player(world).loadout().pending(0, 0));
 
   CHECK(engine::test::player(world).loadout().handle(1, 0).valid() &&
         engine::test::player(world).loadout().handle(2, 0).valid());
   CHECK(engine::test::player(world).loadout().swap(
-      world, engine::test::player(world), engine::test::player(world).profile(), 1, 1, 2, 3));
+      world, engine::test::player(world), engine::test::player(world).profile(), 1,
+      engine::catalog::PetalId::kBasicCommon, 2, engine::catalog::PetalId::kHeavyCommon));
   // Both slots re-enter their catalog recharge; no entity is exchanged.
   CHECK(!engine::test::player(world).loadout().handle(1, 0).valid());
   CHECK(!engine::test::player(world).loadout().handle(2, 0).valid());
@@ -489,9 +505,11 @@ void test_alert_to_attacker_is_local() {
       engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::PlayerConfig{});
   CHECK(player.valid());
   const engine::EntityHandle first = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(20.0F), engine::f32(0.0F)));
   const engine::EntityHandle second = engine::spawn_entity_from_defaults(
-      world, engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(30.0F), engine::f32(0.0F)));
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+      engine::Vec2(engine::f32(30.0F), engine::f32(0.0F)));
   CHECK(first.valid() && second.valid());
   world.entities().get(first)->ai.can_alert = true;
   (void)engine::damage_entity(world, first, engine::f32(1.0F), player);

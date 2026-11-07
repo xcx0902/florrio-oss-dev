@@ -32,8 +32,7 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
   world.detach_linked_entities(target);
   const EntityKind kind = entity->kind;
   const Vec2 position = entity->position;
-  const std::uint16_t type_id = entity->type_id;
-  world.record_death(kind, type_id, position, source.kind, source.type_id);
+  world.record_death(*entity, source);
   if (kind == EntityKind::kPlayer || kind == EntityKind::kMob) {
     entity->killer_name = source.name;
     // The killer name is a per-player local copy for the death payload only:
@@ -70,8 +69,8 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
     state.death.position = position;
     bool wide_view = false;
     for (std::size_t slot = 0; slot < state.profile().active_slots(); ++slot) {
-      wide_view = wide_view || catalog::petal_id(state.loadout().slots()[slot].type_id) ==
-                                   catalog::PetalId::kAntennaeLegendary;
+      wide_view = wide_view ||
+                  state.loadout().slots()[slot].type_id == catalog::PetalId::kAntennaeLegendary;
     }
     state.death.view_scale = f32(wide_view ? 0.63F : 0.9F);
     // A corpse keeps its last input only while an offline input lease is held;
@@ -85,9 +84,9 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
     state.profile().set_lost_items(loot.lost_count, loot.lost);
     // The first three eligible petals are ground loot. The remainder (up to
     // ten) belongs to the controller and respawns.
-    state.set_last_death_kept(std::span<const std::uint16_t>(loot.lost.data(), loot.lost_count));
-    std::vector<std::uint16_t> retained(loot.retained.begin(),
-                                        loot.retained.begin() + loot.retained_count);
+    state.set_last_death_kept(std::span<const catalog::PetalId>(loot.lost.data(), loot.lost_count));
+    std::vector<catalog::PetalId> retained(loot.retained.begin(),
+                                           loot.retained.begin() + loot.retained_count);
     (void)spawn_loot_drops(world, retained, position, target);
     state.set_last_death(state.loadout().score(), state.profile().level());
     // Walk all 24 owned handles (8 slots x 3 instances); live children are
@@ -128,11 +127,11 @@ void kill_entity_from_source(World& world, EntityHandle target, const DamageSour
   if (kind == EntityKind::kMob) {
     // Loot entries were chosen at spawn; the death path only materializes them
     // and consumes no additional RNG values.
-    std::vector<std::uint16_t> petals(entity->loot_petals.begin(),
-                                      entity->loot_petals.begin() + entity->loot_count);
+    std::vector<catalog::PetalId> petals(entity->loot_petals.begin(),
+                                         entity->loot_petals.begin() + entity->loot_count);
     (void)spawn_loot_drops(world, petals, position, target);
     if (auto* player = world.players().get(source.player)) {
-      const auto* definition = Catalog::instance().entity(type_id);
+      const auto* definition = Catalog::instance().entity(entity->species_id);
       if (definition != nullptr) {
         // The catalog scale is the experience reward granted to the attacker's
         // player.

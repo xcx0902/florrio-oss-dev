@@ -1,3 +1,4 @@
+#include "engine/net/catalog_id.hpp"
 #include "engine/net/replication_session.hpp"
 #include "engine/net/generated_protocol.hpp"
 #include "engine/sim/effects.hpp"
@@ -33,7 +34,7 @@ std::optional<EntityUpdate> project(const World& world, const Entity& entity, bo
   codec.write_mask_domain_fields(
       entity.handle, publicMask,
       entity.kind == EntityKind::kPlayer ? entity.player_look
-                                         : static_cast<std::uint8_t>(entity.type_id),
+                                         : static_cast<std::uint8_t>(net::catalog_type_id(entity)),
       static_cast<std::uint8_t>(entity.kind),
       entity.kind == EntityKind::kPlayer ? entity.player_expression : entity.loadout_instance,
       entity.position.x.value, entity.position.y.value, entity.angle.value, entity.health.value,
@@ -52,18 +53,19 @@ std::optional<EntityUpdate> project(const World& world, const Entity& entity, bo
   if (entity.kind == EntityKind::kPetal) {
     codec.write_mask_byte_field(entity.handle, publicMask, 11, entity.loadout_slot);
     codec.write_mask_byte_field(entity.handle, publicMask, 12, entity.loadout_instance);
-    const bool peas = catalog::is_peas_petal(entity.type_id) && entity.petal_launched;
+    const bool peas = catalog::is_peas_petal(entity.petal_id) && entity.petal_launched;
     const auto mask = publicMask | petalSpeciesMask | (peas ? petalVariantMask : 0U);
     if (peas) {
       codec.write_mask_byte_field(entity.handle, mask, 9, entity.petal_variant_flags);
     }
-    codec.write_mask_byte_field(entity.handle, mask, 50, static_cast<std::uint8_t>(entity.type_id));
+    codec.write_mask_byte_field(entity.handle, mask, 50,
+                                static_cast<std::uint8_t>(net::catalog_type_id(entity)));
   } else if (entity.kind == EntityKind::kDrop) {
     codec.write_mask_byte_field(entity.handle, publicMask, 22,
-                                static_cast<std::uint8_t>(entity.type_id));
+                                static_cast<std::uint8_t>(net::catalog_type_id(entity)));
     codec.write_mask_byte_field(entity.handle, publicMask, 54, entity.pickup_collected ? 1 : 0);
   } else if (entity.kind == EntityKind::kProjectile) {
-    const auto tagMask = entity.has_tag_component && catalog::is_web_petal(entity.type_id)
+    const auto tagMask = entity.has_tag_component && catalog::is_web_petal(entity.petal_id)
                              ? webProjectileMask
                              : projectileMask;
     codec.write_mask_entity(entity.handle, publicMask | tagMask);
@@ -120,8 +122,7 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
     next.viewerPosition = body->position;
     bool wide = false;
     for (std::size_t i = 0; i < player->profile().active_slots(); ++i) {
-      wide |= catalog::petal_id(player->loadout().slots()[i].type_id) ==
-              catalog::PetalId::kAntennaeLegendary;
+      wide |= player->loadout().slots()[i].type_id == catalog::PetalId::kAntennaeLegendary;
     }
     next.viewerScale = f32(wide ? 0.63F : 0.9F);
   }
@@ -149,7 +150,7 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
       // Reuse the spawn-tick creation marker: an old pickup entering the AOI
       // starts settled, while a just-created pickup grows and spins in.
       const bool groundWeb = entity.kind == EntityKind::kProjectile && entity.has_tag_component &&
-                             catalog::is_web_petal(entity.type_id);
+                             catalog::is_web_petal(entity.petal_id);
       const bool arriving = (entity.kind == EntityKind::kDrop || groundWeb) &&
                             !next.published.contains(entity.handle.to_wire()) &&
                             world.tick() <= entity.spawn_tick + 1U;
@@ -220,15 +221,17 @@ std::optional<Publication> publish(const World& world, const TickChanges& change
   self.score = player->loadout().score().value;
   self.zoneProgress = player->zone_progress();
   for (std::size_t i = 0; i < self.inventory.size(); ++i) {
-    self.inventory[i] = player->loadout().slots()[i].type_id;
+    self.inventory[i] = static_cast<std::uint16_t>(player->loadout().slots()[i].type_id);
   }
   self.recharge = player->loadout().recharge_progress();
-  self.backpack.assign(player->profile().backpack().begin(),
-                       player->profile().backpack().begin() + player->profile().backpack_count());
+  for (std::size_t i = 0; i < player->profile().backpack_count(); ++i) {
+    self.backpack.push_back(static_cast<std::uint16_t>(player->profile().backpack()[i]));
+  }
   self.deathScore = player->death.score.value;
   self.deathLevel = player->death.level;
-  self.kept.assign(player->death.kept.begin(),
-                   player->death.kept.begin() + player->death.kept_count);
+  for (std::size_t i = 0; i < player->death.kept_count; ++i) {
+    self.kept.push_back(static_cast<std::uint16_t>(player->death.kept[i]));
+  }
   self.killerName = player->death.killer_name;
   self.cameraX = next.viewerPosition.x.value;
   self.cameraY = next.viewerPosition.y.value;

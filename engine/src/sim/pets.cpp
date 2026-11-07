@@ -11,10 +11,10 @@
 
 namespace engine {
 
-bool hatch_equipped_egg(World& world, EntityHandle egg_handle, std::uint16_t hatchling_type) {
+bool hatch_equipped_egg(World& world, EntityHandle egg_handle, catalog::SpeciesId hatchling_type) {
   const Entity* egg = world.entities().get(egg_handle);
   if (egg == nullptr || egg->kind != EntityKind::kPetal || egg->health.value <= 0.0F ||
-      !catalog::is_egg_petal(egg->type_id)) {
+      !catalog::is_egg_petal(egg->petal_id)) {
     return false;
   }
   const Vec2 position = egg->position;

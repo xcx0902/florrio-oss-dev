@@ -15,7 +15,7 @@ constexpr float kPollenConversionChance = 0.01F;
  * minstd_rand with independent_bits_engine: each step rejection-samples
  * ceil(log2(range)) bits until the value falls below the range. `rng` is the
  * independent engine's Park-Miller state. */
-void shuffle_petals(std::uint16_t* data, std::size_t count, ServerRng& rng) {
+void shuffle_petals(catalog::PetalId* data, std::size_t count, ServerRng& rng) {
   if (count < 2) {
     return;
   }
@@ -43,25 +43,26 @@ void shuffle_petals(std::uint16_t* data, std::size_t count, ServerRng& rng) {
   }
 }
 
-std::uint32_t rarity_of(std::uint16_t petal_type) {
+catalog::Rarity rarity_of(catalog::PetalId petal_type) {
   const auto* combat = Catalog::instance().petal_combat(petal_type);
-  return combat == nullptr ? 0U : combat->rarityIndex;
+  return combat == nullptr ? catalog::Rarity::kCommon : combat->rarityIndex;
 }
 
 }  // namespace
 
-double loot_lifetime_ms(std::uint16_t petal_type) {
-  const std::uint32_t rarity = rarity_of(petal_type);
-  if (rarity >= static_cast<std::uint8_t>(catalog::Rarity::kRare) &&
-      rarity <= static_cast<std::uint8_t>(catalog::Rarity::kUnique)) {
+double loot_lifetime_ms(catalog::PetalId petal_type) {
+  const catalog::Rarity rarity = rarity_of(petal_type);
+  if (rarity >= catalog::Rarity::kRare && rarity <= catalog::Rarity::kUnique) {
     static constexpr double kDurations[4]{42000.0, 52000.0, 62000.0, 62000.0};
-    return kDurations[rarity - 2U];
+    return kDurations[catalog::rarity_index(rarity) -
+                      catalog::rarity_index(catalog::Rarity::kRare)];
   }
   return 32000.0;
 }
 
-std::vector<std::uint16_t> roll_entity_loot(ServerRng& rng, std::uint16_t type_id, bool compact) {
-  std::vector<std::uint16_t> result;
+std::vector<catalog::PetalId> roll_entity_loot(ServerRng& rng, catalog::SpeciesId type_id,
+                                               bool compact) {
+  std::vector<catalog::PetalId> result;
   const auto* table = Catalog::instance().drop_table(type_id);
   if (table == nullptr || table->drops == nullptr) {
     return result;
@@ -79,25 +80,27 @@ std::vector<std::uint16_t> roll_entity_loot(ServerRng& rng, std::uint16_t type_i
 
 LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng& shuffle_rng) {
   LootResult result;
-  std::array<std::vector<std::uint16_t>, 6> groups;
+  std::array<std::vector<catalog::PetalId>, 6> groups;
   const std::uint8_t size = profile.inventory_size();
   std::uint8_t occupied = 0;
   for (std::uint8_t slot = 0; slot < size; ++slot) {
-    const std::uint16_t petal = profile.inventory(slot);
-    if (petal == static_cast<std::uint16_t>(catalog::PetalId::kNone)) {
+    const catalog::PetalId petal = profile.inventory(slot);
+    if (petal == catalog::PetalId::kNone) {
       continue;
     }
     ++occupied;
-    groups[std::min<std::uint32_t>(rarity_of(petal), 5U)].push_back(petal);
+    groups[catalog::rarity_index(std::min(rarity_of(petal), catalog::Rarity::kUnique))].push_back(
+        petal);
   }
   const std::uint8_t limit = size > occupied ? static_cast<std::uint8_t>(size - occupied) : 0U;
   const std::uint8_t bag_count = profile.backpack_count();
   const std::uint8_t bag_start =
       bag_count < limit ? 0U : static_cast<std::uint8_t>(bag_count - limit);
   for (std::uint8_t index = bag_start; index < bag_count; ++index) {
-    const std::uint16_t petal = profile.backpack()[index];
-    if (petal != static_cast<std::uint16_t>(catalog::PetalId::kNone)) {
-      groups[std::min<std::uint32_t>(rarity_of(petal), 5U)].push_back(petal);
+    const catalog::PetalId petal = profile.backpack()[index];
+    if (petal != catalog::PetalId::kNone) {
+      groups[catalog::rarity_index(std::min(rarity_of(petal), catalog::Rarity::kUnique))].push_back(
+          petal);
     }
   }
   std::uint32_t retained = 0;
@@ -108,8 +111,8 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng&
       continue;
     }
     shuffle_petals(group.data(), group.size(), shuffle_rng);
-    for (const std::uint16_t petal : group) {
-      if (petal == static_cast<std::uint16_t>(catalog::PetalId::kBasicCommon)) {
+    for (const catalog::PetalId petal : group) {
+      if (petal == catalog::PetalId::kBasicCommon) {
         continue;
       }
       if (rng.next_fraction() < f32(0.1F)) {
@@ -125,9 +128,9 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng&
   result.retained_count = static_cast<std::uint8_t>(retained);
   result.lost_count = static_cast<std::uint8_t>(lost);
   for (std::uint32_t index = 0; index < retained; ++index) {
-    if (rarity_of(result.retained[index]) >= static_cast<std::uint8_t>(catalog::Rarity::kRare) &&
+    if (rarity_of(result.retained[index]) >= catalog::Rarity::kRare &&
         rng.next_fraction() < f32(kPollenConversionChance)) {
-      result.retained[index] = static_cast<std::uint16_t>(catalog::PetalId::kPollenEpic);
+      result.retained[index] = catalog::PetalId::kPollenEpic;
     }
   }
   profile.set_lost_items(result.lost_count, result.lost);
@@ -140,7 +143,7 @@ LootResult retain_player_loot(PlayerProfile& profile, ServerRng& rng, ServerRng&
   return result;
 }
 
-EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 position, Vec2 impulse,
+EntityHandle spawn_loot_drop(World& world, catalog::PetalId petal_type, Vec2 position, Vec2 impulse,
                              Vec2d base_velocity) {
   // Loot is a fixed-size card (70 px world tile), independent of the petal's
   // combat draw radius; scaling it by the draw radius would make Mythic drops
@@ -164,8 +167,8 @@ EntityHandle spawn_loot_drop(World& world, std::uint16_t petal_type, Vec2 positi
   return handle;
 }
 
-bool legendary_exists(const World& world, EntityHandle dead, std::uint16_t petal_type) {
-  if (rarity_of(petal_type) != catalog::rarity_index(catalog::Rarity::kUnique)) {
+bool legendary_exists(const World& world, EntityHandle dead, catalog::PetalId petal_type) {
+  if (rarity_of(petal_type) != catalog::Rarity::kUnique) {
     return false;
   }
   bool equipped = false;
@@ -185,14 +188,15 @@ bool legendary_exists(const World& world, EntityHandle dead, std::uint16_t petal
   // A copy already on the ground also suppresses the drop.
   for (const EntityHandle handle : world.pickups()) {
     const Entity* entity = world.entities().get(handle);
-    if (entity != nullptr && entity->active && entity->type_id == petal_type) {
+    if (entity != nullptr && entity->active && entity->petal_id == petal_type) {
       return true;
     }
   }
   return false;
 }
 
-std::vector<EntityHandle> spawn_loot_drops(World& world, const std::vector<std::uint16_t>& petals,
+std::vector<EntityHandle> spawn_loot_drops(World& world,
+                                           const std::vector<catalog::PetalId>& petals,
                                            Vec2 position, EntityHandle dead) {
   std::vector<EntityHandle> spawned;
   spawned.reserve(petals.size());

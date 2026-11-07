@@ -27,7 +27,7 @@ void require(bool condition, const char* message) {
   std::fprintf(stderr, "passives/pets: %s\n", message);
   std::exit(1);
 }
-EntityHandle setup(World& world, std::initializer_list<std::uint16_t> types) {
+EntityHandle setup(World& world, std::initializer_list<engine::catalog::PetalId> types) {
   world.initialize();
   world.set_auto_populate(false);
   auto profile = make_default_profile();
@@ -45,29 +45,30 @@ EntityHandle setup(World& world, std::initializer_list<std::uint16_t> types) {
   return owner;
 }
 void rotation_and_heaviest() {
-  for (const auto types : {std::initializer_list<std::uint16_t>{1},
-                           {2},
-                           {14},
-                           {14, 14},
-                           {26},
-                           {26, 26},
-                           {14, 26},
-                           {28},
-                           {14, 28},
-                           {28, 28}}) {
+  for (const auto types :
+       {std::initializer_list<engine::catalog::PetalId>{engine::catalog::PetalId::kBasicCommon},
+        {engine::catalog::PetalId::kFastCommon},
+        {engine::catalog::PetalId::kFasterRare},
+        {engine::catalog::PetalId::kFasterRare, engine::catalog::PetalId::kFasterRare},
+        {engine::catalog::PetalId::kHeaviestEpic},
+        {engine::catalog::PetalId::kHeaviestEpic, engine::catalog::PetalId::kHeaviestEpic},
+        {engine::catalog::PetalId::kFasterRare, engine::catalog::PetalId::kHeaviestEpic},
+        {engine::catalog::PetalId::kYinYangEpic},
+        {engine::catalog::PetalId::kFasterRare, engine::catalog::PetalId::kYinYangEpic},
+        {engine::catalog::PetalId::kYinYangEpic, engine::catalog::PetalId::kYinYangEpic}}) {
     World world;
     setup(world, types);
     std::uint32_t faster = 0, yin = 0;
     for (auto type : types) {
-      faster += type == 14U;
-      yin += type == 28U;
+      faster += type == engine::catalog::PetalId::kFasterRare;
+      yin += type == engine::catalog::PetalId::kYinYangEpic;
     }
     advance_loadout_orbit_phase(engine::test::player(world), 50.0);
     const auto direction = yin == 0U ? 1.0 : yin == 1U ? -1.0 : 0.0;
     require(engine::test::player(world).loadout().orbit_phase() ==
                 f32::from_double((2.5 + 0.8 * faster) * direction * 0.05),
             "shared phase including Faster and unchanged Heaviest");
-    if (*types.begin() == 14U) {
+    if (*types.begin() == engine::catalog::PetalId::kFasterRare) {
       engine::test::player(world).loadout().set_pending(0, 0, true);
       engine::test::player(world).loadout().set_orbit_phase(f32(0.0F));
       advance_loadout_orbit_phase(engine::test::player(world), 50.0);
@@ -77,7 +78,7 @@ void rotation_and_heaviest() {
     }
   }
   World world;
-  setup(world, {26});
+  setup(world, {engine::catalog::PetalId::kHeaviestEpic});
   require(world.entities().get(engine::test::player(world).loadout().handle(0, 0))->mass ==
               f32(4.0F),
           "Heaviest mass is four");
@@ -88,15 +89,17 @@ void rotation_and_heaviest() {
 }
 void passive_health() {
   struct Case {
-    std::uint16_t type;
+    engine::catalog::PetalId type;
     float maximum;
     float health;
   };
   // Health starts at 50/100, then one regeneration tick applies the passives.
   for (const auto fixture :
-       {Case{1, 100.0F, 50.02083206176758F}, Case{32, 100.0F, 50.07083511352539F},
-        Case{13, 120.0F, 60.025001525878906F}, Case{21, 120.0F, 60.025001525878906F},
-        Case{33, 140.0F, 70.02916717529297F}}) {
+       {Case{engine::catalog::PetalId::kBasicCommon, 100.0F, 50.02083206176758F},
+        Case{engine::catalog::PetalId::kLeafUnusual, 100.0F, 50.07083511352539F},
+        Case{engine::catalog::PetalId::kCactusRare, 120.0F, 60.025001525878906F},
+        Case{engine::catalog::PetalId::kCactusEpic, 120.0F, 60.025001525878906F},
+        Case{engine::catalog::PetalId::kCactusLegendary, 140.0F, 70.02916717529297F}}) {
     World world;
     const auto owner = setup(world, {fixture.type});
     auto* player = world.entities().get(owner);
@@ -113,7 +116,10 @@ void passive_health() {
             "pending suppresses Leaf/Cactus and preserves health ratio");
   }
   World world;
-  const auto owner = setup(world, {13, 21, 33, 32, 32});
+  const auto owner = setup(
+      world, {engine::catalog::PetalId::kCactusRare, engine::catalog::PetalId::kCactusEpic,
+              engine::catalog::PetalId::kCactusLegendary, engine::catalog::PetalId::kLeafUnusual,
+              engine::catalog::PetalId::kLeafUnusual});
   auto* player = world.entities().get(owner);
   player->health = f32(50.0F);
   regenerate_players(world, 50.0);
@@ -132,26 +138,28 @@ void passive_health() {
   require(player->health == f32(0.0F), "Leaf never revives a dead player");
   // Reserve slots are not counted; type33 contributes once despite three petals.
   engine::test::player(world).profile().set_level(1);
-  require(engine::test::player(world).loadout().equip(5, 13), "reserve Cactus equips");
+  require(engine::test::player(world).loadout().equip(5, engine::catalog::PetalId::kCactusRare),
+          "reserve Cactus equips");
   require(equipped_max_health_bonus(engine::test::player(world), 1) == f32(80.0F),
           "reserve Cactus adds nothing");
   require(equipped_max_health_bonus(engine::test::player(world), 15) == f32(100.0F),
           "unlocking slot includes its Cactus");
   World capped;
-  const auto capped_owner = setup(capped, {32});
+  const auto capped_owner = setup(capped, {engine::catalog::PetalId::kLeafUnusual});
   capped.entities().get(capped_owner)->health = f32(99.99F);
   regenerate_players(capped, 50.0);
   require(capped.entities().get(capped_owner)->health == f32(100.0F),
           "Leaf caps at maximum health");
   World rewards;
-  const auto reward_owner = setup(rewards, {13});
+  const auto reward_owner = setup(rewards, {engine::catalog::PetalId::kCactusRare});
   rewards.entities().get(reward_owner)->health = f32(50.0F);
   award_player_experience(rewards, engine::test::player(rewards).id(), f32(4.0F));
   require(rewards.entities().get(reward_owner)->max_health ==
               player_level_max_health(engine::test::player(rewards).profile().level()) + f32(20.0F),
           "level reward keeps equipped Cactus maximum");
 }
-void egg_slot_and_recharge(std::uint16_t type, double delay, std::uint16_t mob_type) {
+void egg_slot_and_recharge(engine::catalog::PetalId type, double delay,
+                           engine::catalog::SpeciesId mob_type) {
   World world;
   const auto owner = setup(world, {type});
   const auto egg = engine::test::player(world).loadout().handle(0, 0);
@@ -164,7 +172,7 @@ void egg_slot_and_recharge(std::uint16_t type, double delay, std::uint16_t mob_t
   require(pet.valid() && pet != egg, "hatch replaces equipped handle");
   const auto* hatchling = world.entities().get(pet);
   require(hatchling != nullptr && hatchling->kind == EntityKind::kMob &&
-              hatchling->type_id == mob_type,
+              hatchling->species_id == mob_type,
           "hatchling species matches the Egg's pet type");
   require(hatchling->owner == owner.raw && hatchling->ai.owner == owner,
           "pet owner and AI leash owner are the player");
@@ -193,22 +201,25 @@ void egg_slot_and_recharge(std::uint16_t type, double delay, std::uint16_t mob_t
   world.set_time_ms(delay + 6001.0);
   require(refresh_loadout_petals(world, engine::test::player(world), 1.0) == 1U,
           "Egg returns after catalog recharge");
-  require(world.entities().get(engine::test::player(world).loadout().handle(0, 0))->type_id == type,
+  require(world.entities().get(engine::test::player(world).loadout().handle(0, 0))->petal_id ==
+              type,
           "respawns an Egg");
   require(engine::test::player(world).petals()[0].behavior_started_at_ms == world.time_ms(),
           "fresh Egg hatch clock");
 }
 void pet_targeting_and_guard() {
   World world;
-  const auto owner = setup(world, {22});
+  const auto owner = setup(world, {engine::catalog::PetalId::kEggEpic});
   world.set_time_ms(1001.0);
   update_petal_orbits(world, engine::test::player(world), 1.0);
   const auto pet = engine::test::player(world).loadout().handle(0, 0);
   auto* friendly = world.entities().get(pet);
   const auto wild =
-      spawn_entity_from_defaults(world, EntityKind::kMob, 9, Vec2(f32(100.0F), f32(0.0F)));
+      spawn_entity_from_defaults(world, EntityKind::kMob, engine::catalog::SpeciesId::kSoldierAnt,
+                                 Vec2(f32(100.0F), f32(0.0F)));
   const auto other_wild =
-      spawn_entity_from_defaults(world, EntityKind::kMob, 9, Vec2(f32(120.0F), f32(0.0F)));
+      spawn_entity_from_defaults(world, EntityKind::kMob, engine::catalog::SpeciesId::kSoldierAnt,
+                                 Vec2(f32(120.0F), f32(0.0F)));
   require(target_eligible(world, *friendly, *world.entities().get(wild)),
           "pet can target wild mob");
   require(!target_eligible(world, *friendly, *world.entities().get(owner)), "pet rejects owner");
@@ -234,11 +245,12 @@ void pet_targeting_and_guard() {
 }
 
 void egg_full_ticks() {
-  for (const auto type : {22U, 23U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kEggEpic, engine::catalog::PetalId::kEggLegendary}) {
     World world;
-    setup(world, {static_cast<std::uint16_t>(type)});
+    setup(world, {type});
     const auto egg = engine::test::player(world).loadout().handle(0, 0);
-    const int ticks = type == 22U ? 20 : 50;
+    const int ticks = type == engine::catalog::PetalId::kEggEpic ? 20 : 50;
     for (int index = 0; index < ticks; ++index) {
       tick(world, 50.0);
     }
@@ -266,7 +278,7 @@ void pet_contacts() {
   };
   for (const auto pair : {Pair::kWild, Pair::kSibling, Pair::kOwner, Pair::kWildPair}) {
     World world;
-    const auto owner = setup(world, {22});
+    const auto owner = setup(world, {engine::catalog::PetalId::kEggEpic});
     world.set_time_ms(1001.0);
     update_petal_orbits(world, engine::test::player(world), 1.0);
     const auto pet = engine::test::player(world).loadout().handle(0, 0);
@@ -276,12 +288,16 @@ void pet_contacts() {
     EntityHandle second = owner;
     if (pair == Pair::kWildPair) {
       world.entities().get(pet)->set_position(Vec2(f32(-500.0F), f32(0.0F)));
-      first = spawn_entity_from_defaults(world, EntityKind::kMob, 9, Vec2(f32(300.0F), f32(0.0F)));
+      first = spawn_entity_from_defaults(world, EntityKind::kMob,
+                                         engine::catalog::SpeciesId::kSoldierAnt,
+                                         Vec2(f32(300.0F), f32(0.0F)));
     }
     if (pair == Pair::kOwner) {
       world.entities().get(owner)->set_position(Vec2(f32(310.0F), f32(0.0F)));
     } else {
-      second = spawn_entity_from_defaults(world, EntityKind::kMob, 9, Vec2(f32(310.0F), f32(0.0F)));
+      second = spawn_entity_from_defaults(world, EntityKind::kMob,
+                                          engine::catalog::SpeciesId::kSoldierAnt,
+                                          Vec2(f32(310.0F), f32(0.0F)));
       if (pair == Pair::kSibling) {
         world.entities().get(second)->owner = owner.raw;
       }
@@ -306,10 +322,11 @@ void pet_contacts() {
 }
 
 void pet_full_tick_damage() {
-  for (const auto type : {22U, 23U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kEggEpic, engine::catalog::PetalId::kEggLegendary}) {
     World world;
-    const auto owner = setup(world, {static_cast<std::uint16_t>(type)});
-    const int hatch_ticks = type == 22U ? 21 : 51;
+    const auto owner = setup(world, {type});
+    const int hatch_ticks = type == engine::catalog::PetalId::kEggEpic ? 21 : 51;
     for (int index = 0; index < hatch_ticks; ++index) {
       tick(world, 50.0);
     }
@@ -321,7 +338,8 @@ void pet_full_tick_damage() {
     friendly->set_position(Vec2(f32(300.0F), f32(0.0F)));
     friendly->velocity = {};
     const auto wild =
-        spawn_entity_from_defaults(world, EntityKind::kMob, 9, Vec2(f32(310.0F), f32(0.0F)));
+        spawn_entity_from_defaults(world, EntityKind::kMob, engine::catalog::SpeciesId::kSoldierAnt,
+                                   Vec2(f32(310.0F), f32(0.0F)));
     auto* enemy = world.entities().get(wild);
     const auto pet_health = friendly->health, wild_health = enemy->health;
     tick(world, 50.0);
@@ -332,10 +350,11 @@ void pet_full_tick_damage() {
 }
 
 void zone_disables_equipped_pets() {
-  for (const auto type : {22U, 23U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kEggEpic, engine::catalog::PetalId::kEggLegendary}) {
     World world;
-    const auto owner = setup(world, {static_cast<std::uint16_t>(type)});
-    const int hatch_ticks = type == 22U ? 21 : 51;
+    const auto owner = setup(world, {type});
+    const int hatch_ticks = type == engine::catalog::PetalId::kEggEpic ? 21 : 51;
     for (int index = 0; index < hatch_ticks; ++index) {
       tick(world, 50.0);
     }
@@ -376,7 +395,7 @@ void zone_disables_equipped_pets() {
                 engine::test::player(world).zone_timer_ms() == f32(44995.0F),
             "safe-zone timer keeps its 0.1 decay");
     require(replacement.valid() && world.entities().get(replacement)->kind == EntityKind::kPetal &&
-                world.entities().get(replacement)->type_id == type,
+                world.entities().get(replacement)->petal_id == type,
             "leaving zone restriction permits the recharged Egg to spawn");
     require(engine::test::player(world).loadout().recharge_progress()[0] == 65535U,
             "re-enabling a charged Egg restores the ready recharge cache");
@@ -384,13 +403,14 @@ void zone_disables_equipped_pets() {
 }
 
 void discard_hatched_pet_before_owner_death() {
-  for (const auto type : {22U, 23U}) {
+  for (const auto type :
+       {engine::catalog::PetalId::kEggEpic, engine::catalog::PetalId::kEggLegendary}) {
     WorkerApi api;
     api.init(false);
     auto& world = api.world();
-    const auto owner = setup(world, {static_cast<std::uint16_t>(type)});
-    engine::test::player(world).profile().set_inventory(0U, static_cast<std::uint16_t>(type));
-    const int hatch_ticks = type == 22U ? 21 : 51;
+    const auto owner = setup(world, {type});
+    engine::test::player(world).profile().set_inventory(0U, type);
+    const int hatch_ticks = type == engine::catalog::PetalId::kEggEpic ? 21 : 51;
     for (int index = 0; index < hatch_ticks; ++index) {
       tick(world, 50.0);
     }
@@ -400,29 +420,30 @@ void discard_hatched_pet_before_owner_death() {
                 hatchling->health.value > 0.0F,
             "opcode8 fixture starts with a living equipped pet");
     const std::array<std::uint8_t, 4> key{0x11, 0x22, 0x33, 0x44};
-    const auto discard = [&api, &key](std::uint32_t sequence, std::uint8_t expected_type) {
+    const auto discard = [&api, &key](std::uint32_t sequence,
+                                      engine::catalog::PetalId expected_type) {
       ByteWriter writer;
       writer.write_varint32(sequence);
       writer.write_varint32(8U);
       writer.write_u8(0U);
-      writer.write_u8(expected_type);
+      writer.write_u8(static_cast<std::uint8_t>(expected_type));
       auto packet = writer.bytes();
       apply_packet_xor(packet, key);
       require(api.send(packet, key), "opcode8 packet parses");
     };
-    discard(1U, 1U);
+    discard(1U, engine::catalog::PetalId::kBasicCommon);
     require(engine::test::player(world).loadout().handle(0U, 0U) == pet &&
                 world.entities().get(pet)->health.value > 0.0F,
             "mismatched discard leaves the equipped pet alive");
-    discard(2U, static_cast<std::uint8_t>(type));
+    discard(2U, type);
     const auto* corpse = world.entities().get(pet);
     require(corpse != nullptr && corpse->health == f32(0.0F) && corpse->death_processed,
             "opcode8 damages the hatchling before clearing its equipped handle");
-    require(!engine::test::player(world).loadout().handle(0U, 0U).valid() &&
-                engine::test::player(world).loadout().slots()[0].type_id ==
-                    catalog::petal_type_id(catalog::PetalId::kNone) &&
-                engine::test::player(world).profile().inventory(0U) == 0U,
-            "discard clears the slot and profile");
+    require(
+        !engine::test::player(world).loadout().handle(0U, 0U).valid() &&
+            engine::test::player(world).loadout().slots()[0].type_id == catalog::PetalId::kNone &&
+            engine::test::player(world).profile().inventory(0U) == engine::catalog::PetalId::kNone,
+        "discard clears the slot and profile");
     require(engine::test::player(world).profile().backpack_count() == 1U &&
                 engine::test::player(world).profile().backpack()[0] == type,
             "discard retains the Egg type in the backpack");
@@ -443,7 +464,7 @@ void discard_hatched_pet_before_owner_death() {
 
 void zone_reenable_partial_recharge() {
   World world;
-  const auto owner = setup(world, {22});
+  const auto owner = setup(world, {engine::catalog::PetalId::kEggEpic});
   for (int index = 0; index < 21; ++index) {
     tick(world, 50.0);
   }
@@ -487,8 +508,10 @@ int main(int argc, char** argv) {
   std::puts("ok 1 - Faster phase and Heaviest mass/orbit");
   passive_health();
   std::puts("ok 2 - Leaf and Cactus exact health, readiness, stacking and veto");
-  egg_slot_and_recharge(22U, 1000.0, 9U);
-  egg_slot_and_recharge(23U, 2500.0, 12U);
+  egg_slot_and_recharge(engine::catalog::PetalId::kEggEpic, 1000.0,
+                        engine::catalog::SpeciesId::kSoldierAnt);
+  egg_slot_and_recharge(engine::catalog::PetalId::kEggLegendary, 2500.0,
+                        engine::catalog::SpeciesId::kBeetle);
   std::puts("ok 3 - both Egg strict hatch boundaries and recharge after pet death");
   pet_targeting_and_guard();
   std::puts("ok 4 - pet targeting, guard arrival and random guard direction");

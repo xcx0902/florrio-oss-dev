@@ -2,6 +2,8 @@
 #include "engine/model/entity_relations.hpp"
 #include "engine/net/snapshot_codec.hpp"
 #include "engine/net/worker_api.hpp"
+#include "engine/net/catalog_id.hpp"
+#include "engine/model/catalog.hpp"
 #include "engine/sim/combat.hpp"
 #include "engine/sim/effects.hpp"
 #include "engine/sim/spatial.hpp"
@@ -11,6 +13,22 @@
 #include <cstdio>
 #include <vector>
 #include <utility>
+#include <type_traits>
+
+static_assert(std::is_invocable_v<decltype(&engine::Catalog::petal), const engine::Catalog&,
+                                  engine::catalog::PetalId>);
+static_assert(!std::is_invocable_v<decltype(&engine::Catalog::petal), const engine::Catalog&,
+                                   engine::catalog::SpeciesId>);
+static_assert(
+    !std::is_invocable_v<decltype(&engine::Catalog::petal), const engine::Catalog&, std::uint16_t>);
+static_assert(!std::is_invocable_v<decltype(&engine::Catalog::entity), const engine::Catalog&,
+                                   engine::catalog::PetalId>);
+static_assert(
+    !std::is_invocable_v<decltype(&engine::PlayerProfile::set_inventory), engine::PlayerProfile&,
+                         std::uint8_t, engine::catalog::SpeciesId>);
+static_assert(!std::is_invocable_v<decltype(&engine::PlayerLoadout::equip), engine::PlayerLoadout&,
+                                   std::uint8_t, std::uint16_t>);
+
 namespace {
 int failures = 0;
 void check(bool value, const char* name) {
@@ -23,7 +41,7 @@ void seed(engine::World& world, float offset) {
   world.initialize();
   for (unsigned index = 0; index < 5U; ++index) {
     const auto h = engine::spawn_entity_from_defaults(
-        world, engine::EntityKind::kMob, 4U,
+        world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
         {engine::f32(offset + static_cast<float>(index) * 9.0F), engine::f32(0.0F)});
     check(h.valid(), "seed mob");
   }
@@ -45,6 +63,39 @@ void step(engine::World& world) {
 }
 }
 int main() {
+  {
+    engine::World world;
+    world.initialize();
+    const auto hole = engine::spawn_entity(
+        world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kAntHole, {}, engine::f32(1));
+    const auto peas = engine::spawn_entity(world, engine::EntityKind::kPetal,
+                                           engine::catalog::PetalId::kPeasRare, {}, engine::f32(1));
+    const auto& mob = *world.entities().get(hole);
+    const auto& petal = *world.entities().get(peas);
+    check(mob.species_id == engine::catalog::SpeciesId::kAntHole &&
+              mob.petal_id == engine::catalog::PetalId::kNone &&
+              petal.petal_id == engine::catalog::PetalId::kPeasRare &&
+              petal.species_id == engine::catalog::SpeciesId::kNone,
+          "overlapping catalog numbers retain distinct identities");
+    check(!mob.uses_mass_weighted_response && petal.uses_mass_weighted_response,
+          "ant-hole initialization cannot affect a petal with the same number");
+    check(engine::net::catalog_type_id(mob) == 11U && engine::net::catalog_type_id(petal) == 11U,
+          "typed identities preserve the legacy wire number");
+    const auto source = engine::damage_source(world, peas);
+    world.record_death(mob, source);
+    const auto& death = world.deaths().back();
+    check(source.petal_id == engine::catalog::PetalId::kPeasRare &&
+              source.species_id == engine::catalog::SpeciesId::kNone &&
+              death.species_id == engine::catalog::SpeciesId::kAntHole &&
+              death.attacker_petal == engine::catalog::PetalId::kPeasRare &&
+              death.attacker_species == engine::catalog::SpeciesId::kNone,
+          "damage attribution and death records preserve both catalog namespaces");
+    check(engine::Catalog::instance().petal(static_cast<engine::catalog::PetalId>(65535)) ==
+                  nullptr &&
+              engine::Catalog::instance().entity(static_cast<engine::catalog::SpeciesId>(65535)) ==
+                  nullptr,
+          "unknown enum values remain missing catalog entries");
+  }
   {
     // One-view publication culling must retain the tree's inclusive edges,
     // arena-root rejection and treatment of boxes outside the arena.
@@ -157,7 +208,7 @@ int main() {
     const auto reference_factory = [&reference](const engine::SpawnBandEntry& entry,
                                                 const engine::SpawnPosition& position) {
       const engine::Vec2 point(position.x, position.y);
-      switch (engine::catalog::species_id(entry.entity_type)) {
+      switch (entry.entity_type) {
         case engine::catalog::SpeciesId::kRock:
           return engine::spawn_rock_with_drop_draws(reference, point, false, reference.random());
         case engine::catalog::SpeciesId::kBoulder:
@@ -220,8 +271,10 @@ int main() {
   check(first.bounds_rebuilds() == 0U && first.quadtree_updates() == 0U &&
             first.phase_draws().empty(),
         "initialize clears scratch counters and phase records");
-  const auto a = engine::spawn_entity_from_defaults(first, engine::EntityKind::kMob, 4U, {});
-  const auto b = engine::spawn_entity_from_defaults(first, engine::EntityKind::kMob, 4U, {});
+  const auto a = engine::spawn_entity_from_defaults(first, engine::EntityKind::kMob,
+                                                    engine::catalog::SpeciesId::kLadybug, {});
+  const auto b = engine::spawn_entity_from_defaults(first, engine::EntityKind::kMob,
+                                                    engine::catalog::SpeciesId::kLadybug, {});
   first.entities().get(a)->owner = b.raw;
   first.entities().get(b)->owner = a.raw;
   check(!engine::owning_player(first, a).valid(), "ownership cycle terminates");

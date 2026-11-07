@@ -252,7 +252,8 @@ EntityHandle join(WorkerApi& api, float x = -5000.0F, float y = 0.0F) {
 }
 
 EntityHandle mob(WorkerApi& api, float x, float y = 0.0F, float radius = 10.0F) {
-  const auto handle = api.spawn(EntityKind::kMob, 4U, point(x, y));
+  const auto handle =
+      api.spawn(EntityKind::kMob, engine::catalog::SpeciesId::kLadybug, point(x, y));
   auto* entity = api.world().entities().get(handle);
   require(entity != nullptr, "mob spawned");
   entity->collision_radius = f32(radius);
@@ -621,13 +622,20 @@ void test_active_wide_view_slot() {
   (void)join(api);
   const auto wide_only = mob(api, -3500.0F);
   require(!snapshot(api).has(wide_only), "default view excludes wide-only mob");
-  require(engine::test::player(api.world()).loadout().equip(5U, 25U),
+  require(engine::test::player(api.world())
+              .loadout()
+              .equip(5U, engine::catalog::PetalId::kAntennaeLegendary),
           "reserve view petal equipped");
   require(!snapshot(api, 2U).has(wide_only), "reserve slot does not widen view");
-  require(engine::test::player(api.world()).loadout().equip(0U, 25U), "active view petal equipped");
+  require(engine::test::player(api.world())
+              .loadout()
+              .equip(0U, engine::catalog::PetalId::kAntennaeLegendary),
+          "active view petal equipped");
   engine::test::player(api.world()).loadout().set_pending(0U, 0U, true);
   require(snapshot(api, 3U).has(wide_only), "active type25 widens view even while pending");
-  require(engine::test::player(api.world()).loadout().equip(0U, 1U), "restore Basic slot");
+  require(
+      engine::test::player(api.world()).loadout().equip(0U, engine::catalog::PetalId::kBasicCommon),
+      "restore Basic slot");
   require(snapshot(api, 4U).removes(wide_only), "view contraction removes former edge entity");
 }
 

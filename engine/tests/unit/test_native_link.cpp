@@ -1,3 +1,4 @@
+#include "engine/net/catalog_id.hpp"
 #include "../support/single_player.hpp"
 // This executable links only engine_core; no WorkerApi or C ABI initialization.
 #include "engine/model/world_config.hpp"
@@ -42,7 +43,7 @@ State observe(engine::World& world, engine::SnapshotPublisher& publisher) {
     out.push_back(handle.raw);
   }
   for (const auto& entity : world.entities().active_entities()) {
-    out.insert(out.end(), {entity.handle.raw, entity.type_id,
+    out.insert(out.end(), {entity.handle.raw, engine::net::catalog_type_id(entity),
                            std::bit_cast<std::uint32_t>(entity.position.x.value),
                            std::bit_cast<std::uint32_t>(entity.position.y.value),
                            std::bit_cast<std::uint64_t>(entity.velocity.x),
@@ -61,7 +62,7 @@ void setup(engine::World& world, const engine::WorldConfig& config) {
                                      engine::make_default_profile())
             .valid());
   (void)engine::spawn_loadout_petals(world, engine::test::player(world));
-  const auto mob = engine::diagnostics::spawn_mob(world, 4U, {});
+  const auto mob = engine::diagnostics::spawn_mob(world, engine::catalog::SpeciesId::kLadybug, {});
   CHECK(mob.valid());
   CHECK(engine::diagnostics::set_entity_field(world, mob, 0U, -5000.0));
   CHECK(!engine::diagnostics::set_entity_field(world, mob, 99U, 0.0));
@@ -74,7 +75,8 @@ State step(engine::World& world, engine::SnapshotPublisher& publisher, unsigned 
     (void)world.death_shuffle_random().next();
   }
   if (index == 3U) {
-    const auto victim = engine::diagnostics::spawn_mob(world, 4U, {});
+    const auto victim =
+        engine::diagnostics::spawn_mob(world, engine::catalog::SpeciesId::kLadybug, {});
     CHECK(world.destroy(victim));
   }
   engine::advance_world(world);

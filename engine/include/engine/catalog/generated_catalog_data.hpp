@@ -140,91 +140,91 @@ inline constexpr const char* const kEntity22Descriptions0 = "Spooky.";
 inline constexpr const char* const kEntity22DescriptionsValues[] = {kEntity22Descriptions0};
 
 inline constexpr std::array<PetalCatalogEntry, kPetalCount> kPetals{{
-  {0, "None", kPetal0DescriptionsValues, 1, 0, 0.0F, 1, 14.0F, 14.0F, 0.0F, 0.0F, 0.0F, false, false, 0.0F},
-  {1, "Basic", kPetal1DescriptionsValues, 1, 0, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
-  {2, "Fast", kPetal2DescriptionsValues, 1, 0, 500.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
-  {3, "Heavy", kPetal3DescriptionsValues, 1, 0, 5500.0F, 1, 14.0F, 14.0F, 12.0F, 20.0F, 20.0F, false, false, 0.0F},
-  {4, "Rock", kPetal4DescriptionsValues, 1, 2, 10000.0F, 1, 14.0F, 14.0F, 14.0F, 10.0F, 90.0F, false, false, 0.0F},
-  {5, "Square", kPetal5DescriptionsValues, 1, 5, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
-  {6, "Rose", kPetal6DescriptionsValues, 1, 1, 3500.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
-  {7, "Stinger", kPetal7DescriptionsValues, 1, 1, 4000.0F, 1, 14.0F, 14.0F, 7.0F, 35.0F, 8.0F, false, false, 0.0F},
-  {8, "Iris", kPetal8DescriptionsValues, 1, 1, 6000.0F, 1, 14.0F, 14.0F, 6.0F, 5.0F, 5.0F, false, false, 0.0F},
-  {9, "Wing", kPetal9DescriptionsValues, 1, 2, 1250.0F, 1, 14.0F, 14.0F, 15.0F, 15.0F, 15.0F, false, false, 0.0F},
-  {10, "Missile", kPetal10DescriptionsValues, 1, 2, 3000.0F, 1, 14.0F, 14.0F, 10.0F, 35.0F, 10.0F, false, false, 0.0F},
-  {11, "Peas", kPetal11DescriptionsValues, 1, 2, 1000.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 20.0F, false, false, 0.0F},
-  {12, "Peas", kPetal12DescriptionsValues, 1, 3, 1000.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 20.0F, false, false, 0.0F},
-  {13, "Cactus", kPetal13DescriptionsValues, 1, 2, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, false, 0.0F},
-  {14, "Faster", kPetal14DescriptionsValues, 1, 2, 500.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
-  {15, "Rose", kPetal15DescriptionsValues, 1, 3, 3500.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
-  {16, "Twin", kPetal16DescriptionsValues, 1, 1, 1000.0F, 2, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
-  {17, "Triplet", kPetal17DescriptionsValues, 1, 3, 1000.0F, 3, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
-  {18, "Bubble", kPetal18DescriptionsValues, 1, 2, 3500.0F, 1, 14.0F, 14.0F, 12.0F, 0.0F, 1.0F, false, false, 0.0F},
-  {19, "Pollen", kPetal19DescriptionsValues, 1, 3, 1000.0F, 3, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
-  {20, "Dandelion", kPetal20DescriptionsValues, 1, 2, 2000.0F, 1, 11.0F, 11.0F, 9.0F, 5.0F, 10.0F, false, false, 0.0F},
-  {21, "Cactus", kPetal21DescriptionsValues, 2, 3, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, false, 0.0F},
-  {22, "Egg", kPetal22DescriptionsValues, 1, 3, 1000.0F, 1, 14.0F, 14.0F, 13.0F, 1.0F, 50.0F, false, false, 0.0F},
-  {23, "Egg", kPetal23DescriptionsValues, 1, 4, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 1.0F, 50.0F, false, false, 0.0F},
-  {24, "Rose", kPetal24DescriptionsValues, 1, 2, 3500.0F, 3, 14.0F, 14.0F, 7.0F, 5.0F, 5.0F, false, true, 11.0F},
-  {25, "Antennae", kPetal25DescriptionsValues, 1, 4, 0.0F, 1, 12.0F, 12.0F, 10.0F, 10.0F, 10.0F, true, false, 0.0F},
-  {26, "Heaviest", kPetal26DescriptionsValues, 1, 3, 20000.0F, 1, 12.0F, 12.0F, 16.0F, 10.0F, 200.0F, false, false, 0.0F},
-  {27, "Stinger", kPetal27DescriptionsValues, 1, 4, 4000.0F, 3, 14.0F, 14.0F, 7.0F, 35.0F, 8.0F, false, true, 11.0F},
-  {28, "Yin Yang", kPetal28DescriptionsValues, 1, 3, 1000.0F, 1, 12.0F, 12.0F, 12.0F, 15.0F, 15.0F, false, false, 0.0F},
-  {29, "Web", kPetal29DescriptionsValues, 1, 2, 3000.0F, 1, 14.0F, 14.0F, 10.0F, 8.0F, 5.0F, false, false, 0.0F},
-  {30, "Web", kPetal30DescriptionsValues, 1, 4, 3000.0F, 3, 14.0F, 14.0F, 10.0F, 8.0F, 5.0F, false, true, 13.0F},
-  {31, "Honey", kPetal31DescriptionsValues, 1, 2, 1700.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
-  {32, "Leaf", kPetal32DescriptionsValues, 1, 1, 1000.0F, 1, 14.0F, 14.0F, 10.0F, 8.0F, 10.0F, false, false, 0.0F},
-  {33, "Cactus", kPetal33DescriptionsValues, 1, 4, 1000.0F, 3, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, true, 15.0F},
-  {34, "Peas", kPetal34DescriptionsValues, 1, 4, 1000.0F, 1, 14.0F, 14.0F, 10.0F, 12.0F, 20.0F, false, false, 0.0F},
-  {35, "Basic", kPetal35DescriptionsValues, 1, 5, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
-  {36, "Salt", kPetal36DescriptionsValues, 2, 2, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
-  {37, "Rice", kPetal37DescriptionsValues, 1, 3, 0.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
-  {38, "Corn", kPetal38DescriptionsValues, 1, 3, 45000.0F, 1, 14.0F, 14.0F, 10.0F, 1.0F, 2000.0F, false, false, 0.0F},
+  {PetalId::kNone, "None", kPetal0DescriptionsValues, 1, Rarity::kCommon, 0.0F, 1, 14.0F, 14.0F, 0.0F, 0.0F, 0.0F, false, false, 0.0F},
+  {PetalId::kBasicCommon, "Basic", kPetal1DescriptionsValues, 1, Rarity::kCommon, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {PetalId::kFastCommon, "Fast", kPetal2DescriptionsValues, 1, Rarity::kCommon, 500.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kHeavyCommon, "Heavy", kPetal3DescriptionsValues, 1, Rarity::kCommon, 5500.0F, 1, 14.0F, 14.0F, 12.0F, 20.0F, 20.0F, false, false, 0.0F},
+  {PetalId::kRockRare, "Rock", kPetal4DescriptionsValues, 1, Rarity::kRare, 10000.0F, 1, 14.0F, 14.0F, 14.0F, 10.0F, 90.0F, false, false, 0.0F},
+  {PetalId::kSquareUnique, "Square", kPetal5DescriptionsValues, 1, Rarity::kUnique, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {PetalId::kRoseUnusual, "Rose", kPetal6DescriptionsValues, 1, Rarity::kUnusual, 3500.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kStingerUnusual, "Stinger", kPetal7DescriptionsValues, 1, Rarity::kUnusual, 4000.0F, 1, 14.0F, 14.0F, 7.0F, 35.0F, 8.0F, false, false, 0.0F},
+  {PetalId::kIrisUnusual, "Iris", kPetal8DescriptionsValues, 1, Rarity::kUnusual, 6000.0F, 1, 14.0F, 14.0F, 6.0F, 5.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kWingRare, "Wing", kPetal9DescriptionsValues, 1, Rarity::kRare, 1250.0F, 1, 14.0F, 14.0F, 15.0F, 15.0F, 15.0F, false, false, 0.0F},
+  {PetalId::kMissileRare, "Missile", kPetal10DescriptionsValues, 1, Rarity::kRare, 3000.0F, 1, 14.0F, 14.0F, 10.0F, 35.0F, 10.0F, false, false, 0.0F},
+  {PetalId::kPeasRare, "Peas", kPetal11DescriptionsValues, 1, Rarity::kRare, 1000.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 20.0F, false, false, 0.0F},
+  {PetalId::kPeasEpic, "Peas", kPetal12DescriptionsValues, 1, Rarity::kEpic, 1000.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 20.0F, false, false, 0.0F},
+  {PetalId::kCactusRare, "Cactus", kPetal13DescriptionsValues, 1, Rarity::kRare, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, false, 0.0F},
+  {PetalId::kFasterRare, "Faster", kPetal14DescriptionsValues, 1, Rarity::kRare, 500.0F, 1, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kRoseEpic, "Rose", kPetal15DescriptionsValues, 1, Rarity::kEpic, 3500.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kTwinUnusual, "Twin", kPetal16DescriptionsValues, 1, Rarity::kUnusual, 1000.0F, 2, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kTripletEpic, "Triplet", kPetal17DescriptionsValues, 1, Rarity::kEpic, 1000.0F, 3, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kBubbleRare, "Bubble", kPetal18DescriptionsValues, 1, Rarity::kRare, 3500.0F, 1, 14.0F, 14.0F, 12.0F, 0.0F, 1.0F, false, false, 0.0F},
+  {PetalId::kPollenEpic, "Pollen", kPetal19DescriptionsValues, 1, Rarity::kEpic, 1000.0F, 3, 14.0F, 14.0F, 7.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kDandelionRare, "Dandelion", kPetal20DescriptionsValues, 1, Rarity::kRare, 2000.0F, 1, 11.0F, 11.0F, 9.0F, 5.0F, 10.0F, false, false, 0.0F},
+  {PetalId::kCactusEpic, "Cactus", kPetal21DescriptionsValues, 2, Rarity::kEpic, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, false, 0.0F},
+  {PetalId::kEggEpic, "Egg", kPetal22DescriptionsValues, 1, Rarity::kEpic, 1000.0F, 1, 14.0F, 14.0F, 13.0F, 1.0F, 50.0F, false, false, 0.0F},
+  {PetalId::kEggLegendary, "Egg", kPetal23DescriptionsValues, 1, Rarity::kLegendary, 1000.0F, 1, 14.0F, 14.0F, 15.0F, 1.0F, 50.0F, false, false, 0.0F},
+  {PetalId::kRoseRare, "Rose", kPetal24DescriptionsValues, 1, Rarity::kRare, 3500.0F, 3, 14.0F, 14.0F, 7.0F, 5.0F, 5.0F, false, true, 11.0F},
+  {PetalId::kAntennaeLegendary, "Antennae", kPetal25DescriptionsValues, 1, Rarity::kLegendary, 0.0F, 1, 12.0F, 12.0F, 10.0F, 10.0F, 10.0F, true, false, 0.0F},
+  {PetalId::kHeaviestEpic, "Heaviest", kPetal26DescriptionsValues, 1, Rarity::kEpic, 20000.0F, 1, 12.0F, 12.0F, 16.0F, 10.0F, 200.0F, false, false, 0.0F},
+  {PetalId::kStingerLegendary, "Stinger", kPetal27DescriptionsValues, 1, Rarity::kLegendary, 4000.0F, 3, 14.0F, 14.0F, 7.0F, 35.0F, 8.0F, false, true, 11.0F},
+  {PetalId::kYinYangEpic, "Yin Yang", kPetal28DescriptionsValues, 1, Rarity::kEpic, 1000.0F, 1, 12.0F, 12.0F, 12.0F, 15.0F, 15.0F, false, false, 0.0F},
+  {PetalId::kWebRare, "Web", kPetal29DescriptionsValues, 1, Rarity::kRare, 3000.0F, 1, 14.0F, 14.0F, 10.0F, 8.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kWebLegendary, "Web", kPetal30DescriptionsValues, 1, Rarity::kLegendary, 3000.0F, 3, 14.0F, 14.0F, 10.0F, 8.0F, 5.0F, false, true, 13.0F},
+  {PetalId::kHoneyRare, "Honey", kPetal31DescriptionsValues, 1, Rarity::kRare, 1700.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {PetalId::kLeafUnusual, "Leaf", kPetal32DescriptionsValues, 1, Rarity::kUnusual, 1000.0F, 1, 14.0F, 14.0F, 10.0F, 8.0F, 10.0F, false, false, 0.0F},
+  {PetalId::kCactusLegendary, "Cactus", kPetal33DescriptionsValues, 1, Rarity::kLegendary, 1000.0F, 3, 14.0F, 14.0F, 15.0F, 5.0F, 15.0F, false, true, 15.0F},
+  {PetalId::kPeasLegendary, "Peas", kPetal34DescriptionsValues, 1, Rarity::kLegendary, 1000.0F, 1, 14.0F, 14.0F, 10.0F, 12.0F, 20.0F, false, false, 0.0F},
+  {PetalId::kBasicUnique, "Basic", kPetal35DescriptionsValues, 1, Rarity::kUnique, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {PetalId::kSaltRare, "Salt", kPetal36DescriptionsValues, 2, Rarity::kRare, 2500.0F, 1, 14.0F, 14.0F, 10.0F, 10.0F, 10.0F, false, false, 0.0F},
+  {PetalId::kRiceEpic, "Rice", kPetal37DescriptionsValues, 1, Rarity::kEpic, 0.0F, 1, 14.0F, 14.0F, 10.0F, 5.0F, 5.0F, false, false, 0.0F},
+  {PetalId::kCornEpic, "Corn", kPetal38DescriptionsValues, 1, Rarity::kEpic, 45000.0F, 1, 14.0F, 14.0F, 10.0F, 1.0F, 2000.0F, false, false, 0.0F},
 }};
 
-inline constexpr std::array<std::uint32_t, 3> kEntity1PetalIds{{2, 3, 4}};
-inline constexpr std::array<std::uint32_t, 3> kEntity2PetalIds{{3, 4, 26}};
-inline constexpr std::array<std::uint32_t, 5> kEntity3PetalIds{{7, 10, 13, 21, 33}};
-inline constexpr std::array<std::uint32_t, 5> kEntity4PetalIds{{2, 6, 16, 9, 18}};
-inline constexpr std::array<std::uint32_t, 4> kEntity5PetalIds{{6, 18, 24, 15}};
-inline constexpr std::array<std::uint32_t, 6> kEntity6PetalIds{{2, 7, 16, 9, 18, 31}};
-inline constexpr std::array<std::uint32_t, 5> kEntity7PetalIds{{2, 32, 16, 17, 37}};
-inline constexpr std::array<std::uint32_t, 5> kEntity8PetalIds{{2, 32, 16, 17, 38}};
-inline constexpr std::array<std::uint32_t, 5> kEntity9PetalIds{{16, 8, 9, 14, 17}};
-inline constexpr std::array<std::uint32_t, 6> kEntity10PetalIds{{16, 9, 14, 17, 22, 27}};
-inline constexpr std::array<std::uint32_t, 3> kEntity11PetalIds{{8, 9, 22}};
-inline constexpr std::array<std::uint32_t, 4> kEntity12PetalIds{{8, 9, 36, 17}};
-inline constexpr std::array<std::uint32_t, 4> kEntity13PetalIds{{8, 9, 17, 23}};
-inline constexpr std::array<std::uint32_t, 6> kEntity14PetalIds{{10, 9, 31, 18, 20, 25}};
-inline constexpr std::array<std::uint32_t, 6> kEntity15PetalIds{{2, 32, 16, 11, 12, 17}};
-inline constexpr std::array<std::uint32_t, 4> kEntity17PetalIds{{8, 12, 34, 17}};
-inline constexpr std::array<std::uint32_t, 1> kEntity19PetalIds{{5}};
-inline constexpr std::array<std::uint32_t, 6> kEntity20PetalIds{{15, 24, 9, 18, 17, 28}};
-inline constexpr std::array<std::uint32_t, 6> kEntity21PetalIds{{6, 24, 16, 9, 18, 17}};
-inline constexpr std::array<std::uint32_t, 5> kEntity22PetalIds{{8, 7, 14, 29, 30}};
+inline constexpr std::array<PetalId, 3> kEntity1PetalIds{{PetalId::kFastCommon, PetalId::kHeavyCommon, PetalId::kRockRare}};
+inline constexpr std::array<PetalId, 3> kEntity2PetalIds{{PetalId::kHeavyCommon, PetalId::kRockRare, PetalId::kHeaviestEpic}};
+inline constexpr std::array<PetalId, 5> kEntity3PetalIds{{PetalId::kStingerUnusual, PetalId::kMissileRare, PetalId::kCactusRare, PetalId::kCactusEpic, PetalId::kCactusLegendary}};
+inline constexpr std::array<PetalId, 5> kEntity4PetalIds{{PetalId::kFastCommon, PetalId::kRoseUnusual, PetalId::kTwinUnusual, PetalId::kWingRare, PetalId::kBubbleRare}};
+inline constexpr std::array<PetalId, 4> kEntity5PetalIds{{PetalId::kRoseUnusual, PetalId::kBubbleRare, PetalId::kRoseRare, PetalId::kRoseEpic}};
+inline constexpr std::array<PetalId, 6> kEntity6PetalIds{{PetalId::kFastCommon, PetalId::kStingerUnusual, PetalId::kTwinUnusual, PetalId::kWingRare, PetalId::kBubbleRare, PetalId::kHoneyRare}};
+inline constexpr std::array<PetalId, 5> kEntity7PetalIds{{PetalId::kFastCommon, PetalId::kLeafUnusual, PetalId::kTwinUnusual, PetalId::kTripletEpic, PetalId::kRiceEpic}};
+inline constexpr std::array<PetalId, 5> kEntity8PetalIds{{PetalId::kFastCommon, PetalId::kLeafUnusual, PetalId::kTwinUnusual, PetalId::kTripletEpic, PetalId::kCornEpic}};
+inline constexpr std::array<PetalId, 5> kEntity9PetalIds{{PetalId::kTwinUnusual, PetalId::kIrisUnusual, PetalId::kWingRare, PetalId::kFasterRare, PetalId::kTripletEpic}};
+inline constexpr std::array<PetalId, 6> kEntity10PetalIds{{PetalId::kTwinUnusual, PetalId::kWingRare, PetalId::kFasterRare, PetalId::kTripletEpic, PetalId::kEggEpic, PetalId::kStingerLegendary}};
+inline constexpr std::array<PetalId, 3> kEntity11PetalIds{{PetalId::kIrisUnusual, PetalId::kWingRare, PetalId::kEggEpic}};
+inline constexpr std::array<PetalId, 4> kEntity12PetalIds{{PetalId::kIrisUnusual, PetalId::kWingRare, PetalId::kSaltRare, PetalId::kTripletEpic}};
+inline constexpr std::array<PetalId, 4> kEntity13PetalIds{{PetalId::kIrisUnusual, PetalId::kWingRare, PetalId::kTripletEpic, PetalId::kEggLegendary}};
+inline constexpr std::array<PetalId, 6> kEntity14PetalIds{{PetalId::kMissileRare, PetalId::kWingRare, PetalId::kHoneyRare, PetalId::kBubbleRare, PetalId::kDandelionRare, PetalId::kAntennaeLegendary}};
+inline constexpr std::array<PetalId, 6> kEntity15PetalIds{{PetalId::kFastCommon, PetalId::kLeafUnusual, PetalId::kTwinUnusual, PetalId::kPeasRare, PetalId::kPeasEpic, PetalId::kTripletEpic}};
+inline constexpr std::array<PetalId, 4> kEntity17PetalIds{{PetalId::kIrisUnusual, PetalId::kPeasEpic, PetalId::kPeasLegendary, PetalId::kTripletEpic}};
+inline constexpr std::array<PetalId, 1> kEntity19PetalIds{{PetalId::kSquareUnique}};
+inline constexpr std::array<PetalId, 6> kEntity20PetalIds{{PetalId::kRoseEpic, PetalId::kRoseRare, PetalId::kWingRare, PetalId::kBubbleRare, PetalId::kTripletEpic, PetalId::kYinYangEpic}};
+inline constexpr std::array<PetalId, 6> kEntity21PetalIds{{PetalId::kRoseUnusual, PetalId::kRoseRare, PetalId::kTwinUnusual, PetalId::kWingRare, PetalId::kBubbleRare, PetalId::kTripletEpic}};
+inline constexpr std::array<PetalId, 5> kEntity22PetalIds{{PetalId::kIrisUnusual, PetalId::kStingerUnusual, PetalId::kFasterRare, PetalId::kWebRare, PetalId::kWebLegendary}};
 inline constexpr std::array<EntityCatalogEntry, kEntityCount> kEntities{{
-  {0, "None", kEntity0DescriptionsValues, 1, 0, 0.0F, nullptr, 0, 0, 0, 1.0F},
-  {1, "Rock", kEntity1DescriptionsValues, 1, 0, 1.0F, kEntity1PetalIds.data(), 3, 3, 0, 1.0F},
-  {2, "Boulder", kEntity2DescriptionsValues, 1, 1, 10.0F, kEntity2PetalIds.data(), 3, 3, 0, 1.0F},
-  {3, "Cactus", kEntity3DescriptionsValues, 1, 0, 2.0F, kEntity3PetalIds.data(), 5, 5, 0, 1.0F},
-  {4, "Ladybug", kEntity4DescriptionsValues, 1, 0, 3.0F, kEntity4PetalIds.data(), 5, 5, 0, 1.0F},
-  {5, "Massive Ladybug", kEntity5DescriptionsValues, 1, 3, 50.0F, kEntity5PetalIds.data(), 4, 4, 0, 10.0F},
-  {6, "Bee", kEntity6DescriptionsValues, 1, 0, 3.0F, kEntity6PetalIds.data(), 6, 6, 0, 1.0F},
-  {7, "Baby Ant", kEntity7DescriptionsValues, 1, 0, 1.0F, kEntity7PetalIds.data(), 5, 5, 0, 1.0F},
-  {8, "Worker Ant", kEntity8DescriptionsValues, 1, 0, 2.0F, kEntity8PetalIds.data(), 5, 5, 0, 1.0F},
-  {9, "Soldier Ant", kEntity9DescriptionsValues, 1, 1, 5.0F, kEntity9PetalIds.data(), 5, 5, 0, 1.0F},
-  {10, "Queen Ant", kEntity10DescriptionsValues, 1, 2, 20.0F, kEntity10PetalIds.data(), 6, 6, 0, 1.0F},
-  {11, "Ant Hole", kEntity11DescriptionsValues, 1, 2, 20.0F, kEntity11PetalIds.data(), 3, 3, 0, 1.0F},
-  {12, "Beetle", kEntity12DescriptionsValues, 1, 1, 5.0F, kEntity12PetalIds.data(), 4, 4, 0, 1.0F},
-  {13, "Massive Beetle", kEntity13DescriptionsValues, 1, 2, 50.0F, kEntity13PetalIds.data(), 4, 4, 0, 1.0F},
-  {14, "Hornet", kEntity14DescriptionsValues, 1, 1, 10.0F, kEntity14PetalIds.data(), 6, 6, 0, 2.0F},
-  {15, "Centipede", kEntity15DescriptionsValues, 1, 1, 3.0F, kEntity15PetalIds.data(), 6, 6, 0, 1.0F},
-  {16, "Centipede", kEntity16DescriptionsValues, 1, 1, 3.0F, nullptr, 0, 6, 15, 1.0F},
-  {17, "Evil Centipede", kEntity17DescriptionsValues, 1, 2, 5.0F, kEntity17PetalIds.data(), 4, 4, 0, 1.0F},
-  {18, "Evil Centipede", kEntity18DescriptionsValues, 1, 2, 5.0F, nullptr, 0, 4, 17, 1.0F},
-  {19, "Square", kEntity19DescriptionsValues, 1, 5, 10.0F, kEntity19PetalIds.data(), 1, 1, 0, 1.0F},
-  {20, "Ladybug", kEntity20DescriptionsValues, 1, 1, 5.0F, kEntity20PetalIds.data(), 6, 6, 0, 1.0F},
-  {21, "Ladybug", kEntity21DescriptionsValues, 1, 1, 5.0F, kEntity21PetalIds.data(), 6, 6, 0, 0.20000000298023224F},
-  {22, "Spider", kEntity22DescriptionsValues, 1, 1, 5.0F, kEntity22PetalIds.data(), 5, 5, 0, 1.0F},
+  {SpeciesId::kNone, "None", kEntity0DescriptionsValues, 1, Rarity::kCommon, 0.0F, nullptr, 0, 0, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kRock, "Rock", kEntity1DescriptionsValues, 1, Rarity::kCommon, 1.0F, kEntity1PetalIds.data(), 3, 3, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kBoulder, "Boulder", kEntity2DescriptionsValues, 1, Rarity::kUnusual, 10.0F, kEntity2PetalIds.data(), 3, 3, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kCactus, "Cactus", kEntity3DescriptionsValues, 1, Rarity::kCommon, 2.0F, kEntity3PetalIds.data(), 5, 5, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kLadybug, "Ladybug", kEntity4DescriptionsValues, 1, Rarity::kCommon, 3.0F, kEntity4PetalIds.data(), 5, 5, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kMassiveLadybug, "Massive Ladybug", kEntity5DescriptionsValues, 1, Rarity::kEpic, 50.0F, kEntity5PetalIds.data(), 4, 4, SpeciesId::kNone, 10.0F},
+  {SpeciesId::kBee, "Bee", kEntity6DescriptionsValues, 1, Rarity::kCommon, 3.0F, kEntity6PetalIds.data(), 6, 6, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kBabyAnt, "Baby Ant", kEntity7DescriptionsValues, 1, Rarity::kCommon, 1.0F, kEntity7PetalIds.data(), 5, 5, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kWorkerAnt, "Worker Ant", kEntity8DescriptionsValues, 1, Rarity::kCommon, 2.0F, kEntity8PetalIds.data(), 5, 5, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kSoldierAnt, "Soldier Ant", kEntity9DescriptionsValues, 1, Rarity::kUnusual, 5.0F, kEntity9PetalIds.data(), 5, 5, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kQueenAnt, "Queen Ant", kEntity10DescriptionsValues, 1, Rarity::kRare, 20.0F, kEntity10PetalIds.data(), 6, 6, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kAntHole, "Ant Hole", kEntity11DescriptionsValues, 1, Rarity::kRare, 20.0F, kEntity11PetalIds.data(), 3, 3, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kBeetle, "Beetle", kEntity12DescriptionsValues, 1, Rarity::kUnusual, 5.0F, kEntity12PetalIds.data(), 4, 4, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kMassiveBeetle, "Massive Beetle", kEntity13DescriptionsValues, 1, Rarity::kRare, 50.0F, kEntity13PetalIds.data(), 4, 4, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kHornet, "Hornet", kEntity14DescriptionsValues, 1, Rarity::kUnusual, 10.0F, kEntity14PetalIds.data(), 6, 6, SpeciesId::kNone, 2.0F},
+  {SpeciesId::kCentipedeHead, "Centipede", kEntity15DescriptionsValues, 1, Rarity::kUnusual, 3.0F, kEntity15PetalIds.data(), 6, 6, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kCentipedeSegment, "Centipede", kEntity16DescriptionsValues, 1, Rarity::kUnusual, 3.0F, nullptr, 0, 6, SpeciesId::kCentipedeHead, 1.0F},
+  {SpeciesId::kEvilCentipedeHead, "Evil Centipede", kEntity17DescriptionsValues, 1, Rarity::kRare, 5.0F, kEntity17PetalIds.data(), 4, 4, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kEvilCentipedeSegment, "Evil Centipede", kEntity18DescriptionsValues, 1, Rarity::kRare, 5.0F, nullptr, 0, 4, SpeciesId::kEvilCentipedeHead, 1.0F},
+  {SpeciesId::kSquare, "Square", kEntity19DescriptionsValues, 1, Rarity::kUnique, 10.0F, kEntity19PetalIds.data(), 1, 1, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kLadybugDark, "Ladybug", kEntity20DescriptionsValues, 1, Rarity::kUnusual, 5.0F, kEntity20PetalIds.data(), 6, 6, SpeciesId::kNone, 1.0F},
+  {SpeciesId::kLadybugShiny, "Ladybug", kEntity21DescriptionsValues, 1, Rarity::kUnusual, 5.0F, kEntity21PetalIds.data(), 6, 6, SpeciesId::kNone, 0.20000000298023224F},
+  {SpeciesId::kSpider, "Spider", kEntity22DescriptionsValues, 1, Rarity::kUnusual, 5.0F, kEntity22PetalIds.data(), 5, 5, SpeciesId::kNone, 1.0F},
 }};
 
 inline constexpr std::array<std::uint8_t, 2> kSpawnRule0Regions{{0, 1}};
@@ -248,26 +248,26 @@ inline constexpr std::array<std::uint8_t, 8> kSpawnRule17Regions{{0, 1, 2, 3, 4,
 inline constexpr std::array<std::uint8_t, 5> kSpawnRule18Regions{{3, 4, 5, 6, 7}};
 inline constexpr std::array<std::uint8_t, 8> kSpawnRule19Regions{{0, 1, 2, 3, 4, 5, 6, 7}};
 inline constexpr std::array<SpawnRuleCatalogEntry, kSpawnRuleCount> kSpawnRules{{
-  {0.5F, kSpawnRule0Regions.data(), 2, 1},
-  {0.009999999776482582F, kSpawnRule1Regions.data(), 2, 2},
-  {0.10000000149011612F, kSpawnRule2Regions.data(), 3, 2},
-  {0.4000000059604645F, kSpawnRule3Regions.data(), 2, 3},
-  {0.15000000596046448F, kSpawnRule4Regions.data(), 5, 4},
-  {0.004999999888241291F, kSpawnRule5Regions.data(), 2, 21},
-  {0.00019999999494757503F, kSpawnRule6Regions.data(), 2, 5},
-  {0.10000000149011612F, kSpawnRule7Regions.data(), 4, 6},
-  {0.02500000037252903F, kSpawnRule8Regions.data(), 3, 7},
-  {0.02500000037252903F, kSpawnRule9Regions.data(), 3, 8},
-  {0.02500000037252903F, kSpawnRule10Regions.data(), 3, 9},
-  {0.0020000000949949026F, kSpawnRule11Regions.data(), 5, 11},
-  {0.10000000149011612F, kSpawnRule12Regions.data(), 5, 12},
-  {0.0020000000949949026F, kSpawnRule13Regions.data(), 5, 13},
-  {0.10000000149011612F, kSpawnRule14Regions.data(), 3, 14},
-  {0.10000000149011612F, kSpawnRule15Regions.data(), 4, 22},
-  {0.10000000149011612F, kSpawnRule16Regions.data(), 2, 20},
-  {0.008999999612569809F, kSpawnRule17Regions.data(), 8, 15},
-  {0.0010000000474974513F, kSpawnRule18Regions.data(), 5, 17},
-  {9.999999974752427e-7F, kSpawnRule19Regions.data(), 8, 19},
+  {0.5F, kSpawnRule0Regions.data(), 2, SpeciesId::kRock},
+  {0.009999999776482582F, kSpawnRule1Regions.data(), 2, SpeciesId::kBoulder},
+  {0.10000000149011612F, kSpawnRule2Regions.data(), 3, SpeciesId::kBoulder},
+  {0.4000000059604645F, kSpawnRule3Regions.data(), 2, SpeciesId::kCactus},
+  {0.15000000596046448F, kSpawnRule4Regions.data(), 5, SpeciesId::kLadybug},
+  {0.004999999888241291F, kSpawnRule5Regions.data(), 2, SpeciesId::kLadybugShiny},
+  {0.00019999999494757503F, kSpawnRule6Regions.data(), 2, SpeciesId::kMassiveLadybug},
+  {0.10000000149011612F, kSpawnRule7Regions.data(), 4, SpeciesId::kBee},
+  {0.02500000037252903F, kSpawnRule8Regions.data(), 3, SpeciesId::kBabyAnt},
+  {0.02500000037252903F, kSpawnRule9Regions.data(), 3, SpeciesId::kWorkerAnt},
+  {0.02500000037252903F, kSpawnRule10Regions.data(), 3, SpeciesId::kSoldierAnt},
+  {0.0020000000949949026F, kSpawnRule11Regions.data(), 5, SpeciesId::kAntHole},
+  {0.10000000149011612F, kSpawnRule12Regions.data(), 5, SpeciesId::kBeetle},
+  {0.0020000000949949026F, kSpawnRule13Regions.data(), 5, SpeciesId::kMassiveBeetle},
+  {0.10000000149011612F, kSpawnRule14Regions.data(), 3, SpeciesId::kHornet},
+  {0.10000000149011612F, kSpawnRule15Regions.data(), 4, SpeciesId::kSpider},
+  {0.10000000149011612F, kSpawnRule16Regions.data(), 2, SpeciesId::kLadybugDark},
+  {0.008999999612569809F, kSpawnRule17Regions.data(), 8, SpeciesId::kCentipedeHead},
+  {0.0010000000474974513F, kSpawnRule18Regions.data(), 5, SpeciesId::kEvilCentipedeHead},
+  {9.999999974752427e-7F, kSpawnRule19Regions.data(), 8, SpeciesId::kSquare},
 }};
 
 static_assert(std::size(kPetals) == kPetalCount);

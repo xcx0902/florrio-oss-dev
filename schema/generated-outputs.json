@@ -81,38 +81,38 @@
     },
     {
       "path": "engine/include/engine/catalog/catalog_types.hpp",
-      "bytes": 1061,
-      "sha256": "7179f214aa1f2924169d980e0e7f1c95dfcdcbd9b51ae938b2512d0434b0217d"
+      "bytes": 1058,
+      "sha256": "6a15de56fd1b20d562870363e1fbd009d49fdd4a1be563b9a40f1f7560c14c5a"
     },
     {
       "path": "engine/include/engine/catalog/drop_chances.hpp",
-      "bytes": 5824,
-      "sha256": "696ac1907069afb865de8a0d547f10d3e828433033c54b9d6f2d584095054641"
+      "bytes": 8568,
+      "sha256": "442cdeb89932b025e8f6f0d60d5fe7f8ab84f67451e914806c75a85869e931ed"
     },
     {
       "path": "engine/include/engine/catalog/entity_spawn_defaults.hpp",
-      "bytes": 1897,
-      "sha256": "81474fb31ca3862f1096e7e966d5d93bfdaf5e88d7e9a51ad24f221ccfa346b1"
+      "bytes": 2290,
+      "sha256": "aab83f317d24e5783e70f975d99c974fbd590fbb83361048f6b667683058a631"
     },
     {
       "path": "engine/include/engine/catalog/generated_catalog_data.hpp",
-      "bytes": 24415,
-      "sha256": "8c0f195cf520ac018fe7a8b2049fc2ee8741783f60155277c1a9e3341f335f2e"
+      "bytes": 28775,
+      "sha256": "7b4c9e2bdff0a0523d0f31caff9fe24944f4a5b517ff1a353a9fe1f6509221b2"
     },
     {
       "path": "engine/include/engine/catalog/ids.hpp",
-      "bytes": 2366,
-      "sha256": "17c975ad321d87cea03e29d5cc1345102ba526214300a6ffb33c2d68db186684"
+      "bytes": 1922,
+      "sha256": "0d2b57c0e31cdf10a23f2b05c8822f16d34c9bc9b6d1250de56209e5b74c7e51"
     },
     {
       "path": "engine/include/engine/catalog/loadout_rules.hpp",
-      "bytes": 1466,
-      "sha256": "e34ba7af014651e086e8893655fc2a17c583c59aeac3a227c0033dab1e2c1c69"
+      "bytes": 1546,
+      "sha256": "fd15e44fefc048a3971af7bd7a28f9a64b5ea774f5c7c3fe18a20c50c5c7f66f"
     },
     {
       "path": "engine/include/engine/catalog/petal_combat.hpp",
-      "bytes": 4082,
-      "sha256": "cc23356ebe7cdf9d20383fdc117ce8eb51864f5d0fb6a0b5e21fce8f596b6c7d"
+      "bytes": 5321,
+      "sha256": "085b4271cba87917d8cae54052630566a20bfc3bb45924c57b4e04b1241f35b3"
     },
     {
       "path": "engine/include/engine/catalog/state_flag_bits.hpp",

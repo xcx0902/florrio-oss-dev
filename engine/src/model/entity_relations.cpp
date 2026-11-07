@@ -26,7 +26,7 @@ DamageSource damage_source(const World& world, EntityHandle handle) {
           break;
         }
         if (candidate->kind == EntityKind::kMob) {
-          if (const auto* definition = Catalog::instance().entity(candidate->type_id)) {
+          if (const auto* definition = Catalog::instance().entity(candidate->species_id)) {
             result.name = definition->name;
           }
           break;
@@ -40,7 +40,8 @@ DamageSource damage_source(const World& world, EntityHandle handle) {
   }
   result.entity = handle;
   result.kind = entity->kind;
-  result.type_id = entity->type_id;
+  result.species_id = entity->species_id;
+  result.petal_id = entity->petal_id;
   return result;
 }
 PlayerId owning_player_id(const World& world, EntityHandle handle) {
@@ -55,7 +56,8 @@ void inherit_entity_owner(World& world, EntityHandle child, EntityHandle parent)
   entity->attribution = damage_source(world, parent);
   entity->attribution.entity = child;
   entity->attribution.kind = entity->kind;
-  entity->attribution.type_id = entity->type_id;
+  entity->attribution.species_id = entity->species_id;
+  entity->attribution.petal_id = entity->petal_id;
   entity->control_root = controlling_root(world, parent);
   const auto* root = world.entities().get(entity->control_root);
   const auto* owner = world.entities().get(parent);

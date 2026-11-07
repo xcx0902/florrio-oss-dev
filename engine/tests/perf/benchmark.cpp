@@ -1,3 +1,4 @@
+#include "engine/net/catalog_id.hpp"
 #include "engine/core/perf.hpp"
 #include "engine/net/worker_api.hpp"
 #include "engine/sim/effects.hpp"
@@ -71,7 +72,7 @@ static void state(const engine::World& w) {
     if (e.active) {
       hash(e.handle.raw);
       hash(static_cast<unsigned>(e.kind));
-      hash(e.type_id);
+      hash(engine::net::catalog_type_id(e));
       hash(e.owner);
       hash(e.position.x.bits());
       hash(e.position.y.bits());
@@ -136,7 +137,8 @@ int main(int argc, char** argv) {
   if (name == "lifecycle-soak") {
     for (int i = 0; i < 24; ++i) {
       (void)api->spawn(
-          engine::EntityKind::kMob, i % 2 ? 4 : 6,
+          engine::EntityKind::kMob,
+          i % 2 ? engine::catalog::SpeciesId::kLadybug : engine::catalog::SpeciesId::kBee,
           {engine::f32(float(i % 6) * 60 - 180), engine::f32(float(i / 6) * 60 - 120)});
     }
   }
@@ -146,7 +148,7 @@ int main(int argc, char** argv) {
   } else if (area) {
     areas = std::strtoul(name.c_str() + 18, nullptr, 10);
     for (int i = 0; i < 300; ++i) {
-      (void)api->spawn(engine::EntityKind::kMob, 1,
+      (void)api->spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
                        {engine::f32(float(i % 20) * 30), engine::f32(float(i / 20) * 30)});
     }
     std::size_t added = 0;
@@ -181,7 +183,7 @@ int main(int argc, char** argv) {
   } else {
     if (name == "clustered-contacts") {
       for (int i = 0; i < 300; ++i) {
-        (void)api->spawn(engine::EntityKind::kMob, 4,
+        (void)api->spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
                          {engine::f32(float(i % 20) * 10), engine::f32(float(i / 20) * 10)});
       }
     }

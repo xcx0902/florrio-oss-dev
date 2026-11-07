@@ -83,7 +83,7 @@ bool apply_player_input(World& world, PlayerId id, LifeEpoch life, std::uint32_t
   return world.apply_input(id, life, buttons, angle, strength, ttl_ticks);
 }
 bool discard_player_slot(World& world, PlayerId id, LifeEpoch life, std::uint8_t slot,
-                         std::uint16_t expected_type) {
+                         catalog::PetalId expected_type) {
   auto* state = living_player(world, id, life);
   if (state == nullptr) {
     return false;
@@ -95,7 +95,8 @@ bool discard_player_slot(World& world, PlayerId id, LifeEpoch life, std::uint8_t
   return true;
 }
 bool swap_player_slots(World& world, PlayerId id, LifeEpoch life, std::uint8_t first,
-                       std::uint16_t first_type, std::uint8_t second, std::uint16_t second_type) {
+                       catalog::PetalId first_type, std::uint8_t second,
+                       catalog::PetalId second_type) {
   auto* state = living_player(world, id, life);
   return state != nullptr && state->loadout().swap(world, *state, state->profile(), first,
                                                    first_type, second, second_type);

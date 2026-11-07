@@ -384,7 +384,7 @@ test('one owning input propagates a petal field to both generated views and labe
     'utf8',
   );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
-  assert.match(cpp, /\{1, "Basic",[^\n]*, 4321\.0F, 1, 14\.0F,/);
+  assert.match(cpp, /\{PetalId::kBasicCommon, "Basic",[^\n]*, 4321\.0F, 1, 14\.0F,/);
   assert.match(
     ts,
     /1: \{\s*name: ["']Basic["'],\s*rarity: 0,\s*recharge: 4321,\s*radius: 10,\s*labelSize: 14,/,
@@ -430,7 +430,7 @@ test('adding an existing-behavior petal needs schema owner inputs, not generator
   );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
   assert.match(cpp, /kPetalCount = 40/);
-  assert.match(cpp, /\{39, "Basic Plus",/);
+  assert.match(cpp, /\{PetalId::kBasicPlus, "Basic Plus",/);
   assert.match(ts, /39: \{\s*name: ["']Basic Plus["'],/);
 });
 
@@ -593,7 +593,9 @@ test('sparse uint16 type ids remain valid inputs and generated keys', async () =
     'utf8',
   );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
-  assert.match(cpp, /\{100, "Basic",/);
+  assert.match(cpp, /\{PetalId::kBasicCommon, "Basic",/);
+  const ids = await readFile(path.join(fixture, 'engine/include/engine/catalog/ids.hpp'), 'utf8');
+  assert.match(ids, /kBasicCommon = 100,/);
   assert.match(ts, /100: \{\s*name: ["']Basic["'],/);
 });
 
@@ -641,7 +643,9 @@ test('publishable ids accept 255 and reject 256 at the uint8 wire boundary', asy
     'utf8',
   );
   const ts = await readFile(path.join(fixture, 'client/src/schema/petals.ts'), 'utf8');
-  assert.match(cpp, /\{255, "Basic",/);
+  assert.match(cpp, /\{PetalId::kBasicCommon, "Basic",/);
+  const ids = await readFile(path.join(fixture, 'engine/include/engine/catalog/ids.hpp'), 'utf8');
+  assert.match(ids, /kBasicCommon = 255,/);
   assert.match(ts, /255: \{\s*name: ["']Basic["'],/);
 
   await replacePetal(255, 256);

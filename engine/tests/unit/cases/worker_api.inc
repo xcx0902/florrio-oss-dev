@@ -49,7 +49,7 @@ void test_player_input_appearance() {
     engine::test::input(world, buttons, engine::f32(1.0F), engine::f32(0.0F));
     CHECK(entity->player_look == 40U);
     CHECK(entity->player_expression == (0xA0U | (buttons & 3U)));
-    CHECK(entity->type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kNone));
+    CHECK(entity->species_id == engine::catalog::SpeciesId::kNone);
   }
   engine::test::input(world, 2U, engine::f32(-1.0F), engine::f32(0.0F));
   CHECK(entity->player_look == 214U);
@@ -69,12 +69,11 @@ void test_player_input_appearance() {
 void test_entity_domain_state() {
   engine::WorkerApi api;
   api.init();
-  const auto handle =
-      api.spawn(engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(12.5F), engine::f32(-3.25F)));
+  const auto handle = api.spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+                                engine::Vec2(engine::f32(12.5F), engine::f32(-3.25F)));
   const auto* entity = api.world().entities().get(handle);
   CHECK(entity != nullptr);
-  CHECK(entity->handle == handle &&
-        entity->type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kLadybug));
+  CHECK(entity->handle == handle && entity->species_id == engine::catalog::SpeciesId::kLadybug);
   CHECK(entity->kind == engine::EntityKind::kMob);
   CHECK(entity->position.x.value == 12.5F && entity->position.y.value == -3.25F);
   CHECK(entity->velocity.x == 0.0F && entity->velocity.y == 0.0F);
@@ -115,14 +114,14 @@ void test_worker_api() {
   CHECK(api.world().initialized());
   CHECK(api.world().entities().active_count() == 0);
 
-  const auto spawned =
-      api.spawn(engine::EntityKind::kMob, 4, engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
+  const auto spawned = api.spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kLadybug,
+                                 engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)));
   CHECK(spawned.valid());
   CHECK(api.occupied(engine::Vec2(engine::f32(100.0F), engine::f32(0.0F))));
   CHECK(!api.occupied(engine::Vec2(engine::f32(2000.0F), engine::f32(0.0F))));
-  CHECK(
-      !api.spawn(engine::EntityKind::kMob, 0, engine::Vec2(engine::f32(5000.0F), engine::f32(0.0F)))
-           .valid());
+  CHECK(!api.spawn(engine::EntityKind::kMob, engine::catalog::SpeciesId::kNone,
+                   engine::Vec2(engine::f32(5000.0F), engine::f32(0.0F)))
+             .valid());
   const auto bytes = api.domain_snapshot_bytes(7, 0);
   CHECK(bytes.size() > 2);
   engine::ByteReader domain_reader(bytes);
@@ -154,7 +153,7 @@ void test_rock_construction() {
   CHECK(handle.valid());
   const auto* entity = world.entities().get(handle);
   CHECK(entity != nullptr);
-  CHECK(entity->type_id == engine::catalog::species_type_id(engine::catalog::SpeciesId::kRock));
+  CHECK(entity->species_id == engine::catalog::SpeciesId::kRock);
   CHECK(entity->radius.value == 39.513580322265625F);
   CHECK(entity->health.value == 15.805432319641113F);
   CHECK(entity->contact_damage.value == 10.0F);
@@ -171,14 +170,14 @@ void test_rock_construction() {
   CHECK(band_handle.valid());
   const auto* band_entity = band_world.entities().get(band_handle);
   CHECK(band_entity != nullptr);
-  CHECK(band_entity->type_id ==
-        engine::catalog::species_type_id(engine::catalog::SpeciesId::kRock));
+  CHECK(band_entity->species_id == engine::catalog::SpeciesId::kRock);
   CHECK(band_entity->radius.value == 39.513580322265625F);
   CHECK(band_world.random().state() == 2095254635U);
 }
 
 void test_entity_spawn_defaults() {
-  const auto* cactus = engine::Catalog::instance().spawn_defaults(3);
+  const auto* cactus =
+      engine::Catalog::instance().spawn_defaults(engine::catalog::SpeciesId::kCactus);
   CHECK(cactus != nullptr);
   CHECK(cactus->radius == 49.99694061279297F);
   CHECK(cactus->contactDamage == 30.0F);
@@ -188,10 +187,12 @@ void test_entity_spawn_defaults() {
 
   engine::World world;
   world.initialize();
-  CHECK(engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 3,
+  CHECK(engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob,
+                                           engine::catalog::SpeciesId::kCactus,
                                            engine::Vec2(engine::f32(10.0F), engine::f32(20.0F)))
             .valid());
-  CHECK(engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob, 1,
+  CHECK(engine::spawn_entity_from_defaults(world, engine::EntityKind::kMob,
+                                           engine::catalog::SpeciesId::kRock,
                                            engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)))
             .valid());
 }
@@ -234,9 +235,9 @@ void test_spatial_query() {
 
   engine::World world;
   world.initialize();
-  const auto entity = engine::spawn_entity(world, engine::EntityKind::kMob, 1,
-                                           engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)),
-                                           engine::f32(10.0F), 32, 32);
+  const auto entity = engine::spawn_entity(
+      world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
+      engine::Vec2(engine::f32(0.0F), engine::f32(0.0F)), engine::f32(10.0F), 32, 32);
   CHECK(entity.valid());
   const engine::SpatialQuery from_world = engine::SpatialQuery::from_world(world);
   CHECK(from_world.size() == 1);
@@ -282,7 +283,7 @@ void test_catalog() {
   CHECK(catalog.petals().size() == 39);
   CHECK(catalog.entities().size() == 23);
   CHECK(catalog.spawn_rules().size() == 20);
-  const auto* basic = catalog.petal(1);
+  const auto* basic = catalog.petal(engine::catalog::PetalId::kBasicCommon);
   CHECK(basic != nullptr);
   CHECK(std::strcmp(basic->name, "Basic") == 0);
   CHECK(basic->rechargeMilliseconds == 2500.0F);
@@ -290,12 +291,12 @@ void test_catalog() {
   CHECK(basic->drawRadius == 14.0F);
   CHECK(basic->collisionRadius == 10.0F);
   CHECK(basic->descriptionCount == 1);
-  const auto* rock = catalog.entity(1);
+  const auto* rock = catalog.entity(engine::catalog::SpeciesId::kRock);
   CHECK(rock != nullptr);
   CHECK(std::strcmp(rock->name, "Rock") == 0);
   CHECK(rock->petalTypeIdCount == 3);
-  CHECK(rock->petalTypeIds[0] == 2);
-  CHECK(rock->petalTypeIds[2] == 4);
+  CHECK(rock->petalTypeIds[0] == engine::catalog::PetalId::kFastCommon);
+  CHECK(rock->petalTypeIds[2] == engine::catalog::PetalId::kRockRare);
   int rose_count = 0;
   for (const auto& petal : catalog.petals()) {
     if (std::strcmp(petal.name, "Rose") == 0) {
@@ -304,22 +305,18 @@ void test_catalog() {
   }
   CHECK(rose_count == 3);
   CHECK(catalog.spawn_rules()[0].weight == 0.5F);
-  CHECK(catalog.spawn_rules()[0].entityTypeId ==
-        engine::catalog::species_type_id(engine::catalog::SpeciesId::kRock));
-  CHECK(catalog.petal(39) == nullptr);
-  const auto* rock_drops = catalog.drop_table(1);
+  CHECK(catalog.spawn_rules()[0].entityTypeId == engine::catalog::SpeciesId::kRock);
+  CHECK(catalog.petal(static_cast<engine::catalog::PetalId>(39)) == nullptr);
+  const auto* rock_drops = catalog.drop_table(engine::catalog::SpeciesId::kRock);
   CHECK(rock_drops != nullptr);
   CHECK(rock_drops->dropCount == 3);
-  CHECK(rock_drops->drops[0].petalTypeId ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kRockRare));
-  CHECK(rock_drops->drops[2].petalTypeId ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kHeavyCommon));
-  CHECK(catalog.drop_table(0) != nullptr);
-  CHECK(catalog.drop_table(0)->dropCount == 0);
-  CHECK(catalog.drop_table(22) != nullptr);
+  CHECK(rock_drops->drops[0].petalTypeId == engine::catalog::PetalId::kRockRare);
+  CHECK(rock_drops->drops[2].petalTypeId == engine::catalog::PetalId::kHeavyCommon);
+  CHECK(catalog.drop_table(engine::catalog::SpeciesId::kNone) != nullptr);
+  CHECK(catalog.drop_table(engine::catalog::SpeciesId::kNone)->dropCount == 0);
+  CHECK(catalog.drop_table(engine::catalog::SpeciesId::kSpider) != nullptr);
   CHECK(catalog.petals().size() == 39);
-  CHECK(catalog.petals()[1].typeId ==
-        engine::catalog::petal_type_id(engine::catalog::PetalId::kBasicCommon));
+  CHECK(catalog.petals()[1].typeId == engine::catalog::PetalId::kBasicCommon);
   CHECK(catalog.petals()[1].rechargeMilliseconds == 2500.0F);
   CHECK(catalog.petals()[1].labelFontSize == 14.0F);
   CHECK(catalog.petals()[3].rechargeMilliseconds == 5500.0F);

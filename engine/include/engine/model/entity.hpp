@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/catalog/ids.hpp"
 #include "engine/core/f32.hpp"
 #include "engine/core/vec2.hpp"
 #include "engine/model/attack_behavior.hpp"
@@ -73,7 +74,8 @@ struct DamageSource {
   PlayerId player{};
   LifeEpoch life = 0;
   EntityKind kind = EntityKind::kNone;
-  std::uint16_t type_id = 0;
+  catalog::SpeciesId species_id = catalog::SpeciesId::kNone;
+  catalog::PetalId petal_id = catalog::PetalId::kNone;
   std::string name;
 };
 
@@ -184,7 +186,8 @@ struct EntityBounds {
 struct Entity {
   EntityHandle handle;
   EntityKind kind = EntityKind::kNone;
-  std::uint16_t type_id = 0;
+  catalog::SpeciesId species_id = catalog::SpeciesId::kNone;
+  catalog::PetalId petal_id = catalog::PetalId::kNone;
   // The look byte packs the aim direction; the expression byte carries action
   // bits in its low two bits. Both stay separate from the semantic species id.
   std::uint8_t player_look = 0;
@@ -255,7 +258,7 @@ struct Entity {
   std::uint8_t loadout_instance = 0;
   std::uint8_t spawn_band = 0xFF;
   /** Loot table entries attached at spawn. */
-  std::array<std::uint16_t, 8> loot_petals{};
+  std::array<catalog::PetalId, 8> loot_petals{};
   std::uint8_t loot_count = 0;
   EntityHandle last_attacker{};
   DamageSource attribution;

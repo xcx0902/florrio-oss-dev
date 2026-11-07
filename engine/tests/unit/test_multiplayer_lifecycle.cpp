@@ -15,22 +15,22 @@ void nearest_pickup_wins_and_equal_distance_uses_player_id() {
     auto world = make_world();
     const auto a = join_player(*world, "A", at(-30), profile());
     const auto b = join_player(*world, "B", at(10), profile());
-    const auto drop = spawn_drop(*world, 2, at(0));
+    const auto drop = spawn_drop(*world, engine::catalog::PetalId::kFastCommon, at(0));
     world->set_time_ms(500);
     CHECK(find_pickup_recipient(*world, drop) == state(*world, b).player());
     CHECK(collect_drops(*world) == 1 && collect_drops(*world) == 0);
     CHECK(world->entities().get(drop)->pickup_recipient == b);
-    CHECK(state(*world, b).profile().inventory(0) == 2 &&
-          state(*world, a).profile().inventory(0) == 0);
+    CHECK(state(*world, b).profile().inventory(0) == engine::catalog::PetalId::kFastCommon &&
+          state(*world, a).profile().inventory(0) == engine::catalog::PetalId::kNone);
     CHECK(state(*world, b).loadout().pickup_transfers().size() == 1);
     CHECK(state(*world, a).loadout().pickup_transfers().empty());
     body(*world, b).set_position(at(30));
-    const auto tie = spawn_drop(*world, 3, at(0));
+    const auto tie = spawn_drop(*world, engine::catalog::PetalId::kHeavyCommon, at(0));
     world->set_time_ms(1000);
     CHECK(find_pickup_recipient(*world, tie) == state(*world, a).player());
     CHECK(collect_drops(*world) == 1);
     CHECK(world->entities().get(tie)->pickup_recipient == a);
-    CHECK(state(*world, a).profile().inventory(0) == 3);
+    CHECK(state(*world, a).profile().inventory(0) == engine::catalog::PetalId::kHeavyCommon);
   }
 }
 
@@ -38,12 +38,12 @@ void pickup_capacity_death_and_departure_are_transactional() {
   auto world = make_world();
   auto full = profile();
   for (unsigned slot = 0; slot < full.inventory_size(); ++slot) {
-    full.set_inventory(slot, 1);
+    full.set_inventory(slot, engine::catalog::PetalId::kBasicCommon);
   }
   full.set_inventory_count(full.inventory_size());
   const auto a = join_player(*world, "full", at(0), full);
   const auto b = join_player(*world, "receiver", at(30), profile());
-  const auto drop = spawn_drop(*world, 2, at(0));
+  const auto drop = spawn_drop(*world, engine::catalog::PetalId::kFastCommon, at(0));
   world->set_time_ms(500);
   CHECK(collect_drops(*world) == 1);
   const auto old = state(*world, b).player();
@@ -55,7 +55,7 @@ void pickup_capacity_death_and_departure_are_transactional() {
   CHECK(leave_player(*world, b));
   const auto c = join_player(*world, "new", at(0), profile());
   CHECK(collect_drops(*world) == 0);
-  CHECK(state(*world, c).profile().inventory(0) == 0);
+  CHECK(state(*world, c).profile().inventory(0) == engine::catalog::PetalId::kNone);
   CHECK(world->entities().get(drop)->pickup_recipient == b);
   CHECK(world->entities().get(drop)->ai.target == old);
   advance_ticks(*world, 40);
@@ -64,13 +64,14 @@ void pickup_capacity_death_and_departure_are_transactional() {
 
 void death_and_loot_run_once_and_other_player_keeps_fighting() {
   auto world = make_world();
-  auto carried = profile(2, 30);
+  auto carried = profile(engine::catalog::PetalId::kFastCommon, 30);
   for (unsigned slot = 0; slot < carried.inventory_size(); ++slot) {
-    carried.set_inventory(slot, 2);
+    carried.set_inventory(slot, engine::catalog::PetalId::kFastCommon);
   }
   carried.set_inventory_count(carried.inventory_size());
   const auto a = join_player(*world, "A", at(-1000), carried);
-  const auto b = join_player(*world, "B", at(1000), profile(1));
+  const auto b =
+      join_player(*world, "B", at(1000), profile(engine::catalog::PetalId::kBasicCommon));
   const auto target = state(*world, a).player(), b_petal = petal(*world, b);
   CHECK(damage_entity(*world, target, f32(1000), b_petal).died);
   const auto drops = world->pickups().size();
@@ -89,7 +90,8 @@ void death_and_loot_run_once_and_other_player_keeps_fighting() {
   CHECK(apply_player_input(*world, b, 1, 1, f32(0), f32(200)));
   advance_ticks(*world, 1);
   CHECK(body(*world, b).position.x.value > 1000);
-  const auto monster = spawn_entity_from_defaults(*world, EntityKind::kMob, 1, at(5000));
+  const auto monster = spawn_entity_from_defaults(*world, EntityKind::kMob,
+                                                  engine::catalog::SpeciesId::kRock, at(5000));
   CHECK(damage_entity(*world, monster, f32(10000), b_petal).died);
   CHECK(state(*world, b).loadout().score().value > 0);
   advance_ticks(*world, 19);
@@ -101,8 +103,8 @@ void death_and_loot_run_once_and_other_player_keeps_fighting() {
 
 void simultaneous_lethal_contacts_keep_solver_order_and_sources() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(0), profile(0, 10));
-  const auto b = join_player(*world, "B", at(30), profile(0, 10));
+  const auto a = join_player(*world, "A", at(0), profile(engine::catalog::PetalId::kNone, 10));
+  const auto b = join_player(*world, "B", at(30), profile(engine::catalog::PetalId::kNone, 10));
   body(*world, a).contact_damage = f32(1000);
   body(*world, b).contact_damage = f32(1000);
   contacts(*world);
@@ -133,10 +135,11 @@ void spawn_fails_cleanly_when_all_candidates_are_occupied() {
 
 void native_two_player_spawn_combat_loot_respawn_loop() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(-1000), profile(1));
-  auto inventory = profile(2);
+  const auto a =
+      join_player(*world, "A", at(-1000), profile(engine::catalog::PetalId::kBasicCommon));
+  auto inventory = profile(engine::catalog::PetalId::kFastCommon);
   for (unsigned slot = 0; slot < 13; ++slot) {
-    inventory.set_inventory(slot, 2);
+    inventory.set_inventory(slot, engine::catalog::PetalId::kFastCommon);
   }
   inventory.set_inventory_count(13);
   const auto b = join_player(*world, "B", at(1000), inventory);
@@ -164,13 +167,15 @@ void native_two_player_spawn_combat_loot_respawn_loop() {
   CHECK(!apply_player_input(*world, b, 1, 1, f32(0), f32(200)));
   CHECK(!discard_player_slot(*world, b, 1, 0, state(*world, b).profile().inventory(0)));
   CHECK(!world->destroy(old));
-  CHECK(state(*world, a).life_epoch == 1 && state(*world, a).profile().inventory(1) == 2);
+  CHECK(state(*world, a).life_epoch == 1 &&
+        state(*world, a).profile().inventory(1) == engine::catalog::PetalId::kFastCommon);
 }
 
 void departure_after_body_removal_cleans_orphan_attacks_and_areas() {
   auto world = make_world();
-  const auto a = join_player(*world, "A", at(-1000), profile(29));
-  const auto b = join_player(*world, "B", at(1000), profile(1));
+  const auto a = join_player(*world, "A", at(-1000), profile(engine::catalog::PetalId::kWebRare));
+  const auto b =
+      join_player(*world, "B", at(1000), profile(engine::catalog::PetalId::kBasicCommon));
   CHECK(apply_player_input(*world, a, 1, 1, f32(0), f32(0)));
   world->set_time_ms(550);
   update_petal_orbits(*world, state(*world, a), 0);
@@ -195,11 +200,15 @@ void one_hundred_lives_leave_no_persistent_gameplay_residue() {
     auto& player = state(*world, a);
     for (std::uint8_t slot = 0; slot < 16; ++slot) {
       const auto type = player.loadout().slots()[slot].type_id;
-      if (type != 0) {
+      if (type != engine::catalog::PetalId::kNone) {
         CHECK(discard_player_slot(*world, a, player.life_epoch, slot, type));
       }
     }
-    const std::uint16_t types[]{11, 22, 29, 8, 23, 34, 30, 32};
+    const engine::catalog::PetalId types[]{
+        engine::catalog::PetalId::kPeasRare,     engine::catalog::PetalId::kEggEpic,
+        engine::catalog::PetalId::kWebRare,      engine::catalog::PetalId::kIrisUnusual,
+        engine::catalog::PetalId::kEggLegendary, engine::catalog::PetalId::kPeasLegendary,
+        engine::catalog::PetalId::kWebLegendary, engine::catalog::PetalId::kLeafUnusual};
     const auto type = types[cycle % 8];
     CHECK(player.loadout().change_slot_type(*world, player, player.profile(), 0, type));
     (void)spawn_loadout_petals(*world, player);
@@ -229,7 +238,8 @@ void one_hundred_lives_leave_no_persistent_gameplay_residue() {
 }
 
 auto scenario(World& world, PlayerId a, PlayerId b) {
-  const auto target = spawn_entity_from_defaults(world, EntityKind::kMob, 1, at(5000));
+  const auto target = spawn_entity_from_defaults(world, EntityKind::kMob,
+                                                 engine::catalog::SpeciesId::kRock, at(5000));
   const auto payload = add_area_effect(world, state(world, a).player(), f32(10), EffectType::kSlow,
                                        f32(0.5), 100, state(world, a).player());
   CHECK(damage_entity(world, target, f32(10000), petal(world, a)).died);
@@ -245,8 +255,9 @@ auto observation(World& world, PlayerId a, PlayerId b,
 void interleaved_worlds_keep_events_rewards_rng_and_effect_ids_isolated() {
   auto first = make_world(123), second = make_world(123), reference = make_world(123);
   auto seed = [](World& world) {
-    return std::pair(join_player(world, "A", at(-1000), profile(1)),
-                     join_player(world, "B", at(1000), profile(2)));
+    return std::pair(
+        join_player(world, "A", at(-1000), profile(engine::catalog::PetalId::kBasicCommon)),
+        join_player(world, "B", at(1000), profile(engine::catalog::PetalId::kFastCommon)));
   };
   const auto [a1, b1] = seed(*first);
   const auto [a2, b2] = seed(*second);

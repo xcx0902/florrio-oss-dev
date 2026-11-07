@@ -16,11 +16,12 @@ inline PlayerState& state(World& world, PlayerId id) {
 inline Entity& body(World& world, PlayerId id) {
   return *world.entities().get(state(world, id).player());
 }
-inline PlayerProfile profile(std::uint16_t type = 0, std::uint8_t level = 1) {
+inline PlayerProfile profile(catalog::PetalId type = catalog::PetalId::kNone,
+                             std::uint8_t level = 1) {
   auto value = make_default_profile();
   value.clear_inventory();
   value.set_level(level);
-  if (type != 0) {
+  if (type != catalog::PetalId::kNone) {
     value.set_inventory(0, type);
     value.set_inventory_count(1);
   }

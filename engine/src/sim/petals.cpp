@@ -30,9 +30,9 @@ std::uint8_t petal_orbit_index(const PlayerState& state, std::uint8_t slot, std:
   std::uint8_t orbit_index = 0;
   const auto& slots = state.loadout().slots();
   for (std::uint8_t index = 0; index < PlayerLoadout::kActiveSlots; ++index) {
-    const std::uint16_t type = slots[index].type_id;
+    const catalog::PetalId type = slots[index].type_id;
     const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-    if (catalog::petal_id(type) == catalog::PetalId::kNone || definition == nullptr) {
+    if (type == catalog::PetalId::kNone || definition == nullptr) {
       continue;
     }
     // An orbitHidden definition removes the slot from the ring entirely.
@@ -80,9 +80,9 @@ void assign_petal_orbit_indices(PlayerState& state) {
     return nullptr;
   };
   for (std::uint8_t slot = 0; slot < PlayerLoadout::kActiveSlots; ++slot) {
-    const std::uint16_t type = slots[slot].type_id;
+    const catalog::PetalId type = slots[slot].type_id;
     const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-    if (catalog::petal_id(type) == catalog::PetalId::kNone || definition == nullptr) {
+    if (type == catalog::PetalId::kNone || definition == nullptr) {
       // Still write the boundary counter for empty slots.
     } else {
       if (!definition->orbitHidden) {
@@ -146,10 +146,9 @@ double petal_orbit_angle(const PlayerState& state, std::uint8_t orbit_index) {
   if (orbit_positions == 0U) {
     const auto& loadout_slots = state.loadout().slots();
     for (std::uint8_t slot = 0; slot < active && slot < loadout_slots.size(); ++slot) {
-      const std::uint16_t type = loadout_slots[slot].type_id;
+      const catalog::PetalId type = loadout_slots[slot].type_id;
       const catalog::PetalCatalogEntry* definition = Catalog::instance().petal(type);
-      if (catalog::petal_id(type) == catalog::PetalId::kNone || definition == nullptr ||
-          definition->orbitHidden) {
+      if (type == catalog::PetalId::kNone || definition == nullptr || definition->orbitHidden) {
         continue;
       }
       if (definition->sharedOrbit) {
@@ -173,7 +172,7 @@ Vec2 orbit_position(Vec2 center, f32 radius, f32 angle) {
   return center + Vec2(x, y);
 }
 
-f32 petal_radius(std::uint16_t type_id) {
+f32 petal_radius(catalog::PetalId type_id) {
   const auto* petal = Catalog::instance().petal(type_id);
   if (petal != nullptr) {
     return f32(petal->labelFontSize);
@@ -231,10 +230,10 @@ void advance_loadout_orbit_phase(PlayerState& state, double step_milliseconds) {
   std::uint32_t yinyang = 0;
   std::uint32_t faster = 0;
   for (std::uint8_t slot = 0; slot < active && slot < slots.size(); ++slot) {
-    if (catalog::petal_id(slots[slot].type_id) == catalog::PetalId::kYinYangEpic) {
+    if (slots[slot].type_id == catalog::PetalId::kYinYangEpic) {
       ++yinyang;
     }
-    if (catalog::petal_id(slots[slot].type_id) == catalog::PetalId::kFasterRare &&
+    if (slots[slot].type_id == catalog::PetalId::kFasterRare &&
         !state.loadout().pending(slot, 0U)) {
       ++faster;
     }
@@ -322,8 +321,8 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
     if (player != nullptr) {
       orbit.center = player->position;
     }
-    const auto profile = static_cast<OrbitProfile>(orbit.profile);
-    const auto type = catalog::petal_id(orbit.type_id);
+    const auto profile = orbit.profile;
+    const auto type = orbit.type_id;
     const bool defend = has_flag(buttons, InputButton::kDefend);
     const double held_ms = world.time_ms() - orbit.behavior_started_at_ms;
     if (update_projectile_petal_orbit(world, orbit, buttons)) {
@@ -369,9 +368,8 @@ void update_petal_orbits(World& world, PlayerState& state, double step_milliseco
       orbit.orbit_radius = f32(65.0F);
       if (held_ms > (type == catalog::PetalId::kEggEpic ? 1000.0 : 2500.0) &&
           hatch_equipped_egg(world, orbit.handle,
-                             catalog::species_type_id(type == catalog::PetalId::kEggEpic
-                                                          ? catalog::SpeciesId::kSoldierAnt
-                                                          : catalog::SpeciesId::kBeetle))) {
+                             type == catalog::PetalId::kEggEpic ? catalog::SpeciesId::kSoldierAnt
+                                                                : catalog::SpeciesId::kBeetle)) {
         --index;
         continue;
       }
@@ -458,10 +456,10 @@ std::size_t advance_pickups(World& world, double delta_milliseconds) {
           if (state.loadout().slots()[slot].count != 0U) {
             continue;
           }
-          if (!state.loadout().equip(slot, drop.type_id)) {
+          if (!state.loadout().equip(slot, drop.petal_id)) {
             break;
           }
-          state.profile().set_inventory(slot, drop.type_id);
+          state.profile().set_inventory(slot, drop.petal_id);
           if (slot >= state.profile().inventory_count()) {
             state.profile().set_inventory_count(static_cast<std::uint8_t>(slot + 1U));
           }

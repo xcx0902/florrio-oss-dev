@@ -17,8 +17,9 @@ void require(bool condition, const char* message) {
 engine::EntityHandle target(engine::World& world) {
   world.initialize();
   world.set_auto_populate(false);
-  const auto handle = engine::spawn_entity(world, engine::EntityKind::kMob, 1,
-                                           {engine::f32(1000), engine::f32(1000)}, engine::f32(10));
+  const auto handle =
+      engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
+                           {engine::f32(1000), engine::f32(1000)}, engine::f32(10));
   auto* entity = world.entities().get(handle);
   entity->health = engine::f32(1000);
   entity->max_health = entity->health;
@@ -89,8 +90,9 @@ void run(bool trace) {
 
   // Suppression never prevents attribution or death.
   handle = target(world);
-  const auto source = engine::spawn_entity(world, engine::EntityKind::kMob, 1,
-                                           {engine::f32(2000), engine::f32(2000)}, engine::f32(10));
+  const auto source =
+      engine::spawn_entity(world, engine::EntityKind::kMob, engine::catalog::SpeciesId::kRock,
+                           {engine::f32(2000), engine::f32(2000)}, engine::f32(10));
   const auto result = engine::damage_entity(world, handle, engine::f32(2000), source, 1);
   require(result.died && world.entities().get(handle)->death_processed,
           "quiet lethal damage runs death");

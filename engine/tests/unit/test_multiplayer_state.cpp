@@ -127,13 +127,13 @@ void profiles_are_isolated() {
   auto world = make_world();
   auto high = make_default_profile();
   high.set_level(45);
-  high.set_inventory(0, 13);  // Cactus, +20 maximum health
-  high.set_inventory(1, 32);  // Leaf, +1/s
-  high.set_inventory(7, 2);
+  high.set_inventory(0, engine::catalog::PetalId::kCactusRare);   // Cactus, +20 maximum health
+  high.set_inventory(1, engine::catalog::PetalId::kLeafUnusual);  // Leaf, +1/s
+  high.set_inventory(7, engine::catalog::PetalId::kFastCommon);
   high.set_inventory_count(8);
   const auto a = join_player(*world, "A", at(22000), high);
   const auto b = join_player(*world, "B", at(-22000));
-  state(*world, a).profile().push_backpack(35);
+  state(*world, a).profile().push_backpack(engine::catalog::PetalId::kBasicUnique);
   CHECK(state(*world, a).profile().active_slots() == 8);
   CHECK(state(*world, b).profile().active_slots() == 5);
   CHECK(state(*world, b).profile().backpack_count() == 0);
@@ -145,13 +145,13 @@ void profiles_are_isolated() {
   CHECK(equipped_leaf_healing(state(*world, a), 50) == 0.05);
   CHECK(equipped_leaf_healing(state(*world, b), 50) == 0.0);
   const auto b_profile = state(*world, b).profile().inventory();
-  CHECK(discard_player_slot(*world, a, 1, 7, 2));
-  CHECK(state(*world, a).profile().inventory(7) == 0);
+  CHECK(discard_player_slot(*world, a, 1, 7, engine::catalog::PetalId::kFastCommon));
+  CHECK(state(*world, a).profile().inventory(7) == engine::catalog::PetalId::kNone);
   CHECK(state(*world, b).profile().inventory() == b_profile);
-  CHECK(swap_player_slots(*world, a, 1, 0, 13, 2, 1));
-  CHECK(state(*world, a).profile().inventory(2) == 13);
-  CHECK(state(*world, b).loadout().slots()[2].type_id ==
-        catalog::petal_type_id(catalog::PetalId::kBasicCommon));
+  CHECK(swap_player_slots(*world, a, 1, 0, engine::catalog::PetalId::kCactusRare, 2,
+                          engine::catalog::PetalId::kBasicCommon));
+  CHECK(state(*world, a).profile().inventory(2) == engine::catalog::PetalId::kCactusRare);
+  CHECK(state(*world, b).loadout().slots()[2].type_id == catalog::PetalId::kBasicCommon);
   const auto b_hp = body(*world, b).health;
   CHECK(apply_effect(*world, state(*world, b).player(), EffectType::kHealBlock, f32(1), 1000,
                      state(*world, a).player()));
@@ -239,8 +239,9 @@ void stale_body_handle_is_rejected() {
   CHECK(world->players().by_body(fresh) == &player && player.life_epoch == 2);
   CHECK(!world->destroy(old));
   CHECK(!apply_player_input(*world, id, 1, 1, f32(0), f32(200)));
-  CHECK(!discard_player_slot(*world, id, 1, 0, 1));
-  CHECK(!swap_player_slots(*world, id, 1, 0, 1, 1, 1));
+  CHECK(!discard_player_slot(*world, id, 1, 0, engine::catalog::PetalId::kBasicCommon));
+  CHECK(!swap_player_slots(*world, id, 1, 0, engine::catalog::PetalId::kBasicCommon, 1,
+                           engine::catalog::PetalId::kBasicCommon));
   CHECK(body(*world, id).health == f32(100));
 }
 
