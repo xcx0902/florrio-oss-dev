@@ -26,6 +26,7 @@ const check = args.includes('--check');
 
 const IGNORED_DIRECTORIES = new Set([
   'archive',
+  'wave-reference',
   'node_modules',
   'build',
   'dist-next',

@@ -47,11 +47,11 @@ ctest --test-dir build/wave/native --output-on-failure --no-tests=error -L '^w1$
 
 基线提交为 `2f90eed945f2222f0f3a836c83dbdbd9863e27bb`。原生规则版本为 `20221030-w0.1+w1.1`。构建直接消费 W0 的怪种候选、批次、截止、推进阈值、特殊波概率及首波约束。原件 SHA-256 复核通过，归档截止点为 `2022-10-30T21:00:58Z`，构建前缀为 `b632797f0ee487dd99df460b13bde6d7ce5c9773`。浏览器及资源身份沿用 W0 记录。 [源码哈希](../reports/wave/W1/source-sha256.txt) · [W0 原件、浏览器与资源记录](../reports/wave/W0/reference.json)
 
-| 验证 | 退出码 | 结果 |
-| --- | --- | --- |
-| 本页 Release 配置、构建及 CTest 命令 | 0 | W1-01 至 W1-06 及 W0-GARDEN 全部通过 |
-| 在仅含 `wave/` 的临时副本中使用 `-Wall -Wextra -Wpedantic -Werror` 构建并运行同组测试 | 0 | 7/7 通过 |
-| Debug 构建启用 AddressSanitizer 和 UndefinedBehaviorSanitizer 后运行同组测试 | 0 | 7/7 通过 |
+| 验证                                                                                  | 退出码 | 结果                                 |
+| ------------------------------------------------------------------------------------- | ------ | ------------------------------------ |
+| 本页 Release 配置、构建及 CTest 命令                                                  | 0      | W1-01 至 W1-06 及 W0-GARDEN 全部通过 |
+| 在仅含 `wave/` 的临时副本中使用 `-Wall -Wextra -Wpedantic -Werror` 构建并运行同组测试 | 0      | 7/7 通过                             |
+| Debug 构建启用 AddressSanitizer 和 UndefinedBehaviorSanitizer 后运行同组测试          | 0      | 7/7 通过                             |
 
 各报告保存种子、抽样、计划与实际生成 tick、波次、伤害来源和生命代次。W1-06 对比同种子重放和不同房间交错运行的规范化记录。 [命令与退出码](../reports/wave/W1/verification.txt) · [批次](../reports/wave/W1/W1-01.txt) · [阈值与截止](../reports/wave/W1/W1-02.txt) · [生成失败](../reports/wave/W1/W1-03.txt) · [生命](../reports/wave/W1/W1-04.txt) · [几何与战斗](../reports/wave/W1/W1-05.txt) · [隔离](../reports/wave/W1/W1-06.txt) · [早期 Garden](../reports/wave/W1/W0-GARDEN.txt)
 

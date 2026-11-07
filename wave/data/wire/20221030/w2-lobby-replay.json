@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "snapshotSha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0",
+  "scope": "单原版 Chromium 的合成回放，序列从新连接开始。名单是合成输入，尚未接两人房间。",
+  "setup": [
+    "用 W0 的发现夹具启动本地页面和 mock WebSocket",
+    "收到 43 字节首包后依次送 initial",
+    "在昵称框输入 Wave A，点击原版 Squad",
+    "依次送 afterCreate"
+  ],
+  "initial": [
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 12,
+      "hex": "19c6e497a7007f9edf29651d",
+      "purpose": "访客标识"
+    },
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 628,
+      "hex": "52a5559243aac3400803d82e9728d1e152f35d65f227274b421c93a580c22c0029d14ff8aa354081ad2c8604fa7765696c7c52e9bb46c5e348c506189a98d3dd718d5aefe94c86544b35108ebe74c4d3cf6d9bd70fae13389c4fd40ba0ed9096138de091f5cc872d72940452431a57b8fd4d9952c12dc87bb2983172cc32060350ec9e6e686cb6d81b3d1097c935e2a4faa94b244055ce5e4d8cf2a5636c1456e19646dd3072850194cb4193b964d6164989c224cccf4c8f43d044d39189cb3f4370d494963a0c131954c5c8b1b0005ea4e80bb959f632db2690908d0a2705e58b76ad788e82fb2b7f2798993aece9d8fa8ae94b8c7b1f79245022470c63421b69717b0ea9d2c3fad35b2e4ccf34cdd712334f23626b17ef7e8079dd8078f678dfb3dbe436030041bf6a1648cad359f586045253613e3381dcd99a2eda58c19be1c16a4bd5d06c2c4b8fcaf6481650cf535bdb171de88374acebe8974a95902cc9f516f361d01b1b32541614d356671cc1d1732ac197120344faa56e500446c342aa0e2258c88a44f145102d134d14c66eb5d7120095dc18ddc0c2015ff0fe2ee12c9ca5c610111d08fd0153ab22465a792dfeb826b74c3599a8b2b10595570903b0c6d206763cb725c82fb0b10ada26528a9fa5c5c0721b34d600c13a833979610eadc254fa0d49eb3b04af7a2cfb9e6ac6d9efb0e7f50124eaf83ffa01d607f5473bcebb9453b6e3ff12d0254ccd6dc84bb941f6778bd93e406b9b1034c6dce32f319c36b9da394908825456e519359442c21f519a0f1d36a19a94002037f975ddf67d95107e6adbc3fa52748abab753e1016feb8a176830dda85758d30060f9512a6f8ba81ba1e82ce076474afb2a8111616c",
+      "purpose": "资料实体 8193"
+    },
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 13,
+      "hex": "4ffa41af224716591008e5e786",
+      "purpose": "空更新"
+    },
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 13,
+      "hex": "5b615f9a2944a55cc7b3b296b1",
+      "purpose": "空更新"
+    },
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 13,
+      "hex": "4fc8a77d7805422d5e68ab85ec",
+      "purpose": "空更新"
+    },
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 13,
+      "hex": "52a5978c59484be6f909029649",
+      "purpose": "空更新"
+    }
+  ],
+  "afterCreate": [
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 151,
+      "hex": "4f5a0d61b8d9027d38d66b195ca574ec429952c7a1b316e37c990df603ff1fd59ae684758d38078ad4ebf5d1cb883a9a970f93d488c1399bce482115dd93aa1a02586b10b6bf7d278a08235b0d430f5ee860dcdc766960edadb08bf85b9e51ab205853a63e41a020359f7d9530cf6647a2be62210010fbae01affaffeb3f4108292bedbb5993e92be04ed1aafae0509231246c29075eb7",
+      "purpose": "合成私有房实体 8194"
+    },
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 13,
+      "hex": "3c99b9580790d38281c9a296c5",
+      "purpose": "空更新"
+    },
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 13,
+      "hex": "236ec9a1946f227f840c413188",
+      "purpose": "空更新"
+    },
+    {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 13,
+      "hex": "4a6f61c4c1548f26f98732306f",
+      "purpose": "空更新"
+    }
+  ],
+  "observed": {
+    "hash": "#w0fixture-ROOM",
+    "labels": ["Ready", "Private squad", "Wave A", "Wave B", "Empty", "Code: w0fixture-ROOM"],
+    "createCommand": {
+      "kind": "captured-decoded",
+      "hex": "061b01",
+      "sequence": 6,
+      "opcode": 27,
+      "argument": 1,
+      "observation": "在一次含昵称编辑的可靠重传批次中捕获，序号随交互次数变化。"
+    }
+  }
+}

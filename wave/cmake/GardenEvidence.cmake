@@ -1,26 +1,47 @@
 # Generate the typed W1 inputs from the dated W0 rule pack at configure time.
 set(garden_evidence "${CMAKE_CURRENT_SOURCE_DIR}/data/evidence/20221030/rules.json")
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${garden_evidence}")
+set_property(
+  DIRECTORY
+  APPEND
+  PROPERTY CMAKE_CONFIGURE_DEPENDS "${garden_evidence}"
+)
 file(READ "${garden_evidence}" evidence_json)
 string(JSON evidence_version GET "${evidence_json}" version)
 string(JSON rule_count LENGTH "${evidence_json}" rules)
 math(EXPR last_rule "${rule_count} - 1")
 foreach(index RANGE ${last_rule})
-  string(JSON id GET "${evidence_json}" rules ${index} id)
+  string(
+    JSON
+    id
+    GET
+    "${evidence_json}"
+    rules
+    ${index}
+    id
+  )
   string(JSON "rule_${id}" GET "${evidence_json}" rules ${index})
 endforeach()
 
 function(garden_get output id)
   string(JSON value GET "${rule_${id}}" ${ARGN})
-  set("${output}" "${value}" PARENT_SCOPE)
+  set("${output}"
+      "${value}"
+      PARENT_SCOPE
+  )
 endfunction()
 
 function(garden_bool output id)
   garden_get(value "${id}" ${ARGN})
   if(value)
-    set("${output}" "true" PARENT_SCOPE)
+    set("${output}"
+        "true"
+        PARENT_SCOPE
+    )
   else()
-    set("${output}" "false" PARENT_SCOPE)
+    set("${output}"
+        "false"
+        PARENT_SCOPE
+    )
   endif()
 endfunction()
 
@@ -34,7 +55,10 @@ function(garden_mobs output names)
     string(REPLACE " " "_" name "${name}")
     list(APPEND mobs "Mob::${name}")
   endforeach()
-  set("${output}" "${mobs}" PARENT_SCOPE)
+  set("${output}"
+      "${mobs}"
+      PARENT_SCOPE
+  )
 endfunction()
 
 garden_get(threshold wave.advance.remaining currentValue)
@@ -68,15 +92,33 @@ foreach(index RANGE ${last})
   set(batches "")
   set(budget 0)
   foreach(batch RANGE ${last_batch})
-    string(JSON at GET "${schedule}" ${index} batches ${batch} atSeconds)
-    string(JSON amount GET "${schedule}" ${index} batches ${batch} count)
+    string(
+      JSON
+      at
+      GET
+      "${schedule}"
+      ${index}
+      batches
+      ${batch}
+      atSeconds
+    )
+    string(
+      JSON
+      amount
+      GET
+      "${schedule}"
+      ${index}
+      batches
+      ${batch}
+      count
+    )
     math(EXPR budget "${budget} + ${amount}")
     list(APPEND batches "{seconds(${at}), ${amount}}")
   endforeach()
   list(JOIN batches ", " batch_cpp)
-  string(APPEND waves_cpp
-    "      {${wave}, {${mob_cpp}}, Rarity::${rarity}, ${budget},\n"
-    "       {${batch_cpp}}, seconds(${deadline})},\n")
+  string(APPEND waves_cpp "      {${wave}, {${mob_cpp}}, Rarity::${rarity}, ${budget},\n"
+         "       {${batch_cpp}}, seconds(${deadline})},\n"
+  )
 endforeach()
 
 string(JSON count LENGTH "${groups}")

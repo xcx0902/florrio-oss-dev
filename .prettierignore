@@ -6,6 +6,8 @@
 # template text verbatim, so Prettier must neither read nor rewrite them.
 # Change their layout only in the templates, then regenerate.
 archive/
+# Immutable historical clients are verified by SHA-256, never reformatted.
+wave-reference/
 node_modules/
 build/
 dist-next/

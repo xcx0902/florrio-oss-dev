@@ -1,16 +1,38 @@
 # Florr.io Wave 2022-10-30
 
+## W2 · 本地原版客户端
+
+从仓库根目录构建并启动。运行 `dev` 后打开输出的 `localhost` URL。
+
+```sh
+export WAVE_SNAPSHOT="$PWD/wave-reference/20221030"
+cmake -S wave -B build/wave/native -DCMAKE_BUILD_TYPE=Release
+cmake --build build/wave/native --parallel
+npm --prefix wave run dev -- --snapshot "$WAVE_SNAPSHOT" --port 8478
+```
+
+可用 `-DWAVE_BOOST_ARCHIVE=/absolute/path/to/boost_1_86_0.tar.bz2` 离线构建。原生库单独构建时可传 `-DWAVE_BUILD_HOST=OFF`。用 `--native-dir` 或 `WAVE_NATIVE_DIR` 指定其他构建目录。
+
+```sh
+ctest --test-dir build/wave/native --output-on-failure --no-tests=error -L '^w2$'
+npm --prefix wave run test:wire -- --snapshot "$WAVE_SNAPSHOT" --stage W2
+```
+
+完整验收覆盖双人入局、原版鼠标移动、分批生成、清波、阵亡重生、跨波重连和异常恢复。报告、收发字节及截图默认写入 `reports/wave/W2/`；`--bootstrap-only` 仅运行引导子集。 [W2 执行结果](../wave-goals/02-garden-online.md#w2-执行结果)
+
+测试入口使用单独编译的 `wave_host_fixture`，固定种子与短批次由测试宿主提供，专用端点只推进 W1 时钟。正式 `wave_host` 使用 Garden 规则，不包含测试端点。手动复查时，A 点击 Squad 创建私有房，复制地址栏中的邀请链接到另一隔离浏览器上下文，双方填写昵称并点击 Ready。
+
 ## W1 · Garden 原生模拟
 
 使用 CMake 3.20+ 和 C++20 编译器，从仓库根目录执行。
 
 ```sh
-cmake -S wave -B build/wave/native -DCMAKE_BUILD_TYPE=Release
-cmake --build build/wave/native --parallel
-ctest --test-dir build/wave/native --output-on-failure --no-tests=error -L '^w1$'
+cmake -S wave -B build/wave/w1 -DCMAKE_BUILD_TYPE=Release -DWAVE_BUILD_HOST=OFF
+cmake --build build/wave/w1 --parallel
+ctest --test-dir build/wave/w1 --output-on-failure --no-tests=error -L '^w1$'
 ```
 
-`wave_sim` 的构建输入都在 `wave/` 中。CMake 从 W0 规则表生成 Garden 配置。CTest 默认把每个用例的事件和状态写到 `build/wave/native/reports/`，可用 `-DWAVE_REPORT_DIR=<绝对路径>` 指定报告目录。 [规则表](data/evidence/20221030/rules.json) · [执行记录](../wave-goals/01-engine-and-wave-loop.md#w1-执行结果)
+`wave_sim` 的构建输入都在 `wave/` 中。CMake 从 W0 规则表生成 Garden 配置。CTest 默认把每个用例的事件和状态写到构建目录的 `reports/`，可用 `-DWAVE_REPORT_DIR=<绝对路径>` 指定报告目录。 [规则表](data/evidence/20221030/rules.json) · [执行记录](../wave-goals/01-engine-and-wave-loop.md#w1-执行结果)
 
 ### W2 接入
 

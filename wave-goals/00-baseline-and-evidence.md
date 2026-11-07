@@ -108,10 +108,10 @@ W0 放行。原件核对通过，归档原 HTML 的 Memento 时刻为 `2022-10-3
 
 基线提交为 `2f90eed945f2222f0f3a836c83dbdbd9863e27bb`。W0 新文件的独立源码摘要及每项文件哈希记录在报告的 `source` 中。
 
-| 操作 | 退出码 | 结果 |
-| --- | --- | --- |
-| `npm --prefix wave ci --offline` | 0 | 依赖按锁文件安装 |
-| `npm --prefix wave run fetch:archive -- --output-dir <空目录>` | 0 | 12 个归档输入重新下载并通过哈希校验 |
-| `npm --prefix wave run verify:reference -- --snapshot "$WAVE_SNAPSHOT" --resources "$WAVE_RESOURCES"` | 0 | 两条 Chromium 启动路径及证据表检查通过 |
-| 在只复制 `wave/` 的临时目录重新安装并运行同一验收 | 0 | 输入作为绝对路径传入，[独立报告](../reports/wave/W0/isolated/reference.json) |
-| 在实验副本翻转 JS 的一个字节，另跑缺归档资源目录 | 各 1，符合预期 | SHA-256 不符和缺资源都令验收失败 |
+| 操作                                                                                                  | 退出码         | 结果                                                                         |
+| ----------------------------------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------- |
+| `npm --prefix wave ci --offline`                                                                      | 0              | 依赖按锁文件安装                                                             |
+| `npm --prefix wave run fetch:archive -- --output-dir <空目录>`                                        | 0              | 12 个归档输入重新下载并通过哈希校验                                          |
+| `npm --prefix wave run verify:reference -- --snapshot "$WAVE_SNAPSHOT" --resources "$WAVE_RESOURCES"` | 0              | 两条 Chromium 启动路径及证据表检查通过                                       |
+| 在只复制 `wave/` 的临时目录重新安装并运行同一验收                                                     | 0              | 输入作为绝对路径传入，[独立报告](../reports/wave/W0/isolated/reference.json) |
+| 在实验副本翻转 JS 的一个字节，另跑缺归档资源目录                                                      | 各 1，符合预期 | SHA-256 不符和缺资源都令验收失败                                             |

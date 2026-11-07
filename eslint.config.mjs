@@ -19,6 +19,7 @@ export default [
   {
     ignores: [
       'archive/**',
+      'wave-reference/**',
       'build/**',
       'dist-next/**',
       'dist-multiplayer/**',
