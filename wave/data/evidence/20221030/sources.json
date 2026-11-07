@@ -1,0 +1,507 @@
+{
+  "schemaVersion": 1,
+  "cutoffUtc": "2022-10-30T21:00:58Z",
+  "revisionMethod": "MediaWiki UTC 查询以原 HTML 的 Memento 时刻为边界。older/newer 各保留最近修订。后续改动是否相关按内容而非修订时间判断。原响应路径相对 reports/wave/W0。",
+  "sources": [
+    {
+      "id": "snapshot.wasm",
+      "kind": "primary-artifact",
+      "independenceGroup": "snapshot-20221030",
+      "path": "wave-reference/20221030/client.wasm",
+      "sha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0",
+      "captureUtc": "2022-10-30T21:00:58Z",
+      "locator": "Wasm 线性内存、Binaryen 132 WAT 及原件运行。目录报告由 verify:reference 生成。"
+    },
+    {
+      "id": "log.client",
+      "kind": "primary-changelog",
+      "independenceGroup": "florr-in-game-log",
+      "related": ["snapshot.wasm"],
+      "path": "wave-reference/20221030/client.wasm",
+      "captureUtc": "2022-10-30T21:00:58Z",
+      "locator": "Wasm 英语更新日志的线性内存地址。英语与中文 Wiki 转录属于同一日志。",
+      "entries": {
+        "advanceRemaining": {
+          "memoryAddress": 46075,
+          "fileOffset": 2393378
+        },
+        "specialChance": {
+          "memoryAddress": 48864,
+          "fileOffset": 2396167
+        },
+        "specialRandom": {
+          "memoryAddress": 46207,
+          "fileOffset": 2393510
+        },
+        "highestPublic": {
+          "memoryAddress": 45025,
+          "fileOffset": 2392328
+        },
+        "craftRng": {
+          "memoryAddress": 48481,
+          "fileOffset": 2395784
+        },
+        "roundMap": {
+          "memoryAddress": 42654,
+          "fileOffset": 2389957
+        },
+        "leafMobHeal": {
+          "memoryAddress": 44517,
+          "fileOffset": 2391820
+        },
+        "peasGrapes": {
+          "memoryAddress": 44135,
+          "fileOffset": 2391438
+        },
+        "pvpReward": {
+          "memoryAddress": 46329,
+          "fileOffset": 2393632
+        },
+        "antHoleTimer": {
+          "memoryAddress": 47424,
+          "fileOffset": 2394727
+        }
+      }
+    },
+    {
+      "id": "log.en",
+      "kind": "changelog-transcription",
+      "independenceGroup": "florr-in-game-log",
+      "url": "https://github.com/AstRatJP/florr.io-files/blob/main/i18n/en_US/changelog.txt",
+      "locator": "2022-07-16 至 2022-12-29 日期条目。用原 Wasm 字符串交叉定位。"
+    },
+    {
+      "id": "log.zh",
+      "kind": "changelog-transcription",
+      "independenceGroup": "florr-in-game-log",
+      "url": "https://florrio.fandom.com/zh/wiki/%E4%BA%8C/%E6%97%A5%E8%AA%8C/Play_as_guest/Changelog",
+      "locator": "2022 年游戏内日志。8 月 Leaf、9 月波次、10 月合成、11 月 Ultra 和波次改动。"
+    },
+    {
+      "id": "wiki.gg.history",
+      "kind": "modern-history-index",
+      "independenceGroup": "wiki.gg",
+      "access": "2026-11-07 读取原页返回 403，现代资料仅作线索。",
+      "pages": {
+        "Leaf": "https://florrio.wiki.gg/wiki/Leaf#History",
+        "Honey": "https://florrio.wiki.gg/wiki/Honey#History"
+      }
+    },
+    {
+      "id": "plan.w0",
+      "kind": "reconstruction-design",
+      "independenceGroup": "wave-project",
+      "path": "wave-goals/00-baseline-and-evidence.md",
+      "locator": "W0 允许早期数值采用显式复刻设定。"
+    },
+    {
+      "id": "plan.w1",
+      "kind": "reconstruction-design",
+      "independenceGroup": "wave-project",
+      "path": "wave-goals/01-engine-and-wave-loop.md",
+      "locator": "01.2、01.3 的候选波次循环和确定性测试。"
+    },
+    {
+      "id": "wiki.waves",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Waves",
+      "locator": "General Properties；分批、阈值、蚁穴与超时。尾号循环与同期原日志冲突。",
+      "revisions": {
+        "older": {
+          "oldid": 1789,
+          "timestamp": "2022-09-11T16:54:53Z",
+          "parentid": 780,
+          "url": "https://official-florrio.fandom.com/wiki/Waves?oldid=1789",
+          "raw": "wiki/waves-older.json",
+          "sha256": "0b8a7325f0d13d14572b32eb56af9a3656ead976b06d79cdb71869c965986840"
+        },
+        "newer": {
+          "oldid": 5926,
+          "timestamp": "2023-01-22T00:39:40Z",
+          "parentid": 1789,
+          "url": "https://official-florrio.fandom.com/wiki/Waves?oldid=5926",
+          "raw": "wiki/waves-newer.json",
+          "sha256": "98c891e24f71707364a3f4c25a59b4e84f6a3e63027f6f41d10fc557caaa55c0"
+        }
+      },
+      "cutoffComparison": "后侧修订仅增加 Removed 标记，首个相关截止变化采用 2022-11-06 原日志。"
+    },
+    {
+      "id": "wiki.garden",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Garden",
+      "locator": "Mob Spawning / General；Special Waves。Trivia 仍有旧的固定特殊波描述。",
+      "revisions": {
+        "older": {
+          "oldid": 1991,
+          "timestamp": "2022-09-27T15:39:43Z",
+          "parentid": 1825,
+          "url": "https://official-florrio.fandom.com/wiki/Garden?oldid=1991",
+          "raw": "wiki/garden-older.json",
+          "sha256": "c56901fc05159cf16c8606d8a8cd6b49f1853e854475545107affd77fe8ebc9a"
+        },
+        "newer": {
+          "oldid": 3695,
+          "timestamp": "2022-11-22T03:05:00Z",
+          "parentid": 1991,
+          "url": "https://official-florrio.fandom.com/wiki/Garden?oldid=3695",
+          "raw": "wiki/garden-newer.json",
+          "sha256": "e25df647bab75e0b5f925529ed6543f69a86d79dab779a4531cd4ee731c4d16e"
+        }
+      },
+      "cutoffComparison": "后侧修订修改怪物描述，首波与特殊波表保留。11 月场地变化以原日志界定。"
+    },
+    {
+      "id": "wiki.basic",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Basic",
+      "locator": "Function / Petal Stats；Starter slots。表中属性与原件构造器样本冲突。",
+      "revisions": {
+        "older": {
+          "oldid": 2192,
+          "timestamp": "2022-10-22T21:50:46Z",
+          "parentid": 2116,
+          "url": "https://official-florrio.fandom.com/wiki/Basic?oldid=2192",
+          "raw": "wiki/basic-older.json",
+          "sha256": "8311d2071c074686aa90e26082d3811966774ab5636442f9075f4eacb9a2f95c"
+        },
+        "newer": {
+          "oldid": 2649,
+          "timestamp": "2022-11-04T14:32:54Z",
+          "parentid": 2192,
+          "url": "https://official-florrio.fandom.com/wiki/Basic?oldid=2649",
+          "raw": "wiki/basic-newer.json",
+          "sha256": "0af1fbb19b3f39b3a7605ba28b25b30cef7aa979a653fc445e075a60781f66be"
+        }
+      },
+      "cutoffComparison": "后侧修订主要补图库与文案，属性表原值保留。"
+    },
+    {
+      "id": "wiki.faster",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Faster",
+      "locator": "Function / Petal Stats；轨道效果。",
+      "revisions": {
+        "older": {
+          "oldid": 2413,
+          "timestamp": "2022-10-26T20:58:11Z",
+          "parentid": 2327,
+          "url": "https://official-florrio.fandom.com/wiki/Faster?oldid=2413",
+          "raw": "wiki/faster-older.json",
+          "sha256": "1e00f8324b8ee96a4ad197fe8a09e3380b21806fa881ebc743f91d66a764001b"
+        },
+        "newer": {
+          "oldid": 2713,
+          "timestamp": "2022-11-06T10:28:49Z",
+          "parentid": 2413,
+          "url": "https://official-florrio.fandom.com/wiki/Faster?oldid=2713",
+          "raw": "wiki/faster-newer.json",
+          "sha256": "15f7af71afb6aee44e0b9ed4a237ef43b667e8d5ec01551f08f2ae614c75e951"
+        }
+      },
+      "cutoffComparison": "后侧修订补充 Mythic 数量与重做描述，缺少明确生效日。"
+    },
+    {
+      "id": "wiki.rose",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Rose",
+      "locator": "Function / Petal Stats；治疗与重生延迟。",
+      "revisions": {
+        "older": {
+          "oldid": 2305,
+          "timestamp": "2022-10-24T17:35:54Z",
+          "parentid": 939,
+          "url": "https://official-florrio.fandom.com/wiki/Rose?oldid=2305",
+          "raw": "wiki/rose-older.json",
+          "sha256": "1e2dae6c09538dc8b1dae34fc0106dbb457364332c67afa869e72eb88cc4d67e"
+        },
+        "newer": {
+          "oldid": 2637,
+          "timestamp": "2022-11-03T21:52:05Z",
+          "parentid": 2305,
+          "url": "https://official-florrio.fandom.com/wiki/Rose?oldid=2637",
+          "raw": "wiki/rose-newer.json",
+          "sha256": "6ca60ba73f9029b115e2b6c836113b75367d9ba20263fea8551222693b37ed0d"
+        }
+      },
+      "cutoffComparison": "后侧修订改动属性表中的 80 HP 项。"
+    },
+    {
+      "id": "wiki.leaf",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Leaf",
+      "locator": "Function / Petal Stats；被动治疗与友方怪物。",
+      "revisions": {
+        "older": {
+          "oldid": 2030,
+          "timestamp": "2022-10-02T15:13:16Z",
+          "parentid": 1998,
+          "url": "https://official-florrio.fandom.com/wiki/Leaf?oldid=2030",
+          "raw": "wiki/leaf-older.json",
+          "sha256": "f28098d34976a90a584ac10cac19034a59fa561ccdbf3241105269b94c4f9ba7"
+        },
+        "newer": {
+          "oldid": 3785,
+          "timestamp": "2022-11-24T18:15:44Z",
+          "parentid": 2030,
+          "url": "https://official-florrio.fandom.com/wiki/Leaf?oldid=3785",
+          "raw": "wiki/leaf-newer.json",
+          "sha256": "59d37e10f50754a64d9551af50cb36935bbd44525a7e24609490a63c9c07e78d"
+        }
+      },
+      "cutoffComparison": "后侧修订新增 Ultra；属于截止后的能力范围。"
+    },
+    {
+      "id": "wiki.web",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Web",
+      "locator": "Function / Petal Stats；地面网减速。",
+      "revisions": {
+        "older": {
+          "oldid": 2310,
+          "timestamp": "2022-10-24T19:26:12Z",
+          "parentid": 2308,
+          "url": "https://official-florrio.fandom.com/wiki/Web?oldid=2310",
+          "raw": "wiki/web-older.json",
+          "sha256": "ef5b8a41ecb49d27e9c6540e956e28a1f3198ca2ef21b147b063db10a6e1fc91"
+        },
+        "newer": {
+          "oldid": 2628,
+          "timestamp": "2022-11-03T17:56:35Z",
+          "parentid": 2310,
+          "url": "https://official-florrio.fandom.com/wiki/Web?oldid=2628",
+          "raw": "wiki/web-newer.json",
+          "sha256": "c382783ffa9ae06657b2d1bb384d0aa3bc4cbc15e14d355f7b3aca4f73b2d22e"
+        }
+      },
+      "cutoffComparison": "后侧修订新增 Ultra 条目，旧范围内减速值另查。"
+    },
+    {
+      "id": "wiki.peas",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Peas",
+      "locator": "Function / Petal Stats；四粒及子花瓣耐久说明。",
+      "revisions": {
+        "older": {
+          "oldid": 2332,
+          "timestamp": "2022-10-25T13:49:36Z",
+          "parentid": 2051,
+          "url": "https://official-florrio.fandom.com/wiki/Peas?oldid=2332",
+          "raw": "wiki/peas-older.json",
+          "sha256": "1cb2727ab2ec6cf995cbb4f2fe73c5f522caa9fa69a75ac5575d3c22812985c8"
+        },
+        "newer": {
+          "oldid": 3413,
+          "timestamp": "2022-11-13T22:58:38Z",
+          "parentid": 2332,
+          "url": "https://official-florrio.fandom.com/wiki/Peas?oldid=3413",
+          "raw": "wiki/peas-newer.json",
+          "sha256": "bad89f5015b63dbc1c610861c21999383e2fe6107a197d0b0ee66358e6fd8477"
+        }
+      },
+      "cutoffComparison": "后侧修订调整多个稀有度的表值并新增 Ultra。"
+    },
+    {
+      "id": "wiki.grapes",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Grapes",
+      "locator": "Function / Damage；毒和多粒。",
+      "revisions": {
+        "older": {
+          "oldid": 2053,
+          "timestamp": "2022-10-06T00:42:25Z",
+          "parentid": 2050,
+          "url": "https://official-florrio.fandom.com/wiki/Grapes?oldid=2053",
+          "raw": "wiki/grapes-older.json",
+          "sha256": "b75abc72a46dd40e1374f710c5e5b90b26bdb6f07ad101759f3c5328e34f73df"
+        },
+        "newer": {
+          "oldid": 3219,
+          "timestamp": "2022-11-09T03:40:20Z",
+          "parentid": 2053,
+          "url": "https://official-florrio.fandom.com/wiki/Grapes?oldid=3219",
+          "raw": "wiki/grapes-newer.json",
+          "sha256": "1b91b3e8cccc80cf49888bbc17969476ebb3ff831d96935d287c8eff41880ecf"
+        }
+      },
+      "cutoffComparison": "后侧修订纠正 8 月 31 日拆分说明。"
+    },
+    {
+      "id": "wiki.honey",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Honey",
+      "locator": "Function / Petal Stats；后续重做以 12 月原日志为分界。",
+      "revisions": {
+        "older": {
+          "oldid": 940,
+          "timestamp": "2022-08-07T16:56:24Z",
+          "parentid": 217,
+          "url": "https://official-florrio.fandom.com/wiki/Honey?oldid=940",
+          "raw": "wiki/honey-older.json",
+          "sha256": "6405a0eecd552f701c19b1725a4c39b5102d367bf42ca20a34c39cc03a231789"
+        },
+        "newer": {
+          "oldid": 3783,
+          "timestamp": "2022-11-24T18:06:56Z",
+          "parentid": 940,
+          "url": "https://official-florrio.fandom.com/wiki/Honey?oldid=3783",
+          "raw": "wiki/honey-newer.json",
+          "sha256": "20b72b420aa1110a2583c62a3d67136de2d7329384578785b3d591f6c845a943"
+        }
+      },
+      "cutoffComparison": "后侧修订添加 Ultra 等表项。10 月快照直接验证旧说明，重做具体日期待可访问历史来源。"
+    },
+    {
+      "id": "wiki.ladybug",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Ladybug",
+      "locator": "Statistics；基础生命和接触伤害候选。",
+      "revisions": {
+        "older": {
+          "oldid": 918,
+          "timestamp": "2022-08-06T23:56:47Z",
+          "parentid": 471,
+          "url": "https://official-florrio.fandom.com/wiki/Ladybug?oldid=918",
+          "raw": "wiki/ladybug-older.json",
+          "sha256": "3076e62db1ce2a3f56b89edbff2ce49f5543139bf0d6564d93960066d2d3c136"
+        },
+        "newer": {
+          "oldid": 2657,
+          "timestamp": "2022-11-04T22:33:49Z",
+          "parentid": 918,
+          "url": "https://official-florrio.fandom.com/wiki/Ladybug?oldid=2657",
+          "raw": "wiki/ladybug-newer.json",
+          "sha256": "460e0b09f1b3a139b901174ec8156ed89c258c0912ead16d320cfb80deb8ec88"
+        }
+      },
+      "cutoffComparison": "后侧修订增加 Mythic 截图；基本属性文本保留。"
+    },
+    {
+      "id": "wiki.hornet",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Hornet",
+      "locator": "Statistics；本体与导弹字段候选。",
+      "revisions": {
+        "older": {
+          "oldid": 1790,
+          "timestamp": "2022-09-11T16:57:28Z",
+          "parentid": 508,
+          "url": "https://official-florrio.fandom.com/wiki/Hornet?oldid=1790",
+          "raw": "wiki/hornet-older.json",
+          "sha256": "979f1de24c6c10d997b550c4d829e95639f2a1eefee019c98c48cef9c8b9c748"
+        },
+        "newer": {
+          "oldid": 2691,
+          "timestamp": "2022-11-06T01:02:31Z",
+          "parentid": 1790,
+          "url": "https://official-florrio.fandom.com/wiki/Hornet?oldid=2691",
+          "raw": "wiki/hornet-newer.json",
+          "sha256": "841394e469c2b3b96aec1cb8bfa00297f6b5dd08cff1cf9cf847b86b96dd63e1"
+        }
+      },
+      "cutoffComparison": "后侧修订修改行为文案；首个明确属性变化见 2022-11-15 原日志。"
+    },
+    {
+      "id": "wiki.spider",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "Spider",
+      "locator": "Statistics；本体接触和生命字段候选。",
+      "revisions": {
+        "older": {
+          "oldid": 2065,
+          "timestamp": "2022-10-06T18:37:58Z",
+          "parentid": 1946,
+          "url": "https://official-florrio.fandom.com/wiki/Spider?oldid=2065",
+          "raw": "wiki/spider-older.json",
+          "sha256": "ddd62ef8ab1f26b5456c410436ef3c1b609f442a9b7f1c0208021505bce67f2e"
+        },
+        "newer": {
+          "oldid": 3206,
+          "timestamp": "2022-11-08T20:22:51Z",
+          "parentid": 2065,
+          "url": "https://official-florrio.fandom.com/wiki/Spider?oldid=3206",
+          "raw": "wiki/spider-newer.json",
+          "sha256": "8e4a1ac60a07dd0c2937788af9993d007fc36e1948239bfd35013cfa06a73dfd"
+        }
+      },
+      "cutoffComparison": "后侧修订补充相对移速描述；权威移速仍待校准。"
+    },
+    {
+      "id": "wiki.pvp",
+      "kind": "mediawiki-revisions",
+      "independenceGroup": "english-fandom-community",
+      "title": "PvP",
+      "locator": "Features / Points needed to drop Basic；高档阈值自带不确定标注。",
+      "revisions": {
+        "older": {
+          "oldid": 2067,
+          "timestamp": "2022-10-06T23:01:47Z",
+          "parentid": 2066,
+          "url": "https://official-florrio.fandom.com/wiki/PvP?oldid=2067",
+          "raw": "wiki/pvp-older.json",
+          "sha256": "7c34277c180ece0598dae498a0add2720b5d698f992b7c209ccb45219486dc6f"
+        },
+        "newer": {
+          "oldid": 3392,
+          "timestamp": "2022-11-13T16:57:26Z",
+          "parentid": 2067,
+          "url": "https://official-florrio.fandom.com/wiki/PvP?oldid=3392",
+          "raw": "wiki/pvp-newer.json",
+          "sha256": "9e61694b350c68bfc8aff06fb8854e100079516c8d818406fef793a79cd40f92"
+        }
+      },
+      "cutoffComparison": "后侧修订修改怪物描述，掉落分数阈值仍待校准。"
+    },
+    {
+      "id": "wiki.fast",
+      "kind": "missing-mediawiki-title",
+      "independenceGroup": "english-fandom-community",
+      "title": "Fast",
+      "locator": "API 截止点前后均无该标题。原件名称为 Faster，另见 wiki.faster。",
+      "raw": ["wiki/fast-older.json", "wiki/fast-newer.json"]
+    },
+    {
+      "id": "video.garden",
+      "kind": "contemporaneous-gameplay-video",
+      "independenceGroup": "video-BV1ED4y167Sc",
+      "title": "[florr.io]garden wave25-31",
+      "url": "https://www.bilibili.com/video/BV1ED4y167Sc/",
+      "publishedUtc": "2022-08-28T10:24:06Z",
+      "recordedUtc": null,
+      "durationSeconds": 906,
+      "trackQuality": 16,
+      "cid": 817128220,
+      "videoSha256": "b81f6244561ea531be7dc71ae6f6b4df3e627b381577b1a10ed4caa031db25b4",
+      "rawMetadata": "wiki/garden-video.json",
+      "locator": "video-observations.json 中的时间点和帧身份。发布日期只作为录制时间的上界。"
+    },
+    {
+      "id": "video.desert",
+      "kind": "contemporaneous-gameplay-video",
+      "independenceGroup": "video-BV1Pg41117Gb",
+      "title": "【florr.io】Current world record：Desert Wave 28 from discord",
+      "url": "https://www.bilibili.com/video/BV1Pg41117Gb/",
+      "publishedUtc": "2022-07-29T10:32:06Z",
+      "recordedUtc": null,
+      "durationSeconds": 599,
+      "trackQuality": 16,
+      "cid": 787830437,
+      "videoSha256": "25e0838344701ec48b977294a59bc68a2787b4462ae09dc325f9cf0cc9d5e988",
+      "rawMetadata": "wiki/desert-video.json",
+      "locator": "video-observations.json 中的时间点和帧身份。发布日期只作为录制时间的上界。"
+    }
+  ]
+}

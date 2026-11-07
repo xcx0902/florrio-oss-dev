@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "cutoffUtc": "2022-10-30T21:00:58Z",
+  "buildHash": "b632797f0ee487dd99df460b13bde6d7ce5c9773",
+  "snapshot": [
+    {
+      "file": "client.js",
+      "url": "https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/client.js",
+      "contentType": "text/javascript",
+      "bytes": 112347,
+      "sha256": "23c51f12ec4f31b66e4796d799ac944c05b60114cb84ba58e354ed1c53ab4dc0"
+    },
+    {
+      "file": "client.wasm",
+      "url": "https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/client.wasm",
+      "contentType": "application/wasm",
+      "bytes": 2474614,
+      "sha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0"
+    }
+  ],
+  "archive": [
+    {
+      "file": "index-20221030.html",
+      "url": "https://florr.io/",
+      "contentType": "text/html",
+      "role": "archived-document",
+      "capture": "2022-10-30T21:00:58.000Z",
+      "bytes": 5800,
+      "sha256": "2980b47f0e271e715e938dd70de48fd86f6a7337bc185b87a121322bc85c929c",
+      "source": "https://web.archive.org/web/20221030210058id_/https://florr.io/"
+    },
+    {
+      "file": "ubuntu-700.css",
+      "url": "https://fonts.googleapis.com/css?family=Ubuntu:700",
+      "contentType": "text/css",
+      "role": "archived-font-css",
+      "capture": "2022-10-30T21:00:58.000Z",
+      "bytes": 1705,
+      "sha256": "a478264e4b0c4beefb01df67403b47bd2459ebef279936a5b126bb90d175cd76",
+      "source": "https://web.archive.org/web/20221030210058id_/https://fonts.googleapis.com/css?family=Ubuntu:700"
+    },
+    {
+      "file": "4iCv6KVjbNBYlgoCxCvjvWyNL4U.woff2",
+      "url": "https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjvWyNL4U.woff2",
+      "contentType": "font/woff2",
+      "role": "archived-font",
+      "capture": "2022-10-30T16:47:00.000Z",
+      "bytes": 20876,
+      "sha256": "1b5fbd781cfbbd5aaf6258698cdbf9832cb46382bf5e1c9e0db3e3f81f5f9462",
+      "source": "https://web.archive.org/web/20221030164700id_/https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjvWyNL4U.woff2"
+    },
+    {
+      "file": "4iCv6KVjbNBYlgoCxCvjtGyNL4U.woff2",
+      "url": "https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjtGyNL4U.woff2",
+      "contentType": "font/woff2",
+      "role": "archived-font",
+      "capture": "2022-10-30T20:32:43.000Z",
+      "bytes": 18200,
+      "sha256": "caeaf02fa4a8a45438c270767c4e50fc7f3ed5f94a4c90984eaacb87c2e8a693",
+      "source": "https://web.archive.org/web/20221030203243id_/https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjtGyNL4U.woff2"
+    },
+    {
+      "file": "4iCv6KVjbNBYlgoCxCvjvGyNL4U.woff2",
+      "url": "https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjvGyNL4U.woff2",
+      "contentType": "font/woff2",
+      "role": "archived-font",
+      "capture": "2022-10-30T16:47:06.000Z",
+      "bytes": 13284,
+      "sha256": "cc7fd58566791a8682924c5a3d2af45559c96e7a0a2f4cde1bb342d018b6c5aa",
+      "source": "https://web.archive.org/web/20221030164706id_/https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjvGyNL4U.woff2"
+    },
+    {
+      "file": "4iCv6KVjbNBYlgoCxCvjs2yNL4U.woff2",
+      "url": "https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjs2yNL4U.woff2",
+      "contentType": "font/woff2",
+      "role": "archived-font",
+      "capture": "2022-10-30T19:43:30.000Z",
+      "bytes": 12936,
+      "sha256": "7e60d4df52144b57e1065524716f9087b1be34ffc9049e0d3eb1091f8d1e2551",
+      "source": "https://web.archive.org/web/20221030194330id_/https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjs2yNL4U.woff2"
+    },
+    {
+      "file": "4iCv6KVjbNBYlgoCxCvjvmyNL4U.woff2",
+      "url": "https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjvmyNL4U.woff2",
+      "contentType": "font/woff2",
+      "role": "archived-font",
+      "capture": "2022-10-30T22:41:57.000Z",
+      "bytes": 37840,
+      "sha256": "e4f50b8bf27fec2b2be5907a06a6579a355aa86542322a2434fac71a22c2ea6e",
+      "source": "https://web.archive.org/web/20221030224157id_/https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjvmyNL4U.woff2"
+    },
+    {
+      "file": "4iCv6KVjbNBYlgoCxCvjsGyN.woff2",
+      "url": "https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjsGyN.woff2",
+      "contentType": "font/woff2",
+      "role": "archived-font",
+      "capture": "2022-10-30T21:11:11.000Z",
+      "bytes": 29752,
+      "sha256": "7c00752ce82d6abaed0b9766d35b906b16675facdbe24115b410d1fab975effa",
+      "source": "https://web.archive.org/web/20221030211111id_/https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCxCvjsGyN.woff2"
+    },
+    {
+      "file": "favicon-32x32.png",
+      "url": "https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/favicon-32x32.png",
+      "contentType": "image/png",
+      "role": "archived-optional",
+      "capture": "2022-10-30T21:00:59.000Z",
+      "bytes": 1354,
+      "sha256": "c1cbaa14923837daf34b62d0085ba182eb9568438089cad522c31eb8fb4d8a14",
+      "source": "https://web.archive.org/web/20221030210059id_/https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/favicon-32x32.png"
+    },
+    {
+      "file": "favicon-16x16.png",
+      "url": "https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/favicon-16x16.png",
+      "contentType": "image/png",
+      "role": "archived-optional",
+      "capture": "2023-04-06T16:03:55.000Z",
+      "bytes": 752,
+      "sha256": "994894d44d363375576da6e410b82c8ef18722025154c1fb0c94f8f7053e3ceb",
+      "source": "https://web.archive.org/web/20230406160355id_/https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/favicon-16x16.png"
+    },
+    {
+      "file": "apple-touch-icon.png",
+      "url": "https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/apple-touch-icon.png",
+      "contentType": "image/png",
+      "role": "archived-optional",
+      "capture": "2023-02-10T14:02:04.000Z",
+      "bytes": 13430,
+      "sha256": "188c5c3e7aa431381a866bc1914b8683972650513fc5ae7416ee362be96dbb8b",
+      "source": "https://web.archive.org/web/20230210140204id_/https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/apple-touch-icon.png"
+    },
+    {
+      "file": "manifest.json",
+      "url": "https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/manifest.json",
+      "contentType": "application/manifest+json",
+      "role": "archived-optional",
+      "capture": "2022-11-03T07:09:29.000Z",
+      "bytes": 446,
+      "sha256": "2d35f44b55408bf4b2893315e4188d75e272a5a9ce448ee815d5c19cc4b87cfb",
+      "source": "https://web.archive.org/web/20221103070929id_/https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/manifest.json"
+    }
+  ],
+  "excluded": [
+    {
+      "url": "https://api.adinplay.com/libs/aiptag/pub/DGD/florr.io/tag.min.js",
+      "reason": "第三方广告脚本，浏览器验证显式拦截。原 JS 通过可选广告能力检查。"
+    },
+    {
+      "url": "https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/android-chrome-192x192.png",
+      "reason": "Manifest 安装图标，启动不请求。"
+    },
+    {
+      "url": "https://static.florr.io/b632797f0ee487dd99df460b13bde6d7ce5c9773/android-chrome-512x512.png",
+      "reason": "Manifest 安装图标，启动不请求。"
+    }
+  ]
+}

@@ -1,0 +1,6711 @@
+var _____WB$wombat$assign$function_____ = function (name) {
+  return (
+    (globalThis._wb_wombat &&
+      globalThis._wb_wombat.local_init &&
+      globalThis._wb_wombat.local_init(name)) ||
+    globalThis[name]
+  );
+};
+if (!globalThis.__WB_pmw) {
+  globalThis.__WB_pmw = function (obj) {
+    this.__WB_source = obj;
+    return this;
+  };
+}
+{
+  let window = _____WB$wombat$assign$function_____('window');
+  let self = _____WB$wombat$assign$function_____('self');
+  let document = _____WB$wombat$assign$function_____('document');
+  let location = _____WB$wombat$assign$function_____('location');
+  let top = _____WB$wombat$assign$function_____('top');
+  let parent = _____WB$wombat$assign$function_____('parent');
+  let frames = _____WB$wombat$assign$function_____('frames');
+  let opener = _____WB$wombat$assign$function_____('opener');
+  null;
+  var m;
+  m || (m = typeof Module !== 'undefined' ? Module : {});
+  (function (A) {
+    function tb(a, b, c, d) {
+      a || (a = this);
+      this.parent = a;
+      this.vg = a.vg;
+      this.Zh = null;
+      this.id = f.Ml++;
+      this.name = b;
+      this.mode = c;
+      this.og = {};
+      this.rg = {};
+      this.ci = d;
+    }
+    function K(a) {
+      if ('string' != typeof a) return 0;
+      var b = 4 * a.length + 1,
+        c = R(b);
+      L(a, c, b);
+      return c;
+    }
+    function Z(a) {
+      switch (a) {
+        case 0:
+          return 48;
+        case 1:
+          return 49;
+        case 2:
+          return 50;
+        case 3:
+          return 51;
+        case 4:
+          return 52;
+        case 5:
+          return 53;
+        case 6:
+          return 54;
+        case 7:
+          return 55;
+        case 8:
+          return 56;
+        case 9:
+          return 57;
+        case 10:
+          return 65;
+        case 11:
+          return 66;
+        case 12:
+          return 67;
+        case 13:
+          return 68;
+        case 14:
+          return 69;
+        case 15:
+          return 70;
+        default:
+          return 63;
+      }
+    }
+    function rc() {
+      window.onbeforeunload = null;
+      location.reload(!0);
+    }
+    function pa(a) {
+      var b = document.activeElement,
+        c = document.createElement('textarea');
+      c.style.position = 'fixed';
+      c.style.top = 0;
+      c.style.left = 0;
+      c.style.width = '2em';
+      c.style.height = '2em';
+      c.style.margin = 0;
+      c.style.padding = 0;
+      c.style.border = 'none';
+      c.style.outline = 'none';
+      c.style.boxShadow = 'none';
+      c.style.background = 'transparent';
+      c.value = a;
+      document.body.appendChild(c);
+      c.focus();
+      c.select();
+      var d = !1;
+      try {
+        (d = document.execCommand('copy')) || console.log('execCommand copy failed');
+      } catch (e) {}
+      document.body.removeChild(c);
+      d || window.prompt('Copy the following link to your clipboard:', a);
+      b && b.focus();
+    }
+    function sc(a) {
+      return m.locateFile ? m.locateFile(a, ha) : ha + a;
+    }
+    function la(a, b, c) {
+      var d = b + c;
+      for (c = b; a[c] && !(c >= d);) ++c;
+      if (16 < c - b && a.buffer && ub) return ub.decode(a.subarray(b, c));
+      for (d = ''; b < c;) {
+        var e = a[b++];
+        if (e & 128) {
+          var g = a[b++] & 63;
+          if (192 == (e & 224)) d += String.fromCharCode(((e & 31) << 6) | g);
+          else {
+            var h = a[b++] & 63;
+            e =
+              224 == (e & 240)
+                ? ((e & 15) << 12) | (g << 6) | h
+                : ((e & 7) << 18) | (g << 12) | (h << 6) | (a[b++] & 63);
+            65536 > e
+              ? (d += String.fromCharCode(e))
+              : ((e -= 65536), (d += String.fromCharCode(55296 | (e >> 10), 56320 | (e & 1023))));
+          }
+        } else d += String.fromCharCode(e);
+      }
+      return d;
+    }
+    function E(a, b) {
+      return a ? la(P, a, b) : '';
+    }
+    function Ha(a, b, c, d) {
+      if (!(0 < d)) return 0;
+      var e = c;
+      d = c + d - 1;
+      for (var g = 0; g < a.length; ++g) {
+        var h = a.charCodeAt(g);
+        if (55296 <= h && 57343 >= h) {
+          var p = a.charCodeAt(++g);
+          h = (65536 + ((h & 1023) << 10)) | (p & 1023);
+        }
+        if (127 >= h) {
+          if (c >= d) break;
+          b[c++] = h;
+        } else {
+          if (2047 >= h) {
+            if (c + 1 >= d) break;
+            b[c++] = 192 | (h >> 6);
+          } else {
+            if (65535 >= h) {
+              if (c + 2 >= d) break;
+              b[c++] = 224 | (h >> 12);
+            } else {
+              if (c + 3 >= d) break;
+              b[c++] = 240 | (h >> 18);
+              b[c++] = 128 | ((h >> 12) & 63);
+            }
+            b[c++] = 128 | ((h >> 6) & 63);
+          }
+          b[c++] = 128 | (h & 63);
+        }
+      }
+      b[c] = 0;
+      return c - e;
+    }
+    function L(a, b, c) {
+      return Ha(a, P, b, c);
+    }
+    function qa(a) {
+      for (var b = 0, c = 0; c < a.length; ++c) {
+        var d = a.charCodeAt(c);
+        127 >= d
+          ? b++
+          : 2047 >= d
+            ? (b += 2)
+            : 55296 <= d && 57343 >= d
+              ? ((b += 4), ++c)
+              : (b += 3);
+      }
+      return b;
+    }
+    function Ya() {
+      ia++;
+      m.monitorRunDependencies && m.monitorRunDependencies(ia);
+    }
+    function Ia() {
+      ia--;
+      m.monitorRunDependencies && m.monitorRunDependencies(ia);
+      if (0 == ia && (null !== Za && (clearInterval(Za), (Za = null)), ra)) {
+        var a = ra;
+        ra = null;
+        a();
+      }
+    }
+    function W(a) {
+      if (m.onAbort) m.onAbort(a);
+      a = 'Aborted(' + a + ')';
+      V(a);
+      ma = !0;
+      Ja = 1;
+      throw new WebAssembly.RuntimeError(a + '. Build with -sASSERTIONS for more info.');
+    }
+    function vb(a) {
+      return a.startsWith('data:application/octet-stream;base64,');
+    }
+    function wb(a) {
+      try {
+        if (a == aa && sa) return new Uint8Array(sa);
+        if (xb) return xb(a);
+        throw 'both async and sync fetching of the wasm failed';
+      } catch (b) {
+        W(b);
+      }
+    }
+    function tc() {
+      return sa || 'function' != typeof fetch
+        ? Promise.resolve().then(function () {
+            return wb(aa);
+          })
+        : fetch(aa, { credentials: 'same-origin' })
+            .then(function (a) {
+              if (!a.ok) throw "failed to load wasm binary file at '" + aa + "'";
+              return a.arrayBuffer();
+            })
+            .catch(function () {
+              return wb(aa);
+            });
+    }
+    function yb(a) {
+      this.name = 'ExitStatus';
+      this.message = 'Program terminated with exit(' + a + ')';
+      this.status = a;
+    }
+    function uc(a, b, c) {
+      a.addEventListener(b, c, { once: !0 });
+    }
+    function vc(a, b) {
+      b || (b = [document, document.getElementById('canvas')]);
+      ['keydown', 'mousedown', 'touchstart'].forEach(function (c) {
+        b.forEach(function (d) {
+          d &&
+            uc(d, c, () => {
+              'suspended' === a.state && a.resume();
+            });
+        });
+      });
+    }
+    function Ka(a) {
+      for (; 0 < a.length;) a.shift()(m);
+    }
+    function zb(a) {
+      var b = Ab();
+      a = a();
+      Bb(b);
+      return a;
+    }
+    function Q(a) {
+      var b = La[a];
+      b || (a >= La.length && (La.length = a + 1), (La[a] = b = Cb.get(a)));
+      return b;
+    }
+    function $a(a, b, c) {
+      a.includes('j')
+        ? ((a = m['dynCall_' + a]),
+          (b = c && c.length ? a.apply(null, [b].concat(c)) : a.call(null, b)))
+        : (b = Q(b).apply(null, c));
+      return b;
+    }
+    function Db(a) {
+      if (a instanceof yb || 'unwind' == a) return Ja;
+      ab(1, a);
+    }
+    function Eb(a, b, c = 'i8') {
+      c.endsWith('*') && (c = '*');
+      switch (c) {
+        case 'i1':
+          S[a >> 0] = b;
+          break;
+        case 'i8':
+          S[a >> 0] = b;
+          break;
+        case 'i16':
+          na[a >> 1] = b;
+          break;
+        case 'i32':
+          l[a >> 2] = b;
+          break;
+        case 'i64':
+          N = [
+            b >>> 0,
+            ((C = b),
+            1 <= +Math.abs(C)
+              ? 0 < C
+                ? (Math.min(+Math.floor(C / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((C - +(~~C >>> 0)) / 4294967296) >>> 0
+              : 0),
+          ];
+          l[a >> 2] = N[0];
+          l[(a + 4) >> 2] = N[1];
+          break;
+        case 'float':
+          F[a >> 2] = b;
+          break;
+        case 'double':
+          X[a >> 3] = b;
+          break;
+        case '*':
+          J[a >> 2] = b;
+          break;
+        default:
+          W('invalid type for setValue: ' + c);
+      }
+    }
+    function Fb() {
+      if ('object' == typeof crypto && 'function' == typeof crypto.getRandomValues) {
+        var a = new Uint8Array(1);
+        return () => {
+          crypto.getRandomValues(a);
+          return a[0];
+        };
+      }
+      return () => W('randomDevice');
+    }
+    function bb(a, b, c) {
+      c = 0 < c ? c : qa(a) + 1;
+      c = Array(c);
+      a = Ha(a, c, 0, c.length);
+      b && (c.length = a);
+      return c;
+    }
+    function wc(a, b, c, d) {
+      var e = d ? '' : 'al ' + a;
+      xc(
+        a,
+        (g) => {
+          g || W('Loading data file "' + a + '" failed (no arrayBuffer).');
+          b(new Uint8Array(g));
+          e && Ia(e);
+        },
+        () => {
+          if (c) c();
+          else throw 'Loading data file "' + a + '" failed.';
+        },
+      );
+      e && Ya(e);
+    }
+    function ta(a, b) {
+      r.ng.Ji = a;
+      r.ng.Ki = b;
+      if (!r.ng.zh) return 1;
+      r.ng.yj || (r.ng.yj = !0);
+      if (0 == a)
+        ((r.ng.kh = function () {
+          var d = Math.max(0, r.ng.im + b - cb()) | 0;
+          setTimeout(r.ng.Fi, d);
+        }),
+          (r.ng.method = 'timeout'));
+      else if (1 == a)
+        ((r.ng.kh = function () {
+          r.requestAnimationFrame(r.ng.Fi);
+        }),
+          (r.ng.method = 'rAF'));
+      else if (2 == a) {
+        if ('undefined' == typeof setImmediate) {
+          var c = [];
+          addEventListener(
+            'message',
+            (d) => {
+              if ('setimmediate' === d.data || 'setimmediate' === d.data.target)
+                (d.stopPropagation(), c.shift()());
+            },
+            !0,
+          );
+          setImmediate = function (d) {
+            c.push(d);
+            postMessage('setimmediate', '*');
+          };
+        }
+        r.ng.kh = function () {
+          setImmediate(r.ng.Fi);
+        };
+        r.ng.method = 'immediate';
+      }
+      return 0;
+    }
+    function Gb(a) {
+      Ja = a;
+      if (!yc) {
+        if (m.onExit) m.onExit(a);
+        ma = !0;
+      }
+      ab(a, new yb(a));
+    }
+    function Hb(a, b, c, d, e) {
+      !r.ng.zh ||
+        W(
+          'emscripten_set_main_loop: there can only be one main loop function at once: call emscripten_cancel_main_loop to cancel the previous one before setting a new one with different parameters.',
+        );
+      r.ng.zh = a;
+      r.ng.Qi = d;
+      var g = r.ng.yh;
+      r.ng.yj = !1;
+      r.ng.Fi = function () {
+        if (!ma)
+          if (0 < r.ng.uk.length) {
+            var h = Date.now(),
+              p = r.ng.uk.shift();
+            p.zh(p.Qi);
+            if (r.ng.xj) {
+              var q = r.ng.xj,
+                v = 0 == q % 1 ? q - 1 : Math.floor(q);
+              r.ng.xj = p.xm ? v : (8 * q + (v + 0.5)) / 9;
+            }
+            ua('main loop blocker "' + p.name + '" took ' + (Date.now() - h) + ' ms');
+            r.ng.pm();
+            g < r.ng.yh || setTimeout(r.ng.Fi, 0);
+          } else
+            g < r.ng.yh ||
+              ((r.ng.Ui = (r.ng.Ui + 1) | 0),
+              1 == r.ng.Ji && 1 < r.ng.Ki && 0 != r.ng.Ui % r.ng.Ki
+                ? r.ng.kh()
+                : (0 == r.ng.Ji && (r.ng.im = cb()),
+                  r.ng.am(a),
+                  g < r.ng.yh ||
+                    ('object' == typeof SDL && SDL.audio && SDL.audio.Tl && SDL.audio.Tl(),
+                    r.ng.kh())));
+      };
+      e || (b && 0 < b ? ta(0, 1e3 / b) : ta(1, 1), r.ng.kh());
+      if (c) throw 'unwind';
+    }
+    function db(a) {
+      if (!ma)
+        try {
+          a();
+        } catch (b) {
+          Db(b);
+        }
+    }
+    function Ib(a, b) {
+      return setTimeout(function () {
+        db(a);
+      }, b);
+    }
+    function va(a) {
+      va.Aj || (va.Aj = {});
+      va.Aj[a] || ((va.Aj[a] = 1), V(a));
+    }
+    function wa(a) {
+      var b = qa(a) + 1,
+        c = R(b);
+      c && Ha(a, S, c, b);
+      return c;
+    }
+    function Jb(a, b) {
+      eb.length = 0;
+      var c;
+      for (b >>= 2; (c = P[a++]);)
+        ((b += (105 != c) & b), eb.push(105 == c ? l[b] : X[b++ >> 1]), ++b);
+      return eb;
+    }
+    function Kb(a, b, c) {
+      b = Jb(b, c);
+      return Lb[a].apply(null, b);
+    }
+    function T(a) {
+      a = 2 < a ? E(a) : a;
+      return Ma[a] || document.querySelector(a);
+    }
+    function Mb(a) {
+      return zb(function () {
+        var b = xa(8),
+          c = b + 4,
+          d = xa(a.id.length + 1);
+        L(a.id, d, a.id.length + 1);
+        if ((d = T(d))) ((l[b >> 2] = d.width), (l[c >> 2] = d.height));
+        return [l[b >> 2], l[c >> 2]];
+      });
+    }
+    function Nb(a, b, c) {
+      a = T(a);
+      if (!a) return -4;
+      a.width = b;
+      a.height = c;
+      return 0;
+    }
+    function Ob(a, b, c) {
+      a.wm
+        ? zb(function () {
+            var d = xa(a.id.length + 1);
+            L(a.id, d, a.id.length + 1);
+            Nb(d, b, c);
+          })
+        : ((a.width = b), (a.height = c));
+    }
+    function zc(a) {
+      function b() {
+        document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.msFullscreenElement ||
+          (document.removeEventListener('fullscreenchange', b),
+          document.removeEventListener('webkitfullscreenchange', b),
+          Ob(a, d, e),
+          (a.style.width = g),
+          (a.style.height = h),
+          (a.style.backgroundColor = p),
+          q || (document.body.style.backgroundColor = 'white'),
+          (document.body.style.backgroundColor = q),
+          (a.style.paddingLeft = v),
+          (a.style.paddingRight = u),
+          (a.style.paddingTop = z),
+          (a.style.paddingBottom = B),
+          (a.style.marginLeft = t),
+          (a.style.marginRight = G),
+          (a.style.marginTop = M),
+          (a.style.marginBottom = U),
+          (document.body.style.margin = ja),
+          (document.documentElement.style.overflow = Ac),
+          (document.body.scroll = Bc),
+          (a.style.jh = Cc),
+          a.Ph && a.Ph.fh.viewport(0, 0, d, e),
+          Na.mi && Q(Na.mi)(37, 0, Na.Jj));
+      }
+      var c = Mb(a),
+        d = c[0],
+        e = c[1],
+        g = a.style.width,
+        h = a.style.height,
+        p = a.style.backgroundColor,
+        q = document.body.style.backgroundColor,
+        v = a.style.paddingLeft,
+        u = a.style.paddingRight,
+        z = a.style.paddingTop,
+        B = a.style.paddingBottom,
+        t = a.style.marginLeft,
+        G = a.style.marginRight,
+        M = a.style.marginTop,
+        U = a.style.marginBottom,
+        ja = document.body.style.margin,
+        Ac = document.documentElement.style.overflow,
+        Bc = document.body.scroll,
+        Cc = a.style.jh;
+      document.addEventListener('fullscreenchange', b);
+      document.addEventListener('webkitfullscreenchange', b);
+      return b;
+    }
+    function fb(a, b, c) {
+      a.style.paddingLeft = a.style.paddingRight = c + 'px';
+      a.style.paddingTop = a.style.paddingBottom = b + 'px';
+    }
+    function Oa(a) {
+      return 0 > Ma.indexOf(a) ? a.getBoundingClientRect() : { left: 0, top: 0 };
+    }
+    function gb(a, b) {
+      if (0 != b.zj || 0 != b.Si) {
+        zc(a);
+        var c = b.fm ? innerWidth : screen.width,
+          d = b.fm ? innerHeight : screen.height,
+          e = Oa(a),
+          g = e.width;
+        e = e.height;
+        var h = Mb(a),
+          p = h[0];
+        h = h[1];
+        3 == b.zj
+          ? (fb(a, (d - e) / 2, (c - g) / 2), (c = g), (d = e))
+          : 2 == b.zj &&
+            (c * h < p * d
+              ? ((g = (h * c) / p), fb(a, (d - g) / 2, 0), (d = g))
+              : ((g = (p * d) / h), fb(a, 0, (c - g) / 2), (c = g)));
+        a.style.backgroundColor || (a.style.backgroundColor = 'black');
+        document.body.style.backgroundColor || (document.body.style.backgroundColor = 'black');
+        a.style.width = c + 'px';
+        a.style.height = d + 'px';
+        1 == b.ml &&
+          ((a.style.jh = 'optimizeSpeed'),
+          (a.style.jh = '-moz-crisp-edges'),
+          (a.style.jh = '-o-crisp-edges'),
+          (a.style.jh = '-webkit-optimize-contrast'),
+          (a.style.jh = 'optimize-contrast'),
+          (a.style.jh = 'crisp-edges'),
+          (a.style.jh = 'pixelated'));
+        g = 2 == b.Si ? devicePixelRatio : 1;
+        0 != b.Si &&
+          ((c = (c * g) | 0), (d = (d * g) | 0), Ob(a, c, d), a.Ph && a.Ph.fh.viewport(0, 0, c, d));
+      }
+      if (a.requestFullscreen) a.requestFullscreen();
+      else if (a.webkitRequestFullscreen) a.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+      else return w.fullscreenEnabled() ? -3 : -1;
+      Na = b;
+      b.mi && Q(b.mi)(37, 0, b.Jj);
+      return 0;
+    }
+    function hb(a) {
+      if (a.requestPointerLock) a.requestPointerLock();
+      else if (a.Ei) a.Ei();
+      else return document.body.requestPointerLock || document.body.Ei ? -3 : -1;
+      return 0;
+    }
+    function Pb(a, b) {
+      X[a >> 3] = b.timestamp;
+      for (var c = 0; c < b.axes.length; ++c) X[(a + 8 * c + 16) >> 3] = b.axes[c];
+      for (c = 0; c < b.buttons.length; ++c)
+        X[(a + 8 * c + 528) >> 3] =
+          'object' == typeof b.buttons[c] ? b.buttons[c].value : b.buttons[c];
+      for (c = 0; c < b.buttons.length; ++c)
+        l[(a + 4 * c + 1040) >> 2] =
+          'object' == typeof b.buttons[c] ? b.buttons[c].pressed : 1 == b.buttons[c];
+      l[(a + 1296) >> 2] = b.connected;
+      l[(a + 1300) >> 2] = b.index;
+      l[(a + 8) >> 2] = b.axes.length;
+      l[(a + 12) >> 2] = b.buttons.length;
+      L(b.id, a + 1304, 64);
+      L(b.mapping, a + 1368, 64);
+    }
+    function ca(a, b, c, d) {
+      for (var e = 0; e < a; e++) {
+        var g = k[c](),
+          h = g && n.Ah(d);
+        g ? ((g.name = h), (d[h] = g)) : n.mg(1282);
+        l[(b + 4 * e) >> 2] = h;
+      }
+    }
+    function Qb(a, b, c, d, e, g, h, p) {
+      b = n.sg[b];
+      if ((a = k[a](b, c)))
+        ((d = p && L(a.name, p, d)),
+          e && (l[e >> 2] = d),
+          g && (l[g >> 2] = a.size),
+          h && (l[h >> 2] = a.type));
+    }
+    function ya(a, b) {
+      J[a >> 2] = b;
+      J[(a + 4) >> 2] = (b - J[a >> 2]) / 4294967296;
+    }
+    function Pa(a, b, c) {
+      if (b) {
+        var d = A;
+        switch (a) {
+          case 36346:
+            d = 1;
+            break;
+          case 36344:
+            0 != c && 1 != c && n.mg(1280);
+            return;
+          case 34814:
+          case 36345:
+            d = 0;
+            break;
+          case 34466:
+            var e = k.getParameter(34467);
+            d = e ? e.length : 0;
+            break;
+          case 33309:
+            if (2 > n.Ag.version) {
+              n.mg(1282);
+              return;
+            }
+            d = 2 * (k.getSupportedExtensions() || []).length;
+            break;
+          case 33307:
+          case 33308:
+            if (2 > n.Ag.version) {
+              n.mg(1280);
+              return;
+            }
+            d = 33307 == a ? 3 : 0;
+        }
+        if (d === A)
+          switch (((e = k.getParameter(a)), typeof e)) {
+            case 'number':
+              d = e;
+              break;
+            case 'boolean':
+              d = e ? 1 : 0;
+              break;
+            case 'string':
+              n.mg(1280);
+              return;
+            case 'object':
+              if (null === e)
+                switch (a) {
+                  case 34964:
+                  case 35725:
+                  case 34965:
+                  case 36006:
+                  case 36007:
+                  case 32873:
+                  case 34229:
+                  case 36662:
+                  case 36663:
+                  case 35053:
+                  case 35055:
+                  case 36010:
+                  case 35097:
+                  case 35869:
+                  case 32874:
+                  case 36389:
+                  case 35983:
+                  case 35368:
+                  case 34068:
+                    d = 0;
+                    break;
+                  default:
+                    n.mg(1280);
+                    return;
+                }
+              else {
+                if (
+                  e instanceof Float32Array ||
+                  e instanceof Uint32Array ||
+                  e instanceof Int32Array ||
+                  e instanceof Array
+                ) {
+                  for (a = 0; a < e.length; ++a)
+                    switch (c) {
+                      case 0:
+                        l[(b + 4 * a) >> 2] = e[a];
+                        break;
+                      case 2:
+                        F[(b + 4 * a) >> 2] = e[a];
+                        break;
+                      case 4:
+                        S[(b + a) >> 0] = e[a] ? 1 : 0;
+                    }
+                  return;
+                }
+                try {
+                  d = e.name | 0;
+                } catch (g) {
+                  n.mg(1280);
+                  V(
+                    'GL_INVALID_ENUM in glGet' +
+                      c +
+                      'v: Unknown object returned from WebGL getParameter(' +
+                      a +
+                      ')! (error: ' +
+                      g +
+                      ')',
+                  );
+                  return;
+                }
+              }
+              break;
+            default:
+              n.mg(1280);
+              V(
+                'GL_INVALID_ENUM in glGet' +
+                  c +
+                  'v: Native code calling glGet' +
+                  c +
+                  'v(' +
+                  a +
+                  ') and it returns ' +
+                  e +
+                  ' of type ' +
+                  typeof e +
+                  '!',
+              );
+              return;
+          }
+        switch (c) {
+          case 1:
+            ya(b, d);
+            break;
+          case 0:
+            l[b >> 2] = d;
+            break;
+          case 2:
+            F[b >> 2] = d;
+            break;
+          case 4:
+            S[b >> 0] = d ? 1 : 0;
+        }
+      } else n.mg(1281);
+    }
+    function Rb(a, b, c, d) {
+      if (c) {
+        b = k.getIndexedParameter(a, b);
+        switch (typeof b) {
+          case 'boolean':
+            a = b ? 1 : 0;
+            break;
+          case 'number':
+            a = b;
+            break;
+          case 'object':
+            if (null === b)
+              switch (a) {
+                case 35983:
+                case 35368:
+                  a = 0;
+                  break;
+                default:
+                  n.mg(1280);
+                  return;
+              }
+            else if (b instanceof WebGLBuffer) a = b.name | 0;
+            else {
+              n.mg(1280);
+              return;
+            }
+            break;
+          default:
+            n.mg(1280);
+            return;
+        }
+        switch (d) {
+          case 1:
+            ya(c, a);
+            break;
+          case 0:
+            l[c >> 2] = a;
+            break;
+          case 2:
+            F[c >> 2] = a;
+            break;
+          case 4:
+            S[c >> 0] = a ? 1 : 0;
+            break;
+          default:
+            throw 'internal emscriptenWebGLGetIndexed() error, bad type: ' + d;
+        }
+      } else n.mg(1281);
+    }
+    function za(a) {
+      var b = qa(a) + 1,
+        c = R(b);
+      L(a, c, b);
+      return c;
+    }
+    function Sb(a) {
+      return ']' == a.slice(-1) && a.lastIndexOf('[');
+    }
+    function Tb(a) {
+      var b = a.ii,
+        c = a.Gk,
+        d;
+      if (!b)
+        for (a.ii = b = {}, a.Fk = {}, d = 0; d < k.getProgramParameter(a, 35718); ++d) {
+          var e = k.getActiveUniform(a, d);
+          var g = e.name;
+          e = e.size;
+          var h = Sb(g);
+          h = 0 < h ? g.slice(0, h) : g;
+          var p = a.Dj;
+          a.Dj += e;
+          c[h] = [e, p];
+          for (g = 0; g < e; ++g) ((b[p] = g), (a.Fk[p++] = h));
+        }
+    }
+    function H(a) {
+      var b = k.Zk;
+      if (b) {
+        var c = b.ii[a];
+        'number' == typeof c &&
+          (b.ii[a] = c = k.getUniformLocation(b, b.Fk[a] + (0 < c ? '[' + c + ']' : '')));
+        return c;
+      }
+      n.mg(1282);
+    }
+    function ib(a, b, c, d) {
+      if (c)
+        if (
+          ((a = n.sg[a]),
+          Tb(a),
+          (a = k.getUniform(a, H(b))),
+          'number' == typeof a || 'boolean' == typeof a)
+        )
+          switch (d) {
+            case 0:
+              l[c >> 2] = a;
+              break;
+            case 2:
+              F[c >> 2] = a;
+          }
+        else
+          for (b = 0; b < a.length; b++)
+            switch (d) {
+              case 0:
+                l[(c + 4 * b) >> 2] = a[b];
+                break;
+              case 2:
+                F[(c + 4 * b) >> 2] = a[b];
+            }
+      else n.mg(1281);
+    }
+    function Qa(a, b, c, d) {
+      if (c)
+        if (((a = k.getVertexAttrib(a, b)), 34975 == b)) l[c >> 2] = a && a.name;
+        else if ('number' == typeof a || 'boolean' == typeof a)
+          switch (d) {
+            case 0:
+              l[c >> 2] = a;
+              break;
+            case 2:
+              F[c >> 2] = a;
+              break;
+            case 5:
+              l[c >> 2] = Math.fround(a);
+          }
+        else
+          for (b = 0; b < a.length; b++)
+            switch (d) {
+              case 0:
+                l[(c + 4 * b) >> 2] = a[b];
+                break;
+              case 2:
+                F[(c + 4 * b) >> 2] = a[b];
+                break;
+              case 5:
+                l[(c + 4 * b) >> 2] = Math.fround(a[b]);
+            }
+      else n.mg(1281);
+    }
+    function Aa(a) {
+      a -= 5120;
+      return 0 == a
+        ? S
+        : 1 == a
+          ? P
+          : 2 == a
+            ? na
+            : 4 == a
+              ? l
+              : 6 == a
+                ? F
+                : 5 == a || 28922 == a || 28520 == a || 30779 == a || 30782 == a
+                  ? J
+                  : Ub;
+    }
+    function Ba(a) {
+      return 31 - Math.clz32(a.BYTES_PER_ELEMENT);
+    }
+    function Dc(a, b) {
+      if (!w.fullscreenEnabled()) return -1;
+      a = T(a);
+      return a
+        ? a.requestFullscreen || a.webkitRequestFullscreen
+          ? w.Ri()
+            ? gb(a, b)
+            : b.el
+              ? (w.Rj(gb, 1, [a, b]), 1)
+              : -2
+          : -3
+        : -4;
+    }
+    function Ec(a, b, c, d, e, g) {
+      a = {
+        target: T(a),
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          var p = Q(d)(e, 0, b);
+          p && (p = E(p));
+          if (p) return (h.preventDefault(), (h.returnValue = p));
+        },
+        Ig: c,
+      };
+      w.Og(a);
+    }
+    function Vb(a, b, c, d, e, g) {
+      w.Xj || (w.Xj = R(256));
+      a = {
+        target: T(a),
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          var p = h.target.id ? h.target.id : '',
+            q = w.Xj;
+          L(w.dj(h.target), q + 0, 128);
+          L(p, q + 128, 128);
+          Q(d)(e, q, b) && h.preventDefault();
+        },
+        Ig: c,
+      };
+      w.Og(a);
+    }
+    function Wb(a, b, c, d, e, g) {
+      w.Yj || (w.Yj = R(280));
+      w.Og({
+        target: a,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          var p = w.Yj,
+            q =
+              document.fullscreenElement ||
+              document.mozFullScreenElement ||
+              document.webkitFullscreenElement ||
+              document.msFullscreenElement,
+            v = !!q;
+          l[p >> 2] = v;
+          l[(p + 4) >> 2] = w.fullscreenEnabled();
+          var u = v ? q : w.Sl,
+            z = u && u.id ? u.id : '';
+          L(w.dj(u), p + 8, 128);
+          L(z, p + 136, 128);
+          l[(p + 264) >> 2] = u ? u.clientWidth : 0;
+          l[(p + 268) >> 2] = u ? u.clientHeight : 0;
+          l[(p + 272) >> 2] = screen.width;
+          l[(p + 276) >> 2] = screen.height;
+          v && (w.Sl = q);
+          Q(d)(e, p, b) && h.preventDefault();
+        },
+        Ig: c,
+      });
+    }
+    function Xb(a, b, c, d, e, g) {
+      w.$j || (w.$j = R(1432));
+      a = {
+        target: T(a),
+        Rh: !0,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          var p = w.$j;
+          Pb(p, h.gamepad);
+          Q(d)(e, p, b) && h.preventDefault();
+        },
+        Ig: c,
+      };
+      w.Og(a);
+    }
+    function jb(a, b, c, d, e, g) {
+      w.ik || (w.ik = R(176));
+      a = {
+        target: T(a),
+        Rh: !0,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          var p = w.ik;
+          X[p >> 3] = h.timeStamp;
+          var q = p >> 2;
+          l[q + 2] = h.location;
+          l[q + 3] = h.ctrlKey;
+          l[q + 4] = h.shiftKey;
+          l[q + 5] = h.altKey;
+          l[q + 6] = h.metaKey;
+          l[q + 7] = h.repeat;
+          l[q + 8] = h.charCode;
+          l[q + 9] = h.keyCode;
+          l[q + 10] = h.which;
+          L(h.key || '', p + 44, 32);
+          L(h.code || '', p + 76, 32);
+          L(h.char || '', p + 108, 32);
+          L(h.locale || '', p + 140, 32);
+          Q(d)(e, p, b) && h.preventDefault();
+        },
+        Ig: c,
+      };
+      w.Og(a);
+    }
+    function Yb(a, b, c) {
+      X[a >> 3] = b.timeStamp;
+      a >>= 2;
+      l[a + 2] = b.screenX;
+      l[a + 3] = b.screenY;
+      l[a + 4] = b.clientX;
+      l[a + 5] = b.clientY;
+      l[a + 6] = b.ctrlKey;
+      l[a + 7] = b.shiftKey;
+      l[a + 8] = b.altKey;
+      l[a + 9] = b.metaKey;
+      na[2 * a + 20] = b.button;
+      na[2 * a + 21] = b.buttons;
+      l[a + 11] = b.movementX;
+      l[a + 12] = b.movementY;
+      c = Oa(c);
+      l[a + 13] = b.clientX - c.left;
+      l[a + 14] = b.clientY - c.top;
+    }
+    function Ca(a, b, c, d, e, g) {
+      w.qj || (w.qj = R(72));
+      a = T(a);
+      w.Og({
+        target: a,
+        Rh: 'mousemove' != g && 'mouseenter' != g && 'mouseleave' != g,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          Yb(w.qj, h, a);
+          Q(d)(e, w.qj, b) && h.preventDefault();
+        },
+        Ig: c,
+      });
+    }
+    function Ra(a, b, c, d, e, g) {
+      w.sk || (w.sk = R(260));
+      w.Og({
+        target: a,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          var p = w.sk,
+            q = document.pointerLockElement || document.Ym || document.un || document.$m;
+          l[p >> 2] = !!q;
+          var v = q && q.id ? q.id : '';
+          L(w.dj(q), p + 4, 128);
+          L(v, p + 132, 128);
+          Q(d)(e, p, b) && h.preventDefault();
+        },
+        Ig: c,
+      });
+    }
+    function Fc(a, b, c, d, e, g) {
+      w.Ek || (w.Ek = R(36));
+      a = T(a);
+      w.Og({
+        target: a,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          if (h.target == a) {
+            var p = document.body;
+            if (p) {
+              var q = w.Ek;
+              l[q >> 2] = h.detail;
+              l[(q + 4) >> 2] = p.clientWidth;
+              l[(q + 8) >> 2] = p.clientHeight;
+              l[(q + 12) >> 2] = innerWidth;
+              l[(q + 16) >> 2] = innerHeight;
+              l[(q + 20) >> 2] = outerWidth;
+              l[(q + 24) >> 2] = outerHeight;
+              l[(q + 28) >> 2] = pageXOffset;
+              l[(q + 32) >> 2] = pageYOffset;
+              Q(d)(e, q, b) && h.preventDefault();
+            }
+          }
+        },
+        Ig: c,
+      });
+    }
+    function Sa(a, b, c, d, e, g) {
+      w.Ck || (w.Ck = R(1696));
+      a = T(a);
+      w.Og({
+        target: a,
+        Rh: 'touchstart' == g || 'touchend' == g,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          for (var p, q = {}, v = h.touches, u = 0; u < v.length; ++u)
+            ((p = v[u]), (p.gk = p.qk = 0), (q[p.identifier] = p));
+          for (u = 0; u < h.changedTouches.length; ++u)
+            ((p = h.changedTouches[u]), (p.gk = 1), (q[p.identifier] = p));
+          for (u = 0; u < h.targetTouches.length; ++u) q[h.targetTouches[u].identifier].qk = 1;
+          v = w.Ck;
+          X[v >> 3] = h.timeStamp;
+          var z = v >> 2;
+          l[z + 3] = h.ctrlKey;
+          l[z + 4] = h.shiftKey;
+          l[z + 5] = h.altKey;
+          l[z + 6] = h.metaKey;
+          z += 7;
+          var B = Oa(a),
+            t = 0;
+          for (u in q)
+            if (
+              ((p = q[u]),
+              (l[z + 0] = p.identifier),
+              (l[z + 1] = p.screenX),
+              (l[z + 2] = p.screenY),
+              (l[z + 3] = p.clientX),
+              (l[z + 4] = p.clientY),
+              (l[z + 5] = p.pageX),
+              (l[z + 6] = p.pageY),
+              (l[z + 7] = p.gk),
+              (l[z + 8] = p.qk),
+              (l[z + 9] = p.clientX - B.left),
+              (l[z + 10] = p.clientY - B.top),
+              (z += 13),
+              31 < ++t)
+            )
+              break;
+          l[(v + 8) >> 2] = t;
+          Q(d)(e, v, b) && h.preventDefault();
+        },
+        Ig: c,
+      });
+    }
+    function Gc(a, b, c, d, e, g) {
+      w.Hk || (w.Hk = R(8));
+      w.Og({
+        target: a,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          var p = w.Hk,
+            q = ['hidden', 'visible', 'prerender', 'unloaded'].indexOf(document.visibilityState);
+          l[p >> 2] = document.hidden;
+          l[(p + 4) >> 2] = q;
+          Q(d)(e, p, b) && h.preventDefault();
+        },
+        Ig: c,
+      });
+    }
+    function Hc(a, b, c, d, e, g) {
+      w.Ik || (w.Ik = R(104));
+      w.Og({
+        target: a,
+        Rh: !0,
+        Bg: g,
+        Jg: d,
+        Mg: function (h) {
+          h = h || event;
+          var p = w.Ik;
+          Yb(p, h, a);
+          X[(p + 72) >> 3] = h.deltaX;
+          X[(p + 80) >> 3] = h.deltaY;
+          X[(p + 88) >> 3] = h.deltaZ;
+          l[(p + 96) >> 2] = h.deltaMode;
+          Q(d)(e, p, b) && h.preventDefault();
+        },
+        Ig: c,
+      });
+    }
+    function Da() {
+      if (!Da.Ak) {
+        var a = {
+            USER: 'web_user',
+            LOGNAME: 'web_user',
+            PATH: '/',
+            PWD: '/',
+            HOME: '/home/web_user',
+            LANG:
+              (
+                ('object' == typeof navigator && navigator.languages && navigator.languages[0]) ||
+                'C'
+              ).replace('-', '_') + '.UTF-8',
+            _: Zb || './this.program',
+          },
+          b;
+        for (b in kb) kb[b] === A ? delete a[b] : (a[b] = kb[b]);
+        var c = [];
+        for (b in a) c.push(b + '=' + a[b]);
+        Da.Ak = c;
+      }
+      return Da.Ak;
+    }
+    function Ta(a, b) {
+      Ta.vk || (Ta.vk = Fb());
+      for (var c = 0; c < b; c++) S[(a + c) >> 0] = Ta.vk();
+      return 0;
+    }
+    function Ua(a) {
+      return 0 === a % 4 && (0 !== a % 100 || 0 === a % 400);
+    }
+    function Ic(a, b, c, d) {
+      function e(t, G, M) {
+        for (t = 'number' == typeof t ? t.toString() : t || ''; t.length < G;) t = M[0] + t;
+        return t;
+      }
+      function g(t, G) {
+        return e(t, G, '0');
+      }
+      function h(t, G) {
+        function M(ja) {
+          return 0 > ja ? -1 : 0 < ja ? 1 : 0;
+        }
+        var U;
+        0 === (U = M(t.getFullYear() - G.getFullYear())) &&
+          0 === (U = M(t.getMonth() - G.getMonth())) &&
+          (U = M(t.getDate() - G.getDate()));
+        return U;
+      }
+      function p(t) {
+        switch (t.getDay()) {
+          case 0:
+            return new Date(t.getFullYear() - 1, 11, 29);
+          case 1:
+            return t;
+          case 2:
+            return new Date(t.getFullYear(), 0, 3);
+          case 3:
+            return new Date(t.getFullYear(), 0, 2);
+          case 4:
+            return new Date(t.getFullYear(), 0, 1);
+          case 5:
+            return new Date(t.getFullYear() - 1, 11, 31);
+          case 6:
+            return new Date(t.getFullYear() - 1, 11, 30);
+        }
+      }
+      function q(t) {
+        var G = t.wh;
+        for (t = new Date(new Date(t.xh + 1900, 0, 1).getTime()); 0 < G;) {
+          var M = Ua(t.getFullYear()),
+            U = t.getMonth();
+          M = (M ? $b : ac)[U];
+          if (G > M - t.getDate())
+            ((G -= M - t.getDate() + 1),
+              t.setDate(1),
+              11 > U ? t.setMonth(U + 1) : (t.setMonth(0), t.setFullYear(t.getFullYear() + 1)));
+          else {
+            t.setDate(t.getDate() + G);
+            break;
+          }
+        }
+        U = new Date(t.getFullYear() + 1, 0, 4);
+        G = p(new Date(t.getFullYear(), 0, 4));
+        U = p(U);
+        return 0 >= h(G, t)
+          ? 0 >= h(U, t)
+            ? t.getFullYear() + 1
+            : t.getFullYear()
+          : t.getFullYear() - 1;
+      }
+      var v = l[(d + 40) >> 2];
+      d = {
+        lm: l[d >> 2],
+        km: l[(d + 4) >> 2],
+        Li: l[(d + 8) >> 2],
+        Cj: l[(d + 12) >> 2],
+        Mi: l[(d + 16) >> 2],
+        xh: l[(d + 20) >> 2],
+        Zg: l[(d + 24) >> 2],
+        wh: l[(d + 28) >> 2],
+        qn: l[(d + 32) >> 2],
+        jm: l[(d + 36) >> 2],
+        mm: v ? E(v) : '',
+      };
+      c = E(c);
+      v = {
+        '%c': '%a %b %d %H:%M:%S %Y',
+        '%D': '%m/%d/%y',
+        '%F': '%Y-%m-%d',
+        '%h': '%b',
+        '%r': '%I:%M:%S %p',
+        '%R': '%H:%M',
+        '%T': '%H:%M:%S',
+        '%x': '%m/%d/%y',
+        '%X': '%H:%M:%S',
+        '%Ec': '%c',
+        '%EC': '%C',
+        '%Ex': '%m/%d/%y',
+        '%EX': '%H:%M:%S',
+        '%Ey': '%y',
+        '%EY': '%Y',
+        '%Od': '%d',
+        '%Oe': '%e',
+        '%OH': '%H',
+        '%OI': '%I',
+        '%Om': '%m',
+        '%OM': '%M',
+        '%OS': '%S',
+        '%Ou': '%u',
+        '%OU': '%U',
+        '%OV': '%V',
+        '%Ow': '%w',
+        '%OW': '%W',
+        '%Oy': '%y',
+      };
+      for (var u in v) c = c.replace(new RegExp(u, 'g'), v[u]);
+      var z = 'Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' '),
+        B =
+          'January February March April May June July August September October November December'.split(
+            ' ',
+          );
+      v = {
+        '%a': function (t) {
+          return z[t.Zg].substring(0, 3);
+        },
+        '%A': function (t) {
+          return z[t.Zg];
+        },
+        '%b': function (t) {
+          return B[t.Mi].substring(0, 3);
+        },
+        '%B': function (t) {
+          return B[t.Mi];
+        },
+        '%C': function (t) {
+          return g(((t.xh + 1900) / 100) | 0, 2);
+        },
+        '%d': function (t) {
+          return g(t.Cj, 2);
+        },
+        '%e': function (t) {
+          return e(t.Cj, 2, ' ');
+        },
+        '%g': function (t) {
+          return q(t).toString().substring(2);
+        },
+        '%G': function (t) {
+          return q(t);
+        },
+        '%H': function (t) {
+          return g(t.Li, 2);
+        },
+        '%I': function (t) {
+          t = t.Li;
+          0 == t ? (t = 12) : 12 < t && (t -= 12);
+          return g(t, 2);
+        },
+        '%j': function (t) {
+          for (
+            var G = t.Cj, M = Ua(t.xh + 1900) ? $b : ac, U = 0, ja = 0;
+            ja <= t.Mi - 1;
+            U += M[ja++]
+          );
+          return g(G + U, 3);
+        },
+        '%m': function (t) {
+          return g(t.Mi + 1, 2);
+        },
+        '%M': function (t) {
+          return g(t.km, 2);
+        },
+        '%n': function () {
+          return '\n';
+        },
+        '%p': function (t) {
+          return 0 <= t.Li && 12 > t.Li ? 'AM' : 'PM';
+        },
+        '%S': function (t) {
+          return g(t.lm, 2);
+        },
+        '%t': function () {
+          return '\t';
+        },
+        '%u': function (t) {
+          return t.Zg || 7;
+        },
+        '%U': function (t) {
+          return g(Math.floor((t.wh + 7 - t.Zg) / 7), 2);
+        },
+        '%V': function (t) {
+          var G = Math.floor((t.wh + 7 - ((t.Zg + 6) % 7)) / 7);
+          2 >= (t.Zg + 371 - t.wh - 2) % 7 && G++;
+          if (G)
+            53 == G && ((M = (t.Zg + 371 - t.wh) % 7), 4 == M || (3 == M && Ua(t.xh)) || (G = 1));
+          else {
+            G = 52;
+            var M = (t.Zg + 7 - t.wh - 1) % 7;
+            (4 == M || (5 == M && Ua((t.xh % 400) - 1))) && G++;
+          }
+          return g(G, 2);
+        },
+        '%w': function (t) {
+          return t.Zg;
+        },
+        '%W': function (t) {
+          return g(Math.floor((t.wh + 7 - ((t.Zg + 6) % 7)) / 7), 2);
+        },
+        '%y': function (t) {
+          return (t.xh + 1900).toString().substring(2);
+        },
+        '%Y': function (t) {
+          return t.xh + 1900;
+        },
+        '%z': function (t) {
+          t = t.jm;
+          var G = 0 <= t;
+          t = Math.abs(t) / 60;
+          return (G ? '+' : '-') + String('0000' + ((t / 60) * 100 + (t % 60))).slice(-4);
+        },
+        '%Z': function (t) {
+          return t.mm;
+        },
+        '%%': function () {
+          return '%';
+        },
+      };
+      c = c.replace(/%%/g, '\x00\x00');
+      for (u in v) c.includes(u) && (c = c.replace(new RegExp(u, 'g'), v[u](d)));
+      c = c.replace(/\0\0/g, '%');
+      u = bb(c, !1);
+      if (u.length > b) return 0;
+      S.set(u, a);
+      return u.length - 1;
+    }
+    function bc() {
+      function a() {
+        if (!Va && ((Va = !0), (m.calledRun = !0), !ma)) {
+          m.noFSInit || f.bh.hj || f.bh();
+          f.fk = !1;
+          ea.bh();
+          Ka(cc);
+          Ka(Jc);
+          if (m.onRuntimeInitialized) m.onRuntimeInitialized();
+          if (dc) {
+            var b = m._main;
+            try {
+              var c = b(0, 0);
+              Ja = c;
+              Gb(c);
+            } catch (d) {
+              Db(d);
+            }
+          }
+          if (m.postRun)
+            for ('function' == typeof m.postRun && (m.postRun = [m.postRun]); m.postRun.length;)
+              ec.unshift(m.postRun.shift());
+          Ka(ec);
+        }
+      }
+      if (!(0 < ia)) {
+        if (m.preRun)
+          for ('function' == typeof m.preRun && (m.preRun = [m.preRun]); m.preRun.length;)
+            fc.unshift(m.preRun.shift());
+        Ka(fc);
+        0 < ia ||
+          (m.setStatus
+            ? (m.setStatus('Running...'),
+              setTimeout(function () {
+                setTimeout(function () {
+                  m.setStatus('');
+                }, 1);
+                a();
+              }, 1))
+            : a());
+      }
+    }
+    var fa = [],
+      ba = [],
+      y = [],
+      Ea = [],
+      Y = [],
+      lb = [],
+      Kc = [],
+      mb = [0, 0],
+      nb = !1,
+      ob = new TextDecoder('utf8'),
+      Lc = (function () {
+        function a() {
+          if (!b) {
+            b = !0;
+            var e = document.body,
+              g = document.body.firstChild,
+              h = document.getElementById('fontdetectHelper') || document.createElement('div');
+            h.id = 'fontdetectHelper';
+            d = document.createElement('span');
+            d.innerText = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            h.appendChild(d);
+            e.insertBefore(h, g);
+            h.style.position = 'absolute';
+            h.style.visibility = 'hidden';
+            h.style.top = '-200px';
+            h.style.left = '-100000px';
+            h.style.width = '100000px';
+            h.style.height = '200px';
+            h.style.fontSize = '100px';
+          }
+        }
+        var b = !1,
+          c = ['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy'],
+          d = null;
+        return {
+          en: function (e, g, h, p) {
+            if (e) {
+              var q = p && p.Kl ? p.Kl : 100,
+                v = p && p.Ll ? p.Ll : 2e3;
+              if (g || h) {
+                if ((b || a(), this.ui(e))) return void (g && g(e));
+                var u = this,
+                  z = new Date().getTime(),
+                  B = setInterval(function () {
+                    if (u.ui(e)) return (clearInterval(B), void g(e));
+                    new Date().getTime() - z > v && (clearInterval(B), h && h(e));
+                  }, q);
+              }
+            }
+          },
+          ui: function (e) {
+            var g = 0,
+              h = 0;
+            b || a();
+            for (var p = 0; p < c.length; ++p) {
+              if (
+                ((d.style.fontFamily = '"' + e + '",' + c[p]), (g = d.offsetWidth), 0 < p && g != h)
+              )
+                return !1;
+              h = g;
+            }
+            return !0;
+          },
+          wn: function (e) {
+            e = (
+              e instanceof Element
+                ? window.getComputedStyle(e).getPropertyValue('font-family')
+                : window.Pm
+                  ? (void 0)(e).Bm('font-family')
+                  : ''
+            ).split(',');
+            for (var g = e.shift(); g;) {
+              g = g.replace(/^\s*['"]?\s*([^'"]*)\s*['"]?\s*$/, '$1');
+              for (var h = 0; h < c.length; h++) if (g == c[h]) return g;
+              if (this.ui(g)) return g;
+              g = e.shift();
+            }
+            return null;
+          },
+        };
+      })();
+    'undefined' != typeof window &&
+      (document.addEventListener(
+        'paste',
+        function (a) {
+          try {
+            var b = K(a.clipboardData.getData('text/plain'));
+          } catch (c) {
+            return;
+          }
+          gc(b);
+          Fa(b);
+        },
+        { capture: !0 },
+      ),
+      (window.onbeforeunload = function () {
+        if (hc()) return 'Are you sure you want to leave?';
+      }),
+      window.addEventListener(
+        'mousedown',
+        function (a) {
+          a.preventDefault = function () {};
+        },
+        { capture: !0 },
+      ),
+      window.addEventListener(
+        'dragstart',
+        function (a) {
+          a.preventDefault();
+        },
+        { capture: !0 },
+      ),
+      window.addEventListener(
+        'selectstart',
+        function (a) {
+          a.preventDefault();
+        },
+        { capture: !0 },
+      ),
+      window.addEventListener(
+        'keydown',
+        function (a) {
+          var b = !0,
+            c = a.keyCode;
+          if (122 == c || 123 == c) b = !1;
+          (a.ctrlKey || a.metaKey) && 86 == c && (b = !1);
+          b || (a.preventDefault = function () {});
+        },
+        { capture: !0 },
+      ),
+      window.addEventListener('wheel', function (a) {
+        var b = !1;
+        a.wheelDeltaY ? a.wheelDeltaY === -3 * a.deltaY && (b = !0) : 0 === a.deltaMode && (b = !0);
+        var c = a.deltaY / 175;
+        b && (c *= 3);
+        0 != a.deltaMode && (1 == a.deltaMode ? (c /= 18) : 2 == a.deltaMode && (c /= 1e3));
+        ic(c);
+      }),
+      (window.cp6 = window.cp6 || {}),
+      (window.cp6.disconnect = function () {
+        jc();
+      }),
+      (window.cp6.forceServerID = function (a) {
+        (a = K(a)) && kc(a);
+        Fa(a);
+      }),
+      (window.cp6.setSkipTextCache = function (a) {
+        lc(!!a);
+      }));
+    m = m || {};
+    m.arguments = [];
+    var pb = {},
+      Wa = {};
+    'undefined' != typeof window &&
+      window.addEventListener('beforeunload', function () {
+        for (var a in Wa) {
+          var b = a;
+          if (pb[b]) {
+            try {
+              pb[b].close();
+            } catch (c) {
+              console.error(c);
+            }
+            delete pb[b];
+          }
+          if (Wa[b]) {
+            try {
+              Wa[b].close();
+            } catch (c) {
+              console.error(c);
+            }
+            delete Wa[b];
+          }
+          mc(b, 0);
+        }
+      });
+    var nc = Object.assign({}, m),
+      Zb = './this.program',
+      ab = (a, b) => {
+        throw b;
+      },
+      ha = '',
+      xb;
+    'undefined' != typeof document && document.currentScript && (ha = document.currentScript.src);
+    ha =
+      0 !== ha.indexOf('blob:') ? ha.substr(0, ha.replace(/[?#].*/, '').lastIndexOf('/') + 1) : '';
+    var oc = (a) => {
+      var b = new XMLHttpRequest();
+      b.open('GET', a, !1);
+      b.send(null);
+      return b.responseText;
+    };
+    var xc = (a, b, c) => {
+      var d = new XMLHttpRequest();
+      d.open('GET', a, !0);
+      d.responseType = 'arraybuffer';
+      d.onload = () => {
+        200 == d.status || (0 == d.status && d.response) ? b(d.response) : c();
+      };
+      d.onerror = c;
+      d.send(null);
+    };
+    var Mc = (a) => (document.title = a);
+    var ua = m.print || console.log.bind(console),
+      V = m.printErr || console.warn.bind(console);
+    Object.assign(m, nc);
+    nc = null;
+    m.thisProgram && (Zb = m.thisProgram);
+    m.quit && (ab = m.quit);
+    var sa;
+    m.wasmBinary && (sa = m.wasmBinary);
+    var yc = m.noExitRuntime || !0;
+    'object' != typeof WebAssembly && W('no native wasm support detected');
+    var pc,
+      ma = !1,
+      Ja,
+      ub = 'undefined' != typeof TextDecoder ? new TextDecoder('utf8') : A,
+      Xa,
+      S,
+      P,
+      na,
+      Ub,
+      l,
+      J,
+      F,
+      X,
+      Cb,
+      fc = [],
+      cc = [],
+      Jc = [],
+      Nc = [],
+      ec = [],
+      ia = 0,
+      Za = null,
+      ra = null;
+    var aa = 'client.wasm';
+    vb(aa) || (aa = sc(aa));
+    var C,
+      N,
+      Lb = {
+        133424: (a) => {
+          a = E(a);
+          var b = new WebSocket(a);
+          new URL(a).hostname != new URL(b.url).hostname &&
+            ((document.getElementById('loading').style.display = 'none'),
+            (document.getElementById('unsupported').style.display = 'none'),
+            (document.getElementById('errorDialog').style.display = 'block'),
+            (document.getElementById('canvas').style.display = 'none'));
+          b.binaryType = 'arraybuffer';
+          b.ah = [];
+          b.onopen = function () {
+            b.ah.push([2, 0, 0]);
+            Ga();
+          };
+          b.onerror = function () {
+            b.ah.push([3, 0, 0]);
+            Ga();
+          };
+          b.onclose = function () {
+            b.ah.push([4, 0, 0]);
+            Ga();
+          };
+          b.onmessage = function (c) {
+            c = new Uint8Array(c.data);
+            var d = R(c.length);
+            S.set(c, d);
+            b.ah.push([1, d, c.length]);
+            Ga();
+          };
+          for (a = 0; a < ba.length; ++a) if (null == ba[a]) return ((ba[a] = b), a);
+          ba.push(b);
+          return ba.length - 1;
+        },
+        134177: (a) => {
+          var b = ba[a];
+          b.onopen = b.onclose = b.onmessage = b.onerror = function () {};
+          for (var c = 0; c < b.ah.length; ++c) Fa(b.ah[c][1]);
+          b.ah = null;
+          try {
+            b.close();
+          } catch (d) {}
+          ba[a] = null;
+        },
+        134403: (a) => 1 == ba[a].readyState,
+        134447: (a, b, c) => {
+          a = ba[a];
+          if (1 != a.readyState) return 0;
+          try {
+            a.send(S.subarray(b, b + c));
+          } catch (d) {
+            return 0;
+          }
+          return 1;
+        },
+        134584: (a, b, c) => {
+          a = ba[a];
+          if (0 == a.ah.length) return 0;
+          a = a.ah.shift();
+          J[b >> 2] = a[1];
+          l[c >> 2] = a[2];
+          return a[0];
+        },
+        134736: () =>
+          !!(
+            window.aiptag &&
+            window.aiptag.cmd &&
+            window.aiptag.cmd.player &&
+            window.aiptag.cmd.player.push &&
+            window.aiptag.adplayer &&
+            window.aiptag.adplayer.startPreRoll
+          ),
+        134958: () => {
+          window.aip_complete = qb;
+          window.aiptag.cmd.player.push(function () {
+            try {
+              window.aiptag.adplayer.startPreRoll();
+            } catch (a) {
+              qb();
+            }
+          });
+        },
+        135144: () => 'zh' == window.navigator.language.slice(0, 2),
+        135201: () => {
+          var a = document.getElementById('canvas'),
+            b = document.createElement('canvas');
+          b.id = 'canvasOverlay';
+          a.parentNode.insertBefore(b, a.nextSibling);
+        },
+        135410: () => window.innerWidth,
+        135440: () => window.innerHeight,
+        135471: () => {
+          var a = document.getElementById('canvas'),
+            b = document.getElementById('canvasOverlay');
+          b.width != a.width && (b.width = a.width);
+          b.height != a.height && (b.height = a.height);
+        },
+        135741: (a) => wa(encodeURIComponent(E(a))),
+        135804: (a) => {
+          pa(E(a));
+        },
+        135844: (a) => {
+          pa(E(a));
+        },
+        135884: () => {
+          document.getElementById('canvas').style.cursor = 'default';
+        },
+        135948: () => {
+          document.getElementById('canvas').style.cursor = 'pointer';
+        },
+        136012: () => {
+          document.getElementById('canvas').style.cursor = 'text';
+        },
+        136073: (a) => K(window.prompt(void 0, E(a))),
+        136142: (a, b, c) => {
+          var d = new Image();
+          d.lj = !1;
+          d.onload = function () {
+            d.lj = !0;
+          };
+          var e = E(a);
+          d.onerror = function () {
+            console.error('Failed to load image ' + e);
+          };
+          0 == e.indexOf('static/')
+            ? ((a = 'application/octet-binary'),
+              115 == P[b] && (a = 'image/svg+xml'),
+              (d.src = window.URL.createObjectURL(
+                new Blob([new Uint8Array(Xa, b, c - b)], { type: a }),
+              )))
+            : (d.src = e);
+          for (b = 0; b < fa.length; ++b) if (null == fa[b]) return ((fa[b] = d), b);
+          fa.push(d);
+          return fa.length - 1;
+        },
+        136785: (a) => {
+          fa[a] = null;
+        },
+        136812: (a, b, c, d) => {
+          a = fa[a];
+          P[b >> 0] = a.lj | 0;
+          l[c >> 2] = a.width;
+          l[d >> 2] = a.height;
+        },
+        136927: (a) => {
+          lb.push(a);
+          Y[a] = null;
+        },
+        136978: () => {
+          var a = new Path2D();
+          if (0 < lb.length) {
+            var b = lb.pop();
+            Y[b] = a;
+            return b;
+          }
+          Y.push(a);
+          return Y.length - 1;
+        },
+        137159: (a, b, c) => {
+          Y[a].moveTo(b, c);
+        },
+        137193: (a, b, c) => {
+          Y[a].lineTo(b, c);
+        },
+        137227: (a, b, c, d, e, g, h) => {
+          Y[a].arc(b, c, d, e, g, !!h);
+        },
+        137276: (a, b, c, d, e) => {
+          Y[a].quadraticCurveTo(b, c, d, e);
+        },
+        137328: (a, b, c, d, e, g, h) => {
+          Y[a].bezierCurveTo(b, c, d, e, g, h);
+        },
+        137385: (a) => {
+          Y[a].closePath();
+        },
+        137416: (a, b) => {
+          window.localStorage[E(a)] = E(b);
+        },
+        137478: (a) => {
+          delete window.localStorage[E(a)];
+        },
+        137528: (a) => K(window.localStorage[E(a)] || null),
+        137603: (a) => {
+          try {
+            window.location = E(a);
+          } catch (b) {
+            console.error(b);
+          }
+        },
+        137680: (a) => {
+          try {
+            window.open(E(a), '_blank').focus();
+          } catch (b) {
+            console.error(b);
+          }
+        },
+        137770: () => K(window.location.hash.slice(1)),
+        137829: (a) => {
+          a = '#' + E(a);
+          if (window.location.hash != a) {
+            try {
+              window.history.replaceState(
+                null,
+                '',
+                window.location.origin + window.location.pathname + window.location.search + a,
+              );
+              return;
+            } catch (b) {}
+            window.location.hash = a;
+          }
+        },
+        138098: () => {
+          if (window.location.hash) {
+            try {
+              window.history.replaceState(
+                null,
+                '',
+                window.location.origin + window.location.pathname + window.location.search,
+              );
+              return;
+            } catch (a) {}
+            '#' != window.location.hash && (window.location.hash = '');
+          }
+        },
+        138344: () => {
+          window.onhashchange = qc;
+        },
+        138398: () => K(navigator.userAgent),
+        138447: () => K(document.referrer),
+        138494: () => K(navigator.language),
+        138542: (a) => {
+          var b = E(a);
+          setTimeout(function () {
+            window.onbeforeunload = null;
+            var c = new URL(window.location);
+            c.searchParams.set('cp6_version', b);
+            window.location = c;
+          }, 500);
+        },
+        138751: () => {
+          setTimeout(rc, 500);
+        },
+        138784: () => 'https:' == location.protocol,
+        138826: () => 'undefined' != typeof performance && performance.now,
+        138890: (a) => (a ? performance.now() : Date.now()),
+        138938: (a) => !!(E(a) in window),
+        138981: () => K(location.hostname),
+        139028: () => {
+          if ('undefined' == typeof OffscreenCanvas) return !1;
+          try {
+            return null != new OffscreenCanvas(4, 4).getContext('2d');
+          } catch (a) {
+            return !1;
+          }
+        },
+        139182: (a, b) => {
+          a = new OffscreenCanvas(a, b);
+          b = a.getContext('2d');
+          if (0 < Ea.length) {
+            var c = Ea.pop();
+            y[c] = b;
+          } else ((c = y.length), y.push(b));
+          a.rk = function () {
+            rb(c);
+          };
+          return c;
+        },
+        139491: (a, b) => {
+          var c = document.createElement('canvas');
+          c.width = a;
+          c.height = b;
+          a = c.getContext('2d');
+          if (0 < Ea.length) {
+            var d = Ea.pop();
+            y[d] = a;
+          } else ((d = y.length), y.push(a));
+          c.rk = function () {
+            rb(d);
+          };
+          return d;
+        },
+        139844: (a) => {
+          a = y[a];
+          a.direction && (a.direction = 'ltr');
+        },
+        139917: (a) => {
+          var b = y[a].canvas;
+          Ea.push(a);
+          delete b.rk;
+          b.width = 0;
+          b.height = 0;
+          y[a] = null;
+        },
+        140078: () => {
+          try {
+            return !!OffscreenCanvasRenderingContext2D.prototype.isContextLost;
+          } catch (a) {
+            return !1;
+          }
+        },
+        140184: (a) => {
+          y[a].save();
+        },
+        140213: (a) => {
+          y[a].restore();
+        },
+        140245: (a) => {
+          y[a].setTransform(1, 0, 0, 1, 0, 0);
+        },
+        140298: (a, b, c, d, e, g, h) => {
+          y[a].setTransform(b, c, d, e, g, h);
+        },
+        140357: (a, b, c) => {
+          a = y[a].canvas;
+          a.width = b;
+          a.height = c;
+        },
+        140438: (a, b, c) => {
+          a = y[a].canvas;
+          l[b >> 2] = a.width;
+          l[c >> 2] = a.height;
+        },
+        140545: (a) => {
+          y[a].fill();
+        },
+        140574: (a, b) => {
+          y[a].fill(Y[b]);
+        },
+        140616: (a) => {
+          y[a].stroke();
+        },
+        140647: (a, b) => {
+          y[a].stroke(Y[b]);
+        },
+        140691: (a) => {
+          y[a].clip();
+        },
+        140720: (a, b) => {
+          y[a].clip(Y[b]);
+        },
+        140762: (a) => {
+          y[a].beginPath();
+        },
+        140796: (a) => {
+          y[a].closePath();
+        },
+        140830: (a, b, c, d, e) => {
+          y[a].rect(b, c, d, e);
+        },
+        140873: (a) => {
+          a = y[a];
+          var b = a.canvas;
+          a.clearRect(0, 0, b.width, b.height);
+        },
+        140980: (a) => {
+          y[a].fillRect(0, 0, 1, 1);
+        },
+        141023: (a, b, c) => {
+          y[a].strokeRect(0, 0, b, c);
+        },
+        141070: (a, b, c, d) => {
+          b |= 0;
+          c |= 0;
+          d |= 0;
+          y[a].fillStyle = String.fromCharCode(
+            35,
+            Z((b >> 4) & 15),
+            Z(b & 15),
+            Z((c >> 4) & 15),
+            Z(c & 15),
+            Z((d >> 4) & 15),
+            Z(d & 15),
+          );
+        },
+        141340: (a, b, c, d) => {
+          b |= 0;
+          c |= 0;
+          d |= 0;
+          y[a].strokeStyle = String.fromCharCode(
+            35,
+            Z((b >> 4) & 15),
+            Z(b & 15),
+            Z((c >> 4) & 15),
+            Z(c & 15),
+            Z((d >> 4) & 15),
+            Z(d & 15),
+          );
+        },
+        141612: (a, b) => {
+          y[a].globalAlpha = b;
+        },
+        141651: (a, b) => {
+          y[a].globalAlpha = b;
+        },
+        141690: (a, b, c) => {
+          y[a].moveTo(b, c);
+        },
+        141727: (a, b, c) => {
+          y[a].lineTo(b, c);
+        },
+        141764: (a, b, c, d, e) => {
+          y[a].quadraticCurveTo(b, c, d, e);
+        },
+        141819: (a, b, c, d, e, g, h) => {
+          y[a].bezierCurveTo(b, c, d, e, g, h);
+        },
+        141879: (a, b, c, d, e, g, h) => {
+          y[a].arc(b, c, d, e, g, !!h);
+        },
+        141931: (a, b, c, d, e, g, h, p, q) => {
+          y[a].ellipse(b, c, d, e, g, h, p, !!q);
+        },
+        141995: (a, b) => {
+          y[a].lineWidth = b;
+        },
+        142032: (a, b) => {
+          y[a].drawImage(y[b].canvas, 0, 0);
+        },
+        142095: (a, b) => {
+          y[a].drawImage(y[b].canvas, 0, 0, 1, 1);
+        },
+        142164: (a, b, c, d, e, g) => {
+          y[a].drawImage(y[b].canvas, c, d, e, g, 0, 0, 1, 1);
+        },
+        142249: (a, b) => {
+          b = fa[b];
+          b.lj && 0 != b.width && 0 != b.height && y[a].drawImage(b, 0, 0, 1, 1);
+        },
+        142396: (a, b, c, d, e) => {
+          y[a].fillText(ob.decode(P.subarray(b, b + c)), d, e);
+        },
+        142465: (a, b, c, d, e) => {
+          y[a].strokeText(ob.decode(P.subarray(b, b + c)), d, e);
+        },
+        142536: (a, b, c) => y[a].measureText(ob.decode(P.subarray(b, b + c))).width,
+        142613: (a, b) => {
+          y[a].font = ((2048 * b) | 0) / 2048 + 'px Ubuntu';
+        },
+        142679: (a) => {
+          y[a].textAlign = 'center';
+        },
+        142722: (a) => {
+          y[a].lineCap = 'butt';
+        },
+        142761: (a) => {
+          y[a].lineCap = 'round';
+        },
+        142801: (a) => {
+          y[a].lineCap = 'square';
+        },
+        142842: (a) => {
+          y[a].lineJoin = 'round';
+        },
+        142883: (a) => {
+          y[a].lineJoin = 'miter';
+        },
+        142924: (a, b) => {
+          y[a].miterLimit = b;
+        },
+        142962: (a) => {
+          y[a].textBaseline = 'middle';
+        },
+        143008: (a) => {
+          y[a].textBaseline = 'alphabetic';
+        },
+        143058: (a, b, c) => {
+          mb[0] = b;
+          mb[1] = c;
+          y[a].setLineDash(mb);
+        },
+        143153: (a) => {
+          y[a].setLineDash(Kc);
+        },
+        143202: (a) => {
+          y[a].globalCompositeOperation = 'source-over';
+        },
+        143267: (a) => {
+          y[a].globalCompositeOperation = 'lighter';
+        },
+        143328: (a, b, c, d, e, g) => {
+          y[a].putImageData(new ImageData(new Uint8ClampedArray(Xa, b, c * d * 4), c, d), e, g);
+        },
+        143442: (a, b) => {
+          y[a].imageSmoothingEnabled = !!b;
+        },
+        143496: (a) => K(y[a].canvas.toDataURL()),
+        143561: (a, b) => {
+          a = document.getElementById(E(a));
+          if (null == a) return -1;
+          b = a.getContext('2d', { alpha: !!b });
+          y.push(b);
+          return y.length - 1;
+        },
+        143781: () => {
+          nb || (nb = Lc.ui('Ubuntu'));
+          return nb;
+        },
+        143883: () =>
+          -1 != navigator.userAgent.indexOf('iPhone') ||
+          -1 != navigator.userAgent.indexOf('iPad') ||
+          -1 != navigator.userAgent.indexOf('Android') ||
+          -1 != navigator.userAgent.indexOf('Mobile') ||
+          -1 != navigator.userAgent.indexOf('Tablet'),
+        144125: () =>
+          -1 != navigator.userAgent.indexOf('iPad') || -1 != navigator.userAgent.indexOf('Tablet'),
+        144225: () =>
+          -1 != navigator.userAgent.indexOf('iPhone') ||
+          -1 != navigator.userAgent.indexOf('iPad') ||
+          -1 != navigator.userAgent.indexOf('Macintosh'),
+        144375: () => K(new URL(window.location).searchParams.get('state')),
+        144457: () => K(new URL(window.location).searchParams.get('code')),
+        144538: (a) => {
+          a = new URL(E(a));
+          var b = new URL(window.location),
+            c = !1;
+          a.searchParams.forEach(function (d, e) {
+            -1 == b.searchParams.getAll(e).indexOf(d) && (c = !0);
+          });
+          return c ? !1 : !0;
+        },
+        144806: () => {
+          try {
+            var a = new URL(window.location);
+            a.searchParams.delete('state');
+            a.searchParams.delete('code');
+            a.searchParams.delete('oauth2');
+            window.history.replaceState({}, document.title, a);
+          } catch (b) {
+            console.error(b);
+          }
+        },
+        145039: () => 'https:' == location.protocol,
+        145081: () => K(navigator.userAgent),
+        145130: () => K(navigator.language),
+        145178: () => K(navigator.vendor || ''),
+        145230: () => K((navigator.languages || []).join(',')),
+        145297: () =>
+          K(
+            Array.prototype.slice
+              .apply(window.navigator.mimeTypes)
+              .map(function (a) {
+                return a.type + ',' + a.suffixes;
+              })
+              .join(';'),
+          ),
+        145446: () =>
+          K(
+            Array.prototype.slice
+              .apply(navigator.plugins)
+              .map(function (a) {
+                return a.name;
+              })
+              .join(','),
+          ),
+        145567: () => K(new Date().getTimezoneOffset().toString()),
+        145640: () => K(screen.width + 'x' + screen.height + 'x' + window.devicePixelRatio),
+        145736: (a) => {
+          pa(E(a));
+        },
+        145777: () => {
+          try {
+            return (window.localStorage, !1);
+          } catch (a) {
+            return !0;
+          }
+        },
+        145849: () => 'https:' == location.protocol,
+        145891: (a) => {
+          pa(E(a));
+        },
+        145932: (a) => {
+          pa(E(a));
+        },
+        145973: (a) => y[a].isContextLost(),
+        146018: () =>
+          'undefined' !== typeof AudioContext || 'undefined' !== typeof webkitAudioContext
+            ? !0
+            : !1,
+        146165: () =>
+          ('undefined' !== typeof navigator.mediaDevices &&
+            'undefined' !== typeof navigator.mediaDevices.getUserMedia) ||
+          'undefined' !== typeof navigator.webkitGetUserMedia
+            ? !0
+            : !1,
+        146399: (a) => {
+          'undefined' === typeof m.SDL2 && (m.SDL2 = {});
+          var b = m.SDL2;
+          a ? (b.capture = {}) : (b.audio = {});
+          b.xg ||
+            ('undefined' !== typeof AudioContext
+              ? (b.xg = new AudioContext())
+              : 'undefined' !== typeof webkitAudioContext && (b.xg = new webkitAudioContext()),
+            b.xg && vc(b.xg));
+          return b.xg === A ? -1 : 0;
+        },
+        146892: () => m.SDL2.xg.sampleRate,
+        146960: (a, b, c, d) => {
+          function e() {}
+          function g(p) {
+            h.capture.gi !== A && (clearTimeout(h.capture.gi), (h.capture.gi = A));
+            h.capture.Ci = h.xg.createMediaStreamSource(p);
+            h.capture.Hg = h.xg.createScriptProcessor(b, a, 1);
+            h.capture.Hg.onaudioprocess = function (q) {
+              h !== A &&
+                h.capture !== A &&
+                (q.outputBuffer.getChannelData(0).fill(0),
+                (h.capture.Ti = q.inputBuffer),
+                $a('vi', c, [d]));
+            };
+            h.capture.Ci.connect(h.capture.Hg);
+            h.capture.Hg.connect(h.xg.destination);
+            h.capture.stream = p;
+          }
+          var h = m.SDL2;
+          h.capture.Hi = h.xg.createBuffer(a, b, h.xg.sampleRate);
+          h.capture.Hi.getChannelData(0).fill(0);
+          h.capture.gi = setTimeout(
+            function () {
+              h.capture.Ti = h.capture.Hi;
+              $a('vi', c, [d]);
+            },
+            (b / h.xg.sampleRate) * 1e3,
+          );
+          navigator.mediaDevices !== A && navigator.mediaDevices.getUserMedia !== A
+            ? navigator.mediaDevices.getUserMedia({ audio: !0, video: !1 }).then(g).catch(e)
+            : navigator.webkitGetUserMedia !== A &&
+              navigator.webkitGetUserMedia({ audio: !0, video: !1 }, g, e);
+        },
+        148612: (a, b, c, d) => {
+          var e = m.SDL2;
+          e.audio.Hg = e.xg.createScriptProcessor(b, 0, a);
+          e.audio.Hg.onaudioprocess = function (g) {
+            e !== A && e.audio !== A && ((e.audio.Pj = g.outputBuffer), $a('vi', c, [d]));
+          };
+          e.audio.Hg.connect(e.xg.destination);
+        },
+        149022: (a, b) => {
+          for (var c = m.SDL2, d = c.capture.Ti.numberOfChannels, e = 0; e < d; ++e) {
+            var g = c.capture.Ti.getChannelData(e);
+            if (g.length != b)
+              throw (
+                'Web Audio capture buffer length mismatch! Destination size: ' +
+                g.length +
+                ' samples vs expected ' +
+                b +
+                ' samples!'
+              );
+            if (1 == d) for (var h = 0; h < b; ++h) Eb(a + 4 * h, g[h], 'float');
+            else for (h = 0; h < b; ++h) Eb(a + 4 * (h * d + e), g[h], 'float');
+          }
+        },
+        149627: (a, b) => {
+          for (var c = m.SDL2, d = c.audio.Pj.numberOfChannels, e = 0; e < d; ++e) {
+            var g = c.audio.Pj.getChannelData(e);
+            if (g.length != b)
+              throw (
+                'Web Audio output buffer length mismatch! Destination size: ' +
+                g.length +
+                ' samples vs expected ' +
+                b +
+                ' samples!'
+              );
+            for (var h = 0; h < b; ++h) g[h] = F[(a + ((h * d + e) << 2)) >> 2];
+          }
+        },
+        150107: (a) => {
+          var b = m.SDL2;
+          if (a) {
+            b.capture.gi !== A && clearTimeout(b.capture.gi);
+            if (b.capture.stream !== A) {
+              a = b.capture.stream.getAudioTracks();
+              for (var c = 0; c < a.length; c++) b.capture.stream.removeTrack(a[c]);
+              b.capture.stream = A;
+            }
+            b.capture.Hg !== A &&
+              ((b.capture.Hg.onaudioprocess = function () {}),
+              b.capture.Hg.disconnect(),
+              (b.capture.Hg = A));
+            b.capture.Ci !== A && (b.capture.Ci.disconnect(), (b.capture.Ci = A));
+            b.capture.Hi !== A && (b.capture.Hi = A);
+            b.capture = A;
+          } else (b.audio.Hg != A && (b.audio.Hg.disconnect(), (b.audio.Hg = A)), (b.audio = A));
+          b.xg !== A && b.audio === A && b.capture === A && (b.xg.close(), (b.xg = A));
+        },
+        151279: (a, b, c) => {
+          m.SDL2 || (m.SDL2 = {});
+          var d = m.SDL2;
+          d.Xk !== m.canvas && ((d.Rg = m.createContext(m.canvas, !1, !0)), (d.Xk = m.canvas));
+          if (d.w !== a || d.vl !== b || d.yl !== d.Rg)
+            ((d.image = d.Rg.createImageData(a, b)), (d.w = a), (d.vl = b), (d.yl = d.Rg));
+          a = d.image.data;
+          b = c >> 2;
+          var e = 0;
+          if ('undefined' !== typeof CanvasPixelArray && a instanceof CanvasPixelArray)
+            for (c = a.length; e < c;) {
+              var g = l[b];
+              a[e] = g & 255;
+              a[e + 1] = (g >> 8) & 255;
+              a[e + 2] = (g >> 16) & 255;
+              a[e + 3] = 255;
+              b++;
+              e += 4;
+            }
+          else if (
+            (d.al !== a &&
+              ((d.$k = new Int32Array(a.buffer)), (d.bl = new Uint8Array(a.buffer)), (d.al = a)),
+            (a = d.$k),
+            (c = a.length),
+            a.set(l.subarray(b, b + c)),
+            (a = d.bl),
+            (b = 3),
+            (e = b + 4 * c),
+            0 == c % 8)
+          )
+            for (; b < e;)
+              ((a[b] = 255),
+                (b = (b + 4) | 0),
+                (a[b] = 255),
+                (b = (b + 4) | 0),
+                (a[b] = 255),
+                (b = (b + 4) | 0),
+                (a[b] = 255),
+                (b = (b + 4) | 0),
+                (a[b] = 255),
+                (b = (b + 4) | 0),
+                (a[b] = 255),
+                (b = (b + 4) | 0),
+                (a[b] = 255),
+                (b = (b + 4) | 0),
+                (a[b] = 255),
+                (b = (b + 4) | 0));
+          else for (; b < e;) ((a[b] = 255), (b = (b + 4) | 0));
+          d.Rg.putImageData(d.image, 0, 0);
+        },
+        152748: (a, b, c, d, e) => {
+          var g = document.createElement('canvas');
+          g.width = a;
+          g.height = b;
+          var h = g.getContext('2d');
+          a = h.createImageData(a, b);
+          b = a.data;
+          e >>= 2;
+          var p = 0,
+            q;
+          if ('undefined' !== typeof CanvasPixelArray && b instanceof CanvasPixelArray)
+            for (q = b.length; p < q;) {
+              var v = l[e];
+              b[p] = v & 255;
+              b[p + 1] = (v >> 8) & 255;
+              b[p + 2] = (v >> 16) & 255;
+              b[p + 3] = (v >> 24) & 255;
+              e++;
+              p += 4;
+            }
+          else ((b = new Int32Array(b.buffer)), (q = b.length), b.set(l.subarray(e, e + q)));
+          h.putImageData(a, 0, 0);
+          c =
+            0 === c && 0 === d
+              ? 'url(' + g.toDataURL() + '), auto'
+              : 'url(' + g.toDataURL() + ') ' + c + ' ' + d + ', auto';
+          d = R(c.length + 1);
+          L(c, d, c.length + 1);
+          return d;
+        },
+        153737: (a) => {
+          m.canvas && (m.canvas.style.cursor = E(a));
+        },
+        153820: () => {
+          m.canvas && (m.canvas.style.cursor = 'none');
+        },
+        153889: () => window.innerWidth,
+        153919: () => window.innerHeight,
+        153950: (a, b) => {
+          alert(E(a) + '\n\n' + E(b));
+        },
+        154007: (a, b) => a % b,
+        154027: () => K(window.navigator.language || ''),
+        154088: () => K((window.navigator.languages || []).join(',')),
+        154160: () => new Date().getTimezoneOffset(),
+        154203: () => K(window.navigator.platform || ''),
+        154264: () => K((window.navigator.userAgent || '').replace(/[0-9.]/gm, '')),
+        154352: () => K(window.navigator.vendor || ''),
+        154411: () => window.navigator.hardwareConcurrency,
+      },
+      La = [],
+      I = {
+        kj: (a) => '/' === a.charAt(0),
+        gm: (a) => /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/.exec(a).slice(1),
+        rj: (a, b) => {
+          for (var c = 0, d = a.length - 1; 0 <= d; d--) {
+            var e = a[d];
+            '.' === e
+              ? a.splice(d, 1)
+              : '..' === e
+                ? (a.splice(d, 1), c++)
+                : c && (a.splice(d, 1), c--);
+          }
+          if (b) for (; c; c--) a.unshift('..');
+          return a;
+        },
+        normalize: (a) => {
+          var b = I.kj(a),
+            c = '/' === a.substr(-1);
+          (a = I.rj(
+            a.split('/').filter((d) => !!d),
+            !b,
+          ).join('/')) ||
+            b ||
+            (a = '.');
+          a && c && (a += '/');
+          return (b ? '/' : '') + a;
+        },
+        dirname: (a) => {
+          var b = I.gm(a);
+          a = b[0];
+          b = b[1];
+          if (!a && !b) return '.';
+          b && (b = b.substr(0, b.length - 1));
+          return a + b;
+        },
+        gh: (a) => {
+          if ('/' === a) return '/';
+          a = I.normalize(a);
+          a = a.replace(/\/$/, '');
+          var b = a.lastIndexOf('/');
+          return -1 === b ? a : a.substr(b + 1);
+        },
+        join: function () {
+          return I.normalize(Array.prototype.slice.call(arguments, 0).join('/'));
+        },
+        ph: (a, b) => I.normalize(a + '/' + b),
+      },
+      da = {
+        resolve: function () {
+          for (var a = '', b = !1, c = arguments.length - 1; -1 <= c && !b; c--) {
+            b = 0 <= c ? arguments[c] : f.ri();
+            if ('string' != typeof b)
+              throw new TypeError('Arguments to path.resolve must be strings');
+            if (!b) return '';
+            a = b + '/' + a;
+            b = I.kj(b);
+          }
+          a = I.rj(
+            a.split('/').filter((d) => !!d),
+            !b,
+          ).join('/');
+          return (b ? '/' : '') + a || '.';
+        },
+        wk: (a, b) => {
+          function c(h) {
+            for (var p = 0; p < h.length && '' === h[p]; p++);
+            for (var q = h.length - 1; 0 <= q && '' === h[q]; q--);
+            return p > q ? [] : h.slice(p, q - p + 1);
+          }
+          a = da.resolve(a).substr(1);
+          b = da.resolve(b).substr(1);
+          a = c(a.split('/'));
+          b = c(b.split('/'));
+          for (var d = Math.min(a.length, b.length), e = d, g = 0; g < d; g++)
+            if (a[g] !== b[g]) {
+              e = g;
+              break;
+            }
+          d = [];
+          for (g = e; g < a.length; g++) d.push('..');
+          d = d.concat(b.slice(e));
+          return d.join('/');
+        },
+      },
+      ea = {
+        Dk: [],
+        bh: function () {},
+        pn: function () {},
+        register: function (a, b) {
+          ea.Dk[a] = { input: [], Fg: [], Ih: b };
+          f.wj(a, ea.rg);
+        },
+        rg: {
+          open: function (a) {
+            var b = ea.Dk[a.node.ci];
+            if (!b) throw new f.lg(43);
+            a.wg = b;
+            a.seekable = !1;
+          },
+          close: function (a) {
+            a.wg.Ih.flush(a.wg);
+          },
+          flush: function (a) {
+            a.wg.Ih.flush(a.wg);
+          },
+          read: function (a, b, c, d) {
+            if (!a.wg || !a.wg.Ih.ck) throw new f.lg(60);
+            for (var e = 0, g = 0; g < d; g++) {
+              try {
+                var h = a.wg.Ih.ck(a.wg);
+              } catch (p) {
+                throw new f.lg(29);
+              }
+              if (h === A && 0 === e) throw new f.lg(6);
+              if (null === h || h === A) break;
+              e++;
+              b[c + g] = h;
+            }
+            e && (a.node.timestamp = Date.now());
+            return e;
+          },
+          write: function (a, b, c, d) {
+            if (!a.wg || !a.wg.Ih.tj) throw new f.lg(60);
+            try {
+              for (var e = 0; e < d; e++) a.wg.Ih.tj(a.wg, b[c + e]);
+            } catch (g) {
+              throw new f.lg(29);
+            }
+            d && (a.node.timestamp = Date.now());
+            return e;
+          },
+        },
+        dl: {
+          ck: function (a) {
+            if (!a.input.length) {
+              var b = null;
+              'undefined' != typeof window && 'function' == typeof window.prompt
+                ? ((b = window.prompt('Input: ')), null !== b && (b += '\n'))
+                : 'function' == typeof readline && ((b = readline()), null !== b && (b += '\n'));
+              if (!b) return null;
+              a.input = bb(b, !0);
+            }
+            return a.input.shift();
+          },
+          tj: function (a, b) {
+            null === b || 10 === b ? (ua(la(a.Fg, 0)), (a.Fg = [])) : 0 != b && a.Fg.push(b);
+          },
+          flush: function (a) {
+            a.Fg && 0 < a.Fg.length && (ua(la(a.Fg, 0)), (a.Fg = []));
+          },
+        },
+        cl: {
+          tj: function (a, b) {
+            null === b || 10 === b ? (V(la(a.Fg, 0)), (a.Fg = [])) : 0 != b && a.Fg.push(b);
+          },
+          flush: function (a) {
+            a.Fg && 0 < a.Fg.length && (V(la(a.Fg, 0)), (a.Fg = []));
+          },
+        },
+      },
+      D = {
+        Yg: null,
+        vg: function () {
+          return D.createNode(null, '/', 16895, 0);
+        },
+        createNode: function (a, b, c, d) {
+          if (f.Cl(c) || f.Dl(c)) throw new f.lg(63);
+          D.Yg ||
+            (D.Yg = {
+              dir: {
+                node: {
+                  Vg: D.og.Vg,
+                  Dg: D.og.Dg,
+                  qh: D.og.qh,
+                  eh: D.og.eh,
+                  ei: D.og.ei,
+                  Mh: D.og.Mh,
+                  fi: D.og.fi,
+                  di: D.og.di,
+                  lh: D.og.lh,
+                },
+                stream: { Wg: D.rg.Wg },
+              },
+              file: {
+                node: { Vg: D.og.Vg, Dg: D.og.Dg },
+                stream: {
+                  Wg: D.rg.Wg,
+                  read: D.rg.read,
+                  write: D.rg.write,
+                  Qh: D.rg.Qh,
+                  Dh: D.rg.Dh,
+                  Gh: D.rg.Gh,
+                },
+              },
+              link: { node: { Vg: D.og.Vg, Dg: D.og.Dg, uh: D.og.uh }, stream: {} },
+              Lj: { node: { Vg: D.og.Vg, Dg: D.og.Dg }, stream: f.Qk },
+            });
+          c = f.createNode(a, b, c, d);
+          f.Cg(c.mode)
+            ? ((c.og = D.Yg.dir.node), (c.rg = D.Yg.dir.stream), (c.qg = {}))
+            : f.isFile(c.mode)
+              ? ((c.og = D.Yg.file.node), (c.rg = D.Yg.file.stream), (c.ug = 0), (c.qg = null))
+              : f.Xh(c.mode)
+                ? ((c.og = D.Yg.link.node), (c.rg = D.Yg.link.stream))
+                : f.ti(c.mode) && ((c.og = D.Yg.Lj.node), (c.rg = D.Yg.Lj.stream));
+          c.timestamp = Date.now();
+          a && ((a.qg[b] = c), (a.timestamp = c.timestamp));
+          return c;
+        },
+        Lm: function (a) {
+          return a.qg
+            ? a.qg.subarray
+              ? a.qg.subarray(0, a.ug)
+              : new Uint8Array(a.qg)
+            : new Uint8Array(0);
+        },
+        Vj: function (a, b) {
+          var c = a.qg ? a.qg.length : 0;
+          c >= b ||
+            ((b = Math.max(b, (c * (1048576 > c ? 2 : 1.125)) >>> 0)),
+            0 != c && (b = Math.max(b, 256)),
+            (c = a.qg),
+            (a.qg = new Uint8Array(b)),
+            0 < a.ug && a.qg.set(c.subarray(0, a.ug), 0));
+        },
+        Zl: function (a, b) {
+          if (a.ug != b)
+            if (0 == b) ((a.qg = null), (a.ug = 0));
+            else {
+              var c = a.qg;
+              a.qg = new Uint8Array(b);
+              c && a.qg.set(c.subarray(0, Math.min(b, a.ug)));
+              a.ug = b;
+            }
+        },
+        og: {
+          Vg: function (a) {
+            var b = {};
+            b.gl = f.ti(a.mode) ? a.id : 1;
+            b.ij = a.id;
+            b.mode = a.mode;
+            b.Ol = 1;
+            b.uid = 0;
+            b.ul = 0;
+            b.ci = a.ci;
+            f.Cg(a.mode)
+              ? (b.size = 4096)
+              : f.isFile(a.mode)
+                ? (b.size = a.ug)
+                : (b.size = f.Xh(a.mode) ? a.link.length : 0);
+            b.Ij = new Date(a.timestamp);
+            b.mk = new Date(a.timestamp);
+            b.Oj = new Date(a.timestamp);
+            b.Lk = 4096;
+            b.Mk = Math.ceil(b.size / b.Lk);
+            return b;
+          },
+          Dg: function (a, b) {
+            b.mode !== A && (a.mode = b.mode);
+            b.timestamp !== A && (a.timestamp = b.timestamp);
+            b.size !== A && D.Zl(a, b.size);
+          },
+          qh: function () {
+            throw f.aj[44];
+          },
+          eh: function (a, b, c, d) {
+            return D.createNode(a, b, c, d);
+          },
+          ei: function (a, b, c) {
+            if (f.Cg(a.mode)) {
+              try {
+                var d = f.dh(b, c);
+              } catch (g) {}
+              if (d) for (var e in d.qg) throw new f.lg(55);
+            }
+            delete a.parent.qg[a.name];
+            a.parent.timestamp = Date.now();
+            a.name = c;
+            b.qg[c] = a;
+            b.timestamp = a.parent.timestamp;
+            a.parent = b;
+          },
+          Mh: function (a, b) {
+            delete a.qg[b];
+            a.timestamp = Date.now();
+          },
+          fi: function (a, b) {
+            var c = f.dh(a, b),
+              d;
+            for (d in c.qg) throw new f.lg(55);
+            delete a.qg[b];
+            a.timestamp = Date.now();
+          },
+          di: function (a) {
+            var b = ['.', '..'],
+              c;
+            for (c in a.qg) a.qg.hasOwnProperty(c) && b.push(c);
+            return b;
+          },
+          lh: function (a, b, c) {
+            a = D.createNode(a, b, 41471, 0);
+            a.link = c;
+            return a;
+          },
+          uh: function (a) {
+            if (!f.Xh(a.mode)) throw new f.lg(28);
+            return a.link;
+          },
+        },
+        rg: {
+          read: function (a, b, c, d, e) {
+            var g = a.node.qg;
+            if (e >= a.node.ug) return 0;
+            a = Math.min(a.node.ug - e, d);
+            if (8 < a && g.subarray) b.set(g.subarray(e, e + a), c);
+            else for (d = 0; d < a; d++) b[c + d] = g[e + d];
+            return a;
+          },
+          write: function (a, b, c, d, e, g) {
+            if (!d) return 0;
+            a = a.node;
+            a.timestamp = Date.now();
+            if (b.subarray && (!a.qg || a.qg.subarray)) {
+              if (g) return ((a.qg = b.subarray(c, c + d)), (a.ug = d));
+              if (0 === a.ug && 0 === e) return ((a.qg = b.slice(c, c + d)), (a.ug = d));
+              if (e + d <= a.ug) return (a.qg.set(b.subarray(c, c + d), e), d);
+            }
+            D.Vj(a, e + d);
+            if (a.qg.subarray && b.subarray) a.qg.set(b.subarray(c, c + d), e);
+            else for (g = 0; g < d; g++) a.qg[e + g] = b[c + g];
+            a.ug = Math.max(a.ug, e + d);
+            return d;
+          },
+          Wg: function (a, b, c) {
+            1 === c ? (b += a.position) : 2 === c && f.isFile(a.node.mode) && (b += a.node.ug);
+            if (0 > b) throw new f.lg(28);
+            return b;
+          },
+          Qh: function (a, b, c) {
+            D.Vj(a.node, b + c);
+            a.node.ug = Math.max(a.node.ug, b + c);
+          },
+          Dh: function (a, b, c, d, e) {
+            if (!f.isFile(a.node.mode)) throw new f.lg(43);
+            a = a.node.qg;
+            if (e & 2 || a.buffer !== Xa) {
+              if (0 < c || c + b < a.length)
+                a = a.subarray ? a.subarray(c, c + b) : Array.prototype.slice.call(a, c, c + b);
+              c = !0;
+              W();
+              b = void 0;
+              if (!b) throw new f.lg(48);
+              S.set(a, b);
+            } else ((c = !1), (b = a.byteOffset));
+            return { hn: b, tm: c };
+          },
+          Gh: function (a, b, c, d, e) {
+            if (!f.isFile(a.node.mode)) throw new f.lg(43);
+            if (e & 2) return 0;
+            D.rg.write(a, b, 0, d, c, !1);
+            return 0;
+          },
+        },
+      },
+      f = {
+        root: null,
+        $h: [],
+        Sj: {},
+        streams: [],
+        Ml: 1,
+        Xg: null,
+        Qj: '/',
+        hj: !1,
+        fk: !0,
+        lg: null,
+        aj: {},
+        ll: null,
+        Ii: 0,
+        tg: (a, b = {}) => {
+          a = da.resolve(f.ri(), a);
+          if (!a) return { path: '', node: null };
+          b = Object.assign({ Zi: !0, vj: 0 }, b);
+          if (8 < b.vj) throw new f.lg(32);
+          a = I.rj(
+            a.split('/').filter((h) => !!h),
+            !1,
+          );
+          for (var c = f.root, d = '/', e = 0; e < a.length; e++) {
+            var g = e === a.length - 1;
+            if (g && b.parent) break;
+            c = f.dh(c, a[e]);
+            d = I.ph(d, a[e]);
+            f.oh(c) && (!g || (g && b.Zi)) && (c = c.Zh.root);
+            if (!g || b.Ug)
+              for (g = 0; f.Xh(c.mode);)
+                if (
+                  ((c = f.uh(d)),
+                  (d = da.resolve(I.dirname(d), c)),
+                  (c = f.tg(d, { vj: b.vj + 1 }).node),
+                  40 < g++)
+                )
+                  throw new f.lg(32);
+          }
+          return { path: d, node: c };
+        },
+        ih: (a) => {
+          for (var b; ;) {
+            if (f.vi(a))
+              return ((a = a.vg.lk), b ? ('/' !== a[a.length - 1] ? a + '/' + b : a + b) : a);
+            b = b ? a.name + '/' + b : a.name;
+            a = a.parent;
+          }
+        },
+        fj: (a, b) => {
+          for (var c = 0, d = 0; d < b.length; d++) c = ((c << 5) - c + b.charCodeAt(d)) | 0;
+          return ((a + c) >>> 0) % f.Xg.length;
+        },
+        dk: (a) => {
+          var b = f.fj(a.parent.id, a.name);
+          a.sh = f.Xg[b];
+          f.Xg[b] = a;
+        },
+        ek: (a) => {
+          var b = f.fj(a.parent.id, a.name);
+          if (f.Xg[b] === a) f.Xg[b] = a.sh;
+          else
+            for (b = f.Xg[b]; b;) {
+              if (b.sh === a) {
+                b.sh = a.sh;
+                break;
+              }
+              b = b.sh;
+            }
+        },
+        dh: (a, b) => {
+          var c = f.Fl(a);
+          if (c) throw new f.lg(c, a);
+          for (c = f.Xg[f.fj(a.id, b)]; c; c = c.sh) {
+            var d = c.name;
+            if (c.parent.id === a.id && d === b) return c;
+          }
+          return f.qh(a, b);
+        },
+        createNode: (a, b, c, d) => {
+          a = new f.Jk(a, b, c, d);
+          f.dk(a);
+          return a;
+        },
+        Xi: (a) => {
+          f.ek(a);
+        },
+        vi: (a) => a === a.parent,
+        oh: (a) => !!a.Zh,
+        isFile: (a) => 32768 === (a & 61440),
+        Cg: (a) => 16384 === (a & 61440),
+        Xh: (a) => 40960 === (a & 61440),
+        ti: (a) => 8192 === (a & 61440),
+        Cl: (a) => 24576 === (a & 61440),
+        Dl: (a) => 4096 === (a & 61440),
+        Om: (a) => 49152 === (a & 49152),
+        nl: { r: 0, 'r+': 2, w: 577, 'w+': 578, a: 1089, 'a+': 1090 },
+        Il: (a) => {
+          var b = f.nl[a];
+          if ('undefined' == typeof b) throw Error('Unknown file open mode: ' + a);
+          return b;
+        },
+        Wj: (a) => {
+          var b = ['r', 'w', 'rw'][a & 3];
+          a & 512 && (b += 'w');
+          return b;
+        },
+        th: (a, b) => {
+          if (f.fk) return 0;
+          if (!b.includes('r') || a.mode & 292) {
+            if ((b.includes('w') && !(a.mode & 146)) || (b.includes('x') && !(a.mode & 73)))
+              return 2;
+          } else return 2;
+          return 0;
+        },
+        Fl: (a) => {
+          var b = f.th(a, 'x');
+          return b ? b : a.og.qh ? 0 : 2;
+        },
+        pj: (a, b) => {
+          try {
+            return (f.dh(a, b), 20);
+          } catch (c) {}
+          return f.th(a, 'wx');
+        },
+        Bi: (a, b, c) => {
+          try {
+            var d = f.dh(a, b);
+          } catch (e) {
+            return e.Tg;
+          }
+          if ((a = f.th(a, 'wx'))) return a;
+          if (c) {
+            if (!f.Cg(d.mode)) return 54;
+            if (f.vi(d) || f.ih(d) === f.ri()) return 10;
+          } else if (f.Cg(d.mode)) return 31;
+          return 0;
+        },
+        Gl: (a, b) =>
+          a
+            ? f.Xh(a.mode)
+              ? 32
+              : f.Cg(a.mode) && ('r' !== f.Wj(b) || b & 512)
+                ? 31
+                : f.th(a, f.Wj(b))
+            : 44,
+        Kk: 4096,
+        Nl: (a = 0, b = f.Kk) => {
+          for (; a <= b; a++) if (!f.streams[a]) return a;
+          throw new f.lg(33);
+        },
+        Bh: (a) => f.streams[a],
+        Nj: (a, b, c) => {
+          f.ki ||
+            ((f.ki = function () {
+              this.Gi = {};
+            }),
+            (f.ki.prototype = {}),
+            Object.defineProperties(f.ki.prototype, {
+              object: {
+                get: function () {
+                  return this.node;
+                },
+                set: function (d) {
+                  this.node = d;
+                },
+              },
+              flags: {
+                get: function () {
+                  return this.Gi.flags;
+                },
+                set: function (d) {
+                  this.Gi.flags = d;
+                },
+              },
+              position: {
+                get: function () {
+                  return this.Gi.position;
+                },
+                set: function (d) {
+                  this.Gi.position = d;
+                },
+              },
+            }));
+          a = Object.assign(new f.ki(), a);
+          b = f.Nl(b, c);
+          a.Th = b;
+          return (f.streams[b] = a);
+        },
+        Rk: (a) => {
+          f.streams[a] = null;
+        },
+        Qk: {
+          open: (a) => {
+            a.rg = f.ol(a.node.ci).rg;
+            a.rg.open && a.rg.open(a);
+          },
+          Wg: () => {
+            throw new f.lg(70);
+          },
+        },
+        nj: (a) => a >> 8,
+        Wm: (a) => a & 255,
+        rh: (a, b) => (a << 8) | b,
+        wj: (a, b) => {
+          f.Sj[a] = { rg: b };
+        },
+        ol: (a) => f.Sj[a],
+        bk: (a) => {
+          var b = [];
+          for (a = [a]; a.length;) {
+            var c = a.pop();
+            b.push(c);
+            a.push.apply(a, c.$h);
+          }
+          return b;
+        },
+        Bk: (a, b) => {
+          function c(h) {
+            f.Ii--;
+            return b(h);
+          }
+          function d(h) {
+            if (h) {
+              if (!d.hl) return ((d.hl = !0), c(h));
+            } else ++g >= e.length && c(null);
+          }
+          'function' == typeof a && ((b = a), (a = !1));
+          f.Ii++;
+          1 < f.Ii &&
+            V(
+              'warning: ' +
+                f.Ii +
+                ' FS.syncfs operations in flight at once, probably just doing extra work',
+            );
+          var e = f.bk(f.root.vg),
+            g = 0;
+          e.forEach((h) => {
+            if (!h.type.Bk) return d(null);
+            h.type.Bk(h, a, d);
+          });
+        },
+        vg: (a, b, c) => {
+          var d = '/' === c,
+            e = !c;
+          if (d && f.root) throw new f.lg(10);
+          if (!d && !e) {
+            var g = f.tg(c, { Zi: !1 });
+            c = g.path;
+            g = g.node;
+            if (f.oh(g)) throw new f.lg(10);
+            if (!f.Cg(g.mode)) throw new f.lg(54);
+          }
+          b = { type: a, fn: b, lk: c, $h: [] };
+          a = a.vg(b);
+          a.vg = b;
+          b.root = a;
+          d ? (f.root = a) : g && ((g.Zh = b), g.vg && g.vg.$h.push(b));
+          return a;
+        },
+        sn: (a) => {
+          a = f.tg(a, { Zi: !1 });
+          if (!f.oh(a.node)) throw new f.lg(28);
+          a = a.node;
+          var b = a.Zh,
+            c = f.bk(b);
+          Object.keys(f.Xg).forEach((d) => {
+            for (d = f.Xg[d]; d;) {
+              var e = d.sh;
+              c.includes(d.vg) && f.Xi(d);
+              d = e;
+            }
+          });
+          a.Zh = null;
+          a.vg.$h.splice(a.vg.$h.indexOf(b), 1);
+        },
+        qh: (a, b) => a.og.qh(a, b),
+        eh: (a, b, c) => {
+          var d = f.tg(a, { parent: !0 }).node;
+          a = I.gh(a);
+          if (!a || '.' === a || '..' === a) throw new f.lg(28);
+          var e = f.pj(d, a);
+          if (e) throw new f.lg(e);
+          if (!d.og.eh) throw new f.lg(63);
+          return d.og.eh(d, a, b, c);
+        },
+        create: (a, b) => {
+          b = b !== A ? b : 438;
+          return f.eh(a, (b & 4095) | 32768, 0);
+        },
+        Ng: (a, b) => {
+          b = b !== A ? b : 511;
+          return f.eh(a, (b & 1023) | 16384, 0);
+        },
+        Xm: (a, b) => {
+          a = a.split('/');
+          for (var c = '', d = 0; d < a.length; ++d)
+            if (a[d]) {
+              c += '/' + a[d];
+              try {
+                f.Ng(c, b);
+              } catch (e) {
+                if (20 != e.Tg) throw e;
+              }
+            }
+        },
+        Di: (a, b, c) => {
+          'undefined' == typeof c && ((c = b), (b = 438));
+          return f.eh(a, b | 8192, c);
+        },
+        lh: (a, b) => {
+          if (!da.resolve(a)) throw new f.lg(44);
+          var c = f.tg(b, { parent: !0 }).node;
+          if (!c) throw new f.lg(44);
+          b = I.gh(b);
+          var d = f.pj(c, b);
+          if (d) throw new f.lg(d);
+          if (!c.og.lh) throw new f.lg(63);
+          return c.og.lh(c, b, a);
+        },
+        ei: (a, b) => {
+          var c = I.dirname(a),
+            d = I.dirname(b),
+            e = I.gh(a),
+            g = I.gh(b);
+          var h = f.tg(a, { parent: !0 });
+          var p = h.node;
+          h = f.tg(b, { parent: !0 });
+          h = h.node;
+          if (!p || !h) throw new f.lg(44);
+          if (p.vg !== h.vg) throw new f.lg(75);
+          var q = f.dh(p, e);
+          a = da.wk(a, d);
+          if ('.' !== a.charAt(0)) throw new f.lg(28);
+          a = da.wk(b, c);
+          if ('.' !== a.charAt(0)) throw new f.lg(55);
+          try {
+            var v = f.dh(h, g);
+          } catch (u) {}
+          if (q !== v) {
+            b = f.Cg(q.mode);
+            if ((e = f.Bi(p, e, b))) throw new f.lg(e);
+            if ((e = v ? f.Bi(h, g, b) : f.pj(h, g))) throw new f.lg(e);
+            if (!p.og.ei) throw new f.lg(63);
+            if (f.oh(q) || (v && f.oh(v))) throw new f.lg(10);
+            if (h !== p && (e = f.th(p, 'w'))) throw new f.lg(e);
+            f.ek(q);
+            try {
+              p.og.ei(q, h, g);
+            } catch (u) {
+              throw u;
+            } finally {
+              f.dk(q);
+            }
+          }
+        },
+        fi: (a) => {
+          var b = f.tg(a, { parent: !0 }).node;
+          a = I.gh(a);
+          var c = f.dh(b, a),
+            d = f.Bi(b, a, !0);
+          if (d) throw new f.lg(d);
+          if (!b.og.fi) throw new f.lg(63);
+          if (f.oh(c)) throw new f.lg(10);
+          b.og.fi(b, a);
+          f.Xi(c);
+        },
+        di: (a) => {
+          a = f.tg(a, { Ug: !0 }).node;
+          if (!a.og.di) throw new f.lg(54);
+          return a.og.di(a);
+        },
+        Mh: (a) => {
+          var b = f.tg(a, { parent: !0 }).node;
+          if (!b) throw new f.lg(44);
+          a = I.gh(a);
+          var c = f.dh(b, a),
+            d = f.Bi(b, a, !1);
+          if (d) throw new f.lg(d);
+          if (!b.og.Mh) throw new f.lg(63);
+          if (f.oh(c)) throw new f.lg(10);
+          b.og.Mh(b, a);
+          f.Xi(c);
+        },
+        uh: (a) => {
+          a = f.tg(a).node;
+          if (!a) throw new f.lg(44);
+          if (!a.og.uh) throw new f.lg(28);
+          return da.resolve(f.ih(a.parent), a.og.uh(a));
+        },
+        stat: (a, b) => {
+          a = f.tg(a, { Ug: !b }).node;
+          if (!a) throw new f.lg(44);
+          if (!a.og.Vg) throw new f.lg(63);
+          return a.og.Vg(a);
+        },
+        Um: (a) => f.stat(a, !0),
+        ni: (a, b, c) => {
+          a = 'string' == typeof a ? f.tg(a, { Ug: !c }).node : a;
+          if (!a.og.Dg) throw new f.lg(63);
+          a.og.Dg(a, { mode: (b & 4095) | (a.mode & -4096), timestamp: Date.now() });
+        },
+        Qm: (a, b) => {
+          f.ni(a, b, !0);
+        },
+        Hm: (a, b) => {
+          a = f.Bh(a);
+          if (!a) throw new f.lg(8);
+          f.ni(a.node, b);
+        },
+        Kj: (a, b, c, d) => {
+          a = 'string' == typeof a ? f.tg(a, { Ug: !d }).node : a;
+          if (!a.og.Dg) throw new f.lg(63);
+          a.og.Dg(a, { timestamp: Date.now() });
+        },
+        Rm: (a, b, c) => {
+          f.Kj(a, b, c, !0);
+        },
+        Im: (a, b, c) => {
+          a = f.Bh(a);
+          if (!a) throw new f.lg(8);
+          f.Kj(a.node, b, c);
+        },
+        truncate: (a, b) => {
+          if (0 > b) throw new f.lg(28);
+          a = 'string' == typeof a ? f.tg(a, { Ug: !0 }).node : a;
+          if (!a.og.Dg) throw new f.lg(63);
+          if (f.Cg(a.mode)) throw new f.lg(31);
+          if (!f.isFile(a.mode)) throw new f.lg(28);
+          var c = f.th(a, 'w');
+          if (c) throw new f.lg(c);
+          a.og.Dg(a, { size: b, timestamp: Date.now() });
+        },
+        Km: (a, b) => {
+          a = f.Bh(a);
+          if (!a) throw new f.lg(8);
+          if (0 === (a.flags & 2097155)) throw new f.lg(28);
+          f.truncate(a.node, b);
+        },
+        tn: (a, b, c) => {
+          a = f.tg(a, { Ug: !0 }).node;
+          a.og.Dg(a, { timestamp: Math.max(b, c) });
+        },
+        open: (a, b, c) => {
+          if ('' === a) throw new f.lg(44);
+          b = 'string' == typeof b ? f.Il(b) : b;
+          c = b & 64 ? (('undefined' == typeof c ? 438 : c) & 4095) | 32768 : 0;
+          if ('object' == typeof a) var d = a;
+          else {
+            a = I.normalize(a);
+            try {
+              d = f.tg(a, { Ug: !(b & 131072) }).node;
+            } catch (g) {}
+          }
+          var e = !1;
+          if (b & 64)
+            if (d) {
+              if (b & 128) throw new f.lg(20);
+            } else ((d = f.eh(a, c, 0)), (e = !0));
+          if (!d) throw new f.lg(44);
+          f.ti(d.mode) && (b &= -513);
+          if (b & 65536 && !f.Cg(d.mode)) throw new f.lg(54);
+          if (!e && (c = f.Gl(d, b))) throw new f.lg(c);
+          b & 512 && !e && f.truncate(d, 0);
+          b &= -131713;
+          d = f.Nj({
+            node: d,
+            path: f.ih(d),
+            flags: b,
+            seekable: !0,
+            position: 0,
+            rg: d.rg,
+            nm: [],
+            error: !1,
+          });
+          d.rg.open && d.rg.open(d);
+          !m.logReadFiles || b & 1 || (f.uj || (f.uj = {}), a in f.uj || (f.uj[a] = 1));
+          return d;
+        },
+        close: (a) => {
+          if (f.Vh(a)) throw new f.lg(8);
+          a.ej && (a.ej = null);
+          try {
+            a.rg.close && a.rg.close(a);
+          } catch (b) {
+            throw b;
+          } finally {
+            f.Rk(a.Th);
+          }
+          a.Th = null;
+        },
+        Vh: (a) => null === a.Th,
+        Wg: (a, b, c) => {
+          if (f.Vh(a)) throw new f.lg(8);
+          if (!a.seekable || !a.rg.Wg) throw new f.lg(70);
+          if (0 != c && 1 != c && 2 != c) throw new f.lg(28);
+          a.position = a.rg.Wg(a, b, c);
+          a.nm = [];
+          return a.position;
+        },
+        read: (a, b, c, d, e) => {
+          if (0 > d || 0 > e) throw new f.lg(28);
+          if (f.Vh(a)) throw new f.lg(8);
+          if (1 === (a.flags & 2097155)) throw new f.lg(8);
+          if (f.Cg(a.node.mode)) throw new f.lg(31);
+          if (!a.rg.read) throw new f.lg(28);
+          var g = 'undefined' != typeof e;
+          if (!g) e = a.position;
+          else if (!a.seekable) throw new f.lg(70);
+          b = a.rg.read(a, b, c, d, e);
+          g || (a.position += b);
+          return b;
+        },
+        write: (a, b, c, d, e, g) => {
+          if (0 > d || 0 > e) throw new f.lg(28);
+          if (f.Vh(a)) throw new f.lg(8);
+          if (0 === (a.flags & 2097155)) throw new f.lg(8);
+          if (f.Cg(a.node.mode)) throw new f.lg(31);
+          if (!a.rg.write) throw new f.lg(28);
+          a.seekable && a.flags & 1024 && f.Wg(a, 0, 2);
+          var h = 'undefined' != typeof e;
+          if (!h) e = a.position;
+          else if (!a.seekable) throw new f.lg(70);
+          b = a.rg.write(a, b, c, d, e, g);
+          h || (a.position += b);
+          return b;
+        },
+        Qh: (a, b, c) => {
+          if (f.Vh(a)) throw new f.lg(8);
+          if (0 > b || 0 >= c) throw new f.lg(28);
+          if (0 === (a.flags & 2097155)) throw new f.lg(8);
+          if (!f.isFile(a.node.mode) && !f.Cg(a.node.mode)) throw new f.lg(43);
+          if (!a.rg.Qh) throw new f.lg(138);
+          a.rg.Qh(a, b, c);
+        },
+        Dh: (a, b, c, d, e) => {
+          if (0 !== (d & 2) && 0 === (e & 2) && 2 !== (a.flags & 2097155)) throw new f.lg(2);
+          if (1 === (a.flags & 2097155)) throw new f.lg(2);
+          if (!a.rg.Dh) throw new f.lg(43);
+          return a.rg.Dh(a, b, c, d, e);
+        },
+        Gh: (a, b, c, d, e) => (a && a.rg.Gh ? a.rg.Gh(a, b, c, d, e) : 0),
+        bn: () => 0,
+        jj: (a, b, c) => {
+          if (!a.rg.jj) throw new f.lg(59);
+          return a.rg.jj(a, b, c);
+        },
+        kn: (a, b = {}) => {
+          b.flags = b.flags || 0;
+          b.encoding = b.encoding || 'binary';
+          if ('utf8' !== b.encoding && 'binary' !== b.encoding)
+            throw Error('Invalid encoding type "' + b.encoding + '"');
+          var c,
+            d = f.open(a, b.flags);
+          a = f.stat(a).size;
+          var e = new Uint8Array(a);
+          f.read(d, e, 0, a, 0);
+          'utf8' === b.encoding ? (c = la(e, 0)) : 'binary' === b.encoding && (c = e);
+          f.close(d);
+          return c;
+        },
+        An: (a, b, c = {}) => {
+          c.flags = c.flags || 577;
+          a = f.open(a, c.flags, c.mode);
+          if ('string' == typeof b) {
+            var d = new Uint8Array(qa(b) + 1);
+            b = Ha(b, d, 0, d.length);
+            f.write(a, d, 0, b, A, c.Ok);
+          } else if (ArrayBuffer.isView(b)) f.write(a, b, 0, b.byteLength, A, c.Ok);
+          else throw Error('Unsupported data type');
+          f.close(a);
+        },
+        ri: () => f.Qj,
+        vm: (a) => {
+          a = f.tg(a, { Ug: !0 });
+          if (null === a.node) throw new f.lg(44);
+          if (!f.Cg(a.node.mode)) throw new f.lg(54);
+          var b = f.th(a.node, 'x');
+          if (b) throw new f.lg(b);
+          f.Qj = a.path;
+        },
+        Tk: () => {
+          f.Ng('/tmp');
+          f.Ng('/home');
+          f.Ng('/home/web_user');
+        },
+        Sk: () => {
+          f.Ng('/dev');
+          f.wj(f.rh(1, 3), { read: () => 0, write: (b, c, d, e) => e });
+          f.Di('/dev/null', f.rh(1, 3));
+          ea.register(f.rh(5, 0), ea.dl);
+          ea.register(f.rh(6, 0), ea.cl);
+          f.Di('/dev/tty', f.rh(5, 0));
+          f.Di('/dev/tty1', f.rh(6, 0));
+          var a = Fb();
+          f.hh('/dev', 'random', a);
+          f.hh('/dev', 'urandom', a);
+          f.Ng('/dev/shm');
+          f.Ng('/dev/shm/tmp');
+        },
+        Vk: () => {
+          f.Ng('/proc');
+          var a = f.Ng('/proc/self');
+          f.Ng('/proc/self/fd');
+          f.vg(
+            {
+              vg: () => {
+                var b = f.createNode(a, 'fd', 16895, 73);
+                b.og = {
+                  qh: (c, d) => {
+                    var e = f.Bh(+d);
+                    if (!e) throw new f.lg(8);
+                    c = { parent: null, vg: { lk: 'fake' }, og: { uh: () => e.path } };
+                    return (c.parent = c);
+                  },
+                };
+                return b;
+              },
+            },
+            {},
+            '/proc/self/fd',
+          );
+        },
+        Wk: () => {
+          m.stdin ? f.hh('/dev', 'stdin', m.stdin) : f.lh('/dev/tty', '/dev/stdin');
+          m.stdout ? f.hh('/dev', 'stdout', null, m.stdout) : f.lh('/dev/tty', '/dev/stdout');
+          m.stderr ? f.hh('/dev', 'stderr', null, m.stderr) : f.lh('/dev/tty1', '/dev/stderr');
+          f.open('/dev/stdin', 0);
+          f.open('/dev/stdout', 1);
+          f.open('/dev/stderr', 1);
+        },
+        Uj: () => {
+          f.lg ||
+            ((f.lg = function (a, b) {
+              this.node = b;
+              this.cm = function (c) {
+                this.Tg = c;
+              };
+              this.cm(a);
+              this.message = 'FS error';
+            }),
+            (f.lg.prototype = Error()),
+            (f.lg.prototype.constructor = f.lg),
+            [44].forEach((a) => {
+              f.aj[a] = new f.lg(a);
+              f.aj[a].stack = '<generic error, no stack>';
+            }));
+        },
+        hm: () => {
+          f.Uj();
+          f.Xg = Array(4096);
+          f.vg(D, {}, '/');
+          f.Tk();
+          f.Sk();
+          f.Vk();
+          f.ll = { MEMFS: D };
+        },
+        bh: (a, b, c) => {
+          f.bh.hj = !0;
+          f.Uj();
+          m.stdin = a || m.stdin;
+          m.stdout = b || m.stdout;
+          m.stderr = c || m.stderr;
+          f.Wk();
+        },
+        jn: () => {
+          f.bh.hj = !1;
+          for (var a = 0; a < f.streams.length; a++) {
+            var b = f.streams[a];
+            b && f.close(b);
+          }
+        },
+        cj: (a, b) => {
+          var c = 0;
+          a && (c |= 365);
+          b && (c |= 146);
+          return c;
+        },
+        Jm: (a, b) => {
+          a = f.Pi(a, b);
+          return a.Yi ? a.object : null;
+        },
+        Pi: (a, b) => {
+          try {
+            var c = f.tg(a, { Ug: !b });
+            a = c.path;
+          } catch (e) {}
+          var d = {
+            vi: !1,
+            Yi: !1,
+            error: 0,
+            name: null,
+            path: null,
+            object: null,
+            Pl: !1,
+            Rl: null,
+            Ql: null,
+          };
+          try {
+            ((c = f.tg(a, { parent: !0 })),
+              (d.Pl = !0),
+              (d.Rl = c.path),
+              (d.Ql = c.node),
+              (d.name = I.gh(a)),
+              (c = f.tg(a, { Ug: !b })),
+              (d.Yi = !0),
+              (d.path = c.path),
+              (d.object = c.node),
+              (d.name = c.node.name),
+              (d.vi = '/' === c.path));
+          } catch (e) {
+            d.error = e.Tg;
+          }
+          return d;
+        },
+        zm: (a, b) => {
+          a = 'string' == typeof a ? a : f.ih(a);
+          for (b = b.split('/').reverse(); b.length;) {
+            var c = b.pop();
+            if (c) {
+              var d = I.ph(a, c);
+              try {
+                f.Ng(d);
+              } catch (e) {}
+              a = d;
+            }
+          }
+          return d;
+        },
+        Uk: (a, b, c, d, e) => {
+          a = I.ph('string' == typeof a ? a : f.ih(a), b);
+          return f.create(a, f.cj(d, e));
+        },
+        Mj: (a, b, c, d, e, g) => {
+          var h = b;
+          a && ((a = 'string' == typeof a ? a : f.ih(a)), (h = b ? I.ph(a, b) : a));
+          a = f.cj(d, e);
+          h = f.create(h, a);
+          if (c) {
+            if ('string' == typeof c) {
+              b = Array(c.length);
+              d = 0;
+              for (e = c.length; d < e; ++d) b[d] = c.charCodeAt(d);
+              c = b;
+            }
+            f.ni(h, a | 146);
+            b = f.open(h, 577);
+            f.write(b, c, 0, c.length, 0, g);
+            f.close(b);
+            f.ni(h, a);
+          }
+          return h;
+        },
+        hh: (a, b, c, d) => {
+          a = I.ph('string' == typeof a ? a : f.ih(a), b);
+          b = f.cj(!!c, !!d);
+          f.hh.nj || (f.hh.nj = 64);
+          var e = f.rh(f.hh.nj++, 0);
+          f.wj(e, {
+            open: (g) => {
+              g.seekable = !1;
+            },
+            close: () => {
+              d && d.buffer && d.buffer.length && d(10);
+            },
+            read: (g, h, p, q) => {
+              for (var v = 0, u = 0; u < q; u++) {
+                try {
+                  var z = c();
+                } catch (B) {
+                  throw new f.lg(29);
+                }
+                if (z === A && 0 === v) throw new f.lg(6);
+                if (null === z || z === A) break;
+                v++;
+                h[p + u] = z;
+              }
+              v && (g.node.timestamp = Date.now());
+              return v;
+            },
+            write: (g, h, p, q) => {
+              for (var v = 0; v < q; v++)
+                try {
+                  d(h[p + v]);
+                } catch (u) {
+                  throw new f.lg(29);
+                }
+              q && (g.node.timestamp = Date.now());
+              return v;
+            },
+          });
+          return f.Di(a, b, e);
+        },
+        $i: (a) => {
+          if (a.hk || a.El || a.link || a.qg) return !0;
+          if ('undefined' != typeof XMLHttpRequest)
+            throw Error(
+              'Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.',
+            );
+          if (oc)
+            try {
+              ((a.qg = bb(oc(a.url), !0)), (a.ug = a.qg.length));
+            } catch (b) {
+              throw new f.lg(29);
+            }
+          else throw Error('Cannot load without read() or XMLHttpRequest.');
+        },
+        ym: (a, b, c, d, e) => {
+          if ('undefined' != typeof XMLHttpRequest)
+            throw 'Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc';
+          c = { hk: !1, url: c };
+          var g = f.Uk(a, b, c, d, e);
+          c.qg ? (g.qg = c.qg) : c.url && ((g.qg = null), (g.url = c.url));
+          Object.defineProperties(g, {
+            ug: {
+              get: function () {
+                return this.qg.length;
+              },
+            },
+          });
+          var h = {};
+          Object.keys(g.rg).forEach((p) => {
+            var q = g.rg[p];
+            h[p] = function () {
+              f.$i(g);
+              return q.apply(null, arguments);
+            };
+          });
+          h.read = (p, q, v, u, z) => {
+            f.$i(g);
+            p = p.node.qg;
+            if (z >= p.length) q = 0;
+            else {
+              u = Math.min(p.length - z, u);
+              if (p.slice) for (var B = 0; B < u; B++) q[v + B] = p[z + B];
+              else for (B = 0; B < u; B++) q[v + B] = p.get(z + B);
+              q = u;
+            }
+            return q;
+          };
+          h.Dh = () => {
+            f.$i(g);
+            W();
+            throw new f.lg(48);
+          };
+          g.rg = h;
+          return g;
+        },
+        Am: (a, b, c, d, e, g, h, p, q, v) => {
+          function u(t) {
+            function G(M) {
+              v && v();
+              p || f.Mj(a, b, M, d, e, q);
+              g && g();
+              Ia(B);
+            }
+            r.wl(t, z, G, () => {
+              h && h();
+              Ia(B);
+            }) || G(t);
+          }
+          var z = b ? da.resolve(I.ph(a, b)) : a,
+            B = 'cp ' + z;
+          Ya(B);
+          'string' == typeof c ? wc(c, (t) => u(t), h) : u(c);
+        },
+        indexedDB: () =>
+          window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB,
+        Fj: () => 'EM_FS_' + window.location.pathname,
+        Gj: 20,
+        Oh: 'FILE_DATA',
+        on: (a, b, c) => {
+          b = b || (() => {});
+          c = c || (() => {});
+          var d = f.indexedDB();
+          try {
+            var e = d.open(f.Fj(), f.Gj);
+          } catch (g) {
+            return c(g);
+          }
+          e.onupgradeneeded = () => {
+            ua('creating db');
+            e.result.createObjectStore(f.Oh);
+          };
+          e.onsuccess = () => {
+            var g = e.result.transaction([f.Oh], 'readwrite'),
+              h = g.objectStore(f.Oh),
+              p = 0,
+              q = 0,
+              v = a.length;
+            a.forEach((u) => {
+              u = h.put(f.Pi(u).object.qg, u);
+              u.onsuccess = () => {
+                p++;
+                p + q == v && (0 == q ? b() : c());
+              };
+              u.onerror = () => {
+                q++;
+                p + q == v && (0 == q ? b() : c());
+              };
+            });
+            g.onerror = c;
+          };
+          e.onerror = c;
+        },
+        Sm: (a, b, c) => {
+          b = b || (() => {});
+          c = c || (() => {});
+          var d = f.indexedDB();
+          try {
+            var e = d.open(f.Fj(), f.Gj);
+          } catch (g) {
+            return c(g);
+          }
+          e.onupgradeneeded = c;
+          e.onsuccess = () => {
+            var g = e.result;
+            try {
+              var h = g.transaction([f.Oh], 'readonly');
+            } catch (z) {
+              c(z);
+              return;
+            }
+            var p = h.objectStore(f.Oh),
+              q = 0,
+              v = 0,
+              u = a.length;
+            a.forEach((z) => {
+              var B = p.get(z);
+              B.onsuccess = () => {
+                f.Pi(z).Yi && f.Mh(z);
+                f.Mj(I.dirname(z), I.gh(z), B.result, !0, !0, !0);
+                q++;
+                q + v == u && (0 == v ? b() : c());
+              };
+              B.onerror = () => {
+                v++;
+                q + v == u && (0 == v ? b() : c());
+              };
+            });
+            h.onerror = c;
+          };
+          e.onerror = c;
+        },
+      },
+      O = {
+        sm: 5,
+        Nk: function (a, b, c) {
+          if (I.kj(b)) return b;
+          if (-100 === a) a = f.ri();
+          else {
+            a = f.Bh(a);
+            if (!a) throw new f.lg(8);
+            a = a.path;
+          }
+          if (0 == b.length) {
+            if (!c) throw new f.lg(44);
+            return a;
+          }
+          return I.ph(a, b);
+        },
+        Fm: function (a, b, c) {
+          try {
+            var d = a(b);
+          } catch (e) {
+            if (e && e.node && I.normalize(b) !== I.normalize(f.ih(e.node))) return -54;
+            throw e;
+          }
+          l[c >> 2] = d.gl;
+          l[(c + 4) >> 2] = 0;
+          l[(c + 8) >> 2] = d.ij;
+          l[(c + 12) >> 2] = d.mode;
+          l[(c + 16) >> 2] = d.Ol;
+          l[(c + 20) >> 2] = d.uid;
+          l[(c + 24) >> 2] = d.ul;
+          l[(c + 28) >> 2] = d.ci;
+          l[(c + 32) >> 2] = 0;
+          N = [
+            d.size >>> 0,
+            ((C = d.size),
+            1 <= +Math.abs(C)
+              ? 0 < C
+                ? (Math.min(+Math.floor(C / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((C - +(~~C >>> 0)) / 4294967296) >>> 0
+              : 0),
+          ];
+          l[(c + 40) >> 2] = N[0];
+          l[(c + 44) >> 2] = N[1];
+          l[(c + 48) >> 2] = 4096;
+          l[(c + 52) >> 2] = d.Mk;
+          N = [
+            Math.floor(d.Ij.getTime() / 1e3) >>> 0,
+            ((C = Math.floor(d.Ij.getTime() / 1e3)),
+            1 <= +Math.abs(C)
+              ? 0 < C
+                ? (Math.min(+Math.floor(C / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((C - +(~~C >>> 0)) / 4294967296) >>> 0
+              : 0),
+          ];
+          l[(c + 56) >> 2] = N[0];
+          l[(c + 60) >> 2] = N[1];
+          l[(c + 64) >> 2] = 0;
+          N = [
+            Math.floor(d.mk.getTime() / 1e3) >>> 0,
+            ((C = Math.floor(d.mk.getTime() / 1e3)),
+            1 <= +Math.abs(C)
+              ? 0 < C
+                ? (Math.min(+Math.floor(C / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((C - +(~~C >>> 0)) / 4294967296) >>> 0
+              : 0),
+          ];
+          l[(c + 72) >> 2] = N[0];
+          l[(c + 76) >> 2] = N[1];
+          l[(c + 80) >> 2] = 0;
+          N = [
+            Math.floor(d.Oj.getTime() / 1e3) >>> 0,
+            ((C = Math.floor(d.Oj.getTime() / 1e3)),
+            1 <= +Math.abs(C)
+              ? 0 < C
+                ? (Math.min(+Math.floor(C / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((C - +(~~C >>> 0)) / 4294967296) >>> 0
+              : 0),
+          ];
+          l[(c + 88) >> 2] = N[0];
+          l[(c + 92) >> 2] = N[1];
+          l[(c + 96) >> 2] = 0;
+          N = [
+            d.ij >>> 0,
+            ((C = d.ij),
+            1 <= +Math.abs(C)
+              ? 0 < C
+                ? (Math.min(+Math.floor(C / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((C - +(~~C >>> 0)) / 4294967296) >>> 0
+              : 0),
+          ];
+          l[(c + 104) >> 2] = N[0];
+          l[(c + 108) >> 2] = N[1];
+          return 0;
+        },
+        Em: function (a, b, c, d, e) {
+          f.Gh(b, P.slice(a, a + c), e, c, d);
+        },
+        Nh: A,
+        get: function () {
+          O.Nh += 4;
+          return l[(O.Nh - 4) >> 2];
+        },
+        tl: function (a) {
+          return E(a);
+        },
+        Ch: function (a) {
+          a = f.Bh(a);
+          if (!a) throw new f.lg(8);
+          return a;
+        },
+      };
+    var cb = () => performance.now();
+    var r = {
+        ng: {
+          yj: !1,
+          kh: null,
+          method: '',
+          yh: 0,
+          zh: null,
+          Qi: 0,
+          Ji: 0,
+          Ki: 0,
+          Ui: 0,
+          uk: [],
+          pause: function () {
+            r.ng.kh = null;
+            r.ng.yh++;
+          },
+          resume: function () {
+            r.ng.yh++;
+            var a = r.ng.Ji,
+              b = r.ng.Ki,
+              c = r.ng.zh;
+            r.ng.zh = null;
+            Hb(c, 0, !1, r.ng.Qi, !0);
+            ta(a, b);
+            r.ng.kh();
+          },
+          pm: function () {
+            if (m.setStatus) {
+              var a = m.statusMessage || 'Please wait...',
+                b = r.ng.xj,
+                c = r.ng.Gm;
+              b
+                ? b < c
+                  ? m.setStatus(a + ' (' + (c - b) + '/' + c + ')')
+                  : m.setStatus(a)
+                : m.setStatus('');
+            }
+          },
+          am: function (a) {
+            ma ||
+              (m.preMainLoop && !1 === m.preMainLoop()) ||
+              (db(a), m.postMainLoop && m.postMainLoop());
+          },
+        },
+        Wh: !1,
+        sj: !1,
+        kk: [],
+        zn: [],
+        bh: function () {
+          function a() {
+            r.sj =
+              document.pointerLockElement === m.canvas ||
+              document.mozPointerLockElement === m.canvas ||
+              document.webkitPointerLockElement === m.canvas ||
+              document.msPointerLockElement === m.canvas;
+          }
+          m.preloadPlugins || (m.preloadPlugins = []);
+          if (!r.Bl) {
+            r.Bl = !0;
+            try {
+              r.si = !0;
+            } catch (c) {
+              ((r.si = !1), V('warning: no blob constructor, cannot create blobs with mimetypes'));
+            }
+            r.BlobBuilder =
+              'undefined' != typeof MozBlobBuilder
+                ? MozBlobBuilder
+                : 'undefined' != typeof WebKitBlobBuilder
+                  ? WebKitBlobBuilder
+                  : r.si
+                    ? null
+                    : V('warning: no BlobBuilder');
+            r.li = 'undefined' != typeof window ? (window.URL ? window.URL : window.webkitURL) : A;
+            m.pk ||
+              'undefined' != typeof r.li ||
+              (V(
+                'warning: Browser does not support creating object URLs. Built-in browser image decoding will not be available.',
+              ),
+              (m.pk = !0));
+            m.preloadPlugins.push({
+              canHandle: function (c) {
+                return !m.pk && /\.(jpg|jpeg|png|bmp)$/i.test(c);
+              },
+              handle: function (c, d, e, g) {
+                var h = null;
+                if (r.si)
+                  try {
+                    ((h = new Blob([c], { type: r.bj(d) })),
+                      h.size !== c.length &&
+                        (h = new Blob([new Uint8Array(c).buffer], { type: r.bj(d) })));
+                  } catch (v) {
+                    va(
+                      'Blob constructor present but fails: ' + v + '; falling back to blob builder',
+                    );
+                  }
+                h ||
+                  ((h = new r.BlobBuilder()),
+                  h.append(new Uint8Array(c).buffer),
+                  (h = h.getBlob()));
+                var p = r.li.createObjectURL(h),
+                  q = new Image();
+                q.onload = () => {
+                  q.complete || W('Image ' + d + ' could not be decoded');
+                  var v = document.createElement('canvas');
+                  v.width = q.width;
+                  v.height = q.height;
+                  v.getContext('2d').drawImage(q, 0, 0);
+                  r.li.revokeObjectURL(p);
+                  e && e(c);
+                };
+                q.onerror = () => {
+                  ua('Image ' + p + ' could not be decoded');
+                  g && g();
+                };
+                q.src = p;
+              },
+            });
+            m.preloadPlugins.push({
+              canHandle: function (c) {
+                return !m.cn && c.substr(-4) in { '.ogg': 1, '.wav': 1, '.mp3': 1 };
+              },
+              handle: function (c, d, e, g) {
+                function h() {
+                  q || ((q = !0), e && e(c));
+                }
+                function p() {
+                  q || ((q = !0), new Audio(), g && g());
+                }
+                var q = !1;
+                if (r.si) {
+                  try {
+                    var v = new Blob([c], { type: r.bj(d) });
+                  } catch (z) {
+                    return p();
+                  }
+                  v = r.li.createObjectURL(v);
+                  var u = new Audio();
+                  u.addEventListener('canplaythrough', () => h(u), !1);
+                  u.onerror = function () {
+                    if (!q) {
+                      V(
+                        'warning: browser could not fully decode audio ' +
+                          d +
+                          ', trying slower base64 approach',
+                      );
+                      for (var z = '', B = 0, t = 0, G = 0; G < c.length; G++)
+                        for (B = (B << 8) | c[G], t += 8; 6 <= t;) {
+                          var M = (B >> (t - 6)) & 63;
+                          t -= 6;
+                          z += 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'[
+                            M
+                          ];
+                        }
+                      2 == t
+                        ? ((z += 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'[
+                            (B & 3) << 4
+                          ]),
+                          (z += '=='))
+                        : 4 == t &&
+                          ((z += 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'[
+                            (B & 15) << 2
+                          ]),
+                          (z += '='));
+                      u.src = 'data:audio/x-' + d.substr(-3) + ';base64,' + z;
+                      h(u);
+                    }
+                  };
+                  u.src = v;
+                  Ib(function () {
+                    h(u);
+                  }, 1e4);
+                } else return p();
+              },
+            });
+            var b = m.canvas;
+            b &&
+              ((b.requestPointerLock =
+                b.requestPointerLock ||
+                b.mozRequestPointerLock ||
+                b.webkitRequestPointerLock ||
+                b.msRequestPointerLock ||
+                (() => {})),
+              (b.exitPointerLock =
+                document.exitPointerLock ||
+                document.mozExitPointerLock ||
+                document.webkitExitPointerLock ||
+                document.msExitPointerLock ||
+                (() => {})),
+              (b.exitPointerLock = b.exitPointerLock.bind(document)),
+              document.addEventListener('pointerlockchange', a, !1),
+              document.addEventListener('mozpointerlockchange', a, !1),
+              document.addEventListener('webkitpointerlockchange', a, !1),
+              document.addEventListener('mspointerlockchange', a, !1),
+              m.elementPointerLock &&
+                b.addEventListener(
+                  'click',
+                  (c) => {
+                    !r.sj &&
+                      m.canvas.requestPointerLock &&
+                      (m.canvas.requestPointerLock(), c.preventDefault());
+                  },
+                  !1,
+                ));
+          }
+        },
+        wl: function (a, b, c, d) {
+          r.bh();
+          var e = !1;
+          m.preloadPlugins.forEach(function (g) {
+            !e && g.canHandle(b) && (g.handle(a, b, c, d), (e = !0));
+          });
+          return e;
+        },
+        Sh: function (a, b, c, d) {
+          if (b && m.Rg && a == m.canvas) return m.Rg;
+          var e;
+          if (b) {
+            var g = { antialias: !1, alpha: !1, oj: 2 };
+            if (d) for (var h in d) g[h] = d[h];
+            if ('undefined' != typeof n && (e = n.Sh(a, g))) var p = n.getContext(e).fh;
+          } else p = a.getContext('2d');
+          if (!p) return null;
+          c &&
+            (b ||
+              'undefined' == typeof k ||
+              W(
+                'cannot set in module if GLctx is used, but we are a non-GL context that would replace it',
+              ),
+            (m.Rg = p),
+            b && n.Yh(e),
+            (m.qm = b),
+            r.kk.forEach(function (q) {
+              q();
+            }),
+            r.bh());
+          return p;
+        },
+        Cm: function () {},
+        Zj: !1,
+        xi: A,
+        Kh: A,
+        requestFullscreen: function (a, b) {
+          function c() {
+            r.Wh = !1;
+            var g = d.parentNode;
+            (document.fullscreenElement ||
+              document.mozFullScreenElement ||
+              document.msFullscreenElement ||
+              document.webkitFullscreenElement ||
+              document.webkitCurrentFullScreenElement) === g
+              ? ((d.exitFullscreen = r.exitFullscreen),
+                r.xi && d.requestPointerLock(),
+                (r.Wh = !0),
+                r.Kh ? r.dm() : r.ji(d))
+              : (g.parentNode.insertBefore(d, g),
+                g.parentNode.removeChild(g),
+                r.Kh ? r.em() : r.ji(d));
+            if (m.onFullScreen) m.onFullScreen(r.Wh);
+            if (m.onFullscreen) m.onFullscreen(r.Wh);
+          }
+          r.xi = a;
+          r.Kh = b;
+          'undefined' == typeof r.xi && (r.xi = !0);
+          'undefined' == typeof r.Kh && (r.Kh = !1);
+          var d = m.canvas;
+          r.Zj ||
+            ((r.Zj = !0),
+            document.addEventListener('fullscreenchange', c, !1),
+            document.addEventListener('mozfullscreenchange', c, !1),
+            document.addEventListener('webkitfullscreenchange', c, !1),
+            document.addEventListener('MSFullscreenChange', c, !1));
+          var e = document.createElement('div');
+          d.parentNode.insertBefore(e, d);
+          e.appendChild(d);
+          e.requestFullscreen =
+            e.requestFullscreen ||
+            e.mozRequestFullScreen ||
+            e.msRequestFullscreen ||
+            (e.webkitRequestFullscreen
+              ? () => e.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT)
+              : null) ||
+            (e.webkitRequestFullScreen
+              ? () => e.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
+              : null);
+          e.requestFullscreen();
+        },
+        exitFullscreen: function () {
+          if (!r.Wh) return !1;
+          (
+            document.exitFullscreen ||
+            document.cancelFullScreen ||
+            document.mozCancelFullScreen ||
+            document.msExitFullscreen ||
+            document.webkitCancelFullScreen ||
+            function () {}
+          ).apply(document, []);
+          return !0;
+        },
+        Hh: 0,
+        kl: function (a) {
+          var b = Date.now();
+          if (0 === r.Hh) r.Hh = b + 1e3 / 60;
+          else for (; b + 2 >= r.Hh;) r.Hh += 1e3 / 60;
+          setTimeout(a, Math.max(r.Hh - b, 0));
+        },
+        requestAnimationFrame: function (a) {
+          if ('function' == typeof requestAnimationFrame) requestAnimationFrame(a);
+          else {
+            var b = r.kl;
+            b(a);
+          }
+        },
+        nn: function (a) {
+          return Ib(a);
+        },
+        mn: function (a) {
+          return r.requestAnimationFrame(function () {
+            db(a);
+          });
+        },
+        bj: function (a) {
+          return {
+            jpg: 'image/jpeg',
+            jpeg: 'image/jpeg',
+            png: 'image/png',
+            bmp: 'image/bmp',
+            ogg: 'audio/ogg',
+            wav: 'audio/wav',
+            mp3: 'audio/mpeg',
+          }[a.substr(a.lastIndexOf('.') + 1)];
+        },
+        getUserMedia: function (a) {
+          window.getUserMedia ||
+            (window.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia);
+          window.getUserMedia(a);
+        },
+        pl: function (a) {
+          return a.movementX || a.mozMovementX || a.webkitMovementX || 0;
+        },
+        ql: function (a) {
+          return a.movementY || a.mozMovementY || a.webkitMovementY || 0;
+        },
+        Mm: function (a) {
+          switch (a.type) {
+            case 'DOMMouseScroll':
+              var b = a.detail / 3;
+              break;
+            case 'mousewheel':
+              b = a.wheelDelta / 120;
+              break;
+            case 'wheel':
+              b = a.deltaY;
+              switch (a.deltaMode) {
+                case 0:
+                  b /= 100;
+                  break;
+                case 1:
+                  b /= 3;
+                  break;
+                case 2:
+                  b *= 80;
+                  break;
+                default:
+                  throw 'unrecognized mouse wheel delta mode: ' + a.deltaMode;
+              }
+              break;
+            default:
+              throw 'unrecognized mouse wheel event: ' + a.type;
+          }
+          return b;
+        },
+        Eh: 0,
+        Fh: 0,
+        ai: 0,
+        bi: 0,
+        touches: {},
+        jk: {},
+        um: function (a) {
+          if (r.sj)
+            ('mousemove' != a.type && 'mozMovementX' in a
+              ? (r.ai = r.bi = 0)
+              : ((r.ai = r.pl(a)), (r.bi = r.ql(a))),
+              'undefined' != typeof SDL
+                ? ((r.Eh = SDL.Eh + r.ai), (r.Fh = SDL.Fh + r.bi))
+                : ((r.Eh += r.ai), (r.Fh += r.bi)));
+          else {
+            var b = m.canvas.getBoundingClientRect(),
+              c = m.canvas.width,
+              d = m.canvas.height,
+              e = 'undefined' != typeof window.scrollX ? window.scrollX : window.pageXOffset,
+              g = 'undefined' != typeof window.scrollY ? window.scrollY : window.pageYOffset;
+            if ('touchstart' === a.type || 'touchend' === a.type || 'touchmove' === a.type) {
+              var h = a.rn;
+              if (h !== A)
+                if (
+                  ((e = h.pageX - (e + b.left)),
+                  (g = h.pageY - (g + b.top)),
+                  (e *= c / b.width),
+                  (g *= d / b.height),
+                  (b = { x: e, y: g }),
+                  'touchstart' === a.type)
+                )
+                  ((r.jk[h.identifier] = b), (r.touches[h.identifier] = b));
+                else if ('touchend' === a.type || 'touchmove' === a.type)
+                  ((a = r.touches[h.identifier]) || (a = b),
+                    (r.jk[h.identifier] = a),
+                    (r.touches[h.identifier] = b));
+            } else
+              ((h = a.pageX - (e + b.left)),
+                (a = a.pageY - (g + b.top)),
+                (h *= c / b.width),
+                (a *= d / b.height),
+                (r.ai = h - r.Eh),
+                (r.bi = a - r.Fh),
+                (r.Eh = h),
+                (r.Fh = a));
+          }
+        },
+        $l: [],
+        Ej: function () {
+          var a = m.canvas;
+          r.$l.forEach(function (b) {
+            b(a.width, a.height);
+          });
+        },
+        bm: function (a, b, c) {
+          r.ji(m.canvas, a, b);
+          c || r.Ej();
+        },
+        yn: 0,
+        xn: 0,
+        dm: function () {
+          'undefined' != typeof SDL && (l[SDL.screen >> 2] = J[SDL.screen >> 2] | 8388608);
+          r.ji(m.canvas);
+          r.Ej();
+        },
+        em: function () {
+          'undefined' != typeof SDL && (l[SDL.screen >> 2] = J[SDL.screen >> 2] & -8388609);
+          r.ji(m.canvas);
+          r.Ej();
+        },
+        ji: function (a, b, c) {
+          b && c ? ((a.rm = b), (a.xl = c)) : ((b = a.rm), (c = a.xl));
+          var d = b,
+            e = c;
+          m.forcedAspectRatio &&
+            0 < m.forcedAspectRatio &&
+            (d / e < m.forcedAspectRatio
+              ? (d = Math.round(e * m.forcedAspectRatio))
+              : (e = Math.round(d / m.forcedAspectRatio)));
+          if (
+            (document.fullscreenElement ||
+              document.mozFullScreenElement ||
+              document.msFullscreenElement ||
+              document.webkitFullscreenElement ||
+              document.webkitCurrentFullScreenElement) === a.parentNode &&
+            'undefined' != typeof screen
+          ) {
+            var g = Math.min(screen.width / d, screen.height / e);
+            d = Math.round(d * g);
+            e = Math.round(e * g);
+          }
+          r.Kh
+            ? (a.width != d && (a.width = d),
+              a.height != e && (a.height = e),
+              'undefined' != typeof a.style &&
+                (a.style.removeProperty('width'), a.style.removeProperty('height')))
+            : (a.width != b && (a.width = b),
+              a.height != c && (a.height = c),
+              'undefined' != typeof a.style &&
+                (d != b || e != c
+                  ? (a.style.setProperty('width', d + 'px', 'important'),
+                    a.style.setProperty('height', e + 'px', 'important'))
+                  : (a.style.removeProperty('width'), a.style.removeProperty('height'))));
+        },
+      },
+      x = {
+        errorCode: 12288,
+        Wi: !1,
+        Ag: 0,
+        pi: 0,
+        oi: 0,
+        zg: { alpha: !1, depth: !1, stencil: !1, antialias: !1 },
+        Lh: {},
+        pg: function (a) {
+          x.errorCode = a;
+        },
+        Pk: function (a, b, c, d, e) {
+          if (62e3 != a) return (x.pg(12296), 0);
+          if (b)
+            for (;;) {
+              a = l[b >> 2];
+              if (12321 == a) x.zg.alpha = 0 < l[(b + 4) >> 2];
+              else if (12325 == a) x.zg.depth = 0 < l[(b + 4) >> 2];
+              else if (12326 == a) x.zg.stencil = 0 < l[(b + 4) >> 2];
+              else if (12337 == a) ((a = l[(b + 4) >> 2]), (x.zg.antialias = 0 < a));
+              else if (12338 == a) ((a = l[(b + 4) >> 2]), (x.zg.antialias = 1 == a));
+              else if (12544 == a) x.zg.Tm = 12547 != l[(b + 4) >> 2];
+              else if (12344 == a) break;
+              b += 8;
+            }
+          if (!((c && d) || e)) return (x.pg(12300), 0);
+          e && (l[e >> 2] = 1);
+          c && 0 < d && (l[c >> 2] = 62002);
+          x.pg(12288);
+          return 1;
+        },
+      },
+      n = {
+        counter: 1,
+        nh: [],
+        sg: [],
+        Uh: [],
+        Jh: [],
+        vh: [],
+        Eg: [],
+        $g: [],
+        Qg: [],
+        dn: {},
+        yg: [],
+        Pg: [],
+        hi: [],
+        mh: [],
+        Lh: {},
+        zk: {},
+        om: 4,
+        mg: function (a) {
+          n.mj || (n.mj = a);
+        },
+        Ah: function (a) {
+          for (var b = n.counter++, c = a.length; c < b; c++) a[c] = null;
+          return b;
+        },
+        sl: function (a, b, c, d) {
+          a = '';
+          for (var e = 0; e < b; ++e) {
+            var g = d ? l[(d + 4 * e) >> 2] : -1;
+            a += E(l[(c + 4 * e) >> 2], 0 > g ? A : g);
+          }
+          return a;
+        },
+        Sh: function (a, b) {
+          a.ak ||
+            ((a.ak = a.getContext),
+            (a.getContext = function (d, e) {
+              e = a.ak(d, e);
+              return ('webgl' == d) == e instanceof WebGLRenderingContext ? e : null;
+            }));
+          var c = a.getContext('webgl2', b);
+          return c ? n.Ul(c, b) : 0;
+        },
+        Ul: function (a, b) {
+          var c = n.Ah(n.Qg),
+            d = { Nm: c, attributes: b, version: b.oj, fh: a };
+          a.canvas && (a.canvas.Ph = d);
+          n.Qg[c] = d;
+          ('undefined' == typeof b.Tj || b.Tj) && n.zl(d);
+          return c;
+        },
+        Yh: function (a) {
+          n.Ag = n.Qg[a];
+          m.Rg = k = n.Ag && n.Ag.fh;
+          return !(a && !k);
+        },
+        getContext: function (a) {
+          return n.Qg[a];
+        },
+        fl: function (a) {
+          n.Ag === n.Qg[a] && (n.Ag = null);
+          'object' == typeof w && w.Xl(n.Qg[a].fh.canvas);
+          n.Qg[a] && n.Qg[a].fh.canvas && (n.Qg[a].fh.canvas.Ph = A);
+          n.Qg[a] = null;
+        },
+        zl: function (a) {
+          a || (a = n.Ag);
+          if (!a.Al) {
+            a.Al = !0;
+            var b = a.fh;
+            b.Dm = b.getExtension('WEBGL_draw_instanced_base_vertex_base_instance');
+            b.Vm = b.getExtension('WEBGL_multi_draw_instanced_base_vertex_base_instance');
+            2 <= a.version && (b.Gg = b.getExtension('EXT_disjoint_timer_query_webgl2'));
+            if (2 > a.version || !b.Gg) b.Gg = b.getExtension('EXT_disjoint_timer_query');
+            b.an = b.getExtension('WEBGL_multi_draw');
+            (b.getSupportedExtensions() || []).forEach(function (c) {
+              c.includes('lose_context') || c.includes('debug') || b.getExtension(c);
+            });
+          }
+        },
+      },
+      eb = [],
+      ka = {
+        Ni: {},
+        nk: 0,
+        rl: function () {
+          var a = ka.nk;
+          ka.nk++;
+          return a;
+        },
+      },
+      w = {
+        gj: 0,
+        Wl: function () {
+          for (var a = w.Lg.length - 1; 0 <= a; --a) w.Oi(a);
+          w.Lg = [];
+          w.Kg = [];
+        },
+        Vl: function () {
+          w.Yl || (Nc.push(w.Wl), (w.Yl = !0));
+        },
+        Kg: [],
+        Rj: function (a, b, c) {
+          function d(h, p) {
+            if (h.length != p.length) return !1;
+            for (var q in h) if (h[q] != p[q]) return !1;
+            return !0;
+          }
+          for (var e in w.Kg) {
+            var g = w.Kg[e];
+            if (g.Bj == a && d(g.Hj, c)) return;
+          }
+          w.Kg.push({ Bj: a, tk: b, Hj: c });
+          w.Kg.sort(function (h, p) {
+            return h.tk < p.tk;
+          });
+        },
+        xk: function (a) {
+          for (var b = 0; b < w.Kg.length; ++b) w.Kg[b].Bj == a && (w.Kg.splice(b, 1), --b);
+        },
+        Ri: function () {
+          return w.gj && w.Yk.Rh;
+        },
+        yk: function () {
+          if (w.Ri())
+            for (var a = 0; a < w.Kg.length; ++a) {
+              var b = w.Kg[a];
+              w.Kg.splice(a, 1);
+              --a;
+              b.Bj.apply(null, b.Hj);
+            }
+        },
+        Lg: [],
+        Xl: function (a, b) {
+          for (var c = 0; c < w.Lg.length; ++c)
+            w.Lg[c].target != a || (b && b != w.Lg[c].Bg) || w.Oi(c--);
+        },
+        Oi: function (a) {
+          var b = w.Lg[a];
+          b.target.removeEventListener(b.Bg, b.il, b.Ig);
+          w.Lg.splice(a, 1);
+        },
+        Og: function (a) {
+          function b(d) {
+            ++w.gj;
+            w.Yk = a;
+            w.yk();
+            a.Mg(d);
+            w.yk();
+            --w.gj;
+          }
+          if (a.Jg) ((a.il = b), a.target.addEventListener(a.Bg, b, a.Ig), w.Lg.push(a), w.Vl());
+          else
+            for (var c = 0; c < w.Lg.length; ++c)
+              w.Lg[c].target == a.target && w.Lg[c].Bg == a.Bg && w.Oi(c--);
+        },
+        dj: function (a) {
+          return a
+            ? a == window
+              ? '#window'
+              : a == screen
+                ? '#screen'
+                : a && a.nodeName
+                  ? a.nodeName
+                  : ''
+            : '';
+        },
+        fullscreenEnabled: function () {
+          return document.fullscreenEnabled || document.webkitFullscreenEnabled;
+        },
+      },
+      Na = {},
+      Ma = [0, document, window],
+      oa = [],
+      Oc = ['default', 'low-power', 'high-performance'],
+      kb = {},
+      $b = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+      ac = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    Object.defineProperties(tb.prototype, {
+      read: {
+        get: function () {
+          return 365 === (this.mode & 365);
+        },
+        set: function (a) {
+          a ? (this.mode |= 365) : (this.mode &= -366);
+        },
+      },
+      write: {
+        get: function () {
+          return 146 === (this.mode & 146);
+        },
+        set: function (a) {
+          a ? (this.mode |= 146) : (this.mode &= -147);
+        },
+      },
+      El: {
+        get: function () {
+          return f.Cg(this.mode);
+        },
+      },
+      hk: {
+        get: function () {
+          return f.ti(this.mode);
+        },
+      },
+    });
+    f.Jk = tb;
+    f.hm();
+    m.requestFullscreen = function (a, b) {
+      r.requestFullscreen(a, b);
+    };
+    m.requestAnimationFrame = function (a) {
+      r.requestAnimationFrame(a);
+    };
+    m.setCanvasSize = function (a, b, c) {
+      r.bm(a, b, c);
+    };
+    m.pauseMainLoop = function () {
+      r.ng.pause();
+    };
+    m.resumeMainLoop = function () {
+      r.ng.resume();
+    };
+    m.getUserMedia = function () {
+      r.getUserMedia();
+    };
+    m.createContext = function (a, b, c, d) {
+      return r.Sh(a, b, c, d);
+    };
+    for (var k, sb = 0; 32 > sb; ++sb) oa.push(Array(sb));
+    var Pc = {
+      M: function (a, b, c) {
+        O.Nh = c;
+        try {
+          var d = O.Ch(a);
+          switch (b) {
+            case 0:
+              var e = O.get();
+              return 0 > e ? -28 : f.Nj(d, e).Th;
+            case 1:
+            case 2:
+              return 0;
+            case 3:
+              return d.flags;
+            case 4:
+              return ((e = O.get()), (d.flags |= e), 0);
+            case 5:
+              return ((e = O.get()), (na[(e + 0) >> 1] = 2), 0);
+            case 6:
+            case 7:
+              return 0;
+            case 16:
+            case 8:
+              return -28;
+            case 9:
+              return -1;
+            default:
+              return -28;
+          }
+        } catch (g) {
+          if ('undefined' == typeof f || !(g instanceof f.lg)) throw g;
+          return -g.Tg;
+        }
+      },
+      Ma: function (a, b, c) {
+        O.Nh = c;
+        try {
+          var d = O.Ch(a);
+          switch (b) {
+            case 21509:
+            case 21505:
+              return d.wg ? 0 : -59;
+            case 21510:
+            case 21511:
+            case 21512:
+            case 21506:
+            case 21507:
+            case 21508:
+              return d.wg ? 0 : -59;
+            case 21519:
+              if (!d.wg) return -59;
+              var e = O.get();
+              return (l[e >> 2] = 0);
+            case 21520:
+              return d.wg ? -28 : -59;
+            case 21531:
+              return ((e = O.get()), f.jj(d, b, e));
+            case 21523:
+              return d.wg ? 0 : -59;
+            case 21524:
+              return d.wg ? 0 : -59;
+            default:
+              W('bad ioctl syscall ' + b);
+          }
+        } catch (g) {
+          if ('undefined' == typeof f || !(g instanceof f.lg)) throw g;
+          return -g.Tg;
+        }
+      },
+      Na: function (a, b, c, d) {
+        O.Nh = d;
+        try {
+          b = O.tl(b);
+          b = O.Nk(a, b);
+          var e = d ? O.get() : 0;
+          return f.open(b, c, e).Th;
+        } catch (g) {
+          if ('undefined' == typeof f || !(g instanceof f.lg)) throw g;
+          return -g.Tg;
+        }
+      },
+      Pa: function () {
+        return Date.now();
+      },
+      Oa: function () {
+        return !0;
+      },
+      b: function () {
+        W('');
+      },
+      Ca: function (a) {
+        if (12448 == a) return (x.pg(12288), 1);
+        x.pg(12300);
+        return 0;
+      },
+      Ic: function (a, b, c, d, e) {
+        return x.Pk(a, b, c, d, e);
+      },
+      mc: function (a, b, c, d) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        for (a = 1; ;) {
+          b = l[d >> 2];
+          if (12440 == b) a = l[(d + 4) >> 2];
+          else if (12344 == b) break;
+          else return (x.pg(12292), 0);
+          d += 8;
+        }
+        if (2 > a || 3 < a) return (x.pg(12293), 0);
+        x.zg.oj = a - 1;
+        x.zg.Hl = 0;
+        x.context = n.Sh(m.canvas, x.zg);
+        if (0 != x.context)
+          return (
+            x.pg(12288),
+            n.Yh(x.context),
+            (m.qm = !0),
+            r.kk.forEach(function (e) {
+              e();
+            }),
+            n.Yh(null),
+            62004
+          );
+        x.pg(12297);
+        return 0;
+      },
+      Sb: function (a, b) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        if (62002 != b) return (x.pg(12293), 0);
+        x.pg(12288);
+        return 62006;
+      },
+      bc: function (a, b) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        if (62004 != b) return (x.pg(12294), 0);
+        n.fl(x.context);
+        x.pg(12288);
+        x.Ag == b && (x.Ag = 0);
+        return 1;
+      },
+      Hb: function (a, b) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        if (62006 != b) return (x.pg(12301), 1);
+        x.pi == b && (x.pi = 0);
+        x.oi == b && (x.oi = 0);
+        x.pg(12288);
+        return 1;
+      },
+      xc: function (a, b, c, d) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        if (62002 != b) return (x.pg(12293), 0);
+        if (!d) return (x.pg(12300), 0);
+        x.pg(12288);
+        switch (c) {
+          case 12320:
+            return ((l[d >> 2] = x.zg.alpha ? 32 : 24), 1);
+          case 12321:
+            return ((l[d >> 2] = x.zg.alpha ? 8 : 0), 1);
+          case 12322:
+            return ((l[d >> 2] = 8), 1);
+          case 12323:
+            return ((l[d >> 2] = 8), 1);
+          case 12324:
+            return ((l[d >> 2] = 8), 1);
+          case 12325:
+            return ((l[d >> 2] = x.zg.depth ? 24 : 0), 1);
+          case 12326:
+            return ((l[d >> 2] = x.zg.stencil ? 8 : 0), 1);
+          case 12327:
+            return ((l[d >> 2] = 12344), 1);
+          case 12328:
+            return ((l[d >> 2] = 62002), 1);
+          case 12329:
+            return ((l[d >> 2] = 0), 1);
+          case 12330:
+            return ((l[d >> 2] = 4096), 1);
+          case 12331:
+            return ((l[d >> 2] = 16777216), 1);
+          case 12332:
+            return ((l[d >> 2] = 4096), 1);
+          case 12333:
+            return ((l[d >> 2] = 0), 1);
+          case 12334:
+            return ((l[d >> 2] = 0), 1);
+          case 12335:
+            return ((l[d >> 2] = 12344), 1);
+          case 12337:
+            return ((l[d >> 2] = x.zg.antialias ? 4 : 0), 1);
+          case 12338:
+            return ((l[d >> 2] = x.zg.antialias ? 1 : 0), 1);
+          case 12339:
+            return ((l[d >> 2] = 4), 1);
+          case 12340:
+            return ((l[d >> 2] = 12344), 1);
+          case 12341:
+          case 12342:
+          case 12343:
+            return ((l[d >> 2] = -1), 1);
+          case 12345:
+          case 12346:
+            return ((l[d >> 2] = 0), 1);
+          case 12347:
+            return ((l[d >> 2] = 0), 1);
+          case 12348:
+            return (l[d >> 2] = 1);
+          case 12349:
+          case 12350:
+            return ((l[d >> 2] = 0), 1);
+          case 12351:
+            return ((l[d >> 2] = 12430), 1);
+          case 12352:
+            return ((l[d >> 2] = 4), 1);
+          case 12354:
+            return ((l[d >> 2] = 0), 1);
+          default:
+            return (x.pg(12292), 0);
+        }
+      },
+      N: function () {
+        x.pg(12288);
+        return 62e3;
+      },
+      Aa: function () {
+        return x.errorCode;
+      },
+      cd: function (a, b, c) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        b && (l[b >> 2] = 1);
+        c && (l[c >> 2] = 4);
+        x.Wi = !0;
+        x.pg(12288);
+        return 1;
+      },
+      wb: function (a, b, c, d) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        if (0 != d && 62004 != d) return (x.pg(12294), 0);
+        if ((0 != c && 62006 != c) || (0 != b && 62006 != b)) return (x.pg(12301), 0);
+        n.Yh(d ? x.context : null);
+        x.Ag = d;
+        x.oi = b;
+        x.pi = c;
+        x.pg(12288);
+        return 1;
+      },
+      Ba: function (a, b) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        x.pg(12288);
+        if (x.Lh[b]) return x.Lh[b];
+        switch (b) {
+          case 12371:
+            a = wa('Emscripten');
+            break;
+          case 12372:
+            a = wa('1.4 Emscripten EGL');
+            break;
+          case 12373:
+            a = wa('');
+            break;
+          case 12429:
+            a = wa('OpenGL_ES');
+            break;
+          default:
+            return (x.pg(12300), 0);
+        }
+        return (x.Lh[b] = a);
+      },
+      lb: function () {
+        if (x.Wi)
+          if (m.Rg)
+            if (m.Rg.isContextLost()) x.pg(12302);
+            else return (x.pg(12288), 1);
+          else x.pg(12290);
+        else x.pg(12289);
+        return 0;
+      },
+      ab: function (a, b) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        0 == b ? ta(0, 0) : ta(1, b);
+        x.pg(12288);
+        return 1;
+      },
+      Tc: function (a) {
+        if (62e3 != a) return (x.pg(12296), 0);
+        x.Ag = 0;
+        x.pi = 0;
+        x.oi = 0;
+        x.Wi = !1;
+        x.pg(12288);
+        return 1;
+      },
+      Ja: function () {
+        x.pg(12288);
+        return 1;
+      },
+      Ra: function () {
+        x.pg(12288);
+        return 1;
+      },
+      c: Kb,
+      a: Kb,
+      d: function (a, b, c) {
+        b = Jb(b, c);
+        return Lb[a].apply(null, b);
+      },
+      wf: function (a, b, c, d, e, g, h, p) {
+        function q() {
+          if (h) {
+            var B = 0;
+            if (u.statusText) {
+              var t = qa(u.statusText) + 1;
+              B = xa(t);
+              L(u.statusText, B, t);
+            }
+            Q(h)(z, d, u.status, B);
+          }
+        }
+        var v = E(a);
+        a = E(b);
+        c = E(c);
+        var u = new XMLHttpRequest();
+        u.open(a, v, !0);
+        u.responseType = 'arraybuffer';
+        var z = ka.rl();
+        u.onload = function () {
+          if (
+            (200 <= u.status && 300 > u.status) ||
+            (0 === u.status && 'http' != v.substr(0, 4).toLowerCase())
+          ) {
+            var B = new Uint8Array(u.response),
+              t = R(B.length);
+            P.set(B, t);
+            g && Q(g)(z, d, t, B.length);
+            e && Fa(t);
+          } else q();
+          delete ka.Ni[z];
+        };
+        u.onerror = function () {
+          q();
+          delete ka.Ni[z];
+        };
+        u.onprogress = function (B) {
+          p && Q(p)(z, d, B.loaded, B.lengthComputable || B.lengthComputable === A ? B.total : 0);
+        };
+        u.onabort = function () {
+          delete ka.Ni[z];
+        };
+        'POST' == a
+          ? (u.setRequestHeader('Content-type', 'application/x-www-form-urlencoded'), u.send(c))
+          : u.send(null);
+        ka.Ni[z] = u;
+        return z;
+      },
+      sa: function () {
+        if (!w.fullscreenEnabled()) return -1;
+        w.xk(gb);
+        var a = Ma[1];
+        if (a.exitFullscreen) a.fullscreenElement && a.exitFullscreen();
+        else if (a.webkitExitFullscreen) a.webkitFullscreenElement && a.webkitExitFullscreen();
+        else return -1;
+        return 0;
+      },
+      xa: function () {
+        w.xk(hb);
+        if (document.exitPointerLock) document.exitPointerLock();
+        else if (document.Jl) document.Jl();
+        else return -1;
+        return 0;
+      },
+      Re: function () {
+        throw 'unwind';
+      },
+      g: function () {
+        return devicePixelRatio;
+      },
+      e: function (a, b, c) {
+        a = T(a);
+        if (!a) return -4;
+        a = Oa(a);
+        X[b >> 3] = a.width;
+        X[c >> 3] = a.height;
+        return 0;
+      },
+      ae: function (a, b) {
+        if (0 > a || a >= w.wi.length) return -5;
+        if (!w.wi[a]) return -7;
+        Pb(b, w.wi[a]);
+        return 0;
+      },
+      l: cb,
+      le: function () {
+        return w.wi.length;
+      },
+      za: function (a, b) {
+        l[a >> 2] = screen.width;
+        l[b >> 2] = screen.height;
+      },
+      Z: function (a) {
+        k.activeTexture(a);
+      },
+      Y: function (a, b) {
+        k.attachShader(n.sg[a], n.Eg[b]);
+      },
+      Kc: function (a, b) {
+        k.beginQuery(a, n.yg[b]);
+      },
+      oa: function (a, b) {
+        k.Gg.beginQueryEXT(a, n.yg[b]);
+      },
+      pc: function (a) {
+        k.beginTransformFeedback(a);
+      },
+      X: function (a, b, c) {
+        k.bindAttribLocation(n.sg[a], b, E(c));
+      },
+      W: function (a, b) {
+        35051 == a ? (k.Vi = b) : 35052 == a && (k.Sg = b);
+        k.bindBuffer(a, n.nh[b]);
+      },
+      lc: function (a, b, c) {
+        k.bindBufferBase(a, b, n.nh[c]);
+      },
+      nc: function (a, b, c, d, e) {
+        k.bindBufferRange(a, b, n.nh[c], d, e);
+      },
+      V: function (a, b) {
+        k.bindFramebuffer(a, n.Uh[b]);
+      },
+      U: function (a, b) {
+        k.bindRenderbuffer(a, n.Jh[b]);
+      },
+      pb: function (a, b) {
+        k.bindSampler(a, n.Pg[b]);
+      },
+      T: function (a, b) {
+        k.bindTexture(a, n.vh[b]);
+      },
+      gb: function (a, b) {
+        k.bindTransformFeedback(a, n.hi[b]);
+      },
+      uc: function (a) {
+        k.bindVertexArray(n.$g[a]);
+      },
+      fa: function (a) {
+        k.bindVertexArray(n.$g[a]);
+      },
+      S: function (a, b, c, d) {
+        k.blendColor(a, b, c, d);
+      },
+      R: function (a) {
+        k.blendEquation(a);
+      },
+      Q: function (a, b) {
+        k.blendEquationSeparate(a, b);
+      },
+      P: function (a, b) {
+        k.blendFunc(a, b);
+      },
+      O: function (a, b, c, d) {
+        k.blendFuncSeparate(a, b, c, d);
+      },
+      yc: function (a, b, c, d, e, g, h, p, q, v) {
+        k.blitFramebuffer(a, b, c, d, e, g, h, p, q, v);
+      },
+      Gf: function (a, b, c, d) {
+        c && b ? k.bufferData(a, P, d, c, b) : k.bufferData(a, b, d);
+      },
+      Ff: function (a, b, c, d) {
+        c && k.bufferSubData(a, b, P, d, c);
+      },
+      Ef: function (a) {
+        return k.checkFramebufferStatus(a);
+      },
+      Df: function (a) {
+        k.clear(a);
+      },
+      Ob: function (a, b, c, d) {
+        k.clearBufferfi(a, b, c, d);
+      },
+      Pb: function (a, b, c) {
+        k.clearBufferfv(a, b, F, c >> 2);
+      },
+      Rb: function (a, b, c) {
+        k.clearBufferiv(a, b, l, c >> 2);
+      },
+      Qb: function (a, b, c) {
+        k.clearBufferuiv(a, b, J, c >> 2);
+      },
+      Cf: function (a, b, c, d) {
+        k.clearColor(a, b, c, d);
+      },
+      Bf: function (a) {
+        k.clearDepth(a);
+      },
+      Af: function (a) {
+        k.clearStencil(a);
+      },
+      zb: function (a, b, c, d) {
+        return k.clientWaitSync(n.mh[a], b, (c >>> 0) + 4294967296 * d);
+      },
+      zf: function (a, b, c, d) {
+        k.colorMask(!!a, !!b, !!c, !!d);
+      },
+      yf: function (a) {
+        k.compileShader(n.Eg[a]);
+      },
+      xf: function (a, b, c, d, e, g, h, p) {
+        k.Sg || !h
+          ? k.compressedTexImage2D(a, b, c, d, e, g, h, p)
+          : k.compressedTexImage2D(a, b, c, d, e, g, P, p, h);
+      },
+      Pc: function (a, b, c, d, e, g, h, p, q) {
+        k.Sg
+          ? k.compressedTexImage3D(a, b, c, d, e, g, h, p, q)
+          : k.compressedTexImage3D(a, b, c, d, e, g, h, P, q, p);
+      },
+      vf: function (a, b, c, d, e, g, h, p, q) {
+        k.Sg || !p
+          ? k.compressedTexSubImage2D(a, b, c, d, e, g, h, p, q)
+          : k.compressedTexSubImage2D(a, b, c, d, e, g, h, P, q, p);
+      },
+      Oc: function (a, b, c, d, e, g, h, p, q, v, u) {
+        k.Sg
+          ? k.compressedTexSubImage3D(a, b, c, d, e, g, h, p, q, v, u)
+          : k.compressedTexSubImage3D(a, b, c, d, e, g, h, p, q, P, u, v);
+      },
+      Mb: function (a, b, c, d, e) {
+        k.copyBufferSubData(a, b, c, d, e);
+      },
+      uf: function (a, b, c, d, e, g, h, p) {
+        k.copyTexImage2D(a, b, c, d, e, g, h, p);
+      },
+      tf: function (a, b, c, d, e, g, h, p) {
+        k.copyTexSubImage2D(a, b, c, d, e, g, h, p);
+      },
+      Qc: function (a, b, c, d, e, g, h, p, q) {
+        k.copyTexSubImage3D(a, b, c, d, e, g, h, p, q);
+      },
+      sf: function () {
+        var a = n.Ah(n.sg),
+          b = k.createProgram();
+        b.name = a;
+        b.Ai = b.yi = b.zi = 0;
+        b.Dj = 1;
+        n.sg[a] = b;
+        return a;
+      },
+      rf: function (a) {
+        var b = n.Ah(n.Eg);
+        n.Eg[b] = k.createShader(a);
+        return b;
+      },
+      qf: function (a) {
+        k.cullFace(a);
+      },
+      pf: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2],
+            e = n.nh[d];
+          e &&
+            (k.deleteBuffer(e),
+            (e.name = 0),
+            (n.nh[d] = null),
+            d == k.Vi && (k.Vi = 0),
+            d == k.Sg && (k.Sg = 0));
+        }
+      },
+      of: function (a, b) {
+        for (var c = 0; c < a; ++c) {
+          var d = l[(b + 4 * c) >> 2],
+            e = n.Uh[d];
+          e && (k.deleteFramebuffer(e), (e.name = 0), (n.Uh[d] = null));
+        }
+      },
+      nf: function (a) {
+        if (a) {
+          var b = n.sg[a];
+          b ? (k.deleteProgram(b), (b.name = 0), (n.sg[a] = null)) : n.mg(1281);
+        }
+      },
+      Mc: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2],
+            e = n.yg[d];
+          e && (k.deleteQuery(e), (n.yg[d] = null));
+        }
+      },
+      qa: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2],
+            e = n.yg[d];
+          e && (k.Gg.deleteQueryEXT(e), (n.yg[d] = null));
+        }
+      },
+      mf: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2],
+            e = n.Jh[d];
+          e && (k.deleteRenderbuffer(e), (e.name = 0), (n.Jh[d] = null));
+        }
+      },
+      rb: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2],
+            e = n.Pg[d];
+          e && (k.deleteSampler(e), (e.name = 0), (n.Pg[d] = null));
+        }
+      },
+      lf: function (a) {
+        if (a) {
+          var b = n.Eg[a];
+          b ? (k.deleteShader(b), (n.Eg[a] = null)) : n.mg(1281);
+        }
+      },
+      Ab: function (a) {
+        if (a) {
+          var b = n.mh[a];
+          b ? (k.deleteSync(b), (b.name = 0), (n.mh[a] = null)) : n.mg(1281);
+        }
+      },
+      kf: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2],
+            e = n.vh[d];
+          e && (k.deleteTexture(e), (e.name = 0), (n.vh[d] = null));
+        }
+      },
+      fb: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2],
+            e = n.hi[d];
+          e && (k.deleteTransformFeedback(e), (e.name = 0), (n.hi[d] = null));
+        }
+      },
+      tc: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2];
+          k.deleteVertexArray(n.$g[d]);
+          n.$g[d] = null;
+        }
+      },
+      ea: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = l[(b + 4 * c) >> 2];
+          k.deleteVertexArray(n.$g[d]);
+          n.$g[d] = null;
+        }
+      },
+      jf: function (a) {
+        k.depthFunc(a);
+      },
+      hf: function (a) {
+        k.depthMask(!!a);
+      },
+      gf: function (a, b) {
+        k.depthRange(a, b);
+      },
+      ff: function (a, b) {
+        k.detachShader(n.sg[a], n.Eg[b]);
+      },
+      ef: function (a) {
+        k.disable(a);
+      },
+      df: function (a) {
+        k.disableVertexAttribArray(a);
+      },
+      cf: function (a, b, c) {
+        k.drawArrays(a, b, c);
+      },
+      Eb: function (a, b, c, d) {
+        k.drawArraysInstanced(a, b, c, d);
+      },
+      aa: function (a, b, c, d) {
+        k.drawArraysInstanced(a, b, c, d);
+      },
+      _c: function (a, b, c, d) {
+        k.drawArraysInstanced(a, b, c, d);
+      },
+      $c: function (a, b, c, d) {
+        k.drawArraysInstanced(a, b, c, d);
+      },
+      Sa: function (a, b, c, d) {
+        k.drawArraysInstanced(a, b, c, d);
+      },
+      Fc: function (a, b) {
+        for (var c = oa[a], d = 0; d < a; d++) c[d] = l[(b + 4 * d) >> 2];
+        k.drawBuffers(c);
+      },
+      Wc: function (a, b) {
+        for (var c = oa[a], d = 0; d < a; d++) c[d] = l[(b + 4 * d) >> 2];
+        k.drawBuffers(c);
+      },
+      ba: function (a, b) {
+        for (var c = oa[a], d = 0; d < a; d++) c[d] = l[(b + 4 * d) >> 2];
+        k.drawBuffers(c);
+      },
+      bf: function (a, b, c, d) {
+        k.drawElements(a, b, c, d);
+      },
+      Db: function (a, b, c, d, e) {
+        k.drawElementsInstanced(a, b, c, d, e);
+      },
+      $: function (a, b, c, d, e) {
+        k.drawElementsInstanced(a, b, c, d, e);
+      },
+      Xc: function (a, b, c, d, e) {
+        k.drawElementsInstanced(a, b, c, d, e);
+      },
+      Yc: function (a, b, c, d, e) {
+        k.drawElementsInstanced(a, b, c, d, e);
+      },
+      Zc: function (a, b, c, d, e) {
+        k.drawElementsInstanced(a, b, c, d, e);
+      },
+      Uc: function (a, b, c, d, e, g) {
+        k.drawElements(a, d, e, g);
+      },
+      $e: function (a) {
+        k.enable(a);
+      },
+      _e: function (a) {
+        k.enableVertexAttribArray(a);
+      },
+      Jc: function (a) {
+        k.endQuery(a);
+      },
+      na: function (a) {
+        k.Gg.endQueryEXT(a);
+      },
+      oc: function () {
+        k.endTransformFeedback();
+      },
+      Cb: function (a, b) {
+        return (a = k.fenceSync(a, b)) ? ((b = n.Ah(n.mh)), (a.name = b), (n.mh[b] = a), b) : 0;
+      },
+      Ze: function () {
+        k.finish();
+      },
+      Ye: function () {
+        k.flush();
+      },
+      Xe: function (a, b, c, d) {
+        k.framebufferRenderbuffer(a, b, c, n.Jh[d]);
+      },
+      We: function (a, b, c, d, e) {
+        k.framebufferTexture2D(a, b, c, n.vh[d], e);
+      },
+      vc: function (a, b, c, d, e) {
+        k.framebufferTextureLayer(a, b, n.vh[c], d, e);
+      },
+      Ve: function (a) {
+        k.frontFace(a);
+      },
+      Ue: function (a, b) {
+        ca(a, b, 'createBuffer', n.nh);
+      },
+      Se: function (a, b) {
+        ca(a, b, 'createFramebuffer', n.Uh);
+      },
+      Nc: function (a, b) {
+        ca(a, b, 'createQuery', n.yg);
+      },
+      ra: function (a, b) {
+        for (var c = 0; c < a; c++) {
+          var d = k.Gg.createQueryEXT();
+          if (!d) {
+            for (n.mg(1282); c < a;) l[(b + 4 * c++) >> 2] = 0;
+            break;
+          }
+          var e = n.Ah(n.yg);
+          d.name = e;
+          n.yg[e] = d;
+          l[(b + 4 * c) >> 2] = e;
+        }
+      },
+      Qe: function (a, b) {
+        ca(a, b, 'createRenderbuffer', n.Jh);
+      },
+      sb: function (a, b) {
+        ca(a, b, 'createSampler', n.Pg);
+      },
+      Pe: function (a, b) {
+        ca(a, b, 'createTexture', n.vh);
+      },
+      eb: function (a, b) {
+        ca(a, b, 'createTransformFeedback', n.hi);
+      },
+      sc: function (a, b) {
+        ca(a, b, 'createVertexArray', n.$g);
+      },
+      da: function (a, b) {
+        ca(a, b, 'createVertexArray', n.$g);
+      },
+      Te: function (a) {
+        k.generateMipmap(a);
+      },
+      Oe: function (a, b, c, d, e, g, h) {
+        Qb('getActiveAttrib', a, b, c, d, e, g, h);
+      },
+      Ne: function (a, b, c, d, e, g, h) {
+        Qb('getActiveUniform', a, b, c, d, e, g, h);
+      },
+      Gb: function (a, b, c, d, e) {
+        a = n.sg[a];
+        if ((a = k.getActiveUniformBlockName(a, b)))
+          e && 0 < c ? ((c = L(a, e, c)), d && (l[d >> 2] = c)) : d && (l[d >> 2] = 0);
+      },
+      Ib: function (a, b, c, d) {
+        if (d)
+          if (((a = n.sg[a]), 35393 == c))
+            ((c = k.getActiveUniformBlockName(a, b)), (l[d >> 2] = c.length + 1));
+          else {
+            if (((a = k.getActiveUniformBlockParameter(a, b, c)), null !== a))
+              if (35395 == c) for (c = 0; c < a.length; c++) l[(d + 4 * c) >> 2] = a[c];
+              else l[d >> 2] = a;
+          }
+        else n.mg(1281);
+      },
+      Kb: function (a, b, c, d, e) {
+        if (e)
+          if (0 < b && 0 == c) n.mg(1281);
+          else {
+            a = n.sg[a];
+            for (var g = [], h = 0; h < b; h++) g.push(l[(c + 4 * h) >> 2]);
+            if ((a = k.getActiveUniforms(a, g, d)))
+              for (b = a.length, h = 0; h < b; h++) l[(e + 4 * h) >> 2] = a[h];
+          }
+        else n.mg(1281);
+      },
+      Me: function (a, b, c, d) {
+        a = k.getAttachedShaders(n.sg[a]);
+        var e = a.length;
+        e > b && (e = b);
+        l[c >> 2] = e;
+        for (b = 0; b < e; ++b) l[(d + 4 * b) >> 2] = n.Eg.indexOf(a[b]);
+      },
+      Le: function (a, b) {
+        return k.getAttribLocation(n.sg[a], E(b));
+      },
+      Ke: function (a, b) {
+        Pa(a, b, 4);
+      },
+      tb: function (a, b, c) {
+        c ? ya(c, k.getBufferParameter(a, b)) : n.mg(1281);
+      },
+      Je: function (a, b, c) {
+        c ? (l[c >> 2] = k.getBufferParameter(a, b)) : n.mg(1281);
+      },
+      Ie: function () {
+        var a = k.getError() || n.mj;
+        n.mj = 0;
+        return a;
+      },
+      He: function (a, b) {
+        Pa(a, b, 2);
+      },
+      $b: function (a, b) {
+        return k.getFragDataLocation(n.sg[a], E(b));
+      },
+      Ge: function (a, b, c, d) {
+        a = k.getFramebufferAttachmentParameter(a, b, c);
+        if (a instanceof WebGLRenderbuffer || a instanceof WebGLTexture) a = a.name | 0;
+        l[d >> 2] = a;
+      },
+      ub: function (a, b, c) {
+        Rb(a, b, c, 1);
+      },
+      xb: function (a, b) {
+        Pa(a, b, 1);
+      },
+      qc: function (a, b, c) {
+        Rb(a, b, c, 0);
+      },
+      Fe: function (a, b) {
+        Pa(a, b, 0);
+      },
+      Ua: function (a, b, c, d, e) {
+        if (0 > d) n.mg(1281);
+        else if (e) {
+          if (((a = k.getInternalformatParameter(a, b, c)), null !== a))
+            for (b = 0; b < a.length && b < d; ++b) l[(e + 4 * b) >> 2] = a[b];
+        } else n.mg(1281);
+      },
+      $a: function () {
+        n.mg(1282);
+      },
+      De: function (a, b, c, d) {
+        a = k.getProgramInfoLog(n.sg[a]);
+        null === a && (a = '(unknown error)');
+        b = 0 < b && d ? L(a, d, b) : 0;
+        c && (l[c >> 2] = b);
+      },
+      Ee: function (a, b, c) {
+        if (c)
+          if (a >= n.counter) n.mg(1281);
+          else if (((a = n.sg[a]), 35716 == b))
+            ((a = k.getProgramInfoLog(a)),
+              null === a && (a = '(unknown error)'),
+              (l[c >> 2] = a.length + 1));
+          else if (35719 == b) {
+            if (!a.Ai)
+              for (b = 0; b < k.getProgramParameter(a, 35718); ++b)
+                a.Ai = Math.max(a.Ai, k.getActiveUniform(a, b).name.length + 1);
+            l[c >> 2] = a.Ai;
+          } else if (35722 == b) {
+            if (!a.yi)
+              for (b = 0; b < k.getProgramParameter(a, 35721); ++b)
+                a.yi = Math.max(a.yi, k.getActiveAttrib(a, b).name.length + 1);
+            l[c >> 2] = a.yi;
+          } else if (35381 == b) {
+            if (!a.zi)
+              for (b = 0; b < k.getProgramParameter(a, 35382); ++b)
+                a.zi = Math.max(a.zi, k.getActiveUniformBlockName(a, b).length + 1);
+            l[c >> 2] = a.zi;
+          } else l[c >> 2] = k.getProgramParameter(a, b);
+        else n.mg(1281);
+      },
+      ia: function (a, b, c) {
+        c
+          ? ((a = n.yg[a]),
+            (b = 2 > n.Ag.version ? k.Gg.getQueryObjectEXT(a, b) : k.getQueryParameter(a, b)),
+            ya(c, 'boolean' == typeof b ? (b ? 1 : 0) : b))
+          : n.mg(1281);
+      },
+      ka: function (a, b, c) {
+        c
+          ? ((a = k.Gg.getQueryObjectEXT(n.yg[a], b)),
+            (l[c >> 2] = 'boolean' == typeof a ? (a ? 1 : 0) : a))
+          : n.mg(1281);
+      },
+      ha: function (a, b, c) {
+        c
+          ? ((a = n.yg[a]),
+            (b = 2 > n.Ag.version ? k.Gg.getQueryObjectEXT(a, b) : k.getQueryParameter(a, b)),
+            ya(c, 'boolean' == typeof b ? (b ? 1 : 0) : b))
+          : n.mg(1281);
+      },
+      Gc: function (a, b, c) {
+        c
+          ? ((a = k.getQueryParameter(n.yg[a], b)),
+            (l[c >> 2] = 'boolean' == typeof a ? (a ? 1 : 0) : a))
+          : n.mg(1281);
+      },
+      ja: function (a, b, c) {
+        c
+          ? ((a = k.Gg.getQueryObjectEXT(n.yg[a], b)),
+            (l[c >> 2] = 'boolean' == typeof a ? (a ? 1 : 0) : a))
+          : n.mg(1281);
+      },
+      Hc: function (a, b, c) {
+        c ? (l[c >> 2] = k.getQuery(a, b)) : n.mg(1281);
+      },
+      la: function (a, b, c) {
+        c ? (l[c >> 2] = k.Gg.getQueryEXT(a, b)) : n.mg(1281);
+      },
+      Ce: function (a, b, c) {
+        c ? (l[c >> 2] = k.getRenderbufferParameter(a, b)) : n.mg(1281);
+      },
+      ib: function (a, b, c) {
+        c ? (F[c >> 2] = k.getSamplerParameter(n.Pg[a], b)) : n.mg(1281);
+      },
+      jb: function (a, b, c) {
+        c ? (l[c >> 2] = k.getSamplerParameter(n.Pg[a], b)) : n.mg(1281);
+      },
+      Ae: function (a, b, c, d) {
+        a = k.getShaderInfoLog(n.Eg[a]);
+        null === a && (a = '(unknown error)');
+        b = 0 < b && d ? L(a, d, b) : 0;
+        c && (l[c >> 2] = b);
+      },
+      ze: function (a, b, c, d) {
+        a = k.getShaderPrecisionFormat(a, b);
+        l[c >> 2] = a.rangeMin;
+        l[(c + 4) >> 2] = a.rangeMax;
+        l[d >> 2] = a.precision;
+      },
+      ye: function (a, b, c, d) {
+        if ((a = k.getShaderSource(n.Eg[a])))
+          ((b = 0 < b && d ? L(a, d, b) : 0), c && (l[c >> 2] = b));
+      },
+      Be: function (a, b, c) {
+        c
+          ? 35716 == b
+            ? ((a = k.getShaderInfoLog(n.Eg[a])),
+              null === a && (a = '(unknown error)'),
+              (l[c >> 2] = a ? a.length + 1 : 0))
+            : 35720 == b
+              ? ((a = k.getShaderSource(n.Eg[a])), (l[c >> 2] = a ? a.length + 1 : 0))
+              : (l[c >> 2] = k.getShaderParameter(n.Eg[a], b))
+          : n.mg(1281);
+      },
+      xe: function (a) {
+        var b = n.Lh[a];
+        if (!b) {
+          switch (a) {
+            case 7939:
+              b = k.getSupportedExtensions() || [];
+              b = b.concat(
+                b.map(function (d) {
+                  return 'GL_' + d;
+                }),
+              );
+              b = za(b.join(' '));
+              break;
+            case 7936:
+            case 7937:
+            case 37445:
+            case 37446:
+              (b = k.getParameter(a)) || n.mg(1280);
+              b = b && za(b);
+              break;
+            case 7938:
+              b = za('OpenGL ES 3.0 (' + k.getParameter(7938) + ')');
+              break;
+            case 35724:
+              b = k.getParameter(35724);
+              var c = b.match(/^WebGL GLSL ES ([0-9]\.[0-9][0-9]?)(?:$| .*)/);
+              null !== c &&
+                (3 == c[1].length && (c[1] += '0'),
+                (b = 'OpenGL ES GLSL ES ' + c[1] + ' (' + b + ')'));
+              b = za(b);
+              break;
+            default:
+              n.mg(1280);
+          }
+          n.Lh[a] = b;
+        }
+        return b;
+      },
+      Nb: function (a, b) {
+        if (2 > n.Ag.version) return (n.mg(1282), 0);
+        var c = n.zk[a];
+        if (c) return 0 > b || b >= c.length ? (n.mg(1281), 0) : c[b];
+        switch (a) {
+          case 7939:
+            return (
+              (c = k.getSupportedExtensions() || []),
+              (c = c.concat(
+                c.map(function (d) {
+                  return 'GL_' + d;
+                }),
+              )),
+              (c = c.map(function (d) {
+                return za(d);
+              })),
+              (c = n.zk[a] = c),
+              0 > b || b >= c.length ? (n.mg(1281), 0) : c[b]
+            );
+          default:
+            return (n.mg(1280), 0);
+        }
+      },
+      vb: function (a, b, c, d, e) {
+        0 > c
+          ? n.mg(1281)
+          : e
+            ? ((a = k.getSyncParameter(n.mh[a], b)),
+              null !== a && ((l[e >> 2] = a), d && (l[d >> 2] = 1)))
+            : n.mg(1281);
+      },
+      ve: function (a, b, c) {
+        c ? (F[c >> 2] = k.getTexParameter(a, b)) : n.mg(1281);
+      },
+      ue: function (a, b, c) {
+        c ? (l[c >> 2] = k.getTexParameter(a, b)) : n.mg(1281);
+      },
+      jc: function (a, b, c, d, e, g, h) {
+        a = n.sg[a];
+        if ((a = k.getTransformFeedbackVarying(a, b)))
+          (h && 0 < c ? ((c = L(a.name, h, c)), d && (l[d >> 2] = c)) : d && (l[d >> 2] = 0),
+            e && (l[e >> 2] = a.size),
+            g && (l[g >> 2] = a.type));
+      },
+      Jb: function (a, b) {
+        return k.getUniformBlockIndex(n.sg[a], E(b));
+      },
+      Lb: function (a, b, c, d) {
+        if (d)
+          if (0 < b && (0 == c || 0 == d)) n.mg(1281);
+          else {
+            a = n.sg[a];
+            for (var e = [], g = 0; g < b; g++) e.push(E(l[(c + 4 * g) >> 2]));
+            if ((a = k.getUniformIndices(a, e)))
+              for (b = a.length, g = 0; g < b; g++) l[(d + 4 * g) >> 2] = a[g];
+          }
+        else n.mg(1281);
+      },
+      re: function (a, b) {
+        b = E(b);
+        if ((a = n.sg[a])) {
+          Tb(a);
+          var c = a.ii,
+            d = 0,
+            e = b,
+            g = Sb(b);
+          0 < g && ((d = parseInt(b.slice(g + 1)) >>> 0), (e = b.slice(0, g)));
+          if (
+            (e = a.Gk[e]) &&
+            d < e[0] &&
+            ((d += e[1]), (c[d] = c[d] || k.getUniformLocation(a, b)))
+          )
+            return d;
+        } else n.mg(1281);
+        return -1;
+      },
+      te: function (a, b, c) {
+        ib(a, b, c, 2);
+      },
+      se: function (a, b, c) {
+        ib(a, b, c, 0);
+      },
+      ac: function (a, b, c) {
+        ib(a, b, c, 0);
+      },
+      hc: function (a, b, c) {
+        Qa(a, b, c, 0);
+      },
+      gc: function (a, b, c) {
+        Qa(a, b, c, 0);
+      },
+      oe: function (a, b, c) {
+        c ? (l[c >> 2] = k.getVertexAttribOffset(a, b)) : n.mg(1281);
+      },
+      qe: function (a, b, c) {
+        Qa(a, b, c, 2);
+      },
+      pe: function (a, b, c) {
+        Qa(a, b, c, 5);
+      },
+      ne: function (a, b) {
+        k.hint(a, b);
+      },
+      Ya: function (a, b, c) {
+        for (var d = oa[b], e = 0; e < b; e++) d[e] = l[(c + 4 * e) >> 2];
+        k.invalidateFramebuffer(a, d);
+      },
+      Xa: function (a, b, c, d, e, g, h) {
+        for (var p = oa[b], q = 0; q < b; q++) p[q] = l[(c + 4 * q) >> 2];
+        k.invalidateSubFramebuffer(a, p, d, e, g, h);
+      },
+      me: function (a) {
+        return (a = n.nh[a]) ? k.isBuffer(a) : 0;
+      },
+      ke: function (a) {
+        return k.isEnabled(a);
+      },
+      je: function (a) {
+        return (a = n.Uh[a]) ? k.isFramebuffer(a) : 0;
+      },
+      ie: function (a) {
+        return (a = n.sg[a]) ? k.isProgram(a) : 0;
+      },
+      Lc: function (a) {
+        return (a = n.yg[a]) ? k.isQuery(a) : 0;
+      },
+      pa: function (a) {
+        return (a = n.yg[a]) ? k.Gg.isQueryEXT(a) : 0;
+      },
+      he: function (a) {
+        return (a = n.Jh[a]) ? k.isRenderbuffer(a) : 0;
+      },
+      qb: function (a) {
+        return (a = n.Pg[a]) ? k.isSampler(a) : 0;
+      },
+      ge: function (a) {
+        return (a = n.Eg[a]) ? k.isShader(a) : 0;
+      },
+      Bb: function (a) {
+        return k.isSync(n.mh[a]);
+      },
+      fe: function (a) {
+        return (a = n.vh[a]) ? k.isTexture(a) : 0;
+      },
+      db: function (a) {
+        return k.isTransformFeedback(n.hi[a]);
+      },
+      rc: function (a) {
+        return (a = n.$g[a]) ? k.isVertexArray(a) : 0;
+      },
+      ca: function (a) {
+        return (a = n.$g[a]) ? k.isVertexArray(a) : 0;
+      },
+      ee: function (a) {
+        k.lineWidth(a);
+      },
+      de: function (a) {
+        a = n.sg[a];
+        k.linkProgram(a);
+        a.ii = 0;
+        a.Gk = {};
+      },
+      cb: function () {
+        k.pauseTransformFeedback();
+      },
+      ce: function (a, b) {
+        3317 == a && (n.om = b);
+        k.pixelStorei(a, b);
+      },
+      be: function (a, b) {
+        k.polygonOffset(a, b);
+      },
+      _a: function () {
+        n.mg(1280);
+      },
+      Za: function () {
+        n.mg(1280);
+      },
+      ma: function (a, b) {
+        k.Gg.queryCounterEXT(n.yg[a], b);
+      },
+      Vc: function (a) {
+        k.readBuffer(a);
+      },
+      $d: function (a, b, c, d, e, g, h) {
+        if (k.Vi) k.readPixels(a, b, c, d, e, g, h);
+        else {
+          var p = Aa(g);
+          k.readPixels(a, b, c, d, e, g, p, h >> Ba(p));
+        }
+      },
+      _d: function () {},
+      Zd: function (a, b, c, d) {
+        k.renderbufferStorage(a, b, c, d);
+      },
+      wc: function (a, b, c, d, e) {
+        k.renderbufferStorageMultisample(a, b, c, d, e);
+      },
+      bb: function () {
+        k.resumeTransformFeedback();
+      },
+      Yd: function (a, b) {
+        k.sampleCoverage(a, !!b);
+      },
+      mb: function (a, b, c) {
+        k.samplerParameterf(n.Pg[a], b, c);
+      },
+      kb: function (a, b, c) {
+        k.samplerParameterf(n.Pg[a], b, F[c >> 2]);
+      },
+      ob: function (a, b, c) {
+        k.samplerParameteri(n.Pg[a], b, c);
+      },
+      nb: function (a, b, c) {
+        k.samplerParameteri(n.Pg[a], b, l[c >> 2]);
+      },
+      Xd: function (a, b, c, d) {
+        k.scissor(a, b, c, d);
+      },
+      Wd: function () {
+        n.mg(1280);
+      },
+      Vd: function (a, b, c, d) {
+        b = n.sl(a, b, c, d);
+        k.shaderSource(n.Eg[a], b);
+      },
+      Ud: function (a, b, c) {
+        k.stencilFunc(a, b, c);
+      },
+      Td: function (a, b, c, d) {
+        k.stencilFuncSeparate(a, b, c, d);
+      },
+      Sd: function (a) {
+        k.stencilMask(a);
+      },
+      Rd: function (a, b) {
+        k.stencilMaskSeparate(a, b);
+      },
+      Qd: function (a, b, c) {
+        k.stencilOp(a, b, c);
+      },
+      Pd: function (a, b, c, d) {
+        k.stencilOpSeparate(a, b, c, d);
+      },
+      Od: function (a, b, c, d, e, g, h, p, q) {
+        if (k.Sg) k.texImage2D(a, b, c, d, e, g, h, p, q);
+        else if (q) {
+          var v = Aa(p);
+          k.texImage2D(a, b, c, d, e, g, h, p, v, q >> Ba(v));
+        } else k.texImage2D(a, b, c, d, e, g, h, p, null);
+      },
+      Sc: function (a, b, c, d, e, g, h, p, q, v) {
+        if (k.Sg) k.texImage3D(a, b, c, d, e, g, h, p, q, v);
+        else if (v) {
+          var u = Aa(q);
+          k.texImage3D(a, b, c, d, e, g, h, p, q, u, v >> Ba(u));
+        } else k.texImage3D(a, b, c, d, e, g, h, p, q, null);
+      },
+      Nd: function (a, b, c) {
+        k.texParameterf(a, b, c);
+      },
+      Md: function (a, b, c) {
+        k.texParameterf(a, b, F[c >> 2]);
+      },
+      Ld: function (a, b, c) {
+        k.texParameteri(a, b, c);
+      },
+      Kd: function (a, b, c) {
+        k.texParameteri(a, b, l[c >> 2]);
+      },
+      Wa: function (a, b, c, d, e) {
+        k.texStorage2D(a, b, c, d, e);
+      },
+      Va: function (a, b, c, d, e, g) {
+        k.texStorage3D(a, b, c, d, e, g);
+      },
+      Jd: function (a, b, c, d, e, g, h, p, q) {
+        if (k.Sg) k.texSubImage2D(a, b, c, d, e, g, h, p, q);
+        else if (q) {
+          var v = Aa(p);
+          k.texSubImage2D(a, b, c, d, e, g, h, p, v, q >> Ba(v));
+        } else k.texSubImage2D(a, b, c, d, e, g, h, p, null);
+      },
+      Rc: function (a, b, c, d, e, g, h, p, q, v, u) {
+        if (k.Sg) k.texSubImage3D(a, b, c, d, e, g, h, p, q, v, u);
+        else if (u) {
+          var z = Aa(v);
+          k.texSubImage3D(a, b, c, d, e, g, h, p, q, v, z, u >> Ba(z));
+        } else k.texSubImage3D(a, b, c, d, e, g, h, p, q, v, null);
+      },
+      kc: function (a, b, c, d) {
+        a = n.sg[a];
+        for (var e = [], g = 0; g < b; g++) e.push(E(l[(c + 4 * g) >> 2]));
+        k.transformFeedbackVaryings(a, e, d);
+      },
+      Id: function (a, b) {
+        k.uniform1f(H(a), b);
+      },
+      Gd: function (a, b, c) {
+        b && k.uniform1fv(H(a), F, c >> 2, b);
+      },
+      Fd: function (a, b) {
+        k.uniform1i(H(a), b);
+      },
+      Ed: function (a, b, c) {
+        b && k.uniform1iv(H(a), l, c >> 2, b);
+      },
+      _b: function (a, b) {
+        k.uniform1ui(H(a), b);
+      },
+      Wb: function (a, b, c) {
+        b && k.uniform1uiv(H(a), J, c >> 2, b);
+      },
+      Dd: function (a, b, c) {
+        k.uniform2f(H(a), b, c);
+      },
+      Cd: function (a, b, c) {
+        b && k.uniform2fv(H(a), F, c >> 2, 2 * b);
+      },
+      Bd: function (a, b, c) {
+        k.uniform2i(H(a), b, c);
+      },
+      Ad: function (a, b, c) {
+        b && k.uniform2iv(H(a), l, c >> 2, 2 * b);
+      },
+      Zb: function (a, b, c) {
+        k.uniform2ui(H(a), b, c);
+      },
+      Vb: function (a, b, c) {
+        b && k.uniform2uiv(H(a), J, c >> 2, 2 * b);
+      },
+      zd: function (a, b, c, d) {
+        k.uniform3f(H(a), b, c, d);
+      },
+      yd: function (a, b, c) {
+        b && k.uniform3fv(H(a), F, c >> 2, 3 * b);
+      },
+      xd: function (a, b, c, d) {
+        k.uniform3i(H(a), b, c, d);
+      },
+      wd: function (a, b, c) {
+        b && k.uniform3iv(H(a), l, c >> 2, 3 * b);
+      },
+      Yb: function (a, b, c, d) {
+        k.uniform3ui(H(a), b, c, d);
+      },
+      Ub: function (a, b, c) {
+        b && k.uniform3uiv(H(a), J, c >> 2, 3 * b);
+      },
+      vd: function (a, b, c, d, e) {
+        k.uniform4f(H(a), b, c, d, e);
+      },
+      ud: function (a, b, c) {
+        b && k.uniform4fv(H(a), F, c >> 2, 4 * b);
+      },
+      td: function (a, b, c, d, e) {
+        k.uniform4i(H(a), b, c, d, e);
+      },
+      sd: function (a, b, c) {
+        b && k.uniform4iv(H(a), l, c >> 2, 4 * b);
+      },
+      Xb: function (a, b, c, d, e) {
+        k.uniform4ui(H(a), b, c, d, e);
+      },
+      Tb: function (a, b, c) {
+        b && k.uniform4uiv(H(a), J, c >> 2, 4 * b);
+      },
+      Fb: function (a, b, c) {
+        a = n.sg[a];
+        k.uniformBlockBinding(a, b, c);
+      },
+      rd: function (a, b, c, d) {
+        b && k.uniformMatrix2fv(H(a), !!c, F, d >> 2, 4 * b);
+      },
+      Ec: function (a, b, c, d) {
+        b && k.uniformMatrix2x3fv(H(a), !!c, F, d >> 2, 6 * b);
+      },
+      Cc: function (a, b, c, d) {
+        b && k.uniformMatrix2x4fv(H(a), !!c, F, d >> 2, 8 * b);
+      },
+      qd: function (a, b, c, d) {
+        b && k.uniformMatrix3fv(H(a), !!c, F, d >> 2, 9 * b);
+      },
+      Dc: function (a, b, c, d) {
+        b && k.uniformMatrix3x2fv(H(a), !!c, F, d >> 2, 6 * b);
+      },
+      Ac: function (a, b, c, d) {
+        b && k.uniformMatrix3x4fv(H(a), !!c, F, d >> 2, 12 * b);
+      },
+      pd: function (a, b, c, d) {
+        b && k.uniformMatrix4fv(H(a), !!c, F, d >> 2, 16 * b);
+      },
+      Bc: function (a, b, c, d) {
+        b && k.uniformMatrix4x2fv(H(a), !!c, F, d >> 2, 8 * b);
+      },
+      zc: function (a, b, c, d) {
+        b && k.uniformMatrix4x3fv(H(a), !!c, F, d >> 2, 12 * b);
+      },
+      od: function (a) {
+        a = n.sg[a];
+        k.useProgram(a);
+        k.Zk = a;
+      },
+      nd: function (a) {
+        k.validateProgram(n.sg[a]);
+      },
+      md: function (a, b) {
+        k.vertexAttrib1f(a, b);
+      },
+      ld: function (a, b) {
+        k.vertexAttrib1f(a, F[b >> 2]);
+      },
+      kd: function (a, b, c) {
+        k.vertexAttrib2f(a, b, c);
+      },
+      jd: function (a, b) {
+        k.vertexAttrib2f(a, F[b >> 2], F[(b + 4) >> 2]);
+      },
+      id: function (a, b, c, d) {
+        k.vertexAttrib3f(a, b, c, d);
+      },
+      hd: function (a, b) {
+        k.vertexAttrib3f(a, F[b >> 2], F[(b + 4) >> 2], F[(b + 8) >> 2]);
+      },
+      gd: function (a, b, c, d, e) {
+        k.vertexAttrib4f(a, b, c, d, e);
+      },
+      fd: function (a, b) {
+        k.vertexAttrib4f(a, F[b >> 2], F[(b + 4) >> 2], F[(b + 8) >> 2], F[(b + 12) >> 2]);
+      },
+      hb: function (a, b) {
+        k.vertexAttribDivisor(a, b);
+      },
+      _: function (a, b) {
+        k.vertexAttribDivisor(a, b);
+      },
+      ad: function (a, b) {
+        k.vertexAttribDivisor(a, b);
+      },
+      bd: function (a, b) {
+        k.vertexAttribDivisor(a, b);
+      },
+      Ta: function (a, b) {
+        k.vertexAttribDivisor(a, b);
+      },
+      fc: function (a, b, c, d, e) {
+        k.vertexAttribI4i(a, b, c, d, e);
+      },
+      dc: function (a, b) {
+        k.vertexAttribI4i(a, l[b >> 2], l[(b + 4) >> 2], l[(b + 8) >> 2], l[(b + 12) >> 2]);
+      },
+      ec: function (a, b, c, d, e) {
+        k.vertexAttribI4ui(a, b, c, d, e);
+      },
+      cc: function (a, b) {
+        k.vertexAttribI4ui(a, J[b >> 2], J[(b + 4) >> 2], J[(b + 8) >> 2], J[(b + 12) >> 2]);
+      },
+      ic: function (a, b, c, d, e) {
+        k.vertexAttribIPointer(a, b, c, d, e);
+      },
+      ed: function (a, b, c, d, e, g) {
+        k.vertexAttribPointer(a, b, c, !!d, e, g);
+      },
+      dd: function (a, b, c, d) {
+        k.viewport(a, b, c, d);
+      },
+      yb: function (a, b, c, d) {
+        k.waitSync(n.mh[a], b, (c >>> 0) + 4294967296 * d);
+      },
+      m: function () {
+        return 0;
+      },
+      Ia: function (a, b, c) {
+        P.copyWithin(a, b, b + c);
+      },
+      ta: function (a, b, c) {
+        return Dc(a, {
+          zj: l[c >> 2],
+          Si: l[(c + 4) >> 2],
+          ml: l[(c + 8) >> 2],
+          el: b,
+          mi: l[(c + 12) >> 2],
+          Jj: l[(c + 16) >> 2],
+        });
+      },
+      J: function (a, b) {
+        a = T(a);
+        return a
+          ? a.requestPointerLock || a.Ei
+            ? w.Ri()
+              ? hb(a)
+              : b
+                ? (w.Rj(hb, 2, [a]), 1)
+                : -2
+            : -1
+          : -4;
+      },
+      k: function () {
+        W('OOM');
+      },
+      we: function () {
+        return (w.wi = navigator.getGamepads
+          ? navigator.getGamepads()
+          : navigator.webkitGetGamepads
+            ? navigator.webkitGetGamepads()
+            : null)
+          ? 0
+          : -1;
+      },
+      p: function (a, b, c) {
+        if ('undefined' == typeof onbeforeunload) return -1;
+        if (1 !== c) return -5;
+        Ec(2, a, !0, b, 28, 'beforeunload');
+        return 0;
+      },
+      B: function (a, b, c, d, e) {
+        Vb(a, b, c, d, 12, 'blur', e);
+        return 0;
+      },
+      f: Nb,
+      j: function (a, b, c) {
+        a = T(a);
+        if (!a) return -4;
+        a.style.width = b + 'px';
+        a.style.height = c + 'px';
+        return 0;
+      },
+      C: function (a, b, c, d, e) {
+        Vb(a, b, c, d, 13, 'focus', e);
+        return 0;
+      },
+      s: function (a, b, c, d, e) {
+        if (!w.fullscreenEnabled()) return -1;
+        a = T(a);
+        if (!a) return -4;
+        Wb(a, b, c, d, 19, 'fullscreenchange', e);
+        Wb(a, b, c, d, 19, 'webkitfullscreenchange', e);
+        return 0;
+      },
+      i: function (a, b, c, d) {
+        if (!navigator.getGamepads && !navigator.webkitGetGamepads) return -1;
+        Xb(2, a, b, c, 26, 'gamepadconnected', d);
+        return 0;
+      },
+      h: function (a, b, c, d) {
+        if (!navigator.getGamepads && !navigator.webkitGetGamepads) return -1;
+        Xb(2, a, b, c, 27, 'gamepaddisconnected', d);
+        return 0;
+      },
+      v: function (a, b, c, d, e) {
+        jb(a, b, c, d, 2, 'keydown', e);
+        return 0;
+      },
+      t: function (a, b, c, d, e) {
+        jb(a, b, c, d, 1, 'keypress', e);
+        return 0;
+      },
+      u: function (a, b, c, d, e) {
+        jb(a, b, c, d, 3, 'keyup', e);
+        return 0;
+      },
+      af: function (a, b, c) {
+        a = Q(a);
+        Hb(a, b, c);
+      },
+      H: function (a, b, c, d, e) {
+        Ca(a, b, c, d, 5, 'mousedown', e);
+        return 0;
+      },
+      F: function (a, b, c, d, e) {
+        Ca(a, b, c, d, 33, 'mouseenter', e);
+        return 0;
+      },
+      E: function (a, b, c, d, e) {
+        Ca(a, b, c, d, 34, 'mouseleave', e);
+        return 0;
+      },
+      I: function (a, b, c, d, e) {
+        Ca(a, b, c, d, 8, 'mousemove', e);
+        return 0;
+      },
+      G: function (a, b, c, d, e) {
+        Ca(a, b, c, d, 6, 'mouseup', e);
+        return 0;
+      },
+      w: function (a, b, c, d, e) {
+        if (
+          !document ||
+          !document.body ||
+          !(
+            document.body.requestPointerLock ||
+            document.body.Zm ||
+            document.body.vn ||
+            document.body.Ei
+          )
+        )
+          return -1;
+        a = T(a);
+        if (!a) return -4;
+        Ra(a, b, c, d, 20, 'pointerlockchange', e);
+        Ra(a, b, c, d, 20, 'mozpointerlockchange', e);
+        Ra(a, b, c, d, 20, 'webkitpointerlockchange', e);
+        Ra(a, b, c, d, 20, 'mspointerlockchange', e);
+        return 0;
+      },
+      r: function (a, b, c, d, e) {
+        Fc(a, b, c, d, 10, 'resize', e);
+        return 0;
+      },
+      x: function (a, b, c, d, e) {
+        Sa(a, b, c, d, 25, 'touchcancel', e);
+        return 0;
+      },
+      z: function (a, b, c, d, e) {
+        Sa(a, b, c, d, 23, 'touchend', e);
+        return 0;
+      },
+      y: function (a, b, c, d, e) {
+        Sa(a, b, c, d, 24, 'touchmove', e);
+        return 0;
+      },
+      A: function (a, b, c, d, e) {
+        Sa(a, b, c, d, 22, 'touchstart', e);
+        return 0;
+      },
+      q: function (a, b, c, d) {
+        Gc(Ma[1], a, b, c, 21, 'visibilitychange', d);
+        return 0;
+      },
+      D: function (a, b, c, d, e) {
+        a = T(a);
+        return 'undefined' != typeof a.onwheel ? (Hc(a, b, c, d, 9, 'wheel', e), 0) : -1;
+      },
+      ua: function (a) {
+        Mc(E(a));
+      },
+      Hd: function (a, b) {
+        b >>= 2;
+        b = {
+          alpha: !!l[b + 0],
+          depth: !!l[b + 1],
+          stencil: !!l[b + 2],
+          antialias: !!l[b + 3],
+          premultipliedAlpha: !!l[b + 4],
+          preserveDrawingBuffer: !!l[b + 5],
+          powerPreference: Oc[l[b + 6]],
+          failIfMajorPerformanceCaveat: !!l[b + 7],
+          oj: l[b + 8],
+          Hl: l[b + 9],
+          Tj: l[b + 10],
+          jl: l[b + 11],
+          gn: l[b + 12],
+          ln: l[b + 13],
+        };
+        a = T(a);
+        return !a || b.jl ? 0 : n.Sh(a, b);
+      },
+      If: function (a) {
+        a >>= 2;
+        for (var b = 0; 14 > b; ++b) l[a + b] = 0;
+        l[a + 0] = l[a + 1] = l[a + 3] = l[a + 4] = l[a + 8] = l[a + 10] = 1;
+      },
+      ya: function (a) {
+        return n.Yh(a) ? 0 : -5;
+      },
+      Ga: function (a, b) {
+        var c = 0;
+        Da().forEach(function (d, e) {
+          var g = b + c;
+          e = J[(a + 4 * e) >> 2] = g;
+          for (g = 0; g < d.length; ++g) S[e++ >> 0] = d.charCodeAt(g);
+          S[e >> 0] = 0;
+          c += d.length + 1;
+        });
+        return 0;
+      },
+      Ha: function (a, b) {
+        var c = Da();
+        J[a >> 2] = c.length;
+        var d = 0;
+        c.forEach(function (e) {
+          d += e.length + 1;
+        });
+        J[b >> 2] = d;
+        return 0;
+      },
+      L: function (a) {
+        try {
+          var b = O.Ch(a);
+          f.close(b);
+          return 0;
+        } catch (c) {
+          if ('undefined' == typeof f || !(c instanceof f.lg)) throw c;
+          return c.Tg;
+        }
+      },
+      La: function (a, b, c, d) {
+        try {
+          a: {
+            var e = O.Ch(a);
+            a = b;
+            for (var g = (b = 0); g < c; g++) {
+              var h = J[a >> 2],
+                p = J[(a + 4) >> 2];
+              a += 8;
+              var q = f.read(e, S, h, p, void 0);
+              if (0 > q) {
+                var v = -1;
+                break a;
+              }
+              b += q;
+              if (q < p) break;
+            }
+            v = b;
+          }
+          l[d >> 2] = v;
+          return 0;
+        } catch (u) {
+          if ('undefined' == typeof f || !(u instanceof f.lg)) throw u;
+          return u.Tg;
+        }
+      },
+      Da: function (a, b, c, d, e) {
+        try {
+          b = (c + 2097152) >>> 0 < 4194305 - !!b ? (b >>> 0) + 4294967296 * c : NaN;
+          if (isNaN(b)) return 61;
+          var g = O.Ch(a);
+          f.Wg(g, b, d);
+          N = [
+            g.position >>> 0,
+            ((C = g.position),
+            1 <= +Math.abs(C)
+              ? 0 < C
+                ? (Math.min(+Math.floor(C / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((C - +(~~C >>> 0)) / 4294967296) >>> 0
+              : 0),
+          ];
+          l[e >> 2] = N[0];
+          l[(e + 4) >> 2] = N[1];
+          g.ej && 0 === b && 0 === d && (g.ej = null);
+          return 0;
+        } catch (h) {
+          if ('undefined' == typeof f || !(h instanceof f.lg)) throw h;
+          return h.Tg;
+        }
+      },
+      Ka: function (a, b, c, d) {
+        try {
+          a: {
+            var e = O.Ch(a);
+            a = b;
+            for (var g = (b = 0); g < c; g++) {
+              var h = J[a >> 2],
+                p = J[(a + 4) >> 2];
+              a += 8;
+              var q = f.write(e, S, h, p, void 0);
+              if (0 > q) {
+                var v = -1;
+                break a;
+              }
+              b += q;
+            }
+            v = b;
+          }
+          J[d >> 2] = v;
+          return 0;
+        } catch (u) {
+          if ('undefined' == typeof f || !(u instanceof f.lg)) throw u;
+          return u.Tg;
+        }
+      },
+      Ea: Ta,
+      Hf: function (a) {
+        k.clear(a);
+      },
+      va: function (a, b, c, d) {
+        k.clearColor(a, b, c, d);
+      },
+      ga: function (a) {
+        k.clearDepth(a);
+      },
+      o: function (a) {
+        k.clearStencil(a);
+      },
+      n: function (a) {
+        k.depthMask(!!a);
+      },
+      wa: function (a, b, c, d) {
+        k.viewport(a, b, c, d);
+      },
+      Qa: Gb,
+      K: function () {},
+      Fa: function (a, b, c, d) {
+        return Ic(a, b, c, d);
+      },
+    };
+    (function () {
+      function a(e) {
+        m.asm = e.exports;
+        pc = m.asm.Jf;
+        Xa = e = pc.buffer;
+        m.HEAP8 = S = new Int8Array(e);
+        m.HEAP16 = na = new Int16Array(e);
+        m.HEAP32 = l = new Int32Array(e);
+        m.HEAPU8 = P = new Uint8Array(e);
+        m.HEAPU16 = Ub = new Uint16Array(e);
+        m.HEAPU32 = J = new Uint32Array(e);
+        m.HEAPF32 = F = new Float32Array(e);
+        m.HEAPF64 = X = new Float64Array(e);
+        Cb = m.asm.bg;
+        cc.unshift(m.asm.Kf);
+        Ia('wasm-instantiate');
+      }
+      function b(e) {
+        a(e.instance);
+      }
+      function c(e) {
+        return tc()
+          .then(function (g) {
+            return WebAssembly.instantiate(g, d);
+          })
+          .then(function (g) {
+            return g;
+          })
+          .then(e, function (g) {
+            V('failed to asynchronously prepare wasm: ' + g);
+            W(g);
+          });
+      }
+      var d = { a: Pc };
+      Ya('wasm-instantiate');
+      if (m.instantiateWasm)
+        try {
+          return m.instantiateWasm(d, a);
+        } catch (e) {
+          return (V('Module.instantiateWasm callback failed with error: ' + e), !1);
+        }
+      (function () {
+        return sa ||
+          'function' != typeof WebAssembly.instantiateStreaming ||
+          vb(aa) ||
+          'function' != typeof fetch
+          ? c(b)
+          : fetch(aa, { credentials: 'same-origin' }).then(function (e) {
+              return WebAssembly.instantiateStreaming(e, d).then(b, function (g) {
+                V('wasm streaming compile failed: ' + g);
+                V('falling back to ArrayBuffer instantiation');
+                return c(b);
+              });
+            });
+      })();
+      return {};
+    })();
+    m.___wasm_call_ctors = function () {
+      return (m.___wasm_call_ctors = m.asm.Kf).apply(null, arguments);
+    };
+    var Fa = (m._free = function () {
+        return (Fa = m._free = m.asm.Lf).apply(null, arguments);
+      }),
+      R = (m._malloc = function () {
+        return (R = m._malloc = m.asm.Mf).apply(null, arguments);
+      }),
+      Ga = (m._cp6_check_ws = function () {
+        return (Ga = m._cp6_check_ws = m.asm.Nf).apply(null, arguments);
+      }),
+      qb = (m._aip_complete = function () {
+        return (qb = m._aip_complete = m.asm.Of).apply(null, arguments);
+      }),
+      gc = (m._cp6_set_clipboard_callback = function () {
+        return (gc = m._cp6_set_clipboard_callback = m.asm.Pf).apply(null, arguments);
+      }),
+      hc = (m._cp6_browser_quit_confirmation = function () {
+        return (hc = m._cp6_browser_quit_confirmation = m.asm.Qf).apply(null, arguments);
+      }),
+      qc = (m._cp6_location_hash_changed = function () {
+        return (qc = m._cp6_location_hash_changed = m.asm.Rf).apply(null, arguments);
+      });
+    m._emscripten_sleep = function () {
+      return (m._emscripten_sleep = m.asm.Sf).apply(null, arguments);
+    };
+    m._webRTCProxyOpen = function () {
+      return (m._webRTCProxyOpen = m.asm.Tf).apply(null, arguments);
+    };
+    m._webRTCProxyMessage = function () {
+      return (m._webRTCProxyMessage = m.asm.Uf).apply(null, arguments);
+    };
+    var mc = (m._webRTCProxyClosed = function () {
+        return (mc = m._webRTCProxyClosed = m.asm.Vf).apply(null, arguments);
+      }),
+      jc = (m._cp6_force_disconnect = function () {
+        return (jc = m._cp6_force_disconnect = m.asm.Wf).apply(null, arguments);
+      }),
+      kc = (m._cp6_force_server_id = function () {
+        return (kc = m._cp6_force_server_id = m.asm.Xf).apply(null, arguments);
+      }),
+      lc = (m._cp6_set_skip_text_cache = function () {
+        return (lc = m._cp6_set_skip_text_cache = m.asm.Yf).apply(null, arguments);
+      });
+    m._main = function () {
+      return (m._main = m.asm.Zf).apply(null, arguments);
+    };
+    var rb = (m._cp6_canvas_context_lost = function () {
+        return (rb = m._cp6_canvas_context_lost = m.asm._f).apply(null, arguments);
+      }),
+      ic = (m._cp6_mouse_wheel = function () {
+        return (ic = m._cp6_mouse_wheel = m.asm.$f).apply(null, arguments);
+      });
+    m._cp6_timeout_fire = function () {
+      return (m._cp6_timeout_fire = m.asm.ag).apply(null, arguments);
+    };
+    var Ab = (m.stackSave = function () {
+        return (Ab = m.stackSave = m.asm.cg).apply(null, arguments);
+      }),
+      Bb = (m.stackRestore = function () {
+        return (Bb = m.stackRestore = m.asm.dg).apply(null, arguments);
+      }),
+      xa = (m.stackAlloc = function () {
+        return (xa = m.stackAlloc = m.asm.eg).apply(null, arguments);
+      });
+    m.dynCall_jiji = function () {
+      return (m.dynCall_jiji = m.asm.fg).apply(null, arguments);
+    };
+    m.dynCall_ji = function () {
+      return (m.dynCall_ji = m.asm.gg).apply(null, arguments);
+    };
+    m.dynCall_viijii = function () {
+      return (m.dynCall_viijii = m.asm.hg).apply(null, arguments);
+    };
+    m.dynCall_iiiiij = function () {
+      return (m.dynCall_iiiiij = m.asm.ig).apply(null, arguments);
+    };
+    m.dynCall_iiiiijj = function () {
+      return (m.dynCall_iiiiijj = m.asm.jg).apply(null, arguments);
+    };
+    m.dynCall_iiiiiijj = function () {
+      return (m.dynCall_iiiiiijj = m.asm.kg).apply(null, arguments);
+    };
+    var Va;
+    ra = function b() {
+      Va || bc();
+      Va || (ra = b);
+    };
+    if (m.preInit)
+      for ('function' == typeof m.preInit && (m.preInit = [m.preInit]); 0 < m.preInit.length;)
+        m.preInit.pop()();
+    var dc = !0;
+    m.noInitialRun && (dc = !1);
+    bc();
+  })();
+}
+
+/*
+     FILE ARCHIVED ON 04:33:18 Dec 01, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 05:05:15 Nov 07, 2026.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  capture_cache.get: 0.511
+  load_resource: 141.334
+  PetaboxLoader3.resolve: 70.717
+  PetaboxLoader3.datanode: 39.572
+*/

@@ -1,0 +1,42 @@
+html,
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #181818;
+}
+
+#canvas,
+#canvasOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#canvasOverlay {
+  pointer-events: none;
+}
+
+#status-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font: bold 48pt sans-serif;
+  text-align: center;
+}
+
+#unsupported,
+#errorDialog,
+#textInputContainer {
+  display: none;
+}
+
+#textInput {
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: Ubuntu, sans-serif;
+}

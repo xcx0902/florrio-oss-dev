@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>florr.io</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <div id="preroll"></div>
+    <div id="status-container">
+      <span id="loading">Loading...</span>
+      <span id="unsupported">Unsupported browser</span>
+      <span id="errorDialog">Client initialization error</span>
+    </div>
+    <canvas id="canvas" width="800" height="800" oncontextmenu="return false"></canvas>
+    <div id="textInputContainer"><input id="textInput" aria-label="Game text input" /></div>
+    <script>
+      window.cp6 = {};
+      window.Module = { canvas: document.getElementById('canvas') };
+    </script>
+    <script src="client.js"></script>
+  </body>
+</html>

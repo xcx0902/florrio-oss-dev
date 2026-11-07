@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "extractor": "FFmpeg 7.1.1, -ss <seconds> -frames:v 1",
+  "secondsMeaning": "时间为媒体播放偏移。空怪物表表示此样本无保守计数记录。",
+  "samples": [
+    {
+      "source": "video.garden",
+      "timeSeconds": 10,
+      "frame": "frames/garden-010.png",
+      "sha256": "714a33df212560d1b1fc95c7443cead025c0f520b769a2babec258f78d00769b",
+      "scenario": "Garden",
+      "hudWave": 25,
+      "partySize": 4,
+      "visibleAliveFlowersLowerBound": 4,
+      "visibleMobsLowerBound": {
+        "Bee": 3,
+        "Spider": 2
+      },
+      "scope": "录制画面中的可辨认对象，不包括视野外对象",
+      "observation": "镜头内蜂形与蜘蛛形实体可见。HUD 同时显示多种怪物图标，计数不用于推断全场。"
+    },
+    {
+      "source": "video.garden",
+      "timeSeconds": 120,
+      "frame": "frames/garden-120.png",
+      "sha256": "cbd78fcb98821aca9d2b5864d549ad0c1793095351215d503a009db634737f36",
+      "scenario": "Garden",
+      "hudWave": 25,
+      "partySize": 4,
+      "visibleAliveFlowersLowerBound": 1,
+      "visibleMobsLowerBound": {
+        "Ant-like": 2
+      },
+      "scope": "录制画面中的可辨认对象，不包括视野外对象",
+      "observation": "棕色子区域，三名队友条显示问号。只统计可辨认的两只蚁形实体。"
+    },
+    {
+      "source": "video.garden",
+      "timeSeconds": 124,
+      "frame": "frames/garden-124.png",
+      "sha256": "3478b86f44775ffd4d719b2213650ec90f16f618c0844bec2226367442c837fc",
+      "scenario": "Garden",
+      "hudWave": 26,
+      "partySize": 4,
+      "visibleAliveFlowersLowerBound": 1,
+      "visibleMobsLowerBound": {
+        "Ant-like": 1
+      },
+      "scope": "录制画面中的可辨认对象，不包括视野外对象",
+      "observation": "仍处于棕色子区域，HUD 已进波 26。单人可见视角，队友位置和全队是否在同一子区域未知。"
+    },
+    {
+      "source": "video.garden",
+      "timeSeconds": 226,
+      "frame": "frames/garden-226.png",
+      "sha256": "9ceaae4994d631bf04c86a0734e27c58ef23148d4dc1193ec891e1eb37c6331d",
+      "scenario": "Garden",
+      "hudWave": 26,
+      "partySize": 4,
+      "visibleAliveFlowersLowerBound": 3,
+      "visibleMobsLowerBound": {
+        "Spider": 3
+      },
+      "scope": "录制画面中的可辨认对象，不包括视野外对象",
+      "observation": "录制者阵亡，画面中央显示等待下波重生，其他三名队友在画面中。"
+    },
+    {
+      "source": "video.garden",
+      "timeSeconds": 227,
+      "frame": "frames/garden-227.png",
+      "sha256": "156446ccd7ae39790902f2eea0ceab351bf5d3791e7c2501e953a461f71aa6ec",
+      "scenario": "Garden",
+      "hudWave": 27,
+      "partySize": 4,
+      "visibleAliveFlowersLowerBound": 4,
+      "visibleMobsLowerBound": {},
+      "scope": "录制画面中的可辨认对象，不包括视野外对象",
+      "observation": "录制者恢复存活状态，等待提示消失。波 26 到波 27 的转换与重生都发生在相邻两个样本之间。"
+    },
+    {
+      "source": "video.desert",
+      "timeSeconds": 10,
+      "frame": "frames/desert-010.png",
+      "sha256": "af37f81a36da6a0ac09a086826b5bfc20cedc3d2280f84d4f3cb16a08abae93b",
+      "scenario": "Desert",
+      "hudWave": 28,
+      "partySize": 4,
+      "visibleAliveFlowersLowerBound": 4,
+      "visibleMobsLowerBound": {
+        "Beetle-like": 3
+      },
+      "scope": "录制画面中的可辨认对象，不包括视野外对象",
+      "observation": "多只甲虫形敌人聚集，网状效果占据战斗区。左侧名单四人。"
+    },
+    {
+      "source": "video.desert",
+      "timeSeconds": 595,
+      "frame": "frames/desert-595.png",
+      "sha256": "bcf433ca6fd804d9ab205bea21d5ce82691e65ef5d14a2c9bf1c80a4b719c61f",
+      "scenario": "Desert",
+      "hudWave": 28,
+      "partySize": 4,
+      "visibleAliveFlowersLowerBound": 1,
+      "visibleMobsLowerBound": {
+        "Beetle-like": 3
+      },
+      "scope": "录制画面中的可辨认对象，不包括视野外对象",
+      "observation": "左侧三名队友已阵亡，录制者仍存活。开头和接近结尾的 HUD 都显示波 28。录像可能剪辑，不能推算服务器单波时长。"
+    }
+  ],
+  "limits": [
+    "两段均为邻近时期的高波录像，不用于拟合 10 月 Garden 1–3 波数量。",
+    "棕色子区域的画面不能判定全队位置、主波计数或暂停条件。"
+  ]
+}

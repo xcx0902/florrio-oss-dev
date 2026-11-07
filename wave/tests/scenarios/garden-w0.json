@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "rulesVersion": "20221030-w0.1",
+  "scope": "W1 类型化输入及预期，使用 W0 复刻设定",
+  "fixtures": [
+    {
+      "id": "W0-GARDEN-START",
+      "ruleIds": ["match.startingWave"],
+      "setup": { "scenario": "Garden", "players": ["fresh-A", "fresh-B"] },
+      "expect": { "startingWave": 1 }
+    },
+    {
+      "id": "W0-GARDEN-EARLY",
+      "ruleIds": [
+        "wave.spawn.gardenEarlyEligibility",
+        "wave.spawn.gardenEarlySchedule",
+        "wave.advance.deadline"
+      ],
+      "setup": { "waves": [1, 2, 3], "special": false },
+      "expect": { "batchesFromRules": true, "deadlinesFromRules": true }
+    },
+    {
+      "id": "W0-GARDEN-SPECIAL",
+      "ruleIds": ["wave.special.firstWave", "wave.special.chance", "wave.special.gardenPool"],
+      "setup": {
+        "startingWave": 1,
+        "laterWave": 2,
+        "roll": 0.1,
+        "mockPool": ["Ladybug", "Dark Ladybug"]
+      },
+      "expect": {
+        "startingWaveSpecial": false,
+        "laterWaveSpecial": true,
+        "eligibleGroup": ["Ladybug"]
+      }
+    },
+    {
+      "id": "W1-01",
+      "ruleIds": ["wave.spawn.gardenEarlySchedule", "wave.advance.remaining"],
+      "setup": {
+        "syntheticBatches": [
+          { "atTick": 0, "count": 2 },
+          { "atTick": 3, "count": 4 }
+        ],
+        "killFirstBatchAtTick": 1
+      },
+      "expect": { "waveUnchangedThroughTick": 2, "secondBatchAtTick": 3 }
+    },
+    {
+      "id": "W1-02",
+      "ruleIds": [
+        "wave.advance.remaining",
+        "wave.advance.deadline",
+        "wave.advance.priority",
+        "wave.spawn.accounting"
+      ],
+      "setup": { "pendingBatches": 0, "syntheticDeadlineTick": 10 },
+      "cases": [
+        { "tick": 9, "countableAlive": 5, "transitionCount": 0 },
+        { "tick": 9, "countableAlive": 4, "transitionCount": 1 },
+        { "tick": 10, "countableAlive": 4, "transitionCount": 1 }
+      ]
+    },
+    {
+      "id": "W1-03",
+      "ruleIds": ["wave.spawn.accounting"],
+      "setup": { "forceAllSpawnPointsBlocked": true },
+      "expect": { "boundedRetry": true, "batchSettled": true, "falseKillRewards": 0 }
+    },
+    {
+      "id": "W1-04",
+      "ruleIds": ["respawn.nextWave", "wave.advance.priority"],
+      "setup": { "players": ["A", "B"], "playerA": "dead", "wave": 1 },
+      "cases": [
+        {
+          "playerB": "alive",
+          "advanceWave": true,
+          "expectA": "new-life",
+          "oldInputAccepted": false
+        },
+        { "playerB": "dead", "advanceWave": true, "expectA": "ended", "settlements": 1 }
+      ]
+    },
+    {
+      "id": "W1-05",
+      "ruleIds": ["garden.geometry.shape"],
+      "setup": { "spawnNearBoundary": true, "applyOutwardImpulse": true },
+      "expect": { "arenaShape": "circle", "validCenterAfterImpulse": true }
+    }
+  ]
+}

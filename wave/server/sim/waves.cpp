@@ -1,0 +1,204 @@
+#include "sim/match.hpp"
+
+#include <iterator>
+
+namespace wave::sim {
+
+std::uint32_t Match::draw(DrawPurpose purpose) {
+  const auto value = static_cast<std::uint32_t>(rng_());
+  emit(RandomDraw{purpose, value});
+  return value;
+}
+
+std::size_t Match::choose(std::size_t size, DrawPurpose purpose) {
+  constexpr std::uint64_t range = std::uint64_t{1} + std::mt19937::max();
+  const std::uint64_t limit = range - range % size;
+  std::uint32_t value;
+  do {
+    value = draw(purpose);
+  } while (value >= limit);
+  return value % size;
+}
+
+void Match::open_wave(std::size_t index, Tick start) {
+  wave_index_ = index;
+  const auto& definition = rules_.waves[index];
+  wave_ = {};
+  wave_.number = definition.number;
+  wave_.rules_version = rules_.version;
+  wave_.start_tick = start;
+  wave_.deadline_tick = start + definition.deadline;
+  wave_.eligible = definition.eligible;
+  wave_.counts.planned = wave_.counts.pending = definition.budget;
+
+  if (rules_.special_chance > 0 && (index != 0 || rules_.special_on_opening_wave)) {
+    std::vector<std::vector<Mob>> eligible_groups;
+    for (const auto& group : rules_.special_groups) {
+      std::vector<Mob> eligible;
+      std::ranges::copy_if(group, std::back_inserter(eligible), [&definition](Mob kind) {
+        return std::ranges::find(definition.eligible, kind) != definition.eligible.end();
+      });
+      if (!eligible.empty()) {
+        eligible_groups.push_back(std::move(eligible));
+      }
+    }
+    constexpr double range = 4294967296.0;
+    if (!eligible_groups.empty() &&
+        draw(DrawPurpose::special_roll) / range < rules_.special_chance) {
+      wave_.special = true;
+      wave_.eligible =
+          std::move(eligible_groups[choose(eligible_groups.size(), DrawPurpose::special_group)]);
+    }
+  }
+
+  wave_.plan.reserve(definition.budget);
+  for (std::size_t batch = 0; batch < definition.batches.size(); ++batch) {
+    const auto& spec = definition.batches[batch];
+    for (std::uint32_t n = 0; n < spec.count; ++n) {
+      const auto kind = wave_.eligible[choose(wave_.eligible.size(), DrawPurpose::mob_kind)];
+      wave_.plan.push_back({.due_tick = start + spec.offset,
+                            .batch = batch,
+                            .mob = kind,
+                            .rarity = definition.rarity,
+                            .actual_tick = std::nullopt,
+                            .entity = std::nullopt});
+    }
+  }
+}
+
+std::optional<Vec2> Match::spawn_point(double radius) {
+  const auto start = choose(rules_.spawn_points.size(), DrawPurpose::spawn_point);
+  for (std::size_t offset = 0; offset < rules_.spawn_points.size(); ++offset) {
+    const auto candidate =
+        clamp_center(rules_.spawn_points[(start + offset) % rules_.spawn_points.size()],
+                     rules_.arena_radius, radius);
+    const bool blocked = std::ranges::any_of(entities_.active(), [&](std::uint32_t slot) {
+      const auto& body = entities_.at(slot).view;
+      return body.group != Group::petal && overlaps(candidate, radius, body.position, body.radius);
+    });
+    if (!blocked) {
+      return candidate;
+    }
+  }
+  return std::nullopt;
+}
+
+void Match::spawn_due() {
+  if (phase_ != Phase::spawning) {
+    return;
+  }
+  for (std::size_t index = 0; index < wave_.plan.size(); ++index) {
+    auto& slot = wave_.plan[index];
+    if (slot.due_tick > tick_) {
+      break;
+    }
+    if (slot.state != SpawnState::pending) {
+      continue;
+    }
+    ++slot.attempts;
+    const auto& body = std::ranges::find(rules_.mobs, slot.mob, &MobRules::kind)->body;
+    const auto position = spawn_point(body.radius);
+    SpawnOutcome outcome = SpawnOutcome::blocked;
+    std::optional<SpawnFailure> failure;
+    if (position) {
+      EntityView mob;
+      mob.mob = slot.mob;
+      mob.rarity = slot.rarity;
+      mob.position = *position;
+      mob.origin_wave = wave_.number;
+      slot.entity = add_entity(mob, body);
+      slot.state = SpawnState::spawned;
+      slot.actual_tick = tick_;
+      --wave_.counts.pending;
+      ++wave_.counts.spawned;
+      ++wave_.counts.alive;
+      outcome = SpawnOutcome::spawned;
+    } else if (slot.attempts == rules_.spawn_attempts || tick_ == wave_.deadline_tick) {
+      failure = tick_ == wave_.deadline_tick ? SpawnFailure::deadline : SpawnFailure::attempt_limit;
+      slot.state = SpawnState::exhausted;
+      --wave_.counts.pending;
+      ++wave_.counts.exhausted;
+      outcome = SpawnOutcome::exhausted;
+    } else {
+      failure = SpawnFailure::occupied;
+    }
+    emit(SpawnEvent{wave_.number, index, slot.due_tick, slot.attempts, outcome, failure,
+                    slot.entity, position});
+  }
+  if (wave_.counts.pending == 0) {
+    phase_ = Phase::clearing;
+  }
+}
+
+void Match::settle_wave(bool advancing) {
+  for (std::size_t index = 0; index < wave_.plan.size(); ++index) {
+    auto& slot = wave_.plan[index];
+    if (slot.state == SpawnState::pending) {
+      slot.state = SpawnState::cancelled;
+      --wave_.counts.pending;
+      ++wave_.counts.cancelled;
+      emit(SpawnEvent{wave_.number, index, slot.due_tick, slot.attempts, SpawnOutcome::cancelled,
+                      std::nullopt, std::nullopt, std::nullopt});
+    }
+  }
+  if (!advancing) {
+    return;
+  }
+  for (const auto& slot : wave_.plan) {
+    if (!slot.entity) {
+      continue;
+    }
+    auto* entity = entities_.get(*slot.entity);
+    if (!entity) {
+      continue;
+    }
+    --wave_.counts.alive;
+    if (rules_.residual == ResidualPolicy::keep) {
+      entity->view.group = Group::residual;
+      ++wave_.counts.carried;
+    } else {
+      entities_.erase(entity->view.id);
+      ++wave_.counts.discarded;
+    }
+  }
+}
+
+void Match::transition(TransitionReason reason, bool advancing) {
+  settle_wave(advancing);
+  if (advancing) {
+    const auto next = rules_.waves[wave_index_ + 1].number;
+    emit(Transition{wave_.number, next, reason});
+    previous_wave_ = std::move(wave_);
+    open_wave(wave_index_ + 1, tick_ + 1);
+    arrival_ = reason;
+    phase_ = Phase::waiting;
+  } else {
+    emit(Transition{wave_.number, std::nullopt, reason});
+    for (auto& entry : players_) {
+      reap_player(entry, LifeState::ended);
+    }
+    phase_ = Phase::ended;
+  }
+}
+
+void Match::adjudicate() {
+  const bool connected =
+      std::ranges::any_of(players_, [](const Player& entry) { return entry.view.connected; });
+  const bool survivor = std::ranges::any_of(players_, [](const Player& entry) {
+    return entry.view.connected && entry.view.state == LifeState::alive;
+  });
+  if (connected && !survivor && rules_.lifecycle.end_on_team_wipe) {
+    transition(TransitionReason::team_wipe, false);
+  } else if (!connected && rules_.lifecycle.end_on_last_disconnect) {
+    transition(TransitionReason::last_disconnect, false);
+  } else if (phase_ == Phase::clearing) {
+    const bool next = wave_index_ + 1 < rules_.waves.size();
+    if (wave_.counts.alive <= rules_.remaining_threshold) {
+      transition(TransitionReason::threshold, next);
+    } else if (rules_.advance_on_deadline && tick_ >= wave_.deadline_tick) {
+      transition(TransitionReason::deadline, next);
+    }
+  }
+}
+
+}  // namespace wave::sim

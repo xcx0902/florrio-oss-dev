@@ -1,0 +1,664 @@
+{
+  "schemaVersion": 1,
+  "version": "20221030-w0.1",
+  "cutoffUtc": "2022-10-30T21:00:58Z",
+  "currentValueMeaning": "计划中的复刻值，供 W1–W5 消费。null 表示留待取证。W0 尚无权威模拟。",
+  "rules": [
+    {
+      "id": "wave.advance.remaining",
+      "scope": "PvE 清波推进",
+      "dateWindow": {
+        "fromDate": "2022-07-16",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": 4,
+      "unit": "存活怪数上限",
+      "sources": [
+        {
+          "id": "log.client",
+          "locator": "advanceRemaining"
+        },
+        {
+          "id": "log.en",
+          "locator": "2022-07-16"
+        },
+        {
+          "id": "wiki.waves",
+          "locator": "General Properties"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": 4,
+      "acceptanceIds": ["W1-02"],
+      "notes": "已证实阈值。生成结束条件、计数口径和超时另列。"
+    },
+    {
+      "id": "wave.special.chance",
+      "scope": "PvE 特殊波",
+      "dateWindow": {
+        "fromDate": "2022-09-05",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": 0.15,
+      "unit": "概率",
+      "sources": [
+        {
+          "id": "log.client",
+          "locator": "specialChance / specialRandom"
+        },
+        {
+          "id": "log.zh",
+          "locator": "2022-09-05、09-06"
+        },
+        {
+          "id": "wiki.garden",
+          "locator": "Special Waves"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": 0.15,
+      "acceptanceIds": ["W0-GARDEN-SPECIAL", "W5-SPECIAL"],
+      "notes": "随机触发。同期 Garden 文档支持 15%，与 Waves 的旧尾号循环描述冲突。"
+    },
+    {
+      "id": "wave.special.firstWave",
+      "scope": "PvE 对局起始波",
+      "dateWindow": {
+        "fromDate": "2022-09-27",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": false,
+      "unit": "起始波允许特殊波",
+      "sources": [
+        {
+          "id": "wiki.garden",
+          "locator": "Special Waves"
+        },
+        {
+          "id": "log.client",
+          "locator": "specialRandom"
+        }
+      ],
+      "confidence": "重建",
+      "currentValue": false,
+      "acceptanceIds": ["W0-GARDEN-SPECIAL"],
+      "notes": "候选来自 Garden 说明。日志未写首波实现，按首个开局波排除作为复刻设定。"
+    },
+    {
+      "id": "wave.special.gardenPool",
+      "scope": "Garden 特殊波怪种组",
+      "dateWindow": {
+        "fromDate": "2022-09-27",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": [
+        ["Baby Ant", "Worker Ant", "Soldier Ant", "Rock"],
+        ["Bee", "Ladybug"],
+        ["Hornet"],
+        ["Hornet", "Bee"],
+        ["Ladybug", "Dark Ladybug"],
+        ["Spider"]
+      ],
+      "unit": "怪种组",
+      "sources": [
+        {
+          "id": "wiki.garden",
+          "locator": "Special Waves 表"
+        }
+      ],
+      "confidence": "重建",
+      "currentValue": null,
+      "acceptanceIds": ["W5-SPECIAL"],
+      "notes": "只采用当波可出现的怪种。组权重和空组抽样方式待验证。"
+    },
+    {
+      "id": "match.public.highestEligible",
+      "scope": "公开小队匹配",
+      "dateWindow": {
+        "fromDate": "2022-09-05",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": "highest-eligible",
+      "unit": "候选排序",
+      "sources": [
+        {
+          "id": "log.client",
+          "locator": "highestPublic"
+        },
+        {
+          "id": "log.en",
+          "locator": "2022-08-05、09-05"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": "highest-eligible",
+      "acceptanceIds": ["W4-PUBLIC-HIGHEST"],
+      "notes": "最高合格波优先。资格的细节、平局和迟入时点待 W4。"
+    },
+    {
+      "id": "match.startingWave",
+      "scope": "Garden 开局波",
+      "dateWindow": {
+        "fromDate": "2022-07-21",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "inputs": ["队员最高通关波"],
+        "formula": null
+      },
+      "unit": "波",
+      "sources": [
+        {
+          "id": "log.en",
+          "locator": "2022-07-21、08-16、09-05"
+        },
+        {
+          "id": "plan.w1",
+          "locator": "01.2 最小对局"
+        }
+      ],
+      "confidence": "未确认",
+      "currentValue": {
+        "freshProfile": 1
+      },
+      "acceptanceIds": ["W0-GARDEN-START", "W4-START-WAVE"],
+      "notes": "新档用第 1 波作为 W1 复刻设定。组队公式待校准。"
+    },
+    {
+      "id": "craft.rng.mode",
+      "scope": "花瓣合成",
+      "dateWindow": {
+        "fromDate": "2022-10-20",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "normal": "independent-roll",
+        "legacyFailures": "retain-pseudo-until-success"
+      },
+      "unit": "模式",
+      "sources": [
+        {
+          "id": "log.client",
+          "locator": "craftRng"
+        },
+        {
+          "id": "log.en",
+          "locator": "2022-10-20"
+        },
+        {
+          "id": "log.zh",
+          "locator": "2022-10-20"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": {
+        "normal": "independent-roll",
+        "legacyFailures": "retain-pseudo-until-success"
+      },
+      "acceptanceIds": ["W3-CRAFT-RNG"],
+      "notes": "证实历史迁移行为。基础概率表、伪随机累积公式与具体存档键待 W3。"
+    },
+    {
+      "id": "respawn.nextWave",
+      "scope": "有幸存队友的 PvE 对局",
+      "dateWindow": {
+        "fromDate": "2022-08-28",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": true,
+      "unit": "下一波重生",
+      "sources": [
+        {
+          "id": "snapshot.wasm",
+          "locator": "Wasm 地址 32293，$939 显示死亡等待提示"
+        },
+        {
+          "id": "video.garden",
+          "locator": "226–227 s，4 人 Garden 波 26 → 27"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": true,
+      "acceptanceIds": ["W1-04"],
+      "notes": "录像观察为邻近时期，10 月客户端仍有相同显示路径。首波、超时或断线例外另查。"
+    },
+    {
+      "id": "wave.advance.deadline",
+      "scope": "Garden 主场景",
+      "dateWindow": {
+        "fromDate": "2022-09-11",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "exists": true,
+        "duration": null
+      },
+      "unit": "秒",
+      "sources": [
+        {
+          "id": "wiki.waves",
+          "locator": "General Properties"
+        },
+        {
+          "id": "log.en",
+          "locator": "2022-08-04 晚期波缩短"
+        },
+        {
+          "id": "plan.w1",
+          "locator": "01.2 生成与推进"
+        }
+      ],
+      "confidence": "重建",
+      "currentValue": {
+        "deadlineAdvancesAfterSpawn": true
+      },
+      "acceptanceIds": ["W1-02", "W0-GARDEN-EARLY"],
+      "notes": "只在生成结算后按复刻截止推进。下列早期时长是复刻设定。"
+    },
+    {
+      "id": "wave.advance.antHolePause",
+      "scope": "Garden 蚁穴和主波",
+      "dateWindow": {
+        "fromDate": "2022-09-11",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": null,
+      "unit": "暂停条件",
+      "sources": [
+        {
+          "id": "wiki.waves",
+          "locator": "General Properties 的条件式说明"
+        },
+        {
+          "id": "video.garden",
+          "locator": "120–124 s 棕色子区域内 HUD 进波"
+        },
+        {
+          "id": "log.client",
+          "locator": "antHoleTimer"
+        }
+      ],
+      "confidence": "未确认",
+      "currentValue": null,
+      "acceptanceIds": ["W5-ANT-HOLE"],
+      "notes": "不设全局暂停规则。需要能同时观察全部玩家位置的入穴和回程片段。"
+    },
+    {
+      "id": "wave.advance.priority",
+      "scope": "Garden 同 tick 全灭与清波",
+      "dateWindow": {
+        "fromDate": "2022-10-30",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": null,
+      "unit": "转移优先级",
+      "sources": [
+        {
+          "id": "plan.w1",
+          "locator": "01.2 与 W1-02、W1-04"
+        }
+      ],
+      "confidence": "未确认",
+      "currentValue": ["team-wipe", "wave-advance", "wait"],
+      "acceptanceIds": ["W1-02", "W1-04"],
+      "notes": "复刻设定。全灭优先，清波与超时同 tick 合并为一次推进。"
+    },
+    {
+      "id": "wave.spawn.gardenEarlyEligibility",
+      "scope": "Garden 普通波 1–3",
+      "dateWindow": {
+        "fromDate": "2022-09-27",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "1": ["Bee", "Ladybug", "Baby Ant", "Rock"],
+        "2": ["Centipede", "Worker Ant"],
+        "3": ["Dark Ladybug", "Evil Centipede", "Soldier Ant", "Spider", "Hornet"]
+      },
+      "unit": "每波新增怪种",
+      "sources": [
+        {
+          "id": "wiki.garden",
+          "locator": "Mob Spawning / General 表"
+        },
+        {
+          "id": "snapshot.wasm",
+          "locator": "$22 怪物注册表"
+        }
+      ],
+      "confidence": "重建",
+      "currentValue": {
+        "cumulative": true,
+        "useCandidateLists": true
+      },
+      "acceptanceIds": ["W0-GARDEN-EARLY", "W1-01"],
+      "notes": "黑瓢虫及分节的服务端计数方式留待 W5。图鉴中同名异种和分节具有独立编号。"
+    },
+    {
+      "id": "wave.spawn.gardenEarlySchedule",
+      "scope": "Garden 普通波 1–3",
+      "dateWindow": {
+        "fromDate": "2022-09-11",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "shape": "timer-driven-batches",
+        "counts": null,
+        "seconds": null
+      },
+      "unit": "波、只、秒",
+      "sources": [
+        {
+          "id": "wiki.waves",
+          "locator": "General Properties 的定时分批描述"
+        },
+        {
+          "id": "plan.w0",
+          "locator": "00.3 早期候选"
+        },
+        {
+          "id": "plan.w1",
+          "locator": "01.2 与 01.3"
+        }
+      ],
+      "confidence": "估计",
+      "currentValue": [
+        {
+          "wave": 1,
+          "rarity": "Common",
+          "batches": [
+            {
+              "atSeconds": 0,
+              "count": 2
+            },
+            {
+              "atSeconds": 6,
+              "count": 4
+            }
+          ],
+          "deadlineSeconds": 20
+        },
+        {
+          "wave": 2,
+          "rarity": "Common",
+          "batches": [
+            {
+              "atSeconds": 0,
+              "count": 3
+            },
+            {
+              "atSeconds": 7,
+              "count": 5
+            }
+          ],
+          "deadlineSeconds": 25
+        },
+        {
+          "wave": 3,
+          "rarity": "Common",
+          "batches": [
+            {
+              "atSeconds": 0,
+              "count": 3
+            },
+            {
+              "atSeconds": 7,
+              "count": 3
+            },
+            {
+              "atSeconds": 14,
+              "count": 4
+            }
+          ],
+          "deadlineSeconds": 30
+        }
+      ],
+      "acceptanceIds": ["W0-GARDEN-EARLY", "W1-01", "W1-02"],
+      "notes": "每波 6/8/10 只与各批时点、截止和统一 Common 均为可运行的复刻设定。录像只覆盖高波，无法验证这些数值。"
+    },
+    {
+      "id": "garden.geometry.shape",
+      "scope": "Garden 主场景",
+      "dateWindow": {
+        "fromDate": "2022-07-25",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": "circle",
+      "unit": "形状",
+      "sources": [
+        {
+          "id": "log.client",
+          "locator": "roundMap"
+        },
+        {
+          "id": "log.en",
+          "locator": "2022-07-25、11-04、11-06"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": "circle",
+      "acceptanceIds": ["W1-05"],
+      "notes": "半径、实体有效边界与按波变化另测。11 月场地变化排除。"
+    },
+    {
+      "id": "wave.spawn.accounting",
+      "scope": "Garden 主波存活计数",
+      "dateWindow": {
+        "fromDate": "2022-10-30",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": null,
+      "unit": "可计数实体类别",
+      "sources": [
+        {
+          "id": "plan.w1",
+          "locator": "01.2 生成与计数"
+        },
+        {
+          "id": "wiki.garden",
+          "locator": "Centipede 条目"
+        }
+      ],
+      "confidence": "未确认",
+      "currentValue": {
+        "count": "spawned-main-mobs",
+        "excluded": ["summons", "segments", "ant-hole-mobs", "previous-wave-residual"]
+      },
+      "acceptanceIds": ["W1-02", "W1-03"],
+      "notes": "复刻设定。同期 Wiki 提到分节行为，缺少 10 月服务端主波计数观测。"
+    },
+    {
+      "id": "catalog.basic.columns",
+      "scope": "原客户端 Basic 构造器和同期 Wiki",
+      "dateWindow": {
+        "fromDate": "2022-10-22",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "clientColumns": {
+          "offset12": [7, 9, 13, 17, 22, 28],
+          "offset16": [5, 6, 7, 9, 11, 13]
+        },
+        "wiki": {
+          "damage": [10, 13, 18, 24, 32, 40],
+          "health": [10, 12, 14, 17, 21, 25],
+          "reloadSeconds": 2.5
+        }
+      },
+      "unit": "原值、候选 HP、秒",
+      "sources": [
+        {
+          "id": "snapshot.wasm",
+          "locator": "槽 48 / $1180，六稀有度与图鉴说明槽 1019"
+        },
+        {
+          "id": "wiki.basic",
+          "locator": "Function / Petal Stats"
+        }
+      ],
+      "confidence": "未确认",
+      "currentValue": null,
+      "acceptanceIds": ["W0-CATALOG-BASIC", "W3-BASIC"],
+      "notes": "两列原值可重现。倍率与取整已经定位，字段含义、服务端生命/伤害和实际渲染待证。"
+    },
+    {
+      "id": "petal.leaf.friendlyMobHeal",
+      "scope": "Leaf",
+      "dateWindow": {
+        "fromDate": "2022-08-30",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": true,
+      "unit": "可治疗友方怪物",
+      "sources": [
+        {
+          "id": "log.client",
+          "locator": "leafMobHeal"
+        },
+        {
+          "id": "wiki.leaf",
+          "locator": "Function"
+        },
+        {
+          "id": "snapshot.wasm",
+          "locator": "说明字符串 45414"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": true,
+      "acceptanceIds": ["W3-LEAF"],
+      "notes": "治疗量和被动恢复曲线待校准。"
+    },
+    {
+      "id": "petal.honey.octoberEffect",
+      "scope": "Honey",
+      "dateWindow": {
+        "fromDate": "2022-08-07",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "candidate": "slow-on-hit",
+        "decemberReworkExcluded": true
+      },
+      "unit": "行为",
+      "sources": [
+        {
+          "id": "wiki.honey",
+          "locator": "Function"
+        },
+        {
+          "id": "snapshot.wasm",
+          "locator": "线性内存 43225，命中后减速说明与图鉴"
+        },
+        {
+          "id": "wiki.gg.history",
+          "locator": "Honey History 为复查目标，403，具体重做日期保留待验证"
+        }
+      ],
+      "confidence": "重建",
+      "currentValue": null,
+      "acceptanceIds": ["W3-HONEY"],
+      "notes": "W0 固定 10 月说明的命中减速。后续引怪行为排除，减速对象和倍率仍需核对消费路径。"
+    },
+    {
+      "id": "petal.peasGrapes.split",
+      "scope": "Peas 和 Grapes",
+      "dateWindow": {
+        "fromDate": "2022-08-31",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "separate": true,
+        "countCandidate": 4
+      },
+      "unit": "品类、粒数",
+      "sources": [
+        {
+          "id": "log.client",
+          "locator": "peasGrapes"
+        },
+        {
+          "id": "snapshot.wasm",
+          "locator": "Petal IDs 44 和 10"
+        },
+        {
+          "id": "wiki.peas",
+          "locator": "Function"
+        },
+        {
+          "id": "wiki.grapes",
+          "locator": "Damage"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": {
+        "separate": true
+      },
+      "acceptanceIds": ["W3-PEAS-GRAPES"],
+      "notes": "原日志证实拆分。四粒为图鉴与同期 Wiki 候选，单粒伤害和毒结算待验证。"
+    },
+    {
+      "id": "pvp.basic.drop",
+      "scope": "独立 PvP",
+      "dateWindow": {
+        "fromDate": "2022-09-13",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "basedOn": "defeated-player-score",
+        "thresholds": null
+      },
+      "unit": "分、稀有度",
+      "sources": [
+        {
+          "id": "log.client",
+          "locator": "pvpReward"
+        },
+        {
+          "id": "wiki.pvp",
+          "locator": "Features / Points needed to drop Basic"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": {
+        "basedOn": "defeated-player-score"
+      },
+      "acceptanceIds": ["W5-PVP-BASIC"],
+      "notes": "高档阈值证据不足，保留 oldid 的候选边界。"
+    },
+    {
+      "id": "release.cutoff",
+      "scope": "历史范围",
+      "dateWindow": {
+        "fromDate": "2022-10-30",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": {
+        "craftableUltra": false,
+        "postCutoffWaveRebalance": false,
+        "chat": false,
+        "worldMap": false
+      },
+      "unit": "版本范围",
+      "sources": [
+        {
+          "id": "log.en",
+          "locator": "2022-11-02、11-04、11-06、12 月"
+        },
+        {
+          "id": "log.zh",
+          "locator": "2022-11/12 日志"
+        }
+      ],
+      "confidence": "已证实",
+      "currentValue": {
+        "craftableUltra": false,
+        "postCutoffWaveRebalance": false,
+        "chat": false,
+        "worldMap": false
+      },
+      "acceptanceIds": ["W3-NO-ULTRA", "W5-CUTOFF"],
+      "notes": "截止于原 HTML 的归档时刻。"
+    }
+  ]
+}

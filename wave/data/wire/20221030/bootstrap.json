@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "snapshotSha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0",
+  "discovery": {
+    "id": "W0-WIRE-DISCOVERY",
+    "method": "GET",
+    "url": "https://api.n.m28.io/endpoint/florrio-waves-0/findEach/",
+    "response": {
+      "kind": "synthetic",
+      "status": 200,
+      "contentType": "application/json",
+      "body": {
+        "servers": {
+          "us": {
+            "id": "w0fixture",
+            "ipv4": "127.0.0.1"
+          }
+        }
+      },
+      "length": 56,
+      "hex": "7b2273657276657273223a7b227573223a7b226964223a22773066697874757265222c2269707634223a223132372e302e302e31227d7d7d"
+    },
+    "observation": "原客户端取 us 条目的 id，构造并尝试打开下面的 WebSocket。地区优先级、多服务器选择和 IPv4 的实际作用待查。"
+  },
+  "socket": {
+    "id": "W0-WIRE-FIRST-FRAME",
+    "url": "wss://w0fixture.s.m28n.net/",
+    "request": {
+      "kind": "captured",
+      "direction": "client-to-server",
+      "length": 43,
+      "hex": "30623633323739376630656534383764643939646634363062313362646536643763653563393737330000",
+      "observation": "原客户端在 mock open 后发出的首个二进制帧。0x30、40 字节构建哈希和两个零字节。首字节与第二个零字节的协议含义待查。"
+    },
+    "response": {
+      "kind": "synthetic",
+      "direction": "server-to-client",
+      "length": 1,
+      "hex": "ff",
+      "observation": "合成单字节反例。原客户端记录 Connected!，随后记录 kUnknown 并关闭，保持加载画面。",
+      "expectedLog": "Server disconnect reason (0): kUnknown"
+    }
+  },
+  "transport": {
+    "id": "W0-WIRE-TRANSPORT",
+    "kind": "transport-probe",
+    "direction": "client-to-server",
+    "length": 3,
+    "hex": "190a1e",
+    "observation": "Wasm 表槽 3750 经原 JS 发送胶水传递手工构造的测试字节。"
+  },
+  "blocker": "历史服务端首个成功回包的格式、确认条件和后续访客状态待 W2。"
+}
