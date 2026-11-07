@@ -4,6 +4,7 @@
 #include "engine/sim/player_commands.hpp"
 #include "engine/model/catalog.hpp"
 #include "engine/model/entity_relations.hpp"
+#include "engine/model/state_flags.hpp"
 #include "engine/sim/loot.hpp"
 #include "engine/sim/progression.hpp"
 #include "engine/sim/passives.hpp"
@@ -14,6 +15,13 @@
 #include <cmath>
 
 namespace engine {
+
+namespace {
+// Initial player wire mask; PlayerBody participates in clearance and knockback.
+constexpr std::uint8_t kPlayerSpawnWorldFlags = 0x6BU;
+constexpr auto kStarterPetal = catalog::PetalId::kBasicCommon;
+constexpr auto kRareStarterPetal = catalog::PetalId::kBasicUnique;
+}  // namespace
 
 void PlayerProfile::clear() {
   level_ = 0;
@@ -78,10 +86,9 @@ EntityHandle spawn_player(World& world, PlayerState& state, std::string_view nam
   if (!can_spawn_player(world, state)) {
     return {};
   }
-  // Player record flags: world flags 0x6b (bit 32 marks a player for spawn
-  // clearance and contact knockback) and entity flags 0x40 (attachment owner).
-  const EntityHandle handle =
-      spawn_entity(world, EntityKind::kPlayer, 0, position, config.radius, 0x6BU, 0x40U);
+  const EntityHandle handle = spawn_entity(
+      world, EntityKind::kPlayer, catalog::species_type_id(catalog::SpeciesId::kNone), position,
+      config.radius, kPlayerSpawnWorldFlags, static_cast<std::uint8_t>(EntityFlag::kOwned));
   if (!handle.valid()) {
     return EntityHandle{};
   }
@@ -111,7 +118,7 @@ PlayerProfile make_default_profile() {
   profile.set_experience(f32(0.0F));
   const std::uint8_t active = profile.active_slots();
   for (std::uint8_t slot = 0; slot < active; ++slot) {
-    profile.set_inventory(slot, 1);
+    profile.set_inventory(slot, catalog::petal_type_id(kStarterPetal));
   }
   profile.set_inventory_count(active);
   return profile;
@@ -126,7 +133,7 @@ PlayerProfile make_respawn_profile(const PlayerState& state) {
     profile.set_inventory(index, state.last_death_kept()[index]);
   }
   while (count < profile.active_slots()) {
-    profile.set_inventory(count++, 1U);
+    profile.set_inventory(count++, catalog::petal_type_id(kStarterPetal));
   }
   profile.set_inventory_count(count);
   return profile;
@@ -231,11 +238,11 @@ EntityHandle spawn_player_default(World& world, PlayerState& state, std::string_
     // Spawn restores survivors first, then fills the active row. The rare
     // starter can replace the first filler, never a surviving petal.
     for (std::uint8_t slot = 0; slot < profile.active_slots(); ++slot) {
-      if (profile.inventory(slot) != 1U) {
+      if (catalog::petal_id(profile.inventory(slot)) != kStarterPetal) {
         continue;
       }
-      if (!legendary_exists(world, EntityHandle{}, 35U)) {
-        profile.set_inventory(slot, 35U);
+      if (!legendary_exists(world, EntityHandle{}, catalog::petal_type_id(kRareStarterPetal))) {
+        profile.set_inventory(slot, catalog::petal_type_id(kRareStarterPetal));
       }
       break;
     }

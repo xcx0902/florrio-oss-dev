@@ -1,0 +1,528 @@
+{
+  "date": "2026-11-07",
+  "baselineHead": "6cca04d8565e0221e03b2dece22720503f6be505",
+  "source": {
+    "runId": "2026-11-07T00-03-30.402Z-56ea262b",
+    "startedAt": "2026-11-07T00:03:30.404Z",
+    "finishedAt": "2026-11-07T00:25:01.419Z",
+    "passed": true,
+    "stable": true,
+    "tools": {
+      "node": "v24.13.0",
+      "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.10-git",
+      "chromium": "156.0.8078.47"
+    },
+    "ledger": "/Users/xcx0902/Documents/Github/florrio-oss/reports/runs/2026-11-07T00-03-30.402Z-56ea262b/run.json",
+    "ledgerSha256": "c4cf97f4163ee13f04a2d9a0ce6e33a8e39bbd930da7304f0f98d3e47fcd8fa0",
+    "inputs": {
+      "source": "530f8d5da234d9a71177af06a1f7a39472e647a1c40d2e5b6ac8cf958a5b0c05",
+      "verification": "420fb4508ae5b963e2d598d3098abacf94435c68e411270de557cc56f76a141d"
+    },
+    "gates": [
+      {
+        "name": "format",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/00.log",
+        "logSha256": "4b57ed5f5cf80aa0fd7bd889856b12e144569b6f6c98e6cc2937cd9993451077"
+      },
+      {
+        "name": "lint",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/01.log",
+        "logSha256": "a078a92e84694fe61118e5e1c9293199f19039cacd22e49edfdd90363c570155"
+      },
+      {
+        "name": "refactor rules",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/02.log",
+        "logSha256": "3997c460250eabb837e28f0aa8263c315a8e8e42bd37cd7a374627443a670e3f"
+      },
+      {
+        "name": "schema",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/03.log",
+        "logSha256": "f7a76581f354cf096a0872bb814f53e65ddf7008548f2a7fac3c3bf5256750bc"
+      },
+      {
+        "name": "native build",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/04.log",
+        "logSha256": "97c168c7274b5e5b01f1260e88f290bebdde788609f01a8d04229ae1cefde60a"
+      },
+      {
+        "name": "native CTest",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/05.log",
+        "logSha256": "9b81ab456f5009e4009ded1438fcc89e8a705f2a47295ee1a3f93600434b5313",
+        "ctestTargets": 19
+      },
+      {
+        "name": "server build",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/06.log",
+        "logSha256": "3dcf4c93e6a8a9f38c94116036520c96e3d26065854885b6cc8ab3a2b4940df1"
+      },
+      {
+        "name": "server native CTest",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/07.log",
+        "logSha256": "e6424ec9a4c2a686a2e69bb11f3de38576d9973af1052268640f8606905b3e03",
+        "ctestTargets": 30
+      },
+      {
+        "name": "wasm build",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/08.log",
+        "logSha256": "382189d02d4f036b2998bbe7dc104fd66d7696a5152271b307d43b876c92fa5b"
+      },
+      {
+        "name": "client build",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/09.log",
+        "logSha256": "98f8327d58177363f9cd94864363615572125ba4fecdd4820e3a1b8a6a9a7216"
+      },
+      {
+        "name": "package",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/10.log",
+        "logSha256": "be9aa3a79816a90026cfffe5cfd9a54c1f0f2daba847f38695425d610d61607b"
+      },
+      {
+        "name": "unit",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/11.log",
+        "logSha256": "4c14559dd87be9fe1522786577e38b2b46df61c68f4c700b744a3defe87173c0",
+        "tests": 45,
+        "pass": 45,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "tools",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/12.log",
+        "logSha256": "dffa330921e3670258cc5c65ce5fcc6e4091e6b6a84b91fea65b8518ddf6d35c",
+        "tests": 30,
+        "pass": 30,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "client unit",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/13.log",
+        "logSha256": "f16082f0b0d259c74a9d771c833cfdb9cabf0b22a41d438462912a22b3db5c6b",
+        "tests": 143,
+        "pass": 143,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "cross-end integration",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/14.log",
+        "logSha256": "2f416112727fd5ca8987d80720b442610b7f1ef6729f02c6d1169b5bcda4a8d0",
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "ABI consistency",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/15.log",
+        "logSha256": "ec7fdecf163ce9f6d8b7fdb878e8f4be02b0d3ab319edca319a9bcb9fd5e655a"
+      },
+      {
+        "name": "delivery integrity",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/16.log",
+        "logSha256": "32728a4463a53c4cebf3fe8fd245d28cce770251ae99481295aba1eb0fc956b6"
+      },
+      {
+        "name": "browser scenarios and performance",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/17.log",
+        "logSha256": "b61deb86977e1dec553924f639ef1dd4ecc1c7dbb1459ff3dd20a46986e2a4d2"
+      },
+      {
+        "name": "engine performance",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/18.log",
+        "logSha256": "956caed84ef8ca6acc22fbb183ca2d21fb83976d1f5b55fafbbfeb8c67b3de84"
+      },
+      {
+        "name": "integration performance",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-03-30.402Z-56ea262b/19.log",
+        "logSha256": "db371c3328b30b6a85ff09e094bfea9660305f7a09575274e0fabc87fe499378"
+      }
+    ],
+    "browser": {
+      "status": "pass",
+      "total": 88,
+      "passed": 88,
+      "failed": 0,
+      "issues": []
+    },
+    "generatedManifestSha256": "a6f5bcbc695e529c811a662d20a926be645d8438023f3a3e44f0fa85f6b08ce3",
+    "delivery": {
+      "runId": "2026-11-07T00-03-30.402Z-56ea262b",
+      "inputs": "530f8d5da234d9a71177af06a1f7a39472e647a1c40d2e5b6ac8cf958a5b0c05",
+      "artifactsSha256": "da607ade1f3c2d6504e981204167cf7b2750d398d674a080b2b06e7147ffe0c0",
+      "totals": {
+        "files": 107,
+        "bytes": 853480
+      }
+    },
+    "performance": {
+      "renderer": {
+        "runId": "2026-11-07T00-03-30.402Z-56ea262b",
+        "passed": true,
+        "budgetMet": true,
+        "configuration": {
+          "frames": 600,
+          "repeats": 5,
+          "warmupFrames": 60
+        },
+        "frameMs": {
+          "count": 600,
+          "mean": 16.6663333333532,
+          "p50": 16.69999998807907,
+          "p95": 17.5,
+          "p99": 17.900000005960464,
+          "max": 18.80000001192093
+        },
+        "fps": 60.00120002392895
+      },
+      "engine": {
+        "runId": "2026-11-07T00-03-30.402Z-56ea262b",
+        "passed": true,
+        "configuration": {
+          "repeats": 5,
+          "warmupTicks": 200,
+          "ticks": 2000,
+          "soakTicks": 10000,
+          "fixedStepMs": 50,
+          "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.10-git\nCopyright (C) 2026 the Emscripten authors (see AUTHORS.txt)\nThis is free and open source software under the MIT license.\nThere is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "flags": "Release; -ffp-contract=off -fno-fast-math; ENGINE_PERF (separate library)"
+        }
+      },
+      "integration": {
+        "runId": "2026-11-07T00-03-30.402Z-56ea262b",
+        "passed": true,
+        "budgetMet": true,
+        "configuration": {
+          "frames": 600,
+          "repeats": 5,
+          "warmupFrames": 60,
+          "fixedStepMs": 50,
+          "worker": "real product manual clock; default population; trusted input plus real suicide/respawn"
+        }
+      }
+    },
+    "wasmSha256": "2e1b223815305886ebfb3711cf096cf0e2be6aa779513c1f852d500962a0bdd8"
+  },
+  "clean": {
+    "runId": "2026-11-07T00-25-02.658Z-7aae9739",
+    "startedAt": "2026-11-07T00:25:02.659Z",
+    "finishedAt": "2026-11-07T00:47:45.517Z",
+    "passed": true,
+    "stable": true,
+    "tools": {
+      "node": "v24.13.0",
+      "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.10-git",
+      "chromium": "156.0.8078.47"
+    },
+    "ledger": "/private/tmp/florrio-rfv-clean-jhjjdv4f/reports/runs/2026-11-07T00-25-02.658Z-7aae9739/run.json",
+    "ledgerSha256": "b7410670651b506e893a2df60fb49d6240d08626ebe0e37357de2f8e1ce2ed2d",
+    "inputs": {
+      "source": "530f8d5da234d9a71177af06a1f7a39472e647a1c40d2e5b6ac8cf958a5b0c05",
+      "verification": "420fb4508ae5b963e2d598d3098abacf94435c68e411270de557cc56f76a141d"
+    },
+    "gates": [
+      {
+        "name": "format",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/00.log",
+        "logSha256": "952609f5315a25b71e2c078e398247c33d28c52cb59d3d871ac42a5688775d13"
+      },
+      {
+        "name": "lint",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/01.log",
+        "logSha256": "a078a92e84694fe61118e5e1c9293199f19039cacd22e49edfdd90363c570155"
+      },
+      {
+        "name": "refactor rules",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/02.log",
+        "logSha256": "88f858a032e1289fa767a370fff15596d291ee88d19e3b4ec96d4a5004d530aa"
+      },
+      {
+        "name": "schema",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/03.log",
+        "logSha256": "f7a76581f354cf096a0872bb814f53e65ddf7008548f2a7fac3c3bf5256750bc"
+      },
+      {
+        "name": "native build",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/04.log",
+        "logSha256": "b0384d0f4cdbe97058e03beb4d344cbb9ccf7307d67b97261a230418f4071759"
+      },
+      {
+        "name": "native CTest",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/05.log",
+        "logSha256": "00efabfe8bba1258c2d9fc0dfc15f46746fdaf438ff7f5edfe7b5e0ef1fd6d6c",
+        "ctestTargets": 19
+      },
+      {
+        "name": "server build",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/06.log",
+        "logSha256": "77c339256396234a9a8affdc5ed9ad22b5ec3bb1b94b1ff02345852b22b5110c"
+      },
+      {
+        "name": "server native CTest",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/07.log",
+        "logSha256": "01ea9596e6452ed91d003ac4c225b262586dd23fdd3744c8ccfd0da654654c9a",
+        "ctestTargets": 30
+      },
+      {
+        "name": "wasm build",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/08.log",
+        "logSha256": "d028391a9354a5d588e210c816794754207bbed819a006c0009540b83c4892db"
+      },
+      {
+        "name": "client build",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/09.log",
+        "logSha256": "98f8327d58177363f9cd94864363615572125ba4fecdd4820e3a1b8a6a9a7216"
+      },
+      {
+        "name": "package",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/10.log",
+        "logSha256": "be9aa3a79816a90026cfffe5cfd9a54c1f0f2daba847f38695425d610d61607b"
+      },
+      {
+        "name": "unit",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/11.log",
+        "logSha256": "9e11981594a7ab8b3fc4305bb944eebe17c12de2d2bcd8c3ed2ba021f1e0f849",
+        "tests": 45,
+        "pass": 45,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "tools",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/12.log",
+        "logSha256": "c935ef2d673a89b9ed7e0f09dc9e3cfbddd2f4a920c89192d7976e4555358517",
+        "tests": 30,
+        "pass": 30,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "client unit",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/13.log",
+        "logSha256": "e5559f59f29d4199dece0f37336ff458aada436675dd2e13edbd03065939403d",
+        "tests": 143,
+        "pass": 143,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "cross-end integration",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/14.log",
+        "logSha256": "ce3dce2903f57fd4f7945de4df3b90b4b8aa1b4f49c988a65f63242d9d5a9955",
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "ABI consistency",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/15.log",
+        "logSha256": "ec7fdecf163ce9f6d8b7fdb878e8f4be02b0d3ab319edca319a9bcb9fd5e655a"
+      },
+      {
+        "name": "delivery integrity",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/16.log",
+        "logSha256": "32728a4463a53c4cebf3fe8fd245d28cce770251ae99481295aba1eb0fc956b6"
+      },
+      {
+        "name": "browser scenarios and performance",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/17.log",
+        "logSha256": "191d3190c4a0d68e08d4c54af03a8b524085b75689d80c7a4d87a8e7b2026343"
+      },
+      {
+        "name": "engine performance",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/18.log",
+        "logSha256": "f67306559223b99be33da0db94bba8b55daccd294b3c54467d59c57247ae0137"
+      },
+      {
+        "name": "integration performance",
+        "exitCode": 0,
+        "log": "reports/runs/2026-11-07T00-25-02.658Z-7aae9739/19.log",
+        "logSha256": "d8d1f6b209978339cb30f7170c0e8afae2d279509d4bcc713fac984397c70164"
+      }
+    ],
+    "browser": {
+      "status": "pass",
+      "total": 88,
+      "passed": 88,
+      "failed": 0,
+      "issues": []
+    },
+    "generatedManifestSha256": "a6f5bcbc695e529c811a662d20a926be645d8438023f3a3e44f0fa85f6b08ce3",
+    "delivery": {
+      "runId": "2026-11-07T00-25-02.658Z-7aae9739",
+      "inputs": "530f8d5da234d9a71177af06a1f7a39472e647a1c40d2e5b6ac8cf958a5b0c05",
+      "artifactsSha256": "da607ade1f3c2d6504e981204167cf7b2750d398d674a080b2b06e7147ffe0c0",
+      "totals": {
+        "files": 107,
+        "bytes": 853480
+      }
+    },
+    "performance": {
+      "renderer": {
+        "runId": "2026-11-07T00-25-02.658Z-7aae9739",
+        "passed": true,
+        "budgetMet": true,
+        "configuration": {
+          "frames": 600,
+          "repeats": 5,
+          "warmupFrames": 60
+        },
+        "frameMs": {
+          "count": 600,
+          "mean": 16.6656666666766,
+          "p50": 16.600000023841858,
+          "p95": 18,
+          "p99": 18.80000001192093,
+          "max": 19.299999982118607
+        },
+        "fps": 60.003600215977194
+      },
+      "engine": {
+        "runId": "2026-11-07T00-25-02.658Z-7aae9739",
+        "passed": true,
+        "configuration": {
+          "repeats": 5,
+          "warmupTicks": 200,
+          "ticks": 2000,
+          "soakTicks": 10000,
+          "fixedStepMs": 50,
+          "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.10-git\nCopyright (C) 2026 the Emscripten authors (see AUTHORS.txt)\nThis is free and open source software under the MIT license.\nThere is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "flags": "Release; -ffp-contract=off -fno-fast-math; ENGINE_PERF (separate library)"
+        }
+      },
+      "integration": {
+        "runId": "2026-11-07T00-25-02.658Z-7aae9739",
+        "passed": true,
+        "budgetMet": true,
+        "configuration": {
+          "frames": 600,
+          "repeats": 5,
+          "warmupFrames": 60,
+          "fixedStepMs": 50,
+          "worker": "real product manual clock; default population; trusted input plus real suicide/respawn"
+        }
+      }
+    },
+    "wasmSha256": "2e1b223815305886ebfb3711cf096cf0e2be6aa779513c1f852d500962a0bdd8"
+  },
+  "matchingInputs": true,
+  "matchingGeneratedOutputs": true,
+  "matchingDeliveryArtifacts": true,
+  "baselineAttempt": {
+    "runId": "2026-11-07T00-00-53.673Z-258a98d4",
+    "startedAt": "2026-11-07T00:00:53.675Z",
+    "finishedAt": "2026-11-07T00:02:14.598Z",
+    "passed": false,
+    "error": "server native CTest failed (exit 8)",
+    "ledgerSha256": "ee5071f2c004f55a8b2253c0355c1c226b72b7575447f3a91c451bdd7d205acf"
+  },
+  "refactorScan": {
+    "scanned": 493,
+    "patterns": {},
+    "structural": []
+  },
+  "auxiliaryCommands": [
+    {
+      "name": "source-schema-generation",
+      "exitCode": 0,
+      "log": "reports/refactor-08/source-schema-generation.log",
+      "sha256": "78db22ab8a365cc234a66b4daab5ee5ca9dc61446afaef445822f15b82ac26d1"
+    },
+    {
+      "name": "source-typecheck",
+      "exitCode": 0,
+      "log": "reports/refactor-08/source-typecheck.log",
+      "sha256": "f05734471b0449a23bccd8c92be0c97d42b855f83f7c2d982438bbdf0d29dfaa"
+    },
+    {
+      "name": "source-initial-test-all",
+      "exitCode": 1,
+      "log": "reports/refactor-08/source-initial-test-all.log",
+      "sha256": "b5b7af4a7b04e14ac0a8b49d8fd17c00105ed9603ef842e679cfa5ebb0564d78"
+    },
+    {
+      "name": "source-final-test-all",
+      "exitCode": 0,
+      "log": "reports/refactor-08/source-final-test-all.log",
+      "sha256": "36a600cdffce5b8641cd9642236353692c5d631e4c70ee014666d32caaf246b4"
+    },
+    {
+      "name": "clean-offline-install",
+      "exitCode": 1,
+      "log": "reports/refactor-08/clean-offline-install.log",
+      "sha256": "7089c801d31274a90609ac2f5d1bbca458e26a96489ded069c6fbac940cdf810"
+    },
+    {
+      "name": "clean-online-install",
+      "exitCode": 0,
+      "log": "reports/refactor-08/clean-online-install.log",
+      "sha256": "a0c28ec7a044a2ffb65815a0dc1c07214c6a83203b3a3ddcf7051941c1dd49b2"
+    },
+    {
+      "name": "clean-schema-generation",
+      "exitCode": 0,
+      "log": "reports/refactor-08/clean-schema-generation.log",
+      "sha256": "bddf7edb14865941cc37034a29391e8920880265a88da9ad626e6fc6fdf9f9fd"
+    },
+    {
+      "name": "clean-typecheck",
+      "exitCode": 0,
+      "log": "reports/refactor-08/clean-typecheck.log",
+      "sha256": "f05734471b0449a23bccd8c92be0c97d42b855f83f7c2d982438bbdf0d29dfaa"
+    }
+  ],
+  "finalChecks": {
+    "format": {
+      "passed": true,
+      "handwrittenFiles": 526,
+      "generatedOutputs": 26,
+      "log": "reports/refactor-08/final-format.log",
+      "logSha256": "6ca00e3b20cec31e6291638b9e76bb1558eba84897945739b1740bb403ff3f0e"
+    },
+    "acceptanceDocumentFormatting": true,
+    "localFileLinks": true,
+    "gitDiffCheck": true
+  }
+}

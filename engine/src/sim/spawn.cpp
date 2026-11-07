@@ -14,6 +14,11 @@ namespace {
 constexpr double kTau = 6.283185307179586476925286766559;
 // f32(2*pi / 2^31): scale that turns a full-range u32 draw into radians.
 constexpr float kRandomAngleScale = 2.925836239953128e-09F;
+// Initial wire mask for bodies constructed without a fixed catalog spawn row.
+// Preserve the serialized bits, including bits with no simulation consumer.
+constexpr std::uint8_t kMobSpawnWorldFlags = 0x4BU;
+constexpr std::uint8_t kMobSpawnEntityFlags = static_cast<std::uint8_t>(EntityFlag::kBlocksSpawn) |
+                                              static_cast<std::uint8_t>(EntityFlag::kOwned);
 
 /** Spawn-area rejection: a player body inside radius+45 of the candidate point
  * rejects the spawn. A linear scan of the same bodies is equivalent to the
@@ -287,8 +292,9 @@ EntityHandle spawn_rock_impl(World& world, Vec2 position, bool massive, ServerRn
                              bool drop_draws) {
   const std::uint16_t type_id =
       catalog::species_type_id(massive ? catalog::SpeciesId::kBoulder : catalog::SpeciesId::kRock);
-  const EntityHandle handle = spawn_entity(world, EntityKind::kMob, type_id, position,
-                                           f32(massive ? 60.0F : 20.0F), 75, 96);
+  const EntityHandle handle =
+      spawn_entity(world, EntityKind::kMob, type_id, position, f32(massive ? 60.0F : 20.0F),
+                   kMobSpawnWorldFlags, kMobSpawnEntityFlags);
   if (!handle.valid()) {
     return handle;
   }
@@ -329,7 +335,8 @@ namespace {
 
 EntityHandle spawn_cactus_impl(World& world, Vec2 position, ServerRng& rng, bool drop_draws) {
   const EntityHandle handle =
-      spawn_entity(world, EntityKind::kMob, 3, position, f32(40.0F), 75, 96);
+      spawn_entity(world, EntityKind::kMob, catalog::species_type_id(catalog::SpeciesId::kCactus),
+                   position, f32(40.0F), kMobSpawnWorldFlags, kMobSpawnEntityFlags);
   if (!handle.valid()) {
     return handle;
   }
@@ -384,8 +391,8 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
     // initializers still define the complete body.
     const catalog::SpeciesId species = catalog::species_id(type_id);
     if (species == catalog::SpeciesId::kQueenAnt) {
-      const EntityHandle handle =
-          spawn_body_with_loot(world, kind, type_id, position, f32(40.0F), 75U, 96U);
+      const EntityHandle handle = spawn_body_with_loot(world, kind, type_id, position, f32(40.0F),
+                                                       kMobSpawnWorldFlags, kMobSpawnEntityFlags);
       if (Entity* entity = world.entities().get(handle)) {
         configure_ant(*entity, 3, world.random());
         entity->ai.clock_ms = world.time_ms();
@@ -395,8 +402,8 @@ EntityHandle spawn_entity_from_defaults(World& world, EntityKind kind, std::uint
     }
     if (species == catalog::SpeciesId::kCentipedeSegment ||
         species == catalog::SpeciesId::kEvilCentipedeSegment) {
-      const EntityHandle handle =
-          spawn_body_with_loot(world, kind, type_id, position, f32(35.0F), 75U, 96U);
+      const EntityHandle handle = spawn_body_with_loot(world, kind, type_id, position, f32(35.0F),
+                                                       kMobSpawnWorldFlags, kMobSpawnEntityFlags);
       if (Entity* entity = world.entities().get(handle)) {
         configure_centipede(*entity, species == catalog::SpeciesId::kEvilCentipedeSegment, false,
                             world.random());
