@@ -22,18 +22,27 @@ SOURCE_DIR = Path(__file__).resolve().parents[2]
 PACK = SOURCE_DIR / 'data/catalogs/20221030/catalog.json'
 HEADER = SOURCE_DIR / 'server/catalog/generated.hpp'
 EVIDENCE_INPUTS = PACK.with_name('evidence-inputs.json')
-EVIDENCE_SHA256 = 'e14ae1bc32b30bec2adad402070ee1a72f26fab6c4798ec1d9bcaf44a13cbc13'
-KINDS = ('basic', 'rose', 'faster', 'leaf', 'stinger', 'peas', 'grapes', 'web',
-         'missile', 'egg', 'honey', 'cactus')
-MOBS = ('bee', 'ladybug', 'baby_ant', 'rock', 'centipede', 'worker_ant', 'dark_ladybug',
-        'evil_centipede', 'soldier_ant', 'spider', 'hornet', 'beetle')
+EVIDENCE_SHA256 = '342e4fbc31ac2da7cfaa902c544c4f334955d50b0fdf2644ea1de4cda624576a'
+KINDS = tuple(('basic light rock square rose stinger iris wing missile grapes cactus '
+               'faster bubble pollen dandelion egg antennae heavy yin_yang web honey '
+               'leaf salt rice corn sand pincer yucca magnet yggdrasil starfish pearl '
+               'lightning jelly claw shell cutter dahlia uranium sponge soil fangs '
+               'third_eye peas stick').split())
+MOBS = tuple(('rock cactus ladybug bee baby_ant worker_ant soldier_ant queen_ant '
+              'ant_hole beetle hornet centipede centipede_segment evil_centipede '
+              'evil_centipede_segment desert_centipede desert_centipede_segment '
+              'square dark_ladybug shiny_ladybug spider scorpion fire_ant fire_ant_burrow '
+              'sandstorm bubble acid_bubble shell starfish crab jellyfish digger sponge '
+              'leech leech_segment').split())
+MECHANICS = ('attack_distance defend_distance shield reflection damage_ratio damage_limit '
+             'heal_ratio knockback chain_damage bounces vision_multiplier pickup_multiplier '
+             'body_damage sponge_seconds speed_multiplier size_multiplier hidden').split()
 BODY = ('radius', 'health', 'speed_per_second', 'contact_damage', 'contact_heal',
         'poison_per_tick', 'poison_ticks', 'contact_cooldown')
 FIELDS = ('activationSeconds', 'heal', 'passiveHealPerSecond', 'friendlyMobHeal',
           'rotationBonus', 'projectileSpeed', 'range', 'durationSeconds',
           'slowMultiplier', 'healthBonus', 'areaRadius')
-EFFECTS = {'contact', 'rose', 'leaf', 'projectile', 'poison_projectile', 'web',
-           'summon', 'faster', 'honey', 'cactus'}
+EFFECTS = set(KINDS) | {'contact', 'projectile', 'poison_projectile', 'summon'}
 
 
 def require(condition, message):
@@ -103,6 +112,36 @@ def tooltip_evidence(inputs):
     return result
 
 
+def behavior_evidence(inputs):
+    files = {}
+    for key, record in inputs['behaviorEvidence'].items():
+        require(record['file'] == Path(record['file']).name, 'invalid behavior evidence path')
+        files[key] = json.loads(checked_bytes(PACK.with_name(record['file']), record['sha256'], key))
+    wiki, review = files['behavior.wiki'], files['behavior.review']
+    require(wiki['cutoffUtc'] == review['cutoffUtc'] == '2022-10-30T21:00:58Z',
+            'behavior cutoff drift')
+    revisions = {}
+    for title, record in wiki['pages'].items():
+        for page in record.get('response', {}).get('query', {}).get('pages', {}).values():
+            for revision in page.get('revisions', []):
+                require(revision['timestamp'] <= wiki['cutoffUtc'], 'post-cutoff behavior revision')
+                revisions[title, revision['revid']] = revision['timestamp']
+    entries = review['entries']
+    expected = {'petal.' + k for k in KINDS} | {'mob.' + k for k in MOBS}
+    require(unique(entries, 'id', 'behavior rule') == expected, 'incomplete behavior coverage')
+    for entry in entries:
+        require(entry['behavior'] and entry['sources'], 'missing behavior provenance')
+        require(entry['status'] in {'manual-review', 'sourced-behavior'} and
+                bool(entry['manualReview']) == (entry['status'] == 'manual-review'),
+                'missing manual review marker')
+        for source in entry['sources']:
+            require(source['type'] in {'wiki', 'repository', 'client-tooltip'}, 'unknown behavior source')
+            if source['type'] == 'wiki':
+                require(revisions.get((source['title'], source['revision'])) == source['timestamp'],
+                        'unarchived behavior revision')
+    return {e['id']: e for e in entries}
+
+
 def client_adoptions(section, row, observed):
     """Explicit conversion from observed display data to current simulation units.
 
@@ -111,12 +150,16 @@ def client_adoptions(section, row, observed):
     """
     fields = {f['label']: f for f in observed['fields']}
     if section == 'mobs':
-        health = fields['Health']
+        health = fields.get('Health', {'value': observed['baseHealth'] * observed['healthMultiplier']})
         return {'body.health': health.get('range', [health['value']])[0],
-                'body.contact_damage': fields['Damage']['value']}
+                'body.contact_damage': fields.get('Damage', {'value': observed['baseDamage'] * observed['damageMultiplier']})['value'],
+                **{key: fields.get(label, {'value': 0})['value'] for label, key in
+                   [('Missile health', 'missileHealth'), ('Missile damage', 'missileDamage'),
+                    ('Lightning', 'lightningDamage'), ('Bounces', 'lightningBounces'), ('Lifesteal', 'lifesteal')]}}
+    client_body = observed.get('body')
     adopted = {
-        'body.contact_damage': observed['body']['damage'],
-        'body.health': observed['body']['health'] / (4 if row['kind'] in ('peas', 'grapes') else 1),
+        'body.contact_damage': client_body['damage'] if client_body else 0,
+        'body.health': client_body['health'] / (4 if row['kind'] in ('peas', 'grapes') else 1) if client_body else 1,
         'reloadSeconds': observed['reloadSeconds'],
         'activationSeconds': observed['activationSeconds'],
         'particles': 4 if row['kind'] in ('peas', 'grapes') else observed['orbitCount'],
@@ -126,6 +169,9 @@ def client_adoptions(section, row, observed):
         ('leaf', 'Mob Heal', 'friendlyMobHeal'), ('faster', 'Rotation speed', 'rotationBonus'),
         ('cactus', 'Flower Health', 'healthBonus'), ('web', 'Duration', 'durationSeconds'),
         ('honey', 'Duration', 'durationSeconds'),
+        ('dandelion', 'Duration', 'durationSeconds'), ('pincer', 'Duration', 'durationSeconds'),
+        ('yucca', 'Heal', 'passiveHealPerSecond'), ('starfish', 'Heal', 'passiveHealPerSecond'),
+        ('dahlia', 'Heal', 'heal'), ('soil', 'Flower Health', 'healthBonus'),
     ]:
         if row['kind'] == kind:
             adopted[target] = fields[label]['value']
@@ -140,6 +186,20 @@ def client_adoptions(section, row, observed):
             'mob': name.lower().replace(' ', '_'),
             'rarity': ['Common', 'Unusual', 'Rare', 'Epic', 'Legendary', 'Mythic'].index(rarity[:-1]),
         }
+    mechanics = {'Shield': ('shield', 1), 'Damage Reflection': ('reflection', .01),
+                 '% Damage': ('damage_ratio', .01), 'Limit': ('damage_limit', 1),
+                 'Damage Healed': ('heal_ratio', .01), 'Knockback': ('knockback', .2),
+                 'Bounces': ('bounces', 1), 'Body Damage': ('body_damage', 1),
+                 'Period': ('sponge_seconds', 1)}
+    for label, (key, scale) in mechanics.items():
+        if label in fields:
+            adopted['mechanics.' + key] = fields[label]['value'] * scale
+    if row['kind'] == 'lightning':
+        adopted['mechanics.chain_damage'] = fields['Damage']['value']
+    for kind, label, key in [('antennae', 'Extra vision', 'vision_multiplier'),
+                              ('magnet', 'Pickup range', 'pickup_multiplier')]:
+        if row['kind'] == kind:
+            adopted['mechanics.' + key] = 1 + fields[label]['value'] / 100
     return adopted
 
 
@@ -153,8 +213,9 @@ def validate(pack, inputs=None):
     if inputs is None:
         inputs = bundled_evidence()
     tooltips = tooltip_evidence(inputs)
+    behaviors = behavior_evidence(inputs)
     walk(pack)
-    require(pack['schemaVersion'] == 1 and pack['version'] == '20221030-w3.2', 'unlocked version')
+    require(pack['schemaVersion'] == 1 and pack['version'] == '20221030-w3.3', 'unlocked version')
     require(pack['cutoffUtc'] == '2022-10-30T21:00:58Z', 'unlocked historical cutoff')
     reference = inputs['reference']
     require(pack['clientBuildHash'] == reference['buildHash'], 'client build hash mismatch')
@@ -184,12 +245,18 @@ def validate(pack, inputs=None):
         registry = {r['id']: r for r in pack['registries'][section]}
         ids_by_kind = {}
         for row in rows:
+            behavior = behaviors[('petal.' if section == 'petals' else 'mob.') + row['kind']]
+            require(row['provenance']['behaviorKey'] == behavior['id'] and
+                    row['provenance']['unknowns'] == ([behavior['manualReview']] if behavior['manualReview'] else []),
+                    'behavior provenance/review drift')
             require(type(row['rarity']) is int and 0 <= row['rarity'] < 6, 'invalid rarity')
             require(row['clientId'] in registry, 'unknown client reference')
             require(row['evidenceKey'] in evidence, 'unregistered evidenceKey')
             require(row['provenance']['server'] == 'client-tooltip-adoption-with-reconstruction',
                     'unsubstantiated authoritative claim')
             observed = tooltips[section][row['clientId'] - 1]['variants'][row['rarity']]
+            require(row['provenance']['adoptedFields'] == list(client_adoptions(section, row, observed)),
+                    'client adoption field list drift')
             for key, value in client_adoptions(section, row, observed).items():
                 require(nested_value(row, key) == value, f'client tooltip adoption drift: {row["kind"]}.{key}')
             ids_by_kind.setdefault(row['kind'], row['clientId'])
@@ -207,7 +274,16 @@ def validate(pack, inputs=None):
                 require(row['kind'] == row['name'].lower().replace(' ', '_'), 'kind/client identity mismatch')
                 require(row['effect'] in EFFECTS, 'unknown effect')
                 require(type(row['particles']) is int and 1 <= row['particles'] <= 16, 'invalid particle count')
-                require(row['reloadSeconds'] > 0 and all(row[k] >= 0 for k in FIELDS), 'invalid effect value')
+                require(row['reloadSeconds'] >= 0 and all(row[k] >= 0 for k in FIELDS), 'invalid effect value')
+                require(set(row['mechanics']) == set(MECHANICS), 'incomplete mechanics')
+                require(all(type(v) in (int, float) and v >= 0 for k, v in row['mechanics'].items()
+                            if k != 'hidden') and type(row['mechanics']['hidden']) is bool,
+                        'invalid petal mechanics')
+                require(type(row['mechanics']['bounces']) is int, 'invalid bounce count')
+                require(all(row['mechanics'][k] > 0 for k in
+                            ['vision_multiplier', 'pickup_multiplier', 'speed_multiplier', 'size_multiplier']),
+                        'invalid passive multiplier')
+                require(row['mechanics']['damage_ratio'] <= 1, 'invalid percent damage')
                 require(0 <= row['slowMultiplier'] <= 1, 'slow probability/multiplier out of range')
                 effect_ranges = row['provenance']['candidateRanges']
                 require(set(effect_ranges) == set(FIELDS) | {'reloadSeconds'},
@@ -220,8 +296,12 @@ def validate(pack, inputs=None):
                 for field, bounds in body_ranges.items():
                     require(len(bounds) == 2 and 0 <= bounds[0] <= body[field] <= bounds[1],
                             'body reconstruction outside candidate range')
-                require(row['clientValues']['offset12'] == observed['body']['damage'] and
-                        row['clientValues']['offset16'] == observed['body']['health'], 'raw client value drift')
+                if observed.get('body'):
+                    require(row['clientValues']['offset12'] == observed['body']['damage'] and
+                            row['clientValues']['offset16'] == observed['body']['health'], 'raw client value drift')
+                else:
+                    require(row['clientValues'] is None and row['mechanics']['hidden'],
+                            'hidden passive must not invent client body values')
                 if row['effect'] == 'summon':
                     require(row['summon']['mob'] in MOBS and 0 <= row['summon']['rarity'] < 6,
                             'invalid original Egg contents')
@@ -229,6 +309,16 @@ def validate(pack, inputs=None):
                 require(type(row['xp']) is int and row['xp'] >= 0, 'invalid mob XP')
                 require(row['segmentClientId'] == 0 or row['segmentClientId'] in registry,
                         'unknown segment reference')
+                require(row['ai'] in {'stationary', 'passive', 'neutral', 'chase', 'ranged', 'spawner',
+                                     'sandstorm', 'starfish', 'jellyfish', 'digger', 'leech', 'segment'},
+                        'unknown mob AI')
+                require(type(row['reviewRequired']) is bool and type(row['segments']) is int and
+                        0 <= row['segments'] <= 16, 'invalid mob behavior metadata')
+                require(row['reviewRequired'] == (behavior['status'] == 'manual-review'), 'mob review marker drift')
+                parent = row['parentClientId']
+                require(parent == 0 or parent in registry, 'unknown segment parent')
+                require(type(row['lightningBounces']) is int and row['lightningBounces'] >= 0,
+                        'invalid mob bounce count')
     for section in ['spawn', 'encoding', 'ordering', 'craft', 'levels', 'drops']:
         require(pack[section]['evidenceKey'] in evidence, 'unregistered table evidenceKey')
     rule_ids = {r['id'] for r in inputs['rules']}
@@ -275,10 +365,14 @@ def validate(pack, inputs=None):
         key = (drop['mob'], drop['mobRarity'], drop['petal'], drop['rarity'])
         require(key not in drop_keys, 'duplicate drop rule')
         drop_keys.add(key)
-        population = (drop['mob'], drop['mobRarity'])
+        population = (drop['mob'], drop['mobRarity'], drop['petal'])
         totals[population] = totals.get(population, 0) + drop['probability']
     require(all(type(p) in (int, float) and 0 <= p <= 1 for p in probabilities), 'probability out of range')
-    require(all(total <= 1 for total in totals.values()), 'drop probability total exceeds one')
+    require(all(total <= 1 + 1e-12 for total in totals.values()), 'petal rarity probability total exceeds one')
+    expected_drops = {(MOBS[m['id'] - 1], v['rarity'], KINDS[d['petalId'] - 1], d['rarity'])
+                      for m in tooltips['mobs'] for v in m['variants']
+                      for d in v['drops']['candidates'] if d['probability'] is not None and d['probability'] > 0}
+    require(drop_keys == expected_drops, 'incomplete full drop coverage')
     thresholds = pack['levels']['xpThresholds']
     require(thresholds and thresholds[0] == 0 and all(type(n) is int for n in thresholds) and
             all(a < b for a, b in zip(thresholds, thresholds[1:])), 'invalid XP thresholds')
@@ -384,13 +478,17 @@ def generate(pack):
         values = [f'sim::Petal::{r["kind"]}', f'sim::Rarity::{pack["rarities"][r["rarity"]]["name"].lower()}',
                   str(r['clientId']), json.dumps(r['name']), body(r['body']), number(r['reloadSeconds']),
                   'Effect::' + r['effect'], str(r['particles'])] + [number(r[k]) for k in FIELDS] + [cv, json.dumps(r['evidenceKey']),
-                  'sim::Mob::' + summon['mob'], 'sim::Rarity::' + pack['rarities'][summon['rarity']]['name'].lower()]
+                  'sim::Mob::' + summon['mob'], 'sim::Rarity::' + pack['rarities'][summon['rarity']]['name'].lower(),
+                  '{' + ', '.join('.' + k + ' = ' + (str(r['mechanics'][k]).lower() if k == 'hidden'
+                                                    else number(r['mechanics'][k])) for k in MECHANICS) + '}']
         lines.append('  {' + ', '.join(values) + '},')
     lines += ['};', 'inline const MobDefinition mobs[]{']
     for r in pack['mobs']:
         lines.append('  {' + ', '.join([f'sim::Mob::{r["kind"]}',
             f'sim::Rarity::{pack["rarities"][r["rarity"]]["name"].lower()}', str(r['clientId']),
-            str(r['segmentClientId']), body(r['body']), str(r['summon']).lower(), json.dumps(r['evidenceKey']), str(r['xp'])]) + '},')
+            str(r['segmentClientId']), body(r['body']), str(r['summon']).lower(), json.dumps(r['evidenceKey']), str(r['xp']),
+            'MobAI::' + r['ai'], str(r['segments']), str(r['parentClientId']), str(r['reviewRequired']).lower(),
+            *[str(r[k]) for k in ['missileHealth', 'missileDamage', 'lightningDamage', 'lightningBounces', 'lifesteal']]]) + '},')
     lines += ['};', '}  // namespace wave::catalog::detail', 'namespace wave::catalog {',
               'inline std::span<const PetalRegistryEntry> petal_registry() { return detail::registry; }',
               'inline const Catalog& dated() {', '  static const Catalog result{' + ', '.join([
@@ -451,6 +549,12 @@ def self_test(pack):
         lambda p: p['craft']['clientEvidence'].update(wasmFileOffset=0),
         lambda p: p['spawn'].update(sourceRule='missing'),
         lambda p: p['sources'][0].update(path='elsewhere.json'),
+        lambda p: p['petals'][0]['mechanics'].update(vision_multiplier=0),
+        lambda p: p['petals'][0]['mechanics'].update(bounces=1.5),
+        lambda p: p['petals'][0]['provenance'].update(behaviorKey='mob.crab'),
+        lambda p: p['mobs'][0].update(reviewRequired=False),
+        lambda p: p['mobs'][0].update(parentClientId=99),
+        lambda p: p['drops']['entries'].pop(),
     ]
     for mutate in mutations:
         candidate = copy.deepcopy(pack)
@@ -481,6 +585,8 @@ def portable_self_test(pack):
         shutil.copyfile(EVIDENCE_INPUTS, bundled)
         tooltip = data / 'client-tooltips.json'
         shutil.copyfile(PACK.with_name('client-tooltips.json'), tooltip)
+        for name in ['behavior-wiki-snapshots.json', 'behavior-review.json']:
+            shutil.copyfile(PACK.with_name(name), data / name)
         header.write_text(generate(pack))
 
         def run(*arguments):
@@ -499,6 +605,13 @@ def portable_self_test(pack):
         require(result.returncode != 0 and 'client tooltip evidence hash mismatch' in result.stderr,
                 'tampered tooltip evidence unexpectedly accepted')
         shutil.copyfile(PACK.with_name('client-tooltips.json'), tooltip)
+        for name in ['behavior-wiki-snapshots.json', 'behavior-review.json']:
+            path = data / name
+            path.write_bytes(path.read_bytes() + b' ')
+            result = run()
+            require(result.returncode != 0 and 'hash mismatch' in result.stderr,
+                    'tampered behavior evidence unexpectedly accepted')
+            shutil.copyfile(PACK.with_name(name), path)
         header.write_text(header.read_text() + '// stale\n')
         result = run()
         require(result.returncode != 0 and 'generated catalog is stale' in result.stderr,
@@ -518,7 +631,7 @@ def portable_self_test(pack):
         result = run('--snapshot', str(root))
         require(result.returncode != 0 and 'require --verify-evidence' in result.stderr,
                 'snapshot argument unexpectedly ignored')
-    print('Renamed standalone package passed; six integrity/explicit-evidence failures rejected')
+    print('Renamed standalone package passed; eight integrity/explicit-evidence failures rejected')
 
 
 def main():

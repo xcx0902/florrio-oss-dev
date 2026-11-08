@@ -186,3 +186,63 @@ XP、AI、毒持续、Honey 减速作用及 Leaf 脉冲等仍有明确策略或�
 | `npm --prefix wave run test:wire -- --snapshot "$PWD/wave-reference/20221030" --stage W3 --output-dir "$PWD/reports/wave/W3-tooltips"` | 退出 0；原版制作、批量、存档身份、库存、装备回充与访客隔离通过         |
 
 [本次数值校正浏览器报告](../reports/wave/W3-tooltips/wire.json) 单独保存；104 个源码文件摘要与磁盘一致，报告中的目录摘要与上表一致，三个原生工具摘要均已核验。原客户端文件哈希保持不变。
+
+<a id="w33-completion"></a>
+
+### 全花瓣怪物行为扩展（w3.3，2026-11-08）
+
+本次直接复用已完成的原件数值提取，目录扩展到 **45 种花瓣 × 六稀有度 = 270 变体**，
+**35 个怪物 ID × 六稀有度 = 210 变体**。全部非空花瓣可装备，None 保持合法空槽。
+完整 **962 条非零掉落**已接入，按花瓣种类独立投掷，同种不同稀有度互斥。
+上文 w3.1/w3.2 的 12 种实现范围和“完整掉落待接入”属于历史验收记录，由此段更新。
+
+已补齐接触/多粒/飞行、毒/减速/禁疗、护盾/反射/吸血、Sponge 债务与立即清算、条件治疗、
+Yggdrasil 落地复活、Pearl/Pollen 地面行为、Third Eye/Antennae/Cutter 等被动、Uranium 辐射、
+Stick 友方旋风以及完整怪物 AI。Hornet 导弹、Jellyfish 闪电、Spider 地面网、Digger 友方行为、
+Starfish 再生、Ant Hole/Fire Ant Burrow 放蚁、Leech 吸血均有权威路径。分节使用独立 HP，
+断节继续移动，头死亡提升存活节为根，整条最后死亡时只产生一次 W3 根奖励。
+巢穴受击动作在伤害后独立运行，每 tick 不重复施加再生、持续推力等效果。
+
+行为取证采用截止前 Wiki 修订，再参考同仓库 World PvP；保存 **82 个历史查询结果**。
+[中文人工核查清单](../wave/docs/behavior-review-20221030.md)逐种列出 80 条规则的采用行为、
+修订/仓库来源和疑问，其中 51 条带核查标记。所有怪物均因 AI/几何/XP 等参数保留标记，
+这不表示未实现。Crab、Acid Bubble、Sponge、Shell、Leech 等独特攻击缺乏充分证据，
+已明确记录保守采用方式；没有根据名称推定额外毒或爆炸。
+
+| 验证                                                                                                | 结果                                                                                                     |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| 生成器 `--check --self-test --verify-evidence --evidence-root . --snapshot wave-reference/20221030` | 19 个完整来源、2 个原件、36 个非法目录与 8 项完整性拒绝均通过                                            |
+| 正式/夹具宿主及全部测试构建                                                                         | 退出 0                                                                                                   |
+| 全部 CTest                                                                                          | 16/16；包含新增 `W3-behaviors`，W0–W2 回归及六项 W3 测试                                                 |
+| ASan + UBSan Debug 构建，全部 CTest                                                                 | 16/16，无 sanitizer 报错                                                                                 |
+| 只复制 `wave/` 到临时 `source/`，`WAVE_BUILD_HOST=OFF` 独立 Release 构建及 CTest                    | 16/16；生成器另验证重命名独立证据包                                                                      |
+| 原客户端 W3 浏览器回归                                                                              | 11 个结果对象通过：保留原有经济/存档操作，新增全部 270 项库存、八槽混合装备、Antennae 视野与 Pollen 回充 |
+| 原客户端 W2 浏览器回归                                                                              | W2-01 至 W2-11 全通过，13 个结果对象，包含合成回放/双访客等子项                                          |
+| ESLint、仓库格式检查及 `git diff --check`                                                           | 退出 0                                                                                                   |
+
+原生行为测试实际遍历全部 480 变体，并专项检查多粒/回充、毒覆盖、不叠加 Pincer、Honey、
+Shield/Sponge/Salt/Fangs、地面寿命/复活、Wing/Bubble/Yin Yang、Claw/击退、禁疗、Pearl、
+辐射、Stick、Hornet、巢穴、分节、蚂蚁警戒及不同 tick 时长的单次再生。
+经济测试验证六档输入掉落、同种稀有度互斥，以及 Magnet 在普通拾取范围外实际入库。
+浏览器使用原版鼠标/键盘与只读 Wasm 观察，不向页面写入游戏命令或修改内存。
+
+当前固定输入身份：
+
+| 文件                           | SHA-256                                                            |
+| ------------------------------ | ------------------------------------------------------------------ |
+| `catalog.json`                 | `8ebf31a5f01132dee4ce82c887101178294bb963182dfc48b238ec6e0dd4a342` |
+| `evidence-inputs.json`         | `342e4fbc31ac2da7cfaa902c544c4f334955d50b0fdf2644ea1de4cda624576a` |
+| `behavior-review.json`         | `e43e164612f15b8da90dbe495e32e89ace1a6fb011829d8c2e8e0066694e704f` |
+| `behavior-wiki-snapshots.json` | `a1ef5939111e931afa73cdd51132d9a7e6ed45d02d36d3d45fd441b31ecfd080` |
+
+[本次 W3 浏览器报告](../reports/wave/W3-completion/wire.json) ·
+[本次 W2 回归](../reports/wave/W2-completion/wire.json) ·
+[ASan/UBSan JUnit](../reports/wave/W3-completion/asan-tests.xml) ·
+[独立构建及日志](../reports/wave/W3-completion/standalone.json) ·
+[最终身份与验收](../reports/wave/W3-completion/acceptance.json)。
+旧报告独立保留，不能用其哈希代表当前未提交工作树。
+
+本次仍明确保留的边界：Rare+ 巢穴采用同场遭遇代理；子区域传送、入洞和内部超时由 W5
+接续。闪电连线、护盾/毒/减速/禁疗特殊图层及原版地面掉落图形的旧协议还需核查，
+服务器效果已经生效；不以原生行为测试宣称这些原版视觉已经还原。历史攻击方式与复刻参数
+逐种见人工核查清单，不影响已实现种类的装备与模拟入口。

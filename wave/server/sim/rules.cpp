@@ -92,6 +92,13 @@ Rules garden_rules() {
         .contact_cooldown = 20}},
   };
   rules.contact_knockback_speed = 24;
+  // Wave pools remain dated W0 data; all kinds are available to scenario builders.
+  for (const auto& mob : catalog::dated().mobs) {
+    if (mob.rarity == Rarity::common &&
+        std::ranges::find(rules.mobs, mob.kind, &MobRules::kind) == rules.mobs.end()) {
+      rules.mobs.push_back({mob.kind, mob.body});
+    }
+  }
   for (int y : {-100, 0, 100}) {
     for (int x : {-100, 0, 100}) {
       if (x != 0 || y != 0) {

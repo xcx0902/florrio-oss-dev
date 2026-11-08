@@ -66,7 +66,30 @@ enum class Mob {
   soldier_ant,
   spider,
   hornet,
-  beetle
+  beetle,
+  cactus,
+  queen_ant,
+  ant_hole,
+  centipede_segment,
+  evil_centipede_segment,
+  desert_centipede,
+  desert_centipede_segment,
+  square,
+  shiny_ladybug,
+  scorpion,
+  fire_ant,
+  fire_ant_burrow,
+  sandstorm,
+  bubble,
+  acid_bubble,
+  shell,
+  starfish,
+  crab,
+  jellyfish,
+  digger,
+  sponge,
+  leech,
+  leech_segment
 };
 enum class Petal {
   basic,
@@ -161,7 +184,11 @@ enum class TransitionReason {
 enum class HealthKind {
   contact,
   heal,
-  poison
+  poison,
+  shield,
+  radiation,
+  reflected,
+  deferred
 };
 enum class DrawPurpose {
   special_roll,
@@ -174,6 +201,7 @@ struct DamageSource {
   EntityId entity;
   std::optional<LifeId> owner;
   Faction faction = Faction::garden;
+  std::optional<EntityId> instigator;
   bool operator==(const DamageSource&) const = default;
 };
 
@@ -194,6 +222,11 @@ struct EntityView {
   double health = 0;
   double max_health = 0;
   Tick cooldown_ticks = 0;
+  double shield = 0;
+  bool poisoned = false;
+  bool slowed = false;
+  bool heal_blocked = false;
+  std::optional<EntityId> damage_origin;
   bool operator==(const EntityView&) const = default;
 };
 
@@ -216,6 +249,8 @@ struct PlayerView {
   std::vector<PetalSlotView> petals;
   std::uint64_t credited_defeats = 0;
   std::vector<Rarity> loadout_rarities;
+  double vision_multiplier = 1;
+  double pickup_multiplier = 1;
   bool operator==(const PlayerView&) const = default;
 };
 
@@ -280,6 +315,8 @@ struct Input {
   Vec2 move;
   bool attack = false;
   bool defend = false;
+  std::optional<double> aim_angle;
+  double aim_distance = 13;
 };
 
 struct Connection {

@@ -179,6 +179,7 @@ void Match::replace_loadout(Player& entry, std::vector<Petal> loadout,
       continue;
     }
     for (const auto id : entry.view.petals[i].entities) {
+      flush_sponge(id);
       entities_.erase(id);
     }
     entry.view.petals[i] = {};
@@ -246,7 +247,8 @@ bool Match::queue(Input input) {
   auto* entry = player(input.life.player);
   if (phase_ == Phase::ended || input.life.match != id_ || !entry ||
       entry->view.life != input.life || entry->view.state != LifeState::alive ||
-      !input.move.finite() || std::abs(input.move.x) > 1 || std::abs(input.move.y) > 1) {
+      !input.move.finite() || std::abs(input.move.x) > 1 || std::abs(input.move.y) > 1 ||
+      (input.aim_angle && !std::isfinite(*input.aim_angle)) || !nonnegative(input.aim_distance)) {
     return false;
   }
   commands_.emplace_back(input);
@@ -271,6 +273,12 @@ void Match::apply_commands() {
         entry.move = length > 1 ? input->move * (1 / length) : input->move;
         entry.attack = input->attack;
         entry.defend = input->defend;
+        if (input->aim_angle) {
+          entry.aim_angle = *input->aim_angle;
+        } else if (length > 0) {
+          entry.aim_angle = std::atan2(input->move.y, input->move.x);
+        }
+        entry.aim_distance = std::min(input->aim_distance, 40.0);
       }
     } else if (const auto* equip = std::get_if<Equip>(&command)) {
       auto& entry = *player(equip->life.player);
@@ -423,12 +431,16 @@ bool Match::step() {
     phase_ = Phase::spawning;
   }
   refresh_petals();
+  refresh_passives();
   spawn_due();
   move_entities();
+  update_mob_actions();
   update_orbits();
   update_effects();
+  update_special_effects();
   resolve_contacts();
   apply_impacts();
+  update_nests();
   finish_projectiles();
   reap_deaths();
   update_orbits();

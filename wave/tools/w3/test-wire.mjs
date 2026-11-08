@@ -95,6 +95,7 @@ export async function runW3(values) {
       return {
         level: d.getUint8(p + 8),
         flags: d.getUint8(p + 9),
+        visionScale: d.getFloat32(p + 2316, true),
         progress: d.getUint16(p + 4608, true),
         inventory: Array.from({ length: 276 }, (_, i) => u(p + 2400 + i * 4)),
         gallery: Array.from(new Uint8Array(d.buffer, p + 2288, 27)),
@@ -486,6 +487,63 @@ export async function runW3(values) {
     };
     await screenshot(c, 'auto-result');
     await c.context.close();
+    await host.stop();
+    host = null;
+    // Mixed new effects pass through the original reader with ordinary Ready/input.
+    // Offline seeding is restricted to the acceptance executable.
+    const behaviorDatabase = path.join(temporary, 'behaviors.sqlite3');
+    const behaviorSeed = seed(behaviorDatabase, '--behaviors');
+    host = await startHost({
+      snapshot: values.snapshot,
+      nativeDir: native,
+      port: 0,
+      fixture: true,
+      database: behaviorDatabase,
+    });
+    const mixed = await client(behaviorSeed.token, 'new-behaviors');
+    const restoredMixed = await profile(mixed.page);
+    assert.equal(restoredMixed.level, 45);
+    for (const [kind, rarity, count] of behaviorSeed.inventory) {
+      assert.equal(restoredMixed.inventory[kind * 6 + rarity], count);
+    }
+    await mixed.page.mouse.move(512, 384);
+    await clickText(mixed, 'Ready');
+    await mixed.page.waitForTimeout(150);
+    assert.ok((await fetch(host.url + 'wave/test/step/1', { method: 'POST' })).ok);
+    await mixed.page.waitForFunction(() => {
+      const d = new DataView(window.Module.asm.Jf.buffer),
+        u = (a) => d.getUint32(a, true);
+      const p = u(u(u(4347728) + 2768));
+      return u(p + 2360) !== 0 && Math.abs(d.getFloat32(p + 2316, true) - 2 / 3) < 1e-6;
+    });
+    const activeMixed = await profile(mixed.page);
+    assert.deepEqual(activeMixed.equipped.slice(0, 16), behaviorSeed.slots.slice(0, 8).flat());
+    assert.deepEqual(activeMixed.cooldown, Array(8).fill(65535));
+    await mixed.page.mouse.down();
+    await mixed.page.waitForTimeout(120);
+    assert.ok((await fetch(host.url + 'wave/test/step/25', { method: 'POST' })).ok);
+    await mixed.page.mouse.up();
+    await mixed.page.waitForTimeout(500);
+    assert.ok(
+      mixed.requests.some((r) => r.opcode === 9),
+      'Original attack reaches server',
+    );
+    assert.deepEqual(mixed.errors, []);
+    const deployedMixed = await profile(mixed.page);
+    assert.ok(deployedMixed.cooldown[5] < 65535, 'Mythic Pollen deployment enters slot recharge');
+    await screenshot(mixed, 'new-behaviors');
+    report.cases.newBehaviors = {
+      status: 'passed',
+      inventoryVariants: behaviorSeed.inventory.length,
+      slots: behaviorSeed.slots,
+      restored: restoredMixed,
+      active: activeMixed,
+      deployed: deployedMixed,
+      screenshot: 'new-behaviors.png',
+      scope:
+        'Original reader: all 270 inventory entries; mixed eight slots, three hidden passives, Antennae view scale and Pollen recharge. Other effect behavior is covered natively.',
+    };
+    await mixed.context.close();
     await host.stop();
     host = null;
     report.status = 'passed';

@@ -107,8 +107,15 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     hit_cursor_ = room ? room->hit_sequence : 0;
   }
   std::set<Key> live;
+  const auto visible = [](const sim::EntityView& e) {
+    const auto* p = e.petal ? catalog::dated().petal(*e.petal, e.rarity) : nullptr;
+    return !p || !p->mechanics.hidden;
+  };
   if (view) {
     for (const auto& e : view->entities) {
+      if (!visible(e)) {
+        continue;
+      }
       live.emplace(e.id.match.value, e.id.slot, e.id.generation);
     }
   }
@@ -143,6 +150,9 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   sim::Vec2 camera;
   if (view) {
     for (const auto& e : view->entities) {
+      if (!visible(e)) {
+        continue;
+      }
       handle(e.id);
     }
     for (const auto& p : view->players) {
@@ -153,6 +163,9 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     }
     // Put bodies before profiles: references resolve in the original reader.
     for (const auto& e : view->entities) {
+      if (!visible(e)) {
+        continue;
+      }
       const bool flower = e.group == sim::Group::player;
       Writer body;
       std::uint32_t mask = 1 | 0x400 | 0x1000 | 0x80000;
@@ -275,7 +288,10 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   for (const auto byte : gallery) {
     profile.byte(byte);
   }
-  profile.real(1);
+  const auto player = view ? std::ranges::find(view->players, viewer.id, &sim::PlayerView::id)
+                           : std::vector<sim::PlayerView>::const_iterator{};
+  // $601 -> profile+2316; $3384 uses 1920/scale and 1080/scale for the view bounds.
+  profile.real(view && player != view->players.end() ? 1 / player->vision_multiplier : 1);
   profile.text("");
   profile.real(0);
   profile.word(controlled);

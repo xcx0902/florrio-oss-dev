@@ -9,6 +9,7 @@
 #include <future>
 #include <iostream>
 #include <stdexcept>
+#include <set>
 
 namespace wave::sim {
 struct FixtureAccess {
@@ -207,10 +208,10 @@ void commands() {
   check(garden.command(member, swap, life, "1:stale-swap") && garden.wait_storage() &&
             member.profile->version == swapped_version && member.profile->slots[1] == rose,
         "new request with stale old slot values cannot overwrite authoritative equipment");
-  auto unsupported = equipment;
-  unsupported.slots[0] = {*catalog::client_petal(sim::Petal::light), 0};
-  check(!garden.command(member, unsupported, life, "1:4"),
-        "unimplemented active effect rejected before Store mutation");
+  auto invalid = equipment;
+  invalid.slots[0] = {46, 0};
+  check(!garden.command(member, invalid, life, "1:4"),
+        "unknown petal identity rejected before Store mutation");
 }
 
 void command_faults() {
@@ -330,8 +331,11 @@ void economy() {
     check(a.profile->discoveries.contains(discovery) && b.profile->discoveries.contains(discovery),
           "mob gallery discovery shared with eligible teammates");
     const auto& drops = garden.room(a)->drops;
-    check(drops.size() == 1, "fixed seed creates exactly one dated Rose drop");
+    check(drops.size() == 2 && drops[0].item == store::Item{5, 0} &&
+              drops[1].item == store::Item{2, 1},
+          "independent kinds can drop together: seeded Common Rose and Unusual Light");
     const auto item = drops.front().item;
+    const auto second_item = drops.back().item;
     check(count(*a.profile, item) == 0 && count(*b.profile, item) == 0,
           "out of pickup range never grants inventory");
     sim::FixtureAccess::position(match, *player(garden, a).body, {190, 0});
@@ -339,6 +343,7 @@ void economy() {
     garden.step();
     check(garden.wait_storage(), "pickup claim commits");
     check(count(*a.profile, item) == 0 && count(*b.profile, item) == 1 &&
+              count(*a.profile, second_item) == 0 && count(*b.profile, second_item) == 1 &&
               garden.room(a)->drops.empty(),
           "two claimants award the nearer one exactly one item");
     for (unsigned i = 0; i < 8; ++i) {
@@ -361,6 +366,64 @@ void economy() {
     check(restarted.command(a, wire::Ready{true}, {}), "recovered guest starts new match");
     check(restarted.room(a)->economy_id != match_key,
           "restart cannot reuse durable reward match key");
+  }
+}
+
+void complete_drops_and_magnet() {
+  for (unsigned tier = 0; tier < 6; ++tier) {
+    for (const bool magnet : {false, true}) {
+      auto db = std::make_shared<store::Store>(":memory:", store::Options{.allow_test_seed = true});
+      auto guest = db->create_guest();
+      if (magnet) {
+        store::TestSeed seed;
+        seed.inventory = guest.inventory;
+        seed.inventory[{29, 0}] = 1;
+        seed.slots = guest.slots;
+        seed.slots[0] = store::Item{29, 0};
+        guest = db->seed_for_testing(guest.guest_token, seed);
+      }
+      auto r = rules();
+      r.catalog = &catalog::dated();
+      r.waves[0].rarity = static_cast<sim::Rarity>(tier);
+      app::Garden garden(r, 7, {}, db);
+      auto& member = garden.admit(guest.guest_token, 1);
+      check(garden.command(member, wire::Ready{true}, {}), "dated pickup fixture starts");
+      garden.step();
+      auto& match = *garden.room(member)->match;
+      const auto view = match.view();
+      const auto root =
+          *std::ranges::find(view.entities, sim::Group::main_mob, &sim::EntityView::group);
+      // 60 is outside the ordinary 36 range but inside Common Magnet's 90.
+      sim::FixtureAccess::position(match, root.id, {60, 0});
+      sim::FixtureAccess::kill(match, root.id, player(garden, member).life);
+      garden.step();
+      check(garden.wait_storage(), "complete catalog kill and pickup commit");
+      if (magnet) {
+        check(garden.room(member)->drops.empty(),
+              "Magnet actually collects beyond normal pickup range");
+        if (tier == 0) {
+          check(count(*member.profile, {5, 0}) == 1 && count(*member.profile, {2, 1}) == 1,
+                "Magnet grants both independent outputs once");
+        }
+      } else {
+        std::set<std::uint32_t> kinds;
+        for (const auto& drop : garden.room(member)->drops) {
+          check(kinds.insert(drop.item.kind).second,
+                "each petal kind chooses at most one output rarity");
+          check(std::ranges::any_of(catalog::drop_table(),
+                                    [&](const auto& rule) {
+                                      return rule.mob == sim::Mob::ladybug &&
+                                             static_cast<unsigned>(rule.mob_rarity) == tier &&
+                                             catalog::client_petal(rule.petal) == drop.item.kind &&
+                                             static_cast<unsigned>(rule.rarity) == drop.item.rarity;
+                                    }),
+                "all six input rarities select only their own complete drop table");
+        }
+        if (tier == 0) {
+          check(kinds.size() == 2, "separate drop kinds are not normalized into one distribution");
+        }
+      }
+    }
   }
 }
 
@@ -446,7 +509,7 @@ void terminal_snapshot() {
           "final tick movement queued");
     garden.step();
     check(garden.wait_storage() && member.profile->xp == xp && member.profile->highest_wave == 1 &&
-              count(*member.profile, rose) == 0 && garden.room(member)->drops.size() == 1,
+              count(*member.profile, rose) == 0 && garden.room(member)->drops.size() == 2,
           "pickup uses actual final movement position, not stale before-tick in-range coordinates");
   }
 }
@@ -582,6 +645,7 @@ int main() {
     commands();
     command_faults();
     economy();
+    complete_drops_and_magnet();
     eligibility();
     terminal_snapshot();
     shutdown_drain();

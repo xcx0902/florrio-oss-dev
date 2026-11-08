@@ -10,9 +10,10 @@ int main(int argc, char** argv) {
     }
     wave::store::Store store(argv[1], {.allow_test_seed = true});
     const bool automatic = argc == 3 && std::string_view(argv[2]) == "--auto";
-    auto profile =
-        argc == 3 && !automatic ? store.recover_guest(argv[2]).value() : store.create_guest();
-    if (argc == 2 || automatic) {
+    const bool behaviors = argc == 3 && std::string_view(argv[2]) == "--behaviors";
+    auto profile = argc == 3 && !automatic && !behaviors ? store.recover_guest(argv[2]).value()
+                                                         : store.create_guest();
+    if (argc == 2 || automatic || behaviors) {
       wave::store::TestSeed seed;
       seed.xp = 150;
       seed.highest_wave = 7;
@@ -25,6 +26,21 @@ int main(int argc, char** argv) {
       if (automatic) {
         seed.inventory = {{{1, 0}, 5}, {{5, 0}, 30}, {{5, 5}, 2}};
         seed.slots[8] = wave::store::Item{5, 5};
+      }
+      if (behaviors) {
+        seed.xp = 100 * 44 * 44;
+        seed.inventory.clear();
+        seed.slots = {};
+        for (unsigned kind = 1; kind <= 45; ++kind) {
+          for (std::uint8_t rarity = 0; rarity < 6; ++rarity) {
+            seed.inventory[{kind, rarity}] = 1;
+          }
+        }
+        const std::array<wave::store::Item, 8> active{
+            {{17, 5}, {43, 0}, {37, 0}, {32, 2}, {36, 0}, {14, 5}, {38, 3}, {8, 4}}};
+        for (std::size_t i = 0; i < active.size(); ++i) {
+          seed.slots[i] = active[i];
+        }
       }
       seed.discoveries = {{1, 0}, {4, 1}, {12, 2}};
       profile = store.seed_for_testing(profile.guest_token, seed);

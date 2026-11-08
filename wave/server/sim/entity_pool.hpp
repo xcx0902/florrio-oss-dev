@@ -3,6 +3,7 @@
 #include "sim/rules.hpp"
 
 #include <limits>
+#include <deque>
 #include <stdexcept>
 #include <utility>
 
@@ -18,6 +19,14 @@ struct Slow {
   DamageSource source;
   double multiplier = 1;
   Tick until = 0;
+  bool slows_attacks = false;
+};
+
+struct DeferredDamage {
+  DamageSource source;
+  EntityId sponge;
+  double remaining = 0;
+  Tick ticks = 0;
 };
 
 struct Entity {
@@ -36,6 +45,23 @@ struct Entity {
   Vec2 flight_direction;
   unsigned particle_index = 0;
   std::vector<Slow> slows;
+  std::optional<EntityId> target;
+  std::optional<EntityId> root;
+  std::optional<EntityId> predecessor;
+  std::optional<Mob> chain_kind;
+  Tick action_ready = 0;
+  Tick heal_block_until = 0;
+  Tick shield_until = 0;
+  Tick expires = 0;
+  Tick stun_until = 0;
+  unsigned spawn_count = 0;
+  std::optional<Petal> summon_origin;
+  Vec2 home_position;
+  bool returning = false;
+  bool provoked = false;
+  bool held = false;
+  double flight_speed = 0;
+  std::vector<DeferredDamage> deferred;
 };
 
 // Match-local generations and a slot-ordered active set keep pair ordering stable.
@@ -95,7 +121,7 @@ class EntityPool {
     std::optional<Entity> entity;
   };
   MatchId match_;
-  std::vector<Slot> slots_;
+  std::deque<Slot> slots_;
   std::vector<std::uint32_t> free_;
   std::vector<std::uint32_t> active_;
 };

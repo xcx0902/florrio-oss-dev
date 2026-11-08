@@ -24,7 +24,7 @@ const Interaction& interaction(Faction source, Faction target) {
 }
 
 DamageSource source_of(const EntityView& entity) {
-  return {entity.id, entity.owner, entity.faction};
+  return {entity.id, entity.owner, entity.faction, entity.damage_origin};
 }
 
 }  // namespace
@@ -36,10 +36,21 @@ void Match::move_entities() {
     auto& entity = entities_.at(slot);
     auto& body = entity.view;
     Vec2 direction;
-    if (entity.projectile) {
+    if (entity.held) {
+      const auto* owner = body.owner ? player(body.owner->player) : nullptr;
+      if (body.petal == Petal::pearl && owner && owner->view.body) {
+        const auto delta = entities_.get(*owner->view.body)->view.position - body.position;
+        if (delta.length() > 50 || ((owner->attack || owner->defend) && delta.length() > 5)) {
+          direction = delta * (1 / delta.length());
+        }
+        entity.range_left = 1e9;
+      }
+    } else if (entity.projectile) {
       direction = entity.flight_direction;
     } else if (body.group == Group::player) {
       direction = player(body.owner->player)->move;
+    } else if (rules_.catalog && body.mob) {
+      direction = mob_direction(entity);
     } else if (entity.rules.speed_per_second > 0 && body.group != Group::petal) {
       double closest = std::numeric_limits<double>::infinity();
       for (const auto candidate : active) {
@@ -61,9 +72,15 @@ void Match::move_entities() {
     double slow = 1;
     std::erase_if(entity.slows,
                   [this](const detail::Slow& effect) { return tick_ >= effect.until; });
+    double movement_slow = 1;
     for (const auto& effect : entity.slows) {
-      slow *= effect.multiplier;
+      if (effect.slows_attacks) {
+        slow *= effect.multiplier;
+      } else {
+        movement_slow = std::min(movement_slow, effect.multiplier);
+      }
     }
+    slow *= movement_slow;
     for (const auto area_slot : active) {
       const auto& area = entities_.at(area_slot);
       if (!area.ground_web || area.view.faction == body.faction || body.group == Group::petal ||
@@ -79,15 +96,19 @@ void Match::move_entities() {
         break;
       }
     }
-    const double speed = entity.projectile && rules_.catalog
-                             ? rules_.catalog->petal(*body.petal, body.rarity)->projectile_speed
-                             : entity.rules.speed_per_second;
-    body.velocity = direction * (speed * slow) + entity.knockback;
+    const double speed =
+        entity.projectile && rules_.catalog
+            ? (entity.flight_speed > 0
+                   ? entity.flight_speed
+                   : rules_.catalog->petal(*body.petal, body.rarity)->projectile_speed)
+            : entity.rules.speed_per_second;
+    body.velocity =
+        entity.stun_until > tick_ ? Vec2{} : direction * (speed * slow) + entity.knockback;
   }
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
     auto& body = entity.view;
-    if (body.group == Group::petal && !entity.projectile) {
+    if ((body.group == Group::petal && !entity.projectile) || entity.predecessor) {
       continue;
     }
     auto displacement = body.velocity * seconds;
@@ -127,31 +148,41 @@ void Match::update_orbits() {
         continue;
       }
       double bonus = 0;
+      unsigned yin_yang = 0;
       for (std::size_t i = 0; i < owner.view.petals.size(); ++i) {
         if (!owner.view.petals[i].entity) {
           continue;
         }
-        bonus += rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i])
-                     ->rotation_bonus;
+        const auto* p =
+            rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
+        bonus += p->rotation_bonus;
+        yin_yang += p->effect == catalog::Effect::yin_yang;
       }
       double slow = 1;
       if (owner.view.body) {
         for (const auto& effect : entities_.get(*owner.view.body)->slows) {
           if (effect.until > tick_) {
-            slow *= effect.multiplier;
+            if (effect.slows_attacks) {
+              slow *= effect.multiplier;
+            }
           }
         }
       }
       if (tick_ != 0) {
-        owner.orbit_phase = std::fmod(
-            owner.orbit_phase + (rules_.orbit_rad_per_second + bonus) * slow * seconds, turn);
+        owner.orbit_phase =
+            std::fmod(owner.orbit_phase + (rules_.orbit_rad_per_second + bonus) * slow * seconds *
+                                              (yin_yang == 8       ? 5
+                                               : yin_yang % 3 == 1 ? -1
+                                               : yin_yang % 3 == 2 ? 0
+                                                                   : 1),
+                      turn);
       }
       owner.orbit_updated = tick_;
     }
   }
   for (const auto slot : entities_.active()) {
     auto& petal = entities_.at(slot);
-    if (petal.view.group != Group::petal || petal.projectile || petal.ground_web ||
+    if (petal.view.group != Group::petal || petal.projectile || petal.held || petal.ground_web ||
         !petal.view.anchor) {
       continue;
     }
@@ -159,13 +190,59 @@ void Match::update_orbits() {
     const auto& owner = *player(petal.view.owner->player);
     const double phase =
         rules_.catalog ? owner.orbit_phase : rules_.orbit_rad_per_second * seconds * tick_;
-    const double heading = std::fmod(phase + petal.orbit_offset, turn);
+    bool third_eye = false;
+    if (rules_.catalog) {
+      for (std::size_t i = 0; i < owner.view.loadout.size(); ++i) {
+        third_eye |=
+            owner.view.loadout[i] == Petal::third_eye && owner.view.petals[i].entity.has_value();
+      }
+    }
+    if (rules_.catalog) {
+      double total = 0, before = 0;
+      for (std::size_t i = 0; i < owner.view.loadout.size(); ++i) {
+        const auto* p =
+            rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
+        if (!p || p->mechanics.hidden) {
+          continue;
+        }
+        const double weight =
+            p->kind == Petal::light || p->kind == Petal::pollen ? p->particles : 1;
+        if (std::ranges::find(owner.view.petals[i].entities, petal.view.id) !=
+            owner.view.petals[i].entities.end()) {
+          before = total;
+          if (weight > 1) {
+            before += petal.particle_index;
+          }
+        }
+        total += weight;
+      }
+      const auto& p = *rules_.catalog->petal(*petal.view.petal, petal.view.rarity);
+      petal.orbit_offset = total > 0 ? turn * before / total : 0;
+      if (p.particles > 1 && p.kind != Petal::light && p.kind != Petal::pollen) {
+        petal.orbit_offset += (double(petal.particle_index) - (p.particles - 1) / 2.0) * .12;
+      }
+    }
+    const double heading =
+        std::fmod((third_eye ? owner.aim_angle : phase) + petal.orbit_offset, turn);
     const Vec2 offset{std::cos(heading), std::sin(heading)};
-    const bool rose = rules_.catalog && petal.view.petal == Petal::rose;
-    const double radius =
-        rules_.orbit_radius * (owner.defend            ? rules_.defend_orbit_multiplier
-                               : owner.attack && !rose ? rules_.attack_orbit_multiplier
-                                                       : 1);
+    double radius = rules_.orbit_radius * (owner.defend   ? rules_.defend_orbit_multiplier
+                                           : owner.attack ? rules_.attack_orbit_multiplier
+                                                          : 1);
+    if (rules_.catalog) {
+      const auto& p = *rules_.catalog->petal(*petal.view.petal, petal.view.rarity);
+      radius = owner.defend   ? p.mechanics.defend_distance
+               : owner.attack ? p.mechanics.attack_distance
+                              : rules_.orbit_radius;
+      if (p.effect == catalog::Effect::wing && owner.attack && !owner.defend) {
+        radius += (1 + std::sin(seconds * (tick_ - petal.born_tick) * 5)) * 12;
+      }
+      if (third_eye) {
+        radius = owner.aim_distance;
+      }
+      if (p.mechanics.hidden) {
+        radius = 0;
+      }
+    }
     petal.view.heading_rad = heading;
     petal.view.position =
         clamp_center(body.position + offset * radius, rules_.arena_radius, petal.view.radius);
@@ -199,6 +276,7 @@ void Match::detach_petal(EntityId id) {
 }
 
 void Match::consume_petal(EntityId id) {
+  flush_sponge(id);
   detach_petal(id);
   entities_.erase(id);
 }
@@ -263,9 +341,13 @@ void Match::update_effects() {
       summon.owner = entity->view.owner;
       summon.position = entity->view.position;
       // Copy before pool insertion: insert may move its backing storage.
-      const auto body = rules_.catalog->mob(*summon.mob, summon.rarity)->body;
+      const auto lifetime = rules_.timing.ticks_ceil(
+          Microseconds(static_cast<Microseconds::rep>(definition.duration_seconds * 1e6)));
       consume_petal(id);
-      (void)add_entity(summon, body);
+      const auto child =
+          spawn_mob(*summon.mob, summon.rarity, summon.position, Group::summon, summon.owner);
+      entities_.get(child)->summon_origin = Petal::egg;
+      entities_.get(child)->expires = tick_ + lifetime;
     } else if (owner.attack && !owner.defend && tick_ >= entity->born_tick + delay &&
                (definition.effect == catalog::Effect::projectile ||
                 definition.effect == catalog::Effect::poison_projectile ||
@@ -296,14 +378,17 @@ void Match::finish_projectiles() {
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
     const auto id = entity.view.id;
-    if (entity.ground_web) {
+    if (entity.spent && !entity.projectile && !entity.ground_web) {
+      consume_petal(id);
+    } else if (entity.ground_web) {
       const auto& definition = *rules_.catalog->petal(Petal::web, entity.view.rarity);
       if (std::chrono::duration<double>(rules_.timing.step).count() * (tick_ - entity.born_tick) >=
           definition.duration_seconds) {
         consume_petal(id);
       }
     } else if (entity.projectile &&
-               (entity.range_left <= 0 || entity.spent || entity.view.health <= 0)) {
+               (entity.range_left <= 0 || entity.spent || entity.view.health <= 0 ||
+                (entity.expires && tick_ >= entity.expires))) {
       if (entity.view.petal == Petal::web) {
         entity.projectile = false;
         entity.ground_web = true;
@@ -318,35 +403,56 @@ void Match::finish_projectiles() {
       } else {
         consume_petal(id);
       }
-    } else if (entity.view.group == Group::summon && entity.view.owner) {
-      const auto* definition = rules_.catalog->petal(Petal::egg, entity.view.rarity);
-      if (std::chrono::duration<double>(rules_.timing.step).count() * (tick_ - entity.born_tick) >=
-          definition->duration_seconds) {
-        entities_.erase(id);
-      }
+    } else if (entity.expires && tick_ >= entity.expires) {
+      consume_petal(id);
     }
   }
 }
 
 void Match::resolve_contacts() {
   const auto attack = [this](detail::Entity& source, const detail::Entity& target) {
-    if (source.ready_tick > tick_ || source.ground_web || target.ground_web || source.spent) {
+    if (source.ready_tick > tick_ || source.ground_web || target.ground_web || source.spent ||
+        source.view.health <= 0 || target.view.health <= 0) {
+      return;
+    }
+    if (rules_.catalog &&
+        (source.view.mob == Mob::fire_ant_burrow || target.view.mob == Mob::fire_ant_burrow ||
+         (source.view.mob == Mob::ant_hole && source.view.rarity >= Rarity::rare) ||
+         (target.view.mob == Mob::ant_hole && target.view.rarity >= Rarity::rare))) {
       return;
     }
     const auto& pair = interaction(source.view.faction, target.view.faction);
     const auto* definition = rules_.catalog && source.view.petal
                                  ? rules_.catalog->petal(*source.view.petal, source.view.rarity)
                                  : nullptr;
+    const auto* target_definition =
+        rules_.catalog && target.view.petal
+            ? rules_.catalog->petal(*target.view.petal, target.view.rarity)
+            : nullptr;
+    if ((definition && definition->mechanics.hidden) ||
+        (target_definition && target_definition->mechanics.hidden)) {
+      return;
+    }
     if (definition && definition->effect == catalog::Effect::leaf && pair.heal && target.view.mob &&
         target.view.health < target.view.max_health) {
       Impact hit{target.view.id, source_of(source.view), HealthKind::heal,
                  definition->friendly_mob_heal};
       hit.consume_source = true;
       impacts_.push_back(hit);
+    } else if (pair.damage && definition && definition->effect == catalog::Effect::lightning &&
+               target.view.group != Group::petal) {
+      chain_attack(target.view.id, source_of(source.view), definition->mechanics.chain_damage,
+                   definition->mechanics.bounces, 40);
+      source.spent = true;
+
     } else if (pair.damage && source.rules.contact_damage > 0) {
       impacts_.push_back({target.view.id, source_of(source.view), HealthKind::contact,
                           source.rules.contact_damage, source.rules.poison_per_tick,
                           source.rules.poison_ticks});
+      if (definition && definition->mechanics.damage_ratio > 0) {
+        impacts_.back().amount += std::min(definition->mechanics.damage_limit,
+                                           target.view.health * definition->mechanics.damage_ratio);
+      }
     } else if (pair.heal && source.rules.contact_heal > 0 &&
                target.view.health < target.view.max_health) {
       impacts_.push_back(
@@ -354,16 +460,41 @@ void Match::resolve_contacts() {
     } else {
       return;
     }
-    if (definition && definition->effect == catalog::Effect::honey && pair.damage) {
+    if (definition &&
+        (definition->effect == catalog::Effect::honey ||
+         definition->effect == catalog::Effect::pincer) &&
+        pair.damage) {
       auto& hit = impacts_.back();
       hit.slow_multiplier = definition->slow_multiplier;
+      hit.attack_slow = definition->effect == catalog::Effect::honey;
       hit.slow_ticks = rules_.timing.ticks_ceil(
           Microseconds(static_cast<Microseconds::rep>(definition->duration_seconds * 1000000)));
     }
-    if (source.projectile) {
+    if (definition && definition->effect == catalog::Effect::dandelion && pair.damage) {
+      impacts_.back().heal_block_ticks =
+          rules_.timing.ticks_ceil(Microseconds(static_cast<Microseconds::rep>(
+              definition->duration_seconds * (target.view.group == Group::player ? .5 : 1) * 1e6)));
+    }
+    if (pair.damage && definition &&
+        (definition->mechanics.knockback > 0 || definition->effect == catalog::Effect::heavy)) {
+      const auto delta = target.view.position - source.view.position;
+      if (delta.length() > 0) {
+        entities_.get(target.view.id)->knockback +=
+            delta * ((definition->mechanics.knockback > 0 ? definition->mechanics.knockback : 50) /
+                     delta.length());
+      }
+    }
+    if (source.projectile && !source.held && source.view.petal != Petal::pollen) {
       source.spent = true;
     }
-    source.ready_tick = tick_ + source.rules.contact_cooldown;
+    double attack_scale = 1;
+    for (const auto& slow : source.slows) {
+      if (slow.slows_attacks && slow.until > tick_) {
+        attack_scale *= slow.multiplier;
+      }
+    }
+    source.ready_tick =
+        tick_ + static_cast<Tick>(std::ceil(source.rules.contact_cooldown / attack_scale));
   };
 
   const auto& active = entities_.active();
@@ -387,6 +518,9 @@ void Match::resolve_contacts() {
 
       const auto& pair = interaction(first.view.faction, second.view.faction);
       if (pair.push && !first.ground_web && !second.ground_web &&
+          first.view.mob != Mob::fire_ant_burrow && second.view.mob != Mob::fire_ant_burrow &&
+          !(first.view.mob == Mob::ant_hole && first.view.rarity >= Rarity::rare) &&
+          !(second.view.mob == Mob::ant_hole && second.view.rarity >= Rarity::rare) &&
           first.view.group != Group::petal && second.view.group != Group::petal) {
         const Vec2 normal = distance > 0 ? delta * (1 / distance) : Vec2{1, 0};
         const Vec2 shift = normal * (depth / 2);
@@ -405,66 +539,58 @@ void Match::resolve_contacts() {
 }
 
 void Match::apply_impacts() {
-  const auto apply = [this](detail::Entity& target, const DamageSource& source, HealthKind kind,
-                            double amount) {
-    auto& body = target.view;
-    if (body.health <= 0) {
-      return false;
-    }
-    const auto& pair = interaction(source.faction, body.faction);
-    if (kind == HealthKind::heal && pair.heal) {
-      amount = std::min(amount, body.max_health - body.health);
-      body.health += amount;
-    } else if (kind != HealthKind::heal && pair.damage) {
-      amount = std::min(amount, body.health);
-      body.health -= amount;
-      if (body.health == 0) {
-        target.fatal_hit = source;
-      }
-    } else {
-      return false;
-    }
-    if (amount <= 0) {
-      return false;
-    }
-    emit(HealthChange{body.id, source, kind, amount, body.health});
-    return true;
-  };
-
   for (const auto slot : entities_.active()) {
     auto& entity = entities_.at(slot);
     for (auto& poison : entity.poisons) {
-      apply(entity, poison.source, HealthKind::poison, poison.amount);
+      (void)apply_health(entity.view.id, poison.source, HealthKind::poison, poison.amount);
       --poison.remaining;
     }
     std::erase_if(entity.poisons,
                   [](const detail::Poison& poison) { return poison.remaining == 0; });
+    entity.view.poisoned = !entity.poisons.empty();
+    entity.view.slowed = !entity.slows.empty();
+    entity.view.heal_blocked = entity.heal_block_until > tick_;
     entity.view.cooldown_ticks = entity.ready_tick > tick_ ? entity.ready_tick - tick_ : 0;
   }
   for (const auto& hit : impacts_) {
     auto* target = entities_.get(hit.target);
-    if (!target || !apply(*target, hit.source, hit.kind, hit.amount)) {
+    if (!target || apply_health(hit.target, hit.source, hit.kind, hit.amount) <= 0) {
       continue;
     }
     if (hit.consume_source) {
       consume_petal(hit.source.entity);
     }
     if (target->view.health > 0 && hit.slow_ticks > 0) {
-      const auto prior = std::ranges::find(target->slows, hit.source, &detail::Slow::source);
-      const detail::Slow slow{hit.source, hit.slow_multiplier, tick_ + hit.slow_ticks};
+      const auto prior = std::ranges::find_if(target->slows, [&](const detail::Slow& slow) {
+        return hit.attack_slow ? slow.source == hit.source : !slow.slows_attacks;
+      });
+      const detail::Slow slow{hit.source, hit.slow_multiplier, tick_ + hit.slow_ticks,
+                              hit.attack_slow};
       if (prior == target->slows.end()) {
         target->slows.push_back(slow);
       } else {
         *prior = slow;
       }
     }
+    if (target->view.health > 0 && hit.heal_block_ticks > 0) {
+      target->heal_block_until = std::max(target->heal_block_until, tick_ + hit.heal_block_ticks);
+    }
     if (target->view.health > 0 && hit.poison_ticks > 0 && hit.poison_per_tick > 0) {
-      const auto prior = std::ranges::find(target->poisons, hit.source, &detail::Poison::source);
       const detail::Poison poison{hit.source, hit.poison_per_tick, hit.poison_ticks};
-      if (prior == target->poisons.end()) {
-        target->poisons.push_back(poison);
+      if (!rules_.catalog) {
+        const auto prior = std::ranges::find(target->poisons, hit.source, &detail::Poison::source);
+        if (prior == target->poisons.end()) {
+          target->poisons.push_back(poison);
+        } else {
+          *prior = poison;
+        }
       } else {
-        *prior = poison;
+        const double remaining = target->poisons.empty() ? 0
+                                                         : target->poisons.front().amount *
+                                                               target->poisons.front().remaining;
+        if (hit.poison_per_tick * hit.poison_ticks >= remaining) {
+          target->poisons = {poison};
+        }
       }
     }
   }
@@ -472,6 +598,12 @@ void Match::apply_impacts() {
 }
 
 void Match::reap_deaths() {
+  for (const auto slot : entities_.active()) {
+    const auto& e = entities_.at(slot).view;
+    if (e.health == 0 && e.petal == Petal::sponge) {
+      flush_sponge(e.id);
+    }
+  }
   std::vector<EntityId> dead;
   for (const auto slot : entities_.active()) {
     const auto& entity = entities_.at(slot).view;
@@ -484,8 +616,50 @@ void Match::reap_deaths() {
     if (!entity) {
       continue;
     }
-    const auto& body = entity->view;
-    const auto& source = *entity->fatal_hit;
+    auto body = entity->view;
+    const auto source = entity->fatal_hit.value_or(DamageSource{});
+    if (entity->chain_kind) {
+      const auto root = entity->root.value_or(id);
+      std::optional<EntityId> successor;
+      for (const auto slot : entities_.active()) {
+        const auto& child = entities_.at(slot);
+        if (child.root == root && child.view.health > 0) {
+          successor = child.view.id;
+          break;
+        }
+      }
+      // A severed chain keeps moving; settle the W3 root reward only on its last death.
+      if (id == root && successor) {
+        auto& promoted = *entities_.get(*successor);
+        promoted.view.group = body.group;
+        promoted.view.origin_wave = body.origin_wave;
+        promoted.root.reset();
+        promoted.predecessor.reset();
+        promoted.provoked = entity->provoked;
+        for (const auto slot : entities_.active()) {
+          auto& child = entities_.at(slot);
+          if (child.root == root) {
+            child.root = successor;
+          }
+        }
+        promoted.root.reset();
+        for (auto& spawn : wave_.plan) {
+          if (spawn.entity == id) {
+            spawn.entity = successor;
+          }
+        }
+        body.group = Group::segment;
+      }
+      for (const auto slot : entities_.active()) {
+        auto& child = entities_.at(slot);
+        if (child.predecessor == id) {
+          child.predecessor.reset();
+        }
+      }
+      if (!successor && id == root) {
+        body.mob = entity->chain_kind;
+      }
+    }
     std::optional<PlayerId> credit;
     if (body.group == Group::main_mob && body.origin_wave == wave_.number) {
       --wave_.counts.alive;

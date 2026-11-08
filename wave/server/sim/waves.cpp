@@ -109,7 +109,9 @@ void Match::spawn_due() {
       mob.rarity = slot.rarity;
       mob.position = *position;
       mob.origin_wave = wave_.number;
-      slot.entity = add_entity(mob, body);
+      slot.entity = rules_.catalog ? spawn_mob(slot.mob, slot.rarity, *position, Group::main_mob,
+                                               {}, wave_.number)
+                                   : add_entity(mob, body);
       slot.state = SpawnState::spawned;
       slot.actual_tick = tick_;
       --wave_.counts.pending;
@@ -161,7 +163,14 @@ void Match::settle_wave(bool advancing) {
       entity->view.group = Group::residual;
       ++wave_.counts.carried;
     } else {
-      entities_.erase(entity->view.id);
+      const auto root = entity->view.id;
+      const auto active = entities_.active();
+      for (const auto child : active) {
+        if (entities_.at(child).root == root) {
+          entities_.erase(entities_.at(child).view.id);
+        }
+      }
+      entities_.erase(root);
       ++wave_.counts.discarded;
     }
   }

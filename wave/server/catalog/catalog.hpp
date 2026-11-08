@@ -21,7 +21,72 @@ enum class Effect {
   summon,
   faster,
   honey,
-  cactus
+  cactus,
+  iris,
+  wing,
+  bubble,
+  pollen,
+  dandelion,
+  antennae,
+  heavy,
+  yin_yang,
+  salt,
+  rice,
+  corn,
+  sand,
+  pincer,
+  yucca,
+  magnet,
+  yggdrasil,
+  starfish,
+  pearl,
+  lightning,
+  jelly,
+  claw,
+  shell,
+  cutter,
+  dahlia,
+  uranium,
+  sponge,
+  soil,
+  fangs,
+  third_eye,
+  stick
+};
+
+struct PetalMechanics {
+  double attack_distance = 26;
+  double defend_distance = 8;
+  double shield = 0;
+  double reflection = 0;
+  double damage_ratio = 0;
+  double damage_limit = 0;
+  double heal_ratio = 0;
+  double knockback = 0;
+  double chain_damage = 0;
+  unsigned bounces = 0;
+  double vision_multiplier = 1;
+  double pickup_multiplier = 1;
+  double body_damage = 0;
+  double sponge_seconds = 0;
+  double speed_multiplier = 1;
+  double size_multiplier = 1;
+  bool hidden = false;
+};
+
+enum class MobAI {
+  stationary,
+  passive,
+  neutral,
+  chase,
+  ranged,
+  spawner,
+  sandstorm,
+  starfish,
+  jellyfish,
+  digger,
+  leech,
+  segment
 };
 
 struct ClientValues {
@@ -55,6 +120,7 @@ struct PetalDefinition {
   std::string_view evidenceKey;
   sim::Mob summon_mob = sim::Mob::beetle;
   sim::Rarity summon_rarity = sim::Rarity::common;
+  PetalMechanics mechanics;
 };
 
 struct MobDefinition {
@@ -66,6 +132,15 @@ struct MobDefinition {
   bool summon;
   std::string_view evidenceKey;
   std::uint64_t xp;
+  MobAI ai = MobAI::chase;
+  unsigned segments = 0;
+  unsigned parent_client_id = 0;
+  bool review_required = false;
+  double missile_health = 0;
+  double missile_damage = 0;
+  double lightning_damage = 0;
+  unsigned lightning_bounces = 0;
+  double lifesteal = 0;
 };
 
 struct Catalog {
@@ -189,7 +264,7 @@ client_petal(sim::Petal kind, sim::Rarity rarity = sim::Rarity::common) {
   if (!entry) {
     return std::nullopt;
   }
-  if (group == sim::Group::ant_hole) {
+  if (group == sim::Group::ant_hole && kind != sim::Mob::fire_ant_burrow) {
     return 9;
   }
   if (group == sim::Group::segment && entry->segment_client_id) {

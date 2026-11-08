@@ -647,6 +647,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
     const Member* member;
     sim::Vec2 position;
     sim::LifeId life;
+    double pickup_multiplier = 1;
   };
   std::vector<Eligible> eligible;
   // Eligibility is a snapshot at the authoritative event tick, not at the
@@ -694,7 +695,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
     if (died) {
       continue;
     }
-    eligible.push_back({&member, *position, player->life});
+    eligible.push_back({&member, *position, player->life, player->pickup_multiplier});
   }
 
   for (const auto& event : room.match->events()) {
@@ -726,22 +727,26 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
         reward.recipients.push_back(std::move(recipient));
       }
       batch->events.push_back(std::move(reward));
-      std::size_t index = 0;
+      std::map<sim::Petal, std::vector<const catalog::DropDefinition*>> drop_kinds;
       for (const auto& drop : catalog::drop_table()) {
-        if (drop.mob != *defeat->mob || drop.mob_rarity != defeat->rarity) {
-          ++index;
-          continue;
+        if (drop.mob == *defeat->mob && drop.mob_rarity == defeat->rarity) {
+          drop_kinds[drop.petal].push_back(&drop);
         }
-        // Fixed integer PRNG scaling avoids implementation-specific distribution
-        // behavior. Drops are independent server rolls, never client requests.
-        const double roll = double(storage_->rng()) / 4294967296.0;
-        const auto kind = catalog::client_petal(drop.petal, drop.rarity);
-        if (roll < drop.probability && kind && static_cast<unsigned>(drop.rarity) < 6) {
-          room.drops.push_back({id + ":" + std::to_string(index),
-                                {*kind, static_cast<std::uint8_t>(drop.rarity)},
-                                defeat->position});
+      }
+      for (const auto& [petal, variants] : drop_kinds) {
+        // Separate petal kinds roll independently. One roll selects at most one
+        // rarity of this kind; probabilities retain the client's original mass.
+        double roll = double(storage_->rng()) / 4294967296.0;
+        for (const auto* drop : variants) {
+          if (roll < drop->probability) {
+            const auto kind = *catalog::client_petal(petal);
+            room.drops.push_back({id + ":" + std::to_string(kind),
+                                  {kind, static_cast<std::uint8_t>(drop->rarity)},
+                                  defeat->position});
+            break;
+          }
+          roll -= drop->probability;
         }
-        ++index;
       }
     } else if (const auto* transition = std::get_if<sim::Transition>(&event.data)) {
       // Deadlines can carry/discard living mobs: only a threshold transition
@@ -766,9 +771,12 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
       continue;
     }
     const Eligible* nearest = nullptr;
-    double distance = pickup_distance;
+    double distance = std::numeric_limits<double>::infinity();
     for (const auto& e : eligible) {
       const double candidate = (e.position - drop.position).length();
+      if (candidate > pickup_distance * e.pickup_multiplier) {
+        continue;
+      }
       if (candidate < distance ||
           (candidate == distance && (!nearest || e.member->id.value < nearest->member->id.value))) {
         nearest = &e;
@@ -918,7 +926,9 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
         sim::Input{*acknowledged_life,
                    {std::cos(move->angle) * amount, std::sin(move->angle) * amount},
                    (move->buttons & 1) != 0,
-                   (move->buttons & 2) != 0});
+                   (move->buttons & 2) != 0,
+                   move->angle,
+                   double(move->strength) / 5});
     if (accepted) {
       ++accepted_inputs;
     } else {

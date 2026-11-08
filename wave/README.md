@@ -21,7 +21,7 @@ npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --port 84
 面板支持全部 45 种花瓣、Common–Mythic 六个稀有度，可添加、修改总数或设为 0 删除。
 数量包含已装备副本；调低数量时优先保留主槽，自动卸下超额装备。点击“保存并刷新”
 后事务写入当前访客存档并重新加载原版界面，XP、图鉴和最高波保持原值。
-未实现战斗效果的种类标记“仅库存”，仍受正常装备限制。
+全部 45 种花瓣现可正常装备，历史行为不确定项见人工核查清单。
 
 调试宿主是默认构建之外的显式目标，只在开发启动时构建；正式 `wave_host` 及
 `wave_host_fixture` 不包含调试页面和 HTTP 路由。数据库的调试写入也默认关闭。
@@ -35,9 +35,13 @@ npm --prefix wave run test:wire -- --snapshot "$PWD/wave-reference/20221030" --s
 
 `CHROME_PATH` 或 `--browser` 可指定 Chromium；W3 在 macOS 默认尝试已安装的 Chrome。
 结果、库存差分、原版收发帧、源码/二进制摘要和截图写入 `reports/wave/W3/`。
-目录注册表包含全部原版身份，权威效果当前覆盖 12 种花瓣、六个稀有度和早波怪物；
-尚未建模的效果不能装备到主槽。现已从原件提取全部 45 种花瓣／35 个怪物 ID × 六稀有度的
-480 份完整 tooltip，按精确值修正当前目录为 `20221030-w3.2`；未显示字段与行为缺口另记。
+当前目录为 `20221030-w3.3`：全部 45 种花瓣 × 六稀有度（270 变体）、35 个怪物 ID ×
+六稀有度（210 变体）均接入权威行为，完整 962 条非零掉落已接入。复用已提取的原件数值，
+行为按截止前 Wiki 修订、同仓库 World PvP 的顺序取证；不明确的特殊攻击和复刻参数有
+[中文人工核查清单](docs/behavior-review-20221030.md)与
+[机器规则](data/catalogs/20221030/behavior-review.json)。
+Rare+ 巢穴目前采用同场遭遇代理，子区域传送归 W5；特殊闪电线、护盾/毒状态及地面掉落
+图形的原版呈现仍待协议核查。新增 `W3-behaviors` 覆盖全变体和特殊效果。
 [完整数值全表](docs/client-tooltips-20221030.md) ·
 [机器可读记录](data/catalogs/20221030/client-tooltips.json) ·
 [改前／改后差分](data/catalogs/20221030/client-tooltip-corrections.json)

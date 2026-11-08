@@ -1,0 +1,1462 @@
+{
+  "schemaVersion": 1,
+  "cutoffUtc": "2022-10-30T21:00:58Z",
+  "policy": "固定原件精确数值优先；行为用截止前Wiki，其次同仓库world PvP；复刻或冲突必须人工复核。",
+  "commonReconstruction": {
+    "worldScale": 5,
+    "contactCooldownSeconds": 0.2,
+    "mobCooldownSeconds": 0.5,
+    "hornetCooldownSeconds": 2,
+    "aggroRadius": 120,
+    "leashRadius": 180,
+    "geometryAndXP": "非客户端数值；保留明确复刻，不宣称历史服务器精确值。",
+    "rendering": "隐藏被动、视野、原ID/稀有度和回充可显示。特殊闪电线/护盾/毒状态字段仍需原客户端协议核查。",
+    "workerAlertRadius": 60,
+    "soldierAggroRadius": 60,
+    "queenAggroRadius": 80,
+    "leashMultiplier": 1.5
+  },
+  "entries": [
+    {
+      "id": "petal.basic",
+      "status": "sourced-behavior",
+      "behavior": "按原件逐粒接触伤害/HP/冷却，无额外主动效果。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 1
+        },
+        {
+          "type": "wiki",
+          "title": "Basic",
+          "revision": 2192,
+          "timestamp": "2022-10-22T21:50:46Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petals.cpp"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.light",
+      "status": "sourced-behavior",
+      "behavior": "按原件逐粒接触伤害/HP/冷却，无额外主动效果。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 2
+        },
+        {
+          "type": "wiki",
+          "title": "Light",
+          "revision": 2180,
+          "timestamp": "2022-10-22T01:25:37Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.rock",
+      "status": "sourced-behavior",
+      "behavior": "按原件逐粒接触伤害/HP/冷却，无额外主动效果。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 3
+        },
+        {
+          "type": "wiki",
+          "title": "Rock",
+          "revision": 2227,
+          "timestamp": "2022-10-24T01:53:15Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.square",
+      "status": "sourced-behavior",
+      "behavior": "按原件逐粒接触伤害/HP/冷却，无额外主动效果。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 4
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.rose",
+      "status": "sourced-behavior",
+      "behavior": "延迟有效治疗，自己优先，其次最近队友；有效时消耗。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 5
+        },
+        {
+          "type": "wiki",
+          "title": "Rose",
+          "revision": 2305,
+          "timestamp": "2022-10-24T17:35:54Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.stinger",
+      "status": "sourced-behavior",
+      "behavior": "按原件逐粒接触伤害/HP/冷却，无额外主动效果。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 6
+        },
+        {
+          "type": "wiki",
+          "title": "Stinger",
+          "revision": 2083,
+          "timestamp": "2022-10-09T02:49:13Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.iris",
+      "status": "manual-review",
+      "behavior": "接触施毒；保留当前剩余总毒量与新毒量中较高者；普通至 Legendary 15 DPS、Mythic 45 DPS。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 7
+        },
+        {
+          "type": "wiki",
+          "title": "Iris",
+          "revision": 1944,
+          "timestamp": "2022-09-23T19:05:57Z"
+        }
+      ],
+      "manualReview": "同期Wiki提供DPS；毒同总量但不同DPS的覆盖优先级按剩余总量，需要人工确认。"
+    },
+    {
+      "id": "petal.wing",
+      "status": "manual-review",
+      "behavior": "仅进攻状态扩大并周期收缩轨道。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 8
+        },
+        {
+          "type": "wiki",
+          "title": "Wing",
+          "revision": 2437,
+          "timestamp": "2022-10-27T00:42:44Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petals.cpp"
+        }
+      ],
+      "manualReview": "进攻振幅24单位、角频率5为复刻，历史动画曲线待核查。"
+    },
+    {
+      "id": "petal.missile",
+      "status": "sourced-behavior",
+      "behavior": "准备后发射单枚有限射程投射物。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 9
+        },
+        {
+          "type": "wiki",
+          "title": "Missile",
+          "revision": 2212,
+          "timestamp": "2022-10-23T20:07:33Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petal_effects.cpp"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.grapes",
+      "status": "manual-review",
+      "behavior": "四粒分裂发射并施毒；同一目标毒不叠加。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 10
+        },
+        {
+          "type": "wiki",
+          "title": "Grapes",
+          "revision": 2053,
+          "timestamp": "2022-10-06T00:42:25Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petal_effects.cpp"
+        }
+      ],
+      "manualReview": "毒的历史 DPS 未确认，当前总毒量在1秒内释放；每粒HP按总HP/4。"
+    },
+    {
+      "id": "petal.cactus",
+      "status": "sourced-behavior",
+      "behavior": "每装备槽增加原 Flower Health；不按粒数重复计算。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 11
+        },
+        {
+          "type": "wiki",
+          "title": "Cactus",
+          "revision": 2170,
+          "timestamp": "2022-10-20T15:04:35Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/passives.cpp"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.faster",
+      "status": "sourced-behavior",
+      "behavior": "存活时增加全环转速。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 12
+        },
+        {
+          "type": "wiki",
+          "title": "Faster",
+          "revision": 2413,
+          "timestamp": "2022-10-26T20:58:11Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petals.cpp"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.bubble",
+      "status": "manual-review",
+      "behavior": "防御触发后消耗，向花瓣的反方向推进花朵。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 13
+        },
+        {
+          "type": "wiki",
+          "title": "Bubble",
+          "revision": 2234,
+          "timestamp": "2022-10-24T04:47:51Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petals.cpp"
+        }
+      ],
+      "manualReview": "推进110单位/秒及衰减沿Wave规则，历史方向有据但力度待核查。"
+    },
+    {
+      "id": "petal.pollen",
+      "status": "sourced-behavior",
+      "behavior": "进攻/防御触发后散开/聚拢落地；静止接触伤害，5 秒后消失；多粒分别占轨道位置。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 14
+        },
+        {
+          "type": "wiki",
+          "title": "Pollen",
+          "revision": 1962,
+          "timestamp": "2022-09-25T02:50:37Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.dandelion",
+      "status": "sourced-behavior",
+      "behavior": "发射后命中禁疗；原精确持续时间，对花朵减半。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 15
+        },
+        {
+          "type": "wiki",
+          "title": "Dandelion",
+          "revision": 2306,
+          "timestamp": "2022-10-24T17:38:44Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.egg",
+      "status": "sourced-behavior",
+      "behavior": "按原 Contents 和激活时间孵化友军；以原 Egg 稀有度保存召唤到期时间。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 16
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.antennae",
+      "status": "sourced-behavior",
+      "behavior": "取最高视野倍率，不叠加；没有可碰撞实体。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 17
+        },
+        {
+          "type": "wiki",
+          "title": "Antennae",
+          "revision": 1889,
+          "timestamp": "2022-09-18T11:15:11Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.heavy",
+      "status": "manual-review",
+      "behavior": "高耐久接触及加强击退。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 18
+        },
+        {
+          "type": "wiki",
+          "title": "Heavy",
+          "revision": 2195,
+          "timestamp": "2022-10-22T23:11:26Z"
+        }
+      ],
+      "manualReview": "增强击退速度采用50模拟单位/秒，候选25–100；未取得10月冲量曲线。"
+    },
+    {
+      "id": "petal.yin_yang",
+      "status": "sourced-behavior",
+      "behavior": "每槽计数，方向/停转按 world PvP 的 1,-1,0 循环；8 个时倍率 5。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 19
+        },
+        {
+          "type": "wiki",
+          "title": "Yin Yang",
+          "revision": 1905,
+          "timestamp": "2022-09-19T00:09:16Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petals.cpp"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.web",
+      "status": "sourced-behavior",
+      "behavior": "发射后形成限时地面减速区域；蜘蛛免疫。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 20
+        },
+        {
+          "type": "wiki",
+          "title": "Web",
+          "revision": 2310,
+          "timestamp": "2022-10-24T19:26:12Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petal_effects.cpp"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.honey",
+      "status": "sourced-behavior",
+      "behavior": "接触后减移动、转速及怪物攻击频率；同源刷新，异源叠乘。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 21
+        },
+        {
+          "type": "wiki",
+          "title": "Honey",
+          "revision": 940,
+          "timestamp": "2022-08-07T16:56:24Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.leaf",
+      "status": "sourced-behavior",
+      "behavior": "存活时持续自疗；友方怪物可吞食，按 Mob Heal 治疗并开始回充。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 22
+        },
+        {
+          "type": "wiki",
+          "title": "Leaf",
+          "revision": 2030,
+          "timestamp": "2022-10-02T15:13:16Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/passives.cpp"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.salt",
+      "status": "manual-review",
+      "behavior": "按实际即时生命伤害反射，避免递归；敌方花朵受到反射伤害乘 .25。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 23
+        },
+        {
+          "type": "wiki",
+          "title": "Salt",
+          "revision": 2406,
+          "timestamp": "2022-10-26T15:59:18Z"
+        }
+      ],
+      "manualReview": "旧Wiki80%对花朵减伤与原件75%冲突；采用原件。当前Sponge仅即时伤害可反射，待核查。"
+    },
+    {
+      "id": "petal.rice",
+      "status": "sourced-behavior",
+      "behavior": "按原件逐粒接触伤害/HP/冷却，无额外主动效果。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 24
+        },
+        {
+          "type": "wiki",
+          "title": "Rice",
+          "revision": 2163,
+          "timestamp": "2022-10-19T16:30:09Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.corn",
+      "status": "sourced-behavior",
+      "behavior": "按原件逐粒接触伤害/HP/冷却，无额外主动效果。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 25
+        },
+        {
+          "type": "wiki",
+          "title": "Corn",
+          "revision": 2193,
+          "timestamp": "2022-10-22T21:58:12Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.sand",
+      "status": "sourced-behavior",
+      "behavior": "按原件逐粒接触伤害/HP/冷却，无额外主动效果。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 26
+        },
+        {
+          "type": "wiki",
+          "title": "Sand",
+          "revision": 2174,
+          "timestamp": "2022-10-21T08:21:44Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.pincer",
+      "status": "sourced-behavior",
+      "behavior": "接触施毒并降低移动速度 80%；Pincer 之间不叠加，Honey 独立叠乘。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 27
+        },
+        {
+          "type": "wiki",
+          "title": "Pincer",
+          "revision": 2242,
+          "timestamp": "2022-10-24T12:39:49Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.yucca",
+      "status": "sourced-behavior",
+      "behavior": "仅防御时持续治疗。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 28
+        },
+        {
+          "type": "wiki",
+          "title": "Yucca",
+          "revision": 2404,
+          "timestamp": "2022-10-26T15:55:26Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.magnet",
+      "status": "sourced-behavior",
+      "behavior": "拾取倍率取最高值；截获原本击向花朵的闪电。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 29
+        },
+        {
+          "type": "wiki",
+          "title": "Magnet",
+          "revision": 2175,
+          "timestamp": "2022-10-21T11:09:57Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.yggdrasil",
+      "status": "manual-review",
+      "behavior": "有死亡队友时落地，存活满客户端激活时间后在落点复活一名队友。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 30
+        },
+        {
+          "type": "wiki",
+          "title": "Yggdrasil",
+          "revision": 2226,
+          "timestamp": "2022-10-24T01:30:12Z"
+        }
+      ],
+      "manualReview": "原地复活行为有同期证据，复活HP采用50%，候选10%–100%。"
+    },
+    {
+      "id": "petal.starfish",
+      "status": "sourced-behavior",
+      "behavior": "低于半血持续自疗，回充期间仍生效。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 31
+        },
+        {
+          "type": "wiki",
+          "title": "Starfish",
+          "revision": 2304,
+          "timestamp": "2022-10-24T17:33:40Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.pearl",
+      "status": "manual-review",
+      "behavior": "部署为持久地面花瓣；远离时跟随，按键近距离控制移动；破碎才回充。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 32
+        },
+        {
+          "type": "wiki",
+          "title": "Pearl",
+          "revision": 2458,
+          "timestamp": "2022-10-28T16:04:49Z"
+        }
+      ],
+      "manualReview": "旧页2458仅简述跟随。当前50单位开始跟随、按键5单位内停、速度100；需核查实际左右键方向和速度。"
+    },
+    {
+      "id": "petal.lightning",
+      "status": "manual-review",
+      "behavior": "接触怪物/花朵触发；不在导弹上触发；按 Bounces 连接不同目标，短暂停速。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 33
+        },
+        {
+          "type": "wiki",
+          "title": "Lightning",
+          "revision": 2169,
+          "timestamp": "2022-10-20T14:55:33Z"
+        }
+      ],
+      "manualReview": "弹跳范围40单位、停速0.1秒为复刻；未恢复原版闪电线绘制指令。"
+    },
+    {
+      "id": "petal.jelly",
+      "status": "sourced-behavior",
+      "behavior": "接触施加按原 Knockback 缩放的击退。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 34
+        },
+        {
+          "type": "wiki",
+          "title": "Jelly",
+          "revision": 2203,
+          "timestamp": "2022-10-23T01:29:25Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.claw",
+      "status": "sourced-behavior",
+      "behavior": "普通接触伤害加 min(剩余HP×百分比,Limit)。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 35
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.shell",
+      "status": "manual-review",
+      "behavior": "延迟后为自己或近处队友添加临时护盾，有效时消耗并回充。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 36
+        }
+      ],
+      "manualReview": "护盾有效10秒、同源护盾不相加而取较高值；需要核查历史时长及叠加策略。"
+    },
+    {
+      "id": "petal.cutter",
+      "status": "sourced-behavior",
+      "behavior": "身体伤害取最高值；没有可碰撞实体。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 37
+        },
+        {
+          "type": "wiki",
+          "title": "Cutter",
+          "revision": 2530,
+          "timestamp": "2022-10-30T05:42:35Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.dahlia",
+      "status": "manual-review",
+      "behavior": "延迟后小额有效治疗自己或队友，逐粒消耗并回充。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 38
+        }
+      ],
+      "manualReview": "历史页无截止日期前修订；据原描述与Rose共用有效治疗时序和40单位队友范围，需核查目标优先级。"
+    },
+    {
+      "id": "petal.uranium",
+      "status": "manual-review",
+      "behavior": "每秒以花瓣为中心辐射，自己4倍、敌方花朵.25倍；激怒被动怪物，气泡/沙尘暴除外。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 39
+        },
+        {
+          "type": "wiki",
+          "title": "Uranium",
+          "revision": 2407,
+          "timestamp": "2022-10-26T19:50:16Z"
+        }
+      ],
+      "manualReview": "旧Wiki称Mythic自伤2倍，与固定原件全稀有度4倍冲突；采用原件4倍，范围50单位为复刻。"
+    },
+    {
+      "id": "petal.sponge",
+      "status": "manual-review",
+      "behavior": "先护盾，再立即承受10%；90%按 Period 分摊；破碎或卸下立即清算未结余额。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 40
+        }
+      ],
+      "manualReview": "无截止日期前Wiki；按原提示实现90%债务。多个Sponge取最长Period，护盾先抵扣；需核查堆叠/反射与延迟伤害顺序。"
+    },
+    {
+      "id": "petal.soil",
+      "status": "manual-review",
+      "behavior": "装备加HP；存活时减速并放大花朵。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 41
+        },
+        {
+          "type": "wiki",
+          "title": "Soil",
+          "revision": 2140,
+          "timestamp": "2022-10-17T19:11:15Z"
+        }
+      ],
+      "manualReview": "缩放1.15和速度.9为显式复刻；候选尺寸1.05–1.5，速度.5–.95。"
+    },
+    {
+      "id": "petal.fangs",
+      "status": "sourced-behavior",
+      "behavior": "按该花瓣实际生命伤害及原百分比自疗。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 42
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.third_eye",
+      "status": "sourced-behavior",
+      "behavior": "按鼠标角度和距离直接控制轨道；隐藏实体。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 43
+        },
+        {
+          "type": "wiki",
+          "title": "Third Eye",
+          "revision": 2176,
+          "timestamp": "2022-10-22T00:56:10Z"
+        }
+      ],
+      "manualReview": null
+    },
+    {
+      "id": "petal.peas",
+      "status": "manual-review",
+      "behavior": "四粒分裂发射，保留归属，按射程消失。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 44
+        },
+        {
+          "type": "wiki",
+          "title": "Peas",
+          "revision": 2332,
+          "timestamp": "2022-10-25T13:49:36Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/petal_effects.cpp"
+        }
+      ],
+      "manualReview": "每粒HP按总HP/4，分裂方向沿 world PvP 四向；原10月飞行速度/散射尚无精确依据。"
+    },
+    {
+      "id": "petal.stick",
+      "status": "manual-review",
+      "behavior": "按客户端激活时间召唤有归属的友方沙尘暴，限时旋风击退。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 45
+        }
+      ],
+      "manualReview": "只取得原描述与10秒激活时间；友方旋风持续10秒、半径45、切向加速度80单位/秒²（25ms时每tick加2）为复刻，需核查原召唤物寿命和攻击。"
+    },
+    {
+      "id": "mob.rock",
+      "status": "manual-review",
+      "behavior": "采用 stationary AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 1
+        },
+        {
+          "type": "wiki",
+          "title": "Rock (Mob)",
+          "revision": 2516,
+          "timestamp": "2022-10-30T05:03:07Z"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.cactus",
+      "status": "manual-review",
+      "behavior": "采用 stationary AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 2
+        },
+        {
+          "type": "wiki",
+          "title": "Cactus (Mob)",
+          "revision": 484,
+          "timestamp": "2021-07-09T16:49:28Z"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.ladybug",
+      "status": "manual-review",
+      "behavior": "采用 passive AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 3
+        },
+        {
+          "type": "wiki",
+          "title": "Ladybug",
+          "revision": 918,
+          "timestamp": "2022-08-06T23:56:47Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_ladybug"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.bee",
+      "status": "manual-review",
+      "behavior": "采用 neutral AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 4
+        },
+        {
+          "type": "wiki",
+          "title": "Bee",
+          "revision": 2211,
+          "timestamp": "2022-10-23T19:56:38Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_bee"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.baby_ant",
+      "status": "manual-review",
+      "behavior": "采用 passive AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 5
+        },
+        {
+          "type": "wiki",
+          "title": "Baby Ant",
+          "revision": 1940,
+          "timestamp": "2022-09-23T18:48:48Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_ant"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.worker_ant",
+      "status": "manual-review",
+      "behavior": "中立游走，受击或附近蚂蚁受击后追击攻击者；原件HP/伤害。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 6
+        },
+        {
+          "type": "wiki",
+          "title": "Worker Ant",
+          "revision": 1885,
+          "timestamp": "2022-09-18T11:00:44Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_ant"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。 附近同阵营Baby/Worker/Soldier/Queen/Ant Hole受击时警戒，半径60为复刻；Wiki“another mob”的同族范围需要核查。"
+    },
+    {
+      "id": "mob.soldier_ant",
+      "status": "manual-review",
+      "behavior": "采用 chase AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 7
+        },
+        {
+          "type": "wiki",
+          "title": "Soldier Ant",
+          "revision": 511,
+          "timestamp": "2021-07-26T22:24:42Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_ant"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.queen_ant",
+      "status": "manual-review",
+      "behavior": "巢穴放出时追击；离目标或巢穴过远则返回出生点/巢穴，回到附近再警戒。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 8
+        },
+        {
+          "type": "wiki",
+          "title": "Queen Ant",
+          "revision": 1941,
+          "timestamp": "2022-09-23T18:52:05Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_ant"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。 警戒80、追击/离巢120、返回停止距离10为复刻，参照world PvP guard/returning状态。"
+    },
+    {
+      "id": "mob.ant_hole",
+      "status": "manual-review",
+      "behavior": "采用 spawner AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 9
+        },
+        {
+          "type": "wiki",
+          "title": "Ant Hole",
+          "revision": 2081,
+          "timestamp": "2022-10-08T08:26:29Z"
+        }
+      ],
+      "manualReview": "Common/Unusual按伤害分批释放5 Baby/8 Worker/26 Soldier/1 Queen；这些数量在旧页带问号。Rare+同场遭遇替代W5子区域，Digger概率2%；入洞/传送/巢穴超时待W5。"
+    },
+    {
+      "id": "mob.beetle",
+      "status": "manual-review",
+      "behavior": "采用 chase AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 10
+        },
+        {
+          "type": "wiki",
+          "title": "Beetle",
+          "revision": 2075,
+          "timestamp": "2022-10-08T01:22:39Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_beetle"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.hornet",
+      "status": "manual-review",
+      "behavior": "采用 ranged AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 11
+        },
+        {
+          "type": "wiki",
+          "title": "Hornet",
+          "revision": 1790,
+          "timestamp": "2022-09-11T16:57:28Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_hornet"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.centipede",
+      "status": "manual-review",
+      "behavior": "采用 passive AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 12
+        },
+        {
+          "type": "wiki",
+          "title": "Centipede",
+          "revision": 2527,
+          "timestamp": "2022-10-30T05:32:21Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_centipede"
+        }
+      ],
+      "manualReview": "5节为复刻，候选3–12；各节独立生命，可断节；同期Wiki每节掉落与W3根节点奖励一次冲突，保留W3经济要求。"
+    },
+    {
+      "id": "mob.centipede_segment",
+      "status": "manual-review",
+      "behavior": "采用 segment AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 13
+        },
+        {
+          "type": "wiki",
+          "title": "Centipede",
+          "revision": 2527,
+          "timestamp": "2022-10-30T05:32:21Z"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.evil_centipede",
+      "status": "manual-review",
+      "behavior": "采用 chase AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 14
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_centipede"
+        }
+      ],
+      "manualReview": "5节为复刻，候选3–12；各节独立生命，可断节；同期Wiki每节掉落与W3根节点奖励一次冲突，保留W3经济要求。"
+    },
+    {
+      "id": "mob.evil_centipede_segment",
+      "status": "manual-review",
+      "behavior": "采用 segment AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 15
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.desert_centipede",
+      "status": "manual-review",
+      "behavior": "采用 passive AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 16
+        },
+        {
+          "type": "wiki",
+          "title": "Desert Centipede",
+          "revision": 2526,
+          "timestamp": "2022-10-30T05:31:53Z"
+        }
+      ],
+      "manualReview": "5节为复刻，候选3–12；各节独立生命，可断节；同期Wiki每节掉落与W3根节点奖励一次冲突，保留W3经济要求。"
+    },
+    {
+      "id": "mob.desert_centipede_segment",
+      "status": "manual-review",
+      "behavior": "采用 segment AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 17
+        },
+        {
+          "type": "wiki",
+          "title": "Desert Centipede",
+          "revision": 2526,
+          "timestamp": "2022-10-30T05:31:53Z"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.square",
+      "status": "manual-review",
+      "behavior": "采用 passive AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 18
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_square"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.dark_ladybug",
+      "status": "manual-review",
+      "behavior": "采用 neutral AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 19
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_ladybug"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.shiny_ladybug",
+      "status": "manual-review",
+      "behavior": "采用 neutral AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 20
+        },
+        {
+          "type": "wiki",
+          "title": "Ladybug (Shiny)",
+          "revision": 2326,
+          "timestamp": "2022-10-25T00:04:44Z"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.spider",
+      "status": "manual-review",
+      "behavior": "采用 chase AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 21
+        },
+        {
+          "type": "wiki",
+          "title": "Spider",
+          "revision": 2065,
+          "timestamp": "2022-10-06T18:37:58Z"
+        },
+        {
+          "type": "repository",
+          "path": "engine/src/sim/ai_profiles.cpp",
+          "symbol": "configure_spider"
+        }
+      ],
+      "manualReview": "AI转向、速度、警戒/追击距离、几何与XP属复刻参数；优先沿world PvP同族规则。"
+    },
+    {
+      "id": "mob.scorpion",
+      "status": "manual-review",
+      "behavior": "采用 chase AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 22
+        },
+        {
+          "type": "wiki",
+          "title": "Scorpion",
+          "revision": 2356,
+          "timestamp": "2022-10-25T22:53:22Z"
+        }
+      ],
+      "manualReview": "原件给总Poison，当前3秒释放；DPS/再施加时序未确定。"
+    },
+    {
+      "id": "mob.fire_ant",
+      "status": "manual-review",
+      "behavior": "采用 chase AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 23
+        }
+      ],
+      "manualReview": "旧Wiki无截止前修订，复用Soldier Ant追击；未凭名称施毒，是否冲锋待核查。"
+    },
+    {
+      "id": "mob.fire_ant_burrow",
+      "status": "manual-review",
+      "behavior": "采用 spawner AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 24
+        },
+        {
+          "type": "wiki",
+          "title": "Fire Ant Burrow",
+          "revision": 2449,
+          "timestamp": "2022-10-28T03:52:56Z"
+        }
+      ],
+      "manualReview": "不可攻击，Common/Unusual近身放30只后消失；Rare+以同场50只遭遇代替子区域(W5)。Epic/Legendary/Mythic的同级火蚁个数3/2/1已按历史采用；出现范围35单位为复刻。"
+    },
+    {
+      "id": "mob.sandstorm",
+      "status": "manual-review",
+      "behavior": "采用 sandstorm AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 25
+        },
+        {
+          "type": "wiki",
+          "title": "Sandstorm",
+          "revision": 2224,
+          "timestamp": "2022-10-23T23:11:26Z"
+        }
+      ],
+      "manualReview": "同期证据为被动乱走且不被Uranium激怒；旋风轨迹与推力未精确还原。"
+    },
+    {
+      "id": "mob.bubble",
+      "status": "manual-review",
+      "behavior": "采用 passive AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 26
+        },
+        {
+          "type": "wiki",
+          "title": "Bubble",
+          "revision": 2234,
+          "timestamp": "2022-10-24T04:47:51Z"
+        }
+      ],
+      "manualReview": "被动游走、不被Uranium激怒；无截止前独立怪物页面，特殊接触表现待核查。"
+    },
+    {
+      "id": "mob.acid_bubble",
+      "status": "manual-review",
+      "behavior": "采用 chase AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 27
+        }
+      ],
+      "manualReview": "旧Wiki无截止前修订，world PvP无同名AI；暂复用追击/接触，不凭名称添加毒或爆炸。特殊攻击待核查。"
+    },
+    {
+      "id": "mob.shell",
+      "status": "manual-review",
+      "behavior": "采用 passive AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 28
+        }
+      ],
+      "manualReview": "旧Wiki无截止前修订，采用被动游走和精确HP/伤害；开合/护甲/反弹机制待核查。"
+    },
+    {
+      "id": "mob.starfish",
+      "status": "manual-review",
+      "behavior": "采用 starfish AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 29
+        },
+        {
+          "type": "wiki",
+          "title": "Starfish",
+          "revision": 2304,
+          "timestamp": "2022-10-24T17:33:40Z"
+        }
+      ],
+      "manualReview": "自疗按最大HP的2%/秒，候选1%–5%；精确再生率及受击是否中断待核查。"
+    },
+    {
+      "id": "mob.crab",
+      "status": "manual-review",
+      "behavior": "采用 neutral AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 30
+        },
+        {
+          "type": "wiki",
+          "title": "Crab",
+          "revision": 2460,
+          "timestamp": "2022-10-28T21:03:43Z"
+        }
+      ],
+      "manualReview": "截止修订2460只有“Crab”。当前中立接触攻击，尚无足够证据实现特有闪避/钳击；需人工录屏核查。"
+    },
+    {
+      "id": "mob.jellyfish",
+      "status": "manual-review",
+      "behavior": "采用 jellyfish AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 31
+        },
+        {
+          "type": "wiki",
+          "title": "Jellyfish",
+          "revision": 2421,
+          "timestamp": "2022-10-26T22:43:13Z"
+        }
+      ],
+      "manualReview": "有同期闪电连击证据，数值采用原件；2秒冷却、40单位范围与0.1秒停速为复刻。"
+    },
+    {
+      "id": "mob.digger",
+      "status": "manual-review",
+      "behavior": "采用 digger AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 32
+        },
+        {
+          "type": "wiki",
+          "title": "Digger",
+          "revision": 2485,
+          "timestamp": "2022-10-29T21:43:07Z"
+        }
+      ],
+      "manualReview": "友方、攻击怪物、低血退边有同期证据；30%退边阈值、1%/秒自疗为复刻。"
+    },
+    {
+      "id": "mob.sponge",
+      "status": "manual-review",
+      "behavior": "采用 stationary AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 33
+        }
+      ],
+      "manualReview": "旧Wiki无截止前修订，world PvP无同名AI；采用静止接触防御，特殊吸收/吐出行为待核查。"
+    },
+    {
+      "id": "mob.leech",
+      "status": "manual-review",
+      "behavior": "采用 leech AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 34
+        }
+      ],
+      "manualReview": "精确Lifesteal已提取，接触吸血+分节追击；旧Wiki无截止前修订，是否缠绕/脱附及吸血频率待核查。 5节为复刻，候选3–12；各节独立生命，可断节；同期Wiki每节掉落与W3根节点奖励一次冲突，保留W3经济要求。"
+    },
+    {
+      "id": "mob.leech_segment",
+      "status": "manual-review",
+      "behavior": "采用 segment AI；HP/接触/投射/吸血数值来自原件。",
+      "sources": [
+        {
+          "type": "client-tooltip",
+          "id": 35
+        }
+      ],
+      "manualReview": "同Leech；独立HP/接触/跟随，整条奖励一次；节数5为复刻。"
+    }
+  ]
+}

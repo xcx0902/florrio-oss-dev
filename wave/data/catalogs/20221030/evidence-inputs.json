@@ -129,6 +129,16 @@
       "id": "client.tooltips",
       "path": "wave/data/catalogs/20221030/client-tooltips.json",
       "sha256": "2a06ac1e27d15b4dd5782cdddaf99a3fbdb2a6b957d0ef52333bdfe16dc2a346"
+    },
+    {
+      "id": "behavior.wiki",
+      "path": "wave/data/catalogs/20221030/behavior-wiki-snapshots.json",
+      "sha256": "a1ef5939111e931afa73cdd51132d9a7e6ed45d02d36d3d45fd441b31ecfd080"
+    },
+    {
+      "id": "behavior.review",
+      "path": "wave/data/catalogs/20221030/behavior-review.json",
+      "sha256": "e43e164612f15b8da90dbe495e32e89ace1a6fb011829d8c2e8e0066694e704f"
     }
   ],
   "registries": {
@@ -1172,5 +1182,15 @@
     "displayedDropRates": 782,
     "dropCandidates": 2160
   },
-  "constructorSampleStatus": "Retained W0 samples are historical evidence of the old probe, not valid petal numeric identity: hand-written constructor slots were shifted. Use client-tooltips.json registry-derived constructors instead."
+  "constructorSampleStatus": "Retained W0 samples are historical evidence of the old probe, not valid petal numeric identity: hand-written constructor slots were shifted. Use client-tooltips.json registry-derived constructors instead.",
+  "behaviorEvidence": {
+    "behavior.wiki": {
+      "file": "behavior-wiki-snapshots.json",
+      "sha256": "a1ef5939111e931afa73cdd51132d9a7e6ed45d02d36d3d45fd441b31ecfd080"
+    },
+    "behavior.review": {
+      "file": "behavior-review.json",
+      "sha256": "e43e164612f15b8da90dbe495e32e89ace1a6fb011829d8c2e8e0066694e704f"
+    }
+  }
 }

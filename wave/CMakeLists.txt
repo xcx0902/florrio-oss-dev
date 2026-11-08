@@ -18,8 +18,8 @@ target_link_libraries(wave_store PUBLIC SQLite::SQLite3 Threads::Threads)
 set_target_properties(wave_store PROPERTIES CXX_EXTENSIONS OFF)
 
 add_library(
-  wave_sim STATIC server/sim/combat.cpp server/sim/match.cpp server/sim/rules.cpp
-                  server/sim/waves.cpp
+  wave_sim STATIC server/sim/combat.cpp server/sim/effects.cpp server/sim/mobs.cpp
+                  server/sim/match.cpp server/sim/rules.cpp server/sim/waves.cpp
 )
 add_dependencies(wave_sim wave_catalog_check)
 target_compile_features(wave_sim PUBLIC cxx_std_20)
@@ -64,7 +64,7 @@ if(BUILD_TESTING)
   set_tests_properties(DEV-inventory PROPERTIES LABELS dev)
   add_executable(wave_w3_seed tests/native/w3_seed.cpp)
   target_link_libraries(wave_w3_seed PRIVATE wave_store)
-  foreach(suite IN ITEMS catalog store economy wire)
+  foreach(suite IN ITEMS catalog behaviors store economy wire)
     add_executable(wave_w3_${suite} tests/native/w3_${suite}.cpp)
     target_include_directories(wave_w3_${suite} PRIVATE tests)
     target_link_libraries(wave_w3_${suite} PRIVATE wave_wire)

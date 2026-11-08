@@ -19,7 +19,9 @@ struct FixtureAccess {
     view.faction = faction;
     view.group = group;
     view.mob = kind;
-    return match.add_entity(view, body);
+    const auto id = match.add_entity(view, body);
+    match.entities_.get(id)->provoked = true;
+    return id;
   }
   static void damage(Match& match, EntityId id, double amount) {
     get(match, id).view.health -= amount;
@@ -75,7 +77,7 @@ EntityView petal(Match& match, std::size_t slot = 0) {
 }
 void mapping() {
   const auto& c = catalog::dated();
-  check(c.version == "20221030-w3.2" && c.sha256.size() == 64 && c.client_wasm_sha256.size() == 64,
+  check(c.version == "20221030-w3.3" && c.sha256.size() == 64 && c.client_wasm_sha256.size() == 64,
         "dated catalog carries source and client identity");
   check(catalog::petal_registry().size() == 46, "46 original kinds including None");
   std::set<Petal> kinds;
@@ -90,7 +92,8 @@ void mapping() {
   check(!catalog::petal_from_client(46) && !catalog::client_petal(Petal(999)),
         "reject unknown petal ID");
   check(!catalog::client_petal(Petal::basic, Rarity(6)), "no Ultra before cutoff");
-  check(c.petals.size() == 72 && c.mobs.size() == 72, "12 supported kinds times six rarities");
+  check(c.petals.size() == 270 && c.mobs.size() == 210,
+        "45 petals and 35 mob IDs times six rarities");
   for (const auto& p : c.petals) {
     check(catalog::client_petal(p.kind, p.rarity) == p.client_id && p.evidenceKey.size(),
           "every emitted petal mapped");
@@ -101,7 +104,9 @@ void mapping() {
   for (const auto& m : c.mobs) {
     check(catalog::client_mob(m.kind, m.rarity) == m.client_id, "every emitted mob mapped");
     check(catalog::client_mob(m.kind, m.rarity, Group::summon) == m.client_id, "summon mapping");
-    check(catalog::client_mob(m.kind, m.rarity, Group::ant_hole) == 9, "ant-hole role mapping");
+    check(catalog::client_mob(m.kind, m.rarity, Group::ant_hole) ==
+              (m.kind == Mob::fire_ant_burrow ? 24 : 9),
+          "nest role mapping");
     if (m.segment_client_id) {
       check(catalog::client_mob(m.kind, m.rarity, Group::segment) == m.segment_client_id,
             "segment role mapping");
@@ -138,7 +143,7 @@ void mapping() {
             catalog::unlocked_main_slots(30) == 7 && catalog::unlocked_main_slots(44) == 7 &&
             catalog::unlocked_main_slots(45) == 8 && catalog::unlocked_main_slots(255) == 8,
         "shared five-to-eight slot progression has reachable unlocks");
-  check(catalog::drop_table().size() == 4, "bounded dated drop tranche available");
+  check(catalog::drop_table().size() > 780, "complete original nonzero drop table available");
 }
 void damage_rarity_and_reload() {
   for (const auto rarity : {Rarity::common, Rarity::mythic}) {
@@ -188,8 +193,7 @@ void unsupported_effects() {
       }
     }
   }
-  check(rejected == 33 * 6,
-        "33 mapped petal effects are explicitly unsupported across six rarities");
+  check(rejected == 0, "every original petal effect supports all six rarities");
   check(!catalog::can_equip(Petal::none, Rarity(6)) && !catalog::can_equip(Petal(999)),
         "capability rejects invalid rarity and unknown enum");
 }
@@ -203,7 +207,7 @@ void rose_and_leaf() {
     FixtureAccess::damage(match, *owner(match).body, 1);
     steps(match, 39);
     near(body(match).health, 99, "rose waits one second");
-    near(petal(match).position.length(), 14, "rose does not expand on attack");
+    near(petal(match).position.length(), 13, "rose does not expand on attack");
     steps(match, 1);
     near(body(match).health, 100, "rose caps useful healing");
     check(!owner(match).petals[0].entity && owner(match).petals[1].entity,

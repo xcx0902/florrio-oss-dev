@@ -38,6 +38,8 @@ class Match {
     Vec2 move;
     bool attack = false;
     bool defend = false;
+    double aim_angle = 0;
+    double aim_distance = 13;
     std::vector<Tick> petal_ready;
     double orbit_phase = 0;
     Tick orbit_updated = std::numeric_limits<Tick>::max();
@@ -53,6 +55,8 @@ class Match {
     double slow_multiplier = 1;
     Tick slow_ticks = 0;
     bool consume_source = false;
+    Tick heal_block_ticks = 0;
+    bool attack_slow = false;
   };
 
   using Command = std::variant<Input, Connection, Equip>;
@@ -69,7 +73,20 @@ class Match {
   [[nodiscard]] Tick reload_ticks(Petal kind, Rarity rarity) const;
   void detach_petal(EntityId id);
   void consume_petal(EntityId id);
+  void flush_sponge(EntityId id);
   void update_effects();
+  void update_special_effects();
+  void refresh_passives();
+  void update_mob_actions();
+  void update_nests();
+  [[nodiscard]] Vec2 mob_direction(detail::Entity& entity);
+  [[nodiscard]] EntityId spawn_mob(Mob kind, Rarity rarity, Vec2 position,
+                                   Group group = Group::main_mob, std::optional<LifeId> owner = {},
+                                   std::uint32_t wave = 0);
+  [[nodiscard]] double apply_health(EntityId target, const DamageSource& source, HealthKind kind,
+                                    double amount, bool secondary = false);
+  void chain_attack(EntityId first, const DamageSource& source, double damage, unsigned bounces,
+                    double range);
   void finish_projectiles();
   void apply_commands();
   void move_entities();

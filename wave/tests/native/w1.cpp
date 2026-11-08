@@ -735,6 +735,7 @@ void garden_candidates(Trace& trace) {
   }
   // Keep the player and mobs stationary so the test isolates the dated wave schedule.
   rules.version += "/schedule-fixture";
+  rules.catalog = nullptr;
   rules.special_chance = 0;
   rules.remaining_threshold = 0;
   Match match({1}, 30, rules);
@@ -779,6 +780,7 @@ void garden_candidates(Trace& trace) {
 
   auto special_rules = garden_rules();
   special_rules.version += "/special-fixture";
+  special_rules.catalog = nullptr;
   special_rules.special_groups = {{Mob::ladybug, Mob::dark_ladybug}, {Mob::spider}};
   for (auto& mob : special_rules.mobs) {
     mob.body.speed_per_second = 0;
