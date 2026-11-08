@@ -8,6 +8,9 @@
 archive/
 # Immutable historical clients are verified by SHA-256, never reformatted.
 wave-reference/
+# Deterministic original-client evidence and its generated complete inventory.
+wave/data/catalogs/20221030/client-tooltips.json
+wave/docs/client-tooltips-20221030.md
 node_modules/
 build/
 dist-next/

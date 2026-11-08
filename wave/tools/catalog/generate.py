@@ -22,7 +22,7 @@ SOURCE_DIR = Path(__file__).resolve().parents[2]
 PACK = SOURCE_DIR / 'data/catalogs/20221030/catalog.json'
 HEADER = SOURCE_DIR / 'server/catalog/generated.hpp'
 EVIDENCE_INPUTS = PACK.with_name('evidence-inputs.json')
-EVIDENCE_SHA256 = 'ac775f56e5a569189b1aae1722eca2af1118c9eefd637d2a4183a1e0b71a5486'
+EVIDENCE_SHA256 = 'e14ae1bc32b30bec2adad402070ee1a72f26fab6c4798ec1d9bcaf44a13cbc13'
 KINDS = ('basic', 'rose', 'faster', 'leaf', 'stinger', 'peas', 'grapes', 'web',
          'missile', 'egg', 'honey', 'cactus')
 MOBS = ('bee', 'ladybug', 'baby_ant', 'rock', 'centipede', 'worker_ant', 'dark_ladybug',
@@ -71,11 +71,90 @@ def bundled_evidence():
     return inputs
 
 
+def tooltip_evidence(inputs):
+    selection = inputs['tooltipEvidence']
+    path = PACK.with_name('client-tooltips.json')
+    result = json.loads(checked_bytes(path, selection['sha256'], 'client tooltip evidence'))
+    walk(result, 'tooltips')
+    require(result['buildHash'] == inputs['reference']['buildHash'], 'tooltip client identity drift')
+    for section, count in [('petals', 45), ('mobs', 35)]:
+        require([r['id'] for r in result[section]] == list(range(1, count + 1)),
+                f'incomplete original {section} tooltip coverage')
+        for row in result[section]:
+            require([v['rarity'] for v in row['variants']] == list(range(6)),
+                    'incomplete tooltip rarity coverage')
+            for variant in row['variants']:
+                unique(variant['fields'], 'label', 'tooltip field')
+                if section == 'mobs':
+                    candidates = variant['drops']['candidates']
+                    keys = [(d['petalId'], d['rarity']) for d in candidates]
+                    expected = {(d['petalId'], r) for d in row['loot'] for r in range(6)}
+                    require(len(keys) == len(set(keys)) and set(keys) == expected,
+                            'incomplete mob drop candidate coverage')
+                    require(all(d['petalId'] in range(1, 46) for d in candidates),
+                            'unknown drop tooltip petal')
+                    require(all(d['probability'] is None or 0 <= d['probability'] <= 1
+                                for d in candidates), 'invalid tooltip drop probability')
+                    shown = [(d['petalId'], d['rarity'], d['display'])
+                             for d in candidates if d['displayed']]
+                    panel = [(d['petalId'], d['rarity'], d['display'])
+                             for d in variant['drops']['panel']]
+                    require(shown == panel, 'drop tooltip panel/candidate mismatch')
+    return result
+
+
+def client_adoptions(section, row, observed):
+    """Explicit conversion from observed display data to current simulation units.
+
+    Multi-projectile HP division and ranged mob HP selection are adoption policies,
+    not claims that a client tooltip establishes the historical server algorithm.
+    """
+    fields = {f['label']: f for f in observed['fields']}
+    if section == 'mobs':
+        health = fields['Health']
+        return {'body.health': health.get('range', [health['value']])[0],
+                'body.contact_damage': fields['Damage']['value']}
+    adopted = {
+        'body.contact_damage': observed['body']['damage'],
+        'body.health': observed['body']['health'] / (4 if row['kind'] in ('peas', 'grapes') else 1),
+        'reloadSeconds': observed['reloadSeconds'],
+        'activationSeconds': observed['activationSeconds'],
+        'particles': 4 if row['kind'] in ('peas', 'grapes') else observed['orbitCount'],
+    }
+    for kind, label, target in [
+        ('rose', 'Heal', 'heal'), ('leaf', 'Heal', 'passiveHealPerSecond'),
+        ('leaf', 'Mob Heal', 'friendlyMobHeal'), ('faster', 'Rotation speed', 'rotationBonus'),
+        ('cactus', 'Flower Health', 'healthBonus'), ('web', 'Duration', 'durationSeconds'),
+        ('honey', 'Duration', 'durationSeconds'),
+    ]:
+        if row['kind'] == kind:
+            adopted[target] = fields[label]['value']
+    if row['kind'] == 'web':
+        adopted['areaRadius'] = fields['Radius']['value'] / 5
+    if row['kind'] == 'grapes':
+        adopted['body.poison_per_tick'] = fields['Poison']['value'] / row['body']['poison_ticks']
+    if row['kind'] == 'egg':
+        contents = fields['Contents']['display']
+        name, rarity = contents.rsplit(' (', 1)
+        adopted['summon'] = {
+            'mob': name.lower().replace(' ', '_'),
+            'rarity': ['Common', 'Unusual', 'Rare', 'Epic', 'Legendary', 'Mythic'].index(rarity[:-1]),
+        }
+    return adopted
+
+
+def nested_value(row, key):
+    for part in key.split('.'):
+        row = row[part]
+    return row
+
+
 def validate(pack, inputs=None):
     if inputs is None:
         inputs = bundled_evidence()
+    tooltips = tooltip_evidence(inputs)
     walk(pack)
-    require(pack['schemaVersion'] == 1 and pack['version'] == '20221030-w3.1', 'unlocked version')
+    require(pack['schemaVersion'] == 1 and pack['version'] == '20221030-w3.2', 'unlocked version')
     require(pack['cutoffUtc'] == '2022-10-30T21:00:58Z', 'unlocked historical cutoff')
     reference = inputs['reference']
     require(pack['clientBuildHash'] == reference['buildHash'], 'client build hash mismatch')
@@ -108,7 +187,11 @@ def validate(pack, inputs=None):
             require(type(row['rarity']) is int and 0 <= row['rarity'] < 6, 'invalid rarity')
             require(row['clientId'] in registry, 'unknown client reference')
             require(row['evidenceKey'] in evidence, 'unregistered evidenceKey')
-            require(row['provenance']['server'] == 'reconstruction', 'unsubstantiated authoritative claim')
+            require(row['provenance']['server'] == 'client-tooltip-adoption-with-reconstruction',
+                    'unsubstantiated authoritative claim')
+            observed = tooltips[section][row['clientId'] - 1]['variants'][row['rarity']]
+            for key, value in client_adoptions(section, row, observed).items():
+                require(nested_value(row, key) == value, f'client tooltip adoption drift: {row["kind"]}.{key}')
             ids_by_kind.setdefault(row['kind'], row['clientId'])
             require(ids_by_kind[row['kind']] == row['clientId'], 'unstable kind/client mapping')
             body = row['body']
@@ -137,12 +220,11 @@ def validate(pack, inputs=None):
                 for field, bounds in body_ranges.items():
                     require(len(bounds) == 2 and 0 <= bounds[0] <= body[field] <= bounds[1],
                             'body reconstruction outside candidate range')
-                ctor = next((c for c in inputs['constructors'] if c['id'] == row['clientId']), None)
-                if ctor:
-                    require(row['particles'] == ctor['countCandidate'], 'original particle count drift')
-                    observed = ctor['values'][row['rarity']]['raw']
-                    require(row['clientValues']['offset12'] == observed[1] and
-                            row['clientValues']['offset16'] == observed[2], 'raw client value drift')
+                require(row['clientValues']['offset12'] == observed['body']['damage'] and
+                        row['clientValues']['offset16'] == observed['body']['health'], 'raw client value drift')
+                if row['effect'] == 'summon':
+                    require(row['summon']['mob'] in MOBS and 0 <= row['summon']['rarity'] < 6,
+                            'invalid original Egg contents')
             else:
                 require(type(row['xp']) is int and row['xp'] >= 0, 'invalid mob XP')
                 require(row['segmentClientId'] == 0 or row['segmentClientId'] in registry,
@@ -173,10 +255,22 @@ def validate(pack, inputs=None):
     require(pack['craft']['successProbabilities'][4] == .03, 'primary Mythic craft rate drift')
     totals = {}
     drop_keys = set()
+    require(pack['drops']['evidenceKey'] == 'drops.client-display' and
+            pack['drops']['allocationEvidenceKey'] == 'economy.reconstruction',
+            'drop probability/allocation evidence drift')
     for drop in pack['drops']['entries']:
         require(drop['mob'] in MOBS and drop['petal'] in KINDS and type(drop['rarity']) is int and
                 0 <= drop['rarity'] < 6 and type(drop['mobRarity']) is int and
                 0 <= drop['mobRarity'] < 6, 'unknown drop reference')
+        mob = next(r for r in pack['mobs'] if (r['kind'], r['rarity']) ==
+                   (drop['mob'], drop['mobRarity']))
+        petal = next(r for r in pack['petals'] if (r['kind'], r['rarity']) ==
+                     (drop['petal'], drop['rarity']))
+        observed = tooltips['mobs'][mob['clientId'] - 1]['variants'][drop['mobRarity']]
+        matches = [d for d in observed['drops']['candidates']
+                   if (d['petalId'], d['rarity']) == (petal['clientId'], drop['rarity'])]
+        require(len(matches) == 1 and matches[0]['probability'] == drop['probability'],
+                'client drop probability adoption drift')
         probabilities.append(drop['probability'])
         key = (drop['mob'], drop['mobRarity'], drop['petal'], drop['rarity'])
         require(key not in drop_keys, 'duplicate drop rule')
@@ -286,9 +380,11 @@ def generate(pack):
     for r in pack['petals']:
         client = r['clientValues']
         cv = '{true, ' + str(client['offset12']) + ', ' + str(client['offset16']) + '}' if client else '{}'
+        summon = r.get('summon', {'mob': 'beetle', 'rarity': 0})
         values = [f'sim::Petal::{r["kind"]}', f'sim::Rarity::{pack["rarities"][r["rarity"]]["name"].lower()}',
                   str(r['clientId']), json.dumps(r['name']), body(r['body']), number(r['reloadSeconds']),
-                  'Effect::' + r['effect'], str(r['particles'])] + [number(r[k]) for k in FIELDS] + [cv, json.dumps(r['evidenceKey'])]
+                  'Effect::' + r['effect'], str(r['particles'])] + [number(r[k]) for k in FIELDS] + [cv, json.dumps(r['evidenceKey']),
+                  'sim::Mob::' + summon['mob'], 'sim::Rarity::' + pack['rarities'][summon['rarity']]['name'].lower()]
         lines.append('  {' + ', '.join(values) + '},')
     lines += ['};', 'inline const MobDefinition mobs[]{']
     for r in pack['mobs']:
@@ -332,11 +428,15 @@ def self_test(pack):
         lambda p: p['petals'][0]['body'].update(health=float('inf')),
         lambda p: p['spawn'].update(specialChance=1.01),
         lambda p: p['drops']['entries'][0].update(probability=-.01),
+        lambda p: p['drops']['entries'][0].update(probability=.203),
         lambda p: p['drops']['entries'][0].update(petal='missing'),
         lambda p: p['sources'][0].update(sha256='0' * 64),
         lambda p: p.update(clientBuildHash='0' * 40),
         lambda p: p['registries']['petals'].append(copy.deepcopy(p['registries']['petals'][0])),
-        lambda p: p['petals'][0]['clientValues'].update(offset12=10),
+        lambda p: p['petals'][0]['clientValues'].update(offset12=999),
+        lambda p: p['petals'][0]['body'].update(contact_damage=11),
+        lambda p: p['petals'][0].update(reloadSeconds=2.6),
+        lambda p: p['mobs'][0]['body'].update(contact_damage=4),
         lambda p: p['mobs'][0].update(segmentClientId=255),
         lambda p: p['evidence'][0]['sources'].append('missing'),
         lambda p: p['craft'].update(failureLossRange=[0,5]),
@@ -379,6 +479,8 @@ def portable_self_test(pack):
         shutil.copyfile(PACK, data / 'catalog.json')
         bundled = data / EVIDENCE_INPUTS.name
         shutil.copyfile(EVIDENCE_INPUTS, bundled)
+        tooltip = data / 'client-tooltips.json'
+        shutil.copyfile(PACK.with_name('client-tooltips.json'), tooltip)
         header.write_text(generate(pack))
 
         def run(*arguments):
@@ -392,6 +494,11 @@ def portable_self_test(pack):
         require(result.returncode != 0 and 'bundled evidence hash mismatch' in result.stderr,
                 'tampered bundled evidence unexpectedly accepted')
         shutil.copyfile(EVIDENCE_INPUTS, bundled)
+        tooltip.write_bytes(tooltip.read_bytes() + b' ')
+        result = run()
+        require(result.returncode != 0 and 'client tooltip evidence hash mismatch' in result.stderr,
+                'tampered tooltip evidence unexpectedly accepted')
+        shutil.copyfile(PACK.with_name('client-tooltips.json'), tooltip)
         header.write_text(header.read_text() + '// stale\n')
         result = run()
         require(result.returncode != 0 and 'generated catalog is stale' in result.stderr,
@@ -411,7 +518,7 @@ def portable_self_test(pack):
         result = run('--snapshot', str(root))
         require(result.returncode != 0 and 'require --verify-evidence' in result.stderr,
                 'snapshot argument unexpectedly ignored')
-    print('Renamed standalone package passed; five integrity/explicit-evidence failures rejected')
+    print('Renamed standalone package passed; six integrity/explicit-evidence failures rejected')
 
 
 def main():

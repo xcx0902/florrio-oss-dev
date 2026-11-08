@@ -36,7 +36,11 @@ npm --prefix wave run test:wire -- --snapshot "$PWD/wave-reference/20221030" --s
 `CHROME_PATH` 或 `--browser` 可指定 Chromium；W3 在 macOS 默认尝试已安装的 Chrome。
 结果、库存差分、原版收发帧、源码/二进制摘要和截图写入 `reports/wave/W3/`。
 目录注册表包含全部原版身份，权威效果当前覆盖 12 种花瓣、六个稀有度和早波怪物；
-尚未建模的效果不能装备到主槽。精确历史数值的缺口、采用值和范围逐项登记。
+尚未建模的效果不能装备到主槽。现已从原件提取全部 45 种花瓣／35 个怪物 ID × 六稀有度的
+480 份完整 tooltip，按精确值修正当前目录为 `20221030-w3.2`；未显示字段与行为缺口另记。
+[完整数值全表](docs/client-tooltips-20221030.md) ·
+[机器可读记录](data/catalogs/20221030/client-tooltips.json) ·
+[改前／改后差分](data/catalogs/20221030/client-tooltip-corrections.json)
 
 [目录与效果](docs/catalog-20221030.md) · [存档事务](docs/store-20221030.md) ·
 [战斗经济与 I/O 队列](docs/economy-application-20221030.md) ·

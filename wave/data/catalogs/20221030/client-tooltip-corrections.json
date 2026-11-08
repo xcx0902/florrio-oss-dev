@@ -1,0 +1,3446 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "20221030-w3.1",
+  "toVersion": "20221030-w3.2",
+  "tooltipSha256": "2a06ac1e27d15b4dd5782cdddaf99a3fbdb2a6b957d0ef52333bdfe16dc2a346",
+  "notes": "Only implemented definitions and the existing four drop rules are adopted. Complete 45-petal/35-mob evidence, 210 drop panels and 2160 candidate combinations are separate. Before values are the w3.1 hypotheses; clientValues before also includes misassigned W0 constructor observations. HP / 4 and ranged HP lower-bound selections are explicit adoption policies. Client drop probabilities do not establish historical server roll or allocation mechanics.",
+  "changes": [
+    {
+      "section": "petals",
+      "kind": "basic",
+      "clientId": 1,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": {
+        "offset12": 7,
+        "offset16": 5
+      },
+      "after": {
+        "offset12": 10,
+        "offset16": 10
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "basic",
+      "clientId": 1,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": {
+        "offset12": 9,
+        "offset16": 6
+      },
+      "after": {
+        "offset12": 13,
+        "offset16": 12
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "basic",
+      "clientId": 1,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": {
+        "offset12": 13,
+        "offset16": 7
+      },
+      "after": {
+        "offset12": 18,
+        "offset16": 14
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "basic",
+      "clientId": 1,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": {
+        "offset12": 17,
+        "offset16": 9
+      },
+      "after": {
+        "offset12": 24,
+        "offset16": 17
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "basic",
+      "clientId": 1,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": {
+        "offset12": 22,
+        "offset16": 11
+      },
+      "after": {
+        "offset12": 32,
+        "offset16": 21
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "basic",
+      "clientId": 1,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": {
+        "offset12": 28,
+        "offset16": 13
+      },
+      "after": {
+        "offset12": 40,
+        "offset16": 25
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": {
+        "offset12": 35,
+        "offset16": 2
+      },
+      "after": {
+        "offset12": 5,
+        "offset16": 5
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 7,
+      "after": 6
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": {
+        "offset12": 46,
+        "offset16": 2
+      },
+      "after": {
+        "offset12": 6,
+        "offset16": 7
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 9,
+      "after": 7
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": {
+        "offset12": 63,
+        "offset16": 3
+      },
+      "after": {
+        "offset12": 7,
+        "offset16": 9
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 12,
+      "after": 9
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": {
+        "offset12": 84,
+        "offset16": 3
+      },
+      "after": {
+        "offset12": 9,
+        "offset16": 12
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 16,
+      "after": 11
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": {
+        "offset12": 112,
+        "offset16": 4
+      },
+      "after": {
+        "offset12": 11,
+        "offset16": 16
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 20,
+      "after": 13
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 5,
+      "field": "heal",
+      "before": 40,
+      "after": 80
+    },
+    {
+      "section": "petals",
+      "kind": "rose",
+      "clientId": 5,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": {
+        "offset12": 140,
+        "offset16": 5
+      },
+      "after": {
+        "offset12": 13,
+        "offset16": 20
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 0,
+      "field": "rotationBonus",
+      "before": 0.2,
+      "after": 0.15000000596046448
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": {
+        "offset12": 0,
+        "offset16": 1
+      },
+      "after": {
+        "offset12": 8,
+        "offset16": 5
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 1,
+      "field": "rotationBonus",
+      "before": 0.2,
+      "after": 0.19499999284744263
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": {
+        "offset12": 0,
+        "offset16": 1
+      },
+      "after": {
+        "offset12": 10,
+        "offset16": 6
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 2,
+      "field": "rotationBonus",
+      "before": 0.3,
+      "after": 0.26999998092651367
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": {
+        "offset12": 0,
+        "offset16": 1
+      },
+      "after": {
+        "offset12": 14,
+        "offset16": 7
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 3,
+      "field": "rotationBonus",
+      "before": 0.4,
+      "after": 0.36000001430511475
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": {
+        "offset12": 0,
+        "offset16": 1
+      },
+      "after": {
+        "offset12": 19,
+        "offset16": 9
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 4,
+      "field": "rotationBonus",
+      "before": 0.5,
+      "after": 0.48000001907348633
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": {
+        "offset12": 0,
+        "offset16": 1
+      },
+      "after": {
+        "offset12": 26,
+        "offset16": 11
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 5,
+      "field": "rotationBonus",
+      "before": 1.2,
+      "after": 1.2000000476837158
+    },
+    {
+      "section": "petals",
+      "kind": "faster",
+      "clientId": 12,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": {
+        "offset12": 0,
+        "offset16": 1
+      },
+      "after": {
+        "offset12": 40,
+        "offset16": 25
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 10,
+      "after": 12
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 0,
+      "field": "activationSeconds",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 0,
+      "field": "passiveHealPerSecond",
+      "before": 1.6,
+      "after": 1.600000023841858
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": {
+        "offset12": 10,
+        "offset16": 10
+      },
+      "after": {
+        "offset12": 10,
+        "offset16": 12
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 1,
+      "field": "activationSeconds",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 1,
+      "field": "passiveHealPerSecond",
+      "before": 2.1,
+      "after": 2.0799999237060547
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": {
+        "offset12": 12,
+        "offset16": 13
+      },
+      "after": {
+        "offset12": 13,
+        "offset16": 14
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 2,
+      "field": "activationSeconds",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 2,
+      "field": "passiveHealPerSecond",
+      "before": 2.9,
+      "after": 2.879999876022339
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": {
+        "offset12": 14,
+        "offset16": 18
+      },
+      "after": {
+        "offset12": 18,
+        "offset16": 17
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 3,
+      "field": "activationSeconds",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 3,
+      "field": "passiveHealPerSecond",
+      "before": 3.8,
+      "after": 3.8400001525878906
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": {
+        "offset12": 17,
+        "offset16": 24
+      },
+      "after": {
+        "offset12": 24,
+        "offset16": 20
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 4,
+      "field": "activationSeconds",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 4,
+      "field": "passiveHealPerSecond",
+      "before": 5.1,
+      "after": 5.119999885559082
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": {
+        "offset12": 21,
+        "offset16": 32
+      },
+      "after": {
+        "offset12": 32,
+        "offset16": 25
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 5,
+      "field": "activationSeconds",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 5,
+      "field": "friendlyMobHeal",
+      "before": 40,
+      "after": 80
+    },
+    {
+      "section": "petals",
+      "kind": "leaf",
+      "clientId": 22,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": {
+        "offset12": 25,
+        "offset16": 40
+      },
+      "after": {
+        "offset12": 40,
+        "offset16": 30
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 0,
+      "field": "reloadSeconds",
+      "before": 4,
+      "after": 2.5
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 35,
+        "offset16": 2
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 1,
+      "field": "reloadSeconds",
+      "before": 4,
+      "after": 2.5
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 46,
+        "offset16": 2
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 2,
+      "field": "reloadSeconds",
+      "before": 4,
+      "after": 2.5
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 63,
+        "offset16": 3
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 3,
+      "field": "reloadSeconds",
+      "before": 4,
+      "after": 2.5
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 84,
+        "offset16": 3
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 4,
+      "field": "reloadSeconds",
+      "before": 4,
+      "after": 2.5
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 112,
+        "offset16": 4
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 5,
+      "field": "reloadSeconds",
+      "before": 4,
+      "after": 2.5
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 5,
+      "field": "particles",
+      "before": 1,
+      "after": 3
+    },
+    {
+      "section": "petals",
+      "kind": "stinger",
+      "clientId": 6,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 140,
+        "offset16": 5
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 3,
+      "after": 8
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": {
+        "offset12": 1,
+        "offset16": 10
+      },
+      "after": {
+        "offset12": 8,
+        "offset16": 20
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 4,
+      "after": 10
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 6.5,
+      "after": 6
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": {
+        "offset12": 1,
+        "offset16": 13
+      },
+      "after": {
+        "offset12": 10,
+        "offset16": 24
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 5,
+      "after": 14
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 9,
+      "after": 7
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": {
+        "offset12": 1,
+        "offset16": 18
+      },
+      "after": {
+        "offset12": 14,
+        "offset16": 28
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 7,
+      "after": 19
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 12,
+      "after": 8.5
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": {
+        "offset12": 2,
+        "offset16": 24
+      },
+      "after": {
+        "offset12": 19,
+        "offset16": 34
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 10,
+      "after": 26
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 16,
+      "after": 10.5
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": {
+        "offset12": 2,
+        "offset16": 32
+      },
+      "after": {
+        "offset12": 26,
+        "offset16": 42
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 12,
+      "after": 60
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 19.5,
+      "after": 12.5
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 5,
+      "field": "reloadSeconds",
+      "before": 0.3,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 5,
+      "field": "activationSeconds",
+      "before": 0.1,
+      "after": 0.5
+    },
+    {
+      "section": "petals",
+      "kind": "peas",
+      "clientId": 44,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": {
+        "offset12": 3,
+        "offset16": 40
+      },
+      "after": {
+        "offset12": 60,
+        "offset16": 50
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "grapes",
+      "clientId": 10,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": {
+        "offset12": 5,
+        "offset16": 15
+      },
+      "after": {
+        "offset12": 3,
+        "offset16": 20
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "grapes",
+      "clientId": 10,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": {
+        "offset12": 6,
+        "offset16": 20
+      },
+      "after": {
+        "offset12": 4,
+        "offset16": 24
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "grapes",
+      "clientId": 10,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": {
+        "offset12": 7,
+        "offset16": 27
+      },
+      "after": {
+        "offset12": 5,
+        "offset16": 28
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "grapes",
+      "clientId": 10,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": {
+        "offset12": 9,
+        "offset16": 36
+      },
+      "after": {
+        "offset12": 7,
+        "offset16": 34
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "grapes",
+      "clientId": 10,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": {
+        "offset12": 11,
+        "offset16": 48
+      },
+      "after": {
+        "offset12": 10,
+        "offset16": 42
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "grapes",
+      "clientId": 10,
+      "rarity": 5,
+      "field": "body.poison_per_tick",
+      "before": 1.1,
+      "after": 2.2
+    },
+    {
+      "section": "petals",
+      "kind": "grapes",
+      "clientId": 10,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": {
+        "offset12": 13,
+        "offset16": 60
+      },
+      "after": {
+        "offset12": 12,
+        "offset16": 50
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": {
+        "offset12": 10,
+        "offset16": 10
+      },
+      "after": {
+        "offset12": 8,
+        "offset16": 5
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": {
+        "offset12": 13,
+        "offset16": 12
+      },
+      "after": {
+        "offset12": 10,
+        "offset16": 7
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 14,
+      "after": 11
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": {
+        "offset12": 18,
+        "offset16": 14
+      },
+      "after": {
+        "offset12": 11,
+        "offset16": 9
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 19,
+      "after": 14
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": {
+        "offset12": 24,
+        "offset16": 17
+      },
+      "after": {
+        "offset12": 14,
+        "offset16": 12
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 26,
+      "after": 17
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": {
+        "offset12": 32,
+        "offset16": 21
+      },
+      "after": {
+        "offset12": 17,
+        "offset16": 16
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 32,
+      "after": 20
+    },
+    {
+      "section": "petals",
+      "kind": "web",
+      "clientId": 20,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": {
+        "offset12": 40,
+        "offset16": 25
+      },
+      "after": {
+        "offset12": 20,
+        "offset16": 20
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 20,
+      "after": 25
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 0,
+      "field": "reloadSeconds",
+      "before": 3,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 25,
+        "offset16": 2
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 26,
+      "after": 33
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 1,
+      "field": "reloadSeconds",
+      "before": 3,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 33,
+        "offset16": 2
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 36,
+      "after": 45
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 2,
+      "field": "reloadSeconds",
+      "before": 3,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 45,
+        "offset16": 3
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 48,
+      "after": 60
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 3,
+      "field": "reloadSeconds",
+      "before": 3,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 60,
+        "offset16": 3
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 64,
+      "after": 80
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 4,
+      "field": "reloadSeconds",
+      "before": 3,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 80,
+        "offset16": 4
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 80,
+      "after": 100
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 5,
+      "field": "reloadSeconds",
+      "before": 3,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "missile",
+      "clientId": 9,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 100,
+        "offset16": 5
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 10,
+      "after": 25
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 0,
+      "field": "reloadSeconds",
+      "before": 5,
+      "after": 4
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 0,
+      "field": "summon",
+      "before": null,
+      "after": {
+        "mob": "baby_ant",
+        "rarity": 0
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 1,
+        "offset16": 25
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 12,
+      "after": 33
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 1,
+      "field": "reloadSeconds",
+      "before": 5,
+      "after": 4
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 1,
+      "field": "summon",
+      "before": null,
+      "after": {
+        "mob": "worker_ant",
+        "rarity": 1
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 1,
+        "offset16": 33
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 0,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 14,
+      "after": 45
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 2,
+      "field": "reloadSeconds",
+      "before": 5,
+      "after": 4
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 2,
+      "field": "summon",
+      "before": null,
+      "after": {
+        "mob": "soldier_ant",
+        "rarity": 1
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 1,
+        "offset16": 45
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 0,
+      "after": 2
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 17,
+      "after": 60
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 3,
+      "field": "reloadSeconds",
+      "before": 5,
+      "after": 4
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 3,
+      "field": "summon",
+      "before": null,
+      "after": {
+        "mob": "beetle",
+        "rarity": 1
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 2,
+        "offset16": 60
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 0,
+      "after": 2
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 21,
+      "after": 80
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 4,
+      "field": "reloadSeconds",
+      "before": 5,
+      "after": 4
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 4,
+      "field": "summon",
+      "before": null,
+      "after": {
+        "mob": "beetle",
+        "rarity": 2
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 2,
+        "offset16": 80
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 0,
+      "after": 3
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 25,
+      "after": 100
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 5,
+      "field": "reloadSeconds",
+      "before": 5,
+      "after": 4
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 5,
+      "field": "activationSeconds",
+      "before": 2,
+      "after": 15
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 5,
+      "field": "summon",
+      "before": null,
+      "after": {
+        "mob": "beetle",
+        "rarity": 4
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "egg",
+      "clientId": 16,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 3,
+        "offset16": 100
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 0,
+      "field": "durationSeconds",
+      "before": 3.2,
+      "after": 2.4000000953674316
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 10,
+        "offset16": 10
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 13,
+      "after": 12
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 1,
+      "field": "durationSeconds",
+      "before": 3.2,
+      "after": 3.119999885559082
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 13,
+        "offset16": 12
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 18,
+      "after": 14
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 2,
+      "field": "durationSeconds",
+      "before": 4.3,
+      "after": 4.320000171661377
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 18,
+        "offset16": 14
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 24,
+      "after": 17
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 3,
+      "field": "durationSeconds",
+      "before": 5.8,
+      "after": 5.760000228881836
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 24,
+        "offset16": 17
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 32,
+      "after": 21
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 4,
+      "field": "durationSeconds",
+      "before": 7.7,
+      "after": 7.679999828338623
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 32,
+        "offset16": 21
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 40,
+      "after": 25
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 5,
+      "field": "durationSeconds",
+      "before": 9.4,
+      "after": 9.600000381469727
+    },
+    {
+      "section": "petals",
+      "kind": "honey",
+      "clientId": 21,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 40,
+        "offset16": 25
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 10,
+      "after": 5
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 20,
+      "after": 15
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 0,
+      "field": "reloadSeconds",
+      "before": 2.5,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 0,
+      "field": "healthBonus",
+      "before": 10,
+      "after": 25
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 0,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 5,
+        "offset16": 15
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 13,
+      "after": 6
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 24,
+      "after": 20
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 1,
+      "field": "reloadSeconds",
+      "before": 2.5,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 1,
+      "field": "healthBonus",
+      "before": 13,
+      "after": 32.5
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 1,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 6,
+        "offset16": 20
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 18,
+      "after": 7
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 28,
+      "after": 27
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 2,
+      "field": "reloadSeconds",
+      "before": 2.5,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 2,
+      "field": "healthBonus",
+      "before": 18,
+      "after": 45
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 2,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 7,
+        "offset16": 27
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 24,
+      "after": 9
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 34,
+      "after": 36
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 3,
+      "field": "reloadSeconds",
+      "before": 2.5,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 3,
+      "field": "healthBonus",
+      "before": 24,
+      "after": 60.000003814697266
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 3,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 9,
+        "offset16": 36
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 32,
+      "after": 11
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 42,
+      "after": 48
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 4,
+      "field": "reloadSeconds",
+      "before": 2.5,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 4,
+      "field": "healthBonus",
+      "before": 32,
+      "after": 80
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 4,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 11,
+        "offset16": 48
+      }
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 40,
+      "after": 13
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 50,
+      "after": 60
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 5,
+      "field": "reloadSeconds",
+      "before": 2.5,
+      "after": 1
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 5,
+      "field": "healthBonus",
+      "before": 40,
+      "after": 200
+    },
+    {
+      "section": "petals",
+      "kind": "cactus",
+      "clientId": 11,
+      "rarity": 5,
+      "field": "clientValues",
+      "before": null,
+      "after": {
+        "offset12": 13,
+        "offset16": 60
+      }
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 16,
+      "after": 15
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 4,
+      "after": 50
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 19.2,
+      "after": 24
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 5.2,
+      "after": 55
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 22.4,
+      "after": 37.5
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 7.2,
+      "after": 65
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 27.2,
+      "after": 60
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 9.6,
+      "after": 80
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 33.6,
+      "after": 375
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 12.8,
+      "after": 100
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 40,
+      "after": 750
+    },
+    {
+      "section": "mobs",
+      "kind": "bee",
+      "clientId": 4,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 16,
+      "after": 125
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 24,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 5,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 28.799999999999997,
+      "after": 40
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 6.5,
+      "after": 11
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 33.599999999999994,
+      "after": 62.5
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 9,
+      "after": 13
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 40.8,
+      "after": 100
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 12,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 50.400000000000006,
+      "after": 625
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 16,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 60,
+      "after": 1250
+    },
+    {
+      "section": "mobs",
+      "kind": "ladybug",
+      "clientId": 3,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 20,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 12,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 14.399999999999999,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 3.9000000000000004,
+      "after": 11
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 16.799999999999997,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 5.4,
+      "after": 13
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 20.4,
+      "after": 40
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 7.199999999999999,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 25.200000000000003,
+      "after": 250
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 9.600000000000001,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 30,
+      "after": 500
+    },
+    {
+      "section": "mobs",
+      "kind": "baby_ant",
+      "clientId": 5,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 12,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 35,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 5,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 42,
+      "after": 32
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 6.5,
+      "after": 11
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 49,
+      "after": 50
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 9,
+      "after": 13
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 59.5,
+      "after": 80
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 12,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 73.5,
+      "after": 500
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 16,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 87.5,
+      "after": 1000
+    },
+    {
+      "section": "mobs",
+      "kind": "rock",
+      "clientId": 1,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 20,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 30,
+      "after": 50
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 6,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 36,
+      "after": 80
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 7.800000000000001,
+      "after": 11
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 42,
+      "after": 125
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 10.8,
+      "after": 13
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 51,
+      "after": 200
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 14.399999999999999,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 63,
+      "after": 1250
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 19.200000000000003,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 75,
+      "after": 2500
+    },
+    {
+      "section": "mobs",
+      "kind": "centipede",
+      "clientId": 12,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 24,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 19,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 4,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 22.8,
+      "after": 40
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 5.2,
+      "after": 11
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 26.599999999999998,
+      "after": 62.5
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 7.2,
+      "after": 13
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 32.3,
+      "after": 100
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 9.6,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 39.9,
+      "after": 625
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 12.8,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 47.5,
+      "after": 1250
+    },
+    {
+      "section": "mobs",
+      "kind": "worker_ant",
+      "clientId": 6,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 16,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 34,
+      "after": 35
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 7,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 40.8,
+      "after": 56
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 9.1,
+      "after": 11
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 47.599999999999994,
+      "after": 87.5
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 12.6,
+      "after": 13
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 57.8,
+      "after": 140
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 16.8,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 71.4,
+      "after": 875
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 22.400000000000002,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 85,
+      "after": 1750
+    },
+    {
+      "section": "mobs",
+      "kind": "dark_ladybug",
+      "clientId": 19,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 28,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 38,
+      "after": 50
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 7,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 45.6,
+      "after": 80
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 9.1,
+      "after": 11
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 53.199999999999996,
+      "after": 125
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 12.6,
+      "after": 13
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 64.6,
+      "after": 200
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 16.8,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 79.8,
+      "after": 1250
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 22.400000000000002,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 95,
+      "after": 2500
+    },
+    {
+      "section": "mobs",
+      "kind": "evil_centipede",
+      "clientId": 14,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 28,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 28,
+      "after": 40
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 6,
+      "after": 10
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 33.6,
+      "after": 64
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 7.800000000000001,
+      "after": 11
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 39.199999999999996,
+      "after": 100
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 10.8,
+      "after": 13
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 47.6,
+      "after": 160
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 14.399999999999999,
+      "after": 16
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 58.800000000000004,
+      "after": 1000
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 19.200000000000003,
+      "after": 20
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 70,
+      "after": 2000
+    },
+    {
+      "section": "mobs",
+      "kind": "soldier_ant",
+      "clientId": 7,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 24,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 32,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 6,
+      "after": 25
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 38.4,
+      "after": 40
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 7.800000000000001,
+      "after": 27.5
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 44.8,
+      "after": 62.5
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 10.8,
+      "after": 32.5
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 54.4,
+      "after": 100
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 14.399999999999999,
+      "after": 40
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 67.2,
+      "after": 625
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 19.200000000000003,
+      "after": 50
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 80,
+      "after": 1250
+    },
+    {
+      "section": "mobs",
+      "kind": "spider",
+      "clientId": 21,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 24,
+      "after": 62.5
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 0,
+      "field": "body.health",
+      "before": 24,
+      "after": 40
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 4,
+      "after": 50
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 28.799999999999997,
+      "after": 64
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 5.2,
+      "after": 55
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 33.599999999999994,
+      "after": 100
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 7.2,
+      "after": 65
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 40.8,
+      "after": 160
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 9.6,
+      "after": 80
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 50.400000000000006,
+      "after": 1000
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 12.8,
+      "after": 100
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 60,
+      "after": 2000
+    },
+    {
+      "section": "mobs",
+      "kind": "hornet",
+      "clientId": 11,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 16,
+      "after": 125
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 0,
+      "field": "body.contact_damage",
+      "before": 8,
+      "after": 30
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 1,
+      "field": "body.health",
+      "before": 48,
+      "after": 64
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 1,
+      "field": "body.contact_damage",
+      "before": 10.4,
+      "after": 33
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 2,
+      "field": "body.health",
+      "before": 56,
+      "after": 100
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 2,
+      "field": "body.contact_damage",
+      "before": 14.4,
+      "after": 39
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 3,
+      "field": "body.health",
+      "before": 68,
+      "after": 160
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 3,
+      "field": "body.contact_damage",
+      "before": 19.2,
+      "after": 48
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 4,
+      "field": "body.health",
+      "before": 84,
+      "after": 1000
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 4,
+      "field": "body.contact_damage",
+      "before": 25.6,
+      "after": 60
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 5,
+      "field": "body.health",
+      "before": 100,
+      "after": 2000
+    },
+    {
+      "section": "mobs",
+      "kind": "beetle",
+      "clientId": 10,
+      "rarity": 5,
+      "field": "body.contact_damage",
+      "before": 32,
+      "after": 75
+    },
+    {
+      "section": "drops",
+      "mob": "ladybug",
+      "mobRarity": 0,
+      "petal": "rose",
+      "rarity": 0,
+      "field": "probability",
+      "before": 0.203,
+      "after": 0.20471331946741778,
+      "clientDisplay": "20.5%"
+    },
+    {
+      "section": "drops",
+      "mob": "baby_ant",
+      "mobRarity": 0,
+      "petal": "leaf",
+      "rarity": 1,
+      "field": "probability",
+      "before": 0.028,
+      "after": 0.027172009399267893,
+      "clientDisplay": "2.7%"
+    },
+    {
+      "section": "drops",
+      "mob": "centipede",
+      "mobRarity": 0,
+      "petal": "peas",
+      "rarity": 0,
+      "field": "probability",
+      "before": 0.041,
+      "after": 0.04094266450357675,
+      "clientDisplay": "4.1%"
+    },
+    {
+      "section": "drops",
+      "mob": "spider",
+      "mobRarity": 0,
+      "petal": "web",
+      "rarity": 1,
+      "field": "probability",
+      "before": 0.047,
+      "after": 0.045286680532582224,
+      "clientDisplay": "4.5%"
+    }
+  ]
+}

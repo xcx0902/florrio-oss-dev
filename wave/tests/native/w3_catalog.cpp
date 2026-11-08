@@ -75,7 +75,7 @@ EntityView petal(Match& match, std::size_t slot = 0) {
 }
 void mapping() {
   const auto& c = catalog::dated();
-  check(c.version == "20221030-w3.1" && c.sha256.size() == 64 && c.client_wasm_sha256.size() == 64,
+  check(c.version == "20221030-w3.2" && c.sha256.size() == 64 && c.client_wasm_sha256.size() == 64,
         "dated catalog carries source and client identity");
   check(catalog::petal_registry().size() == 46, "46 original kinds including None");
   std::set<Petal> kinds;
@@ -232,7 +232,9 @@ void rose_and_leaf() {
         FixtureAccess::spawn(match, {14, 0}, {.radius = 1, .health = 50}, Faction::team);
     FixtureAccess::damage(match, friendly, 20);
     steps(match, 1);
-    near(body(match).health, 90 + 2.1 * .025, "Leaf passive heal uses elapsed time");
+    near(body(match).health,
+         90 + catalog::dated().petal(Petal::leaf, Rarity::unusual)->passive_heal_per_second * .025,
+         "Leaf passive heal preserves original formatter precision");
     near(FixtureAccess::get(match, friendly).view.health, 43, "Leaf eaten by friendly mob");
     check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 40,
           "friendly mob consumption reloads Leaf");
@@ -334,21 +336,46 @@ void web_summon_passive_equip() {
       check(e.id != area->id, "ground Web expires after ten seconds");
     }
   }
+  for (unsigned rarity = 0; rarity < 5; ++rarity) {
+    Match match({80 + rarity}, 5, arena());
+    check(match.add_player({1}, {}, {Petal::egg}, {Rarity(rarity)}), "admit Egg contents fixture");
+    steps(match, 80);
+    check(owner(match).petals[0].entity.has_value(), "Egg does not hatch before two seconds");
+    steps(match, 1);
+    const std::array kinds{Mob::baby_ant, Mob::worker_ant, Mob::soldier_ant, Mob::beetle,
+                           Mob::beetle};
+    const std::array tiers{Rarity::common, Rarity::unusual, Rarity::unusual, Rarity::unusual,
+                           Rarity::rare};
+    unsigned summons = 0;
+    for (const auto& entity : match.view().entities) {
+      if (entity.group == Group::summon) {
+        ++summons;
+        check(entity.mob == kinds[rarity] && entity.rarity == tiers[rarity] &&
+                  entity.owner == owner(match).life,
+              "Egg uses original Contents kind/rarity independently of equipped rarity");
+      }
+    }
+    check(summons == 1 && owner(match).petals[0].reload_ticks == 160,
+          "each original Egg contents variant consumes its slot and reloads in four seconds");
+  }
   {
     Match match({8}, 5, arena());
     check(match.add_player({1}, {}, {Petal::egg}, {Rarity::mythic}), "admit Egg");
-    steps(match, 81);
+    steps(match, 600);
+    check(owner(match).petals[0].entity.has_value(), "Mythic Egg waits fifteen seconds");
+    steps(match, 1);
     unsigned summons = 0;
     for (const auto& e : match.view().entities) {
       if (e.group == Group::summon) {
         ++summons;
-        check(e.mob == Mob::beetle && e.owner == owner(match).life && e.rarity == Rarity::mythic,
+        check(e.mob == Mob::beetle && e.owner == owner(match).life && e.rarity == Rarity::legendary,
               "hatch ownership and rarity");
       }
     }
     check(summons == 1 && match.view().wave.counts.alive == 1,
           "summon excluded from wave population accounting");
-    check(owner(match).petals[0].reload_ticks == 200, "hatch consumes Egg and starts reload");
+    check(owner(match).petals[0].reload_ticks == 160,
+          "hatch consumes Egg and starts four-second reload");
     for (const auto& e : match.view().entities) {
       if (e.group == Group::main_mob) {
         FixtureAccess::get(match, e.id).view.health = 1000000;
@@ -372,7 +399,9 @@ void web_summon_passive_equip() {
         match.add_player({1}, {}, {Petal::basic, Petal::faster}, {Rarity::common, Rarity::mythic}),
         "admit Faster");
     steps(match, 2);
-    near(petal(match).heading_rad, 5.2 * .025, "Faster changes orbit angular speed");
+    near(petal(match).heading_rad,
+         (4 + catalog::dated().petal(Petal::faster, Rarity::mythic)->rotation_bonus) * .025,
+         "Faster changes orbit angular speed with original f32 precision");
     const auto old = petal(match).id;
     check(match.queue(Equip{
               owner(match).life, {Petal::basic, Petal::cactus}, {Rarity::rare, Rarity::common}}),
@@ -383,7 +412,7 @@ void web_summon_passive_equip() {
     steps(match, 1);
     check(owner(match).loadout_rarities[0] == Rarity::rare && !owner(match).petals[0].entity,
           "live equip applies rarity and selected reload");
-    near(body(match).max_health, 110, "Cactus increases max health");
+    near(body(match).max_health, 125, "Cactus increases max health");
     near(body(match).health, 100, "equipping health passive does not mint healing");
     check(!match.equip({1}, {Petal(999)}) && !match.equip({1}, {Petal::basic}, {Rarity(6)}) &&
               !match.equip({1}, {Petal::basic, Petal::rose}, {Rarity::common}),
@@ -412,7 +441,7 @@ void honey_stinger_and_life_cleanup() {
         FixtureAccess::spawn(match, {14, 0}, {.radius = 1, .health = 500, .speed_per_second = 20});
     steps(match, 2);
     near(FixtureAccess::get(match, target).view.velocity.length(), 16,
-         "October Honey slows movement on contact");
+         "reconstructed Honey movement slowdown remains explicit");
     check(match.set_loadout({1}, {}), "remove Honey source");
     steps(match, 173);
     near(FixtureAccess::get(match, target).view.velocity.length(), 20,
@@ -427,8 +456,8 @@ void honey_stinger_and_life_cleanup() {
     steps(match, 1);
     near(FixtureAccess::get(match, target).view.health, 465,
          "fragile Stinger deals adopted burst damage");
-    check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 160,
-          "Stinger destruction uses its own four second reload");
+    check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 100,
+          "Stinger destruction uses original 2.5 second reload");
   }
   {
     auto rules = arena();
@@ -436,7 +465,7 @@ void honey_stinger_and_life_cleanup() {
     Match match({14}, 5, rules);
     check(match.add_player({1}, {}, {Petal::egg, Petal::peas}, {Rarity::mythic, Rarity::common}),
           "admit summon and projectile owner");
-    steps(match, 81);
+    steps(match, 601);
     check(match.queue(Input{owner(match).life, {}, true, false}), "launch before life removal");
     steps(match, 1);
     FixtureAccess::kill(match, *owner(match).body);

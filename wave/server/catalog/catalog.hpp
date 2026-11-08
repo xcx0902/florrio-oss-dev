@@ -25,7 +25,7 @@ enum class Effect {
 };
 
 struct ClientValues {
-  // Raw constructor observations; meanings are deliberately not assumed to be server stats.
+  // Registry-derived constructor f32, confirmed by original Damage/Health tooltips.
   bool observed = false;
   double offset12 = 0;
   double offset16 = 0;
@@ -53,6 +53,8 @@ struct PetalDefinition {
   double area_radius;
   ClientValues client;
   std::string_view evidenceKey;
+  sim::Mob summon_mob = sim::Mob::beetle;
+  sim::Rarity summon_rarity = sim::Rarity::common;
 };
 
 struct MobDefinition {

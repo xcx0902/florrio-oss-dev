@@ -258,12 +258,12 @@ void Match::update_effects() {
       EntityView summon;
       summon.group = Group::summon;
       summon.faction = Faction::team;
-      summon.mob = Mob::beetle;
-      summon.rarity = entity->view.rarity;
+      summon.mob = definition.summon_mob;
+      summon.rarity = definition.summon_rarity;
       summon.owner = entity->view.owner;
       summon.position = entity->view.position;
       // Copy before pool insertion: insert may move its backing storage.
-      const auto body = rules_.catalog->mob(Mob::beetle, summon.rarity)->body;
+      const auto body = rules_.catalog->mob(*summon.mob, summon.rarity)->body;
       consume_petal(id);
       (void)add_entity(summon, body);
     } else if (owner.attack && !owner.defend && tick_ >= entity->born_tick + delay &&

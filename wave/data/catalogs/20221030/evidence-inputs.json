@@ -124,6 +124,11 @@
       "sha256": "979f1de24c6c10d997b550c4d829e95639f2a1eefee019c98c48cef9c8b9c748",
       "revision": 1790,
       "timestamp": "2022-09-11T16:57:28Z"
+    },
+    {
+      "id": "client.tooltips",
+      "path": "wave/data/catalogs/20221030/client-tooltips.json",
+      "sha256": "2a06ac1e27d15b4dd5782cdddaf99a3fbdb2a6b957d0ef52333bdfe16dc2a346"
     }
   ],
   "registries": {
@@ -974,6 +979,13 @@
       "kind": "primary-changelog",
       "locator": "Wasm 英语更新日志的线性内存地址。英语与中文 Wiki 转录属于同一日志。",
       "path": "wave-reference/20221030/client.wasm"
+    },
+    {
+      "id": "client.tooltips",
+      "description": "Complete 20221030 original-client tooltip observations; supersedes misassigned W0 constructor samples.",
+      "kind": "primary-artifact-runtime",
+      "locator": "Registry-derived original constructors and virtual tooltip builders; all 480 variants checked against unmodified Wasm.",
+      "path": "wave/data/catalogs/20221030/client-tooltips.json"
     }
   ],
   "craftDisplay": {
@@ -1150,5 +1162,15 @@
     "thresholds": [15, 30, 45],
     "mainSlots": [5, 6, 7, 8],
     "watExcerpt": "(block $block1 (result i32)\n(drop\n(br_if $block1\n(i32.const 5)\n(i32.lt_u\n(local.tee $1\n(i32.load8_u offset=8\n(local.get $1)\n)\n)\n(i32.const 15)\n)\n)\n)\n(drop\n(br_if $block1\n(i32.const 6)\n(i32.lt_u\n(local.get $1)\n(i32.const 30)\n)\n)\n)\n(select\n(i32.const 7)\n(i32.const 8)\n(i32.lt_u\n(local.get $1)\n(i32.const 45)\n)\n)\n)"
-  }
+  },
+  "tooltipEvidence": {
+    "file": "client-tooltips.json",
+    "sha256": "2a06ac1e27d15b4dd5782cdddaf99a3fbdb2a6b957d0ef52333bdfe16dc2a346",
+    "petalVariants": 270,
+    "mobVariants": 210,
+    "dropPanelVariants": 210,
+    "displayedDropRates": 782,
+    "dropCandidates": 2160
+  },
+  "constructorSampleStatus": "Retained W0 samples are historical evidence of the old probe, not valid petal numeric identity: hand-written constructor slots were shifted. Use client-tooltips.json registry-derived constructors instead."
 }

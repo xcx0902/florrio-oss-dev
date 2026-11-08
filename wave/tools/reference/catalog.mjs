@@ -4,13 +4,13 @@ import { probeGlue } from './glue.mjs';
 
 const rarities = ['Common', 'Unusual', 'Rare', 'Epic', 'Legendary', 'Mythic'];
 const petalSamples = [
-  { id: 1, name: 'Basic', slot: 48, countCandidate: 1, descriptionAddresses: [30790] },
-  { id: 5, name: 'Rose', slot: 44, countCandidate: 1 },
-  { id: 10, name: 'Grapes', slot: 39, countCandidate: 4 },
-  { id: 12, name: 'Faster', slot: 37, countCandidate: 1 },
-  { id: 20, name: 'Web', slot: 29, countCandidate: 1, descriptionAddresses: [21169] },
-  { id: 22, name: 'Leaf', slot: 27, countCandidate: 1, descriptionAddresses: [41842, 45414] },
-  { id: 44, name: 'Peas', slot: 5, countCandidate: 4 },
+  { id: 1, name: 'Basic', countCandidate: 1 },
+  { id: 5, name: 'Rose', countCandidate: 1 },
+  { id: 10, name: 'Grapes', countCandidate: 4 },
+  { id: 12, name: 'Faster', countCandidate: 1 },
+  { id: 20, name: 'Web', countCandidate: 1 },
+  { id: 22, name: 'Leaf', countCandidate: 1 },
+  { id: 44, name: 'Peas', countCandidate: 4 },
 ];
 
 function readString(heap, address) {
@@ -92,45 +92,49 @@ export function readCatalog(probe, js, wasm, transport) {
   const descriptor = alloc(8);
   table.get(1019)(descriptor, 0);
   assert.equal(u32(u32(descriptor)), 30790);
-  free(descriptor);
   const offsets = [8, 12, 16, 20, 24];
-  const constructors = petalSamples.map(
-    ({ id, name, slot, countCandidate, descriptionAddresses }) => {
-      assert.equal(petals[id].name, name);
-      let vtable;
-      const values = rarities.map((rarityName, rarity) => {
-        heap.writeUInt16LE(id | (rarity << 8), input);
-        const record = table.get(slot)(input);
-        vtable ??= u32(record);
-        assert.equal(u32(record), vtable);
-        const raw = offsets.map((offset) => f32(record + offset));
-        free(record);
-        return { rarity, name: rarityName, raw };
+  const constructors = petalSamples.map(({ id, name, countCandidate }) => {
+    assert.equal(petals[id].name, name);
+    // The registry's +20 field is the constructor table slot, not UI order.
+    // Hand-written slot numbers previously selected the following petal.
+    const slot = petals[id].orderAt20;
+    let vtable;
+    let descriptions;
+    const values = rarities.map((rarityName, rarity) => {
+      heap.writeUInt16LE(id | (rarity << 8), input);
+      const record = table.get(slot)(input);
+      vtable ??= u32(record);
+      assert.equal(u32(record), vtable);
+      const raw = offsets.map((offset) => f32(record + offset));
+      table.get(u32(vtable + 8))(descriptor, record);
+      descriptions ??= Array.from({ length: u32(descriptor + 4) }, (_, i) => {
+        const address = u32(u32(descriptor) + i * 4);
+        return { address, text: string(address) };
       });
-      // Inline description pointers adjacent to the original vtable. Web uses
-      // an indirect descriptor, so its string is located separately.
-      const addresses = descriptionAddresses ?? [u32(vtable - 12)];
-      return {
-        id,
-        name,
-        slot,
-        vtable,
-        countCandidate,
-        values,
-        descriptions: addresses.map((address) => ({ address, text: string(address) })),
-        authoritativeValues: null,
-      };
-    },
-  );
+      table.get(u32(vtable + 4))(record);
+      return { rarity, name: rarityName, raw };
+    });
+    return {
+      id,
+      name,
+      slot,
+      vtable,
+      countCandidate,
+      values,
+      descriptions,
+      authoritativeValues: null,
+    };
+  });
   free(input);
+  free(descriptor);
   const basic = constructors[0];
   assert.deepEqual(
     basic.values.map(({ raw }) => raw[1]),
-    [7, 9, 13, 17, 22, 28],
+    [10, 13, 18, 24, 32, 40],
   );
   assert.deepEqual(
     basic.values.map(({ raw }) => raw[2]),
-    [5, 6, 7, 9, 11, 13],
+    [10, 12, 14, 17, 21, 25],
   );
   assert.equal(basic.descriptions[0].text, 'A nice petal, not too strong but not too weak');
 
@@ -143,15 +147,18 @@ export function readCatalog(probe, js, wasm, transport) {
       rawF32Offsets: offsets,
       entries: constructors,
       basicEvidence: {
-        function: '$1180',
+        function: '$1169',
         descriptionSlot: 1019,
-        fieldMeaning: { 12: '伤害候选', 16: '耐久候选' },
+        fieldMeaning: {
+          12: 'Damage，已由原版 $96 tooltip 确认',
+          16: 'Health，已由原版 $96 tooltip 确认',
+        },
         preRoundMultipliers: {
           12: rarities.map((_, i) => f32(56656 + 4 * i)),
           16: rarities.map((_, i) => f32(56688 + 4 * i)),
         },
         rounding:
-          'f32 乘积经 $23 就近取整，半整数远离零，+16 下限为 1。图鉴实际渲染与单位待联机数据验证。',
+          'f32 乘积经 $23 就近取整，半整数远离零，+16 下限为 1。Damage/Health 已由完整原版 tooltip 确认；历史服务器算法另行取证。',
       },
     },
   };

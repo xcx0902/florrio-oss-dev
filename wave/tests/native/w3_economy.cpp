@@ -279,7 +279,7 @@ void economy() {
     b_profile = db->seed_for_testing(b_profile.guest_token, seed);
     a_token = a_profile.guest_token;
     b_token = b_profile.guest_token;
-    app::Garden garden(rules(), 7, {}, db);  // First MT word is below Rose's .203 chance.
+    app::Garden garden(rules(), 7, {}, db);  // First MT word is below the adopted Rose chance.
     bool callback = false;
     check(
         garden.request_profile(
