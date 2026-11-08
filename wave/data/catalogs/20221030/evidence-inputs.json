@@ -1,0 +1,1154 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Portable, hash-locked evidence selections; not complete source archives. Full original byte hashes are retained for explicit verification.",
+  "upstreamReference": {
+    "path": "reports/wave/W0/reference.json",
+    "sha256": "16477eaa30722eba7692261aaa67a8a849457a4e30a6f293e81738e7a6729863"
+  },
+  "reference": {
+    "schemaVersion": 1,
+    "cutoffUtc": "2022-10-30T21:00:58Z",
+    "buildHash": "b632797f0ee487dd99df460b13bde6d7ce5c9773",
+    "snapshot": [
+      {
+        "file": "client.js",
+        "bytes": 112347,
+        "sha256": "23c51f12ec4f31b66e4796d799ac944c05b60114cb84ba58e354ed1c53ab4dc0"
+      },
+      {
+        "file": "client.wasm",
+        "bytes": 2474614,
+        "sha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "w0.catalog",
+      "path": "reports/wave/W0/catalog.json",
+      "sha256": "a22efb63d3d2421c75f951944315c75185f3cfe54754420c7c3d76505ecfd14e"
+    },
+    {
+      "id": "w0.rules",
+      "path": "wave/data/evidence/20221030/rules.json",
+      "sha256": "d15d795487caf575d969cfe3f1fc356ccd877ee9266438e335b357bac814ffc4"
+    },
+    {
+      "id": "w0.sources",
+      "path": "wave/data/evidence/20221030/sources.json",
+      "sha256": "397cd99c789bc312be7ae1ecded7472ebfffe085f0dbe9485e4ef4cced6aa980"
+    },
+    {
+      "id": "snapshot.wasm",
+      "path": "wave-reference/20221030/client.wasm",
+      "sha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0"
+    },
+    {
+      "id": "primary.changelog",
+      "path": "wave/data/catalogs/20221030/primary-changelog.txt",
+      "sha256": "6c75ac049079b2faa6d5f0fd09ba25e13ce8b46ef0f2b582cb59536134aafeca"
+    },
+    {
+      "id": "wiki.basic",
+      "path": "reports/wave/W0/wiki/basic-older.json",
+      "sha256": "8311d2071c074686aa90e26082d3811966774ab5636442f9075f4eacb9a2f95c",
+      "revision": 2192,
+      "timestamp": "2022-10-22T21:50:46Z"
+    },
+    {
+      "id": "wiki.faster",
+      "path": "reports/wave/W0/wiki/faster-older.json",
+      "sha256": "1e00f8324b8ee96a4ad197fe8a09e3380b21806fa881ebc743f91d66a764001b",
+      "revision": 2413,
+      "timestamp": "2022-10-26T20:58:11Z"
+    },
+    {
+      "id": "wiki.rose",
+      "path": "reports/wave/W0/wiki/rose-older.json",
+      "sha256": "1e2dae6c09538dc8b1dae34fc0106dbb457364332c67afa869e72eb88cc4d67e",
+      "revision": 2305,
+      "timestamp": "2022-10-24T17:35:54Z"
+    },
+    {
+      "id": "wiki.leaf",
+      "path": "reports/wave/W0/wiki/leaf-older.json",
+      "sha256": "f28098d34976a90a584ac10cac19034a59fa561ccdbf3241105269b94c4f9ba7",
+      "revision": 2030,
+      "timestamp": "2022-10-02T15:13:16Z"
+    },
+    {
+      "id": "wiki.web",
+      "path": "reports/wave/W0/wiki/web-older.json",
+      "sha256": "ef5b8a41ecb49d27e9c6540e956e28a1f3198ca2ef21b147b063db10a6e1fc91",
+      "revision": 2310,
+      "timestamp": "2022-10-24T19:26:12Z"
+    },
+    {
+      "id": "wiki.peas",
+      "path": "reports/wave/W0/wiki/peas-older.json",
+      "sha256": "1cb2727ab2ec6cf995cbb4f2fe73c5f522caa9fa69a75ac5575d3c22812985c8",
+      "revision": 2332,
+      "timestamp": "2022-10-25T13:49:36Z"
+    },
+    {
+      "id": "wiki.grapes",
+      "path": "reports/wave/W0/wiki/grapes-older.json",
+      "sha256": "b75abc72a46dd40e1374f710c5e5b90b26bdb6f07ad101759f3c5328e34f73df",
+      "revision": 2053,
+      "timestamp": "2022-10-06T00:42:25Z"
+    },
+    {
+      "id": "wiki.honey",
+      "path": "reports/wave/W0/wiki/honey-older.json",
+      "sha256": "6405a0eecd552f701c19b1725a4c39b5102d367bf42ca20a34c39cc03a231789",
+      "revision": 940,
+      "timestamp": "2022-08-07T16:56:24Z"
+    },
+    {
+      "id": "wiki.ladybug",
+      "path": "reports/wave/W0/wiki/ladybug-older.json",
+      "sha256": "3076e62db1ce2a3f56b89edbff2ce49f5543139bf0d6564d93960066d2d3c136",
+      "revision": 918,
+      "timestamp": "2022-08-06T23:56:47Z"
+    },
+    {
+      "id": "wiki.spider",
+      "path": "reports/wave/W0/wiki/spider-older.json",
+      "sha256": "ddd62ef8ab1f26b5456c410436ef3c1b609f442a9b7f1c0208021505bce67f2e",
+      "revision": 2065,
+      "timestamp": "2022-10-06T18:37:58Z"
+    },
+    {
+      "id": "wiki.hornet",
+      "path": "reports/wave/W0/wiki/hornet-older.json",
+      "sha256": "979f1de24c6c10d997b550c4d829e95639f2a1eefee019c98c48cef9c8b9c748",
+      "revision": 1790,
+      "timestamp": "2022-09-11T16:57:28Z"
+    }
+  ],
+  "registries": {
+    "petals": [
+      {
+        "id": 0,
+        "name": "None"
+      },
+      {
+        "id": 1,
+        "name": "Basic"
+      },
+      {
+        "id": 2,
+        "name": "Light"
+      },
+      {
+        "id": 3,
+        "name": "Rock"
+      },
+      {
+        "id": 4,
+        "name": "Square"
+      },
+      {
+        "id": 5,
+        "name": "Rose"
+      },
+      {
+        "id": 6,
+        "name": "Stinger"
+      },
+      {
+        "id": 7,
+        "name": "Iris"
+      },
+      {
+        "id": 8,
+        "name": "Wing"
+      },
+      {
+        "id": 9,
+        "name": "Missile"
+      },
+      {
+        "id": 10,
+        "name": "Grapes"
+      },
+      {
+        "id": 11,
+        "name": "Cactus"
+      },
+      {
+        "id": 12,
+        "name": "Faster"
+      },
+      {
+        "id": 13,
+        "name": "Bubble"
+      },
+      {
+        "id": 14,
+        "name": "Pollen"
+      },
+      {
+        "id": 15,
+        "name": "Dandelion"
+      },
+      {
+        "id": 16,
+        "name": "Egg"
+      },
+      {
+        "id": 17,
+        "name": "Antennae"
+      },
+      {
+        "id": 18,
+        "name": "Heavy"
+      },
+      {
+        "id": 19,
+        "name": "Yin Yang"
+      },
+      {
+        "id": 20,
+        "name": "Web"
+      },
+      {
+        "id": 21,
+        "name": "Honey"
+      },
+      {
+        "id": 22,
+        "name": "Leaf"
+      },
+      {
+        "id": 23,
+        "name": "Salt"
+      },
+      {
+        "id": 24,
+        "name": "Rice"
+      },
+      {
+        "id": 25,
+        "name": "Corn"
+      },
+      {
+        "id": 26,
+        "name": "Sand"
+      },
+      {
+        "id": 27,
+        "name": "Pincer"
+      },
+      {
+        "id": 28,
+        "name": "Yucca"
+      },
+      {
+        "id": 29,
+        "name": "Magnet"
+      },
+      {
+        "id": 30,
+        "name": "Yggdrasil"
+      },
+      {
+        "id": 31,
+        "name": "Starfish"
+      },
+      {
+        "id": 32,
+        "name": "Pearl"
+      },
+      {
+        "id": 33,
+        "name": "Lightning"
+      },
+      {
+        "id": 34,
+        "name": "Jelly"
+      },
+      {
+        "id": 35,
+        "name": "Claw"
+      },
+      {
+        "id": 36,
+        "name": "Shell"
+      },
+      {
+        "id": 37,
+        "name": "Cutter"
+      },
+      {
+        "id": 38,
+        "name": "Dahlia"
+      },
+      {
+        "id": 39,
+        "name": "Uranium"
+      },
+      {
+        "id": 40,
+        "name": "Sponge"
+      },
+      {
+        "id": 41,
+        "name": "Soil"
+      },
+      {
+        "id": 42,
+        "name": "Fangs"
+      },
+      {
+        "id": 43,
+        "name": "Third Eye"
+      },
+      {
+        "id": 44,
+        "name": "Peas"
+      },
+      {
+        "id": 45,
+        "name": "Stick"
+      }
+    ],
+    "mobs": [
+      {
+        "id": 1,
+        "name": "Rock"
+      },
+      {
+        "id": 2,
+        "name": "Cactus"
+      },
+      {
+        "id": 3,
+        "name": "Ladybug"
+      },
+      {
+        "id": 4,
+        "name": "Bee"
+      },
+      {
+        "id": 5,
+        "name": "Baby Ant"
+      },
+      {
+        "id": 6,
+        "name": "Worker Ant"
+      },
+      {
+        "id": 7,
+        "name": "Soldier Ant"
+      },
+      {
+        "id": 8,
+        "name": "Queen Ant"
+      },
+      {
+        "id": 9,
+        "name": "Ant Hole"
+      },
+      {
+        "id": 10,
+        "name": "Beetle"
+      },
+      {
+        "id": 11,
+        "name": "Hornet"
+      },
+      {
+        "id": 12,
+        "name": "Centipede"
+      },
+      {
+        "id": 13,
+        "name": "Centipede"
+      },
+      {
+        "id": 14,
+        "name": "Evil Centipede"
+      },
+      {
+        "id": 15,
+        "name": "Evil Centipede"
+      },
+      {
+        "id": 16,
+        "name": "Desert Centipede"
+      },
+      {
+        "id": 17,
+        "name": "Desert Centipede"
+      },
+      {
+        "id": 18,
+        "name": "Square"
+      },
+      {
+        "id": 19,
+        "name": "Ladybug"
+      },
+      {
+        "id": 20,
+        "name": "Ladybug"
+      },
+      {
+        "id": 21,
+        "name": "Spider"
+      },
+      {
+        "id": 22,
+        "name": "Scorpion"
+      },
+      {
+        "id": 23,
+        "name": "Fire Ant"
+      },
+      {
+        "id": 24,
+        "name": "Fire Ant Burrow"
+      },
+      {
+        "id": 25,
+        "name": "Sandstorm"
+      },
+      {
+        "id": 26,
+        "name": "Bubble"
+      },
+      {
+        "id": 27,
+        "name": "Acid Bubble"
+      },
+      {
+        "id": 28,
+        "name": "Shell"
+      },
+      {
+        "id": 29,
+        "name": "Starfish"
+      },
+      {
+        "id": 30,
+        "name": "Crab"
+      },
+      {
+        "id": 31,
+        "name": "Jellyfish"
+      },
+      {
+        "id": 32,
+        "name": "Digger"
+      },
+      {
+        "id": 33,
+        "name": "Sponge"
+      },
+      {
+        "id": 34,
+        "name": "Leech"
+      },
+      {
+        "id": 35,
+        "name": "Leech"
+      }
+    ]
+  },
+  "constructors": [
+    {
+      "id": 1,
+      "countCandidate": 1,
+      "values": [
+        {
+          "rarity": 0,
+          "raw": [7, 7, 5, 145, 40]
+        },
+        {
+          "rarity": 1,
+          "raw": [7, 9, 6, 145, 40]
+        },
+        {
+          "rarity": 2,
+          "raw": [7, 13, 7, 145, 40]
+        },
+        {
+          "rarity": 3,
+          "raw": [7, 17, 9, 145, 40]
+        },
+        {
+          "rarity": 4,
+          "raw": [7, 22, 11, 145, 40]
+        },
+        {
+          "rarity": 5,
+          "raw": [7, 28, 13, 145, 40]
+        }
+      ],
+      "descriptions": [
+        {
+          "address": 30790,
+          "text": "A nice petal, not too strong but not too weak"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "countCandidate": 1,
+      "values": [
+        {
+          "rarity": 0,
+          "raw": [7, 35, 2, 130, 40]
+        },
+        {
+          "rarity": 1,
+          "raw": [7, 46, 2, 130, 40]
+        },
+        {
+          "rarity": 2,
+          "raw": [7, 63, 3, 130, 40]
+        },
+        {
+          "rarity": 3,
+          "raw": [7, 84, 3, 130, 40]
+        },
+        {
+          "rarity": 4,
+          "raw": [7, 112, 4, 130, 40]
+        },
+        {
+          "rarity": 5,
+          "raw": [7, 140, 5, 130, 40]
+        }
+      ],
+      "descriptions": [
+        {
+          "address": 31358,
+          "text": "Its healing properties are amazing. Not so good at combat though"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "countCandidate": 4,
+      "values": [
+        {
+          "rarity": 0,
+          "raw": [15, 5, 15, 130, 40]
+        },
+        {
+          "rarity": 1,
+          "raw": [15, 6, 20, 130, 40]
+        },
+        {
+          "rarity": 2,
+          "raw": [15, 7, 27, 130, 40]
+        },
+        {
+          "rarity": 3,
+          "raw": [15, 9, 36, 130, 40]
+        },
+        {
+          "rarity": 4,
+          "raw": [15, 11, 48, 130, 40]
+        },
+        {
+          "rarity": 5,
+          "raw": [15, 13, 60, 130, 40]
+        }
+      ],
+      "descriptions": [
+        {
+          "address": 29129,
+          "text": "4 in 1 deal. Now with a secret ingredient: poison"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "countCandidate": 1,
+      "values": [
+        {
+          "rarity": 0,
+          "raw": [12, 0, 1, 130, 40]
+        },
+        {
+          "rarity": 1,
+          "raw": [12, 0, 1, 130, 40]
+        },
+        {
+          "rarity": 2,
+          "raw": [12, 0, 1, 130, 40]
+        },
+        {
+          "rarity": 3,
+          "raw": [12, 0, 1, 130, 40]
+        },
+        {
+          "rarity": 4,
+          "raw": [12, 0, 1, 130, 40]
+        },
+        {
+          "rarity": 5,
+          "raw": [12, 0, 1, 130, 40]
+        }
+      ],
+      "descriptions": [
+        {
+          "address": 27169,
+          "text": "It's so light it makes your other petals spin faster"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "countCandidate": 1,
+      "values": [
+        {
+          "rarity": 0,
+          "raw": [10, 10, 10, 130, 40]
+        },
+        {
+          "rarity": 1,
+          "raw": [10, 13, 12, 130, 40]
+        },
+        {
+          "rarity": 2,
+          "raw": [10, 18, 14, 130, 40]
+        },
+        {
+          "rarity": 3,
+          "raw": [10, 24, 17, 130, 40]
+        },
+        {
+          "rarity": 4,
+          "raw": [10, 32, 21, 130, 40]
+        },
+        {
+          "rarity": 5,
+          "raw": [10, 40, 25, 130, 40]
+        }
+      ],
+      "descriptions": [
+        {
+          "address": 21169,
+          "text": "It's really sticky"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "countCandidate": 1,
+      "values": [
+        {
+          "rarity": 0,
+          "raw": [10, 10, 10, 130, 40]
+        },
+        {
+          "rarity": 1,
+          "raw": [10, 12, 13, 130, 40]
+        },
+        {
+          "rarity": 2,
+          "raw": [10, 14, 18, 130, 40]
+        },
+        {
+          "rarity": 3,
+          "raw": [10, 17, 24, 130, 40]
+        },
+        {
+          "rarity": 4,
+          "raw": [10, 21, 32, 130, 40]
+        },
+        {
+          "rarity": 5,
+          "raw": [10, 25, 40, 130, 40]
+        }
+      ],
+      "descriptions": [
+        {
+          "address": 41842,
+          "text": "Gathers energy from the sun to heal your flower passively."
+        },
+        {
+          "address": 45414,
+          "text": "Can be eaten by friendly mobs to heal."
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "countCandidate": 4,
+      "values": [
+        {
+          "rarity": 0,
+          "raw": [10, 1, 10, 130, 40]
+        },
+        {
+          "rarity": 1,
+          "raw": [10, 1, 13, 130, 40]
+        },
+        {
+          "rarity": 2,
+          "raw": [10, 1, 18, 130, 40]
+        },
+        {
+          "rarity": 3,
+          "raw": [10, 2, 24, 130, 40]
+        },
+        {
+          "rarity": 4,
+          "raw": [10, 2, 32, 130, 40]
+        },
+        {
+          "rarity": 5,
+          "raw": [10, 3, 40, 130, 40]
+        }
+      ],
+      "descriptions": [
+        {
+          "address": 30171,
+          "text": "4 in 1 deal"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "wave.advance.remaining",
+      "candidate": 4,
+      "currentValue": 4,
+      "unit": "存活怪数上限"
+    },
+    {
+      "id": "wave.special.chance",
+      "candidate": 0.15,
+      "currentValue": 0.15,
+      "unit": "概率"
+    },
+    {
+      "id": "wave.special.firstWave",
+      "candidate": false,
+      "currentValue": false,
+      "unit": "起始波允许特殊波"
+    },
+    {
+      "id": "wave.special.gardenPool",
+      "candidate": [
+        ["Baby Ant", "Worker Ant", "Soldier Ant", "Rock"],
+        ["Bee", "Ladybug"],
+        ["Hornet"],
+        ["Hornet", "Bee"],
+        ["Ladybug", "Dark Ladybug"],
+        ["Spider"]
+      ],
+      "currentValue": null,
+      "unit": "怪种组"
+    },
+    {
+      "id": "match.public.highestEligible",
+      "candidate": "highest-eligible",
+      "currentValue": "highest-eligible",
+      "unit": "候选排序"
+    },
+    {
+      "id": "match.startingWave",
+      "candidate": {
+        "inputs": ["队员最高通关波"],
+        "formula": null
+      },
+      "currentValue": {
+        "freshProfile": 1
+      },
+      "unit": "波"
+    },
+    {
+      "id": "craft.rng.mode",
+      "candidate": {
+        "normal": "independent-roll",
+        "legacyFailures": "retain-pseudo-until-success"
+      },
+      "currentValue": {
+        "normal": "independent-roll",
+        "legacyFailures": "retain-pseudo-until-success"
+      },
+      "unit": "模式"
+    },
+    {
+      "id": "respawn.nextWave",
+      "candidate": true,
+      "currentValue": true,
+      "unit": "下一波重生"
+    },
+    {
+      "id": "wave.advance.deadline",
+      "candidate": {
+        "exists": true,
+        "duration": null
+      },
+      "currentValue": {
+        "deadlineAdvancesAfterSpawn": true
+      },
+      "unit": "秒"
+    },
+    {
+      "id": "wave.advance.antHolePause",
+      "candidate": null,
+      "currentValue": null,
+      "unit": "暂停条件"
+    },
+    {
+      "id": "wave.advance.priority",
+      "candidate": null,
+      "currentValue": ["team-wipe", "wave-advance", "wait"],
+      "unit": "转移优先级"
+    },
+    {
+      "id": "wave.spawn.gardenEarlyEligibility",
+      "candidate": {
+        "1": ["Bee", "Ladybug", "Baby Ant", "Rock"],
+        "2": ["Centipede", "Worker Ant"],
+        "3": ["Dark Ladybug", "Evil Centipede", "Soldier Ant", "Spider", "Hornet"]
+      },
+      "currentValue": {
+        "cumulative": true,
+        "useCandidateLists": true
+      },
+      "unit": "每波新增怪种"
+    },
+    {
+      "id": "wave.spawn.gardenEarlySchedule",
+      "candidate": {
+        "shape": "timer-driven-batches",
+        "counts": null,
+        "seconds": null
+      },
+      "currentValue": [
+        {
+          "wave": 1,
+          "rarity": "Common",
+          "batches": [
+            {
+              "atSeconds": 0,
+              "count": 2
+            },
+            {
+              "atSeconds": 6,
+              "count": 4
+            }
+          ],
+          "deadlineSeconds": 20
+        },
+        {
+          "wave": 2,
+          "rarity": "Common",
+          "batches": [
+            {
+              "atSeconds": 0,
+              "count": 3
+            },
+            {
+              "atSeconds": 7,
+              "count": 5
+            }
+          ],
+          "deadlineSeconds": 25
+        },
+        {
+          "wave": 3,
+          "rarity": "Common",
+          "batches": [
+            {
+              "atSeconds": 0,
+              "count": 3
+            },
+            {
+              "atSeconds": 7,
+              "count": 3
+            },
+            {
+              "atSeconds": 14,
+              "count": 4
+            }
+          ],
+          "deadlineSeconds": 30
+        }
+      ],
+      "unit": "波、只、秒"
+    },
+    {
+      "id": "garden.geometry.shape",
+      "candidate": "circle",
+      "currentValue": "circle",
+      "unit": "形状"
+    },
+    {
+      "id": "wave.spawn.accounting",
+      "candidate": null,
+      "currentValue": {
+        "count": "spawned-main-mobs",
+        "excluded": ["summons", "segments", "ant-hole-mobs", "previous-wave-residual"]
+      },
+      "unit": "可计数实体类别"
+    },
+    {
+      "id": "catalog.basic.columns",
+      "candidate": {
+        "clientColumns": {
+          "offset12": [7, 9, 13, 17, 22, 28],
+          "offset16": [5, 6, 7, 9, 11, 13]
+        },
+        "wiki": {
+          "damage": [10, 13, 18, 24, 32, 40],
+          "health": [10, 12, 14, 17, 21, 25],
+          "reloadSeconds": 2.5
+        }
+      },
+      "currentValue": null,
+      "unit": "原值、候选 HP、秒"
+    },
+    {
+      "id": "petal.leaf.friendlyMobHeal",
+      "candidate": true,
+      "currentValue": true,
+      "unit": "可治疗友方怪物"
+    },
+    {
+      "id": "petal.honey.octoberEffect",
+      "candidate": {
+        "candidate": "slow-on-hit",
+        "decemberReworkExcluded": true
+      },
+      "currentValue": null,
+      "unit": "行为"
+    },
+    {
+      "id": "petal.peasGrapes.split",
+      "candidate": {
+        "separate": true,
+        "countCandidate": 4
+      },
+      "currentValue": {
+        "separate": true
+      },
+      "unit": "品类、粒数"
+    },
+    {
+      "id": "pvp.basic.drop",
+      "candidate": {
+        "basedOn": "defeated-player-score",
+        "thresholds": null
+      },
+      "currentValue": {
+        "basedOn": "defeated-player-score"
+      },
+      "unit": "分、稀有度"
+    },
+    {
+      "id": "release.cutoff",
+      "candidate": {
+        "craftableUltra": false,
+        "postCutoffWaveRebalance": false,
+        "chat": false,
+        "worldMap": false
+      },
+      "currentValue": {
+        "craftableUltra": false,
+        "postCutoffWaveRebalance": false,
+        "chat": false,
+        "worldMap": false
+      },
+      "unit": "版本范围"
+    }
+  ],
+  "sourceDescriptions": [
+    {
+      "id": "snapshot.wasm",
+      "kind": "primary-artifact",
+      "locator": "Wasm 线性内存、Binaryen 132 WAT 及原件运行。目录报告由 verify:reference 生成。",
+      "path": "wave-reference/20221030/client.wasm"
+    },
+    {
+      "id": "log.client",
+      "kind": "primary-changelog",
+      "locator": "Wasm 英语更新日志的线性内存地址。英语与中文 Wiki 转录属于同一日志。",
+      "path": "wave-reference/20221030/client.wasm"
+    }
+  ],
+  "craftDisplay": {
+    "evidenceKey": "craft.client-display",
+    "memoryAddress": 53136,
+    "wasmFileOffset": 2400435,
+    "reader": "$902",
+    "encoding": "five little-endian u32 percentages",
+    "bytesHex": "3c00000028000000140000000a00000003000000"
+  },
+  "wikiSnippets": [
+    {
+      "sourceId": "wiki.basic",
+      "title": "Basic",
+      "revision": 2192,
+      "timestamp": "2022-10-22T21:50:46Z",
+      "snippets": [
+        "{{Petal_Template_Infobox\n|caption1 =\n|image1 = Basic.png\n|dropped_by =*Players in PvP\n|damage = *<font color=\"#7EEF6D\">'''Common:'''</font> 10\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 13\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 18\n*<font color=\"#861FDE\">'''Epic:'''</font> 24\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 32\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 40\n|respawn_time = 2.5s\n|special = N/A\n|title1 = Basic\n|durability = *<font color=\"#7EEF6D\">'''Common:'''</font> 10 \n*<font color=\"#FFE65D\">'''Unusual:'''</font> 12 \n*<font color=\"#5E4DE3\">'''Rare:'''</font> 14 \n*<font color=\"#861FDE\">'''Epic:'''</font> 17\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 21\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 25\n|description=A nice petal, not too strong but not too weak.|cooldown_time=2.5}}",
+        "''In-game description: A nice petal, not too strong but not too weak.''\n{| class=\"article-table\"\n|+Petal Stats\n![[Rarity]]\n!Damage\n!Health\n!Respawn\n|-\n|{{Rarity|Common}}\n|10 HP\n|10 HP\n|2.5 seconds\n|-\n|{{Rarity|Unusual}}\n|13 HP\n|12 HP\n|2.5 seconds\n|-\n|{{Rarity|Rare}}\n|18 HP\n|14 HP\n|2.5 seconds\n|-\n|{{Rarity|Epic}}\n|24 HP\n|17 HP\n|2.5 seconds\n|-\n|{{Rarity|Legendary}}\n|32 HP\n|21 HP\n|2.5 seconds\n|-\n|{{Rarity|Mythic}}\n|40 HP\n|25 HP\n|2.5 seconds\n|}\nAll players start with 5 common Basics, which cannot b"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.faster",
+      "title": "Faster",
+      "revision": 2413,
+      "timestamp": "2022-10-26T20:58:11Z",
+      "snippets": [
+        "{{Petal_Template_Infobox\n|caption1 =\n|image1 = Faster.png\n|dropped_by =*[[Queen Ant]]\n*[[Spider]]\n*[[Leech]]\n|damage = *<font color=\"#7EEF6D\">'''Common:'''</font> 8\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 10\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 14\n*<font color=\"#861FDE\">'''Epic:'''</font> 19\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 26\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 40\n|cooldown_time = 0.5\n|special = Makes petals spin faster\n|title1 = Faster\n|durability = *<font color=\"#7EEF6D\">'''Common:'''</font> 5\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 6\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 7\n*<font color=\"#861FDE\">'''Epic:'''</font> 9\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 11\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 25\n|description=It's so light it makes your other petals spin faster.}}",
+        "''In-game description: It's so light that it makes your other petals spin faster''\n{| class=\"article-table sortable\"\n|+Petal Stats\n![[Rarity]]\n!Damage \n!Health\n!Respawn \n!Rotation Speed\n|-\n|Common \n|8 HP\n|5 HP\n| rowspan=\"6\" |0.8 seconds\n| +0.2 rad/s\n|-\n|Unusual\n|10 HP \n|6 HP\n| +0.2 rad/s\n|-\n|Rare\n|14 HP\n|7 HP\n| +0.3 rad/s\n|-\n|Epic\n|19 HP\n|9 HP \n| +0.4 rad/s\n|-\n|Legendary\n|26 HP\n|11 HP\n| +0.5 rad/s\n|-\n|Mythic\n|40 HP\n|25 HP \n| +1.2 rad/s\n|}"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.rose",
+      "title": "Rose",
+      "revision": 2305,
+      "timestamp": "2022-10-24T17:35:54Z",
+      "snippets": [
+        "{{Petal_Template_Infobox\n|caption1 =\n|image1 = Rose-Current.png\n|dropped_by =*[[Ladybug]]\n|damage = *<font color=\"#7EEF6D\">'''Common:'''</font> 5\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 7\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 9\n*<font color=\"#861FDE\">'''Epic:'''</font> 12\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 16\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 20\n|cooldown_time = 3.5 + 1\n|special = Heals the user\n|title1 = Rose\n|durability = *<font color=\"#7EEF6D\">'''Common:'''</font> 5\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 7\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 9\n*<font color=\"#861FDE\">'''Epic:'''</font> 12\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 16\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 20\n|description=Its healing properties are amazing. Not so good at combat though.}}",
+        "<br>\n''Note: The \"A + B\" respawn format means that the petal takes A seconds to respawn and B seconds after respawning to do its special action/have its special action enabled.''\n{| class=\"article-table\"\n|+Petal Stats\n![[Rarity]]\n!Damage\n!Health\n!Respawn\n!Heal\n|-\n|{{Rarity|Common}}\n|5 HP\n|5 HP\n|rowspan=\"6\" |3.5 + 1 seconds\n|10 HP\n|-\n|{{Rarity|Unusual}}\n|7 HP\n|7 HP\n|13 HP\n|-\n|{{Rarity|Rare}}\n|9 HP\n|9 HP\n|18 HP\n|-\n|{{Rarity|Epic}}\n|12 HP\n|12 HP\n|24 HP\n|-\n|{{Rarity|Legendary}}\n|16 HP\n|16 HP\n|32 HP"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.leaf",
+      "title": "Leaf",
+      "revision": 2030,
+      "timestamp": "2022-10-02T15:13:16Z",
+      "snippets": [
+        "{{Petal Template Infobox\n|image1 = Leaf.PNG\n|title1 = Leaf|caption1 = |rarity = |dropped_by = *[[Baby Ant]]\n*[[Worker Ant]]\n*[[Centipede]]|damage = *<font color=\"#7EEF6D\">'''Common:'''</font> Doesn't Spawn\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 13\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 18\n*<font color=\"#861FDE\">'''Epic:'''</font> 24\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 32\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 40|durability = *<font color=\"#7EEF6D\">'''Common:'''</font> Doesn't Spawn\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 14\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 17\n*<font color=\"#861FDE\">'''Epic:'''</font> 20\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 25\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 30\n|special = Constantly heals the user, and can heal friendly mobs\n|description=Gathers energy from the sun to heal your flower passively.\nCan be eaten by friendly mobs to heal.\n|cooldown_time=1}}",
+        "{| class=\"article-table\"\n|+Petal Stats\n![[Rarity]]\n!Damage\n!Health\n!Respawn\n!Heal\n|-\n|{{Rarity|Common}}\n|colspan=\"4\"|Doesn't Spawn\n|-\n|{{Rarity|Unusual}}\n|13 HP\n|14 HP\n|rowspan=\"5\" |1 second\n|2.1 HP/s\n|-\n|{{Rarity|Rare}}\n|18 HP\n|17 HP\n|2.9 HP/s\n|-\n|{{Rarity|Epic}}\n|24 HP\n|20 HP\n|3.8 HP/s\n|-\n|{{Rarity|Legendary}}\n|32 HP\n|25 HP\n|5.1 HP/s\n|-\n|{{Rarity|Mythic}}\n|40 HP\n|30 HP\n|8 HP/s\n|}\nsomeone add mob heal Unusual=13 Rare=18 Epic=24 Legendary=32 Mythic=?\n\nHeals the user passively, and can also be e"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.web",
+      "title": "Web",
+      "revision": 2310,
+      "timestamp": "2022-10-24T19:26:12Z",
+      "snippets": [
+        "{{Petal Template Infobox\n|image1 = Web.png\n|title1 = Web\n|caption1 = \n|rarity = \n|dropped_by = *[[Spider]]|damage = *<font color=\"#7EEF6D\">'''Common:'''</font> Doesn't Spawn\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 10\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 14\n*<font color=\"#861FDE\">'''Epic:'''</font> 19\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 26\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 32|durability = *<font color=\"#7EEF6D\">'''Common:'''</font> Doesn't Spawn\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 7\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 9\n*<font color=\"#861FDE\">'''Epic:'''</font> 12\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 16\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 20\n|special = Projectile. Drops webs that slow enemies\n|description=It's really sticky.\n|cooldown_time=3 + 0.5}}",
+        "''Note: The \"A + B\" respawn format means that the petal takes A seconds to respawn and B seconds after respawning to do its special action/have its special action enabled.''\n{| class=\"article-table\"\n|+Petal Stats\n![[Rarity]]\n!Damage\n!Health\n!Respawn\n!Duration\n!Radius\n|-\n|{{Rarity|Common}}\n|colspan=\"5\"|Doesn't Spawn\n|-\n|{{Rarity|Unusual}}\n|10 HP\n|7 HP\n|rowspan=\"5\" |3 + 0.5 seconds\n|rowspan=\"5\" |10 seconds\n|60\n|-\n|{{Rarity|Rare}}\n|14 HP\n|9 HP\n|70\n|-\n|{{Rarity|Epic}}\n|19 HP\n|12 HP\n|80\n|-\n|{{Rarity"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.peas",
+      "title": "Peas",
+      "revision": 2332,
+      "timestamp": "2022-10-25T13:49:36Z",
+      "snippets": [
+        "{{Petal_Template_Infobox\n|caption1 =\n|image1 = (image outdated)\n|dropped_by =*[[Centipede]]<br> \n|damage = *<font color=\"#7EEF6D\">'''Common:'''</font> 8\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 10\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 14\n*<font color=\"#861FDE\">'''Epic:'''</font> 19\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 26\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 60\n|respawn_time = 1 + 0.5 (0.3 + 0.1 for mythic)\n|special = Splits into 4 and shoots away on left-click.\n|title1 = Peas\n|durability = *<font color=\"#7EEF6D\">'''Common:'''</font> 20\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 24\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 28\n*<font color=\"#861FDE\">'''Epic:'''</font> 34\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 42\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 50\n|description=4 in 1 deal}}",
+        "''Note: The \"A + B\" respawn format means that the petal takes A seconds to respawn and B seconds after respawning to do its special action/have its special action enabled.''\n\n''Note: Health stats the whole petal health. Each pea have 1/4 of the full health.''\n{| class=\"article-table\"\n|+Petal Stats\n![[Rarity]]\n!Damage\n!Health\n!Respawn\n|-\n|{{Rarity|Common}}\n|3 HP\n|20 HP\n|rowspan=\"5\" |1 + 0.5 seconds\n|-\n|{{Rarity|Unusual}}\n|4 HP\n|26 HP\n|-\n|{{Rarity|Rare}}\n|5 HP\n|36 HP\n|-\n|{{Rarity|Epic}}\n|7 HP\n|48"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.grapes",
+      "title": "Grapes",
+      "revision": 2053,
+      "timestamp": "2022-10-06T00:42:25Z",
+      "snippets": [],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.honey",
+      "title": "Honey",
+      "revision": 940,
+      "timestamp": "2022-08-07T16:56:24Z",
+      "snippets": [
+        "{{Petal_Template_Infobox\n|caption1 =\n|image1 = Honey-Current.png\n|dropped_by =*[[Bee]]\n|damage = *<font color=\"#7EEF6D\">'''Common:'''</font> Doesn't Spawn\n*<font color=\"#FFE65D\">'''Unusual:'''</font> Doesn't Spawn\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 18\n*<font color=\"#861FDE\">'''Epic:'''</font> 24\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 32\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 40\n|cooldown_time = 1.7\n|special = Slows movement and petal rotation\n|title1 = Honey\n|durability = *<font color=\"#7EEF6D\">'''Common:'''</font> Doesn't Spawn\n*<font color=\"#FFE65D\">'''Unusual:'''</font> Doesn't Spawn\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 18\n*<font color=\"#861FDE\">'''Epic:'''</font> 24\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 32\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 40\n|description=This is so sticky it slows down whatever it hits.}}",
+        "{| class=\"article-table\"\n|+Petal Stats\n![[Rarity]]\n!Damage\n!Health\n!Respawn\n!Duration\n|-\n|{{Rarity|Common}}\n|colspan=\"4\" rowspan=\"2\" |Doesn't Spawn\n|-\n|{{Rarity|Unusual}}\n|-\n|{{Rarity|Rare}}\n|18 HP\n|18 HP\n|rowspan=\"4\" |1.7 seconds\n|4.3 seconds\n|-\n|{{Rarity|Epic}}\n|24 HP\n|24 HP\n|5.8 seconds\n|-\n|{{Rarity|Legendary}}\n|32 HP\n|32 HP\n|7.7 seconds\n|-\n|{{Rarity|Mythic}}\n|40 HP\n|40 HP\n|9.4 seconds\n|}\nSlows the movement speed of anything it hits by 20%. It also slows petal rotation speed by 20% if it hit"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.ladybug",
+      "title": "Ladybug",
+      "revision": 918,
+      "timestamp": "2022-08-06T23:56:47Z",
+      "snippets": [
+        "{{Mob Template Infobox\n|title = Ladybug\n|image = LadybugDrops.png\n|rarity = {{rarity|Common}}"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.spider",
+      "title": "Spider",
+      "revision": 2065,
+      "timestamp": "2022-10-06T18:37:58Z",
+      "snippets": [
+        "{{Mob Template Infobox|title1=|description=Spooky.|loot_and_exp=|Drops=*[[Faster]]\n*[[Web]]|health=*<font color=\"#7EEF6D\">'''Common:'''</font> 25 HP\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 40 HP\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 62.5 HP\n*<font color=\"#861FDE\">'''Epic:'''</font> 100 HP\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 625 HP\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 1250 HP|title=Sandstorm|body_damage=*<font color=\"#7EEF6D\">'''Common:'''</font> 25 HP\n*<font color=\"#FFE65D\">'''Unusual:'''</font> 27.5 HP\n*<font color=\"#5E4DE3\">'''Rare:'''</font> 32.5 HP\n*<font color=\"#861FDE\">'''Epic:'''</font> 40 HP\n*<font color=\"#DE1F1F\">'''Legendary:'''</font> 50 HP\n*<span style=\"color:#33FEFF\">'''Mythic:'''</span> 62.5 HP|move=Yes|attack=Hostile|image1=[[spider.png]]}}"
+      ],
+      "missingRevision": false
+    },
+    {
+      "sourceId": "wiki.hornet",
+      "title": "Hornet",
+      "revision": 1790,
+      "timestamp": "2022-09-11T16:57:28Z",
+      "snippets": [
+        "{{Mob Template Infobox\n|title = Hornet\n|image = HornetDrops.png\n|rarity = Unusual\n|description = These aren't quite as nice as the little bees.\n|loot_and_exp = [[Dandelion]]<br/>[[Missile]]<br/>[[Honey]]<br/>[[Bubble]]<br/>[[Wing]]<br/>[[Antennae]]<br/>10 XP\n|bullet_damage = 10 HP\n|move = Wanders around randomly, but chases a flower when one gets close. Stays at a distance from the flower. \n|attack = Shoots missiles at flowers, and contact with flowers. Einstein Hornets predict the movement of flowers, not just following alongside them.\n|spawn = Hard<br/>???\n|body_damage = 50 HP\n|special = Shoots missiles|image1=[[Hornet.png]]}}"
+      ],
+      "missingRevision": false
+    }
+  ],
+  "primarySnippets": [
+    {
+      "sourceId": "primary.changelog",
+      "date": "October 20th 2022",
+      "text": "October 20th 2022\n\t- Pseudo-RNG system has been removed from crafting. Now it's back to truly random with no increasing odds. If you have any failed attempts on a specific petal, it'll keep using the old system until you succeed (so you don't lose increased odds you already accumulated)."
+    },
+    {
+      "sourceId": "primary.changelog",
+      "date": "September 1st 2022",
+      "text": "September 1st 2022\n\t- Increased mythic craft chance to 3%."
+    },
+    {
+      "sourceId": "primary.changelog",
+      "date": "August 16th 2022",
+      "text": "August 16th 2022\n\t- Players can now start on wave 11.\n\t- Mobs can now only drop petals of at most their own rarity.\n\t- Tweaked petal drop rate to compensate.\n\t- Craft chances have been changed.\n\t- Rare rarity color is now a bit more blue."
+    },
+    {
+      "sourceId": "primary.changelog",
+      "date": "July 30th 2022",
+      "text": "July 30th 2022\n\t- Reduced Lightning petal range.\n\t- Cactus no longer turns poisonous at higher rarity, more health instead."
+    },
+    {
+      "sourceId": "primary.changelog",
+      "date": "July 24th 2022",
+      "text": "July 24th 2022\n\t- Web no longer stacks, slow increased to -75%."
+    },
+    {
+      "sourceId": "primary.changelog",
+      "date": "July 22nd 2022",
+      "text": "July 22nd 2022\n\t- Web rarity now affects radius rather than duration."
+    },
+    {
+      "sourceId": "primary.changelog",
+      "date": "August 30th 2022",
+      "text": "August 30th 2022\n\t- Reworked several mythic petals.\n\t- Leaf can now heal friendly mobs."
+    },
+    {
+      "sourceId": "primary.changelog",
+      "date": "August 31st 2022",
+      "text": "August 31st 2022\n\t- Peas have been split into Peas and Grapes. Existing Peas have been turned into Grapes."
+    }
+  ],
+  "slotUnlock": {
+    "reader": "$107 -> table143 -> $3645",
+    "levelByteOffset": 8,
+    "requiredProfileFlag": 8,
+    "thresholds": [15, 30, 45],
+    "mainSlots": [5, 6, 7, 8],
+    "watExcerpt": "(block $block1 (result i32)\n(drop\n(br_if $block1\n(i32.const 5)\n(i32.lt_u\n(local.tee $1\n(i32.load8_u offset=8\n(local.get $1)\n)\n)\n(i32.const 15)\n)\n)\n)\n(drop\n(br_if $block1\n(i32.const 6)\n(i32.lt_u\n(local.get $1)\n(i32.const 30)\n)\n)\n)\n(select\n(i32.const 7)\n(i32.const 8)\n(i32.lt_u\n(local.get $1)\n(i32.const 45)\n)\n)\n)"
+  }
+}

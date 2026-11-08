@@ -14,9 +14,16 @@ class Match {
   Match& operator=(const Match&) = delete;
 
   // Admission before tick zero. Connections and life-scoped inputs apply on the next step.
-  bool add_player(PlayerId id, Vec2 start = {}, std::vector<Petal> loadout = {Petal::basic});
+  bool add_player(PlayerId id, Vec2 start = {}, std::vector<Petal> loadout = {Petal::basic},
+                  std::vector<Rarity> rarities = {});
+  bool equip(PlayerId id, std::vector<Petal> loadout, std::vector<Rarity> rarities = {});
+  bool equip(PlayerId id, std::size_t slot, Petal kind, Rarity rarity = Rarity::common);
+  bool set_loadout(PlayerId id, std::vector<Petal> loadout, std::vector<Rarity> rarities = {}) {
+    return equip(id, std::move(loadout), std::move(rarities));
+  }
   bool queue(Input input);
   bool queue(Connection connection);
+  bool queue(Equip equip);
   bool step();
 
   [[nodiscard]] MatchView view() const;
@@ -32,6 +39,8 @@ class Match {
     bool attack = false;
     bool defend = false;
     std::vector<Tick> petal_ready;
+    double orbit_phase = 0;
+    Tick orbit_updated = std::numeric_limits<Tick>::max();
   };
 
   struct Impact {
@@ -41,15 +50,27 @@ class Match {
     double amount = 0;
     double poison_per_tick = 0;
     Tick poison_ticks = 0;
+    double slow_multiplier = 1;
+    Tick slow_ticks = 0;
+    bool consume_source = false;
   };
 
-  using Command = std::variant<Input, Connection>;
+  using Command = std::variant<Input, Connection, Equip>;
 
   [[nodiscard]] Player* player(PlayerId id);
   [[nodiscard]] EntityId add_entity(EntityView view, BodyRules body);
   void reap_player(Player& player, LifeState state);
   void spawn_player(Player& player);
   void refresh_petals();
+  [[nodiscard]] bool valid_loadout(const std::vector<Petal>& loadout,
+                                   const std::vector<Rarity>& rarities) const;
+  void replace_loadout(Player& player, std::vector<Petal> loadout, std::vector<Rarity> rarities);
+  [[nodiscard]] BodyRules petal_body(Petal kind, Rarity rarity) const;
+  [[nodiscard]] Tick reload_ticks(Petal kind, Rarity rarity) const;
+  void detach_petal(EntityId id);
+  void consume_petal(EntityId id);
+  void update_effects();
+  void finish_projectiles();
   void apply_commands();
   void move_entities();
   void update_orbits();

@@ -65,11 +65,56 @@ enum class Mob {
   evil_centipede,
   soldier_ant,
   spider,
-  hornet
+  hornet,
+  beetle
 };
 enum class Petal {
   basic,
-  rose
+  rose,
+  faster,
+  leaf,
+  stinger,
+  peas,
+  grapes,
+  web,
+  missile,
+  egg,
+  honey,
+  cactus,
+  none,
+  light,
+  rock,
+  square,
+  iris,
+  wing,
+  bubble,
+  pollen,
+  dandelion,
+  antennae,
+  heavy,
+  yin_yang,
+  salt,
+  rice,
+  corn,
+  sand,
+  pincer,
+  yucca,
+  magnet,
+  yggdrasil,
+  starfish,
+  pearl,
+  lightning,
+  jelly,
+  claw,
+  shell,
+  cutter,
+  dahlia,
+  uranium,
+  sponge,
+  soil,
+  fangs,
+  third_eye,
+  stick
 };
 enum class Rarity {
   common,
@@ -155,6 +200,9 @@ struct EntityView {
 struct PetalSlotView {
   std::optional<EntityId> entity;
   Tick reload_ticks = 0;
+  // entity remains the first orbiting particle for W1/W2 consumers.
+  std::vector<EntityId> entities;
+  Tick reload_total_ticks = 0;
   bool operator==(const PetalSlotView&) const = default;
 };
 
@@ -167,6 +215,7 @@ struct PlayerView {
   std::vector<Petal> loadout;
   std::vector<PetalSlotView> petals;
   std::uint64_t credited_defeats = 0;
+  std::vector<Rarity> loadout_rarities;
   bool operator==(const PlayerView&) const = default;
 };
 
@@ -222,6 +271,8 @@ struct MatchView {
   std::vector<PlayerView> players;
   std::vector<EntityView> entities;
   std::array<std::size_t, static_cast<std::size_t>(Group::count)> population{};
+  std::string catalog_version;
+  std::string catalog_sha256;
 };
 
 struct Input {
@@ -234,6 +285,12 @@ struct Input {
 struct Connection {
   PlayerId player;
   bool connected;
+};
+
+struct Equip {
+  LifeId life;
+  std::vector<Petal> loadout;
+  std::vector<Rarity> rarities;
 };
 
 struct RandomDraw {
@@ -270,6 +327,7 @@ struct LifeChange {
   LifeId life;
   std::optional<EntityId> body;
   LifeState state;
+  std::optional<Vec2> position = std::nullopt;
 };
 
 struct Defeat {
@@ -277,6 +335,10 @@ struct Defeat {
   Group group;
   DamageSource source;
   std::optional<PlayerId> credit;
+  std::optional<Mob> mob;
+  Rarity rarity = Rarity::common;
+  Vec2 position;
+  std::uint32_t origin_wave = 0;
 };
 
 using EventData =

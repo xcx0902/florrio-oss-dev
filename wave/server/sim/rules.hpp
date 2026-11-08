@@ -4,6 +4,10 @@
 
 #include <array>
 
+namespace wave::catalog {
+struct Catalog;
+}
+
 namespace wave::sim {
 
 struct Timing {
@@ -83,6 +87,8 @@ struct Rules {
   LifecycleRules lifecycle;
   ResidualPolicy residual = ResidualPolicy::discard;
   Evidence residual_evidence = Evidence::reconstruction;
+  // Null keeps explicitly supplied W1/W2 rules authoritative.
+  const catalog::Catalog* catalog = nullptr;
 };
 
 [[nodiscard]] Rules garden_rules();

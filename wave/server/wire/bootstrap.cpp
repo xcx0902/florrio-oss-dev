@@ -146,6 +146,69 @@ std::optional<Command> read_startup(std::span<const std::uint8_t> bytes) {
     ReliableAction action;
     const auto opcode = read_varint(bytes).value_or(0);
     switch (opcode) {
+      case 5: {
+        if (bytes.empty() || bytes.front() > 1) {
+          return std::nullopt;
+        }
+        const bool all = bytes.front();
+        bytes = bytes.subspan(1);
+        const auto keep = read_varint(bytes);
+        const auto kind = read_varint(bytes);
+        if (!keep || !kind || *kind == 0 || *kind > 45 || bytes.empty() || bytes.front() > 5) {
+          return std::nullopt;
+        }
+        const auto rarity = bytes.front();
+        bytes = bytes.subspan(1);
+        action = Craft{all, *keep, *kind, rarity};
+        break;
+      }
+      case 12: {
+        Equip equip;
+        for (auto& [kind, rarity] : equip.slots) {
+          const auto value = read_varint(bytes);
+          if (!value || *value > 45) {
+            return std::nullopt;
+          }
+          kind = *value;
+          if (kind) {
+            if (bytes.empty() || bytes.front() > 5) {
+              return std::nullopt;
+            }
+            rarity = bytes.front();
+            bytes = bytes.subspan(1);
+          }
+        }
+        action = equip;
+        break;
+      }
+      case 28: {
+        Swap swap{};
+        for (auto [slot, item] : {std::pair{&swap.first, &swap.first_item},
+                                  std::pair{&swap.second, &swap.second_item}}) {
+          if (bytes.empty() || bytes.front() >= 16) {
+            return std::nullopt;
+          }
+          *slot = bytes.front();
+          bytes = bytes.subspan(1);
+          const auto kind = read_varint(bytes);
+          if (!kind || *kind > 45) {
+            return std::nullopt;
+          }
+          item->first = *kind;
+          if (*kind) {
+            if (bytes.empty() || bytes.front() > 5) {
+              return std::nullopt;
+            }
+            item->second = bytes.front();
+            bytes = bytes.subspan(1);
+          }
+        }
+        if (swap.first == swap.second) {
+          return std::nullopt;
+        }
+        action = swap;
+        break;
+      }
       case 25:
       case 34:  // $456: no-argument completion of the optional pre-roll ad attempt.
         break;

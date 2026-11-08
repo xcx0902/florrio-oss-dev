@@ -1,5 +1,6 @@
 #include "sim/rules.hpp"
 #include "garden_evidence.hpp"
+#include "catalog/catalog.hpp"
 
 #include <stdexcept>
 
@@ -15,6 +16,7 @@ Tick Timing::ticks_ceil(Microseconds time) const {
 Rules garden_rules() {
   Rules rules;
   detail::load_garden_evidence(rules);
+  rules.catalog = &catalog::dated();
   // Local display calibration: 5 W1 units projects to a 25-unit flower body.
   rules.player = {.radius = 5,
                   .health = 100,

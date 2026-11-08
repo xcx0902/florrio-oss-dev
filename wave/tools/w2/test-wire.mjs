@@ -20,6 +20,14 @@ const { values } = parseArgs({
     'bootstrap-only': { type: 'boolean' },
   },
 });
+if (values.stage === 'W3') {
+  const { runW3 } = await import('../w3/test-wire.mjs');
+  if (!process.argv.includes('--output-dir')) {
+    values['output-dir'] = path.join(root, '../reports/wave/W3');
+  }
+  await runW3(values);
+  process.exit(process.exitCode ?? 0);
+}
 assert.equal(values.stage, 'W2');
 const output = path.resolve(values['output-dir']);
 await mkdir(output, { recursive: true });

@@ -1,4 +1,5 @@
 #include "sim/match.hpp"
+#include "catalog/catalog.hpp"
 
 #include <iterator>
 
@@ -96,7 +97,9 @@ void Match::spawn_due() {
       continue;
     }
     ++slot.attempts;
-    const auto& body = std::ranges::find(rules_.mobs, slot.mob, &MobRules::kind)->body;
+    const auto& body = rules_.catalog
+                           ? rules_.catalog->mob(slot.mob, slot.rarity)->body
+                           : std::ranges::find(rules_.mobs, slot.mob, &MobRules::kind)->body;
     const auto position = spawn_point(body.radius);
     SpawnOutcome outcome = SpawnOutcome::blocked;
     std::optional<SpawnFailure> failure;

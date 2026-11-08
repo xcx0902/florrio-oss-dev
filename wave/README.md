@@ -1,5 +1,48 @@
 # Florr.io Wave 2022-10-30
 
+## W3 · 目录、经济与存档
+
+W3 接入日期固定的目录、花瓣效果、击杀 XP/掉落拾取、装备、原版制作界面和独立
+SQLite 存档。构建需要 C++20、CMake 3.20+、Python 3、SQLite3 开发库和 Threads。
+原版 `client.js` / `client.wasm` 保持原件哈希。
+
+```sh
+cmake -S wave -B build/wave/native -DCMAKE_BUILD_TYPE=Release
+cmake --build build/wave/native --parallel
+npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --port 8478
+```
+
+默认存档是 `build/wave/saves/profiles.sqlite3`；可用 `--database /absolute/path/save.sqlite3`
+或 `WAVE_DATABASE` 指定。关闭临时网页或重启宿主不会删除数据库。访客凭证在原版
+`cp6_player_id`，新浏览器上下文仅带该凭证即可恢复库存、主副槽、等级和图鉴。
+新档只有五个 Common Basic。测试使用独立离线种子工具，正式宿主没有发物端点。
+
+`npm run dev` 会额外构建并使用 `wave_host_dev`，右下角提供“库存调试 · DEV”。
+面板支持全部 45 种花瓣、Common–Mythic 六个稀有度，可添加、修改总数或设为 0 删除。
+数量包含已装备副本；调低数量时优先保留主槽，自动卸下超额装备。点击“保存并刷新”
+后事务写入当前访客存档并重新加载原版界面，XP、图鉴和最高波保持原值。
+未实现战斗效果的种类标记“仅库存”，仍受正常装备限制。
+
+调试宿主是默认构建之外的显式目标，只在开发启动时构建；正式 `wave_host` 及
+`wave_host_fixture` 不包含调试页面和 HTTP 路由。数据库的调试写入也默认关闭。
+可单独执行 `cmake --build build/wave/native --target wave_host_dev --parallel` 构建它。
+开发功能验收运行 `npm --prefix wave run test:dev -- --snapshot "$WAVE_SNAPSHOT"`。
+
+```sh
+ctest --test-dir build/wave/native --output-on-failure --no-tests=error -L '^w3$'
+npm --prefix wave run test:wire -- --snapshot "$PWD/wave-reference/20221030" --stage W3
+```
+
+`CHROME_PATH` 或 `--browser` 可指定 Chromium；W3 在 macOS 默认尝试已安装的 Chrome。
+结果、库存差分、原版收发帧、源码/二进制摘要和截图写入 `reports/wave/W3/`。
+目录注册表包含全部原版身份，权威效果当前覆盖 12 种花瓣、六个稀有度和早波怪物；
+尚未建模的效果不能装备到主槽。精确历史数值的缺口、采用值和范围逐项登记。
+
+[目录与效果](docs/catalog-20221030.md) · [存档事务](docs/store-20221030.md) ·
+[战斗经济与 I/O 队列](docs/economy-application-20221030.md) ·
+[原版协议与验收](docs/economy-wire-20221030.md) ·
+[W3 执行记录](../wave-goals/03-catalog-economy-and-save.md#w3-执行结果)
+
 ## W2 · 本地原版客户端
 
 从仓库根目录构建并启动。运行 `dev` 后打开输出的 `localhost` URL。

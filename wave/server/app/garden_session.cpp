@@ -26,7 +26,24 @@ wire::Bytes GardenSession::snapshot() {
   if (last_tick_ == std::numeric_limits<std::uint32_t>::max()) {
     throw std::runtime_error("Garden wire tick exhausted");
   }
-  const auto frame = projection_.build(garden_, *member_);
+  auto frame = projection_.build(garden_, *member_);
+  const auto integer = [&](std::uint64_t value) {
+    do {
+      frame.commands.push_back((value & 127) | (value > 127 ? 128 : 0));
+      value >>= 7;
+    } while (value);
+  };
+  for (const auto& [sequence, result] : member_->craft_results) {
+    if (sequence <= craft_cursor_) {
+      continue;
+    }
+    integer(1);
+    integer(35);
+    integer(result.code == store::Code::ok && result.craft.successes != 0);
+    integer(result.craft.successes);
+    integer(result.craft.returned);
+    craft_cursor_ = sequence;
+  }
   sent_lives_.emplace(++last_tick_, frame.control);
   while (sent_lives_.size() > 256) {
     sent_lives_.erase(sent_lives_.begin());
@@ -41,7 +58,61 @@ Reply GardenSession::publish() {
   if (!garden_.active(member_->token, connection_)) {
     return reject();
   }
-  return {{snapshot()}};
+  auto reply = drain();
+  if (!reply.close) {
+    reply.frames.push_back(snapshot());
+  }
+  return reply;
+}
+
+Reply GardenSession::drain() {
+  garden_.poll_storage();
+  Reply reply;
+  while (!pending_.empty()) {
+    const auto& queued = pending_.front();
+    const auto& request = queued.request;
+    if (std::holds_alternative<wire::Identify>(request.action)) {
+      if (member_) {
+        return reject();
+      }
+      member_ = &garden_.admit(requested_guest_, connection_);
+      craft_cursor_ = member_->craft_sequence;
+      reply.frames.push_back(wire_.guest_id(member_->token));
+    } else if (member_) {
+      const bool economic = std::holds_alternative<wire::Craft>(request.action) ||
+                            std::holds_alternative<wire::Equip>(request.action) ||
+                            std::holds_alternative<wire::Swap>(request.action);
+      if (economic && garden_.storage() && garden_.storage_pending() >= Garden::storage_capacity) {
+        break;
+      }
+      const bool accepted =
+          garden_.command(*member_, request.action, queued.life,
+                          std::to_string(connection_) + ":" + std::to_string(request.sequence));
+      if (!accepted && economic && garden_.storage() &&
+          garden_.storage_pending() >= Garden::storage_capacity) {
+        break;
+      }
+      // No native error enum has been recovered for denied economic actions.
+      // Use the known disconnect/reload path to restore committed state.
+      if (!accepted && economic && garden_.storage()) {
+        return reject();
+      }
+    } else if (!std::holds_alternative<std::monostate>(request.action)) {
+      return reject();
+    }
+    // Queue saturation keeps both the request and ACK at this boundary. Invalid
+    // actions are consumed once; accepted mutations are now owned by Garden.
+    acknowledged_ = request.sequence;
+    pending_.pop_front();
+  }
+  if (member_) {
+    for (const auto& [sequence, result] : member_->craft_results) {
+      if (sequence > craft_cursor_ && result.code != store::Code::ok) {
+        return reject();
+      }
+    }
+  }
+  return reply;
 }
 
 Reply GardenSession::receive(wire::Bytes bytes) {
@@ -78,31 +149,25 @@ Reply GardenSession::receive(wire::Bytes bytes) {
     return {};
   }
   const auto& batch = std::get<wire::Startup>(*command);
-  if (batch.first_sequence > acknowledged_ + 1) {
+  if (batch.first_sequence > std::uint64_t(received_) + 1) {
     return reject();
   }
   if (batch.last_sequence <= acknowledged_) {
     return member_ ? publish() : reject();
   }
-  Reply reply;
   for (const auto& request : batch.requests) {
-    if (request.sequence <= acknowledged_) {
+    if (request.sequence <= received_) {
       continue;
     }
-    if (const auto* identity = std::get_if<wire::Identify>(&request.action)) {
-      if (member_) {
-        return reject();
-      }
-      member_ = &garden_.admit(requested_guest_, connection_);
-      reply.frames.push_back(wire_.guest_id(member_->token));
-    } else if (member_) {
-      // A reliable sequence is consumed exactly once, including a denied action.
-      // Life bindings come from ACKs earlier on this ordered WebSocket stream.
-      garden_.command(*member_, request.action, acknowledged_life_);
-    } else if (!std::holds_alternative<std::monostate>(request.action)) {
+    if (pending_.size() == 256) {
       return reject();
     }
-    acknowledged_ = request.sequence;
+    pending_.push_back({request, acknowledged_life_});
+    received_ = request.sequence;
+  }
+  auto reply = drain();
+  if (reply.close) {
+    return reply;
   }
   if (!member_) {
     return reject();

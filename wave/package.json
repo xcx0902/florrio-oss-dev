@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "node tools/w2/dev.mjs",
     "test:wire": "node tools/w2/test-wire.mjs",
+    "test:dev": "node tools/dev/test-inventory.mjs",
     "verify:reference": "node tools/reference/verify.mjs",
     "fetch:archive": "node tools/reference/fetch-archive.mjs"
   },

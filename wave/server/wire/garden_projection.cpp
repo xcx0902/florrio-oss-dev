@@ -1,4 +1,5 @@
 #include "wire/garden_projection.hpp"
+#include "catalog/catalog.hpp"
 
 #include <algorithm>
 #include <bit>
@@ -59,15 +60,14 @@ std::string player_name(const app::Garden& garden, const app::Room& room, sim::P
   }
   return "Flower";
 }
-std::uint8_t mob_type(sim::Mob mob, sim::Group group) {
-  // $22's 216-byte catalog entries in the October Wasm, not the later schema.
-  constexpr std::uint8_t types[]{4, 3, 5, 1, 12, 6, 19, 14, 7, 21, 11};
-  if (group == sim::Group::ant_hole) {
-    return 9;
+std::uint8_t mob_type(sim::Mob mob, sim::Group group, sim::Rarity rarity = sim::Rarity::common) {
+  const auto mapped = catalog::client_mob(mob, rarity, group);
+  if (!mapped) {
+    throw std::logic_error("Mob missing from dated client registry");
   }
-  const auto type = types[static_cast<std::size_t>(mob)];
-  return group == sim::Group::segment && (type == 12 || type == 14) ? type + 1 : type;
+  return static_cast<std::uint8_t>(*mapped);
 }
+
 }  // namespace
 
 std::uint32_t GardenProjection::handle(const sim::EntityId& id) {
@@ -161,15 +161,31 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         mask |= 0x20 | 0x100;
         body.byte(0);
         body.byte(0);
-        body.byte(1);  // Level-one W2 guest, matching the profile.
+        const auto member_it = std::ranges::find_if(room->members, [&](const auto& token) {
+          return garden.member(token)->id == e.owner->player;
+        });
+        const auto* member = member_it == room->members.end() ? nullptr : garden.member(*member_it);
+        body.byte(member && member->profile ? std::min(255u, member->profile->level) : 1);
         body.byte(0);
         const auto& owner =
             *std::ranges::find(view->players, e.owner->player, &sim::PlayerView::id);
         // $601/$55: sixteen (type vu, rarity byte) slots; active slots precede reserves.
         for (std::size_t slot = 0; slot < 16; ++slot) {
-          if (slot < owner.loadout.size()) {
-            body.integer(owner.loadout[slot] == sim::Petal::basic ? 1 : 5);
-            body.byte(0);
+          const auto count = member && member->profile
+                                 ? store::unlocked_main_slots(member->profile->level)
+                                 : owner.loadout.size();
+          const auto stored = slot < count ? slot : 8 + slot - count;
+          if (member && member->profile && slot < 2 * count && member->profile->slots[stored]) {
+            const auto item = *member->profile->slots[stored];
+            body.integer(item.kind);
+            body.byte(item.rarity);
+          } else if (!(member && member->profile) && slot < owner.loadout.size()) {
+            body.integer(catalog::client_petal(owner.loadout[slot]).value_or(0));
+            if (owner.loadout[slot] != sim::Petal::none) {
+              body.byte(slot < owner.loadout_rarities.size()
+                            ? catalog::client_rarity(owner.loadout_rarities[slot])
+                            : 0);
+            }
           } else {
             body.integer(0);
           }
@@ -177,8 +193,11 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         // $126/$998: u16 / 65535, 0 = broken, 1 = fully recharged.
         for (std::size_t slot = 0; slot < 8; ++slot) {
           const auto remaining = slot < owner.petals.size() ? owner.petals[slot].reload_ticks : 0;
+          const auto total = slot < owner.petals.size() && owner.petals[slot].reload_total_ticks
+                                 ? owner.petals[slot].reload_total_ticks
+                                 : view->petal_reload;
           body.integer(static_cast<std::uint32_t>(
-              65535 * (1 - std::min(1.0, double(remaining) / view->petal_reload))));
+              65535 * (1 - std::min(1.0, double(remaining) / std::max<sim::Tick>(1, total)))));
         }
         body.text(player_name(garden, *room, e.owner->player));
       }
@@ -193,14 +212,14 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       body.real(e.radius * world_scale);
       if (e.petal) {
         mask |= 0x10000;
-        body.integer(*e.petal == sim::Petal::basic ? 1 : 5);
+        body.integer(catalog::client_petal(*e.petal, e.rarity).value_or(0));
         body.byte(static_cast<std::uint8_t>(e.rarity));
       }
       const auto flags_offset = body.bytes.size();
       body.byte(0);  // Generic render component ($592).
       if (e.mob || e.group == sim::Group::ant_hole) {
         mask |= 0x100000;
-        body.byte(mob_type(e.mob.value_or(sim::Mob::baby_ant), e.group));
+        body.byte(mob_type(e.mob.value_or(sim::Mob::baby_ant), e.group, e.rarity));
         body.byte(0);
         body.byte(static_cast<std::uint8_t>(e.rarity));
       }
@@ -232,14 +251,55 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     }
   }
   Writer profile;
-  profile.zeros(607);
-  profile.bytes[0] = 1;  // Original $140 default level; W2 has no XP progression.
-  // $991: profile +2264 is camera Y; +2376 is camera X (not wire order X/Y).
-  set_real(profile.bytes, 283, camera.y * world_scale);
-  set_real(profile.bytes, 314, 1);
-  set_word(profile.bytes, 323, controlled);
-  set_real(profile.bytes, 327, camera.x * world_scale);
-  out.record(8193, 0x8000, profile);
+  const auto* saved = viewer.profile ? &*viewer.profile : nullptr;
+  profile.byte(saved ? std::min(255u, saved->level) : 1);
+  profile.byte(saved ? 10 : 0);  // $2350/$2348: economic cache + authoritative level/XP.
+  // The first 276 values are legacy craft counters; fresh post-Oct-20 rolls are independent.
+  for (unsigned i = 0; i < 276; ++i) {
+    profile.integer(0);
+  }
+  for (unsigned i = 0; i < 4; ++i) {
+    profile.integer(0);
+  }
+  profile.text("");
+  profile.real(camera.y * world_scale);
+  std::array<std::uint8_t, 27> gallery{};  // $3750: 216 mob-kind/rarity discovery bits.
+  if (saved) {
+    for (const auto item : saved->discoveries) {
+      const auto bit = item.kind * 6 + item.rarity;
+      if (bit < gallery.size() * 8) {
+        gallery[bit / 8] |= 1u << (bit % 8);
+      }
+    }
+  }
+  for (const auto byte : gallery) {
+    profile.byte(byte);
+  }
+  profile.real(1);
+  profile.text("");
+  profile.real(0);
+  profile.word(controlled);
+  profile.real(camera.x * world_scale);
+  for (unsigned kind = 0; kind < 46; ++kind) {
+    for (unsigned rarity = 0; rarity < 6; ++rarity) {
+      const auto it = saved ? saved->inventory.find({kind, static_cast<std::uint8_t>(rarity)})
+                            : store::Inventory::const_iterator{};
+      const auto count = saved && it != saved->inventory.end() ? it->second : 0;
+      profile.integer(static_cast<std::uint32_t>(std::min<std::uint64_t>(count, UINT32_MAX)));
+    }
+  }
+  if (saved) {
+    const auto thresholds = catalog::xp_thresholds();
+    const auto level = std::min<std::size_t>(saved->level, thresholds.size());
+    std::uint32_t fraction = 0;
+    if (level && level < thresholds.size()) {
+      const auto low = thresholds[level - 1], high = thresholds[level];
+      fraction = static_cast<std::uint32_t>(
+          65535.0 * std::clamp(double(saved->xp - low) / double(high - low), 0.0, 1.0));
+    }
+    profile.integer(fraction);
+  }
+  out.record(8193, 0x8000, profile, saved != nullptr);
 
   if (room && !view) {
     Writer roster;
@@ -290,7 +350,8 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     std::array<std::uint32_t, 216> counts{};
     for (const auto& entity : view->entities) {
       if (entity.mob || entity.group == sim::Group::ant_hole) {
-        ++counts[mob_type(entity.mob.value_or(sim::Mob::baby_ant), entity.group) * 6 +
+        ++counts[mob_type(entity.mob.value_or(sim::Mob::baby_ant), entity.group, entity.rarity) *
+                     6 +
                  static_cast<std::size_t>(entity.rarity)];
       }
     }

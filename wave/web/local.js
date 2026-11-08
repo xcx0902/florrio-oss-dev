@@ -4,6 +4,24 @@
     return;
   }
 
+  // Restore only the original presentation cache before the October Wasm loads.
+  // The bearer token selects the durable server profile; socket mutations validate ownership.
+  try {
+    const cached = new XMLHttpRequest();
+    cached.open('GET', '/wave/cache/' + (localStorage.getItem('cp6_player_id') || ''), false);
+    cached.send();
+    if (cached.status === 200) {
+      const profile = JSON.parse(cached.responseText);
+      localStorage.setItem('cp6_player_id', profile.token);
+      localStorage.setItem('cached_inventory', profile.inventory);
+      localStorage.setItem('cached_level', profile.level);
+      localStorage.setItem('cached_num_petals', profile.numPetals);
+      localStorage.setItem('cached_equipped', profile.equipped);
+    }
+  } catch {
+    /* W2 and unavailable storage fall back to normal client admission. */
+  }
+
   const discoveryPath = '/endpoint/florrio-waves-0/findEach/';
   const unsupportedDiscovery = new Set([
     'https://api.n.m28.io/endpoint/florrio-waves-1/findEach/',

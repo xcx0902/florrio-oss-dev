@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <utility>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -37,9 +39,23 @@ struct Move {
   float strength;
 };
 struct Leave {};
+// October $436 and $939/$997; zero kinds omit the rarity byte.
+struct Craft {
+  bool all;
+  std::uint64_t keep;
+  std::uint32_t kind;
+  std::uint8_t rarity;
+};
+struct Equip {
+  std::array<std::pair<std::uint32_t, std::uint8_t>, 16> slots{};
+};
+struct Swap {
+  std::uint8_t first, second;
+  std::pair<std::uint32_t, std::uint8_t> first_item, second_item;
+};
 
-using ReliableAction =
-    std::variant<std::monostate, Identify, Nickname, CreateSquad, Ready, JoinSquad, Move, Leave>;
+using ReliableAction = std::variant<std::monostate, Identify, Nickname, CreateSquad, Ready,
+                                    JoinSquad, Move, Leave, Craft, Equip, Swap>;
 struct ReliableRequest {
   std::uint32_t sequence;
   ReliableAction action;

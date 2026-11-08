@@ -13,7 +13,16 @@ const project = path.resolve(root, '..');
 export const defaultNative = path.join(project, 'build/wave/native');
 const web = path.join(root, 'web');
 
-export async function startHost({ snapshot, nativeDir, port, fixture = false }) {
+export async function startHost({
+  snapshot,
+  nativeDir,
+  port,
+  fixture = false,
+  database,
+  craftRoll,
+  development = false,
+}) {
+  assert.ok(!(fixture && development), 'Development and fixture hosts are separate');
   assert.ok(snapshot, 'Pass --snapshot or set WAVE_SNAPSHOT');
   const manifest = JSON.parse(await readFile(path.join(web, 'resources-20221030.json')));
   const resources = await Promise.all(
@@ -49,10 +58,21 @@ export async function startHost({ snapshot, nativeDir, port, fixture = false }) 
     resources.push(
       {
         file: 'index.html',
-        body: html.replace(client, `<script src="local.js"></script>\n    ${client}`),
+        body: html.replace(
+          client,
+          `<script src="local.js"></script>\n    ${development ? '<link rel="stylesheet" href="dev-inventory.css" /><script src="dev-inventory.js"></script>\n    ' : ''}${client}`,
+        ),
       },
       { file: 'reference.css', body: await readFile(path.join(web, 'reference.css')) },
       { file: 'local.js', body: await readFile(path.join(web, 'local.js')) },
+      ...(development
+        ? await Promise.all(
+            ['dev-inventory.js', 'dev-inventory.css'].map(async (file) => ({
+              file,
+              body: await readFile(path.join(web, file)),
+            })),
+          )
+        : []),
       { file: 'ubuntu-LICENCE.txt', body: await readFile(path.join(web, 'ubuntu-LICENCE.txt')) },
       ...(await Promise.all(
         manifest.archive
@@ -75,8 +95,16 @@ export async function startHost({ snapshot, nativeDir, port, fixture = false }) 
       resources.map(({ file, body }) => writeFile(path.join(directory, file), body)),
     );
     child = spawn(
-      path.resolve(nativeDir, fixture ? 'wave_host_fixture' : 'wave_host'),
-      [directory, String(port)],
+      path.resolve(
+        nativeDir,
+        development ? 'wave_host_dev' : fixture ? 'wave_host_fixture' : 'wave_host',
+      ),
+      [
+        directory,
+        String(port),
+        ...(database ? [path.resolve(database)] : []),
+        ...(craftRoll !== undefined ? [String(craftRoll)] : []),
+      ],
       {
         stdio: ['ignore', 'pipe', 'inherit'],
       },

@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "stage": "W3",
+  "buildHash": "b632797f0ee487dd99df460b13bde6d7ce5c9773",
+  "clientWasmSha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0",
+  "classification": "captured-original-client-output",
+  "captures": [
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "5e8cf97a3055a935",
+      "plain": "0100050500000500"
+    },
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "05242aae11cb07d9",
+      "plain": "0100060501000500"
+    },
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "0015c662185c0266282ae5cf2b2b69cb565448974e52fa034f",
+      "plain": "0100070c010001000001000100050100000000000000000000"
+    },
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "01a4042919659777293099fd7f6f80efb5b3afe29d69f3b282f5",
+      "plain": "0100080c01000100060201000100050100000000000000000000"
+    },
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "0d7398627e0e0a621691232df18d193f926c6afd2818b0651f",
+      "plain": "0100090c010001000602000100050100000000000000000000"
+    },
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "16c2dc696155c70bb77ee84c9de542ff0df3fd46051179d458b5",
+      "plain": "01000a0c0100010006022c010100050100000000000000000000"
+    },
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "00e7048a6ab6986ea0ab835bc4c477a4f395b86390a8dcf1815664",
+      "plain": "01000b0c0100010006022c01010005010501000000000000000000"
+    },
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "042da16e2715500bd931",
+      "plain": "01001a1c060501010100"
+    },
+    {
+      "label": "success",
+      "direction": "client-to-server",
+      "hex": "5eacce2141ad2d9293d8e0084b3f46636c657fcefd03a3ba5efd4f",
+      "plain": "01001e0c0100050106022c01010005010100000000000000000000"
+    },
+    {
+      "label": "failure",
+      "direction": "client-to-server",
+      "hex": "43395e99c552f426",
+      "plain": "0100050500000500"
+    },
+    {
+      "label": "auto",
+      "direction": "client-to-server",
+      "hex": "014ca3365df29541",
+      "plain": "0100050501050500"
+    },
+    {
+      "label": "auto",
+      "direction": "client-to-server",
+      "hex": "17c5e1e74410f45a",
+      "plain": "0100060501000500"
+    }
+  ],
+  "serverResult": {
+    "classification": "synthetic-validated-by-original-client",
+    "envelope": 1,
+    "opcode": 35,
+    "fields": ["success bool", "created vu", "returned vu"],
+    "successCommandHex": "0123010100",
+    "failureCommandHex": "0123000001"
+  },
+  "normalCaches": {
+    "classification": "captured-original-client-output",
+    "oneCommonRoseEquipped": "BQAAAAAAAAAAAAAAAAAAAADV/Iq1vrWGm7QB2ay4wcysxuMI",
+    "level10": "FPr+g4XqtI7LDNDnt4b2/vGLUw==",
+    "slotCount5": "Ctij352j+Ou27AG9uO7BzZfnhzA=",
+    "inventoryExample": "BgEAfQUAFAEBGQECCgEDBQEEBeSsqKf94N//NtWW5on/yIH9fg=="
+  },
+  "rules": ["W3-01.mapping", "W3-03.craft", "W3-04.transaction", "W3-05.recovery"],
+  "notes": [
+    "Reliable sequence numbers are connection-local; encrypted byte state is per direction and connection.",
+    "Captures omit the variable token-bearing Identify batch. Replaying encryption requires preceding connection state.",
+    "Server result commands are validated responses, not captured historical server traffic.",
+    "Insufficient stock disables the original Craft button without sending opcode 5."
+  ]
+}

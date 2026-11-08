@@ -14,6 +14,12 @@ struct Poison {
   Tick remaining;
 };
 
+struct Slow {
+  DamageSource source;
+  double multiplier = 1;
+  Tick until = 0;
+};
+
 struct Entity {
   EntityView view;
   BodyRules rules;
@@ -22,6 +28,14 @@ struct Entity {
   Tick ready_tick = 0;
   std::vector<Poison> poisons;
   std::optional<DamageSource> fatal_hit;
+  Tick born_tick = 0;
+  bool projectile = false;
+  bool ground_web = false;
+  bool spent = false;
+  double range_left = 0;
+  Vec2 flight_direction;
+  unsigned particle_index = 0;
+  std::vector<Slow> slows;
 };
 
 // Match-local generations and a slot-ordered active set keep pair ordering stable.
