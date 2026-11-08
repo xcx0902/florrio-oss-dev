@@ -126,6 +126,7 @@ void Match::spawn_due() {
                     slot.entity, position});
   }
   if (wave_.counts.pending == 0) {
+    wave_.spawn_complete_tick = tick_;
     phase_ = Phase::clearing;
   }
 }

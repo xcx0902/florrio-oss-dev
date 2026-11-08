@@ -140,7 +140,7 @@ function world(plain, baseline) {
       wave = entity.wave;
       entity.biome = r.vu();
       entity.mobCounts = Array.from({ length: 216 }, () => r.vu());
-      entity.clearProgress = r.byte();
+      entity.spawnProgress = r.byte();
     }
     if (mask & 0x1000) {
       entity.radius = r.real();

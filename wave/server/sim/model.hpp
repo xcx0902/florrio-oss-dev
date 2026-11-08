@@ -200,6 +200,7 @@ struct WaveView {
   std::string rules_version;
   Tick start_tick = 0;
   Tick deadline_tick = 0;
+  std::optional<Tick> spawn_complete_tick;
   bool special = false;
   std::vector<Mob> eligible;
   std::vector<SpawnSlot> plan;

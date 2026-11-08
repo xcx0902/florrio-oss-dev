@@ -22,15 +22,34 @@ function rendered(observe = false) {
     // A frame trace catches 150 ms effects between server broadcasts.
     window.waveEffectFrames = [];
     window.waveObserveEffects = true;
+    const initialPetals = rendered()
+      .entities.filter((e) => e.kind === 'petal')
+      .map((e) => e.id);
+    window.wavePetalBirthFrame = null;
     const read = () => {
       if (!window.waveObserveEffects) {
         return;
       }
       const s = rendered();
+      const growing = s.entities.find(
+        (e) =>
+          e.kind === 'petal' &&
+          !e.flags &&
+          !initialPetals.includes(e.id) &&
+          e.orbitDistance > e.orbitTarget * 0.1 &&
+          e.orbitDistance < e.orbitTarget * 0.7,
+      );
+      if (growing && !window.wavePetalBirthFrame) {
+        window.wavePetalBirthFrame = {
+          petal: growing,
+          png: window.Module.canvas.toDataURL('image/png'),
+        };
+      }
       window.waveEffectFrames.push({
         now: s.now,
         reload: s.reload,
         widgets: s.widgets,
+        petals: s.entities.filter((e) => e.kind === 'petal' && !e.flags),
         effects: s.entities.filter((e) => e.flash || e.flags),
       });
       requestAnimationFrame(read);
@@ -58,12 +77,22 @@ function rendered(observe = false) {
       id: u(e + 28),
       kind: u(e + 108) ? 'petal' : u(e + 124) ? 'mob' : 'flower',
       draw: [F(t + 176), F(t + 184)],
+      target: [f(t + 40), f(t + 64)],
+      previous: [f(t + 44), f(t + 68)],
+      poseClock: F(t + 56),
       angle: F(t + 192),
       radius: f(u(e + 92) + 8),
       flags: d.getUint8(g + 8),
       flash: u(g + 76),
       fading: d.getUint8(g + 40),
     });
+  }
+  const flower = entities.find((e) => e.id === (body ? u(body + 28) : 0));
+  if (flower) {
+    for (const e of entities.filter((e) => e.kind === 'petal')) {
+      e.orbitDistance = Math.hypot(...e.draw.map((v, i) => v - flower.draw[i]));
+      e.orbitTarget = Math.hypot(...e.target.map((v, i) => v - flower.target[i]));
+    }
   }
   const equipment = body ? u(body + 68) : 0;
   return {
@@ -78,11 +107,11 @@ function rendered(observe = false) {
       u(737568 + i * 4) ? f(u(737568 + i * 4) + 24) : 0,
     ),
     wave: {
-      elapsed: d.getUint8(world + 820),
+      clearing: d.getUint8(world + 820),
       index: u(world + 824),
       biome: u(world + 828),
       counts: Array.from({ length: 216 }, (_, i) => u(world + 832 + i * 4)),
-      clear: d.getUint8(world + 2560),
+      spawning: d.getUint8(world + 2560),
     },
   };
 }
@@ -157,12 +186,18 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
     await aim(b);
     const sample = () => b.page.evaluate(rendered);
     const first = await sample();
+    assert.equal(first.wave.spawning, 85, 'Blue advances with the first 2 of 6 spawns');
+    assert.equal(first.wave.clearing, 0, 'Red stays empty while spawns are pending');
+    await photograph(b, 'wave-spawning');
     const body = first.entities.find((e) => e.id === first.control);
     assert.equal(body.radius, 10, 'Fixture body radius is distinct from production radius 25');
     const handles = [...b.baseline.values()].filter((e) => e.petal === 1).map((e) => e.id);
     const idle = orbit(first, handles);
     assert.ok(Math.abs(idle.radius - 40) < 0.5);
     s = await advance(4);
+    const spawned = await sample();
+    assert.equal(spawned.wave.spawning, 255, 'Blue fills after the last spawn batch');
+    assert.equal(spawned.wave.clearing, 0, 'Red starts at the end of spawning');
     const rotated = orbit(await sample(), handles);
     assert.ok(
       Math.hypot(...rotated.vectors[0].map((v, i) => v - idle.vectors[0][i])) > 8,
@@ -189,11 +224,12 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
     }
     s = await advance();
     assert.ok(Math.abs(orbit(await sample(), handles).radius - 40) < 0.6);
-    // Give the elapsed bar visible width without approaching the fixture deadline.
+    // Only time after the final spawn advances the red clearing timer.
     s = await advance(4000);
     const hud = await sample();
     assert.equal(hud.wave.biome, 0);
-    assert.ok(hud.wave.elapsed >= 50 && hud.wave.elapsed <= 52);
+    assert.equal(hud.wave.spawning, 255);
+    assert.ok(hud.wave.clearing >= 50 && hud.wave.clearing <= 52);
     assert.equal(
       hud.wave.counts.reduce((a, b) => a + b, 0),
       6,
@@ -242,7 +278,7 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
       if (draw.reload.some((v) => v === 32767) && !screenshots.includes('W2-11-recharge.png')) {
         await photograph(b, 'recharge');
       }
-      if (draw.wave.clear) {
+      if (s.rooms[0].defeated) {
         killed = true;
         await photograph(b, 'mob-fade');
         // Stop further collisions while the petal completes its real reload.
@@ -275,8 +311,32 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
       'Original recharge widget interpolates between broken and ready',
     );
     assert.ok(frames.at(-1).widgets[slot] > 0.99);
+    const reborn = frames
+      .flatMap((f) => f.petals)
+      .find(
+        (e) =>
+          !handles.includes(e.id) &&
+          e.orbitDistance > e.orbitTarget * 0.1 &&
+          e.orbitDistance < e.orbitTarget * 0.7,
+      );
+    assert.ok(reborn, 'Recharged petal is actually drawn between the flower and its orbit');
+    const growth = frames.flatMap((f) => f.petals).filter((e) => e.id === reborn.id);
+    const arrived = growth.at(-1);
+    assert.ok(
+      Math.abs(arrived.orbitDistance - arrived.orbitTarget) < 0.5,
+      'Reappearing petal reaches the authoritative orbit',
+    );
+    assert.ok(growth.some((e) => e.orbitDistance > reborn.orbitDistance + 2));
+    const birthFrame = await b.page.evaluate(() => window.wavePetalBirthFrame);
+    assert.ok(birthFrame, 'Capture the original canvas during the petal appearance animation');
+    const birthFile = 'W2-11-petal-appear.png';
+    await writeFile(
+      path.join(output, birthFile),
+      Buffer.from(birthFrame.png.split(',')[1], 'base64'),
+    );
+    screenshots.push(birthFile);
     const final = await sample();
-    assert.equal(final.wave.clear, 42);
+    assert.equal(final.wave.spawning, 255, 'Kills do not restart or advance the blue bar');
     assert.equal(
       final.wave.counts.reduce((a, b) => a + b, 0),
       5,
@@ -304,7 +364,9 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
       camera: moved.camera,
       flower: movedBody,
       waveBefore: hud.wave,
+      waveSpawning: first.wave,
       waveAfter: final.wave,
+      reappearingPetal: { first: reborn, captured: birthFrame.petal, arrived },
       frames: frames.length,
       screenshots,
     });

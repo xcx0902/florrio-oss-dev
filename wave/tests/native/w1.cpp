@@ -313,9 +313,12 @@ void batches(Trace& trace) {
   check(before.phase == Phase::spawning && before.wave.number == 1 &&
             before.wave.counts.alive == 0 && before.wave.counts.pending == 4,
         "empty first batch cannot advance with a future batch");
+  check(!before.wave.spawn_complete_tick, "Clearing timer cannot start between spawn batches");
   step(match, trace);
   const auto wave = match.view().previous_wave.value();
   check(wave.counts.spawned == 6 && wave.counts.defeated == 2, "both batches accounted");
+  check(wave.spawn_complete_tick == 3 && !match.view().wave.spawn_complete_tick,
+        "Actual last spawn starts clearing, and the next wave resets its timer");
   for (std::size_t index = 0; index < wave.plan.size(); ++index) {
     const Tick expected = index < 2 ? 0 : 3;
     check(wave.plan[index].due_tick == expected && wave.plan[index].actual_tick == expected,
@@ -377,6 +380,8 @@ void blocked(Trace& trace) {
     check(counts.exhausted == 6 && counts.pending == 0 && counts.spawned == 0 &&
               counts.defeated == 0 && participant(match).credited_defeats == 0,
           "blocked batches settle without false defeats or credits");
+    check(previous.spawn_complete_tick == (limit == 2 ? 4U : 10U),
+          "Blocked spawn attempts delay clearing until they actually settle");
     for (const auto& entry : previous.plan) {
       check(entry.attempts > 0 && entry.attempts <= limit && !entry.actual_tick,
             "bounded attempts and no false spawn");

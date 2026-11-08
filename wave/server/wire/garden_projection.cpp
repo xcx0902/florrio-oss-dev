@@ -187,6 +187,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
           65536 / (2 * std::numbers::pi));
       body.byte(angle);
       body.byte(angle >> 8);
+      const auto position_offset = body.bytes.size();
       body.real(e.position.x * world_scale);
       body.real(e.position.y * world_scale);
       body.real(e.radius * world_scale);
@@ -211,8 +212,19 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       }
       Writer record;
       record.record(handle(e.id), mask, body, flower);
-      rendered_.insert_or_assign(Key{e.id.match.value, e.id.slot, e.id.generation},
-                                 Rendered{record.bytes, 8 + flags_offset, e.max_health, {}});
+      const Key key{e.id.match.value, e.id.slot, e.id.generation};
+      if (e.petal && e.anchor && !rendered_.contains(key)) {
+        // $601 snaps all first-frame poses, including duplicate records.
+        // Establish the flower center for one broadcast; the next orbit pose
+        // then uses $973/$41's native interpolation on the drawn petal.
+        const auto anchor = std::ranges::find(view->entities, *e.anchor, &sim::EntityView::id);
+        if (anchor == view->entities.end()) {
+          throw std::runtime_error("Garden petal anchor missing");
+        }
+        set_real(record.bytes, 8 + position_offset, anchor->position.x * world_scale);
+        set_real(record.bytes, 12 + position_offset, anchor->position.y * world_scale);
+      }
+      rendered_.insert_or_assign(key, Rendered{record.bytes, 8 + flags_offset, e.max_health, {}});
       out.bytes.insert(out.bytes.end(), record.bytes.begin(), record.bytes.end());
       if (handle(e.id) == controlled) {
         camera = e.position;
@@ -263,11 +275,16 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     arena.byte(97);
     out.record(8196, 16 | 0x2000, arena);
     Writer wave;
-    // $828 consumes two normalized bars. Local convention: elapsed deadline and clear progress.
-    const double duration = view->wave.deadline_tick - view->wave.start_tick;
-    wave.byte(static_cast<std::uint8_t>(
-        255 * std::clamp(duration > 0 ? (view->next_tick - view->wave.start_tick) / duration : 0,
-                         0.0, 1.0)));
+    // $828 overlays the red clearing timer on the blue spawning bar.
+    // Do not start red while any scheduled spawn is still pending.
+    double clearing = 0;
+    if (view->wave.spawn_complete_tick) {
+      const auto start = *view->wave.spawn_complete_tick;
+      const double duration = view->wave.deadline_tick - start;
+      const auto tick = view->next_tick ? view->next_tick - 1 : 0;
+      clearing = duration > 0 ? (tick - start) / duration : 1;
+    }
+    wave.byte(static_cast<std::uint8_t>(255 * std::clamp(clearing, 0.0, 1.0)));
     wave.integer(view->wave.number ? view->wave.number - 1 : 0);
     wave.integer(0);  // Garden biome index, not the alive count.
     std::array<std::uint32_t, 216> counts{};
@@ -281,8 +298,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       wave.integer(count);
     }
     const auto& c = view->wave.counts;
-    wave.byte(c.planned ? static_cast<std::uint8_t>(
-                              255.0 * (c.defeated + c.exhausted + c.cancelled) / c.planned)
+    wave.byte(c.planned ? static_cast<std::uint8_t>(255.0 * (c.planned - c.pending) / c.planned)
                         : 0);
     out.record(8197, 2048, wave);
     had_world_ = true;
