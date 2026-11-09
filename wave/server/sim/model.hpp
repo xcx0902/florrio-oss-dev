@@ -231,6 +231,7 @@ struct EntityView {
   bool heal_blocked = false;
   std::optional<EntityId> damage_origin;
   bool split_particle = false;
+  std::optional<EntityId> predecessor;
   bool operator==(const EntityView&) const = default;
 };
 

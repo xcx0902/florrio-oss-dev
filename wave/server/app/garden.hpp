@@ -56,6 +56,14 @@ struct Room {
     bool claimed = false;
   };
   std::deque<Drop> drops;
+  struct Pickup {
+    static constexpr auto duration = std::chrono::milliseconds(700);
+    Drop drop;
+    sim::EntityId target;
+    sim::Vec2 destination;
+    std::chrono::steady_clock::time_point started;
+  };
+  std::deque<Pickup> pickups;
   std::uint64_t drop_sequence = 0;
   // Independent of the process-local MatchId: durable reward keys never repeat
   // when a host restarts with match number one again.

@@ -78,6 +78,7 @@ class Match {
   void update_special_effects();
   void refresh_passives();
   void update_mob_actions();
+  void constrain_leeches();
   void update_nests();
   [[nodiscard]] Vec2 mob_direction(detail::Entity& entity);
   [[nodiscard]] EntityId spawn_mob(Mob kind, Rarity rarity, Vec2 position,
@@ -88,6 +89,7 @@ class Match {
   void chain_attack(EntityId first, const DamageSource& source, double damage, unsigned bounces,
                     double range);
   void finish_projectiles();
+  void launch_projectile(detail::Entity& shot, double heading, Microseconds duration);
   void apply_commands();
   void move_entities();
   void update_orbits();

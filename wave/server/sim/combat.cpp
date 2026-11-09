@@ -27,10 +27,29 @@ DamageSource source_of(const EntityView& entity) {
   return {entity.id, entity.owner, entity.faction, entity.damage_origin};
 }
 
+std::optional<double> flight_contact(Vec2 start, Vec2 end, double radius) {
+  const auto dot = [](Vec2 a, Vec2 b) { return a.x * b.x + a.y * b.y; };
+  const double outside = dot(start, start) - radius * radius;
+  if (outside < 0) {
+    return 0;
+  }
+  const auto travel = end - start;
+  const double along = dot(start, travel);
+  const double length_squared = dot(travel, travel);
+  const double discriminant = along * along - length_squared * outside;
+  if (along >= 0 || discriminant <= 0) {
+    return std::nullopt;
+  }
+  const double entry = outside / (-along + std::sqrt(discriminant));
+  return entry < 1 ? std::optional{entry} : std::nullopt;
+}
+
 }  // namespace
 
 void Match::move_entities() {
   const double seconds = std::chrono::duration<double>(rules_.timing.step).count();
+  const double flight_damping = std::pow(.992, seconds * 1000);
+  const double flight_drag = .125 * (1 - flight_damping) / seconds;
   const auto& active = entities_.active();
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
@@ -96,15 +115,10 @@ void Match::move_entities() {
         break;
       }
     }
-    double speed =
-        entity.projectile && rules_.catalog
-            ? (entity.flight_speed > 0
-                   ? entity.flight_speed
-                   : rules_.catalog->petal(*body.petal, body.rarity)->projectile_speed)
-            : entity.rules.speed_per_second;
-    if (entity.projectile && body.petal == Petal::missile && body.faction == Faction::team) {
-      const auto age = (tick_ - entity.born_tick) * seconds;
-      speed += 400 * std::min(.25, age);
+    double speed = entity.projectile ? entity.flight_speed : entity.rules.speed_per_second;
+    if (entity.projectile) {
+      speed += entity.flight_impulse * flight_drag;
+      entity.flight_impulse *= flight_damping;
     }
     body.velocity =
         entity.stun_until > tick_ ? Vec2{} : direction * (speed * slow) + entity.knockback;
@@ -112,7 +126,7 @@ void Match::move_entities() {
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
     auto& body = entity.view;
-    if ((body.group == Group::petal && !entity.projectile) || entity.predecessor) {
+    if ((body.group == Group::petal && !entity.projectile) || body.predecessor) {
       continue;
     }
     auto displacement = body.velocity * seconds;
@@ -136,6 +150,7 @@ void Match::move_entities() {
     entity.knockback = entity.knockback * rules_.knockback_retention;
     body.velocity = (clamped - body.position) * (1 / seconds);
     if (entity.projectile) {
+      entity.flight_start = body.position;
       entity.range_left = std::max(0.0, entity.range_left - (clamped - body.position).length());
       if (reaches_range || next != clamped || entity.range_left <= 1e-8) {
         entity.range_left = 0;
@@ -278,11 +293,9 @@ void Match::detach_petal(EntityId id) {
     }
     slot.entities.erase(found);
     slot.entity = slot.entities.empty() ? std::nullopt : std::optional{slot.entities.front()};
-    if (slot.entities.empty()) {
-      const Tick reload = reload_ticks(owner->view.loadout[i], owner->view.loadout_rarities[i]);
-      slot.reload_ticks = slot.reload_total_ticks = reload;
-      owner->petal_ready[i] = tick_ + reload;
-    }
+    const Tick reload = reload_ticks(owner->view.loadout[i], owner->view.loadout_rarities[i]);
+    slot.reload_ticks = slot.reload_total_ticks = reload;
+    owner->petal_ready[i] = tick_ + reload;
     return;
   }
 }
@@ -291,6 +304,22 @@ void Match::consume_petal(EntityId id) {
   flush_sponge(id);
   detach_petal(id);
   entities_.erase(id);
+}
+
+void Match::launch_projectile(detail::Entity& shot, double heading, Microseconds duration) {
+  const bool web = shot.view.petal == Petal::web;
+  shot.projectile = true;
+  shot.flight_direction = {std::cos(heading), std::sin(heading)};
+  shot.flight_start = shot.view.position;
+  // World PvP integrates a damped launch impulse plus steady displacement.
+  // Convert its client units/ms to Wave units/s (1000 / 5).
+  shot.flight_impulse = (web ? 2.2 : 1.4) * 200;
+  shot.flight_speed = web ? 0 : .6 * 200;
+  shot.range_left = std::numeric_limits<double>::infinity();
+  shot.born_tick = tick_;
+  shot.expires = tick_ + rules_.timing.ticks_ceil(duration);
+  shot.view.anchor.reset();
+  shot.view.heading_rad = heading;
 }
 
 void Match::update_effects() {
@@ -366,15 +395,6 @@ void Match::update_effects() {
                (definition.effect == catalog::Effect::projectile ||
                 definition.effect == catalog::Effect::poison_projectile ||
                 definition.effect == catalog::Effect::web)) {
-      const auto launch = [&](detail::Entity& shot, double heading, double range, Tick duration) {
-        shot.projectile = true;
-        shot.flight_direction = {std::cos(heading), std::sin(heading)};
-        shot.range_left = range;
-        shot.born_tick = tick_;
-        shot.expires = tick_ + duration;
-        shot.view.anchor.reset();
-        shot.view.heading_rad = heading;
-      };
       if (definition.kind == Petal::peas || definition.kind == Petal::grapes) {
         // World Peas replace the equipped cluster with four radial children.
         const double phase = 2 * std::numbers::pi *
@@ -382,20 +402,17 @@ void Match::update_effects() {
         auto shot = entity->view;
         const auto center = shot.position;
         shot.split_particle = true;
-        const auto duration = rules_.timing.ticks_ceil(std::chrono::seconds(1));
         consume_petal(id);
         for (unsigned i = 0; i < 4; ++i) {
           const double heading = phase + i * std::numbers::pi / 2;
           const auto direction = Vec2{std::cos(heading), std::sin(heading)};
           shot.position = center + direction * (std::sqrt(72.) / 5);
           const auto child = add_entity(shot, petal_body(definition.kind, shot.rarity));
-          launch(*entities_.get(child), heading, definition.projectile_speed, duration);
+          launch_projectile(*entities_.get(child), heading, std::chrono::seconds(1));
         }
       } else {
-        const bool missile = definition.kind == Petal::missile;
-        const auto duration = rules_.timing.ticks_ceil(
-            std::chrono::milliseconds(missile ? 1500 : 2000));
-        launch(*entity, entity->view.heading_rad, missile ? 160 : definition.range, duration);
+        launch_projectile(*entity, entity->view.heading_rad,
+                          std::chrono::milliseconds(definition.kind == Petal::web ? 650 : 1500));
         detach_petal(id);
       }
     }
@@ -531,17 +548,35 @@ void Match::resolve_contacts() {
 
   const auto& active = entities_.active();
   std::vector<Vec2> positions;
+  std::vector<Vec2> travel;
   positions.reserve(active.size());
+  travel.reserve(active.size());
   for (const auto slot : active) {
-    positions.push_back(entities_.at(slot).view.position);
+    const auto& entity = entities_.at(slot);
+    positions.push_back(entity.view.position);
+    travel.push_back(entity.projectile && !entity.held
+                         ? entity.view.position - entity.flight_start
+                         : Vec2{});
   }
+  struct FlightContact {
+    std::size_t first, second;
+    double time;
+  };
+  std::vector<FlightContact> flight_contacts;
   for (std::size_t a = 0; a < active.size(); ++a) {
     auto& first = entities_.at(active[a]);
     for (std::size_t b = a + 1; b < active.size(); ++b) {
       auto& second = entities_.at(active[b]);
       const Vec2 delta = positions[b] - positions[a];
+      const double radius = first.view.radius + second.view.radius;
+      if (travel[a] != Vec2{} || travel[b] != Vec2{}) {
+        if (const auto time = flight_contact(delta - (travel[b] - travel[a]), delta, radius)) {
+          flight_contacts.push_back({a, b, *time});
+        }
+        continue;
+      }
       const double distance = delta.length();
-      const double depth = first.view.radius + second.view.radius - distance;
+      const double depth = radius - distance;
       if (depth <= 0) {
         continue;
       }
@@ -566,6 +601,24 @@ void Match::resolve_contacts() {
           second.knockback += impulse;
         }
       }
+    }
+  }
+  // A launch can cross more than one collider in a tick. Resolve the first
+  // contact along the path before later ones, including where a Web lands.
+  std::ranges::stable_sort(flight_contacts, {}, &FlightContact::time);
+  for (const auto [a, b, time] : flight_contacts) {
+    auto& first = entities_.at(active[a]);
+    auto& second = entities_.at(active[b]);
+    if (first.spent || second.spent) {
+      continue;
+    }
+    attack(first, second);
+    attack(second, first);
+    if (first.projectile && first.spent) {
+      first.view.position = positions[a] - travel[a] * (1 - time);
+    }
+    if (second.projectile && second.spent) {
+      second.view.position = positions[b] - travel[b] * (1 - time);
     }
   }
 }
@@ -660,13 +713,31 @@ void Match::reap_deaths() {
           break;
         }
       }
-      // A severed chain keeps moving; settle the W3 root reward only on its last death.
+      // Keep a Leech in body order even when the entity pool reused its slots.
+      if (id == root && successor && entity->chain_kind == Mob::leech) {
+        auto previous = id;
+        for (;;) {
+          const auto next = std::ranges::find_if(entities_.active(), [&](auto slot) {
+            return entities_.at(slot).view.predecessor == previous;
+          });
+          if (next == entities_.active().end()) {
+            break;
+          }
+          const auto& child = entities_.at(*next).view;
+          if (child.health > 0) {
+            successor = child.id;
+            break;
+          }
+          previous = child.id;
+        }
+      }
+      // Settle the W3 root reward only on its last death.
       if (id == root && successor) {
         auto& promoted = *entities_.get(*successor);
         promoted.view.group = body.group;
         promoted.view.origin_wave = body.origin_wave;
         promoted.root.reset();
-        promoted.predecessor.reset();
+        promoted.view.predecessor.reset();
         promoted.provoked = entity->provoked;
         for (const auto slot : entities_.active()) {
           auto& child = entities_.at(slot);
@@ -684,8 +755,9 @@ void Match::reap_deaths() {
       }
       for (const auto slot : entities_.active()) {
         auto& child = entities_.at(slot);
-        if (child.predecessor == id) {
-          child.predecessor.reset();
+        if (child.view.predecessor == id) {
+          child.view.predecessor = entity->chain_kind == Mob::leech ? body.predecessor
+                                                                  : std::nullopt;
         }
       }
       if (!successor && id == root) {

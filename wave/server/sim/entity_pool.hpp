@@ -43,11 +43,11 @@ struct Entity {
   bool spent = false;
   double range_left = 0;
   Vec2 flight_direction;
+  Vec2 flight_start;
   unsigned particle_index = 0;
   std::vector<Slow> slows;
   std::optional<EntityId> target;
   std::optional<EntityId> root;
-  std::optional<EntityId> predecessor;
   std::optional<Mob> chain_kind;
   Tick action_ready = 0;
   Tick heal_block_until = 0;
@@ -61,6 +61,7 @@ struct Entity {
   bool provoked = false;
   bool held = false;
   double flight_speed = 0;
+  double flight_impulse = 0;
   std::vector<DeferredDamage> deferred;
 };
 

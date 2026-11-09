@@ -409,18 +409,16 @@ void Match::update_special_effects() {
                (owner->attack ||
                 ((p.effect == catalog::Effect::pollen || p.effect == catalog::Effect::pearl) &&
                  owner->defend))) {
+      if (p.effect == catalog::Effect::dandelion) {
+        launch_projectile(*e, e->view.heading_rad, std::chrono::milliseconds(1500));
+        detach_petal(target);
+        continue;
+      }
       e->projectile = true;
-      const double sign = p.effect == catalog::Effect::pollen && owner->defend ? -1 : 1;
-      e->flight_direction = {std::cos(e->view.heading_rad) * sign,
-                             std::sin(e->view.heading_rad) * sign};
+      e->flight_start = e->view.position;
       e->range_left = p.range;
       e->flight_speed = p.projectile_speed;
-      e->expires = p.effect == catalog::Effect::pearl
-                       ? 0
-                       : tick_ + ticks(rules_, p.effect == catalog::Effect::pollen ? 5 : 1.5);
-      if (p.effect == catalog::Effect::pollen) {
-        e->flight_direction = {};
-      }
+      e->expires = p.effect == catalog::Effect::pearl ? 0 : tick_ + ticks(rules_, 5);
       e->held = p.effect == catalog::Effect::pearl;
       e->view.anchor.reset();
       if (p.effect != catalog::Effect::pearl) {

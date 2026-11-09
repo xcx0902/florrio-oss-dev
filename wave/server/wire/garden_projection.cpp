@@ -36,9 +36,11 @@ struct Writer {
     bytes.insert(bytes.end(), value.begin(), value.end());
     byte(0);
   }
-  void record(std::uint32_t id, std::uint32_t mask, const Writer& body, bool equipment = false) {
+  void record(std::uint32_t id, std::uint32_t mask, const Writer& body, bool equipment = false,
+              bool arriving = false) {
     word(id);
-    byte(equipment ? 0xc4 : 0xcc);  // $601: header XOR 0xac; bit 3 includes equipment.
+    // $601: header XOR 0xac; bit 3 includes equipment, bit 1 marks a fresh drop.
+    byte((equipment ? 0xc4 : 0xcc) | (arriving ? 2 : 0));
     byte(mask);
     byte(mask >> 8);
     byte(mask >> 16);
@@ -108,6 +110,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   if (match != match_) {
     hit_cursor_ = room ? room->hit_sequence : 0;
     arc_cursor_ = room ? room->arc_sequence : 0;
+    drop_cursor_ = room ? room->drop_sequence : 0;
   }
   std::set<Key> live;
   const auto visible = [](const sim::EntityView& e) {
@@ -115,12 +118,20 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     return !p || !p->mechanics.hidden;
   };
   std::vector<const app::Room::Drop*> drops;
+  std::vector<const app::Room::Pickup*> pickups;
   if (view && room) {
+    for (const auto& pickup : room->pickups) {
+      const Key key{match, UINT32_MAX, pickup.drop.serial};
+      if (now < pickup.started + app::Room::Pickup::duration && handles_.contains(key)) {
+        pickups.push_back(&pickup);
+        live.insert(key);
+      }
+    }
     for (const auto& drop : room->drops) {
       drops.push_back(&drop);
     }
     // Keep the nearest drops in the old client's bounded entity table.
-    constexpr std::size_t drop_limit = 512;
+    const std::size_t drop_limit = 512 - pickups.size();
     if (drops.size() > drop_limit) {
       const auto player = std::ranges::find(view->players, viewer.id, &sim::PlayerView::id);
       const auto flower = player != view->players.end() && player->body
@@ -195,6 +206,11 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       Writer body;
       std::uint32_t mask = 1 | 0x400 | 0x1000 | 0x80000;
       body.byte(0);
+      if (e.mob == sim::Mob::leech || e.mob == sim::Mob::leech_segment) {
+        // $1795 follows the native 0x80 links to draw one continuous Leech.
+        mask |= 0x80;
+        body.word(e.predecessor ? handle(*e.predecessor) : 0);
+      }
       if (flower) {
         mask |= 0x20 | 0x100;
         body.byte(0);
@@ -294,21 +310,36 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         camera = e.position;
       }
     }
-    for (const auto* drop : drops) {
+    const auto write_drop = [&](const app::Room::Drop& drop, sim::Vec2 position,
+                                std::uint32_t target, bool collected, bool arriving) {
       Writer body;
       body.byte(0);
       body.zeros(2);  // Heading.
-      body.real(drop->position.x * world_scale);
-      body.real(drop->position.y * world_scale);
+      body.real(position.x * world_scale);
+      body.real(position.y * world_scale);
       body.real(16);
       body.byte(0);  // Generic render flags.
-      body.byte(0);  // Ground item, not in the pickup animation.
-      body.integer(0);
-      body.integer(drop->item.kind);
-      body.byte(drop->item.rarity);
-      out.record(handle({view->id, UINT32_MAX, drop->serial}),
-                 1 | 0x400 | 0x1000 | 0x80000 | 0x400000, body);
+      body.byte(collected ? 1 : 0);  // The native pickup renderer shrinks and spins out.
+      body.integer(target);
+      body.integer(drop.item.kind);
+      body.byte(drop.item.rarity);
+      out.record(handle({view->id, UINT32_MAX, drop.serial}),
+                 1 | 0x400 | 0x1000 | 0x80000 | 0x400000, body, false, arriving);
+    };
+    for (const auto* drop : drops) {
+      write_drop(*drop, drop->position, 0, false, drop->serial > drop_cursor_);
     }
+    for (const auto* pickup : pickups) {
+      const auto target = std::ranges::find(view->entities, pickup->target, &sim::EntityView::id);
+      const auto destination =
+          target == view->entities.end() ? pickup->destination : target->position;
+      const double elapsed = std::chrono::duration<double, std::milli>(now - pickup->started).count();
+      const double factor = 1 - std::pow(.8, std::max(0., elapsed) * .06);
+      const auto position = pickup->drop.position + (destination - pickup->drop.position) * factor;
+      write_drop(pickup->drop, position, target == view->entities.end() ? 0 : handle(target->id),
+                 true, false);
+    }
+    drop_cursor_ = room->drop_sequence;
   }
   Writer profile;
   const auto* saved = viewer.profile ? &*viewer.profile : nullptr;

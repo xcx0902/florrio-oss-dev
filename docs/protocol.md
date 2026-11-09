@@ -118,3 +118,9 @@ component projection is in `schema/protocol.yaml`.
 `DecodeError` rejects truncated packets, non-canonical varints, unknown opcodes,
 trailing bytes in a command and non-finite f32 values. The worker shim reports a
 decode failure as an error response; it never falls back to a second framing.
+
+## 6. 历史原版客户端
+
+2022-10-30 版 florrio.io 客户端的线上协议是另一套编号空间（类型 0/1/2/5、
+组件掩码 24 位、命令 opcode 1–40）。该协议的分析、字节布局和溯源索引见
+[`wave/docs/protocol/`](../wave/docs/protocol/README.md)；本文件描述的产品协议与其**不可混用**。

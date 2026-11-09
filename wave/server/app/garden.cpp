@@ -63,10 +63,15 @@ struct Garden::StorageState {
     std::chrono::steady_clock::time_point retry_at{};
   };
   struct Batch {
+    struct Pickup {
+      std::string id;
+      sim::EntityId target;
+      sim::Vec2 position;
+    };
     std::string room;
     std::string match;
     std::vector<store::RewardEvent> events;
-    std::vector<std::string> pickups;
+    std::vector<Pickup> pickups;
   };
   struct Ledger {
     std::set<std::string> roots;
@@ -652,6 +657,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
     const Member* member;
     sim::Vec2 position;
     sim::LifeId life;
+    sim::EntityId body;
     double pickup_multiplier = 1;
   };
   std::vector<Eligible> eligible;
@@ -700,7 +706,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
     if (died) {
       continue;
     }
-    eligible.push_back({&member, *position, player->life, player->pickup_multiplier});
+    eligible.push_back({&member, *position, player->life, *body, player->pickup_multiplier});
   }
 
   for (const auto& event : room.match->events()) {
@@ -812,7 +818,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
     recipient.guest_id = nearest->member->profile->guest_id;
     recipient.items[drop.item] = 1;
     batch->events.push_back({room.economy_id, "pickup", drop.id, {std::move(recipient)}});
-    batch->pickups.push_back(drop.id);
+    batch->pickups.push_back({drop.id, nearest->body, nearest->position});
   }
   if (!batch->events.empty()) {
     ledger.pending = std::move(batch);
@@ -850,8 +856,14 @@ void Garden::flush_economy() {
               }
               const auto room = rooms_.find(batch->room);
               if (room != rooms_.end() && room->second.economy_id == batch->match) {
+                const auto now = std::chrono::steady_clock::now();
                 std::erase_if(room->second.drops, [&](const Room::Drop& drop) {
-                  return std::ranges::find(batch->pickups, drop.id) != batch->pickups.end();
+                  const auto pickup = std::ranges::find(batch->pickups, drop.id, &StorageState::Batch::Pickup::id);
+                  if (pickup == batch->pickups.end()) {
+                    return false;
+                  }
+                  room->second.pickups.push_back({drop, pickup->target, pickup->position, now});
+                  return true;
                 });
               }
             })) {
@@ -964,7 +976,11 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
 
 void Garden::step() {
   poll_storage();
+  const auto now = std::chrono::steady_clock::now();
   for (auto& [code, room] : rooms_) {
+    while (!room.pickups.empty() && now >= room.pickups.front().started + Room::Pickup::duration) {
+      room.pickups.pop_front();
+    }
     // A full I/O queue retains at most one tick's settlement per room. Pause
     // that room without waiting for I/O; never advance and silently lose rewards.
     if (storage_ && room.match && storage_->ledgers[room.economy_id].pending) {

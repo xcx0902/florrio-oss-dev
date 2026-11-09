@@ -114,8 +114,6 @@ def decode_escapes(s):
             out.append(34); i += 2
         elif n == "'":
             out.append(39); i += 2
-        elif n == '0':
-            out.append(0); i += 2
         elif n in '0123456789abcdefABCDEF':
             out.append(int(s[i + 1:i + 3], 16)); i += 3
         else:

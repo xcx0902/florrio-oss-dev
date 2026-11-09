@@ -1,0 +1,85 @@
+# florrio.io 原版客户端协议（20221030 构建）
+
+本目录记录 **2022-10-30 版 florrio.io 客户端**（`client.wasm` + `client.js`）与
+`m28n.net` 游戏服之间的二进制 WebSocket 协议。目标是把 `wave/` 中已经分析出的结论
+与本次对剩余未分析部分的静态分析合并成一套可溯源、可复现的协议说明。
+
+> 与 [`../../protocol.md`](../../protocol.md) 的区分：那份文档描述当前产品自己的
+> `engine` 协议（30 组件、事件 9/11/14 等），编号空间与本目录**不同**。
+> 本目录只描述原版客户端线上字节，供 `wave/` 的兼容层与抓包回归使用。
+
+## 分析对象
+
+| 文件 | 大小 | SHA-256 |
+| --- | ---: | --- |
+| `wave-reference/20221030/client.wasm` | 2 474 614 B | `68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0` |
+| `wave-reference/20221030/client.js` | 112 347 B | `23c51f12ec4f31b66e4796d799ac944c05b60114cb84ba58e354ed1c53ab4dc0` |
+
+构建号（握手首包中的 40 字节 ASCII）：
+
+```
+b632797f0ee487dd99df460b13bde6d7ce5c9773
+```
+
+Wasm 布局：358 个导入函数、4 138 个定义函数，`code` 段 2 330 231 B，从文件偏移
+18 542 开始。静态证据统一引用反汇编文本 `build/wave/reference/client.wat`
+（binaryen 132 编号，`$0..$4137`；浏览器栈帧号 = `$N + 358`）。
+
+## 文档索引
+
+| 文档 | 内容 |
+| --- | --- |
+| [01-transport.md](01-transport.md) | 服务发现、WebSocket 握手、双向字节变换、外层消息类型、可靠批次/ACK、关闭码 |
+| [02-client-to-server.md](02-client-to-server.md) | 全部 C→S 命令 opcode、字段编码、构造函数与调用点 |
+| [03-server-to-client.md](03-server-to-client.md) | 世界更新包结构、命令 envelope、全部 S→C opcode 与消费函数 |
+| [04-entities.md](04-entities.md) | 实体记录格式、句柄编码、组件掩码逐位字段表 |
+| [05-profile.md](05-profile.md) | `0x8000` 本地资料 607 字节布局、镜头/缩放/控制句柄 |
+| [06-economy.md](06-economy.md) | 合成、装备、交换、商店与 `35` 结果事件 |
+| [07-lobby-and-squad.md](07-lobby-and-squad.md) | 登录/身份、准备、创建与加入小队、昵称、退出、广告 |
+| [08-traceability.md](08-traceability.md) | 函数行号表、数据段地址、抓包与测试夹具索引、复核方法、未决问题 |
+
+## 证据等级
+
+每条结论标注以下等级之一，正文中统一使用 `A/B/C`：
+
+| 等级 | 含义 | 典型证据 |
+| ---: | --- | --- |
+| **A** | 双向捕获或双端运行验证 | `wave/data/wire/20221030/*.json`、`wave/tests/native/*`、W2 浏览器验收 |
+| **B** | 静态确定 | WAT 中字段读取/写入顺序完整，或服务端实现与客户端读取互相对照 |
+| **C** | 仅定位，语义未定 | 找到 opcode 与构造/消费函数，但字段或玩法含义未闭合 |
+
+“静态确定”只表示**字节布局**确定，不表示玩法含义一定正确。语义推断在表格中单独
+注明“推断”，并在 [08-traceability.md](08-traceability.md) 列出未决问题。
+
+## 复核方法
+
+```bash
+# 1. 校验原文件
+shasum -a 256 wave-reference/20221030/client.wasm
+
+# 2. 重新生成 WAT（需要 wabt 的 wasm2wat，binaryen 编号由 --generate-names 决定）
+wasm2wat --generate-names wave-reference/20221030/client.wasm \
+  -o build/wave/reference/client.wat
+
+# 3. 查询函数、调用者、字符串
+python3 tools/protocol/wat.py fn 988
+python3 tools/protocol/wat.py callers 988
+python3 tools/protocol/wat.py str 34440 32
+```
+
+`tools/protocol/wat.py` 的 `fn` 输出是压缩伪代码，`raw N` 输出原始 WAT 行范围，
+`refs ADDR` 搜索立即数地址。所有行号均指 `build/wave/reference/client.wat`。
+
+## 一句话结构
+
+```
+TCP/TLS → WebSocket 二进制帧
+  └─ 外层变换（首字节置换 + 22 字节滚动 XOR）
+      ├─ 0x00 错误/关闭原因：vu code + NUL message
+      ├─ 0x01 世界/命令帧：vu epoch, vu tick, vu ack, 删除段, 实体*, 0, 分隔符, 命令*, 0
+      │     └─ 内层 256 字节掩码（从实体段开始）
+      ├─ 0x02 C→S ACK：vu epoch, vu tick
+      ├─ 0x05 访客标识：vu epoch, 00 0e, NUL visitor id
+      └─ 其他类型忽略
+C→S 0x01 批次：vu epoch, (vu seq, vu opcode, fields)*   ← 同样有内层掩码
+```

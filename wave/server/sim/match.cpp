@@ -349,7 +349,7 @@ void Match::refresh_petals() {
       }
       auto& slot = entry.view.petals[index];
       slot.reload_ticks = entry.petal_ready[index] > tick_ ? entry.petal_ready[index] - tick_ : 0;
-      if (slot.entity || slot.reload_ticks != 0) {
+      if (slot.reload_ticks != 0) {
         continue;
       }
       EntityView petal;
@@ -364,8 +364,16 @@ void Match::refresh_petals() {
           rules_.catalog ? rules_.catalog->petal(*petal.petal, petal.rarity) : nullptr;
       const bool splits_on_launch = petal.petal == Petal::peas || petal.petal == Petal::grapes;
       const auto count = definition && !splits_on_launch ? definition->particles : 1;
+      if (slot.entities.size() == count) {
+        continue;
+      }
       slot.reload_total_ticks = reload_ticks(*petal.petal, petal.rarity);
       for (unsigned particle = 0; particle < count; ++particle) {
+        if (std::ranges::any_of(slot.entities, [&](EntityId id) {
+              return entities_.get(id)->particle_index == particle;
+            })) {
+          continue;
+        }
         auto body = petal_body(*petal.petal, petal.rarity);
         if (definition && splits_on_launch) {
           body.health *= definition->particles;
@@ -375,6 +383,9 @@ void Match::refresh_petals() {
         entities_.get(id)->particle_index = particle;
         entities_.get(id)->orbit_offset = 2 * std::numbers::pi * index / entry.view.petals.size();
       }
+      std::ranges::sort(slot.entities, {}, [this](EntityId id) {
+        return entities_.get(id)->particle_index;
+      });
       slot.entity = slot.entities.front();
     }
   }
@@ -445,6 +456,7 @@ bool Match::step() {
   update_nests();
   finish_projectiles();
   reap_deaths();
+  constrain_leeches();
   update_orbits();
   adjudicate();
   ++tick_;

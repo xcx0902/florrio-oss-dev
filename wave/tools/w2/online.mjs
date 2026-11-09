@@ -94,9 +94,9 @@ function world(plain, baseline) {
       break;
     }
     const header = r.byte();
-    assert.ok([0xcc, 0xc4].includes(header));
+    assert.ok([0xcc, 0xce, 0xc4].includes(header));
     const mask = r.byte() | (r.byte() << 8) | (r.byte() << 16),
-      entity = { id, mask };
+      entity = { id, mask, arriving: ((header ^ 0xac) & 2) !== 0 };
     if (mask & 1) {
       r.byte();
     }
@@ -119,6 +119,9 @@ function world(plain, baseline) {
       entity.height = r.vu();
       r.real();
       r.byte();
+    }
+    if (mask & 0x80) {
+      entity.predecessor = r.word();
     }
     if (mask & 0x100) {
       entity.name = r.str();

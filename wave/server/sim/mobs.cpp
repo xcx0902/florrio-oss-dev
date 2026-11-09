@@ -58,7 +58,7 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
           rules_.timing.ticks_ceil(Microseconds(segment_body.contact_cooldown * 25000));
       const auto child = add_entity(view, segment_body);
       entities_.get(child)->root = id;
-      entities_.get(child)->predecessor = previous;
+      entities_.get(child)->view.predecessor = previous;
       entities_.get(child)->chain_kind = kind;
       previous = child;
     }
@@ -72,7 +72,7 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
   }
   const auto& definition =
       *rules_.catalog->mob(entity.chain_kind.value_or(*entity.view.mob), entity.view.rarity);
-  if (entity.predecessor || definition.ai == catalog::MobAI::stationary ||
+  if (entity.view.predecessor || definition.ai == catalog::MobAI::stationary ||
       definition.ai == catalog::MobAI::spawner) {
     return {};
   }
@@ -183,8 +183,11 @@ void Match::update_mob_actions() {
       continue;
     }
     const auto& definition = *rules_.catalog->mob(*e->view.mob, e->view.rarity);
-    if (e->predecessor) {
-      const auto* previous = entities_.get(*e->predecessor);
+    if (e->view.predecessor) {
+      if (e->chain_kind == Mob::leech) {
+        continue;  // Resolve Leech links in chain order after contacts and deaths.
+      }
+      const auto* previous = entities_.get(*e->view.predecessor);
       const auto* root = e->root ? entities_.get(*e->root) : nullptr;
       if (!previous || !root) {
         entities_.erase(id);
@@ -265,12 +268,7 @@ void Match::update_mob_actions() {
                                             .health = definition.missile_health,
                                             .contact_damage = definition.missile_damage,
                                             .contact_cooldown = 8});
-      auto& projectile = *entities_.get(shot);
-      projectile.projectile = true;
-      projectile.flight_direction = delta * (1 / distance);
-      projectile.flight_speed = 100;
-      projectile.range_left = 180;
-      projectile.expires = tick_ + seconds(rules_, 2);
+      launch_projectile(*entities_.get(shot), bullet.heading_rad, std::chrono::seconds(2));
     } else if (definition.ai == catalog::MobAI::jellyfish && e->target) {
       e->action_ready = tick_ + seconds(rules_, 2 / attack_scale);
       if ((entities_.get(*e->target)->view.position - position).length() <= 40) {
@@ -289,6 +287,33 @@ void Match::update_mob_actions() {
       const auto area = add_entity(
           web, {.radius = rules_.catalog->petal(Petal::web, rarity)->area_radius, .health = 1});
       entities_.get(area)->ground_web = true;
+    }
+  }
+}
+
+void Match::constrain_leeches() {
+  // Slot order can change when the pool reuses a handle. Settle each parent
+  // before its child so even a freshly rejoined chain stays connected.
+  const auto follow = [this](auto&& self, EntityView& body) -> void {
+    if (!body.predecessor) {
+      return;
+    }
+    auto& previous = entities_.get(*body.predecessor)->view;
+    self(self, previous);
+    const auto delta = previous.position - body.position;
+    const auto distance = delta.length();
+    const double gap = (previous.radius + body.radius) * .9;
+    if (distance > gap) {
+      body.position += delta * ((distance - gap) / distance);
+    }
+    if (distance > 0) {
+      body.heading_rad = std::atan2(delta.y, delta.x);
+    }
+  };
+  for (const auto slot : entities_.active()) {
+    auto& entity = entities_.at(slot);
+    if (entity.chain_kind == Mob::leech) {
+      follow(follow, entity.view);
     }
   }
 }
