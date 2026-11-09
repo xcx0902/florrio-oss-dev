@@ -25,7 +25,8 @@ wss://<id>.s.m28n.net/
 
 - 证据：`wave/data/wire/20221030/bootstrap.json` 的 `discovery` 段（A，抓包）。
 - 字符串 `florrio-waves-0` 位于数据段地址 `41492`（B，`strings 40000 45000`）。
-- 地区优先级、多服务器选择与 `ipv4` 字段的实际用途尚未恢复（C）。
+- 地区选择与多服务器排序属于调度层，不进入二进制帧；线上协议只使用
+  `servers.<region>.id` 拼出 `wss://<id>.s.m28n.net/`。
 
 ## 2. WebSocket 首包（握手）
 
