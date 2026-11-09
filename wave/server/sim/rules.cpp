@@ -1,7 +1,8 @@
 #include "sim/rules.hpp"
-#include "garden_evidence.hpp"
 #include "catalog/catalog.hpp"
+#include "garden_evidence.hpp"
 
+#include <numbers>
 #include <stdexcept>
 
 namespace wave::sim {
@@ -13,14 +14,17 @@ Tick Timing::ticks_ceil(Microseconds time) const {
   return time.count() / step.count() + (time.count() % step.count() != 0);
 }
 
-Rules garden_rules() {
+Rules scenario_rules(Biome biome) {
   Rules rules;
   detail::load_garden_evidence(rules);
   rules.catalog = &catalog::dated();
+  rules.biome = biome;
+  rules.progressive_waves = true;
+  rules.residual = ResidualPolicy::keep;
   // Local display calibration: 5 W1 units projects to a 25-unit flower body.
   rules.player = {.radius = 5,
                   .health = 100,
-                  .speed_per_second = 85,
+                  .speed_per_second = 50,
                   .contact_damage = 2,
                   .contact_cooldown = 12};
   rules.petals = {{{.radius = 3, .health = 12, .contact_damage = 10, .contact_cooldown = 8},
@@ -92,21 +96,84 @@ Rules garden_rules() {
         .contact_cooldown = 20}},
   };
   rules.contact_knockback_speed = 24;
-  // Wave pools remain dated W0 data; all kinds are available to scenario builders.
+  // All kinds are available to the scenario schedules.
   for (const auto& mob : catalog::dated().mobs) {
     if (mob.rarity == Rarity::common &&
         std::ranges::find(rules.mobs, mob.kind, &MobRules::kind) == rules.mobs.end()) {
       rules.mobs.push_back({mob.kind, mob.body});
     }
   }
-  for (int y : {-100, 0, 100}) {
-    for (int x : {-100, 0, 100}) {
-      if (x != 0 || y != 0) {
-        rules.spawn_points.emplace_back(x, y);
-      }
+  using enum Mob;
+  std::array<std::vector<Mob>, 3> unlocks;
+  switch (biome) {
+    case Biome::garden:
+      rules.late_mobs = {ant_hole, digger, queen_ant};
+      rules.dangerous_mobs = {spider, hornet};
+      break;
+    case Biome::desert:
+      unlocks = {{{cactus, sandstorm, desert_centipede}, {beetle}, {scorpion, shiny_ladybug}}};
+      rules.late_mobs = {fire_ant_burrow, fire_ant, digger};
+      rules.dangerous_mobs = {sandstorm, beetle, scorpion};
+      rules.special_groups = {{beetle}, {desert_centipede}, {sandstorm}, {scorpion}};
+      break;
+    case Biome::ocean:
+      unlocks = {{{bubble, shell, sponge}, {crab}, {starfish, jellyfish}}};
+      rules.late_mobs = {leech};
+      rules.dangerous_mobs = {starfish, crab, jellyfish};
+      rules.special_groups = {{bubble}, {crab}, {jellyfish}, {leech}, {shell},
+                              {shell, sponge}, {starfish}};
+      break;
+  }
+  if (biome != Biome::garden) {
+    std::vector<Mob> eligible;
+    for (std::size_t i = 0; i < unlocks.size(); ++i) {
+      eligible.insert(eligible.end(), unlocks[i].begin(), unlocks[i].end());
+      rules.waves[i].eligible = eligible;
+    }
+  }
+  for (const int radius : {95, 135, 175}) {
+    for (int i = 0; i < 32; ++i) {
+      const double angle = (i + radius / 100.0) * 2 * std::numbers::pi / 32;
+      rules.spawn_points.emplace_back(radius * std::cos(angle), radius * std::sin(angle));
     }
   }
   return rules;
+}
+
+Rules garden_rules() { return scenario_rules(Biome::garden); }
+
+WaveRules wave_rules_at(const Rules& rules, std::size_t index) {
+  if (index < rules.waves.size()) {
+    return rules.waves[index];
+  }
+  const auto offset = index - rules.waves.size();
+  const auto last = rules.waves.back().number;
+  if (!rules.progressive_waves || last >= max_wave_number || offset >= max_wave_number - last) {
+    throw std::out_of_range("Wave index outside the scenario");
+  }
+  const auto number = last + static_cast<std::uint32_t>(offset) + 1;
+  auto eligible = rules.waves.back().eligible;
+  eligible.insert(eligible.end(), rules.late_mobs.begin(), rules.late_mobs.end());
+  const auto ticks = [&](unsigned seconds) {
+    return rules.timing.ticks_ceil(std::chrono::seconds(seconds));
+  };
+  const auto budget = 10 + std::min(26u, number / 2);
+  return {number, std::move(eligible), wave_rarity(number, 1), budget,
+          {{0, budget / 6}, {ticks(6), budget / 4}, {ticks(13), budget / 4},
+           {ticks(21), budget - budget / 6 - 2 * (budget / 4)}},
+          ticks(30 + std::min(45u, number))};
+}
+
+Rarity wave_rarity(std::uint32_t number, double roll) {
+  // Wiki: each ten waves starting at 21 eliminates the lowest remaining tier.
+  const unsigned floor = number < 21 ? 0 : std::min(5u, (number - 11) / 10);
+  if (floor == 5) {
+    return Rarity::mythic;
+  }
+  // Local reconstruction: the next tier ramps in before the lower one retires.
+  const double chance = number < 21 ? std::clamp((double(number) - 3) / 18, 0., 1.)
+                                    : (number - 21 - (floor - 1) * 10) / 10.0;
+  return static_cast<Rarity>(floor + (roll < chance));
 }
 
 }  // namespace wave::sim

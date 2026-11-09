@@ -44,6 +44,7 @@ enum class Faction {
   team,
   garden
 };
+enum class Biome : std::uint8_t { garden, desert, ocean };
 enum class Group {
   player,
   petal,
@@ -194,7 +195,9 @@ enum class DrawPurpose {
   special_roll,
   special_group,
   mob_kind,
-  spawn_point
+  spawn_point,
+  mob_rarity,
+  projectile_phase
 };
 
 struct DamageSource {
@@ -227,6 +230,7 @@ struct EntityView {
   bool slowed = false;
   bool heal_blocked = false;
   std::optional<EntityId> damage_origin;
+  bool split_particle = false;
   bool operator==(const EntityView&) const = default;
 };
 
@@ -299,6 +303,7 @@ struct MatchView {
   Microseconds step{};
   Microseconds broadcast_interval{};
   double arena_radius = 0;
+  Biome biome = Biome::garden;
   Tick petal_reload = 1;
   Phase phase = Phase::waiting;
   WaveView wave;
@@ -360,6 +365,11 @@ struct HealthChange {
   double health_after;
 };
 
+struct LightningArc {
+  Vec2 from;
+  Vec2 to;
+};
+
 struct LifeChange {
   LifeId life;
   std::optional<EntityId> body;
@@ -379,7 +389,7 @@ struct Defeat {
 };
 
 using EventData =
-    std::variant<RandomDraw, SpawnEvent, Transition, HealthChange, LifeChange, Defeat>;
+    std::variant<RandomDraw, SpawnEvent, Transition, HealthChange, LifeChange, Defeat, LightningArc>;
 struct Event {
   Tick tick;
   EventData data;

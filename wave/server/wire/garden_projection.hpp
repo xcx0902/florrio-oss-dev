@@ -28,11 +28,13 @@ class GardenProjection {
     Bytes record;
     std::size_t flags_offset;
     double max_health;
+    bool fade_on_remove;
     std::optional<std::chrono::steady_clock::time_point> expires;
   };
   std::map<Key, Rendered> rendered_;
   std::uint64_t match_ = 0;
   std::uint64_t hit_cursor_ = 0;
+  std::uint64_t arc_cursor_ = 0;
   std::vector<std::uint32_t> generations_{16, 1};
   std::vector<std::uint32_t> free_;
   std::uint32_t next_slot_ = 16;

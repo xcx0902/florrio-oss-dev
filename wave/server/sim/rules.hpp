@@ -64,6 +64,7 @@ enum class Evidence {
 struct Rules {
   std::string version;
   Timing timing;
+  Biome biome = Biome::garden;
   double arena_radius = 200;
   BodyRules player;
   std::array<BodyRules, 2> petals;
@@ -77,6 +78,9 @@ struct Rules {
   double contact_knockback_speed = 0;
   std::vector<MobRules> mobs;
   std::vector<WaveRules> waves;
+  bool progressive_waves = false;
+  std::vector<Mob> late_mobs;
+  std::vector<Mob> dangerous_mobs;
   std::vector<Vec2> spawn_points;
   std::uint32_t spawn_attempts = 4;
   std::uint32_t remaining_threshold = 4;
@@ -92,5 +96,10 @@ struct Rules {
 };
 
 [[nodiscard]] Rules garden_rules();
+[[nodiscard]] Rules scenario_rules(Biome biome);
+// The October HUD treats the wave index as a signed integer.
+inline constexpr std::uint32_t max_wave_number = INT32_MAX;
+[[nodiscard]] WaveRules wave_rules_at(const Rules& rules, std::size_t index);
+[[nodiscard]] Rarity wave_rarity(std::uint32_t number, double roll);
 
 }  // namespace wave::sim

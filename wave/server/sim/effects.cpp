@@ -58,6 +58,8 @@ void Match::chain_attack(EntityId first, const DamageSource& source, double dama
                          unsigned bounces, double range) {
   std::vector<EntityId> visited;
   auto current = std::optional{first};
+  const auto* emitter = entities_.get(source.entity);
+  std::optional<Vec2> from = emitter ? std::optional{emitter->view.position} : std::nullopt;
   for (unsigned hop = 0; current && hop <= bounces; ++hop) {
     const auto* hit = entities_.get(*current);
     if (!hit || hit->view.group == Group::petal || hit->view.health <= 0 ||
@@ -77,8 +79,13 @@ void Match::chain_attack(EntityId first, const DamageSource& source, double dama
         }
       }
     }
-    entities_.get(*current)->stun_until = tick_ + ticks(rules_, .1);
-    entities_.get(*current)->view.velocity = {};
+    auto& struck = *entities_.get(*current);
+    if (from && *from != struck.view.position) {
+      emit(LightningArc{*from, struck.view.position});
+    }
+    from = struck.view.position;
+    struck.stun_until = tick_ + ticks(rules_, .1);
+    struck.view.velocity = {};
     impacts_.push_back({*current, source, HealthKind::contact, damage});
     current.reset();
     double nearest = range;

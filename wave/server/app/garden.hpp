@@ -22,6 +22,7 @@ struct Member {
   std::uint64_t connection = 0;
   bool connected = false;
   bool ready = false;
+  sim::Biome biome = sim::Biome::garden;
   std::optional<store::Profile> profile;
   std::deque<std::pair<std::uint64_t, store::Result>> craft_results;
   std::uint64_t craft_sequence = 0;
@@ -30,6 +31,7 @@ struct Member {
 struct Room {
   std::string code;
   bool private_room = true;
+  sim::Biome biome = sim::Biome::garden;
   std::vector<std::string> members;
   std::unique_ptr<sim::Match> match;
   struct Hit {
@@ -39,13 +41,22 @@ struct Room {
   // Survives the ticks between broadcasts; each socket advances its own cursor.
   std::deque<Hit> hits;
   std::uint64_t hit_sequence = 0;
+  struct Arc {
+    std::uint64_t sequence;
+    sim::LightningArc effect;
+  };
+  std::deque<Arc> arcs;
+  std::uint64_t arc_sequence = 0;
   struct Drop {
     std::string id;
     store::Item item;
     sim::Vec2 position;
+    std::uint64_t serial;
+    sim::Tick available_tick;
     bool claimed = false;
   };
   std::deque<Drop> drops;
+  std::uint64_t drop_sequence = 0;
   // Independent of the process-local MatchId: durable reward keys never repeat
   // when a host restarts with match number one again.
   std::string economy_id;
@@ -59,7 +70,8 @@ class Garden {
                   std::vector<std::vector<sim::Petal>> loadouts = {},
                   std::shared_ptr<store::Store> storage = {});
   ~Garden();
-  Member& admit(std::string_view token, std::uint64_t connection);
+  Member& admit(std::string_view token, std::uint64_t connection,
+                sim::Biome biome = sim::Biome::garden);
   bool active(std::string_view token, std::uint64_t connection) const;
   void disconnect(std::string_view token, std::uint64_t connection);
   bool command(Member& member, const wire::ReliableAction& action,
@@ -82,7 +94,7 @@ class Garden {
   [[nodiscard]] std::shared_ptr<store::Store> storage() const;
   [[nodiscard]] const std::string& storage_error() const;
   static constexpr std::size_t storage_capacity = 64;
-  static constexpr double pickup_distance = 36;
+  static constexpr double pickup_distance = 16;
   const Member* member(std::string_view token) const;
   const Room* room(const Member& member) const;
   const auto& rooms() const { return rooms_; }

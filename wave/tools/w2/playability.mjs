@@ -311,11 +311,11 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
   }
 }
 
-export async function modeRecoveryCase({ browser, snapshot, nativeDir, output, report }) {
+export async function biomeSelectionCase({ browser, snapshot, nativeDir, output, report }) {
   const host = await startHost({ snapshot, nativeDir, port: 0 });
   let entry;
   try {
-    console.log('W2-09: unavailable scene discovery, explicit Garden recovery');
+    console.log('W2-09: original client switches between Desert, Ocean and Garden');
     report.cases['W2-09'] = { status: 'failed', kind: 'original-mode-selection' };
     entry = await client(browser, host.url, 'mode-recovery');
     await pause(700);
@@ -342,52 +342,50 @@ export async function modeRecoveryCase({ browser, snapshot, nativeDir, output, r
     const squad = 'W2-10-squad-left.png';
     await entry.page.screenshot({ path: path.join(output, squad) });
     Object.assign(report.cases['W2-10'], { status: 'passed', screenshot: squad });
-    const before = {
-      sockets: entry.sockets.length,
-      navigations: entry.navigations.length,
-      requests: entry.requests.length,
-    };
-    await entry.page.mouse.click(440, 406); // Original Desert button.
-    const notice = entry.page.getByRole('dialog');
-    await notice.waitFor({ state: 'visible' });
-    assert.match(await notice.textContent(), /Desert and PvP are not available yet/);
-    await pause(5500); // Longer than the original failed-discovery retry interval.
-    stableConnection(entry, before);
-    assert.equal(entry.requests.length, before.requests, 'Unavailable discovery is suspended');
+    const scenes = [];
+    for (const [name, biome, rgb, pool] of [
+      ['desert', 1, [211, 173, 105], [2, 16, 17, 25]],
+      ['ocean', 2, [53, 140, 195], [26, 28, 33]],
+      ['garden', 0, [30, 167, 97], [1, 3, 4, 5]],
+    ]) {
+      const connections = entry.sockets.length;
+      const selector = entry.page.getByRole('combobox', { name: 'Wave biome' });
+      await selector.selectOption(name);
+      await until(
+        () => entry.sockets.length === connections + 1 && entry.baseline.has(8193),
+        `Original client connects to ${name}`,
+      );
+      assert.equal(
+        new URL(entry.sockets.at(-1)).pathname,
+        biome ? `/wave/socket/${name}` : '/wave/socket',
+      );
+      assert.equal(
+        await entry.page.evaluate(() => localStorage.getItem('cp6_player_id')),
+        entry.guest,
+      );
+      await entry.page.waitForFunction(() => window.waveLabels.has('Ready'));
+      await pause(600);
+      await entry.page.keyboard.press('Enter');
+      await until(
+        () => entry.current?.control && entry.baseline.get(8197)?.biome === biome,
+        `Original client enters ${name} arena`,
+      );
+      assert.deepEqual(entry.baseline.get(8196).background, rgb);
+      const mobs = [...entry.baseline.values()].filter((e) => e.mob);
+      assert.ok(mobs.length && mobs.every((e) => pool.includes(e.mob)), `${name} wave 1 pool`);
+      const activeBiome = await entry.page.evaluate(() => {
+        const memory = new DataView(window.Module.asm.Jf.buffer);
+        return memory.getUint32(memory.getUint32(4347728, true) + 828, true);
+      });
+      assert.equal(activeBiome, biome);
+      await pause(450);  // Let the original canvas finish transitioning away from the menu.
+      const screenshot = `W2-09-${name}.png`;
+      await entry.page.screenshot({ path: path.join(output, screenshot) });
+      scenes.push({ name, biome, mobs: mobs.map((mob) => mob.mob), screenshot });
+    }
     assert.ok(entry.requests.every((url) => new URL(url).origin === new URL(host.url).origin));
-    const unavailable = 'W2-09-unavailable.png';
-    await entry.page.screenshot({ path: path.join(output, unavailable) });
-    await entry.page.getByRole('button', { name: 'Return to Garden' }).click();
-    await until(
-      () => entry.sockets.length === before.sockets + 1 && entry.baseline.has(8193),
-      'Explicit recovery reconnects Garden once',
-    );
-    assert.equal(await entry.page.evaluate(() => localStorage.getItem('florrio_gamemode')), '0');
-    assert.equal(
-      await entry.page.evaluate(() => localStorage.getItem('cp6_player_id')),
-      entry.guest,
-    );
-    await pause(700);
-    await entry.page.keyboard.press('Enter');
-    await until(() => entry.current?.control, 'Ready works after scene recovery');
-    await pause(700);
-    assert.equal((await consumed(entry)).health, 255);
-    assert.equal(
-      entry.navigations.length,
-      before.navigations + 1,
-      'Only the user-requested recovery navigates',
-    );
-    assert.equal(entry.sockets.length, before.sockets + 1);
     assert.deepEqual(entry.errors, []);
-    const screenshot = 'W2-09-recovered.png';
-    await entry.page.screenshot({ path: path.join(output, screenshot) });
-    Object.assign(report.cases['W2-09'], {
-      status: 'passed',
-      unavailable,
-      screenshot,
-      navigations: entry.navigations,
-      requests: entry.requests,
-    });
+    Object.assign(report.cases['W2-09'], { status: 'passed', scenes });
   } finally {
     if (entry) {
       await entry.page.screenshot({ path: path.join(output, 'W2-09-final.png') }).catch(() => {});

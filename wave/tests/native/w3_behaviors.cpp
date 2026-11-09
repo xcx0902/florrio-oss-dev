@@ -17,8 +17,8 @@ struct FixtureAccess {
   }
   static bool exists(Match& m, EntityId id) { return m.entities_.get(id); }
   static EntityId spawn(Match& m, Mob kind, Rarity rarity = Rarity::common, Vec2 at = {100, 0},
-                        Group group = Group::summon) {
-    return m.spawn_mob(kind, rarity, at, group);
+                        Group group = Group::summon, std::uint32_t wave = 0) {
+    return m.spawn_mob(kind, rarity, at, group, {}, wave);
   }
   static double hit(Match& m, EntityId target, EntityId source, double amount,
                     HealthKind kind = HealthKind::contact) {
@@ -48,6 +48,7 @@ struct FixtureAccess {
     e.view.origin_wave = m.wave_.number;
     ++m.wave_.counts.alive;
   }
+  static void plan(Match& m, std::uint32_t number) { m.open_wave(number - 1, m.tick_); }
 };
 }
 namespace {
@@ -63,6 +64,7 @@ void near(double a, double b, const char* reason) {
 }
 Rules arena() {
   auto r = garden_rules();
+  r.progressive_waves = false;
   r.arena_radius = 1000;
   r.player.health = 10000;
   r.player.contact_damage = 0;
@@ -96,12 +98,13 @@ void all_variants() {
     Match m({1}, 3, arena());
     check(m.add_player({1}, {}, {p.kind}, {p.rarity}), "every petal can be equipped");
     steps(m);
-    check(owner(m).petals[0].entities.size() == p.particles,
+    const bool split = p.kind == Petal::peas || p.kind == Petal::grapes;
+    check(owner(m).petals[0].entities.size() == (split ? 1 : p.particles),
           "every variant has exact particle count");
     const auto particle_ids = owner(m).petals[0].entities;
     for (auto id : particle_ids) {
       const auto& e = FixtureAccess::get(m, id);
-      near(e.view.max_health, p.body.health, "runtime particle health");
+      near(e.view.max_health, p.body.health * (split ? p.particles : 1), "runtime particle health");
       check(e.view.rarity == p.rarity && e.view.owner == owner(m).life, "rarity and attribution");
     }
     check(m.queue({owner(m).life, {}, true, false}), "all petal input paths");
@@ -225,11 +228,66 @@ void lightning_and_passives() {
   const auto before = FixtureAccess::get(m, body).view.health;
   const auto magnet = petal(m);
   FixtureAccess::chain(m, body, jelly, 0);
+  check(std::ranges::any_of(m.events(), [&](const Event& event) {
+          const auto* arc = std::get_if<LightningArc>(&event.data);
+          return arc && arc->from == FixtureAccess::get(m, jelly).view.position &&
+                 arc->to == FixtureAccess::get(m, magnet).view.position;
+        }),
+        "lightning emits the arc to the actual redirected target");
   near(FixtureAccess::get(m, body).view.health, before,
        "Magnet intercepts lightning aimed at flower");
   near(FixtureAccess::get(m, magnet).view.health, 5, "Magnet takes intercepted lightning");
   check(FixtureAccess::get(m, magnet).stun_until > m.view().next_tick,
         "lightning stops velocity briefly");
+}
+
+void biome_progression() {
+  for (const auto biome : {Biome::garden, Biome::desert, Biome::ocean}) {
+    auto rules = scenario_rules(biome);
+    rules.special_chance = 0;
+    const auto opening = rules.waves.front().eligible;
+    const auto unlocked = biome == Biome::garden ? Mob::ant_hole
+                          : biome == Biome::desert ? Mob::fire_ant_burrow
+                                                   : Mob::leech;
+    check(std::ranges::find(opening, unlocked) == opening.end(), "late mob locked at start");
+    const auto fourth = wave_rules_at(rules, 3);
+    check(std::ranges::find(fourth.eligible, unlocked) != fourth.eligible.end(),
+          "late mob unlocked on wave four");
+    // Force the first spawn batch to finish with four or fewer mobs alive.
+    rules.waves[0].batches = {{0, 2}};
+    rules.waves[0].budget = 2;
+    Match match({42}, 99, rules);
+    check(match.add_player({1}, {}, {}), "admit biome player");
+    steps(match);
+    const auto view = match.view();
+    check(view.biome == biome && view.wave.number == 2 && view.previous_wave->counts.carried == 2,
+          "live monsters are carried into the next wave");
+    for (const auto& slot : view.previous_wave->plan) {
+      check(slot.entity && FixtureAccess::get(match, *slot.entity).view.group == Group::residual,
+            "same mob entity remains on the ground across transition");
+    }
+    for (unsigned floor = 1; floor <= 5; ++floor) {
+      const unsigned number = 11 + 10 * floor;
+      FixtureAccess::plan(match, number);
+      check(std::ranges::all_of(match.view().wave.plan, [floor](const SpawnSlot& slot) {
+              return static_cast<unsigned>(slot.rarity) >= floor;
+            }),
+            "late wave excludes retired rarities");
+    }
+    FixtureAccess::plan(match, max_wave_number);
+    const auto last = match.view().wave;
+    check(last.number == max_wave_number && !last.plan.empty() &&
+              std::ranges::all_of(last.plan,
+                                  [](const SpawnSlot& slot) { return slot.rarity == Rarity::mythic; }),
+          "last representable client wave still has a bounded Mythic plan");
+    const auto mythic_health = [&](std::uint32_t wave) {
+      const auto id = FixtureAccess::spawn(match, unlocked, Rarity::mythic, {150, 0},
+                                           Group::summon, wave);
+      return FixtureAccess::get(match, id).view.max_health;
+    };
+    check(mythic_health(100) > mythic_health(61) && mythic_health(300) > mythic_health(100),
+          "monsters keep getting stronger after reaching Mythic");
+  }
 }
 void monsters() {
   Match m({8}, 1, arena());
@@ -602,6 +660,8 @@ int main() {
     timing_and_debts();
     phase = "lightning/ant alert";
     lightning_contacts_and_ant_alert();
+    phase = "biome progression";
+    biome_progression();
     std::cout << "W3 behaviors: 270 petals, 210 mobs and special effect regressions passed\n";
   } catch (const std::exception& e) {
     std::cerr << phase << ": " << e.what() << '\n';

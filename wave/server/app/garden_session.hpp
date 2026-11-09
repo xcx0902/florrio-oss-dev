@@ -11,7 +11,8 @@ namespace wave::app {
 
 class GardenSession {
  public:
-  GardenSession(Garden& garden, std::uint64_t connection);
+  GardenSession(Garden& garden, std::uint64_t connection,
+                sim::Biome biome = sim::Biome::garden);
   ~GardenSession();
   Reply receive(wire::Bytes bytes);
   Reply publish();
@@ -27,6 +28,7 @@ class GardenSession {
   std::deque<Pending> pending_;
   std::uint32_t received_ = 0;
   Garden& garden_;
+  sim::Biome biome_;
   std::uint64_t connection_;
   Member* member_ = nullptr;
   std::string requested_guest_;

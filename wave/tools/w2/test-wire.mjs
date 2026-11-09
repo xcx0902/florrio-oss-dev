@@ -7,7 +7,7 @@ import { parseArgs } from 'node:util';
 import { chromium } from 'playwright-core';
 import { defaultNative, root, startHost } from './host.mjs';
 import { onlineCases } from './online.mjs';
-import { playabilityCases, modeRecoveryCase } from './playability.mjs';
+import { playabilityCases, biomeSelectionCase } from './playability.mjs';
 import { protocolEffectsCase } from './protocol-effects.mjs';
 
 const { values } = parseArgs({
@@ -383,7 +383,7 @@ try {
       output,
       report,
     });
-    await modeRecoveryCase({
+    await biomeSelectionCase({
       browser,
       snapshot: values.snapshot,
       nativeDir: values['native-dir'],

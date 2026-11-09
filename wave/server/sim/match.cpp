@@ -362,16 +362,18 @@ void Match::refresh_petals() {
       petal.rarity = entry.view.loadout_rarities[index];
       const auto* definition =
           rules_.catalog ? rules_.catalog->petal(*petal.petal, petal.rarity) : nullptr;
-      const auto count = definition ? definition->particles : 1;
+      const bool splits_on_launch = petal.petal == Petal::peas || petal.petal == Petal::grapes;
+      const auto count = definition && !splits_on_launch ? definition->particles : 1;
       slot.reload_total_ticks = reload_ticks(*petal.petal, petal.rarity);
       for (unsigned particle = 0; particle < count; ++particle) {
-        const auto id = add_entity(petal, petal_body(*petal.petal, petal.rarity));
+        auto body = petal_body(*petal.petal, petal.rarity);
+        if (definition && splits_on_launch) {
+          body.health *= definition->particles;
+        }
+        const auto id = add_entity(petal, body);
         slot.entities.push_back(id);
         entities_.get(id)->particle_index = particle;
         entities_.get(id)->orbit_offset = 2 * std::numbers::pi * index / entry.view.petals.size();
-        if (count > 1) {
-          entities_.get(id)->orbit_offset += (double(particle) - (count - 1) / 2.0) * .12;
-        }
       }
       slot.entity = slot.entities.front();
     }
@@ -457,6 +459,7 @@ MatchView Match::view() const {
       .step = rules_.timing.step,
       .broadcast_interval = rules_.timing.broadcast_interval,
       .arena_radius = rules_.arena_radius,
+      .biome = rules_.biome,
       .petal_reload = rules_.petal_reload,
       .phase = phase_,
       .wave = wave_,

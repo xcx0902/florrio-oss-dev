@@ -96,12 +96,16 @@ void Match::move_entities() {
         break;
       }
     }
-    const double speed =
+    double speed =
         entity.projectile && rules_.catalog
             ? (entity.flight_speed > 0
                    ? entity.flight_speed
                    : rules_.catalog->petal(*body.petal, body.rarity)->projectile_speed)
             : entity.rules.speed_per_second;
+    if (entity.projectile && body.petal == Petal::missile && body.faction == Faction::team) {
+      const auto age = (tick_ - entity.born_tick) * seconds;
+      speed += 400 * std::min(.25, age);
+    }
     body.velocity =
         entity.stun_until > tick_ ? Vec2{} : direction * (speed * slow) + entity.knockback;
   }
@@ -112,8 +116,10 @@ void Match::move_entities() {
       continue;
     }
     auto displacement = body.velocity * seconds;
-    if (entity.projectile && displacement.length() > entity.range_left) {
-      displacement = displacement * (entity.range_left / displacement.length());
+    const double distance = displacement.length();
+    const bool reaches_range = entity.projectile && distance >= entity.range_left;
+    if (reaches_range && distance > 0) {
+      displacement = displacement * (entity.range_left / distance);
     }
     const auto next = body.position + displacement;
     const auto clamped = clamp_center(next, rules_.arena_radius, body.radius);
@@ -131,7 +137,7 @@ void Match::move_entities() {
     body.velocity = (clamped - body.position) * (1 / seconds);
     if (entity.projectile) {
       entity.range_left = std::max(0.0, entity.range_left - (clamped - body.position).length());
-      if (next != clamped) {
+      if (reaches_range || next != clamped || entity.range_left <= 1e-8) {
         entity.range_left = 0;
       }
     }
@@ -216,11 +222,7 @@ void Match::update_orbits() {
         }
         total += weight;
       }
-      const auto& p = *rules_.catalog->petal(*petal.view.petal, petal.view.rarity);
       petal.orbit_offset = total > 0 ? turn * before / total : 0;
-      if (p.particles > 1 && p.kind != Petal::light && p.kind != Petal::pollen) {
-        petal.orbit_offset += (double(petal.particle_index) - (p.particles - 1) / 2.0) * .12;
-      }
     }
     const double heading =
         std::fmod((third_eye ? owner.aim_angle : phase) + petal.orbit_offset, turn);
@@ -228,6 +230,7 @@ void Match::update_orbits() {
     double radius = rules_.orbit_radius * (owner.defend   ? rules_.defend_orbit_multiplier
                                            : owner.attack ? rules_.attack_orbit_multiplier
                                                           : 1);
+    Vec2 cluster_offset;
     if (rules_.catalog) {
       const auto& p = *rules_.catalog->petal(*petal.view.petal, petal.view.rarity);
       radius = owner.defend   ? p.mechanics.defend_distance
@@ -242,10 +245,19 @@ void Match::update_orbits() {
       if (p.mechanics.hidden) {
         radius = 0;
       }
+      if (p.particles > 1 && p.kind != Petal::light && p.kind != Petal::pollen &&
+          p.kind != Petal::peas && p.kind != Petal::grapes) {
+        // Pack the particles around their slot center. Spacing is in world units,
+        // so attacking or aiming farther away does not stretch the cluster.
+        const double angle = heading + turn * petal.particle_index / p.particles;
+        cluster_offset = Vec2{std::cos(angle), std::sin(angle)} *
+                         (p.body.radius * .75 / std::sin(std::numbers::pi / p.particles));
+      }
     }
     petal.view.heading_rad = heading;
     petal.view.position =
-        clamp_center(body.position + offset * radius, rules_.arena_radius, petal.view.radius);
+        clamp_center(body.position + offset * radius + cluster_offset, rules_.arena_radius,
+                     petal.view.radius);
   }
 }
 
@@ -286,15 +298,17 @@ void Match::update_effects() {
     return;
   }
   const double seconds = std::chrono::duration<double>(rules_.timing.step).count();
-  const auto active = entities_.active();
+  std::vector<EntityId> active;
+  for (auto slot : entities_.active()) {
+    active.push_back(entities_.at(slot).view.id);
+  }
   // Queue effects before contacts; useful healing is consumed when impacts are applied.
-  for (const auto slot : active) {
-    auto* entity = entities_.get(entities_.at(slot).view.id);
+  for (const auto id : active) {
+    auto* entity = entities_.get(id);
     if (!entity || entity->projectile || entity->ground_web || entity->view.group != Group::petal ||
         entity->view.health <= 0) {
       continue;
     }
-    const auto id = entity->view.id;
     const auto& definition = *rules_.catalog->petal(*entity->view.petal, entity->view.rarity);
     auto& owner = *player(entity->view.owner->player);
     if (owner.view.life != *entity->view.owner || !owner.view.body) {
@@ -352,20 +366,38 @@ void Match::update_effects() {
                (definition.effect == catalog::Effect::projectile ||
                 definition.effect == catalog::Effect::poison_projectile ||
                 definition.effect == catalog::Effect::web)) {
-      // Four-shot directions are stable, seeded by the orbit phase; absolute aiming is
-      // reconstructed.
-      const double cluster_offset =
-          definition.particles > 1
-              ? (double(entity->particle_index) - (definition.particles - 1) / 2.0) * .12
-              : 0;
-      const double heading =
-          entity->view.heading_rad - cluster_offset +
-          (definition.particles > 1 ? entity->particle_index * std::numbers::pi / 2 : 0);
-      entity->projectile = true;
-      entity->flight_direction = {std::cos(heading), std::sin(heading)};
-      entity->range_left = definition.range;
-      entity->view.anchor.reset();
-      detach_petal(id);
+      const auto launch = [&](detail::Entity& shot, double heading, double range, Tick duration) {
+        shot.projectile = true;
+        shot.flight_direction = {std::cos(heading), std::sin(heading)};
+        shot.range_left = range;
+        shot.born_tick = tick_;
+        shot.expires = tick_ + duration;
+        shot.view.anchor.reset();
+        shot.view.heading_rad = heading;
+      };
+      if (definition.kind == Petal::peas || definition.kind == Petal::grapes) {
+        // World Peas replace the equipped cluster with four radial children.
+        const double phase = 2 * std::numbers::pi *
+                             (draw(DrawPurpose::projectile_phase) / 4294967296.0);
+        auto shot = entity->view;
+        const auto center = shot.position;
+        shot.split_particle = true;
+        const auto duration = rules_.timing.ticks_ceil(std::chrono::seconds(1));
+        consume_petal(id);
+        for (unsigned i = 0; i < 4; ++i) {
+          const double heading = phase + i * std::numbers::pi / 2;
+          const auto direction = Vec2{std::cos(heading), std::sin(heading)};
+          shot.position = center + direction * (std::sqrt(72.) / 5);
+          const auto child = add_entity(shot, petal_body(definition.kind, shot.rarity));
+          launch(*entities_.get(child), heading, definition.projectile_speed, duration);
+        }
+      } else {
+        const bool missile = definition.kind == Petal::missile;
+        const auto duration = rules_.timing.ticks_ceil(
+            std::chrono::milliseconds(missile ? 1500 : 2000));
+        launch(*entity, entity->view.heading_rad, missile ? 160 : definition.range, duration);
+        detach_petal(id);
+      }
     }
   }
 }
@@ -664,11 +696,12 @@ void Match::reap_deaths() {
     if (body.group == Group::main_mob && body.origin_wave == wave_.number) {
       --wave_.counts.alive;
       ++wave_.counts.defeated;
-      if (source.owner && source.faction == Faction::team) {
-        if (auto* entry = player(source.owner->player)) {
-          ++entry->view.credited_defeats;
-          credit = entry->view.id;
-        }
+    }
+    if ((body.group == Group::main_mob || body.group == Group::residual) && source.owner &&
+        source.faction == Faction::team) {
+      if (auto* entry = player(source.owner->player)) {
+        ++entry->view.credited_defeats;
+        credit = entry->view.id;
       }
     }
     emit(Defeat{id, body.group, source, credit, body.mob, body.rarity, body.position,

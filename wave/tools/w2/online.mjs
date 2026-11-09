@@ -149,6 +149,9 @@ function world(plain, baseline) {
       entity.arenaRadius = r.real();
       entity.background = [r.byte(), r.byte(), r.byte()];
     }
+    if (mask & 0x4000) {
+      entity.seed = r.byte();
+    }
     if (mask & 0x8000) {
       entity.control = plain.readUInt32LE(r.cursor.offset + 323);
       control = entity.control;
@@ -165,7 +168,7 @@ function world(plain, baseline) {
     }
     if (mask & 0x100000) {
       entity.mob = r.byte();
-      r.byte();
+      entity.mobVariant = r.byte();
       entity.rarity = r.byte();
     }
     if (mask & 0x200000) {
@@ -173,18 +176,29 @@ function world(plain, baseline) {
       r.byte();
       entity.health = r.byte();
     }
+    if (mask & 0x400000) {
+      entity.dropFlags = r.byte();
+      entity.dropTarget = r.vu();
+      entity.drop = { kind: r.vu(), rarity: r.byte() };
+    }
     baseline.set(id, entity);
   }
   const hits = [];
+  const arcs = [];
   assert.equal(r.byte(), 0, '$601 delimiter after the u32 entity terminator');
   // The captured initial empty world ends at the delimiter (implicit empty list).
   for (let envelope = r.cursor.offset < plain.length ? r.vu() : 0; envelope; envelope = r.vu()) {
     assert.equal(envelope, 1);
-    assert.equal(r.vu(), 32, 'Recovered native hit event');
-    hits.push({ id: r.word(), strength: r.byte() });
+    const opcode = r.vu();
+    if (opcode === 33) {
+      arcs.push([r.real(), r.real(), r.real(), r.real()]);
+    } else {
+      assert.equal(opcode, 32, 'Recovered native hit event');
+      hits.push({ id: r.word(), strength: r.byte() });
+    }
   }
   assert.equal(r.cursor.offset, plain.length);
-  return { tick, ack, control, wave, removed, hits };
+  return { tick, ack, control, wave, removed, hits, arcs };
 }
 
 export async function client(browser, url, name, storageState) {

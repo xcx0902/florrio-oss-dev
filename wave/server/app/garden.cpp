@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <numbers>
 #include <random>
 #include <stdexcept>
 #include <set>
@@ -316,7 +317,7 @@ void Garden::drain_storage() {
   }
 }
 
-Member& Garden::admit(std::string_view token, std::uint64_t connection) {
+Member& Garden::admit(std::string_view token, std::uint64_t connection, sim::Biome biome) {
   poll_storage();
   auto found = members_.find(token);
   if (found == members_.end()) {
@@ -373,6 +374,10 @@ Member& Garden::admit(std::string_view token, std::uint64_t connection) {
     }
   }
   auto& entry = found->second;
+  if (entry.biome != biome) {
+    leave(entry);
+    entry.biome = biome;
+  }
   entry.connection = connection;
   entry.connected = true;
   if (auto r = rooms_.find(entry.room); r != rooms_.end() && r->second.match) {
@@ -700,7 +705,8 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
 
   for (const auto& event : room.match->events()) {
     if (const auto* defeat = std::get_if<sim::Defeat>(&event.data)) {
-      if (defeat->group != sim::Group::main_mob || !defeat->mob ||
+      if ((defeat->group != sim::Group::main_mob && defeat->group != sim::Group::residual) ||
+          !defeat->mob ||
           defeat->source.faction != sim::Faction::team || !defeat->source.owner ||
           static_cast<unsigned>(defeat->rarity) >= 6) {
         continue;
@@ -733,6 +739,9 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
           drop_kinds[drop.petal].push_back(&drop);
         }
       }
+      const auto first_drop = room.drops.size();
+      const auto available_tick =
+          event.tick + rules_.timing.ticks_ceil(std::chrono::milliseconds(250));
       for (const auto& [petal, variants] : drop_kinds) {
         // Separate petal kinds roll independently. One roll selects at most one
         // rarity of this kind; probabilities retain the client's original mass.
@@ -742,10 +751,21 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
             const auto kind = *catalog::client_petal(petal);
             room.drops.push_back({id + ":" + std::to_string(kind),
                                   {kind, static_cast<std::uint8_t>(drop->rarity)},
-                                  defeat->position});
+                                  defeat->position, ++room.drop_sequence, available_tick});
             break;
           }
           roll -= drop->probability;
+        }
+      }
+      const auto count = room.drops.size() - first_drop;
+      if (count > 1) {
+        // A single defeat can yield several kinds; give each card its own spot.
+        const double spread = std::min(12., 5.5 / std::sin(std::numbers::pi / count));
+        for (std::size_t i = 0; i < count; ++i) {
+          const double angle = std::numbers::pi * (.5 + 2. * i / count);
+          const sim::Vec2 offset{spread * std::cos(angle), spread * std::sin(angle)};
+          room.drops[first_drop + i].position =
+              sim::clamp_center(defeat->position + offset, after.arena_radius, 4);
         }
       }
     } else if (const auto* transition = std::get_if<sim::Transition>(&event.data)) {
@@ -767,7 +787,8 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
   }
 
   for (auto& drop : room.drops) {
-    if (drop.claimed) {
+    if (drop.claimed ||
+        (after.phase != sim::Phase::ended && after.next_tick <= drop.available_tick)) {
       continue;
     }
     const Eligible* nearest = nullptr;
@@ -866,6 +887,7 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
     auto& room = rooms_[code];
     room.code = code;
     room.private_room = create->private_room;
+    room.biome = entry.biome;
     entry.room = code;
     room.members.push_back(entry.token);
   } else if (const auto* join_room = std::get_if<wire::JoinSquad>(&action)) {
@@ -894,7 +916,8 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
           const auto& m = members_.at(token);
           return m.ready && m.connected;
         })) {
-      room.match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_, rules_);
+      auto rules = room.biome == sim::Biome::garden ? rules_ : sim::scenario_rules(room.biome);
+      room.match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_, std::move(rules));
       if (storage_) {
         room.economy_id = random_hex(32);
       }
@@ -920,8 +943,8 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
       ++rejected_inputs;
       return false;
     }
-    // Local reconstruction: 100 client aim-distance units select full W1 speed.
-    const double amount = move->strength < 2 ? 0 : std::min(1.0, double(move->strength) / 100);
+    // The World engine reaches full movement input at 200 client units.
+    const double amount = move->strength < 2 ? 0 : std::min(1.0, double(move->strength) / 200);
     const bool accepted = it->second.match->queue(
         sim::Input{*acknowledged_life,
                    {std::cos(move->angle) * amount, std::sin(move->angle) * amount},
@@ -959,6 +982,11 @@ void Garden::step() {
           room.hits.push_back({++room.hit_sequence, *hit});
           if (room.hits.size() > 4096) {
             room.hits.pop_front();
+          }
+        } else if (const auto* arc = std::get_if<sim::LightningArc>(&event.data)) {
+          room.arcs.push_back({++room.arc_sequence, *arc});
+          if (room.arcs.size() > 256) {
+            room.arcs.pop_front();
           }
         }
       }

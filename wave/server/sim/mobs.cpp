@@ -23,6 +23,11 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
   view.faction = owner || kind == Mob::digger ? Faction::team : Faction::garden;
   view.origin_wave = wave;
   auto body = definition.body;
+  // Keep increasing pressure after the highest catalog rarity is reached.
+  const double strength =
+      rules_.progressive_waves && wave > 61 ? 1 + std::log1p((wave - 61) / 100.0) : 1;
+  body.health *= strength;
+  body.contact_damage *= strength;
   const double scale = std::chrono::duration<double>(rules_.timing.step).count() / .025;
   body.poison_per_tick *= scale;
   body.poison_ticks = rules_.timing.ticks_ceil(Microseconds(body.poison_ticks * 25000));
@@ -44,6 +49,8 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
       view.group = Group::segment;
       view.position = position + Vec2{-(i + 1.0) * body.radius * 1.8, 0};
       auto segment_body = segment->body;
+      segment_body.health *= strength;
+      segment_body.contact_damage *= strength;
       segment_body.poison_per_tick *= scale;
       segment_body.poison_ticks =
           rules_.timing.ticks_ceil(Microseconds(segment_body.poison_ticks * 25000));

@@ -5,8 +5,8 @@
 
 namespace wave::app {
 
-GardenSession::GardenSession(Garden& garden, std::uint64_t connection)
-    : garden_(garden), connection_(connection) {}
+GardenSession::GardenSession(Garden& garden, std::uint64_t connection, sim::Biome biome)
+    : garden_(garden), biome_(biome), connection_(connection) {}
 
 GardenSession::~GardenSession() {
   if (member_) {
@@ -75,7 +75,7 @@ Reply GardenSession::drain() {
       if (member_) {
         return reject();
       }
-      member_ = &garden_.admit(requested_guest_, connection_);
+      member_ = &garden_.admit(requested_guest_, connection_, biome_);
       craft_cursor_ = member_->craft_sequence;
       reply.frames.push_back(wire_.guest_id(member_->token));
     } else if (member_) {

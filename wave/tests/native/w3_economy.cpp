@@ -54,6 +54,8 @@ struct Database {
 sim::Rules rules() {
   auto result = sim::garden_rules();
   result.catalog = nullptr;  // Deterministic combat fixture; economics uses the dated catalog.
+  result.progressive_waves = false;
+  result.residual = sim::ResidualPolicy::discard;
   result.arena_radius = 500;
   result.player = {.radius = 2, .health = 1000};
   result.petals[0] = {.radius = 1, .health = 100};
@@ -64,7 +66,7 @@ sim::Rules rules() {
   result.mobs = {{sim::Mob::ladybug, {.radius = 1, .health = 100}},
                  {sim::Mob::rock, {.radius = 1, .health = 100}}};
   result.waves = {{1, {sim::Mob::ladybug}, sim::Rarity::common, 1, {{0, 1}}, 100},
-                  {2, {sim::Mob::rock}, sim::Rarity::common, 1, {{0, 1}}, 4}};
+                  {2, {sim::Mob::rock}, sim::Rarity::common, 1, {{0, 1}}, 16}};
   result.spawn_points = {{400, 0}};
   result.remaining_threshold = 0;
   result.advance_on_deadline = true;
@@ -332,15 +334,18 @@ void economy() {
           "mob gallery discovery shared with eligible teammates");
     const auto& drops = garden.room(a)->drops;
     check(drops.size() == 2 && drops[0].item == store::Item{5, 0} &&
-              drops[1].item == store::Item{2, 1},
-          "independent kinds can drop together: seeded Common Rose and Unusual Light");
+              drops[1].item == store::Item{2, 1} && drops[0].position != drops[1].position,
+          "the Common Rose and Unusual Light from one defeat occupy distinct ground positions");
     const auto item = drops.front().item;
     const auto second_item = drops.back().item;
     check(count(*a.profile, item) == 0 && count(*b.profile, item) == 0,
           "out of pickup range never grants inventory");
     sim::FixtureAccess::position(match, *player(garden, a).body, {190, 0});
     sim::FixtureAccess::position(match, *player(garden, b).body, {200, 0});
-    garden.step();
+    const auto pickup_tick = drops.front().available_tick;
+    while (match.view().phase != sim::Phase::ended && match.view().next_tick <= pickup_tick) {
+      garden.step();
+    }
     check(garden.wait_storage(), "pickup claim commits");
     check(count(*a.profile, item) == 0 && count(*b.profile, item) == 1 &&
               count(*a.profile, second_item) == 0 && count(*b.profile, second_item) == 1 &&
@@ -393,10 +398,13 @@ void complete_drops_and_magnet() {
       const auto view = match.view();
       const auto root =
           *std::ranges::find(view.entities, sim::Group::main_mob, &sim::EntityView::group);
-      // 60 is outside the ordinary 36 range but inside Common Magnet's 90.
-      sim::FixtureAccess::position(match, root.id, {60, 0});
+      // Outside normal range, inside Common Magnet range.
+      sim::FixtureAccess::position(match, root.id, {20, 0});
       sim::FixtureAccess::kill(match, root.id, player(garden, member).life);
       garden.step();
+      for (unsigned i = 0; i < 10; ++i) {
+        garden.step();
+      }
       check(garden.wait_storage(), "complete catalog kill and pickup commit");
       if (magnet) {
         check(garden.room(member)->drops.empty(),

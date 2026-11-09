@@ -76,6 +76,8 @@ Resources load(const std::filesystem::path& root) {
   resources.emplace(
       "/endpoint/florrio-waves-0/findEach/",
       Resource{"application/json", R"({"servers":{"us":{"id":"wavelocal","ipv4":"127.0.0.1"}}})"});
+  resources.emplace("/endpoint/florrio-waves-1/findEach/",
+                    resources.at("/endpoint/florrio-waves-0/findEach/"));
   resources.emplace("/server/wavelocal",
                     Resource{"application/json", R"({"id":"wavelocal","ipv4":"127.0.0.1"})"});
   return resources;
@@ -234,12 +236,17 @@ class Connection : public std::enable_shared_from_this<Connection> {
       respond(http::status::bad_request, {"text/plain", "Bad request"});
       return;
     }
-    if (target == "/wave/socket" && ws::is_upgrade(request)) {
+    using wave::sim::Biome;
+    const auto biome = target == "/wave/socket"          ? std::optional{Biome::garden}
+                       : target == "/wave/socket/desert" ? std::optional{Biome::desert}
+                       : target == "/wave/socket/ocean"  ? std::optional{Biome::ocean}
+                                                         : std::nullopt;
+    if (biome && ws::is_upgrade(request)) {
       if (request[http::field::origin] != "http://" + authority_ || buffer_.size() != 0) {
         respond(http::status::forbidden, {"text/plain", "Forbidden"});
         return;
       }
-      session_.emplace(*garden_, ++last_guest_);
+      session_.emplace(*garden_, ++last_guest_, *biome);
       socket_.next_layer().expires_never();
       auto timeouts = ws::stream_base::timeout::suggested(beast::role_type::server);
       timeouts.handshake_timeout = std::chrono::seconds(5);
@@ -259,7 +266,9 @@ class Connection : public std::enable_shared_from_this<Connection> {
       });
       return;
     }
-    if (const auto resource = resources_.find(target); resource != resources_.end()) {
+    // Biome selection can be part of the entry URL; asset routes remain exact.
+    const auto resource_target = target.starts_with("/?") ? std::string_view{"/"} : target;
+    if (const auto resource = resources_.find(resource_target); resource != resources_.end()) {
       respond(http::status::ok, resource->second);
     } else {
       respond(http::status::not_found, {"text/plain", "Not found"});

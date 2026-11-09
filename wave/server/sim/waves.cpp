@@ -23,14 +23,13 @@ std::size_t Match::choose(std::size_t size, DrawPurpose purpose) {
 
 void Match::open_wave(std::size_t index, Tick start) {
   wave_index_ = index;
-  const auto& definition = rules_.waves[index];
+  const auto definition = wave_rules_at(rules_, index);
   wave_ = {};
   wave_.number = definition.number;
   wave_.rules_version = rules_.version;
   wave_.start_tick = start;
   wave_.deadline_tick = start + definition.deadline;
   wave_.eligible = definition.eligible;
-  wave_.counts.planned = wave_.counts.pending = definition.budget;
 
   if (rules_.special_chance > 0 && (index != 0 || rules_.special_on_opening_wave)) {
     std::vector<std::vector<Mob>> eligible_groups;
@@ -53,18 +52,36 @@ void Match::open_wave(std::size_t index, Tick start) {
   }
 
   wave_.plan.reserve(definition.budget);
+  auto pool = wave_.eligible;
+  if (rules_.progressive_waves && !wave_.special && definition.number > 3) {
+    const auto weight = std::min(4u, definition.number / 5);
+    for (const auto kind : rules_.dangerous_mobs) {
+      if (std::ranges::find(wave_.eligible, kind) != wave_.eligible.end()) {
+        pool.insert(pool.end(), weight, kind);
+      }
+    }
+  }
   for (std::size_t batch = 0; batch < definition.batches.size(); ++batch) {
     const auto& spec = definition.batches[batch];
-    for (std::uint32_t n = 0; n < spec.count; ++n) {
-      const auto kind = wave_.eligible[choose(wave_.eligible.size(), DrawPurpose::mob_kind)];
+    const auto count = spec.count +
+                       (wave_.special && rules_.progressive_waves && definition.number > 3
+                            ? spec.count / 2
+                            : 0);
+    for (std::uint32_t n = 0; n < count; ++n) {
+      const auto kind = pool[choose(pool.size(), DrawPurpose::mob_kind)];
+      const auto rarity =
+          rules_.progressive_waves && index >= rules_.waves.size()
+              ? wave_rarity(definition.number, draw(DrawPurpose::mob_rarity) / 4294967296.0)
+              : definition.rarity;
       wave_.plan.push_back({.due_tick = start + spec.offset,
                             .batch = batch,
                             .mob = kind,
-                            .rarity = definition.rarity,
+                            .rarity = rarity,
                             .actual_tick = std::nullopt,
                             .entity = std::nullopt});
     }
   }
+  wave_.counts.planned = wave_.counts.pending = wave_.plan.size();
 }
 
 std::optional<Vec2> Match::spawn_point(double radius) {
@@ -179,7 +196,7 @@ void Match::settle_wave(bool advancing) {
 void Match::transition(TransitionReason reason, bool advancing) {
   settle_wave(advancing);
   if (advancing) {
-    const auto next = rules_.waves[wave_index_ + 1].number;
+    const auto next = wave_rules_at(rules_, wave_index_ + 1).number;
     emit(Transition{wave_.number, next, reason});
     previous_wave_ = std::move(wave_);
     open_wave(wave_index_ + 1, tick_ + 1);
@@ -205,8 +222,17 @@ void Match::adjudicate() {
   } else if (!connected && rules_.lifecycle.end_on_last_disconnect) {
     transition(TransitionReason::last_disconnect, false);
   } else if (phase_ == Phase::clearing) {
-    const bool next = wave_index_ + 1 < rules_.waves.size();
-    if (wave_.counts.alive <= rules_.remaining_threshold) {
+    const bool next = wave_index_ + 1 < rules_.waves.size() ||
+                      (rules_.progressive_waves && wave_.number < max_wave_number);
+    auto remaining = wave_.counts.alive;
+    if (rules_.progressive_waves) {
+      remaining = std::ranges::count_if(entities_.active(), [this](auto slot) {
+        const auto& mob = entities_.at(slot).view;
+        return mob.faction == Faction::garden &&
+               (mob.group == Group::main_mob || mob.group == Group::residual);
+      });
+    }
+    if (remaining <= rules_.remaining_threshold) {
       transition(TransitionReason::threshold, next);
     } else if (rules_.advance_on_deadline && tick_ >= wave_.deadline_tick) {
       transition(TransitionReason::deadline, next);

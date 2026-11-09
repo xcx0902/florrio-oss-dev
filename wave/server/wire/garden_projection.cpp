@@ -12,6 +12,8 @@ namespace wave::wire {
 namespace {
 // Shared local calibration for positions, collision radii, camera and arena.
 constexpr double world_scale = 5;
+constexpr std::array<std::array<std::uint8_t, 3>, 3> biome_colors{
+    {{30, 167, 97}, {211, 173, 105}, {53, 140, 195}}};
 
 struct Writer {
   Bytes bytes;
@@ -105,12 +107,35 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   const auto match = view ? view->id.value : 0;
   if (match != match_) {
     hit_cursor_ = room ? room->hit_sequence : 0;
+    arc_cursor_ = room ? room->arc_sequence : 0;
   }
   std::set<Key> live;
   const auto visible = [](const sim::EntityView& e) {
     const auto* p = e.petal ? catalog::dated().petal(*e.petal, e.rarity) : nullptr;
     return !p || !p->mechanics.hidden;
   };
+  std::vector<const app::Room::Drop*> drops;
+  if (view && room) {
+    for (const auto& drop : room->drops) {
+      drops.push_back(&drop);
+    }
+    // Keep the nearest drops in the old client's bounded entity table.
+    constexpr std::size_t drop_limit = 512;
+    if (drops.size() > drop_limit) {
+      const auto player = std::ranges::find(view->players, viewer.id, &sim::PlayerView::id);
+      const auto flower = player != view->players.end() && player->body
+                              ? std::ranges::find(view->entities, *player->body, &sim::EntityView::id)
+                              : view->entities.end();
+      const auto at = flower == view->entities.end() ? sim::Vec2{} : flower->position;
+      std::ranges::partial_sort(drops, drops.begin() + drop_limit, {}, [&](const auto* drop) {
+        return std::pair{(drop->position - at).length(), drop->serial};
+      });
+      drops.resize(drop_limit);
+    }
+    for (const auto* drop : drops) {
+      live.emplace(match, UINT32_MAX, drop->serial);
+    }
+  }
   if (view) {
     for (const auto& e : view->entities) {
       if (!visible(e)) {
@@ -122,7 +147,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   for (auto it = handles_.begin(); it != handles_.end();) {
     if (!live.contains(it->first)) {
       const auto cached = rendered_.find(it->first);
-      if (view && match == match_ && cached != rendered_.end()) {
+      if (view && match == match_ && cached != rendered_.end() && cached->second.fade_on_remove) {
         auto& ghost = cached->second;
         if (!ghost.expires) {
           ghost.expires = now + std::chrono::milliseconds(400);
@@ -223,7 +248,11 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       body.real(e.position.x * world_scale);
       body.real(e.position.y * world_scale);
       body.real(e.radius * world_scale);
-      if (e.petal) {
+      if (e.split_particle) {
+        // $597 renders 0x4000 as one seed; bit 0 selects the Grapes palette.
+        mask |= 0x4000;
+        body.byte(e.petal == sim::Petal::grapes ? 1 : 0);
+      } else if (e.petal) {
         mask |= 0x10000;
         body.integer(catalog::client_petal(*e.petal, e.rarity).value_or(0));
         body.byte(static_cast<std::uint8_t>(e.rarity));
@@ -233,7 +262,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       if (e.mob || e.group == sim::Group::ant_hole) {
         mask |= 0x100000;
         body.byte(mob_type(e.mob.value_or(sim::Mob::baby_ant), e.group, e.rarity));
-        body.byte(0);
+        body.byte(e.faction == sim::Faction::team ? 1 : 0);  // Native yellow ally palette.
         body.byte(static_cast<std::uint8_t>(e.rarity));
       }
       if (flower) {
@@ -256,11 +285,29 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         set_real(record.bytes, 8 + position_offset, anchor->position.x * world_scale);
         set_real(record.bytes, 12 + position_offset, anchor->position.y * world_scale);
       }
-      rendered_.insert_or_assign(key, Rendered{record.bytes, 8 + flags_offset, e.max_health, {}});
+      const bool fade = !e.petal || (e.anchor && e.petal != sim::Petal::peas &&
+                                     e.petal != sim::Petal::grapes);
+      rendered_.insert_or_assign(key,
+                                 Rendered{record.bytes, 8 + flags_offset, e.max_health, fade, {}});
       out.bytes.insert(out.bytes.end(), record.bytes.begin(), record.bytes.end());
       if (handle(e.id) == controlled) {
         camera = e.position;
       }
+    }
+    for (const auto* drop : drops) {
+      Writer body;
+      body.byte(0);
+      body.zeros(2);  // Heading.
+      body.real(drop->position.x * world_scale);
+      body.real(drop->position.y * world_scale);
+      body.real(16);
+      body.byte(0);  // Generic render flags.
+      body.byte(0);  // Ground item, not in the pickup animation.
+      body.integer(0);
+      body.integer(drop->item.kind);
+      body.byte(drop->item.rarity);
+      out.record(handle({view->id, UINT32_MAX, drop->serial}),
+                 1 | 0x400 | 0x1000 | 0x80000 | 0x400000, body);
     }
   }
   Writer profile;
@@ -346,9 +393,9 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     arena.byte(0);
     // 0x2000 is the singleton circular arena radius and RGB, not entity health.
     arena.real(view->arena_radius * world_scale);
-    arena.byte(30);
-    arena.byte(167);
-    arena.byte(97);
+    for (const auto channel : biome_colors[static_cast<unsigned>(view->biome)]) {
+      arena.byte(channel);
+    }
     out.record(8196, 16 | 0x2000, arena);
     Writer wave;
     // $828 overlays the red clearing timer on the blue spawning bar.
@@ -362,10 +409,11 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     }
     wave.byte(static_cast<std::uint8_t>(255 * std::clamp(clearing, 0.0, 1.0)));
     wave.integer(view->wave.number ? view->wave.number - 1 : 0);
-    wave.integer(0);  // Garden biome index, not the alive count.
+    wave.integer(static_cast<unsigned>(view->biome));
     std::array<std::uint32_t, 216> counts{};
     for (const auto& entity : view->entities) {
-      if (entity.mob || entity.group == sim::Group::ant_hole) {
+      if (entity.faction == sim::Faction::garden &&
+          (entity.mob || entity.group == sim::Group::ant_hole)) {
         ++counts[mob_type(entity.mob.value_or(sim::Mob::baby_ant), entity.group, entity.rarity) *
                      6 +
                  static_cast<std::size_t>(entity.rarity)];
@@ -402,6 +450,18 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
           std::clamp(255 * hit.change.amount / cached->second.max_health, 1.0, 255.0)));
     }
     hit_cursor_ = room->hit_sequence;
+    for (const auto& arc : room->arcs) {
+      if (arc.sequence <= arc_cursor_) {
+        continue;
+      }
+      commands.integer(1);
+      commands.integer(33);  // $988: native lightning between two f32 world points.
+      commands.real(arc.effect.from.x * world_scale);
+      commands.real(arc.effect.from.y * world_scale);
+      commands.real(arc.effect.to.x * world_scale);
+      commands.real(arc.effect.to.y * world_scale);
+    }
+    arc_cursor_ = room->arc_sequence;
   }
   match_ = match;
   result.commands = std::move(commands.bytes);

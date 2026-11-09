@@ -12,6 +12,13 @@ cmake --build build/wave/native --parallel
 npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --port 8478
 ```
 
+左上角的场景菜单可切换 Garden、Desert 和 Ocean，三个场景共享访客存档。
+各场景按旧版 [Waves Wiki](https://official-florrio.fandom.com/wiki/Waves) 解锁怪物种类，
+刷怪完成且剩余主怪不超过 4 只时推进；清场超时也会推进，幸存怪物留场。
+第 21、31、41、51、61 波依次淘汰最低一档稀有度，第 61 波起只刷 Mythic。
+波次按需生成，可继续到旧客户端可表示的第 2,147,483,647 波。刷怪数量、清场时长和
+Mythic 后的强度增幅采用本地复刻参数。
+
 默认存档是 `build/wave/saves/profiles.sqlite3`；可用 `--database /absolute/path/save.sqlite3`
 或 `WAVE_DATABASE` 指定。关闭临时网页或重启宿主不会删除数据库。访客凭证在原版
 `cp6_player_id`，新浏览器上下文仅带该凭证即可恢复库存、主副槽、等级和图鉴。
@@ -40,8 +47,9 @@ npm --prefix wave run test:wire -- --snapshot "$PWD/wave-reference/20221030" --s
 行为按截止前 Wiki 修订、同仓库 World PvP 的顺序取证；不明确的特殊攻击和复刻参数有
 [中文人工核查清单](docs/behavior-review-20221030.md)与
 [机器规则](data/catalogs/20221030/behavior-review.json)。
-Rare+ 巢穴目前采用同场遭遇代理，子区域传送归 W5；特殊闪电线、护盾/毒状态及地面掉落
-图形的原版呈现仍待协议核查。新增 `W3-behaviors` 覆盖全变体和特殊效果。
+Rare+ 巢穴目前采用同场遭遇代理，子区域传送归 W5。闪电、地面掉落、Peas/Grapes
+飞行弹体和 Egg 友军使用原版绘制；护盾/毒状态图形仍待协议核查。
+`W3-behaviors` 覆盖全变体和特殊效果。
 [完整数值全表](docs/client-tooltips-20221030.md) ·
 [机器可读记录](data/catalogs/20221030/client-tooltips.json) ·
 [改前／改后差分](data/catalogs/20221030/client-tooltip-corrections.json)
@@ -71,7 +79,7 @@ npm --prefix wave run test:wire -- --snapshot "$WAVE_SNAPSHOT" --stage W2
 
 完整验收覆盖双人入局、原版鼠标移动、分批生成、清波、阵亡重生、跨波重连和异常恢复。报告、收发字节及截图默认写入 `reports/wave/W2/`；`--bootstrap-only` 仅运行引导子集。 [W2 执行结果](../wave-goals/02-garden-online.md#w2-执行结果)
 
-测试入口使用单独编译的 `wave_host_fixture`，固定种子与短批次由测试宿主提供，专用端点只推进 W1 时钟。正式 `wave_host` 使用 Garden 规则，不包含测试端点。手动复查时，A 点击 Squad 创建私有房，复制地址栏中的邀请链接到另一隔离浏览器上下文，双方填写昵称并点击 Ready。
+测试入口使用单独编译的 `wave_host_fixture`，固定种子与短批次由测试宿主提供，专用端点只推进 W1 时钟。正式 `wave_host` 按所选场景加载规则，不包含测试端点。手动复查时，A 点击 Squad 创建私有房，复制地址栏中的邀请链接到另一隔离浏览器上下文，双方填写昵称并点击 Ready。
 
 ## W1 · Garden 原生模拟
 

@@ -61,7 +61,8 @@ constexpr std::array spawn_outcomes{"spawned", "blocked", "exhausted", "cancelle
 constexpr std::array spawn_failures{"occupied", "attempt_limit", "deadline"};
 constexpr std::array transition_reasons{"threshold", "deadline", "team_wipe", "last_disconnect"};
 constexpr std::array health_kinds{"contact", "heal", "poison"};
-constexpr std::array draw_purposes{"special_roll", "special_group", "mob_kind", "spawn_point"};
+constexpr std::array draw_purposes{"special_roll", "special_group", "mob_kind", "spawn_point",
+                                   "mob_rarity", "projectile_phase"};
 constexpr std::array groups{"player", "petal",    "main_mob", "segment",
                             "summon", "ant_hole", "residual"};
 
@@ -226,6 +227,13 @@ class Trace {
     out << " body ";
     id(event.body);
     out << " state " << life_states[number(event.state)];
+  }
+
+  void record_event(const LightningArc& event) {
+    out << "lightning from ";
+    xy(event.from);
+    out << " to ";
+    xy(event.to);
   }
 
   void record_event(const Defeat& event) {
@@ -425,8 +433,8 @@ void blocked(Trace& trace) {
         }
       }
       step(match, trace);
-      check(match.view().wave.counts.defeated == 0 && participant(match).credited_defeats == 2,
-            "residuals are excluded from next wave accounting and credit");
+      check(match.view().wave.counts.defeated == 0 && participant(match).credited_defeats == 6,
+            "residuals award defeat credit without counting as next wave defeats");
     } else {
       check(counts.discarded == 4 && residuals == 0, "discard survivors without recording defeats");
     }
@@ -736,6 +744,8 @@ void garden_candidates(Trace& trace) {
   // Keep the player and mobs stationary so the test isolates the dated wave schedule.
   rules.version += "/schedule-fixture";
   rules.catalog = nullptr;
+  rules.progressive_waves = false;
+  rules.residual = ResidualPolicy::discard;
   rules.special_chance = 0;
   rules.remaining_threshold = 0;
   Match match({1}, 30, rules);
