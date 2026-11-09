@@ -162,12 +162,14 @@ def fmt(node, prec=0):
         return conststr(node[1]) + 'L'
     if h in ('f32.const', 'f64.const'):
         return node[1]
-    if h in ('local.get', 'global.get'):
-        return node[1]
+    if h == 'local.get':
+        return 'l' + node[1]
+    if h == 'global.get':
+        return 'g' + node[1]
     if h == 'local.set':
-        return '%s = %s' % (node[1], fmt(node[2]))
+        return 'l%s = %s' % (node[1], fmt(node[2]))
     if h == 'local.tee':
-        return '(%s = %s)' % (node[1], fmt(node[2]))
+        return '(l%s = %s)' % (node[1], fmt(node[2]))
     if h in LOADS:
         typ = LOADS[h]
         args = node[1:]
@@ -200,20 +202,32 @@ def fmt(node, prec=0):
     if h == 'select':
         return 'select(%s)' % ', '.join(fmt(a) for a in node[1:])
     if h == 'call':
-        return '%s(%s)' % (node[1], ', '.join(fmt(a) for a in node[2:]))
+        name = node[1]
+        if name.startswith('$') and name[1:].isdigit():
+            name = 'f' + name
+        return '%s(%s)' % (name, ', '.join(fmt(a) for a in node[2:]))
     if h == 'call_indirect':
         return 'call_indirect%s(%s)' % (fmt(node[1]) if len(node) > 1 and not isinstance(node[1], list) else '', ', '.join(fmt(a) for a in node[2:] if isinstance(a, list)))
     if h in ('block', 'loop'):
-        label = node[1] if len(node) > 1 and isinstance(node[1], str) and node[1].startswith('$') else None
-        rest = node[2:] if label else node[1:]
+        i = 1
+        label = None
+        if i < len(node) and isinstance(node[i], str) and node[i].startswith('$'):
+            label = node[i]; i += 1
+        if i < len(node) and isinstance(node[i], list) and node[i] and node[i][0] == 'result':
+            i += 1
+        rest = node[i:]
         body = '\n'.join('  ' + line for line in block(rest).splitlines())
         return '%s %s {\n%s\n}' % (h, label or '', body)
     if h == 'if':
-        cond = fmt(node[1])
-        then = node[2] if len(node) > 2 else []
-        els = node[3] if len(node) > 3 else None
+        i = 1
+        result = None
+        if i < len(node) and isinstance(node[i], list) and node[i] and node[i][0] == 'result':
+            result = ' '.join(node[i][1:]); i += 1
+        cond = fmt(node[i]) if i < len(node) else '?'
+        then = node[i + 1] if i + 1 < len(node) else []
+        els = node[i + 2] if i + 2 < len(node) else None
         thenbody = then[1:] if isinstance(then, list) and then and then[0] == 'then' else then
-        s = 'if (%s) {\n%s\n}' % (cond, '\n'.join('  ' + l for l in block(thenbody).splitlines()))
+        s = 'if (%s)%s {\n%s\n}' % (cond, (' -> ' + result) if result else '', '\n'.join('  ' + l for l in block(thenbody).splitlines()))
         if els:
             ebody = els[1:] if els and els[0] == 'else' else els
             s += ' else {\n%s\n}' % '\n'.join('  ' + l for l in block(ebody).splitlines())
