@@ -5,6 +5,7 @@
 .vscode/
 
 # Dependencies and local tool caches
+__pycache__/
 node_modules/
 .emcache/
 
