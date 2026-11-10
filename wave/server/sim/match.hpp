@@ -82,6 +82,7 @@ class Match {
   [[nodiscard]] double mob_radius(Mob kind, Rarity rarity) const;
   [[nodiscard]] DamageSource damage_source(const detail::Entity& entity) const;
   void update_nests();
+  void resolve_cleared_nests();
   [[nodiscard]] Vec2 mob_direction(detail::Entity& entity);
   [[nodiscard]] EntityId spawn_mob(Mob kind, Rarity rarity, Vec2 position,
                                    Group group = Group::main_mob, std::optional<LifeId> owner = {},
@@ -121,6 +122,12 @@ class Match {
   std::vector<Command> commands_;
   std::vector<Impact> impacts_;
   std::vector<Event> events_;
+  struct FallenAntHole {
+    EntityId id;
+    Rarity rarity;
+    Vec2 position;
+  };
+  std::vector<FallenAntHole> fallen_ant_holes_;
   std::size_t wave_index_ = 0;
   WaveView wave_;
   std::optional<WaveView> previous_wave_;

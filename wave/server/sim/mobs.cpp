@@ -16,8 +16,8 @@ double segment_gap(Mob kind, double radii) {
   return radii * (kind == Mob::leech ? .9 : 1.1);
 }
 
-void place_segment(EntityView& body, const EntityView& parent, Vec2 direction, double gap,
-                   double arena_radius) {
+void place_spawn_segment(EntityView& body, const EntityView& parent, Vec2 direction, double gap,
+                         double arena_radius) {
   const auto offset = direction * (-gap / direction.length());
   const double limit = std::max(0., arena_radius - body.radius);
   auto position = parent.position + offset;
@@ -75,7 +75,7 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
   } else if (kind == Mob::jellyfish) {
     body.speed_per_second = rules_.player.speed_per_second * .9;
   }
-  // Keep increasing pressure after the highest catalog rarity is reached.
+  // Continue scaling health and damage in waves past 61.
   const double strength =
       rules_.progressive_waves && wave > 61 ? 1 + std::log1p((wave - 61) / 100.0) : 1;
   body.health *= strength;
@@ -110,9 +110,10 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
       view.group = Group::segment;
       const auto& parent = entities_.get(previous)->view;
       const Vec2 forward{std::cos(parent.heading_rad), std::sin(parent.heading_rad)};
-      place_segment(view, parent, forward, gap, rules_.arena_radius);
+      place_spawn_segment(view, parent, forward, gap, rules_.arena_radius);
       auto segment_body = segment->body;
       segment_body.radius = body.radius;
+      segment_body.speed_per_second = body.speed_per_second;
       segment_body.health = kind == Mob::leech ? body.health : segment_body.health * strength;
       segment_body.contact_damage *= strength;
       segment_body.poison_per_tick *= scale;
@@ -197,6 +198,7 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
     }
   }
   if (entity.target) {
+    entity.wander_heading.reset();
     const auto delta = entities_.get(*entity.target)->view.position - entity.view.position;
     const double distance = delta.length();
     if (distance == 0) {
@@ -227,6 +229,27 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
   }
   const double time =
       std::chrono::duration<double>(rules_.timing.step).count() * (tick_ - entity.born_tick);
+  if (entity.chain_kind == Mob::centipede || entity.chain_kind == Mob::evil_centipede) {
+    // The engine's Centipede profile adds a slow sine to its base heading.
+    const bool evil = entity.chain_kind == Mob::evil_centipede;
+    const double step = std::chrono::duration<double>(rules_.timing.step).count();
+    const double turn = entity.view.id.slot % 2 == 0 ? .006 : -.006;
+    double base = entity.wander_heading.value_or(entity.view.heading_rad) + turn * step;
+    const double wobble = std::sin(time * .1) * (evil ? .16 : .6);
+    const double angle = base + wobble;
+    Vec2 direction{std::cos(angle), std::sin(angle)};
+    const double distance = entity.view.position.length();
+    if (distance > 0 && distance >= rules_.arena_radius - entity.view.radius - 2) {
+      const auto normal = entity.view.position * (1 / distance);
+      const double outward = normal.x * direction.x + normal.y * direction.y;
+      if (outward > 0) {
+        direction = direction - normal * (2 * outward);
+        base = std::atan2(direction.y, direction.x) - wobble;
+      }
+    }
+    entity.wander_heading = std::remainder(base, 2 * std::numbers::pi);
+    return direction * (evil ? .32 : .4);
+  }
   const double angle =
       entity.view.heading_rad + .3 * std::chrono::duration<double>(rules_.timing.step).count();
   const double pulse = .15 + .25 * (1 + std::cos(time * 2));
@@ -362,13 +385,19 @@ void Match::constrain_segments() {
     for (auto next = successors.find(previous->id.slot); next != successors.end();
          next = successors.find(previous->id.slot)) {
       auto& body = next->second->view;
-      const Vec2 facing{std::cos(previous->heading_rad), std::sin(previous->heading_rad)};
       const auto delta = previous->position - body.position;
       const auto distance = delta.length();
-      // Keep bends smooth while letting the tail follow the head around turns.
-      const auto direction = distance > 0 ? delta * (.8 / distance) + facing * .2 : facing;
       const double gap = segment_gap(*root.chain_kind, previous->radius + body.radius);
-      place_segment(body, *previous, direction, gap, rules_.arena_radius);
+      // As in engine/src/sim/movement.cpp, a link limits extension only.
+      // A compressed link can stay put as its predecessor moves into a turn.
+      if (distance > gap) {
+        body.position = previous->position - delta * (gap / distance);
+      }
+      body.position = clamp_center(body.position, rules_.arena_radius, body.radius);
+      const auto facing = previous->position - body.position;
+      if (facing != Vec2{}) {
+        body.heading_rad = std::atan2(facing.y, facing.x);
+      }
       previous = &body;
     }
   }
@@ -417,7 +446,8 @@ void Match::update_nests() {
     const unsigned total = fire ? (entrance ? 50 : 30) : 40;
     if (e->spawn_count >= total) {
       const bool alive = std::ranges::any_of(entities_.active(), [&](auto slot) {
-        return entities_.at(slot).root == id && entities_.at(slot).view.faction == Faction::garden;
+        const auto& child = entities_.at(slot);
+        return child.root == id && child.view.faction == Faction::garden && child.view.health > 0;
       });
       if (!alive && entrance) {
         e->view.health = 0;
@@ -436,11 +466,6 @@ void Match::update_nests() {
     const auto radius = e->view.radius;
     e->spawn_count += count;
     e->action_ready = tick_ + seconds(rules_, .25 / attack_scale);
-    if (entrance && first == 0 && draw(DrawPurpose::mob_kind) % 100 < 2) {
-      const auto digger =
-          spawn_mob(Mob::digger, rarity, position + Vec2{radius + 10, 0}, Group::summon);
-      entities_.get(digger)->root = id;
-    }
     for (unsigned n = first; n < first + count; ++n) {
       const auto kind = fire             ? Mob::fire_ant
                         : n == total - 1 ? Mob::queen_ant
@@ -464,6 +489,22 @@ void Match::update_nests() {
     }
     // W3 runs nest encounters in this arena; W5 owns interior transfers.
   }
+}
+
+void Match::resolve_cleared_nests() {
+  std::erase_if(fallen_ant_holes_, [&](const FallenAntHole& hole) {
+    const bool defended = std::ranges::any_of(entities_.active(), [&](auto slot) {
+      const auto& child = entities_.at(slot);
+      return child.root == hole.id && child.view.faction == Faction::garden;
+    });
+    if (defended) {
+      return false;
+    }
+    if (choose(100, DrawPurpose::digger_spawn) < 2) {
+      (void)spawn_mob(Mob::digger, hole.rarity, hole.position, Group::summon);
+    }
+    return true;
+  });
 }
 
 }  // namespace wave::sim

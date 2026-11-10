@@ -463,6 +463,7 @@ bool Match::step() {
   update_nests();
   finish_projectiles();
   reap_deaths();
+  resolve_cleared_nests();
   constrain_segments();
   update_orbits();
   adjudicate();
@@ -494,9 +495,15 @@ MatchView Match::view() const {
     view.catalog_sha256 = rules_.catalog->sha256;
   }
   for (const auto slot : entities_.active()) {
-    const auto& entity = entities_.at(slot).view;
-    view.entities.push_back(entity);
-    ++view.population[static_cast<std::size_t>(entity.group)];
+    const auto& entity = entities_.at(slot);
+    auto& projected = view.entities.emplace_back(entity.view);
+    if (projected.mob == Mob::digger && entity.target && entity.stun_until <= tick_ &&
+        projected.health >= projected.max_health * .3) {
+      const auto* target = entities_.get(*entity.target);
+      projected.digger_attacking = target && target->view.health > 0 &&
+                                   target->view.faction != projected.faction;
+    }
+    ++view.population[static_cast<std::size_t>(projected.group)];
   }
   return view;
 }

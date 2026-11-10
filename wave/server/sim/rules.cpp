@@ -107,12 +107,12 @@ Rules scenario_rules(Biome biome) {
   std::array<std::vector<Mob>, 3> unlocks;
   switch (biome) {
     case Biome::garden:
-      rules.late_mobs = {ant_hole, digger, queen_ant};
+      rules.late_mobs = {ant_hole, queen_ant};
       rules.dangerous_mobs = {spider, hornet};
       break;
     case Biome::desert:
       unlocks = {{{cactus, sandstorm, desert_centipede}, {beetle}, {scorpion, shiny_ladybug}}};
-      rules.late_mobs = {fire_ant_burrow, fire_ant, digger};
+      rules.late_mobs = {fire_ant_burrow, fire_ant};
       rules.dangerous_mobs = {sandstorm, beetle, scorpion};
       rules.special_groups = {{beetle}, {desert_centipede}, {sandstorm}, {scorpion}};
       break;
@@ -158,22 +158,39 @@ WaveRules wave_rules_at(const Rules& rules, std::size_t index) {
     return rules.timing.ticks_ceil(std::chrono::seconds(seconds));
   };
   const auto budget = 10 + std::min(26u, number / 2);
-  return {number, std::move(eligible), wave_rarity(number, 1), budget,
+  return {number, std::move(eligible), wave_rarity(number, 0), budget,
           {{0, budget / 6}, {ticks(6), budget / 4}, {ticks(13), budget / 4},
            {ticks(21), budget - budget / 6 - 2 * (budget / 4)}},
           ticks(30 + std::min(45u, number))};
 }
 
 Rarity wave_rarity(std::uint32_t number, double roll) {
-  // Wiki: each ten waves starting at 21 eliminates the lowest remaining tier.
-  const unsigned floor = number < 21 ? 0 : std::min(5u, (number - 11) / 10);
-  if (floor == 5) {
-    return Rarity::mythic;
+  struct Band {
+    std::uint32_t last_wave;
+    std::array<unsigned, 6> weights;
+  };
+  // Percent chances from Common to Mythic. Only new spawns use these weights.
+  static constexpr Band bands[]{
+      {6, {75, 25, 0, 0, 0, 0}},
+      {14, {0, 65, 35, 0, 0, 0}},
+      {22, {0, 25, 65, 10, 0, 0}},
+      {30, {0, 10, 25, 55, 10, 0}},
+      {40, {0, 0, 15, 45, 30, 10}},
+      {UINT32_MAX, {0, 0, 0, 30, 50, 20}},
+  };
+  const auto& weights = std::ranges::lower_bound(bands, number, {}, &Band::last_wave)->weights;
+  unsigned cumulative = 0;
+  Rarity selected = Rarity::common;
+  for (unsigned tier = 0; tier < weights.size(); ++tier) {
+    if (weights[tier]) {
+      selected = static_cast<Rarity>(tier);
+      cumulative += weights[tier];
+      if (roll < cumulative / 100.) {
+        return selected;
+      }
+    }
   }
-  // Local reconstruction: the next tier ramps in before the lower one retires.
-  const double chance = number < 21 ? std::clamp((double(number) - 3) / 18, 0., 1.)
-                                    : (number - 21 - (floor - 1) * 10) / 10.0;
-  return static_cast<Rarity>(floor + (roll < chance));
+  return selected;
 }
 
 }  // namespace wave::sim

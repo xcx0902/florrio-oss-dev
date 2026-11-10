@@ -164,6 +164,9 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         if (!ghost.expires) {
           ghost.expires = now + std::chrono::milliseconds(400);
           ghost.record.at(ghost.flags_offset) |= 1;  // $597: native 150 ms fade and expansion.
+          if (ghost.digger) {
+            ghost.record.back() = 0;
+          }
           if (ghost.flower) {
             const auto fallen = std::ranges::find(view->players, *ghost.flower, &sim::PlayerView::id);
             if (fallen != view->players.end() && fallen->death_position) {
@@ -215,12 +218,14 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         continue;
       }
       const bool flower = e.group == sim::Group::player;
+      const bool digger = e.mob == sim::Mob::digger;
       Writer body;
       std::uint32_t mask = 0x400 | 0x1000 | 0x80000;
       if (e.mob != sim::Mob::leech_segment) {
         // $1795 follows predecessors until it finds this component on the Leech head.
         mask |= 1;
-        body.byte(e.mob == sim::Mob::leech ? 1 : 0);
+        // $1738 reads bit 0 here for the Digger's attack pose.
+        body.byte(e.mob == sim::Mob::leech || e.digger_attacking ? 1 : 0);
       }
       if (e.mob == sim::Mob::leech_segment && e.predecessor) {
         // $1795 follows the native 0x80 links to draw one continuous Leech.
@@ -301,11 +306,15 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         body.byte(e.faction == sim::Faction::team ? 1 : 0);  // Native yellow ally palette.
         body.byte(static_cast<std::uint8_t>(e.rarity));
       }
-      if (flower || (e.mob && e.rarity >= sim::Rarity::legendary && !e.predecessor)) {
+      const bool mob_bar = e.mob && e.rarity >= sim::Rarity::legendary && !e.predecessor;
+      if (flower || digger || mob_bar) {
         mask |= 0x200000;
         body.byte(0);
-        body.byte(flower ? 0 : 2);  // $991: draw the native world-space health bar.
-        body.byte(static_cast<std::uint8_t>(255 * std::clamp(e.health / e.max_health, 0.0, 1.0)));
+        body.byte(mob_bar ? 2 : 0);  // $991: draw the native world-space health bar.
+        const auto health =
+            static_cast<std::uint8_t>(255 * std::clamp(e.health / e.max_health, 0.0, 1.0));
+        // $1738 draws crossed eyes for zero health, even without a visible bar.
+        body.byte(digger && e.health > 0 && health == 0 ? 1 : health);
       }
       Writer record;
       const Key key{e.id.match.value, e.id.slot, e.id.generation};
@@ -323,7 +332,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       }
       rendered_.insert_or_assign(
           key, Rendered{record.bytes, 8 + flags_offset, 8 + position_offset, e.max_health,
-                        flower ? std::optional{e.owner->player} : std::nullopt, {}});
+                        flower ? std::optional{e.owner->player} : std::nullopt, digger, {}});
       out.bytes.insert(out.bytes.end(), record.bytes.begin(), record.bytes.end());
       if (handle(e.id) == controlled) {
         camera = e.position;
@@ -484,7 +493,9 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     wave.integer(static_cast<unsigned>(view->biome));
     std::array<std::uint32_t, 216> counts{};
     for (const auto& entity : view->entities) {
+      // Leech sections share the head's health and count as one mob with it.
       if (entity.faction == sim::Faction::garden &&
+          entity.mob != sim::Mob::leech_segment &&
           (entity.mob || entity.group == sim::Group::ant_hole)) {
         ++counts[mob_type(entity.mob.value_or(sim::Mob::baby_ant), entity.group, entity.rarity) *
                      6 +

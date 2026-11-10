@@ -197,7 +197,8 @@ enum class DrawPurpose {
   mob_kind,
   spawn_point,
   mob_rarity,
-  projectile_phase
+  projectile_phase,
+  digger_spawn
 };
 
 struct MobIdentity {
@@ -239,6 +240,7 @@ struct EntityView {
   std::optional<EntityId> damage_origin;
   bool split_particle = false;
   bool ground_web = false;
+  bool digger_attacking = false;
   std::optional<MobIdentity> damage_mob;
   std::optional<EntityId> predecessor;
   bool operator==(const EntityView&) const = default;

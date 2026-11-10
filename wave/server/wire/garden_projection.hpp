@@ -30,6 +30,7 @@ class GardenProjection {
     std::size_t position_offset;
     double max_health;
     std::optional<sim::PlayerId> flower;
+    bool digger;
     std::optional<std::chrono::steady_clock::time_point> expires;
   };
   std::map<Key, Rendered> rendered_;

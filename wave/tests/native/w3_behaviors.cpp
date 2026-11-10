@@ -37,6 +37,8 @@ struct FixtureAccess {
     m.finish_projectiles();
   }
   static void reap(Match& m) { m.reap_deaths(); }
+  static void constrain(Match& m) { m.constrain_segments(); }
+  static void seed(Match& m, std::uint32_t seed) { m.rng_.seed(seed); }
   static void chain(Match& m, EntityId target, EntityId source, unsigned hops) {
     const auto s = get(m, source).view;
     m.chain_attack(target, {source, s.owner, s.faction}, 10, hops, 40);
@@ -294,20 +296,6 @@ void biome_progression() {
       check(slot.entity && FixtureAccess::get(match, *slot.entity).view.group == Group::residual,
             "same mob entity remains on the ground across transition");
     }
-    for (unsigned floor = 1; floor <= 5; ++floor) {
-      const unsigned number = 11 + 10 * floor;
-      FixtureAccess::plan(match, number);
-      check(std::ranges::all_of(match.view().wave.plan, [floor](const SpawnSlot& slot) {
-              return static_cast<unsigned>(slot.rarity) >= floor;
-            }),
-            "late wave excludes retired rarities");
-    }
-    FixtureAccess::plan(match, max_wave_number);
-    const auto last = match.view().wave;
-    check(last.number == max_wave_number && !last.plan.empty() &&
-              std::ranges::all_of(last.plan,
-                                  [](const SpawnSlot& slot) { return slot.rarity == Rarity::mythic; }),
-          "last representable client wave still has a bounded Mythic plan");
     const auto mythic_health = [&](std::uint32_t wave) {
       const auto id = FixtureAccess::spawn(match, unlocked, Rarity::mythic, {150, 0},
                                            Group::summon, wave);
@@ -315,6 +303,48 @@ void biome_progression() {
     };
     check(mythic_health(100) > mythic_health(61) && mythic_health(300) > mythic_health(100),
           "monsters keep getting stronger after reaching Mythic");
+  }
+}
+
+void wave_rarity_progression() {
+  struct Band {
+    std::uint32_t first, last;
+    std::array<unsigned, 6> expected;
+  };
+  const Band bands[]{
+      {1, 6, {75, 25, 0, 0, 0, 0}},
+      {7, 14, {0, 65, 35, 0, 0, 0}},
+      {15, 22, {0, 25, 65, 10, 0, 0}},
+      {23, 30, {0, 10, 25, 55, 10, 0}},
+      {31, 40, {0, 0, 15, 45, 30, 10}},
+      {41, max_wave_number, {0, 0, 0, 30, 50, 20}},
+  };
+  auto rules = garden_rules();
+  rules.special_chance = 0;
+  Match match({44}, 99, rules);
+  for (const auto& band : bands) {
+    for (const auto number : {band.first, band.last}) {
+      std::array<unsigned, 6> counts{};
+      for (unsigned i = 0; i < 100; ++i) {
+        ++counts.at(static_cast<unsigned>(wave_rarity(number, (i + .5) / 100)));
+      }
+      check(counts == band.expected, "each wave band has the expected rarity odds");
+
+      const auto before = match.events().size();
+      FixtureAccess::plan(match, number);
+      const auto wave = match.view().wave;
+      check(wave.number == number && !wave.plan.empty() &&
+                std::ranges::all_of(wave.plan, [&band](const SpawnSlot& slot) {
+                  return band.expected.at(static_cast<unsigned>(slot.rarity)) > 0;
+                }),
+            "the live wave plan only uses its band's rarities");
+      const auto rolls = std::ranges::count_if(match.events().subspan(before), [](const Event& e) {
+        const auto* roll = std::get_if<RandomDraw>(&e.data);
+        return roll && roll->purpose == DrawPurpose::mob_rarity;
+      });
+      check(static_cast<std::size_t>(rolls) == wave.plan.size(),
+            "each new mob, including those in wave one, gets its own rarity roll");
+    }
   }
 }
 void fixed_bodies_and_missile_death() {
@@ -363,12 +393,15 @@ void monsters() {
   const auto beetle = FixtureAccess::spawn(m, Mob::beetle, Rarity::common, {120, 0});
   steps(m);
   check(FixtureAccess::get(m, digger).view.faction == Faction::team &&
-            FixtureAccess::get(m, digger).target == beetle,
-        "Digger attacks hostile mobs");
+            FixtureAccess::get(m, digger).target == beetle &&
+            std::ranges::any_of(m.view().entities, &EntityView::digger_attacking),
+        "Digger attacks hostile mobs and spins its gears");
   auto& d = FixtureAccess::get(m, digger);
   d.view.health = d.view.max_health * .1;
   steps(m);
-  check(!d.target && d.view.velocity.x > 0, "injured Digger retreats to arena edge");
+  check(!d.target && d.view.velocity.x > 0 &&
+            std::ranges::none_of(m.view().entities, &EntityView::digger_attacking),
+        "injured Digger retreats to arena edge and leaves the attack pose");
   const auto hornet = FixtureAccess::spawn(m, Mob::hornet, Rarity::rare, {50, 0});
   steps(m, 22);
   bool bullet = false;
@@ -396,6 +429,73 @@ void monsters() {
     ants += e.mob == Mob::fire_ant;
   }
   check(ants == 30, "exact thirty-ant Common burrow release");
+}
+
+void digger_after_ant_hole() {
+  for (const auto biome : {Biome::garden, Biome::desert, Biome::ocean}) {
+    const auto rules = scenario_rules(biome);
+    for (std::size_t wave = 0; wave < 80; ++wave) {
+      const auto eligible = wave_rules_at(rules, wave).eligible;
+      check(std::ranges::find(eligible, Mob::digger) == eligible.end(),
+            "Digger is absent from every ordinary spawn pool");
+    }
+  }
+  for (const auto [rarity, wins_roll] :
+       {std::pair{Rarity::common, true}, std::pair{Rarity::rare, true},
+        std::pair{Rarity::rare, false}}) {
+    Match m({53}, 1, arena());
+    check(m.add_player({1}, {}, {}), "admit the ant hole fixture player");
+    steps(m);
+    // The first draw after resetting the generator lands in the required bucket.
+    std::uint32_t seed = 0;
+    while ((std::mt19937(seed)() % 100 < 2) != wins_roll) {
+      ++seed;
+    }
+    FixtureAccess::seed(m, seed);
+    const auto hole = FixtureAccess::spawn(m, Mob::ant_hole, rarity, {25, 0});
+    const auto nest_position = FixtureAccess::get(m, hole).view.position;
+    if (rarity == Rarity::common) {
+      FixtureAccess::hit(m, hole, flower(m), 1e5);
+    }
+    const auto rolls = [&] {
+      return std::ranges::count_if(m.events(), [](const auto& e) {
+        const auto* draw = std::get_if<RandomDraw>(&e.data);
+        return draw && draw->purpose == DrawPurpose::digger_spawn;
+      });
+    };
+    steps(m);
+    std::vector<EntityId> defenders;
+    for (const auto& e : m.view().entities) {
+      if (FixtureAccess::get(m, e.id).root == hole) {
+        defenders.push_back(e.id);
+      }
+    }
+    check(defenders.size() == 40 && rolls() == 0, "the nest releases defenders before any roll");
+    check(FixtureAccess::exists(m, hole) == (rarity >= Rarity::rare),
+          "early destruction of a Common hole does not forget its defenders");
+    for (std::size_t i = 1; i < defenders.size(); ++i) {
+      FixtureAccess::get(m, defenders[i]).view.health = 0;
+    }
+    for (int tick = 0; tick < 20; ++tick) {
+      steps(m);
+      check(rolls() == 0, "no Digger roll while even one defender survives");
+    }
+    FixtureAccess::get(m, defenders.front()).view.health = 0;
+    steps(m);
+    check(!FixtureAccess::exists(m, hole) && rolls() == 1, "clearing the nest rolls once");
+    const auto view = m.view();
+    const auto digger = std::ranges::find(view.entities, Mob::digger, &EntityView::mob);
+    check((digger != view.entities.end()) == wins_roll, "the roll controls whether Digger spawns");
+    if (wins_roll) {
+      check(digger->position == nest_position && digger->rarity == rarity &&
+                digger->faction == Faction::team && digger->health == digger->max_health,
+            "Digger appears at the cleared nest with full health as an ally");
+    }
+    for (int tick = 0; tick < 12; ++tick) {
+      steps(m);
+      check(rolls() == 0, "a cleared nest cannot roll again");
+    }
+  }
 }
 void remaining_petals() {
   for (auto kind : {Petal::yucca, Petal::starfish}) {
@@ -528,50 +628,69 @@ void remaining_petals() {
 }
 
 void chains() {
-  Match m({9}, 1, arena());
-  m.add_player({1}, {}, {});
-  steps(m);
-  const auto root =
-      FixtureAccess::spawn(m, Mob::centipede, Rarity::mythic, {100, 0}, Group::main_mob);
-  FixtureAccess::main_wave(m, root);
-  steps(m, 15);
-  std::vector<EntityId> segments;
-  for (const auto& e : m.view().entities) {
-    if (FixtureAccess::get(m, e.id).root == root) {
-      segments.push_back(e.id);
-      near(e.max_health, catalog::dated().mob(Mob::centipede_segment, Rarity::mythic)->body.health,
-           "segments use their own rarity and exact health");
-      const auto& parent = FixtureAccess::get(m, *e.predecessor).view;
-      near(e.radius, parent.radius, "centipede head and segments have equal radii");
-      check((e.position - parent.position).length() > e.radius + parent.radius &&
-                std::abs(std::remainder(e.heading_rad - parent.heading_rad,
-                                        2 * std::acos(-1.0))) < .2,
-            "centipede sections do not overlap or zigzag on a gradual turn");
-    }
-  }
-  check(segments.size() == 5, "all segment entities spawned");
-  const auto root_hp = FixtureAccess::get(m, root).view.health;
-  FixtureAccess::hit(m, segments[1], flower(m), 20);
-  near(FixtureAccess::get(m, root).view.health, root_hp, "segment damage does not damage head");
-  FixtureAccess::get(m, root).view.health = 0;
-  FixtureAccess::reap(m);
-  check(FixtureAccess::exists(m, segments[0]), "surviving segments remain after head death");
-  check(FixtureAccess::get(m, segments[0]).view.group == Group::main_mob,
-        "successor becomes root for one reward");
-  // Kill the promoted root before the other pieces, then the last piece.
-  for (const auto id : segments) {
-    FixtureAccess::get(m, id).view.health = 0;
-    FixtureAccess::reap(m);
-  }
-  unsigned rewards = 0;
-  for (const auto& event : m.events()) {
-    if (const auto* d = std::get_if<Defeat>(&event.data)) {
-      if (d->group == Group::main_mob && d->mob == Mob::centipede) {
-        ++rewards;
+  for (const auto kind : {Mob::centipede, Mob::evil_centipede}) {
+    Match m({9}, 1, arena());
+    m.add_player({1}, {}, {});
+    steps(m);
+    const auto root = FixtureAccess::spawn(m, kind, Rarity::mythic, {200, 0}, Group::main_mob);
+    FixtureAccess::main_wave(m, root);
+    const auto initial = m.view();
+    std::vector<EntityId> segments;
+    for (auto parent = root;;) {
+      const auto next = std::ranges::find(initial.entities, parent, &EntityView::predecessor);
+      if (next == initial.entities.end()) {
+        break;
       }
+      segments.push_back(next->id);
+      near(next->max_health, catalog::dated().mob(*next->mob, Rarity::mythic)->body.health,
+           "segments use their own rarity and exact health");
+      near(next->radius, FixtureAccess::get(m, parent).view.radius, "equal segment radii");
+      parent = next->id;
     }
+    check(segments.size() == 5, "all segment entities spawned");
+    const auto head = FixtureAccess::get(m, root).view;
+    auto& front = FixtureAccess::get(m, segments[0]).view;
+    const auto gap = (front.position - head.position).length();
+    const auto compressed = head.position + Vec2{0, -gap / 2};
+    front.position = compressed;
+    FixtureAccess::constrain(m);
+    check(front.position == compressed, "a compressed link is not pushed out or straightened");
+    near(front.heading_rad, std::acos(0.), "a link faces its predecessor rather than its heading");
+    front.position = head.position + Vec2{-2 * gap, 0};
+    FixtureAccess::constrain(m);
+    near((front.position - head.position).length(), gap, "a stretched link is shortened");
+
+    FixtureAccess::hit(m, segments[1], flower(m), 20);
+    near(FixtureAccess::get(m, root).view.health, head.health, "segment damage leaves head intact");
+    FixtureAccess::get(m, segments[1]).view.health = 0;
+    FixtureAccess::reap(m);
+    const auto tail_start = FixtureAccess::get(m, segments[2]).view.position;
+    steps(m, 15);
+    const auto tail = FixtureAccess::get(m, segments[2]).view;
+    check(front.predecessor == root && !tail.predecessor &&
+              FixtureAccess::get(m, segments[3]).view.predecessor == tail.id &&
+              (tail.position - tail_start).length() > 1,
+          "the detached fragment leads its own moving chain and never reconnects");
+    // Kill the entire front fragment together. Wave credit survives in the tail.
+    FixtureAccess::get(m, root).view.health = 0;
+    front.health = 0;
+    FixtureAccess::reap(m);
+    check(FixtureAccess::get(m, tail.id).view.group == Group::main_mob &&
+              !FixtureAccess::get(m, tail.id).view.predecessor && m.view().wave.counts.defeated == 0,
+          "the surviving fragment retains the wave slot without rebuilding links");
+    for (const auto id : std::span(segments).subspan(2)) {
+      FixtureAccess::get(m, id).view.health = 0;
+      FixtureAccess::reap(m);
+    }
+    const auto rewards = std::ranges::count_if(m.events(), [&](const auto& event) {
+      if (const auto* d = std::get_if<Defeat>(&event.data)) {
+        return d->group == Group::main_mob && d->mob == kind;
+      }
+      return false;
+    });
+    check(rewards == 1 && m.view().wave.counts.defeated == 1,
+          "the whole severed chain yields exactly one wave credit and root reward");
   }
-  check(rewards == 1, "whole severed chain yields exactly one root reward");
 }
 
 void chains_stay_inside_arena() {
@@ -589,7 +708,7 @@ void chains_stay_inside_arena() {
     const auto first = std::ranges::find(start.entities, root, &EntityView::predecessor);
     check(first != start.entities.end(), "spawned first body segment");
     const double spacing = (head.view.position - first->position).length();
-    // A bunched link near the rim would be placed outside by an unconstrained follow step.
+    // Bend the chain at the rim with the first link bunched and the next stretched.
     FixtureAccess::get(m, first->id).view.position = head.view.position + Vec2{-.1, 1};
     for (int tick = 0; tick < 20; ++tick) {
       steps(m);
@@ -600,8 +719,8 @@ void chains_stay_inside_arena() {
         }
         if (e.predecessor) {
           const auto& parent = FixtureAccess::get(m, *e.predecessor).view;
-          near((e.position - parent.position).length(), spacing,
-               "turning at the rim preserves segment spacing");
+          check((e.position - parent.position).length() <= spacing + 1e-6,
+                "turning at the rim keeps each link within reach");
         }
       }
     }
@@ -828,6 +947,8 @@ int main() {
     lightning_and_passives();
     phase = "monsters";
     monsters();
+    phase = "Digger after clearing an Ant Hole";
+    digger_after_ant_hole();
     phase = "pursuit speeds";
     pursuit_speeds();
     phase = "static bodies and Hornet attribution";
@@ -846,6 +967,8 @@ int main() {
     lightning_contacts_and_ant_alert();
     phase = "biome progression";
     biome_progression();
+    phase = "wave rarity progression";
+    wave_rarity_progression();
     std::cout << "W3 behaviors: 270 petals, 210 mobs and special effect regressions passed\n";
   } catch (const std::exception& e) {
     std::cerr << phase << ": " << e.what() << '\n';

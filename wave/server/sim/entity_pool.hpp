@@ -49,6 +49,7 @@ struct Entity {
   std::optional<EntityId> target;
   std::optional<EntityId> root;
   std::optional<Mob> chain_kind;
+  std::optional<double> wander_heading;
   Tick action_ready = 0;
   Tick heal_block_until = 0;
   Tick shield_until = 0;

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <span>
 #include <string_view>
 
 namespace {
@@ -27,6 +28,29 @@ wave::wire::Bytes bytes(std::string_view hex) {
     result.push_back(static_cast<std::uint8_t>(nibble(hex[i]) * 16 + nibble(hex[i + 1])));
   }
   return result;
+}
+
+void leech_wave_count() {
+  using namespace wave;
+  auto rules = sim::garden_rules();
+  rules.progressive_waves = false;
+  rules.special_chance = 0;
+  rules.remaining_threshold = 0;
+  rules.waves = {{1, {sim::Mob::leech}, sim::Rarity::common, 1, {{0, 1}}, 200}};
+  app::Garden garden(rules);
+  auto& member = garden.admit("", 1);
+  check(garden.command(member, wire::Ready{true}, {}), "Leech count fixture starts");
+  garden.step();
+  const auto view = garden.room(member)->match->view();
+  check(view.population[static_cast<unsigned>(sim::Group::segment)] == 5,
+        "The Leech still has all five body sections in the world");
+  const auto snapshot = wire::GardenProjection{}.build(garden, member);
+  // The last record ends in 216 mob counts (each a single byte here) and spawn progress.
+  constexpr std::size_t entries = 216;
+  check(snapshot.records.size() >= entries + 1, "Wave count record is present");
+  const auto counts = std::span(snapshot.records).last(entries + 1).first(entries);
+  check(counts[34 * 6] == 1 && std::ranges::count(counts, 0) == entries - 1,
+        "The wave HUD counts the whole Common Leech once, at client mob ID 34");
 }
 
 void session_life_boundary() {
@@ -224,6 +248,7 @@ int main() {
         "Distinct authoritative match identities");
   session_life_boundary();
   orbit_buttons();
+  leech_wave_count();
   std::cout
       << "W2 rooms, batched spawns, life bindings, projection removals, reconnect and isolation passed\n";
 }

@@ -62,7 +62,7 @@ constexpr std::array spawn_failures{"occupied", "attempt_limit", "deadline"};
 constexpr std::array transition_reasons{"threshold", "deadline", "team_wipe", "last_disconnect"};
 constexpr std::array health_kinds{"contact", "heal", "poison"};
 constexpr std::array draw_purposes{"special_roll", "special_group", "mob_kind", "spawn_point",
-                                   "mob_rarity", "projectile_phase"};
+                                   "mob_rarity", "projectile_phase", "digger_spawn"};
 constexpr std::array groups{"player", "petal",    "main_mob", "segment",
                             "summon", "ant_hole", "residual"};
 
@@ -798,7 +798,8 @@ void garden_candidates(Trace& trace) {
   for (auto& mob : special_rules.mobs) {
     mob.body.speed_per_second = 0;
   }
-  Match special({2}, 32, special_rules);
+  // This seed triggers a special wave after the opening mob rarity draws.
+  Match special({2}, 330, special_rules);
   check(special.add_player(a, {}, {}), "admit a player for the special-wave fixture");
   step(special, trace);
   const auto opening_draws = events_of<RandomDraw>(special);
@@ -815,7 +816,7 @@ void garden_candidates(Trace& trace) {
   trace.record(special);
   const auto draws = events_of<RandomDraw>(special);
   const auto roll = std::ranges::find(draws, DrawPurpose::special_roll, &RandomDraw::purpose);
-  check(roll != draws.end() && roll->value == 434163459U, "seeded special roll near 0.1");
+  check(roll != draws.end() && roll->value == 434410844U, "seeded special roll near 0.1");
   check(special.view().wave.number == 2 && special.view().wave.special &&
             special.view().wave.eligible == std::vector{Mob::ladybug} &&
             std::ranges::all_of(special.view().wave.plan,

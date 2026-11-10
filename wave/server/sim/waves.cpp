@@ -71,7 +71,7 @@ void Match::open_wave(std::size_t index, Tick start) {
     for (std::uint32_t n = 0; n < count; ++n) {
       const auto kind = pool[choose(pool.size(), DrawPurpose::mob_kind)];
       const auto rarity =
-          rules_.progressive_waves && index >= rules_.waves.size()
+          rules_.progressive_waves
               ? wave_rarity(definition.number, draw(DrawPurpose::mob_rarity) / 4294967296.0)
               : definition.rarity;
       wave_.plan.push_back({.due_tick = start + spec.offset,

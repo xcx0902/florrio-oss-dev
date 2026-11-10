@@ -594,12 +594,17 @@ void Match::resolve_contacts() {
       attack(second, first);
 
       const auto& pair = interaction(first.view.faction, second.view.faction);
-      const bool move_first = !first.immovable && !first.view.predecessor;
-      const bool move_second = !second.immovable && !second.view.predecessor;
-      const bool same_chain = first.chain_kind && second.chain_kind &&
+      // Centipede links may compress, and contacts can separate their bodies.
+      // Leech sections overlap intentionally to draw one continuous body.
+      const auto movable = [](const detail::Entity& body) {
+        return !body.immovable && !(body.chain_kind == Mob::leech && body.view.predecessor);
+      };
+      const bool move_first = movable(first);
+      const bool move_second = movable(second);
+      const bool same_leech = first.chain_kind == Mob::leech && second.chain_kind == Mob::leech &&
                               first.root.value_or(first.view.id) ==
                                   second.root.value_or(second.view.id);
-      if (pair.push && (move_first || move_second) && !same_chain &&
+      if (pair.push && (move_first || move_second) && !same_leech &&
           first.view.group != Group::petal && second.view.group != Group::petal) {
         const Vec2 normal = distance > 0 ? delta * (1 / distance) : Vec2{1, 0};
         const Vec2 shift = normal * (depth / (move_first + move_second));
@@ -722,6 +727,9 @@ void Match::reap_deaths() {
     }
     auto body = entity->view;
     const auto source = entity->fatal_hit.value_or(DamageSource{});
+    if (body.mob == Mob::ant_hole && entity->spawn_count > 0) {
+      fallen_ant_holes_.push_back({id, body.rarity, body.position});
+    }
     if (entity->chain_kind && entity->chain_kind != Mob::leech) {
       const auto root = entity->root.value_or(id);
       std::optional<EntityId> successor;
@@ -741,15 +749,26 @@ void Match::reap_deaths() {
             successor = link;
           }
         }
+        if (!successor) {
+          // A previous cut may have left other fragments of the same wave mob.
+          const auto fragment = std::ranges::find_if(entities_.active(), [&](auto slot) {
+            const auto& piece = entities_.at(slot);
+            const auto* parent =
+                piece.view.predecessor ? entities_.get(*piece.view.predecessor) : nullptr;
+            return piece.root == root && piece.view.health > 0 &&
+                   (!parent || parent->view.health == 0);
+          });
+          if (fragment != entities_.active().end()) {
+            successor = entities_.at(*fragment).view.id;
+          }
+        }
       }
       // Settle the W3 root reward only on its last death.
       if (id == root && successor) {
         auto& promoted = *entities_.get(*successor);
         promoted.view.group = body.group;
         promoted.view.origin_wave = body.origin_wave;
-        promoted.root.reset();
-        promoted.view.predecessor.reset();
-        promoted.provoked = entity->provoked;
+        promoted.provoked = promoted.provoked || entity->provoked;
         for (const auto slot : entities_.active()) {
           auto& child = entities_.at(slot);
           if (child.root == root) {
@@ -767,7 +786,10 @@ void Match::reap_deaths() {
       for (const auto slot : entities_.active()) {
         auto& child = entities_.at(slot);
         if (child.view.predecessor == id) {
-          child.view.predecessor = body.predecessor;
+          // The following piece leads its own fragment, even when the previous
+          // fragment survives. Wave credit still belongs to the original mob.
+          child.view.predecessor.reset();
+          child.provoked = child.provoked || entity->provoked;
         }
       }
       if (!successor && id == root) {
