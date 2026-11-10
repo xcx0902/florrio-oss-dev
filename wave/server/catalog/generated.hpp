@@ -545,6 +545,10 @@ inline const Catalog& dated() {
 }  // namespace wave::catalog
 
 namespace wave::catalog {
+inline std::string_view mob_name(unsigned client_id) {
+  static constexpr std::string_view names[]{"Rock", "Cactus", "Ladybug", "Bee", "Baby Ant", "Worker Ant", "Soldier Ant", "Queen Ant", "Ant Hole", "Beetle", "Hornet", "Centipede", "Centipede", "Evil Centipede", "Evil Centipede", "Desert Centipede", "Desert Centipede", "Square", "Ladybug", "Ladybug", "Spider", "Scorpion", "Fire Ant", "Fire Ant Burrow", "Sandstorm", "Bubble", "Acid Bubble", "Shell", "Starfish", "Crab", "Jellyfish", "Digger", "Sponge", "Leech", "Leech"};
+  return client_id > 0 && client_id <= std::size(names) ? names[client_id - 1] : std::string_view{};
+}
 inline const CraftTable& craft_table() {
   static const CraftTable result{{60, 40, 20, 10, 3}, {600000, 400000, 200000, 100000, 30000}, 5, 5, "economy.reconstruction", {1, 4}, {1, 1, 1, 1}};
   return result;

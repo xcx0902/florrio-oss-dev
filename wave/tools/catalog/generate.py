@@ -495,7 +495,11 @@ def generate(pack):
               json.dumps(pack['version']), json.dumps(digest), json.dumps(pack['clientBuildHash']),
               json.dumps(pack['clientWasmSha256']), 'detail::petals', 'detail::mobs']) + '};',
               '  return result;', '}', '}  // namespace wave::catalog', '']
-    lines += ['namespace wave::catalog {', 'inline const CraftTable& craft_table() {',
+    lines += ['namespace wave::catalog {', 'inline std::string_view mob_name(unsigned client_id) {',
+              '  static constexpr std::string_view names[]{' +
+              ', '.join(json.dumps(r['name']) for r in pack['registries']['mobs']) + '};',
+              '  return client_id > 0 && client_id <= std::size(names) ? names[client_id - 1] : std::string_view{};',
+              '}', 'inline const CraftTable& craft_table() {',
               '  static const CraftTable result{{' + ', '.join(map(str, pack['craft']['clientPercent'])) +
               '}, {' + ', '.join(str(round(p * 1000000)) for p in pack['craft']['successProbabilities']) +
               '}, 5, 5, "economy.reconstruction", {' + ', '.join(map(str, pack['craft']['failureLossRange'])) +

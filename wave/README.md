@@ -13,11 +13,15 @@ npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --port 84
 ```
 
 左上角的场景菜单可切换 Garden、Desert 和 Ocean，三个场景共享访客存档。
+最高通关波按场景分别记录。开局波取队伍在当前场景的最低纪录的 2/3，向下取整，最低第 1 波。
 各场景按旧版 [Waves Wiki](https://official-florrio.fandom.com/wiki/Waves) 解锁怪物种类，
 刷怪完成且剩余主怪不超过 4 只时推进；清场超时也会推进，幸存怪物留场。
 第 21、31、41、51、61 波依次淘汰最低一档稀有度，第 61 波起只刷 Mythic。
 波次按需生成，可继续到旧客户端可表示的第 2,147,483,647 波。刷怪数量、清场时长和
 Mythic 后的强度增幅采用本地复刻参数。
+
+蜘蛛和水蛭的半径为同稀有度基准的 75%，追击速度为玩家基础移速的 110%；水母为 90%。
+分节怪物会在圆形场地的边缘弯曲身体，让每一节都留在场内。
 
 默认存档是 `build/wave/saves/profiles.sqlite3`；可用 `--database /absolute/path/save.sqlite3`
 或 `WAVE_DATABASE` 指定。关闭临时网页或重启宿主不会删除数据库。访客凭证在原版

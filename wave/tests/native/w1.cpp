@@ -581,9 +581,12 @@ void geometry_and_combat(Trace& trace) {
   FixtureAccess::shove(edge, *runner.body, {500, 500});
   step(edge, trace);
   const auto pushed = entity(edge, *runner.body).value();
-  check(pushed.position.length() <= 98 && pushed.position.y > 0 &&
-            entity(edge, *runner.petals.front().entity)->position.length() <= 99,
-        "diagonal knockback and petal projection respect their own center limits");
+  const auto orbiting = entity(edge, *runner.petals.front().entity)->position;
+  check(pushed.position.length() <= 98 && pushed.position.y > 0,
+        "diagonal knockback respects the flower's center limit");
+  check(orbiting.length() > 99 &&
+            std::abs((orbiting - pushed.position).length() - rules.orbit_radius) < 1e-9,
+        "the petal keeps its orbit radius outside the circular boundary");
   check(edge.queue(Input{runner.life, {0, -1}}), "turn inward");
   step(edge, trace);
   check(entity(edge, *runner.body)->heading_rad < -1, "movement heading is exposed in radians");

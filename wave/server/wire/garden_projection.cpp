@@ -112,6 +112,8 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     arc_cursor_ = room ? room->arc_sequence : 0;
     drop_cursor_ = room ? room->drop_sequence : 0;
   }
+  const auto player = view ? std::ranges::find(view->players, viewer.id, &sim::PlayerView::id)
+                           : std::vector<sim::PlayerView>::const_iterator{};
   std::set<Key> live;
   const auto visible = [](const sim::EntityView& e) {
     const auto* p = e.petal ? catalog::dated().petal(*e.petal, e.rarity) : nullptr;
@@ -133,7 +135,6 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     // Keep the nearest drops in the old client's bounded entity table.
     const std::size_t drop_limit = 512 - pickups.size();
     if (drops.size() > drop_limit) {
-      const auto player = std::ranges::find(view->players, viewer.id, &sim::PlayerView::id);
       const auto flower = player != view->players.end() && player->body
                               ? std::ranges::find(view->entities, *player->body, &sim::EntityView::id)
                               : view->entities.end();
@@ -158,11 +159,19 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   for (auto it = handles_.begin(); it != handles_.end();) {
     if (!live.contains(it->first)) {
       const auto cached = rendered_.find(it->first);
-      if (view && match == match_ && cached != rendered_.end() && cached->second.fade_on_remove) {
+      if (view && match == match_ && cached != rendered_.end()) {
         auto& ghost = cached->second;
         if (!ghost.expires) {
           ghost.expires = now + std::chrono::milliseconds(400);
           ghost.record.at(ghost.flags_offset) |= 1;  // $597: native 150 ms fade and expansion.
+          if (ghost.flower) {
+            const auto fallen = std::ranges::find(view->players, *ghost.flower, &sim::PlayerView::id);
+            if (fallen != view->players.end() && fallen->death_position) {
+              set_real(ghost.record, ghost.position_offset, fallen->death_position->x * world_scale);
+              set_real(ghost.record, ghost.position_offset + 4, fallen->death_position->y * world_scale);
+              ghost.record.back() = 0;
+            }
+          }
         }
         if (now < *ghost.expires) {
           out.bytes.insert(out.bytes.end(), ghost.record.begin(), ghost.record.end());
@@ -185,6 +194,9 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   std::uint32_t controlled = 0;
   sim::Vec2 camera;
   if (view) {
+    if (player != view->players.end() && player->death_position) {
+      camera = *player->death_position;
+    }
     for (const auto& e : view->entities) {
       if (!visible(e)) {
         continue;
@@ -204,12 +216,16 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       }
       const bool flower = e.group == sim::Group::player;
       Writer body;
-      std::uint32_t mask = 1 | 0x400 | 0x1000 | 0x80000;
-      body.byte(0);
-      if (e.mob == sim::Mob::leech || e.mob == sim::Mob::leech_segment) {
+      std::uint32_t mask = 0x400 | 0x1000 | 0x80000;
+      if (e.mob != sim::Mob::leech_segment) {
+        // $1795 follows predecessors until it finds this component on the Leech head.
+        mask |= 1;
+        body.byte(e.mob == sim::Mob::leech ? 1 : 0);
+      }
+      if (e.mob == sim::Mob::leech_segment && e.predecessor) {
         // $1795 follows the native 0x80 links to draw one continuous Leech.
         mask |= 0x80;
-        body.word(e.predecessor ? handle(*e.predecessor) : 0);
+        body.word(handle(*e.predecessor));
       }
       if (flower) {
         mask |= 0x20 | 0x100;
@@ -268,10 +284,14 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         // $597 renders 0x4000 as one seed; bit 0 selects the Grapes palette.
         mask |= 0x4000;
         body.byte(e.petal == sim::Petal::grapes ? 1 : 0);
-      } else if (e.petal) {
+      } else if (e.petal && !e.ground_web) {
         mask |= 0x10000;
         body.integer(catalog::client_petal(*e.petal, e.rarity).value_or(0));
         body.byte(static_cast<std::uint8_t>(e.rarity));
+      }
+      if (e.ground_web) {
+        mask |= 0x20000;  // $597: unfolded web renderer.
+        body.byte(0);
       }
       const auto flags_offset = body.bytes.size();
       body.byte(0);  // Generic render component ($592).
@@ -281,15 +301,15 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         body.byte(e.faction == sim::Faction::team ? 1 : 0);  // Native yellow ally palette.
         body.byte(static_cast<std::uint8_t>(e.rarity));
       }
-      if (flower) {
+      if (flower || (e.mob && e.rarity >= sim::Rarity::legendary && !e.predecessor)) {
         mask |= 0x200000;
         body.byte(0);
-        body.byte(0);
+        body.byte(flower ? 0 : 2);  // $991: draw the native world-space health bar.
         body.byte(static_cast<std::uint8_t>(255 * std::clamp(e.health / e.max_health, 0.0, 1.0)));
       }
       Writer record;
-      record.record(handle(e.id), mask, body, flower);
       const Key key{e.id.match.value, e.id.slot, e.id.generation};
+      record.record(handle(e.id), mask, body, flower, e.ground_web && !rendered_.contains(key));
       if (e.petal && e.anchor && !rendered_.contains(key)) {
         // $601 snaps all first-frame poses, including duplicate records.
         // Establish the flower center for one broadcast; the next orbit pose
@@ -301,10 +321,9 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         set_real(record.bytes, 8 + position_offset, anchor->position.x * world_scale);
         set_real(record.bytes, 12 + position_offset, anchor->position.y * world_scale);
       }
-      const bool fade = !e.petal || (e.anchor && e.petal != sim::Petal::peas &&
-                                     e.petal != sim::Petal::grapes);
-      rendered_.insert_or_assign(key,
-                                 Rendered{record.bytes, 8 + flags_offset, e.max_health, fade, {}});
+      rendered_.insert_or_assign(
+          key, Rendered{record.bytes, 8 + flags_offset, 8 + position_offset, e.max_health,
+                        flower ? std::optional{e.owner->player} : std::nullopt, {}});
       out.bytes.insert(out.bytes.end(), record.bytes.begin(), record.bytes.end());
       if (handle(e.id) == controlled) {
         camera = e.position;
@@ -366,11 +385,13 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   for (const auto byte : gallery) {
     profile.byte(byte);
   }
-  const auto player = view ? std::ranges::find(view->players, viewer.id, &sim::PlayerView::id)
-                           : std::vector<sim::PlayerView>::const_iterator{};
   // $601 -> profile+2316; $3384 uses 1920/scale and 1080/scale for the view bounds.
   profile.real(view && player != view->players.end() ? 1 / player->vision_multiplier : 1);
-  profile.text("");
+  // $939 copies profile+2320 into the native death screen's killer label.
+  profile.text(view && player != view->players.end() && player->killer
+                   ? catalog::mob_name(mob_type(player->killer->kind, sim::Group::main_mob,
+                                                player->killer->rarity))
+                   : std::string_view{});
   profile.real(0);
   profile.word(controlled);
   profile.real(camera.x * world_scale);
@@ -395,15 +416,39 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   }
   out.record(8193, 0x8000, profile, saved != nullptr);
 
-  if (room && !view) {
+  if (room) {
     Writer roster;
-    for (std::size_t i = 0; i < 4; ++i) {
-      roster.text(i < room->members.size() ? garden.member(room->members[i])->name : "");
+    std::uint8_t ready = 0;
+    std::array<std::uint32_t, 4> bodies{};
+    for (std::size_t i = 0; i < bodies.size(); ++i) {
+      const auto* member = i < room->members.size() ? garden.member(room->members[i]) : nullptr;
+      roster.text(member ? member->name : "");
+      if (!member) {
+        continue;
+      }
+      if (member->ready) {
+        ready |= 1 << i;
+      }
+      if (view) {
+        const auto teammate = std::ranges::find(view->players, member->id, &sim::PlayerView::id);
+        if (teammate != view->players.end() && teammate->body) {
+          bodies[i] = handle(*teammate->body);
+        }
+      }
     }
-    roster.zeros(21);
+    roster.byte(ready);
+    roster.zeros(4);  // Optional labels.
+    for (const auto body : bodies) {
+      roster.word(body);  // $954 resolves each teammate's position from this handle.
+    }
     roster.text(room->code);
-    roster.zeros(84);
-    for (std::size_t i = 0; i < 4; ++i) {
+    for (std::size_t i = 0; i < bodies.size(); ++i) {
+      // $939 compares this ID to the local profile entity, not its flower.
+      roster.word(i < room->members.size() && room->members[i] == viewer.token ? 8193 : bodies[i]);
+    }
+    roster.zeros(64);  // Optional equipment preview.
+    roster.real(0);
+    for (std::size_t i = 0; i < bodies.size(); ++i) {
       roster.byte(i < room->members.size() ? 1 : 0);
     }
     out.record(8194, 0x200, roster);
@@ -413,10 +458,6 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     had_roster_ = false;
   }
   if (view) {
-    Writer leaderboard;
-    leaderboard.integer(view->players.size());
-    leaderboard.zeros(61);
-    out.record(8195, 8, leaderboard);
     Writer arena;
     arena.integer(static_cast<std::uint32_t>(view->arena_radius * 2 * world_scale));
     arena.integer(static_cast<std::uint32_t>(view->arena_radius * 2 * world_scale));
@@ -459,7 +500,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     out.record(8197, 2048, wave);
     had_world_ = true;
   } else if (had_world_) {
-    result.removed.insert(result.removed.end(), {8195, 8196, 8197});
+    result.removed.insert(result.removed.end(), {8196, 8197});
     had_world_ = false;
   }
   Writer commands;

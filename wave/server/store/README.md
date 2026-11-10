@@ -69,13 +69,16 @@ XP, items, discoveries, highest wave, and an optional expected profile version.
 The canonical recipient set commits atomically and has one immutable result.
 Two claimants using the same pickup event cannot both win: the changed
 recipient fingerprint conflicts. Reordered identical shared recipients replay.
-Highest wave is monotonic; XP does not implicitly award wave progress.
+Highest wave is monotonic within each biome; XP does not implicitly award wave progress.
 
 ## Transactions and recovery
 
 The database uses WAL, foreign keys, a configured busy timeout (default 5 s), and
 `synchronous=FULL`. Schema v1 stores profiles, inventory, slots and discoveries;
-v2 adds command and reward journals. Both migrations run in one transaction.
+v2 adds command and reward journals; v3 tracks highest completed waves separately
+for Garden, Desert, and Ocean. The migration keeps the old aggregate for profile
+display. The new biome records start at zero because the old value had no biome.
+All migrations run in one transaction.
 Opening a future schema fails instead of silently reinterpreting it.
 
 Inventory, progression, profile version and the command/reward result commit

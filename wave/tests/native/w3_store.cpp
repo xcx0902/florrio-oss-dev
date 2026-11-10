@@ -141,7 +141,7 @@ void identity_and_migration() {
   Command full_command;
   {
     Store store(db.path);
-    check(store.schema_version() == 2, "fresh DB migrates through both schemas");
+    check(store.schema_version() == 3, "fresh DB migrates through all schemas");
     original = store.create_guest();
     check(original.guest_id > 0 && original.guest_token.size() == 64, "opaque persistent identity");
     check(original.xp == 0 && original.highest_wave == 0 && original.level == 1 &&
@@ -169,16 +169,20 @@ void identity_and_migration() {
   {
     Raw raw(db.path);
     check(raw.scalar("PRAGMA journal_mode") == "wal", "persistent WAL mode");
-    // Downgrade only the journal migration to model an existing v1 database.
-    raw.execute("DROP TABLE command_results; DROP TABLE reward_results; PRAGMA user_version=1");
+    // Model an existing v1 database before journal tables and biome records.
+    raw.execute("ALTER TABLE profiles DROP COLUMN garden_wave; "
+                "ALTER TABLE profiles DROP COLUMN desert_wave; "
+                "ALTER TABLE profiles DROP COLUMN ocean_wave; "
+                "DROP TABLE command_results; DROP TABLE reward_results; PRAGMA user_version=1");
   }
   {
     Store restored(db.path, deterministic());
-    check(restored.schema_version() == 2 && get(restored, original.guest_token) == original,
-          "migration v1->v2 preserves complete profile");
+    check(restored.schema_version() == 3 && get(restored, original.guest_token) == original,
+          "migration v1->v3 preserves complete profile");
     TestSeed all;
     all.xp = 202500;
     all.highest_wave = 57;
+    all.highest_waves = {12, 24, 48};
     for (std::uint32_t kind = 1; kind <= 45; ++kind) {
       for (std::uint8_t rarity = 0; rarity <= 5; ++rarity) {
         const Item item{kind, rarity};
@@ -214,7 +218,7 @@ void identity_and_migration() {
   {
     Raw raw(db.path);
     check(raw.scalar("PRAGMA integrity_check") == "ok", "SQLite integrity after reopen/migrate");
-    raw.execute("PRAGMA user_version=3");
+    raw.execute("PRAGMA user_version=4");
   }
   throws<Error>([&] { Store unsupported(db.path); }, "refuse newer schema");
 }
@@ -254,7 +258,12 @@ void shared_rewards_and_progress() {
   completion.highest_wave = 4;
   status(store.reward({"match-a", "wave", "4", {completion}}).code, Code::ok,
          "lower completion accepted");
-  check(get(store, a.guest_token).highest_wave == 12, "highest wave cannot regress");
+  completion.wave_biome = wave::sim::Biome::ocean;
+  status(store.reward({"match-ocean", "wave", "4", {completion}}).code, Code::ok,
+         "Ocean completion recorded independently");
+  const auto records = get(store, a.guest_token);
+  check(records.highest_wave == 12 && records.highest_waves == std::array{12u, 0u, 4u},
+        "completing waves updates only the current biome and cannot lower a record");
   const auto before_items = get(store, a.guest_token);
   status(
       store.reward({"match-a", "pickup", "petal-only", {grant(a.guest_id, 0, {{rose, 1}})}}).code,

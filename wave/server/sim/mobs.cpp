@@ -1,6 +1,7 @@
 #include "sim/match.hpp"
 #include "catalog/catalog.hpp"
 
+#include <map>
 #include <numbers>
 
 namespace wave::sim {
@@ -9,6 +10,51 @@ Tick seconds(const Rules& rules, double value) {
   return rules.timing.ticks_ceil(
       Microseconds(static_cast<Microseconds::rep>(std::ceil(value * 1e6))));
 }
+
+double segment_gap(Mob kind, double radii) {
+  // The Leech is drawn as a continuous body; separate Centipede outlines.
+  return radii * (kind == Mob::leech ? .9 : 1.1);
+}
+
+void place_segment(EntityView& body, const EntityView& parent, Vec2 direction, double gap,
+                   double arena_radius) {
+  const auto offset = direction * (-gap / direction.length());
+  const double limit = std::max(0., arena_radius - body.radius);
+  auto position = parent.position + offset;
+  if (position.length() > limit) {
+    if (const double distance = parent.position.length(); distance > 0) {
+      // Rotate the link just enough to fit. The cosine rule gives the closest
+      // legal direction without shortening the link or stacking its circles.
+      const auto inward = parent.position * (-1 / distance);
+      const Vec2 tangent{-inward.y, inward.x};
+      const double cosine = std::clamp(
+          (distance * distance + gap * gap - limit * limit) / (2 * distance * gap), -1., 1.);
+      const double sine = std::copysign(std::sqrt((1 - cosine) * (1 + cosine)),
+                                       offset.x * tangent.x + offset.y * tangent.y);
+      position = parent.position + (inward * cosine + tangent * sine) * gap;
+    }
+    // Also handles rounding or an arena too small to fit a full link.
+    position = clamp_center(position, arena_radius, body.radius);
+  }
+  body.position = position;
+  const auto forward = parent.position - position;
+  body.heading_rad = forward == Vec2{} ? parent.heading_rad : std::atan2(forward.y, forward.x);
+}
+}
+
+double Match::mob_radius(Mob kind, Rarity rarity) const {
+  constexpr std::array radii{7., 8., 9.5, 11.5, 14., 17.5};
+  const bool smaller = kind == Mob::spider || kind == Mob::leech || kind == Mob::leech_segment;
+  return radii.at(static_cast<unsigned>(rarity)) * (smaller ? .75 : 1.);
+}
+
+DamageSource Match::damage_source(const detail::Entity& entity) const {
+  const auto& view = entity.view;
+  auto mob = view.damage_mob;
+  if (const auto kind = entity.chain_kind ? entity.chain_kind : view.mob) {
+    mob = MobIdentity{*kind, view.rarity};
+  }
+  return {view.id, view.owner, view.faction, view.damage_origin, mob};
 }
 
 EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
@@ -23,6 +69,12 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
   view.faction = owner || kind == Mob::digger ? Faction::team : Faction::garden;
   view.origin_wave = wave;
   auto body = definition.body;
+  body.radius = mob_radius(kind, rarity);
+  if (kind == Mob::spider || kind == Mob::leech) {
+    body.speed_per_second = rules_.player.speed_per_second * 1.1;
+  } else if (kind == Mob::jellyfish) {
+    body.speed_per_second = rules_.player.speed_per_second * .9;
+  }
   // Keep increasing pressure after the highest catalog rarity is reached.
   const double strength =
       rules_.progressive_waves && wave > 61 ? 1 + std::log1p((wave - 61) / 100.0) : 1;
@@ -33,23 +85,35 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
   body.poison_ticks = rules_.timing.ticks_ceil(Microseconds(body.poison_ticks * 25000));
   body.contact_cooldown = rules_.timing.ticks_ceil(Microseconds(body.contact_cooldown * 25000));
   const auto id = add_entity(view, body);
-  entities_.get(id)->home_position = entities_.get(id)->view.position;
+  auto& head = *entities_.get(id);
+  head.home_position = head.view.position;
+  head.immovable = definition.ai == catalog::MobAI::stationary ||
+                   definition.ai == catalog::MobAI::spawner;
   entities_.get(id)->view.heading_rad =
       std::fmod((id.slot + 1) * 2.399963229728653, 2 * std::numbers::pi);
   entities_.get(id)->action_ready =
       tick_ + seconds(rules_, definition.ai == catalog::MobAI::spawner ? 0 : .5);
   if (definition.segments) {
-    entities_.get(id)->chain_kind = kind;
+    head.chain_kind = kind;
+    // Start with the tail pointing inward so an edge spawn has room for its links.
+    if (head.view.position != Vec2{}) {
+      head.view.heading_rad = std::atan2(head.view.position.y, head.view.position.x);
+    }
+    const double gap = segment_gap(kind, 2 * body.radius);
     const auto segment = std::ranges::find_if(rules_.catalog->mobs, [&](const auto& m) {
       return m.client_id == definition.segment_client_id && m.rarity == rarity;
     });
     auto previous = id;
+    view.radius = body.radius;
     for (unsigned i = 0; i < definition.segments; ++i) {
       view.mob = segment->kind;
       view.group = Group::segment;
-      view.position = position + Vec2{-(i + 1.0) * body.radius * 1.8, 0};
+      const auto& parent = entities_.get(previous)->view;
+      const Vec2 forward{std::cos(parent.heading_rad), std::sin(parent.heading_rad)};
+      place_segment(view, parent, forward, gap, rules_.arena_radius);
       auto segment_body = segment->body;
-      segment_body.health *= strength;
+      segment_body.radius = body.radius;
+      segment_body.health = kind == Mob::leech ? body.health : segment_body.health * strength;
       segment_body.contact_damage *= strength;
       segment_body.poison_per_tick *= scale;
       segment_body.poison_ticks =
@@ -184,32 +248,16 @@ void Match::update_mob_actions() {
     }
     const auto& definition = *rules_.catalog->mob(*e->view.mob, e->view.rarity);
     if (e->view.predecessor) {
-      if (e->chain_kind == Mob::leech) {
-        continue;  // Resolve Leech links in chain order after contacts and deaths.
-      }
-      const auto* previous = entities_.get(*e->view.predecessor);
-      const auto* root = e->root ? entities_.get(*e->root) : nullptr;
-      if (!previous || !root) {
-        entities_.erase(id);
-        continue;
-      }
-      const auto delta = previous->view.position - e->view.position;
-      const auto distance = delta.length();
-      const double gap = (previous->view.radius + e->view.radius) * .9;
-      if (distance > gap) {
-        e->view.position += delta * ((distance - gap) / distance);
-      }
-      e->view.heading_rad = std::atan2(delta.y, delta.x);
       continue;
     }
     if (definition.ai == catalog::MobAI::starfish) {
-      const DamageSource self{id, e->view.owner, e->view.faction, {}};
+      const auto self = damage_source(*e);
       (void)apply_health(id, self, HealthKind::heal,
                          e->view.max_health * .02 *
                              std::chrono::duration<double>(rules_.timing.step).count());
     }
     if (definition.ai == catalog::MobAI::digger) {
-      const DamageSource self{id, {}, Faction::team, {}};
+      const auto self = damage_source(*e);
       (void)apply_health(id, self, HealthKind::heal,
                          e->view.max_health * .01 *
                              std::chrono::duration<double>(rules_.timing.step).count());
@@ -219,7 +267,8 @@ void Match::update_mob_actions() {
       const auto& p = *rules_.catalog->petal(Petal::stick, e->view.rarity);
       for (const auto slot : entities_.active()) {
         auto& other = entities_.at(slot);
-        if (other.view.faction == e->view.faction || other.view.group == Group::petal) {
+        if (other.view.faction == e->view.faction || other.view.group == Group::petal ||
+            other.immovable || other.view.predecessor) {
           continue;
         }
         const auto delta = other.view.position - e->view.position;
@@ -237,7 +286,7 @@ void Match::update_mob_actions() {
         attack_scale *= slow.multiplier;
       }
     }
-    const auto source = DamageSource{id, e->view.owner, e->view.faction, {}};
+    const auto source = damage_source(*e);
     const auto position = e->view.position;
     const auto rarity = e->view.rarity;
     if (definition.ai == catalog::MobAI::ranged && e->target) {
@@ -262,9 +311,13 @@ void Match::update_mob_actions() {
       bullet.owner = e->view.owner;
       bullet.damage_origin = id;
       bullet.rarity = rarity;
-      bullet.position = position;
+      constexpr double missile_radius = 2;
+      const auto forward = delta * (1 / distance);
       bullet.heading_rad = std::atan2(delta.y, delta.x);
-      const auto shot = add_entity(bullet, {.radius = 2,
+      e->view.heading_rad = bullet.heading_rad;
+      bullet.position = position + forward * (e->view.radius + missile_radius);
+      bullet.damage_mob = source.mob;
+      const auto shot = add_entity(bullet, {.radius = missile_radius,
                                             .health = definition.missile_health,
                                             .contact_damage = definition.missile_damage,
                                             .contact_cooldown = 8});
@@ -284,36 +337,39 @@ void Match::update_mob_actions() {
       web.faction = e->view.faction;
       web.position = position;
       web.owner = e->view.owner;
-      const auto area = add_entity(
+      web.ground_web = true;
+      (void)add_entity(
           web, {.radius = rules_.catalog->petal(Petal::web, rarity)->area_radius, .health = 1});
-      entities_.get(area)->ground_web = true;
     }
   }
 }
 
-void Match::constrain_leeches() {
-  // Slot order can change when the pool reuses a handle. Settle each parent
-  // before its child so even a freshly rejoined chain stays connected.
-  const auto follow = [this](auto&& self, EntityView& body) -> void {
-    if (!body.predecessor) {
-      return;
-    }
-    auto& previous = entities_.get(*body.predecessor)->view;
-    self(self, previous);
-    const auto delta = previous.position - body.position;
-    const auto distance = delta.length();
-    const double gap = (previous.radius + body.radius) * .9;
-    if (distance > gap) {
-      body.position += delta * ((distance - gap) / distance);
-    }
-    if (distance > 0) {
-      body.heading_rad = std::atan2(delta.y, delta.x);
-    }
-  };
+void Match::constrain_segments() {
+  // Follow the links in chain order, independent of recycled entity slots.
+  std::map<std::uint32_t, detail::Entity*> successors;
   for (const auto slot : entities_.active()) {
     auto& entity = entities_.at(slot);
-    if (entity.chain_kind == Mob::leech) {
-      follow(follow, entity.view);
+    if (entity.view.predecessor) {
+      successors.emplace(entity.view.predecessor->slot, &entity);
+    }
+  }
+  for (const auto slot : entities_.active()) {
+    const auto& root = entities_.at(slot);
+    if (!root.chain_kind || root.view.predecessor) {
+      continue;
+    }
+    auto previous = &root.view;
+    for (auto next = successors.find(previous->id.slot); next != successors.end();
+         next = successors.find(previous->id.slot)) {
+      auto& body = next->second->view;
+      const Vec2 facing{std::cos(previous->heading_rad), std::sin(previous->heading_rad)};
+      const auto delta = previous->position - body.position;
+      const auto distance = delta.length();
+      // Keep bends smooth while letting the tail follow the head around turns.
+      const auto direction = distance > 0 ? delta * (.8 / distance) + facing * .2 : facing;
+      const double gap = segment_gap(*root.chain_kind, previous->radius + body.radius);
+      place_segment(body, *previous, direction, gap, rules_.arena_radius);
+      previous = &body;
     }
   }
 }
@@ -365,7 +421,7 @@ void Match::update_nests() {
       });
       if (!alive && entrance) {
         e->view.health = 0;
-        e->fatal_hit = DamageSource{id, {}, Faction::garden, {}};
+        e->fatal_hit = damage_source(*e);
       }
       continue;
     }
@@ -404,7 +460,7 @@ void Match::update_nests() {
     if (!entrance && fire) {
       auto& burrow = *entities_.get(id);
       burrow.view.health = 0;
-      burrow.fatal_hit = DamageSource{id, {}, Faction::garden, {}};
+      burrow.fatal_hit = damage_source(burrow);
     }
     // W3 runs nest encounters in this arena; W5 owns interior transfers.
   }

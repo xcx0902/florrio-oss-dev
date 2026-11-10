@@ -200,11 +200,18 @@ enum class DrawPurpose {
   projectile_phase
 };
 
+struct MobIdentity {
+  Mob kind;
+  Rarity rarity;
+  bool operator==(const MobIdentity&) const = default;
+};
+
 struct DamageSource {
   EntityId entity;
   std::optional<LifeId> owner;
   Faction faction = Faction::garden;
   std::optional<EntityId> instigator;
+  std::optional<MobIdentity> mob = {};
   bool operator==(const DamageSource&) const = default;
 };
 
@@ -231,6 +238,8 @@ struct EntityView {
   bool heal_blocked = false;
   std::optional<EntityId> damage_origin;
   bool split_particle = false;
+  bool ground_web = false;
+  std::optional<MobIdentity> damage_mob;
   std::optional<EntityId> predecessor;
   bool operator==(const EntityView&) const = default;
 };
@@ -256,6 +265,8 @@ struct PlayerView {
   std::vector<Rarity> loadout_rarities;
   double vision_multiplier = 1;
   double pickup_multiplier = 1;
+  std::optional<Vec2> death_position;
+  std::optional<MobIdentity> killer;
   bool operator==(const PlayerView&) const = default;
 };
 

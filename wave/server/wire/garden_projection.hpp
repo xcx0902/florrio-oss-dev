@@ -27,8 +27,9 @@ class GardenProjection {
   struct Rendered {
     Bytes record;
     std::size_t flags_offset;
+    std::size_t position_offset;
     double max_health;
-    bool fade_on_remove;
+    std::optional<sim::PlayerId> flower;
     std::optional<std::chrono::steady_clock::time_point> expires;
   };
   std::map<Key, Rendered> rendered_;

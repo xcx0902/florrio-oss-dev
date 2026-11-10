@@ -9,9 +9,6 @@ Tick ticks(const Rules& rules, double seconds) {
   return rules.timing.ticks_ceil(
       Microseconds(static_cast<Microseconds::rep>(std::ceil(seconds * 1e6))));
 }
-DamageSource source_of(const EntityView& view) {
-  return {view.id, view.owner, view.faction, view.damage_origin};
-}
 }
 
 void Match::refresh_passives() {
@@ -42,7 +39,7 @@ void Match::refresh_passives() {
       const auto* p = rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
       if (p && p->effect == catalog::Effect::starfish &&
           body.view.health < body.view.max_health * .5) {
-        impacts_.push_back({body.view.id, source_of(body.view), HealthKind::heal,
+        impacts_.push_back({body.view.id, damage_source(body), HealthKind::heal,
                             p->passive_heal_per_second *
                                 std::chrono::duration<double>(rules_.timing.step).count()});
       }
@@ -86,6 +83,7 @@ void Match::chain_attack(EntityId first, const DamageSource& source, double dama
     from = struck.view.position;
     struck.stun_until = tick_ + ticks(rules_, .1);
     struck.view.velocity = {};
+    // Keep each struck Leech segment as its own hit against the shared health.
     impacts_.push_back({*current, source, HealthKind::contact, damage});
     current.reset();
     double nearest = range;
@@ -116,6 +114,23 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
     return 0;
   }
   auto& body = target->view;
+  // The head owns the Leech's health. Keep every section's view in sync before
+  // processing the next impact, while keeping hit effects on the struck section.
+  auto& health_owner = target->chain_kind == Mob::leech && target->root
+                           ? *entities_.get(*target->root)
+                           : *target;
+  auto& health = health_owner.view.health;
+  const auto set_health = [&](double value) {
+    health = value;
+    if (health_owner.chain_kind == Mob::leech) {
+      for (const auto slot : entities_.active()) {
+        auto& section = entities_.at(slot);
+        if (section.root == health_owner.view.id) {
+          section.view.health = value;
+        }
+      }
+    }
+  };
   if (kind == HealthKind::shield) {
     if (source.faction != body.faction) {
       return 0;
@@ -129,8 +144,10 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
     if (source.faction != body.faction || target->heal_block_until > tick_) {
       return 0;
     }
-    amount = std::min(amount, body.max_health - body.health);
-    body.health += amount;
+    amount = std::min(amount, health_owner.view.max_health - health);
+    if (amount > 0) {
+      set_health(health + amount);
+    }
   } else {
     if (source.faction == body.faction && source.entity != id && kind != HealthKind::deferred) {
       return 0;
@@ -158,17 +175,19 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
         amount *= .1;
       }
     }
-    amount = std::min(amount, body.health);
-    body.health -= amount;
-    if (body.health == 0) {
-      target->fatal_hit = source;
+    amount = std::min(amount, health);
+    if (amount > 0) {
+      set_health(health - amount);
+      if (health == 0) {
+        health_owner.fatal_hit = source;
+      }
     }
     if (amount > 0 && !secondary) {
       if (body.mob && *body.mob != Mob::sandstorm && *body.mob != Mob::bubble) {
         const auto ai = rules_.catalog ? rules_.catalog->mob(*body.mob, body.rarity)->ai
                                        : catalog::MobAI::chase;
         if (ai != catalog::MobAI::passive || kind == HealthKind::radiation) {
-          target->provoked = true;
+          health_owner.provoked = true;
         }
         EntityId attacker = source.instigator.value_or(source.entity);
         if (source.owner) {
@@ -177,8 +196,8 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
             attacker = *owner->view.body;
           }
         }
-        if (target->provoked) {
-          target->target = attacker;
+        if (health_owner.provoked) {
+          health_owner.target = attacker;
         }
         // The dated Worker Ant page describes retaliation when another ant is hit.
         if (body.mob == Mob::baby_ant || body.mob == Mob::worker_ant ||
@@ -216,7 +235,7 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
         const auto* attacker = entities_.get(attacker_id);
         if (attacker && reflect > 0) {
           const double flower_factor = attacker->view.group == Group::player ? .25 : 1;
-          (void)apply_health(attacker_id, source_of(body), HealthKind::reflected,
+          (void)apply_health(attacker_id, damage_source(*target), HealthKind::reflected,
                              amount * reflect * flower_factor, true);
         }
       }
@@ -298,7 +317,7 @@ void Match::update_special_effects() {
     }
     e = entities_.get(target);
     if (!e || e->view.health <= 0 || e->view.group != Group::petal || e->projectile ||
-        e->ground_web || !e->view.owner) {
+        e->view.ground_web || !e->view.owner) {
       continue;
     }
     auto* owner = player(e->view.owner->player);
@@ -306,7 +325,7 @@ void Match::update_special_effects() {
       continue;
     }
     const auto& p = *rules_.catalog->petal(*e->view.petal, e->view.rarity);
-    const auto source = source_of(e->view);
+    const auto source = damage_source(*e);
     const auto owner_id = *owner->view.body;
     const auto origin = entities_.get(owner_id)->view.position;
     const auto delay = ticks(rules_, p.activation_seconds);

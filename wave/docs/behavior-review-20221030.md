@@ -21,7 +21,7 @@ World PvP → 显式复刻。Wiki 修订号和时间可在
 | `mob.acid_bubble`                | 复用主动追击/接触伤害                     | 截止前无可用 Wiki，World PvP 无同名 AI；酸液、爆炸等均未假定   |
 | `mob.sponge`                     | 静止接触防御                              | 截止前无可用 Wiki/同名 AI；是否吸收、吐出、再生及触发方式      |
 | `mob.shell`                      | 被动游走/接触伤害                         | 截止前无可用 Wiki；开合、护甲、反弹或其他攻击方式              |
-| `mob.leech`、`mob.leech_segment` | 独立 HP 分节追击、按原 Lifesteal 接触吸血 | 无截止前行为页；缠绕、附着/脱离、每次吸血还是每秒吸血          |
+| `mob.leech`、`mob.leech_segment` | 整条共享 HP、按原 Lifesteal 接触吸血     | 无截止前行为页；缠绕、附着/脱离、每次吸血还是每秒吸血          |
 | `mob.fire_ant`                   | 复用 Soldier Ant 追击                     | 截止前无可用独立页面；有无冲锋、特殊转向或群体行为             |
 | `mob.bubble`                     | 被动游走，不被 Uranium 激怒               | 未取得截止前独立怪物页；碰撞破裂等特殊表现                     |
 
@@ -33,8 +33,9 @@ World PvP → 显式复刻。Wiki 修订号和时间可在
 - Uranium：旧 Wiki 声称 Mythic 自伤二倍，原件提示全稀有度四倍；采用四倍。
 - Salt：旧 Wiki 对花朵减伤 80%，原件提示 75%；采用伤害乘 `.25`。
 - Iris：同期 Wiki 给出 15 DPS、Mythic 45 DPS；同总量不同 DPS 的覆盖优先级仍需核查。
-- 分节：同期页面包含逐节掉落说法；本次按 W3 的根奖励去重要求，整条最后一节才结算一次。
-  各节仍有独立 HP，断节继续移动；五节是复刻值，候选三至十二节。
+- 分节：同期页面包含逐节掉落说法；Wave 按 W3 的根奖励去重要求，整条只结算一次。
+  蜈蚣各节有独立 HP，断节继续移动。Leech 在当前 Wave 实现中共享 HP，每一节命中的闪电各扣一份伤害，整条同时死亡。
+  固定目录的证据记录保留了旧实现的独立 HP 说明；五节是复刻值，候选三至十二节。
 - Ant Hole Common/Unusual 的 5 Baby/8 Worker/26 Soldier/1 Queen 数量在旧页面带问号。
   Fire Ant Burrow 同级火蚁 3/2/1 采用同期修订。Rare+ 巢穴的同场放怪是 W3 遭遇代理，
   入洞、独立子区域和内部超时留给 W5，不能认为已恢复历史传送流程。
@@ -132,8 +133,8 @@ World PvP → 显式复刻。Wiki 修订号和时间可在
 | 31 / `mob.jellyfish`                | 采用 jellyfish AI；HP/接触/投射/吸血数值来自原件。                  | 有同期闪电连击证据，数值采用原件；2秒冷却、40单位范围与0.1秒停速为复刻。                                                                                                                        | 原件 ID 31<br>[Jellyfish r2421](https://official-florrio.fandom.com/wiki/Jellyfish?oldid=2421)（2022-10-26）                                                                            |
 | 32 / `mob.digger`                   | 采用 digger AI；HP/接触/投射/吸血数值来自原件。                     | 友方、攻击怪物、低血退边有同期证据；30%退边阈值、1%/秒自疗为复刻。                                                                                                                              | 原件 ID 32<br>[Digger r2485](https://official-florrio.fandom.com/wiki/Digger?oldid=2485)（2022-10-29）                                                                                  |
 | 33 / `mob.sponge`                   | 采用 stationary AI；HP/接触/投射/吸血数值来自原件。                 | 旧Wiki无截止前修订，world PvP无同名AI；采用静止接触防御，特殊吸收/吐出行为待核查。                                                                                                              | 原件 ID 33                                                                                                                                                                              |
-| 34 / `mob.leech`                    | 采用 leech AI；HP/接触/投射/吸血数值来自原件。                      | 精确Lifesteal已提取，接触吸血+分节追击；旧Wiki无截止前修订，是否缠绕/脱附及吸血频率待核查。 5节为复刻，候选3–12；各节独立生命，可断节；同期Wiki每节掉落与W3根节点奖励一次冲突，保留W3经济要求。 | 原件 ID 34                                                                                                                                                                              |
-| 35 / `mob.leech_segment`            | 采用 segment AI；HP/接触/投射/吸血数值来自原件。                    | 同Leech；独立HP/接触/跟随，整条奖励一次；节数5为复刻。                                                                                                                                          | 原件 ID 35                                                                                                                                                                              |
+| 34 / `mob.leech`                    | 采用 leech AI；头和身体共用头部的 HP，接触吸血。                    | 旧 Wiki 无截止前修订，是否缠绕/脱附及吸血频率待核查。五节为复刻，整条只结算一次奖励。                                                                                                            | 原件 ID 34                                                                                                                                                                              |
+| 35 / `mob.leech_segment`            | 跟随前一节、接触吸血；所受伤害扣除整条共享 HP。                    | 同 Leech；节数五为复刻。                                                                                                                                                                      | 原件 ID 35                                                                                                                                                                              |
 
 ## 修改与校验约定
 

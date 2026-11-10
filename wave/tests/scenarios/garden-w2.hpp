@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app/garden.hpp"
+#include "catalog/catalog.hpp"
 #include "scenarios/garden-w1.hpp"
 
 #include <sstream>
@@ -61,7 +62,14 @@ inline std::string garden_state(const app::Garden& garden) {
         }
         item_separator = true;
         out << "{\"id\":" << p.id.value << ",\"life\":" << p.life.generation
-            << ",\"state\":" << int(p.state) << ",\"connected\":" << p.connected << '}';
+            << ",\"state\":" << int(p.state) << ",\"connected\":" << p.connected;
+        if (p.death_position) {
+          out << ",\"deathX\":" << p.death_position->x << ",\"deathY\":" << p.death_position->y;
+        }
+        if (p.killer) {
+          out << ",\"killerId\":" << catalog::client_mob(p.killer->kind, p.killer->rarity).value();
+        }
+        out << '}';
       }
       out << "],\"entities\":[";
       item_separator = false;

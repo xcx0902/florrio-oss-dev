@@ -23,10 +23,6 @@ const Interaction& interaction(Faction source, Faction target) {
   return pve[static_cast<std::size_t>(source)][static_cast<std::size_t>(target)];
 }
 
-DamageSource source_of(const EntityView& entity) {
-  return {entity.id, entity.owner, entity.faction, entity.damage_origin};
-}
-
 std::optional<double> flight_contact(Vec2 start, Vec2 end, double radius) {
   const auto dot = [](Vec2 a, Vec2 b) { return a.x * b.x + a.y * b.y; };
   const double outside = dot(start, start) - radius * radius;
@@ -54,6 +50,13 @@ void Match::move_entities() {
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
     auto& body = entity.view;
+    std::erase_if(entity.slows,
+                  [this](const detail::Slow& effect) { return tick_ >= effect.until; });
+    if (entity.immovable || body.predecessor) {
+      body.velocity = {};
+      entity.knockback = {};
+      continue;
+    }
     Vec2 direction;
     if (entity.held) {
       const auto* owner = body.owner ? player(body.owner->player) : nullptr;
@@ -88,9 +91,15 @@ void Match::move_entities() {
     if (direction != Vec2{}) {
       body.heading_rad = std::atan2(direction.y, direction.x);
     }
+    if (body.mob == Mob::hornet && entity.target) {
+      if (const auto* target = entities_.get(*entity.target)) {
+        const auto aim = target->view.position - body.position;
+        if (aim != Vec2{}) {
+          body.heading_rad = std::atan2(aim.y, aim.x);
+        }
+      }
+    }
     double slow = 1;
-    std::erase_if(entity.slows,
-                  [this](const detail::Slow& effect) { return tick_ >= effect.until; });
     double movement_slow = 1;
     for (const auto& effect : entity.slows) {
       if (effect.slows_attacks) {
@@ -102,7 +111,7 @@ void Match::move_entities() {
     slow *= movement_slow;
     for (const auto area_slot : active) {
       const auto& area = entities_.at(area_slot);
-      if (!area.ground_web || area.view.faction == body.faction || body.group == Group::petal ||
+      if (!area.view.ground_web || area.view.faction == body.faction || body.group == Group::petal ||
           body.mob == Mob::spider) {
         continue;
       }
@@ -126,7 +135,7 @@ void Match::move_entities() {
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
     auto& body = entity.view;
-    if ((body.group == Group::petal && !entity.projectile) || body.predecessor) {
+    if ((body.group == Group::petal && !entity.projectile) || body.predecessor || entity.immovable) {
       continue;
     }
     auto displacement = body.velocity * seconds;
@@ -203,7 +212,7 @@ void Match::update_orbits() {
   }
   for (const auto slot : entities_.active()) {
     auto& petal = entities_.at(slot);
-    if (petal.view.group != Group::petal || petal.projectile || petal.held || petal.ground_web ||
+    if (petal.view.group != Group::petal || petal.projectile || petal.held || petal.view.ground_web ||
         !petal.view.anchor) {
       continue;
     }
@@ -270,9 +279,7 @@ void Match::update_orbits() {
       }
     }
     petal.view.heading_rad = heading;
-    petal.view.position =
-        clamp_center(body.position + offset * radius + cluster_offset, rules_.arena_radius,
-                     petal.view.radius);
+    petal.view.position = body.position + offset * radius + cluster_offset;
   }
 }
 
@@ -334,7 +341,7 @@ void Match::update_effects() {
   // Queue effects before contacts; useful healing is consumed when impacts are applied.
   for (const auto id : active) {
     auto* entity = entities_.get(id);
-    if (!entity || entity->projectile || entity->ground_web || entity->view.group != Group::petal ||
+    if (!entity || entity->projectile || entity->view.ground_web || entity->view.group != Group::petal ||
         entity->view.health <= 0) {
       continue;
     }
@@ -345,7 +352,7 @@ void Match::update_effects() {
     }
     const auto owner_body = *owner.view.body;
     const auto origin = entities_.get(owner_body)->view.position;
-    const auto source = source_of(entity->view);
+    const auto source = damage_source(*entity);
     const Tick delay = rules_.timing.ticks_ceil(
         Microseconds(static_cast<Microseconds::rep>(definition.activation_seconds * 1000000)));
     if (definition.effect == catalog::Effect::leaf) {
@@ -427,9 +434,9 @@ void Match::finish_projectiles() {
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
     const auto id = entity.view.id;
-    if (entity.spent && !entity.projectile && !entity.ground_web) {
+    if (entity.spent && !entity.projectile && !entity.view.ground_web) {
       consume_petal(id);
-    } else if (entity.ground_web) {
+    } else if (entity.view.ground_web) {
       const auto& definition = *rules_.catalog->petal(Petal::web, entity.view.rarity);
       if (std::chrono::duration<double>(rules_.timing.step).count() * (tick_ - entity.born_tick) >=
           definition.duration_seconds) {
@@ -439,16 +446,14 @@ void Match::finish_projectiles() {
                (entity.range_left <= 0 || entity.spent || entity.view.health <= 0 ||
                 (entity.expires && tick_ >= entity.expires))) {
       if (entity.view.petal == Petal::web) {
-        entity.projectile = false;
-        entity.ground_web = true;
-        entity.spent = false;
-        entity.born_tick = tick_;
-        entity.view.velocity = {};
-        entity.view.radius = rules_.catalog->petal(Petal::web, entity.view.rarity)->area_radius;
-        entity.view.health = entity.view.max_health = 1;
-        entity.rules.contact_damage = 0;
-        entity.poisons.clear();
-        entity.fatal_hit.reset();
+        // The original client keeps component presence for the life of a handle.
+        // Give the unfolded web its own entity and radius.
+        auto web = entity.view;
+        web.ground_web = true;
+        web.velocity = {};
+        const double radius = rules_.catalog->petal(Petal::web, web.rarity)->area_radius;
+        consume_petal(id);
+        (void)add_entity(web, {.radius = radius, .health = 1});
       } else {
         consume_petal(id);
       }
@@ -460,7 +465,7 @@ void Match::finish_projectiles() {
 
 void Match::resolve_contacts() {
   const auto attack = [this](detail::Entity& source, const detail::Entity& target) {
-    if (source.ready_tick > tick_ || source.ground_web || target.ground_web || source.spent ||
+    if (source.ready_tick > tick_ || source.view.ground_web || target.view.ground_web || source.spent ||
         source.view.health <= 0 || target.view.health <= 0) {
       return;
     }
@@ -482,20 +487,25 @@ void Match::resolve_contacts() {
         (target_definition && target_definition->mechanics.hidden)) {
       return;
     }
+    if (pair.damage && source.projectile && source.view.petal == Petal::web &&
+        target.view.group != Group::petal) {
+      source.spent = true;
+      return;
+    }
     if (definition && definition->effect == catalog::Effect::leaf && pair.heal && target.view.mob &&
         target.view.health < target.view.max_health) {
-      Impact hit{target.view.id, source_of(source.view), HealthKind::heal,
+      Impact hit{target.view.id, damage_source(source), HealthKind::heal,
                  definition->friendly_mob_heal};
       hit.consume_source = true;
       impacts_.push_back(hit);
     } else if (pair.damage && definition && definition->effect == catalog::Effect::lightning &&
                target.view.group != Group::petal) {
-      chain_attack(target.view.id, source_of(source.view), definition->mechanics.chain_damage,
+      chain_attack(target.view.id, damage_source(source), definition->mechanics.chain_damage,
                    definition->mechanics.bounces, 40);
       source.spent = true;
 
     } else if (pair.damage && source.rules.contact_damage > 0) {
-      impacts_.push_back({target.view.id, source_of(source.view), HealthKind::contact,
+      impacts_.push_back({target.view.id, damage_source(source), HealthKind::contact,
                           source.rules.contact_damage, source.rules.poison_per_tick,
                           source.rules.poison_ticks});
       if (definition && definition->mechanics.damage_ratio > 0) {
@@ -505,7 +515,7 @@ void Match::resolve_contacts() {
     } else if (pair.heal && source.rules.contact_heal > 0 &&
                target.view.health < target.view.max_health) {
       impacts_.push_back(
-          {target.view.id, source_of(source.view), HealthKind::heal, source.rules.contact_heal});
+          {target.view.id, damage_source(source), HealthKind::heal, source.rules.contact_heal});
     } else {
       return;
     }
@@ -524,7 +534,7 @@ void Match::resolve_contacts() {
           rules_.timing.ticks_ceil(Microseconds(static_cast<Microseconds::rep>(
               definition->duration_seconds * (target.view.group == Group::player ? .5 : 1) * 1e6)));
     }
-    if (pair.damage && definition &&
+    if (pair.damage && definition && !target.immovable && !target.view.predecessor &&
         (definition->mechanics.knockback > 0 || definition->effect == catalog::Effect::heavy)) {
       const auto delta = target.view.position - source.view.position;
       if (delta.length() > 0) {
@@ -584,20 +594,24 @@ void Match::resolve_contacts() {
       attack(second, first);
 
       const auto& pair = interaction(first.view.faction, second.view.faction);
-      if (pair.push && !first.ground_web && !second.ground_web &&
-          first.view.mob != Mob::fire_ant_burrow && second.view.mob != Mob::fire_ant_burrow &&
-          !(first.view.mob == Mob::ant_hole && first.view.rarity >= Rarity::rare) &&
-          !(second.view.mob == Mob::ant_hole && second.view.rarity >= Rarity::rare) &&
+      const bool move_first = !first.immovable && !first.view.predecessor;
+      const bool move_second = !second.immovable && !second.view.predecessor;
+      const bool same_chain = first.chain_kind && second.chain_kind &&
+                              first.root.value_or(first.view.id) ==
+                                  second.root.value_or(second.view.id);
+      if (pair.push && (move_first || move_second) && !same_chain &&
           first.view.group != Group::petal && second.view.group != Group::petal) {
         const Vec2 normal = distance > 0 ? delta * (1 / distance) : Vec2{1, 0};
-        const Vec2 shift = normal * (depth / 2);
-        first.view.position =
-            clamp_center(first.view.position - shift, rules_.arena_radius, first.view.radius);
-        second.view.position =
-            clamp_center(second.view.position + shift, rules_.arena_radius, second.view.radius);
-        if (pair.damage) {
-          const Vec2 impulse = normal * rules_.contact_knockback_speed;
+        const Vec2 shift = normal * (depth / (move_first + move_second));
+        const Vec2 impulse = normal * (pair.damage ? rules_.contact_knockback_speed : 0);
+        if (move_first) {
+          first.view.position =
+              clamp_center(first.view.position - shift, rules_.arena_radius, first.view.radius);
           first.knockback = first.knockback - impulse;
+        }
+        if (move_second) {
+          second.view.position =
+              clamp_center(second.view.position + shift, rules_.arena_radius, second.view.radius);
           second.knockback += impulse;
         }
       }
@@ -701,34 +715,31 @@ void Match::reap_deaths() {
     if (!entity) {
       continue;
     }
+    // Shared health kills the whole Leech. Only its head is a defeat.
+    if (entity->chain_kind == Mob::leech && entity->root) {
+      entities_.erase(id);
+      continue;
+    }
     auto body = entity->view;
     const auto source = entity->fatal_hit.value_or(DamageSource{});
-    if (entity->chain_kind) {
+    if (entity->chain_kind && entity->chain_kind != Mob::leech) {
       const auto root = entity->root.value_or(id);
       std::optional<EntityId> successor;
-      for (const auto slot : entities_.active()) {
-        const auto& child = entities_.at(slot);
-        if (child.root == root && child.view.health > 0) {
-          successor = child.view.id;
-          break;
-        }
-      }
-      // Keep a Leech in body order even when the entity pool reused its slots.
-      if (id == root && successor && entity->chain_kind == Mob::leech) {
-        auto previous = id;
-        for (;;) {
-          const auto next = std::ranges::find_if(entities_.active(), [&](auto slot) {
-            return entities_.at(slot).view.predecessor == previous;
+      if (id == root) {
+        // Follow the chain in order, even if the pool recycled a slot.
+        auto link = id;
+        while (!successor) {
+          const auto child = std::ranges::find_if(entities_.active(), [&](auto slot) {
+            return entities_.at(slot).view.predecessor == link;
           });
-          if (next == entities_.active().end()) {
+          if (child == entities_.active().end()) {
             break;
           }
-          const auto& child = entities_.at(*next).view;
-          if (child.health > 0) {
-            successor = child.id;
-            break;
+          const auto& next = entities_.at(*child).view;
+          link = next.id;
+          if (next.health > 0) {
+            successor = link;
           }
-          previous = child.id;
         }
       }
       // Settle the W3 root reward only on its last death.
@@ -756,8 +767,7 @@ void Match::reap_deaths() {
       for (const auto slot : entities_.active()) {
         auto& child = entities_.at(slot);
         if (child.view.predecessor == id) {
-          child.view.predecessor = entity->chain_kind == Mob::leech ? body.predecessor
-                                                                  : std::nullopt;
+          child.view.predecessor = body.predecessor;
         }
       }
       if (!successor && id == root) {
@@ -779,7 +789,10 @@ void Match::reap_deaths() {
     emit(Defeat{id, body.group, source, credit, body.mob, body.rarity, body.position,
                 body.origin_wave});
     if (body.group == Group::player) {
-      reap_player(*player(body.owner->player), LifeState::waiting);
+      auto& victim = *player(body.owner->player);
+      victim.view.death_position = body.position;
+      victim.view.killer = source.mob;
+      reap_player(victim, LifeState::waiting);
     } else {
       if (body.group == Group::petal) {
         detach_petal(id);

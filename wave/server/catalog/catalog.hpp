@@ -213,6 +213,7 @@ struct LevelTable {
   std::array<std::uint32_t, 3> slot_unlock_levels;
 };
 
+[[nodiscard]] std::string_view mob_name(unsigned client_id);
 [[nodiscard]] const CraftTable& craft_table();
 [[nodiscard]] const LevelTable& level_table();
 // Index L-1 is level L's cumulative XP; index maximum_level is the sentinel

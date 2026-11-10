@@ -268,10 +268,25 @@ void projectiles_and_poison() {
     }
     check(flights == count, "all particles become projectiles");
     auto& flight = FixtureAccess::get(match, shot);
-    const auto target = FixtureAccess::spawn(
-        match, flight.view.position + flight.flight_direction * 1.75, {.radius = 1, .health = 100});
+    const auto launch = flight.view.position;
     steps(match, 1);
-    check(FixtureAccess::get(match, target).view.health < 100, "projectile contact damage");
+    // Original World PvP advances 46.8373 client units in the first 25 ms.
+    near((flight.view.position - launch).length(), 9.367461839492728,
+         "first flight step matches original launch impulse at Wave scale");
+    const auto first = flight.view.position;
+    steps(match, 3);
+    near((flight.view.position - launch).length(), 31.323999820892258,
+         "flight slows toward original cruise speed");
+    check((flight.view.position - first).length() / 3 < (first - launch).length(),
+          "flight does not accelerate after launch");
+    const auto farther = FixtureAccess::spawn(
+        match, flight.view.position + flight.flight_direction * 6, {.radius = 1, .health = 100});
+    const auto target = FixtureAccess::spawn(
+        match, flight.view.position + flight.flight_direction * .5, {.radius = .25, .health = 100});
+    steps(match, 1);
+    check(FixtureAccess::get(match, target).view.health < 100 &&
+              FixtureAccess::get(match, farther).view.health == 100,
+          "projectile hits the nearer target along its path first");
     const auto after = FixtureAccess::get(match, target).view.health;
     steps(match, 1);
     if (kind == Petal::grapes) {
@@ -293,7 +308,7 @@ void projectiles_and_poison() {
     steps(match, 65);
     for (const auto& e : match.view().entities) {
       if (e.petal == kind) {
-        check(!FixtureAccess::get(match, e.id).projectile, "projectiles expire at bounded range");
+        check(!FixtureAccess::get(match, e.id).projectile, "projectiles expire after their flight");
       }
     }
   }
@@ -301,14 +316,25 @@ void projectiles_and_poison() {
     Match match({6}, 5, arena());
     check(match.add_player({1}, {}, {Petal::sand}), "admit breakable group");
     steps(match, 1);
-    auto ids = owner(match).petals[0].entities;
+    const auto ids = owner(match).petals[0].entities;
     FixtureAccess::kill(match, ids[0]);
-    check(owner(match).petals[0].entities.size() == 3 && owner(match).petals[0].reload_ticks == 0,
-          "one broken particle does not duplicate surviving particles");
-    for (std::size_t i = 1; i < ids.size(); ++i) {
-      FixtureAccess::kill(match, ids[i]);
-    }
-    check(owner(match).petals[0].reload_ticks > 0, "last broken particle starts shared reload");
+    const auto first = owner(match).petals[0];
+    check(first.entities.size() == 3 && first.reload_ticks == first.reload_total_ticks &&
+              first.reload_ticks > 0,
+          "losing one particle immediately starts shared reload");
+    steps(match, 2);
+    FixtureAccess::kill(match, ids[2]);
+    check(owner(match).petals[0].reload_ticks == first.reload_ticks,
+          "losing another particle restarts the original slot timer");
+    steps(match, first.reload_ticks);
+    check(owner(match).petals[0].entities == std::vector{ids[1], ids[3]},
+          "surviving petals stay equipped throughout recharge");
+    steps(match, 1);
+    const auto restored = owner(match).petals[0];
+    check(restored.reload_ticks == 0 && restored.entities.size() == ids.size() &&
+              restored.entities[0] != ids[0] && restored.entities[1] == ids[1] &&
+              restored.entities[2] != ids[2] && restored.entities[3] == ids[3],
+          "only missing particles return, in their original orbit positions");
   }
 }
 void web_summon_passive_equip() {
@@ -317,10 +343,10 @@ void web_summon_passive_equip() {
     check(match.add_player({1}, {}, {Petal::web}, {Rarity::unusual}), "admit Web");
     steps(match, 1);
     check(match.queue(Input{owner(match).life, {}, true, false}), "fire Web");
-    steps(match, 30);
+    steps(match, 46);
     std::optional<EntityView> area;
     for (const auto& e : match.view().entities) {
-      if (e.petal == Petal::web && FixtureAccess::get(match, e.id).ground_web) {
+      if (e.petal == Petal::web && e.ground_web) {
         area = e;
       }
     }
@@ -335,7 +361,7 @@ void web_summon_passive_equip() {
     near(FixtureAccess::get(match, spider).view.velocity.length(), 20, "Spider immune to Web");
     check(match.queue(Input{owner(match).life, {}, false, false}), "stop Web fire");
     steps(match, 400);
-    check(!FixtureAccess::get(match, slowed).ground_web, "unrelated mob unaffected by expiry");
+    check(!FixtureAccess::get(match, slowed).view.ground_web, "unrelated mob unaffected by expiry");
     for (const auto& e : match.view().entities) {
       check(e.id != area->id, "ground Web expires after ten seconds");
     }

@@ -94,6 +94,7 @@ EntityId petal(Match& m, unsigned i = 0) {
 }
 void all_variants() {
   unsigned petals = 0, mobs = 0;
+  std::array<double, 6> radii{};
   for (const auto& p : catalog::dated().petals) {
     Match m({1}, 3, arena());
     check(m.add_player({1}, {}, {p.kind}, {p.rarity}), "every petal can be equipped");
@@ -120,7 +121,16 @@ void all_variants() {
     m.add_player({1}, {}, {});
     steps(m);
     const auto id = FixtureAccess::spawn(m, mob.kind, mob.rarity);
-    near(FixtureAccess::get(m, id).view.max_health, mob.body.health, "all mob health variants");
+    const auto& body = FixtureAccess::get(m, id).view;
+    near(body.max_health, mob.body.health, "all mob health variants");
+    const bool smaller =
+        mob.kind == Mob::spider || mob.kind == Mob::leech || mob.kind == Mob::leech_segment;
+    const double scale = smaller ? .75 : 1.;
+    auto& size = radii.at(static_cast<unsigned>(mob.rarity));
+    if (size == 0) {
+      size = body.radius / scale;
+    }
+    near(body.radius, size * scale, "mob radii match their tier and species scale");
     near(FixtureAccess::get(m, id).rules.contact_damage, mob.body.contact_damage,
          "all mob damage variants");
     steps(m, 22);
@@ -128,6 +138,24 @@ void all_variants() {
     ++mobs;
   }
   check(petals == 270 && mobs == 210, "480 runtime variants exercised");
+  check(std::ranges::adjacent_find(radii, std::greater_equal{}) == radii.end(),
+        "mob radius increases at every rarity");
+}
+
+void pursuit_speeds() {
+  for (const auto kind : {Mob::spider, Mob::leech, Mob::jellyfish}) {
+    Match m({50}, 7, arena());
+    check(m.add_player({1}, {}, {}), "admit player for pursuit");
+    steps(m);
+    const auto mob = FixtureAccess::spawn(m, kind, Rarity::rare, {65, 0});
+    check(m.queue({owner(m).life, {-1, 0}, false, false}), "run away at full speed");
+    steps(m, 4);
+    const auto player_speed = FixtureAccess::get(m, flower(m)).view.velocity.length();
+    const auto& pursuer = FixtureAccess::get(m, mob).view;
+    const double ratio = kind == Mob::jellyfish ? .9 : 1.1;
+    check(pursuer.velocity.x < 0, "mob is chasing the player");
+    near(pursuer.velocity.length(), player_speed * ratio, "pursuit speed relative to the player");
+  }
 }
 void poison_and_slow() {
   Match m({3}, 4, arena());
@@ -289,6 +317,44 @@ void biome_progression() {
           "monsters keep getting stronger after reaching Mythic");
   }
 }
+void fixed_bodies_and_missile_death() {
+  auto rules = arena();
+  rules.player.health = 1;
+  Match m({51}, 3, rules);
+  m.add_player({1}, {80, 0}, {});
+  steps(m);
+  const auto nest = FixtureAccess::spawn(m, Mob::ant_hole, Rarity::common, {87, 0});
+  auto& stationary = FixtureAccess::get(m, nest);
+  stationary.rules.contact_damage = 0;
+  stationary.knockback = {100, 50};
+  steps(m);
+  check(stationary.view.position == Vec2{87, 0} && stationary.view.velocity == Vec2{},
+        "Ant Hole stays fixed during overlap and knockback");
+  const auto hornet = FixtureAccess::spawn(m, Mob::hornet, Rarity::common, {135, 0});
+  steps(m, 20);
+  const auto& head = FixtureAccess::get(m, hornet).view;
+  steps(m);
+  const auto view = m.view();
+  const auto missile = std::ranges::find(view.entities, hornet, &EntityView::damage_origin);
+  check(missile != view.entities.end(), "first Hornet missile was fired");
+  const Vec2 forward{std::cos(head.heading_rad), std::sin(head.heading_rad)};
+  near((missile->position - head.position -
+        forward * (head.radius + missile->radius)).length(), 0, "missile begins in front of the head");
+  check(missile->damage_mob == MobIdentity{Mob::hornet, Rarity::common},
+        "missile retains its Hornet identity");
+  // Remove the emitter before its missile lands. Attribution cannot rely on
+  // resolving the emitter's now stale entity handle.
+  FixtureAccess::hit(m, hornet, flower(m), 10000);
+  FixtureAccess::reap(m);
+  for (int i = 0; i < 40 && owner(m).body; ++i) {
+    steps(m);
+  }
+  const auto fallen = owner(m);
+  check(!fallen.body && fallen.death_position && fallen.death_position->x > 70 &&
+            fallen.killer == MobIdentity{Mob::hornet, Rarity::common},
+        "death retains its actual position and the departed missile's emitter");
+}
+
 void monsters() {
   Match m({8}, 1, arena());
   m.add_player({1}, {}, {});
@@ -385,7 +451,7 @@ void remaining_petals() {
     steps(m);
     const auto p = petal(m);
     const auto at = FixtureAccess::get(m, p).view.position;
-    const auto t = FixtureAccess::spawn(m, Mob::rock, Rarity::common, at + Vec2{1, 0});
+    const auto t = FixtureAccess::spawn(m, Mob::beetle, Rarity::common, at + Vec2{1, 0});
     auto& target = FixtureAccess::get(m, t);
     target.view.health = target.view.max_health = 1000;
     target.rules.contact_damage = 0;
@@ -468,12 +534,19 @@ void chains() {
   const auto root =
       FixtureAccess::spawn(m, Mob::centipede, Rarity::mythic, {100, 0}, Group::main_mob);
   FixtureAccess::main_wave(m, root);
+  steps(m, 15);
   std::vector<EntityId> segments;
   for (const auto& e : m.view().entities) {
     if (FixtureAccess::get(m, e.id).root == root) {
       segments.push_back(e.id);
       near(e.max_health, catalog::dated().mob(Mob::centipede_segment, Rarity::mythic)->body.health,
            "segments use their own rarity and exact health");
+      const auto& parent = FixtureAccess::get(m, *e.predecessor).view;
+      near(e.radius, parent.radius, "centipede head and segments have equal radii");
+      check((e.position - parent.position).length() > e.radius + parent.radius &&
+                std::abs(std::remainder(e.heading_rad - parent.heading_rad,
+                                        2 * std::acos(-1.0))) < .2,
+            "centipede sections do not overlap or zigzag on a gradual turn");
     }
   }
   check(segments.size() == 5, "all segment entities spawned");
@@ -499,6 +572,109 @@ void chains() {
     }
   }
   check(rewards == 1, "whole severed chain yields exactly one root reward");
+}
+
+void chains_stay_inside_arena() {
+  for (const auto kind : {Mob::centipede, Mob::evil_centipede, Mob::desert_centipede, Mob::leech}) {
+    auto rules = arena();
+    rules.arena_radius = 200;
+    rules.spawn_points = {{0, -150}};
+    Match m({52}, 1, rules);
+    check(m.add_player({1}, {110, 0}, {}), "admit player inside the rim");
+    steps(m);
+    const auto root = FixtureAccess::spawn(m, kind, Rarity::mythic, {200, 0});
+    auto& head = FixtureAccess::get(m, root);
+    head.provoked = true;
+    const auto start = m.view();
+    const auto first = std::ranges::find(start.entities, root, &EntityView::predecessor);
+    check(first != start.entities.end(), "spawned first body segment");
+    const double spacing = (head.view.position - first->position).length();
+    // A bunched link near the rim would be placed outside by an unconstrained follow step.
+    FixtureAccess::get(m, first->id).view.position = head.view.position + Vec2{-.1, 1};
+    for (int tick = 0; tick < 20; ++tick) {
+      steps(m);
+      for (const auto& e : m.view().entities) {
+        if (e.mob) {
+          check(e.position.length() + e.radius <= rules.arena_radius + 1e-6,
+                "the entire mob body stays in the arena");
+        }
+        if (e.predecessor) {
+          const auto& parent = FixtureAccess::get(m, *e.predecessor).view;
+          near((e.position - parent.position).length(), spacing,
+               "turning at the rim preserves segment spacing");
+        }
+      }
+    }
+  }
+}
+
+void leech_shared_health() {
+  Match m({49}, 1, arena());
+  m.add_player({1}, {}, {});
+  steps(m);
+  const auto attacker = flower(m);
+  const auto root = FixtureAccess::spawn(m, Mob::leech, Rarity::rare, {100, 0}, Group::main_mob);
+  FixtureAccess::main_wave(m, root);
+  const auto other = FixtureAccess::spawn(m, Mob::leech, Rarity::rare, {400, 0});
+  const auto max_health = catalog::dated().mob(Mob::leech, Rarity::rare)->body.health;
+  const auto check_chain = [&](double health) {
+    const auto view = m.view();
+    std::vector<EntityId> result;
+    auto parent = std::ranges::find(view.entities, root, &EntityView::id);
+    while (parent != view.entities.end()) {
+      near(parent->health, health, "every Leech section has the same current health");
+      near(parent->max_health, max_health, "every Leech section uses the head's maximum health");
+      result.push_back(parent->id);
+      const auto child = std::ranges::find(view.entities, parent->id, &EntityView::predecessor);
+      if (child != view.entities.end()) {
+        check(child->mob == Mob::leech_segment &&
+                  (child->position - parent->position).length() <= child->radius + parent->radius,
+              "Leech body uses segment identity and stays physically joined");
+      }
+      parent = child;
+    }
+    return result;
+  };
+  steps(m);
+  const auto original = check_chain(max_health);
+  check(original.size() == 6, "Leech spawns one head and five connected body sections");
+  FixtureAccess::hit(m, original[2], attacker, 20);
+  steps(m);
+  check(check_chain(max_health - 20) == original, "a nonlethal hit leaves the chain intact");
+  FixtureAccess::hit(m, root, attacker, 5);
+  FixtureAccess::hit(m, attacker, original.back(), 3);
+  check(check_chain(max_health - 22) == original, "head damage and tail lifesteal share health");
+
+  const auto before_lightning = m.events().size();
+  FixtureAccess::chain(m, original[2], attacker, 2);
+  std::vector<EntityId> struck;
+  for (const auto& event : m.events().subspan(before_lightning)) {
+    if (const auto* hit = std::get_if<HealthChange>(&event.data)) {
+      check(std::ranges::find(original, hit->target) != original.end() &&
+                std::ranges::find(struck, hit->target) == struck.end(),
+            "each lightning hit lands on a distinct section of the same Leech");
+      struck.push_back(hit->target);
+    }
+  }
+  check(struck.size() == 3 && check_chain(max_health - 52) == original,
+        "three lightning hits deal three times the damage to one shared health pool");
+  near(FixtureAccess::get(m, other).view.health, max_health, "each Leech has its own health pool");
+
+  FixtureAccess::hit(m, original.back(), attacker, max_health);
+  FixtureAccess::reap(m);
+  check(std::ranges::none_of(original, [&](EntityId id) { return FixtureAccess::exists(m, id); }),
+        "a lethal hit to the tail removes the whole Leech in the same tick");
+  unsigned defeats = 0;
+  for (const auto& event : m.events()) {
+    if (const auto* defeat = std::get_if<Defeat>(&event.data)) {
+      check(defeat->entity == root && defeat->mob == Mob::leech &&
+                defeat->source.entity == attacker && defeat->credit == PlayerId{1},
+            "the whole Leech defeat credits the player who landed the tail hit");
+      ++defeats;
+    }
+  }
+  check(defeats == 1 && m.view().wave.counts.defeated == 1,
+        "the Leech produces one defeat and one wave credit");
 }
 void timing_and_debts() {
   for (const auto us : {25000, 50000, 100000}) {
@@ -652,10 +828,18 @@ int main() {
     lightning_and_passives();
     phase = "monsters";
     monsters();
+    phase = "pursuit speeds";
+    pursuit_speeds();
+    phase = "static bodies and Hornet attribution";
+    fixed_bodies_and_missile_death();
     phase = "remaining petals";
     remaining_petals();
     phase = "chains";
     chains();
+    phase = "chains at the arena rim";
+    chains_stay_inside_arena();
+    phase = "Leech shared health";
+    leech_shared_health();
     phase = "timing/debts";
     timing_and_debts();
     phase = "lightning/ant alert";

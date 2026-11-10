@@ -128,9 +128,14 @@ function world(plain, baseline) {
     }
     if (mask & 0x200) {
       entity.names = Array.from({ length: 4 }, () => r.str());
-      r.skip(21);
+      entity.ready = r.byte();
+      entity.labels = Array.from({ length: 4 }, () => r.str());
+      entity.teammates = Array.from({ length: 4 }, () => r.word());
       entity.code = r.str();
-      r.skip(88);
+      r.skip(16);
+      for (let i = 0; i < 64; i += 1) r.vu();
+      r.skip(4);
+      entity.memberFlags = Array.from({ length: 4 }, () => r.byte());
     }
     if (mask & 0x400) {
       entity.angle = r.byte() | (r.byte() << 8);
@@ -156,15 +161,28 @@ function world(plain, baseline) {
       entity.seed = r.byte();
     }
     if (mask & 0x8000) {
-      entity.control = plain.readUInt32LE(r.cursor.offset + 323);
+      r.skip(2);
+      for (let i = 0; i < 280; i += 1) r.vu();
+      r.str();
+      entity.cameraY = r.real();
+      r.skip(27);
+      entity.zoom = r.real();
+      entity.killer = r.str();
+      r.real();
+      entity.control = r.word();
+      entity.cameraX = r.real();
       control = entity.control;
-      r.skip(607);
+      for (let i = 0; i < 276; i += 1) r.vu();
+      if ((header ^ 0xac) & 8) r.vu();
     }
     if (mask & 0x10000) {
       entity.petal = r.vu();
       if (entity.petal) {
         entity.rarity = r.byte();
       }
+    }
+    if (mask & 0x20000) {
+      entity.web = r.byte();
     }
     if (mask & 0x80000) {
       entity.renderFlags = r.byte();
@@ -423,6 +441,8 @@ export async function onlineCases({ browser, snapshot, nativeDir, output, report
     );
     assert.ok(a.current.control && b.current.control);
     assert.notEqual(a.current.control, b.current.control);
+    assert.deepEqual(a.baseline.get(8194).teammates, [a.current.control, b.current.control, 0, 0]);
+    assert.ok(!a.baseline.has(8195), 'Waves do not publish a leaderboard');
     assert.ok([...a.baseline.values()].some((e) => e.mob));
     assert.ok([...a.baseline.values()].some((e) => e.petal));
     await aim(a, [1, 0]);
@@ -458,13 +478,17 @@ export async function onlineCases({ browser, snapshot, nativeDir, output, report
           Math.hypot(y.x - bodyOf(s, aid).x, y.y - bodyOf(s, aid).y),
       )[0];
     s = await travel(a, aid, target);
-    assert.equal(
-      roomOf(s).players.find((p) => p.id === aid).state,
-      0,
-      'A waits after real W1 contact damage',
-    );
+    const fallen = roomOf(s).players.find((p) => p.id === aid);
+    assert.equal(fallen.state, 0, 'A waits after real W1 contact damage');
     await settle();
     assert.equal(a.current.control, 0);
+    const { killer, cameraX, cameraY } = a.baseline.get(8193);
+    assert.equal(killer, { 3: 'Ladybug', 4: 'Bee' }[fallen.killerId]);
+    assert.ok(Math.hypot(cameraX - fallen.deathX * 5, cameraY - fallen.deathY * 5) < 0.01);
+    await a.page.waitForFunction(
+      (name) => window.waveLabels.has(name) && window.waveLabels.has('You were destroyed by:'),
+      killer,
+    );
     report.cases['W2-04'].death = await photograph(a, 'W2-04-death.png');
     const beforeDenied = s.rejectedInputs;
     await a.page.mouse.move(900, 384);

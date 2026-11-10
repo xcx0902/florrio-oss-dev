@@ -80,6 +80,33 @@ store::Count count(const store::Profile& profile, store::Item item) {
   const auto found = profile.inventory.find(item);
   return found == profile.inventory.end() ? 0 : found->second;
 }
+void squad_opening_wave() {
+  store::Options options;
+  options.allow_test_seed = true;
+  const auto db = std::make_shared<store::Store>(":memory:", options);
+  const auto first = db->create_guest();
+  const auto second = db->create_guest();
+  for (const auto& [profile, waves] :
+       {std::pair{first, std::array{99u, 44u, 70u}}, std::pair{second, std::array{9u, 80u, 17u}}}) {
+    store::TestSeed seed;
+    seed.inventory = profile.inventory;
+    seed.slots = profile.slots;
+    seed.highest_waves = waves;
+    (void)db->seed_for_testing(profile.guest_token, seed);
+  }
+  app::Garden garden(sim::garden_rules(), 20221030, {}, db);
+  auto& a = garden.admit(first.guest_token, 1, sim::Biome::ocean);
+  auto& b = garden.admit(second.guest_token, 2, sim::Biome::ocean);
+  check(garden.command(a, wire::CreateSquad{true}, {}) &&
+            garden.command(b, wire::JoinSquad{a.room}, {}) &&
+            garden.command(a, wire::Ready{true}, {}) && garden.command(b, wire::Ready{true}, {}),
+        "two Ocean squad members ready");
+  garden.step();
+  const auto view = garden.room(a)->match->view();
+  check(view.biome == sim::Biome::ocean && view.wave.number == 11,
+        "opening wave is floor(two thirds of the lowest Ocean record)");
+}
+
 void queue_bound() {
   app::EconomyQueue queue(2);
   std::promise<void> started, release;
@@ -336,6 +363,7 @@ void economy() {
     check(drops.size() == 2 && drops[0].item == store::Item{5, 0} &&
               drops[1].item == store::Item{2, 1} && drops[0].position != drops[1].position,
           "the Common Rose and Unusual Light from one defeat occupy distinct ground positions");
+    check(garden.room(a)->pickups.empty(), "ground drops are not yet pickup animations");
     const auto item = drops.front().item;
     const auto second_item = drops.back().item;
     check(count(*a.profile, item) == 0 && count(*b.profile, item) == 0,
@@ -351,6 +379,14 @@ void economy() {
               count(*a.profile, second_item) == 0 && count(*b.profile, second_item) == 1 &&
               garden.room(a)->drops.empty(),
           "two claimants award the nearer one exactly one item");
+    const auto& pickups = garden.room(a)->pickups;
+    check(pickups.size() == 2 && pickups[0].drop.item == item &&
+              pickups[1].drop.item == second_item &&
+              std::ranges::all_of(pickups, [&](const app::Room::Pickup& pickup) {
+                return pickup.target == player(garden, b).body &&
+                       pickup.destination == sim::Vec2{200, 0};
+              }),
+          "committed drops animate toward the same recipient who received the items");
     for (unsigned i = 0; i < 8; ++i) {
       garden.step();
     }
@@ -650,6 +686,7 @@ void shutdown_failure() {
 int main() {
   try {
     queue_bound();
+    squad_opening_wave();
     commands();
     command_faults();
     economy();

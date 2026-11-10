@@ -12,7 +12,7 @@
 namespace wave::store {
 namespace {
 constexpr Count sql_max = static_cast<Count>(std::numeric_limits<std::int64_t>::max());
-constexpr int current_schema = 2;
+constexpr int current_schema = 3;
 
 bool valid(Item item) {
   return item.kind >= 1 && item.kind <= 80 && item.rarity <= 5;
@@ -200,6 +200,9 @@ struct Encoder {
     inventory(value.inventory);
     slots(value.slots);
     discoveries(value.discoveries);
+    for (const auto wave : value.highest_waves) {
+      n(wave);
+    }
   }
 };
 struct Decoder {
@@ -232,7 +235,7 @@ struct Decoder {
     }
     return {static_cast<std::uint32_t>(kind), static_cast<std::uint8_t>(rarity)};
   }
-  Profile profile() {
+  Profile profile(Count codec) {
     Profile value;
     const auto id = n();
     if (id == 0 || id > sql_max) {
@@ -268,6 +271,15 @@ struct Decoder {
     for (Count i = 0; i < size; ++i) {
       value.discoveries.insert(item());
     }
+    if (codec >= 2) {
+      for (auto& best : value.highest_waves) {
+        const auto wave = n();
+        if (wave > UINT32_MAX) {
+          corrupt();
+        }
+        best = static_cast<std::uint32_t>(wave);
+      }
+    }
     return value;
   }
   void end() const {
@@ -279,7 +291,7 @@ struct Decoder {
 
 std::string encode(const Result& result) {
   Encoder out;
-  out.n(1);
+  out.n(2);
   out.n(static_cast<Count>(result.code));
   out.profile(result.profile);
   out.n(result.craft.attempts);
@@ -290,7 +302,8 @@ std::string encode(const Result& result) {
 }
 Result decode_result(const std::string& bytes) {
   Decoder in{bytes};
-  if (in.n() != 1) {
+  const auto codec = in.n();
+  if (codec != 1 && codec != 2) {
     Decoder::corrupt();
   }
   Result result;
@@ -299,7 +312,7 @@ Result decode_result(const std::string& bytes) {
     Decoder::corrupt();
   }
   result.code = static_cast<Code>(code);
-  result.profile = in.profile();
+  result.profile = in.profile(codec);
   const auto attempts = in.n(), successes = in.n();
   if (attempts > max_craft_attempts || successes > attempts) {
     Decoder::corrupt();
@@ -314,7 +327,7 @@ Result decode_result(const std::string& bytes) {
 }
 std::string encode(const RewardResult& result) {
   Encoder out;
-  out.n(1);
+  out.n(2);
   out.n(static_cast<Count>(result.code));
   out.n(result.profiles.size());
   for (const auto& profile : result.profiles) {
@@ -324,7 +337,8 @@ std::string encode(const RewardResult& result) {
 }
 RewardResult decode_reward(const std::string& bytes) {
   Decoder in{bytes};
-  if (in.n() != 1) {
+  const auto codec = in.n();
+  if (codec != 1 && codec != 2) {
     Decoder::corrupt();
   }
   RewardResult result;
@@ -334,7 +348,7 @@ RewardResult decode_reward(const std::string& bytes) {
   }
   result.code = static_cast<Code>(code);
   for (Count i = 0; i < size; ++i) {
-    result.profiles.push_back(in.profile());
+    result.profiles.push_back(in.profile(codec));
   }
   in.end();
   result.replayed = true;
@@ -490,6 +504,16 @@ CREATE TABLE reward_results (
 );
 PRAGMA user_version=2;
 )SQL");
+        version = 2;
+      }
+      if (version == 2) {
+        // The old aggregate does not identify which biome it came from.
+        execute(db, R"SQL(
+ALTER TABLE profiles ADD COLUMN garden_wave INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN desert_wave INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN ocean_wave INTEGER NOT NULL DEFAULT 0;
+PRAGMA user_version=3;
+)SQL");
       }
       transaction.commit();
     } catch (...) {
@@ -554,7 +578,8 @@ PRAGMA user_version=2;
     if (id <= 0) {
       return {};
     }
-    Statement query(db, "SELECT token,xp,highest_wave,level,version FROM profiles WHERE id=?");
+    Statement query(db, "SELECT token,xp,highest_wave,level,version,garden_wave,desert_wave,"
+                        "ocean_wave FROM profiles WHERE id=?");
     query.number(1, static_cast<Count>(id));
     if (!query.row()) {
       return {};
@@ -566,6 +591,9 @@ PRAGMA user_version=2;
     result.highest_wave = static_cast<std::uint32_t>(query.number(2));
     result.level = static_cast<std::uint32_t>(query.number(3));
     result.version = query.number(4);
+    for (std::size_t biome = 0; biome < result.highest_waves.size(); ++biome) {
+      result.highest_waves[biome] = static_cast<std::uint32_t>(query.number(5 + biome));
+    }
     Statement inventory(
         db, "SELECT kind,rarity,count FROM inventory WHERE guest_id=? ORDER BY kind,rarity");
     inventory.number(1, static_cast<Count>(id));
@@ -635,13 +663,16 @@ PRAGMA user_version=2;
     if (profile.version >= sql_max) {
       throw Error(SQLITE_FULL, "profile version exhausted");
     }
-    Statement update(db, "UPDATE profiles SET xp=?,highest_wave=?,level=?,version=version+1 "
-                         "WHERE id=? AND version=?");
+    Statement update(db, "UPDATE profiles SET xp=?,highest_wave=?,level=?,version=version+1,"
+                         "garden_wave=?,desert_wave=?,ocean_wave=? WHERE id=? AND version=?");
     update.number(1, profile.xp);
     update.number(2, profile.highest_wave);
     update.number(3, profile.level);
-    update.number(4, static_cast<Count>(profile.guest_id));
-    update.number(5, profile.version);
+    for (std::size_t biome = 0; biome < profile.highest_waves.size(); ++biome) {
+      update.number(4 + biome, profile.highest_waves[biome]);
+    }
+    update.number(7, static_cast<Count>(profile.guest_id));
+    update.number(8, profile.version);
     update.done();
     if (sqlite3_changes(db) != 1) {
       throw Error(SQLITE_BUSY, "profile version changed");
@@ -875,7 +906,8 @@ RewardResult Store::reward(const RewardEvent& event) {
   fingerprint.n(recipients.size());
   GuestId previous = 0;
   for (const auto& reward : recipients) {
-    if (reward.guest_id <= previous || reward.xp > sql_max ||
+    const auto biome = static_cast<unsigned>(reward.wave_biome);
+    if (reward.guest_id <= previous || reward.xp > sql_max || biome > 2 ||
         (reward.expected_version && *reward.expected_version > sql_max)) {
       result.code = Code::invalid_request;
       return result;
@@ -895,7 +927,8 @@ RewardResult Store::reward(const RewardEvent& event) {
     }
     fingerprint.n(static_cast<Count>(reward.guest_id));
     fingerprint.n(reward.xp);
-    fingerprint.n(reward.highest_wave.has_value());
+    // Keep the old 0/1 fingerprints compatible for non-wave and Garden events.
+    fingerprint.n(reward.highest_wave ? biome + 1 : 0);
     if (reward.highest_wave) {
       fingerprint.n(*reward.highest_wave);
     }
@@ -940,7 +973,9 @@ RewardResult Store::reward(const RewardEvent& event) {
     }
     profile->level = level_for_xp(profile->xp);
     if (reward.highest_wave) {
-      profile->highest_wave = std::max(profile->highest_wave, *reward.highest_wave);
+      auto& best = profile->highest_waves.at(static_cast<unsigned>(reward.wave_biome));
+      best = std::max(best, *reward.highest_wave);
+      profile->highest_wave = std::max(profile->highest_wave, best);
     }
     for (const auto& [item, count] : reward.items) {
       if (!add(profile->inventory[item], count)) {
@@ -991,7 +1026,8 @@ Profile Store::seed_for_testing(std::string_view token, const TestSeed& seed) {
   }
   profile->xp = seed.xp;
   profile->level = level_for_xp(seed.xp);
-  profile->highest_wave = seed.highest_wave;
+  profile->highest_waves = seed.highest_waves;
+  profile->highest_wave = std::max(seed.highest_wave, std::ranges::max(seed.highest_waves));
   profile->inventory = seed.inventory;
   profile->slots = seed.slots;
   profile->discoveries = seed.discoveries;

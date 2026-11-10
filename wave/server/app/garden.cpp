@@ -786,6 +786,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
         store::Reward recipient;
         recipient.guest_id = e.member->profile->guest_id;
         recipient.highest_wave = transition->from;
+        recipient.wave_biome = room.biome;
         reward.recipients.push_back(std::move(recipient));
       }
       batch->events.push_back(std::move(reward));
@@ -858,7 +859,8 @@ void Garden::flush_economy() {
               if (room != rooms_.end() && room->second.economy_id == batch->match) {
                 const auto now = std::chrono::steady_clock::now();
                 std::erase_if(room->second.drops, [&](const Room::Drop& drop) {
-                  const auto pickup = std::ranges::find(batch->pickups, drop.id, &StorageState::Batch::Pickup::id);
+                  const auto pickup =
+                      std::ranges::find(batch->pickups, drop.id, &StorageState::Batch::Pickup::id);
                   if (pickup == batch->pickups.end()) {
                     return false;
                   }
@@ -929,7 +931,19 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
           return m.ready && m.connected;
         })) {
       auto rules = room.biome == sim::Biome::garden ? rules_ : sim::scenario_rules(room.biome);
-      room.match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_, std::move(rules));
+      std::size_t opening_index = 0;
+      if (rules.progressive_waves) {
+        const auto biome = static_cast<unsigned>(room.biome);
+        auto lowest = sim::max_wave_number;
+        for (const auto& token : room.members) {
+          const auto& profile = members_.at(token).profile;
+          lowest = std::min(lowest, profile ? profile->highest_waves.at(biome) : 0u);
+        }
+        // Start at floor(2/3 * minimum), with wave one for a fresh squad.
+        opening_index = std::max<std::uint64_t>(1, lowest * std::uint64_t{2} / 3) - 1;
+      }
+      room.match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_, std::move(rules),
+                                               opening_index);
       if (storage_) {
         room.economy_id = random_hex(32);
       }

@@ -9,7 +9,7 @@ namespace wave::sim {
 
 class Match {
  public:
-  Match(MatchId id, std::uint32_t seed, Rules rules);
+  Match(MatchId id, std::uint32_t seed, Rules rules, std::size_t opening_index = 0);
   Match(const Match&) = delete;
   Match& operator=(const Match&) = delete;
 
@@ -78,7 +78,9 @@ class Match {
   void update_special_effects();
   void refresh_passives();
   void update_mob_actions();
-  void constrain_leeches();
+  void constrain_segments();
+  [[nodiscard]] double mob_radius(Mob kind, Rarity rarity) const;
+  [[nodiscard]] DamageSource damage_source(const detail::Entity& entity) const;
   void update_nests();
   [[nodiscard]] Vec2 mob_direction(detail::Entity& entity);
   [[nodiscard]] EntityId spawn_mob(Mob kind, Rarity rarity, Vec2 position,

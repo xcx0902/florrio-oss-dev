@@ -22,6 +22,7 @@ std::size_t Match::choose(std::size_t size, DrawPurpose purpose) {
 }
 
 void Match::open_wave(std::size_t index, Tick start) {
+  const bool opening = !previous_wave_;
   wave_index_ = index;
   const auto definition = wave_rules_at(rules_, index);
   wave_ = {};
@@ -31,7 +32,7 @@ void Match::open_wave(std::size_t index, Tick start) {
   wave_.deadline_tick = start + definition.deadline;
   wave_.eligible = definition.eligible;
 
-  if (rules_.special_chance > 0 && (index != 0 || rules_.special_on_opening_wave)) {
+  if (rules_.special_chance > 0 && (!opening || rules_.special_on_opening_wave)) {
     std::vector<std::vector<Mob>> eligible_groups;
     for (const auto& group : rules_.special_groups) {
       std::vector<Mob> eligible;
@@ -117,7 +118,8 @@ void Match::spawn_due() {
     const auto& body = rules_.catalog
                            ? rules_.catalog->mob(slot.mob, slot.rarity)->body
                            : std::ranges::find(rules_.mobs, slot.mob, &MobRules::kind)->body;
-    const auto position = spawn_point(body.radius);
+    const auto radius = rules_.catalog ? mob_radius(slot.mob, slot.rarity) : body.radius;
+    const auto position = spawn_point(radius);
     SpawnOutcome outcome = SpawnOutcome::blocked;
     std::optional<SpawnFailure> failure;
     if (position) {

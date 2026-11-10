@@ -39,7 +39,7 @@ struct Entity {
   std::optional<DamageSource> fatal_hit;
   Tick born_tick = 0;
   bool projectile = false;
-  bool ground_web = false;
+  bool immovable = false;
   bool spent = false;
   double range_left = 0;
   Vec2 flight_direction;

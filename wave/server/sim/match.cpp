@@ -67,12 +67,14 @@ void validate(const Rules& rules) {
 
 }  // namespace
 
-Match::Match(MatchId id, std::uint32_t seed, Rules rules)
-    : id_(id), seed_(seed), rules_(std::move(rules)), entities_(id), rng_(seed) {
+Match::Match(MatchId id, std::uint32_t seed, Rules rules, std::size_t opening_index)
+    : id_(id), seed_(seed), rules_(std::move(rules)), entities_(id), rng_(seed),
+      wave_index_(opening_index) {
   if (id.value == 0) {
     throw std::invalid_argument("Wave match identity must be nonzero");
   }
   validate(rules_);
+  (void)wave_rules_at(rules_, wave_index_);
 }
 
 Match::Player* Match::player(PlayerId id) {
@@ -304,7 +306,9 @@ void Match::apply_commands() {
 }
 
 EntityId Match::add_entity(EntityView view, BodyRules body) {
-  view.position = clamp_center(view.position, rules_.arena_radius, body.radius);
+  if (!view.ground_web) {
+    view.position = clamp_center(view.position, rules_.arena_radius, body.radius);
+  }
   view.radius = body.radius;
   view.health = view.max_health = body.health;
   detail::Entity entity;
@@ -333,6 +337,8 @@ void Match::spawn_player(Player& entry) {
   }
   entry.view.body = add_entity(body, player_body);
   entry.view.state = LifeState::alive;
+  entry.view.death_position.reset();
+  entry.view.killer.reset();
   std::ranges::fill(entry.petal_ready, tick_);
   emit(LifeChange{entry.view.life, entry.view.body, LifeState::alive,
                   entities_.get(*entry.view.body)->view.position});
@@ -430,7 +436,7 @@ bool Match::step() {
   if (phase_ == Phase::waiting) {
     const bool opening = wave_.number == 0;
     if (opening) {
-      open_wave(0, tick_);
+      open_wave(wave_index_, tick_);
     }
     const bool can_respawn =
         rules_.lifecycle.respawn_next_wave &&
@@ -447,6 +453,7 @@ bool Match::step() {
   refresh_passives();
   spawn_due();
   move_entities();
+  constrain_segments();
   update_mob_actions();
   update_orbits();
   update_effects();
@@ -456,7 +463,7 @@ bool Match::step() {
   update_nests();
   finish_projectiles();
   reap_deaths();
-  constrain_leeches();
+  constrain_segments();
   update_orbits();
   adjudicate();
   ++tick_;

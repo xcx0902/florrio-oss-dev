@@ -14,6 +14,10 @@
 #include <string_view>
 #include <vector>
 
+namespace wave::sim {
+enum class Biome : std::uint8_t;
+}
+
 namespace wave::store {
 
 using GuestId = std::int64_t;
@@ -40,6 +44,7 @@ struct Profile {
   Slots slots{};
   std::set<Item> discoveries;  // Explicit mob gallery entries, never inferred from petals.
   Count version = 0;
+  std::array<std::uint32_t, 3> highest_waves{};  // Garden, Desert, Ocean.
   bool operator==(const Profile&) const = default;
 };
 
@@ -101,6 +106,7 @@ struct Reward {
   Inventory items;
   std::set<Item> discoveries;
   std::optional<Count> expected_version;
+  sim::Biome wave_biome{};
 };
 
 // App resolves damage owner, shared eligibility, pickup distance, and segmented
@@ -151,6 +157,7 @@ struct TestSeed {
   Inventory inventory;
   Slots slots{};
   std::set<Item> discoveries;
+  std::array<std::uint32_t, 3> highest_waves{};
 };
 
 class Error : public std::runtime_error {
