@@ -33,6 +33,7 @@ struct Entity {
   EntityView view;
   BodyRules rules;
   Vec2 knockback;
+  Vec2 recoil;
   double orbit_offset = 0;
   Tick ready_tick = 0;
   std::vector<Poison> poisons;

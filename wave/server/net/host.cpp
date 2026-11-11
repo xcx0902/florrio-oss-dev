@@ -248,10 +248,8 @@ class Connection : public std::enable_shared_from_this<Connection> {
       }
       session_.emplace(*garden_, ++last_guest_, *biome);
       socket_.next_layer().expires_never();
-      auto timeouts = ws::stream_base::timeout::suggested(beast::role_type::server);
-      timeouts.handshake_timeout = std::chrono::seconds(5);
-      timeouts.idle_timeout = std::chrono::seconds(30);
-      socket_.set_option(timeouts);
+      socket_.set_option(ws::stream_base::timeout{
+          std::chrono::seconds(5), ws::stream_base::none(), false});
       // Bound application buffering ourselves. Beast's automatic size failure
       // can tear down TCP before Chromium receives its close frame. Reading
       // only limit + 1 bytes lets async_close drain the remainder and complete

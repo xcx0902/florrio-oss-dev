@@ -44,8 +44,8 @@ std::optional<double> flight_contact(Vec2 start, Vec2 end, double radius) {
 
 void Match::move_entities() {
   const double seconds = std::chrono::duration<double>(rules_.timing.step).count();
-  const double flight_damping = std::pow(.992, seconds * 1000);
-  const double flight_drag = .125 * (1 - flight_damping) / seconds;
+  const double impulse_damping = std::pow(.992, seconds * 1000);
+  const double impulse_drag = .125 * (1 - impulse_damping) / seconds;
   const auto& active = entities_.active();
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
@@ -55,6 +55,7 @@ void Match::move_entities() {
     if (entity.immovable || body.predecessor) {
       body.velocity = {};
       entity.knockback = {};
+      entity.recoil = {};
       continue;
     }
     Vec2 direction;
@@ -126,11 +127,13 @@ void Match::move_entities() {
     }
     double speed = entity.projectile ? entity.flight_speed : entity.rules.speed_per_second;
     if (entity.projectile) {
-      speed += entity.flight_impulse * flight_drag;
-      entity.flight_impulse *= flight_damping;
+      speed += entity.flight_impulse * impulse_drag;
+      entity.flight_impulse *= impulse_damping;
     }
-    body.velocity =
-        entity.stun_until > tick_ ? Vec2{} : direction * (speed * slow) + entity.knockback;
+    body.velocity = entity.stun_until > tick_
+                        ? Vec2{}
+                        : direction * (speed * slow) + entity.knockback +
+                              entity.recoil * impulse_drag;
   }
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
@@ -150,13 +153,19 @@ void Match::move_entities() {
       const double distance = clamped.length();
       if (distance == 0) {
         entity.knockback = {};
+        entity.recoil = {};
       } else {
         const Vec2 normal = clamped * (1 / distance);
-        const double outward = normal.x * entity.knockback.x + normal.y * entity.knockback.y;
-        entity.knockback = entity.knockback - normal * std::max(0.0, outward);
+        const auto cancel_outward = [normal](Vec2 impulse) {
+          const double outward = normal.x * impulse.x + normal.y * impulse.y;
+          return impulse - normal * std::max(0.0, outward);
+        };
+        entity.knockback = cancel_outward(entity.knockback);
+        entity.recoil = cancel_outward(entity.recoil);
       }
     }
     entity.knockback = entity.knockback * rules_.knockback_retention;
+    entity.recoil = entity.recoil * impulse_damping;
     body.velocity = (clamped - body.position) * (1 / seconds);
     if (entity.projectile) {
       entity.flight_start = body.position;

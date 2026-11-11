@@ -385,6 +385,38 @@ void fixed_bodies_and_missile_death() {
         "death retains its actual position and the departed missile's emitter");
 }
 
+void hornet_recoil_and_missile_size() {
+  double last_radius = 0;
+  for (const auto rarity : {Rarity::common, Rarity::unusual, Rarity::rare, Rarity::epic,
+                            Rarity::legendary, Rarity::mythic}) {
+    Match m({54}, 1, arena());
+    check(m.add_player({1}, {}, {}), "admit a player for the Hornet to target");
+    steps(m);
+    const auto hornet = FixtureAccess::spawn(m, Mob::hornet, rarity, {65, 0});
+    FixtureAccess::get(m, hornet).rules.speed_per_second = 0;
+    steps(m, 21);
+    const auto shot = m.view();
+    const auto missile = std::ranges::find(shot.entities, hornet, &EntityView::damage_origin);
+    check(missile != shot.entities.end() && missile->rarity == rarity &&
+              missile->radius > last_radius,
+          "Hornet missiles get larger at each rarity");
+    last_radius = missile->radius;
+
+    const auto before = FixtureAccess::get(m, hornet).view;
+    near(missile->radius / before.radius, 11. / 35, "missile scales with its emitter");
+    const Vec2 direction{std::cos(missile->heading_rad), std::sin(missile->heading_rad)};
+    constexpr double old_impulse = .4 * 1000 / 5;
+    const double damping = std::pow(.992, 25);
+    const auto recoil = direction * (-old_impulse * .125 * (1 - damping));
+    steps(m);
+    const auto after = FixtureAccess::get(m, hornet).view.position;
+    near((after - before.position - recoil).length(), 0, "Hornet recoils opposite the shot");
+    steps(m);
+    near((FixtureAccess::get(m, hornet).view.position - after - recoil * damping).length(), 0,
+         "recoil decays with the older engine's drag");
+  }
+}
+
 void monsters() {
   Match m({8}, 1, arena());
   m.add_player({1}, {}, {});
@@ -953,6 +985,8 @@ int main() {
     pursuit_speeds();
     phase = "static bodies and Hornet attribution";
     fixed_bodies_and_missile_death();
+    phase = "Hornet recoil and missile size";
+    hornet_recoil_and_missile_size();
     phase = "remaining petals";
     remaining_petals();
     phase = "chains";

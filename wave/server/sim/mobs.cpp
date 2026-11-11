@@ -334,12 +334,16 @@ void Match::update_mob_actions() {
       bullet.owner = e->view.owner;
       bullet.damage_origin = id;
       bullet.rarity = rarity;
-      constexpr double missile_radius = 2;
+      // The older engine uses an 11-unit stinger and a 0.4-unit/ms recoil.
+      // Convert from client units, then grow the shot with its Hornet's tier.
+      const double missile_radius = (11. / 5) * e->view.radius /
+                                    mob_radius(Mob::hornet, Rarity::common);
       const auto forward = delta * (1 / distance);
       bullet.heading_rad = std::atan2(delta.y, delta.x);
       e->view.heading_rad = bullet.heading_rad;
       bullet.position = position + forward * (e->view.radius + missile_radius);
       bullet.damage_mob = source.mob;
+      e->recoil += forward * (-.4 * 1000 / 5);
       const auto shot = add_entity(bullet, {.radius = missile_radius,
                                             .health = definition.missile_health,
                                             .contact_damage = definition.missile_damage,

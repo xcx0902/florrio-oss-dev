@@ -255,6 +255,10 @@ async function browserCase(browser, host, label) {
     assert.equal(first?.url, host.url.replace('http:', 'ws:') + 'wave/socket');
     assert.ok(labels.includes('Garden') && labels.includes('Squad'));
     assert.deepEqual(errors, []);
+    assert.ok(
+      !events.some(({ text }) => text?.includes('wasm streaming compile failed')),
+      'The client must load without falling back to the unadapted Wasm',
+    );
     Object.assign(report.cases[label], { guest, labels, screenshot, status: 'passed' });
     return guest;
   } finally {

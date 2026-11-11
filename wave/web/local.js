@@ -4,6 +4,80 @@
     return;
   }
 
+  // Adapt the pinned October client in memory; the served Wasm is unchanged.
+  // $597 scales fixed-size world art, and $991 skips the local AFK timer.
+  const uleb = (value) => {
+    const bytes = [];
+    do {
+      const next = value & 0x7f;
+      value >>>= 7;
+      bytes.push(next | (value ? 0x80 : 0));
+    } while (value);
+    return bytes;
+  };
+  const artScale = (types, baseRadius) => {
+    // $0 = type component, $1 = canvas state, $2 = entity.
+    const test = types.flatMap((type, i) => [
+      0x20, 0, 0x2d, 0, 8, 0x41, type, 0x46, // type->id == type
+      ...(i ? [0x72] : []),                   // i32.or
+    ]);
+    const radius = [0x20, 2, 0x28, 2, 92];   // entity->radius component
+    const base = new Uint8Array(4);
+    new DataView(base.buffer).setFloat32(0, baseRadius, true);
+    const basis = [0, 4, 8, 12].flatMap((offset) => [
+      0x20, 1, 0x20, 1, 0x2a, 2, offset,    // &matrix, matrix[offset]
+      ...radius, 0x2a, 2, 8, 0x43, ...base, // radius->value, baseRadius
+      0x95, 0x94, 0x38, 2, offset,          // divide, multiply, store f32
+    ]);
+    return [
+      ...test, 0x04, 0x40, ...radius, 0x04, 0x40, ...basis,
+      0x20, 1, 0x41, 1, 0x3a, 0, 48,      // mark canvas transform dirty
+      0x0b, 0x0b,
+    ];
+  };
+  const adaptWaveClient = (wasm) => {
+    const missile = artScale([9], 15);
+    const fixedMobs = artScale([5, 6, 7, 8, 18, 23], 35);
+    const growth = missile.length + fixedMobs.length;
+    const petalBranch = [0x20, 2, 0x28, 2, 108, 0x22, 0, 0x04, 0x40];
+    const mobBranch = [0x20, 2, 0x28, 2, 124, 0x22, 0, 0x45, 0x0d, 0];
+    const idleBranch = [0x02, 0x40, 0x02, 0x40, 0x20, 11, 0x45, 0x0d, 0];
+    const edits = [
+      [18538, uleb(2330231), uleb(2330231 + growth)], // Code section size
+      [580942, uleb(8411), uleb(8411 + growth)],      // $597 body size
+      [580944 + 4921, petalBranch, [...petalBranch, ...missile]],
+      [580944 + 8174, mobBranch, [...mobBranch, ...fixedMobs]],
+      // Always take $991's existing path that clears the AFK deadline.
+      [1436535 + 4217, idleBranch, [0x02, 0x40, 0x02, 0x40, 0x41, 0, 0x45, 0x0d, 0]],
+    ];
+    const result = new Uint8Array(wasm.length + growth);
+    let input = 0;
+    let output = 0;
+    for (const [offset, before, after] of edits) {
+      if (!before.every((byte, i) => wasm[offset + i] === byte)) {
+        throw new Error('Wave runtime fixes require the pinned October client');
+      }
+      result.set(wasm.subarray(input, offset), output);
+      output += offset - input;
+      result.set(after, output);
+      output += after.length;
+      input = offset + before.length;
+    }
+    result.set(wasm.subarray(input), output);
+    return result;
+  };
+  const instantiateStreaming = WebAssembly.instantiateStreaming;
+  if (instantiateStreaming) {
+    WebAssembly.instantiateStreaming = async (source, imports, ...options) => {
+      const response = await source;
+      if (response.url !== new URL('/client.wasm', location.href).href || !response.ok) {
+        return instantiateStreaming(response, imports, ...options);
+      }
+      const wasm = adaptWaveClient(new Uint8Array(await response.arrayBuffer()));
+      return WebAssembly.instantiate(wasm, imports, ...options);
+    };
+  }
+
   // Restore only the original presentation cache before the October Wasm loads.
   // The bearer token selects the durable server profile; socket mutations validate ownership.
   try {
