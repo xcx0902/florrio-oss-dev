@@ -3,6 +3,7 @@
 
 #include <limits>
 #include <numbers>
+#include <unordered_map>
 
 namespace wave::sim {
 namespace {
@@ -222,7 +223,7 @@ void Match::update_orbits() {
   for (const auto slot : entities_.active()) {
     auto& petal = entities_.at(slot);
     if (petal.view.group != Group::petal || petal.projectile || petal.held || petal.view.ground_web ||
-        !petal.view.anchor) {
+        petal.healing || !petal.view.anchor) {
       continue;
     }
     const auto& body = entities_.get(*petal.view.anchor)->view;
@@ -282,9 +283,14 @@ void Match::update_orbits() {
           p.kind != Petal::peas && p.kind != Petal::grapes) {
         // Pack the particles around their slot center. Spacing is in world units,
         // so attacking or aiming farther away does not stretch the cluster.
-        const double angle = heading + turn * petal.particle_index / p.particles;
-        cluster_offset = Vec2{std::cos(angle), std::sin(angle)} *
-                         (p.body.radius * .75 / std::sin(std::numbers::pi / p.particles));
+        const bool dahlia = p.kind == Petal::dahlia;
+        // Match the original three-particle Rose ring (11 client units). Put
+        // Dahlia's first petal on the inside so it can heal without crossing the others.
+        const double angle = heading + (dahlia ? std::numbers::pi : 0) +
+                             turn * petal.particle_index / p.particles;
+        const double cluster_radius =
+            dahlia ? 2.2 : p.body.radius * .75 / std::sin(std::numbers::pi / p.particles);
+        cluster_offset = Vec2{std::cos(angle), std::sin(angle)} * cluster_radius;
       }
     }
     petal.view.heading_rad = heading;
@@ -343,9 +349,27 @@ void Match::update_effects() {
     return;
   }
   const double seconds = std::chrono::duration<double>(rules_.timing.step).count();
+  // The original Rose closes in over nine 25 ms updates with exponential easing.
+  const double heal_step = 1 - std::pow(.8, seconds * 60);
+  const Tick heal_travel = rules_.timing.ticks_ceil(std::chrono::milliseconds(225));
+  const auto can_heal = [this](const detail::Entity& petal, const detail::Entity& target) {
+    const auto& body = target.view;
+    return body.group == Group::player && body.faction == petal.view.faction &&
+           body.health > 0 && body.health < body.max_health && target.heal_block_until <= tick_;
+  };
+  // Reserve healing already on its way, so a small injury only draws one petal.
+  std::unordered_map<std::uint32_t, double> incoming_heal;
   std::vector<EntityId> active;
   for (auto slot : entities_.active()) {
-    active.push_back(entities_.at(slot).view.id);
+    const auto& entity = entities_.at(slot);
+    active.push_back(entity.view.id);
+    if (entity.healing && entity.view.health > 0) {
+      const auto* target = entities_.get(entity.healing->recipient);
+      if (target && can_heal(entity, *target)) {
+        incoming_heal[target->view.id.slot] +=
+            rules_.catalog->petal(*entity.view.petal, entity.view.rarity)->heal;
+      }
+    }
   }
   // Queue effects before contacts; useful healing is consumed when impacts are applied.
   for (const auto id : active) {
@@ -367,29 +391,46 @@ void Match::update_effects() {
     if (definition.effect == catalog::Effect::leaf) {
       impacts_.push_back(
           {owner_body, source, HealthKind::heal, definition.passive_heal_per_second * seconds});
-    } else if (definition.effect == catalog::Effect::rose && tick_ >= entity->born_tick + delay) {
-      // Owner first, then nearest teammate; no consumption at full health or outside range.
-      std::optional<EntityId> target;
-      double closest = definition.range;
-      for (const auto candidate : entities_.active()) {
-        const auto& body = entities_.at(candidate).view;
-        if (body.group != Group::player || body.faction != entity->view.faction ||
-            body.health <= 0 || body.health >= body.max_health) {
-          continue;
-        }
-        const double distance = (body.position - origin).length();
-        if (body.id == owner_body || distance <= closest) {
-          target = body.id;
-          closest = distance;
-          if (body.id == owner_body) {
-            break;
+    } else if ((definition.effect == catalog::Effect::rose ||
+                definition.effect == catalog::Effect::dahlia) &&
+               tick_ >= entity->born_tick + delay) {
+      if (!entity->healing) {
+        // Owner first, then nearest teammate who still needs healing.
+        std::optional<EntityId> target;
+        double closest = definition.range;
+        for (const auto candidate : entities_.active()) {
+          const auto& recipient = entities_.at(candidate);
+          const auto& body = recipient.view;
+          if (!can_heal(*entity, recipient) ||
+              body.health + incoming_heal[body.id.slot] >= body.max_health) {
+            continue;
+          }
+          const double distance = (body.position - origin).length();
+          if (body.id == owner_body || distance <= closest) {
+            target = body.id;
+            closest = distance;
+            if (body.id == owner_body) {
+              break;
+            }
           }
         }
+        if (!target) {
+          continue;
+        }
+        incoming_heal[target->slot] += definition.heal;
+        entity->healing = detail::HealingPetal{*target, tick_ + heal_travel - 1};
       }
-      if (target) {
-        Impact hit{*target, source, HealthKind::heal, definition.heal};
+      const auto* target = entities_.get(entity->healing->recipient);
+      if (!target || !can_heal(*entity, *target)) {
+        entity->healing.reset();
+        continue;
+      }
+      entity->view.position += (target->view.position - entity->view.position) * heal_step;
+      if (tick_ >= entity->healing->arrival) {
+        Impact hit{target->view.id, source, HealthKind::heal, definition.heal};
         hit.consume_source = true;
         impacts_.push_back(hit);
+        entity->healing.reset();
       }
     } else if (definition.effect == catalog::Effect::summon && tick_ >= entity->born_tick + delay) {
       EntityView summon;
@@ -474,7 +515,7 @@ void Match::finish_projectiles() {
 
 void Match::resolve_contacts() {
   const auto attack = [this](detail::Entity& source, const detail::Entity& target) {
-    if (source.ready_tick > tick_ || source.view.ground_web || target.view.ground_web || source.spent ||
+    if (source.view.ground_web || target.view.ground_web || source.spent ||
         source.view.health <= 0 || target.view.health <= 0) {
       return;
     }
@@ -555,14 +596,6 @@ void Match::resolve_contacts() {
     if (source.projectile && !source.held && source.view.petal != Petal::pollen) {
       source.spent = true;
     }
-    double attack_scale = 1;
-    for (const auto& slow : source.slows) {
-      if (slow.slows_attacks && slow.until > tick_) {
-        attack_scale *= slow.multiplier;
-      }
-    }
-    source.ready_tick =
-        tick_ + static_cast<Tick>(std::ceil(source.rules.contact_cooldown / attack_scale));
   };
 
   const auto& active = entities_.active();
@@ -663,9 +696,12 @@ void Match::apply_impacts() {
     entity.view.poisoned = !entity.poisons.empty();
     entity.view.slowed = !entity.slows.empty();
     entity.view.heal_blocked = entity.heal_block_until > tick_;
-    entity.view.cooldown_ticks = entity.ready_tick > tick_ ? entity.ready_tick - tick_ : 0;
   }
   for (const auto& hit : impacts_) {
+    // Several allies can touch the same Leaf, but only one can consume it.
+    if (hit.consume_source && !entities_.get(hit.source.entity)) {
+      continue;
+    }
     auto* target = entities_.get(hit.target);
     if (!target || apply_health(hit.target, hit.source, hit.kind, hit.amount) <= 0) {
       continue;

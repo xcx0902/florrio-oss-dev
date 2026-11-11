@@ -38,7 +38,7 @@ MECHANICS = ('attack_distance defend_distance shield reflection damage_ratio dam
              'heal_ratio knockback chain_damage bounces vision_multiplier pickup_multiplier '
              'body_damage sponge_seconds speed_multiplier size_multiplier hidden').split()
 BODY = ('radius', 'health', 'speed_per_second', 'contact_damage', 'contact_heal',
-        'poison_per_tick', 'poison_ticks', 'contact_cooldown')
+        'poison_per_tick', 'poison_ticks')
 FIELDS = ('activationSeconds', 'heal', 'passiveHealPerSecond', 'friendlyMobHeal',
           'rotationBonus', 'projectileSpeed', 'range', 'durationSeconds',
           'slowMultiplier', 'healthBonus', 'areaRadius')
@@ -264,10 +264,8 @@ def validate(pack, inputs=None):
             body = row['body']
             require(set(body) == set(BODY), 'missing or unknown body field')
             require(all(type(v) in (int, float) and v >= 0 for v in body.values()), 'negative body value')
-            require(body['radius'] > 0 and body['health'] > 0 and body['contact_cooldown'] > 0,
-                    'invalid body dimensions/cooldown')
-            for k in ['poison_ticks', 'contact_cooldown']:
-                require(type(body[k]) is int, 'fractional tick count')
+            require(body['radius'] > 0 and body['health'] > 0, 'invalid body dimensions')
+            require(type(body['poison_ticks']) is int, 'fractional poison tick count')
             require((body['poison_ticks'] > 0) == (body['poison_per_tick'] > 0), 'incomplete poison rule')
             if section == 'petals':
                 require(row['name'] == registry[row['clientId']]['name'], 'client petal name mismatch')

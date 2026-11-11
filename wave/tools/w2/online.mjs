@@ -49,7 +49,9 @@ function requests(plain) {
       r.skip(r.vu());
     } else if (opcode === 30) {
       entry.name = r.str();
-    } else if (opcode === 27 || opcode === 7) {
+    } else if (opcode === 3 || opcode === 27) {
+      entry.value = r.vu();
+    } else if (opcode === 7) {
       entry.value = r.byte();
     } else if (opcode === 4) {
       entry.value = r.byte();

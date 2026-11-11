@@ -209,6 +209,12 @@ void rose_and_leaf() {
     near(body(match).health, 99, "rose waits one second");
     near(petal(match).position.length(), 13, "rose does not expand on attack");
     steps(match, 1);
+    near(body(match).health, 99, "rose does not heal before reaching the player");
+    check(petal(match).position.length() < 13, "rose visibly leaves its orbit");
+    near(petal(match, 1).position.length(), 13, "spare rose stays in orbit");
+    steps(match, 7);
+    check(petal(match).position.length() < 1, "rose closes in on the player");
+    steps(match, 1);
     near(body(match).health, 100, "rose caps useful healing");
     check(!owner(match).petals[0].entity && owner(match).petals[1].entity,
           "only useful rose is consumed");
@@ -224,6 +230,9 @@ void rose_and_leaf() {
     near(body(match, 1).health, 80, "rose cannot heal out of range");
     FixtureAccess::get(match, *owner(match, 1).body).view.position = {20, 0};
     steps(match, 1);
+    near(body(match, 1).health, 80, "teammate sees the rose fly toward them before healing");
+    check(petal(match).position.x > 13, "rose travels toward its recipient instead of the owner");
+    steps(match, 8);
     near(body(match, 1).health, 90, "rose heals teammate in range");
     check(!owner(match).petals[0].entity, "teammate rose consumed");
   }
@@ -234,15 +243,56 @@ void rose_and_leaf() {
     FixtureAccess::damage(match, *owner(match).body, 10);
     const auto friendly =
         FixtureAccess::spawn(match, {14, 0}, {.radius = 1, .health = 50}, Faction::team);
+    const auto other =
+        FixtureAccess::spawn(match, {14, 2.25}, {.radius = 1, .health = 50}, Faction::team);
     FixtureAccess::damage(match, friendly, 20);
+    FixtureAccess::damage(match, other, 20);
     steps(match, 1);
     near(body(match).health,
          90 + catalog::dated().petal(Petal::leaf, Rarity::unusual)->passive_heal_per_second * .025,
          "Leaf passive heal preserves original formatter precision");
     near(FixtureAccess::get(match, friendly).view.health, 43, "Leaf eaten by friendly mob");
+    near(FixtureAccess::get(match, other).view.health, 30, "the same Leaf cannot be eaten twice");
     check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 40,
           "friendly mob consumption reloads Leaf");
   }
+}
+void dahlia_orbit_and_heal() {
+  Match match({43}, 5, arena());
+  check(match.add_player({1}, {}, {Petal::dahlia}), "admit Dahlia");
+  steps(match, 1);
+  const auto petals = owner(match).petals[0].entities;
+  check(petals.size() == 3, "Dahlia has three independent petals");
+  const auto particle = [&](std::size_t index) -> const EntityView& {
+    return FixtureAccess::get(match, petals[index]).view;
+  };
+  const auto spaced = [&] {
+    for (std::size_t i = 0; i < petals.size(); ++i) {
+      for (std::size_t j = i + 1; j < petals.size(); ++j) {
+        check((particle(i).position - particle(j).position).length() >
+                  particle(i).radius + particle(j).radius,
+              "Dahlia petals have a visible gap");
+      }
+    }
+  };
+  spaced();
+  check(match.queue(Input{owner(match).life, {}, false, true}), "Dahlia defend input");
+  steps(match, 40);
+  spaced();
+  const auto first = particle(0).position;
+  const auto second = particle(1).position;
+  const auto third = particle(2).position;
+  FixtureAccess::damage(match, *owner(match).body, 2);
+  steps(match, 1);
+  near(body(match).health, 98, "Dahlia heals only after traveling to the player");
+  check(particle(0).position.length() < first.length(), "one Dahlia petal leaves orbit");
+  check(particle(1).position == second && particle(2).position == third,
+        "unused Dahlia petals keep orbiting");
+  spaced();
+  steps(match, 8);
+  near(body(match).health, 100, "Dahlia heals the player on arrival");
+  check(owner(match).petals[0].entities == std::vector{petals[1], petals[2]},
+        "only the Dahlia petal needed to heal is consumed");
 }
 void projectiles_and_poison() {
   for (const auto kind : {Petal::peas, Petal::grapes, Petal::missile}) {
@@ -557,6 +607,7 @@ int main() {
         {"W3-01.unsupported-effects", unsupported_effects},
         {"W3-01.rarity-damage-reload", damage_rarity_and_reload},
         {"W3-01.rose-leaf", rose_and_leaf},
+        {"W3-01.dahlia-orbit-heal", dahlia_orbit_and_heal},
         {"W3-01.projectile-poison", projectiles_and_poison},
         {"W3-01.web-summon-passive-equip", web_summon_passive_equip},
         {"W3-01.legacy", legacy},

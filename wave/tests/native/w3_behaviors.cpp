@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <numbers>
 #include <set>
 #include <stdexcept>
 
@@ -125,14 +126,14 @@ void all_variants() {
     const auto id = FixtureAccess::spawn(m, mob.kind, mob.rarity);
     const auto& body = FixtureAccess::get(m, id).view;
     near(body.max_health, mob.body.health, "all mob health variants");
-    const bool smaller =
-        mob.kind == Mob::spider || mob.kind == Mob::leech || mob.kind == Mob::leech_segment;
-    const double scale = smaller ? .75 : 1.;
+    const bool leech = mob.kind == Mob::leech || mob.kind == Mob::leech_segment;
     auto& size = radii.at(static_cast<unsigned>(mob.rarity));
-    if (size == 0) {
-      size = body.radius / scale;
+    if (!leech) {
+      if (size == 0) {
+        size = body.radius;
+      }
+      near(body.radius, size, "ordinary mobs, including Spider, use the full rarity radius");
     }
-    near(body.radius, size * scale, "mob radii match their tier and species scale");
     near(FixtureAccess::get(m, id).rules.contact_damage, mob.body.contact_damage,
          "all mob damage variants");
     steps(m, 22);
@@ -174,9 +175,7 @@ void poison_and_slow() {
         "stronger poison replaces attribution");
   t.poisons.clear();
   for (auto id : {petal(m), petal(m, 1)}) {
-    auto& e = FixtureAccess::get(m, id);
-    e.view.position = t.view.position;
-    e.ready_tick = 0;
+    FixtureAccess::get(m, id).view.position = t.view.position;
   }
   FixtureAccess::contacts(m);
   check(t.slows.size() == 1 && !t.slows[0].slows_attacks, "Pincers share a single movement slow");
@@ -786,9 +785,26 @@ void leech_shared_health() {
     }
     return result;
   };
-  steps(m);
   const auto original = check_chain(max_health);
   check(original.size() == 6, "Leech spawns one head and five connected body sections");
+  const auto rock = FixtureAccess::spawn(m, Mob::rock, Rarity::rare, {600, 0});
+  const auto radius = FixtureAccess::get(m, root).view.radius;
+  const auto rock_radius = FixtureAccess::get(m, rock).view.radius;
+  // At spawn the centers lie on a line; sum the uncovered part of each circle.
+  double footprint = std::numbers::pi * radius * radius;
+  for (std::size_t i = 1; i < original.size(); ++i) {
+    const auto& a = FixtureAccess::get(m, original[i - 1]).view;
+    const auto& b = FixtureAccess::get(m, original[i]).view;
+    near(b.radius, radius, "all Leech body circles have the same radius");
+    const double half_gap = (a.position - b.position).length() / 2;
+    const double overlap =
+        2 * (radius * radius * std::acos(half_gap / radius) -
+             half_gap * std::sqrt(radius * radius - half_gap * half_gap));
+    footprint += std::numbers::pi * radius * radius - overlap;
+  }
+  const double size = footprint / (std::numbers::pi * rock_radius * rock_radius);
+  check(size > .95 && size < 1.05, "extended Leech occupies the area of one same-rarity mob");
+  steps(m);
   FixtureAccess::hit(m, original[2], attacker, 20);
   steps(m);
   check(check_chain(max_health - 20) == original, "a nonlethal hit leaves the chain intact");

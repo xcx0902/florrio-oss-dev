@@ -29,13 +29,17 @@ struct DeferredDamage {
   Tick ticks = 0;
 };
 
+struct HealingPetal {
+  EntityId recipient;
+  Tick arrival;
+};
+
 struct Entity {
   EntityView view;
   BodyRules rules;
   Vec2 knockback;
   Vec2 recoil;
   double orbit_offset = 0;
-  Tick ready_tick = 0;
   std::vector<Poison> poisons;
   std::optional<DamageSource> fatal_hit;
   Tick born_tick = 0;
@@ -46,6 +50,7 @@ struct Entity {
   Vec2 flight_direction;
   Vec2 flight_start;
   unsigned particle_index = 0;
+  std::optional<HealingPetal> healing;
   std::vector<Slow> slows;
   std::optional<EntityId> target;
   std::optional<EntityId> root;

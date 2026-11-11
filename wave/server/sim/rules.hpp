@@ -24,7 +24,6 @@ struct BodyRules {
   double contact_heal = 0;
   double poison_per_tick = 0;
   Tick poison_ticks = 0;
-  Tick contact_cooldown = 1;
 };
 
 struct MobRules {

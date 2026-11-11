@@ -60,7 +60,7 @@ export async function startHost({
         file: 'index.html',
         body: html.replace(
           client,
-          `<script src="local.js"></script>\n    ${development ? '<link rel="stylesheet" href="dev-inventory.css" /><script src="dev-inventory.js"></script>\n    ' : ''}${client}`,
+          `<script src="local.js"></script>${development ? '\n    <link rel="stylesheet" href="dev-inventory.css" /><script src="dev-inventory.js"></script>' : ''}`,
         ),
       },
       { file: 'reference.css', body: await readFile(path.join(web, 'reference.css')) },

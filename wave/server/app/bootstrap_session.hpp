@@ -6,9 +6,12 @@
 
 namespace wave::app {
 
+enum class CloseReason { protocol_error, superseded };
+
 struct Reply {
   std::vector<wire::Bytes> frames;
   bool close = false;
+  CloseReason reason = CloseReason::protocol_error;
 };
 
 class BootstrapSession {

@@ -232,7 +232,6 @@ struct EntityView {
   double heading_rad = 0;
   double health = 0;
   double max_health = 0;
-  Tick cooldown_ticks = 0;
   double shield = 0;
   bool poisoned = false;
   bool slowed = false;

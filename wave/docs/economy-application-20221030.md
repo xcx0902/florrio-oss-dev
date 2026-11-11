@@ -71,8 +71,8 @@ that queue; backpressure leaves the blocked command at the admission boundary.
 The session owns that distinction and retries deferred work in order.
 
 Terminal economic rejections and committed craft results whose `Result.code`
-is not `ok` use the verified disconnect/reload path. Reload uses the guest token
-to obtain the full committed profile. They are not encoded as opcode 35's normal
+is not `ok` close the socket. The local client offers Reconnect, which uses the
+same guest token to obtain the full committed profile. They are not encoded as opcode 35's normal
 failed-craft result because the original error enum has not been recovered. An
 actual unsuccessful random craft has `code=ok` and continues to emit the original
 opcode 35 failure flag with its returned input count.

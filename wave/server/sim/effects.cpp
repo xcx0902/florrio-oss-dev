@@ -338,18 +338,13 @@ void Match::update_special_effects() {
       direction = length > 0 ? direction * (1 / length) : Vec2{1, 0};
       entities_.get(owner_id)->knockback += direction * 110;
       consume_petal(target);
-    } else if ((p.effect == catalog::Effect::dahlia || p.effect == catalog::Effect::shell) &&
-               tick_ >= e->born_tick + delay) {
+    } else if (p.effect == catalog::Effect::shell && tick_ >= e->born_tick + delay) {
       std::optional<EntityId> recipient;
       double nearest = p.range;
       for (const auto candidate : entities_.active()) {
         const auto& t = entities_.at(candidate).view;
-        if (t.group != Group::player || t.faction != e->view.faction || t.health <= 0) {
-          continue;
-        }
-        const bool useful = p.effect == catalog::Effect::shell ? t.shield < p.mechanics.shield
-                                                               : t.health < t.max_health;
-        if (!useful) {
+        if (t.group != Group::player || t.faction != e->view.faction || t.health <= 0 ||
+            t.shield >= p.mechanics.shield) {
           continue;
         }
         const auto distance = (t.position - origin).length();
@@ -362,11 +357,9 @@ void Match::update_special_effects() {
         }
       }
       if (recipient) {
-        const auto kind =
-            p.effect == catalog::Effect::shell ? HealthKind::shield : HealthKind::heal;
-        impacts_.push_back({*recipient, source, kind,
-                            p.effect == catalog::Effect::shell ? p.mechanics.shield : p.heal, 0, 0,
-                            1, 0, true});
+        Impact hit{*recipient, source, HealthKind::shield, p.mechanics.shield};
+        hit.consume_source = true;
+        impacts_.push_back(hit);
       }
     } else if (p.effect == catalog::Effect::yggdrasil) {
       const bool waiting = std::ranges::any_of(players_, [](const Player& p) {

@@ -99,6 +99,17 @@ int main() {
             std::holds_alternative<wire::Leave>(
                 std::get<wire::Startup>(*squad_leave).requests.front().action),
         "Original squad Leave has no fields and leaves without a protocol reload");
+  wire::Bootstrap play;
+  // Create Squad with request 300, followed by Quick Play with request 128.
+  const auto play_batch = play.receive(bytes("051eab6cd04784e6fd83"));
+  check(play_batch && std::holds_alternative<wire::Startup>(*play_batch),
+        "Play requests accept multi-byte request numbers");
+  const auto& modes = std::get<wire::Startup>(*play_batch).requests;
+  check(modes.size() == 2 && std::get<wire::CreateSquad>(modes[0].action).private_room &&
+            !std::get<wire::CreateSquad>(modes[1].action).private_room,
+        "The opcode, not the request number, selects the room mode");
+  wire::Bootstrap truncated_play;
+  check(!truncated_play.receive(bytes("051eab6cfc")), "A truncated Play request is still rejected");
 
   app::BootstrapSession early_session("guest-early");
   const auto early = early_session.receive({0x20, 0x1e, 0xb8});

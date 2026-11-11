@@ -43,6 +43,32 @@ body {
   font-family: Ubuntu, sans-serif;
 }
 
+#wave-connection {
+  position: fixed;
+  top: 3.5rem;
+  left: 50%;
+  z-index: 20;
+  width: max-content;
+  max-width: calc(100vw - 4rem);
+  transform: translateX(-50%);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: white;
+  background: #202020;
+  font: 700 1rem Ubuntu, sans-serif;
+  text-align: center;
+}
+
+#wave-connection p {
+  margin: 0 0 0.5rem;
+}
+
+#wave-connection button {
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  cursor: pointer;
+}
+
 #wave-mode-notice {
   max-width: 28rem;
   padding: 1.5rem;

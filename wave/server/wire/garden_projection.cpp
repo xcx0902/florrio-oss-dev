@@ -10,26 +10,11 @@
 
 namespace wave::wire {
 namespace {
-// Shared local calibration for positions, camera and arena.
+// Shared scale for world positions, collision radii, camera and arena.
 constexpr double world_scale = 5;
+// The Desert sand is sampled from the original recording in reports/wave/W0.
 constexpr std::array<std::array<std::uint8_t, 3>, 3> biome_colors{
-    {{30, 167, 97}, {211, 173, 105}, {53, 140, 195}}};
-
-// Native art applies different local scales to the same 0x1000 radius.
-// Match the solid body silhouettes at equal collision radius; thin appendages
-// may extend farther. These factors are in the 2022 client's mob ID order.
-constexpr std::array<double, 36> mob_art_scale{
-    1.,                          // Reserved ID 0
-    1., 1.08, 1., .91,            // Rock, Cactus, Ladybug, Bee
-    2., 1.78, 1.78, .90,          // Baby, Worker, Soldier, Queen Ant
-    1., 1.04, .87,                // Ant Hole, Beetle, Hornet
-    .93, .93, .93, .93, .93, .93,  // The three Centipedes and their sections
-    1.41, 1., 1.,                // Square, Dark Ladybug, Shiny Ladybug
-    1.59, 1.09, 1.78, 1.,        // Spider, Scorpion, Fire Ant, Fire Ant Burrow
-    .94, 1.06, 1.06, 1.16,       // Sandstorm, Bubble, Acid Bubble, Shell
-    .68, 1., 1.05, .90, .90,      // Starfish, Crab, Jellyfish, Digger, Sponge
-    1.04, 1.04,                  // Leech and its body (same scale keeps them joined)
-};
+    {{30, 167, 97}, {211, 196, 113}, {53, 140, 195}}};
 
 struct Writer {
   Bytes bytes;
@@ -304,7 +289,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       const auto position_offset = body.bytes.size();
       body.real(e.position.x * world_scale);
       body.real(e.position.y * world_scale);
-      body.real(e.radius * world_scale * (client_mob ? mob_art_scale.at(*client_mob) : 1.));
+      body.real(e.radius * world_scale);
       if (e.split_particle) {
         // $597 renders 0x4000 as one seed; bit 0 selects the Grapes palette.
         mask |= 0x4000;

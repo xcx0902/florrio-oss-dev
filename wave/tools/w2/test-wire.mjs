@@ -7,7 +7,7 @@ import { parseArgs } from 'node:util';
 import { chromium } from 'playwright-core';
 import { defaultNative, root, startHost } from './host.mjs';
 import { onlineCases } from './online.mjs';
-import { playabilityCases, biomeSelectionCase } from './playability.mjs';
+import { playabilityCases, biomeSelectionCase, connectionRecoveryCase } from './playability.mjs';
 import { protocolEffectsCase } from './protocol-effects.mjs';
 
 const { values } = parseArgs({
@@ -99,7 +99,7 @@ const sources = [
   'web/reference.css',
   'web/resources-20221030.json',
 ];
-const openCases = ['W2-02', 'W2-03', 'W2-04', 'W2-05', 'W2-07', 'W2-08', 'W2-09', 'W2-10', 'W2-11'];
+const openCases = ['W2-02', 'W2-03', 'W2-04', 'W2-05', 'W2-07', 'W2-08', 'W2-09', 'W2-10', 'W2-11', 'W2-12'];
 
 async function observeLabels(page) {
   await page.addInitScript(() => {
@@ -395,6 +395,13 @@ try {
       report,
     });
     await protocolEffectsCase({
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: values['native-dir'],
+      output,
+      report,
+    });
+    await connectionRecoveryCase({
       browser,
       snapshot: values.snapshot,
       nativeDir: values['native-dir'],

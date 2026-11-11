@@ -129,8 +129,7 @@ class Trace {
       out << " velocity ";
       xy(entity.velocity);
       out << " radius " << entity.radius << " heading_rad " << entity.heading_rad << " hp "
-          << entity.health << '/' << entity.max_health << " cooldown_ticks "
-          << entity.cooldown_ticks << '\n';
+          << entity.health << '/' << entity.max_health << '\n';
     }
   }
 
@@ -602,7 +601,6 @@ void geometry_and_combat(Trace& trace) {
   check(entity(huge, *giant.body)->position == Vec2{}, "oversized bodies stay at the origin");
 
   rules.player.contact_damage = 3;
-  rules.player.contact_cooldown = 4;
   Match contacts({3}, 952, rules);
   check(contacts.add_player(a, {}, {}) && contacts.add_player(b, {}, {}), "overlap teammates");
   step(contacts, trace);
@@ -617,12 +615,11 @@ void geometry_and_combat(Trace& trace) {
                                            .health = 15,
                                            .contact_damage = 7,
                                            .poison_per_tick = 2,
-                                           .poison_ticks = 2,
-                                           .contact_cooldown = 3});
+                                           .poison_ticks = 2});
   step(contacts, trace);
   check(entity(contacts, a_body)->health == 13 && entity(contacts, enemy)->health == 12 &&
-            entity(contacts, enemy)->cooldown_ticks == 3 && entity(contacts, b_body)->health == 20,
-        "enemy collision does reciprocal damage with independent cooldowns");
+            entity(contacts, b_body)->health == 20,
+        "enemy collision does reciprocal damage");
   FixtureAccess::hit(contacts, enemy, team(contacts));
   step(contacts, trace);
   check(!entity(contacts, enemy) && entity(contacts, a_body)->health == 11, "first poison tick");
@@ -663,16 +660,33 @@ void geometry_and_combat(Trace& trace) {
   const auto basic = participant(petal).petals.front().entity.value();
   const auto target = FixtureAccess::spawn(
       petal, Group::ant_hole, Faction::garden, {4, 0},
-      {.radius = 1, .health = 20, .contact_damage = 5, .contact_cooldown = 20});
+      {.radius = 1, .health = 20, .contact_damage = 5});
   step(petal, trace);
   check(!entity(petal, basic) && entity(petal, target)->health == 13 &&
             participant(petal).petals.front().reload_ticks == 2,
         "enemy and basic petal trade damage and start reload on petal death");
+  FixtureAccess::hit(petal, target, team(petal));
   step(petal, trace);
-  check(!participant(petal).petals.front().entity, "reload gates petal recovery");
+  check(!entity(petal, target) && !participant(petal).petals.front().entity,
+        "reload gates petal recovery after combat ends");
   step(petal, trace);
   const auto new_petal = participant(petal).petals.front().entity;
   check(new_petal && new_petal != basic, "reloaded petal receives a fresh entity generation");
+
+  Match multiple({6}, 952, fixtures::short_garden_rules());
+  check(multiple.add_player(a, {}, {Petal::basic}), "equip a petal for simultaneous contacts");
+  step(multiple, trace);
+  const auto stationary = [&](double y) {
+    return FixtureAccess::spawn(multiple, Group::summon, Faction::garden, {4, y},
+                                {.radius = 1, .health = 30});
+  };
+  const auto left = stationary(-1.75), right = stationary(1.75);
+  step(multiple, trace);
+  check(entity(multiple, left)->health == 23 && entity(multiple, right)->health == 23,
+        "one petal damages both overlapping enemies in the same step");
+  step(multiple, trace);
+  check(entity(multiple, left)->health == 16 && entity(multiple, right)->health == 16,
+        "continuing contact damages both enemies again on the next step");
 }
 
 void isolation(Trace& trace) {

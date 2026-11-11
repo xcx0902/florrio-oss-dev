@@ -59,8 +59,7 @@ def main():
                 row['body'] = dict(radius=max(.2, body['radius'] / 5) if body else .2,
                                    health=body['health'] if body else 1, speed_per_second=0,
                                    contact_damage=body['damage'] if body else 0,
-                                   contact_heal=0, poison_per_tick=0, poison_ticks=0,
-                                   contact_cooldown=8)
+                                   contact_heal=0, poison_per_tick=0, poison_ticks=0)
             for label, key in FIELD_MAP.items():
                 if fields.get(label) is not None:
                     row[key] = fields[label]
@@ -139,7 +138,7 @@ def main():
             health = fields.get('Health', {'value': v['baseHealth'] * v['healthMultiplier']})
             body = row.get('body', dict(radius=6, health=1, speed_per_second=30,
                                        contact_damage=1, contact_heal=0, poison_per_tick=0,
-                                       poison_ticks=0, contact_cooldown=20))
+                                       poison_ticks=0))
             body.update(health=health.get('range', [health['value']])[0],
                         contact_damage=fields.get('Damage', {'value': v['baseDamage'] * v['damageMultiplier']})['value'])
             if kind in stationary:

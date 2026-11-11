@@ -180,6 +180,10 @@ class Connection : public std::enable_shared_from_this<Connection> {
 #endif
     constexpr std::string_view cache_path = "/wave/cache/";
     if (target.starts_with(cache_path) && request.method() == http::verb::get) {
+      if (!garden_->storage()) {
+        respond(http::status::not_found, {"text/plain", "No profile store"});
+        return;
+      }
       const auto token = target.substr(cache_path.size());
       if (token.size() > 128 ||
           token.find_first_not_of("0123456789abcdef") != std::string_view::npos) {
@@ -333,6 +337,9 @@ class Connection : public std::enable_shared_from_this<Connection> {
       outgoing_.push_back(std::move(frame));
     }
     closing_ = reply.close;
+    if (closing_ && reply.reason == wave::app::CloseReason::superseded) {
+      close_code_ = 4001;  // Another socket is now using this guest.
+    }
     if (!writing && (!outgoing_.empty() || closing_)) {
       write_frame();
     }
@@ -371,7 +378,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
   std::deque<wave::wire::Bytes> outgoing_;
   bool upgraded_ = false;
   bool closing_ = false;
-  ws::close_code close_code_ = ws::close_code::protocol_error;
+  ws::close_reason close_code_ = ws::close_code::protocol_error;
 };
 
 class Host {

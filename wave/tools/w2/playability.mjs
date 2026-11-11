@@ -322,15 +322,20 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
     console.log('W2-10: original squad close leaves without reconnect or reload');
     report.cases['W2-10'] = { status: 'failed', kind: 'original-squad-leave' };
     const menuConnection = { sockets: entry.sockets.length, loads: entry.documentLoads.length };
-    await entry.page.mouse.click(660, 408);
-    await entry.page.waitForFunction(() => location.hash.startsWith('#wavelocal-'));
-    await pause(700);
-    await entry.page.mouse.click(697, 296);
-    await until(
-      () => entry.commands.some((c) => c.opcode === 38) && !entry.baseline.has(8194),
-      'Original squad close removes the roster',
-    );
-    await pause(700);
+    for (const request of [1, 2]) {
+      await entry.page.mouse.click(660, 408);
+      await entry.page.waitForFunction(() => location.hash.startsWith('#wavelocal-'));
+      assert.ok(entry.commands.some((c) => c.opcode === 27 && c.value === request));
+      await pause(700);
+      await entry.page.mouse.click(697, 296);
+      await until(
+        () =>
+          entry.commands.filter((c) => c.opcode === 38).length === request &&
+          !entry.baseline.has(8194),
+        'Original squad close removes the roster',
+      );
+      await pause(700);
+    }
     assert.equal(entry.sockets.length, menuConnection.sockets);
     assert.equal(
       entry.documentLoads.length,
@@ -344,7 +349,7 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
     Object.assign(report.cases['W2-10'], { status: 'passed', screenshot: squad });
     const scenes = [];
     for (const [name, biome, rgb, pool] of [
-      ['desert', 1, [211, 173, 105], [2, 16, 17, 25]],
+      ['desert', 1, [211, 196, 113], [2, 16, 17, 25]],
       ['ocean', 2, [53, 140, 195], [26, 28, 33]],
       ['garden', 0, [30, 167, 97], [1, 3, 4, 5]],
     ]) {
@@ -391,6 +396,115 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
       await entry.page.screenshot({ path: path.join(output, 'W2-09-final.png') }).catch(() => {});
       await entry.context.close();
     }
+    await host.stop();
+  }
+}
+
+export async function connectionRecoveryCase({ browser, snapshot, nativeDir, output, report }) {
+  console.log('W2-12: same-guest tabs, stalled cache or socket, and explicit reconnect');
+  report.cases['W2-12'] = { status: 'failed', kind: 'connection-recovery' };
+  const host = await startHost({ snapshot, nativeDir, port: 0 });
+  const contexts = [];
+  const banner = (page) => page.locator('#wave-connection');
+  try {
+    const a = await client(browser, host.url, 'first-tab');
+    contexts.push(a.context);
+    const b = await client(browser, host.url, 'second-tab', await a.context.storageState());
+    contexts.push(b.context);
+    assert.equal(a.guest, b.guest);
+    await banner(a.page).getByText(/another tab/).waitFor();
+    await pause(1100); // The legacy client used to reload 500 ms after a forced disconnect.
+    assert.deepEqual([a.documentLoads.length, b.documentLoads.length], [1, 1]);
+    assert.deepEqual([a.sockets.length, b.sockets.length], [1, 1]);
+    await b.page.keyboard.press('Enter');
+    await until(() => b.current?.control, 'Replacement tab can still enter the arena');
+    await banner(a.page).getByRole('button', { name: 'Reconnect' }).click();
+    await until(
+      () => a.sockets.length === 2 && a.baseline.has(8193),
+      'The reconnect button hands the same guest back to the first tab',
+    );
+    assert.equal(await a.page.evaluate(() => localStorage.getItem('cp6_player_id')), a.guest);
+    await banner(b.page).getByText(/another tab/).waitFor();
+    await pause(600);
+    assert.deepEqual([a.documentLoads.length, b.documentLoads.length], [2, 1]);
+    assert.deepEqual([...a.errors, ...b.errors], []);
+
+    const faulty = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+    contexts.push(faulty);
+    let releaseCache;
+    const blocked = new Promise((resolve) => { releaseCache = resolve; });
+    await faulty.route('**/wave/cache/**', async (route) => {
+      await blocked;
+      await route.fulfill({ status: 503, body: 'Profile temporarily unavailable' });
+    });
+    const page = await faulty.newPage();
+    let loads = 0;
+    page.on('domcontentloaded', () => ++loads);
+    await page.addInitScript(() => {
+      // Delay delivery on a real Wave socket, keeping the native upgrade and
+      // Origin header intact. Resume with the original frames in order.
+      const Native = window.WebSocket;
+      window.WebSocket = class extends Native {
+        constructor(url, protocols) {
+          super(url, protocols);
+          if (new URL(url).pathname !== '/wave/socket') return;
+          window.waveTestSocket = this;
+          let stalled = !sessionStorage.getItem('waveTestResumed');
+          const buffered = [];
+          this.addEventListener('message', (event) => {
+            if (stalled) {
+              event.stopImmediatePropagation();
+              buffered.push(event.data);
+            }
+          });
+          window.waveTestResume = () => {
+            stalled = false;
+            sessionStorage.setItem('waveTestResumed', '1');
+            for (const data of buffered.splice(0)) {
+              this.dispatchEvent(new MessageEvent('message', { data }));
+            }
+          };
+        }
+      };
+      const draw = CanvasRenderingContext2D.prototype.fillText;
+      CanvasRenderingContext2D.prototype.fillText = function (value, ...args) {
+        if (value === 'Ready') window.waveReadyDrawn = true;
+        return draw.call(this, value, ...args);
+      };
+    });
+    await Promise.all([page.waitForRequest('**/wave/cache/**'), page.goto(host.url)]);
+    const selector = page.getByRole('combobox', { name: 'Wave biome' });
+    await selector.focus();
+    assert.ok(await selector.evaluate((element) => document.activeElement === element));
+    releaseCache();
+    const recovery = banner(page);
+    await recovery.getByText(/Could not load your saved profile/).waitFor();
+    await faulty.unroute('**/wave/cache/**');
+    const retry = recovery.getByRole('button', { name: 'Reconnect' });
+    await retry.click();
+    await recovery.getByText(/No response from the game server/).waitFor({ timeout: 15000 });
+    assert.equal(loads, 2, 'A silent socket leaves the page available for recovery');
+    await page.evaluate(() => window.waveTestResume());
+    await page.waitForFunction(() => window.waveReadyDrawn);
+    await recovery.waitFor({ state: 'hidden' });
+    assert.equal(loads, 2, 'Traffic can resume without reloading the game');
+
+    const guest = await page.evaluate(() => localStorage.getItem('cp6_player_id'));
+    assert.ok(guest);
+    await page.evaluate(() => window.waveTestSocket.send(Uint8Array.of(255)));
+    await recovery.getByText(/The server ended this session/).waitFor();
+    await pause(1100);
+    assert.equal(loads, 2, 'The fatal wire reply does not start an automatic reload loop');
+    const screenshot = 'W2-12-reconnect.png';
+    await page.screenshot({ path: path.join(output, screenshot) });
+    await Promise.all([page.waitForEvent('domcontentloaded'), retry.click()]);
+    await page.waitForFunction(() => window.waveReadyDrawn);
+    assert.equal(await page.evaluate(() => localStorage.getItem('cp6_player_id')), guest);
+    assert.equal(loads, 3);
+    await recovery.waitFor({ state: 'hidden' });
+    Object.assign(report.cases['W2-12'], { status: 'passed', screenshot });
+  } finally {
+    await Promise.all(contexts.map((context) => context.close()));
     await host.stop();
   }
 }

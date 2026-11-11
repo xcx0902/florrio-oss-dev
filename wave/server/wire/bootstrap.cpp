@@ -252,18 +252,22 @@ std::optional<Command> read_startup(std::span<const std::uint8_t> bytes) {
         action = JoinSquad{std::move(*code)};
         break;
       }
-      case 27:
+      case 3:
+      case 27: {
+        // $985/$986 send an incrementing Play request number, not a mode byte.
+        if (!read_varint(bytes)) {
+          return std::nullopt;
+        }
+        action = CreateSquad{opcode == 27};
+        break;
+      }
       case 7: {
         if (bytes.empty() || bytes.front() > 1) {
           return std::nullopt;
         }
         const bool value = bytes.front() != 0;
         bytes = bytes.subspan(1);
-        if (opcode == 27) {
-          action = CreateSquad{value};
-        } else {
-          action = Ready{value};
-        }
+        action = Ready{value};
         break;
       }
       case 9: {

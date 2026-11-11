@@ -22,6 +22,11 @@ Reply GardenSession::reject() {
   return {{wire_.disconnect()}, true};
 }
 
+Reply GardenSession::superseded() {
+  closed_ = true;
+  return {{}, true, CloseReason::superseded};
+}
+
 wire::Bytes GardenSession::snapshot() {
   if (last_tick_ == std::numeric_limits<std::uint32_t>::max()) {
     throw std::runtime_error("Garden wire tick exhausted");
@@ -56,7 +61,7 @@ Reply GardenSession::publish() {
     return {};
   }
   if (!garden_.active(member_->token, connection_)) {
-    return reject();
+    return superseded();
   }
   auto reply = drain();
   if (!reply.close) {
@@ -93,7 +98,7 @@ Reply GardenSession::drain() {
         break;
       }
       // No native error enum has been recovered for denied economic actions.
-      // Use the known disconnect/reload path to restore committed state.
+      // Close the session so a fresh admission can restore committed state.
       if (!accepted && economic && garden_.storage()) {
         return reject();
       }
@@ -129,7 +134,7 @@ Reply GardenSession::receive(wire::Bytes bytes) {
     return {{wire_.world(++last_tick_, 0)}};
   }
   if (member_ && !garden_.active(member_->token, connection_)) {
-    return reject();
+    return superseded();
   }
   const auto command = wire_.receive(std::move(bytes));
   if (!command) {

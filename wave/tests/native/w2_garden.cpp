@@ -122,8 +122,10 @@ void session_life_boundary() {
   check(!replacement.receive(hello).close && !replacement.receive(bytes("201eb8")).close &&
             !replacement.receive(startup).close,
         "Replacement socket restores original guest");
-  check(session.publish().close && garden.active(member.token, 3),
-        "Displaced socket cannot publish or disconnect its replacement");
+  const auto displaced = session.publish();
+  check(displaced.close && displaced.reason == app::CloseReason::superseded &&
+            displaced.frames.empty() && garden.active(member.token, 3),
+        "A replaced socket closes without a forced reload or affecting its replacement");
 }
 
 void orbit_buttons() {

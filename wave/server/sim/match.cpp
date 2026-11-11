@@ -14,7 +14,7 @@ bool valid_body(const BodyRules& body) {
   return std::isfinite(body.radius) && body.radius > 0 && std::isfinite(body.health) &&
          body.health > 0 && nonnegative(body.speed_per_second) &&
          nonnegative(body.contact_damage) && nonnegative(body.contact_heal) &&
-         nonnegative(body.poison_per_tick) && body.contact_cooldown > 0;
+         nonnegative(body.poison_per_tick);
 }
 
 void validate(const Rules& rules) {
@@ -111,7 +111,6 @@ BodyRules Match::petal_body(Petal kind, Rarity rarity) const {
   const double scale = std::chrono::duration<double>(rules_.timing.step).count() / .025;
   body.poison_per_tick *= scale;
   body.poison_ticks = rules_.timing.ticks_ceil(Microseconds(body.poison_ticks * 25000));
-  body.contact_cooldown = rules_.timing.ticks_ceil(Microseconds(body.contact_cooldown * 25000));
   return body;
 }
 

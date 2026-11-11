@@ -11,8 +11,8 @@ inline sim::Rules short_garden_rules() {
   rules.version = "w1-fixture.1";
   rules.arena_radius = 100;
   rules.player = {.radius = 2, .health = 20, .speed_per_second = 100};
-  rules.petals = {{{.radius = 1, .health = 5, .contact_damage = 7, .contact_cooldown = 2},
-                   {.radius = 2, .health = 8, .contact_heal = 6, .contact_cooldown = 3}}};
+  rules.petals = {{{.radius = 1, .health = 5, .contact_damage = 7},
+                   {.radius = 2, .health = 8, .contact_heal = 6}}};
   rules.orbit_radius = 4;
   rules.orbit_rad_per_second = 0;
   rules.petal_reload = 2;

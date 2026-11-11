@@ -12,8 +12,8 @@ Tick seconds(const Rules& rules, double value) {
 }
 
 double segment_gap(Mob kind, double radii) {
-  // The Leech is drawn as a continuous body; separate Centipede outlines.
-  return radii * (kind == Mob::leech ? .9 : 1.1);
+  // Overlap the Leech circles to form one body; separate Centipede outlines.
+  return radii * (kind == Mob::leech ? .75 : 1.1);
 }
 
 void place_spawn_segment(EntityView& body, const EntityView& parent, Vec2 direction, double gap,
@@ -44,8 +44,10 @@ void place_spawn_segment(EntityView& body, const EntityView& parent, Vec2 direct
 
 double Match::mob_radius(Mob kind, Rarity rarity) const {
   constexpr std::array radii{7., 8., 9.5, 11.5, 14., 17.5};
-  const bool smaller = kind == Mob::spider || kind == Mob::leech || kind == Mob::leech_segment;
-  return radii.at(static_cast<unsigned>(rarity)) * (smaller ? .75 : 1.);
+  const bool leech = kind == Mob::leech || kind == Mob::leech_segment;
+  // The union of the six overlapping circles at full extension covers
+  // roughly the same area as one ordinary mob of this rarity.
+  return radii.at(static_cast<unsigned>(rarity)) * (leech ? .44 : 1.);
 }
 
 DamageSource Match::damage_source(const detail::Entity& entity) const {
@@ -83,7 +85,6 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
   const double scale = std::chrono::duration<double>(rules_.timing.step).count() / .025;
   body.poison_per_tick *= scale;
   body.poison_ticks = rules_.timing.ticks_ceil(Microseconds(body.poison_ticks * 25000));
-  body.contact_cooldown = rules_.timing.ticks_ceil(Microseconds(body.contact_cooldown * 25000));
   const auto id = add_entity(view, body);
   auto& head = *entities_.get(id);
   head.home_position = head.view.position;
@@ -119,8 +120,6 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
       segment_body.poison_per_tick *= scale;
       segment_body.poison_ticks =
           rules_.timing.ticks_ceil(Microseconds(segment_body.poison_ticks * 25000));
-      segment_body.contact_cooldown =
-          rules_.timing.ticks_ceil(Microseconds(segment_body.contact_cooldown * 25000));
       const auto child = add_entity(view, segment_body);
       entities_.get(child)->root = id;
       entities_.get(child)->view.predecessor = previous;
@@ -346,8 +345,7 @@ void Match::update_mob_actions() {
       e->recoil += forward * (-.4 * 1000 / 5);
       const auto shot = add_entity(bullet, {.radius = missile_radius,
                                             .health = definition.missile_health,
-                                            .contact_damage = definition.missile_damage,
-                                            .contact_cooldown = 8});
+                                            .contact_damage = definition.missile_damage});
       launch_projectile(*entities_.get(shot), bullet.heading_rad, std::chrono::seconds(2));
     } else if (definition.ai == catalog::MobAI::jellyfish && e->target) {
       e->action_ready = tick_ + seconds(rules_, 2 / attack_scale);

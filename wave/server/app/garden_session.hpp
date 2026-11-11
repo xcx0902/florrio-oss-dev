@@ -19,6 +19,7 @@ class GardenSession {
   Reply reject();
 
  private:
+  Reply superseded();
   wire::Bytes snapshot();
   Reply drain();
   struct Pending {
