@@ -24,8 +24,64 @@ const Interaction& interaction(Faction source, Faction target) {
   return pve[static_cast<std::size_t>(source)][static_cast<std::size_t>(target)];
 }
 
+double dot(Vec2 a, Vec2 b) { return a.x * b.x + a.y * b.y; }
+
+void rebound_player_mob(detail::Entity& player, detail::Entity& mob, const Rules& rules) {
+  auto& flower = player.view;
+  auto& creature = mob.view;
+  const auto delta = flower.position - creature.position;
+  const double distance = delta.length();
+  const double depth = flower.radius + creature.radius - distance;
+  if (depth <= 0) {
+    return;
+  }
+  const auto normal = distance > 0 ? delta * (1 / distance) : Vec2{1, 0};
+  const auto space_to_wall = [&](const EntityView& body, Vec2 away) {
+    const double limit = std::max(0., rules.arena_radius - body.radius);
+    const double radial = dot(body.position, away);
+    const double remaining = std::max(0., limit * limit - dot(body.position, body.position));
+    return std::sqrt(radial * radial + remaining) - radial;
+  };
+  const double player_space = space_to_wall(flower, normal);
+  // Followers are positioned by their chain; they cannot integrate an impulse.
+  const double mob_space = mob.immovable || creature.predecessor
+                               ? 0
+                               : space_to_wall(creature, normal * -1);
+  // Like the original engine, split the response by the bodies' effective mass.
+  const double player_mass = flower.radius * flower.radius;
+  const double mob_mass = creature.radius * creature.radius;
+  double player_share = mob_mass / (player_mass + mob_mass);
+  const double player_shift =
+      std::min(player_space, std::max(depth * player_share, depth - mob_space));
+  const double mob_shift = std::min(mob_space, depth - player_shift);
+  flower.position = clamp_center(flower.position + normal * player_shift,
+                                 rules.arena_radius, flower.radius);
+  creature.position = clamp_center(creature.position - normal * mob_shift,
+                                   rules.arena_radius, creature.radius);
+
+  // Give the available body the full rebound when the other cannot move away.
+  constexpr double wall_slop = 1e-6;
+  const bool player_free = player_space - player_shift > wall_slop;
+  const bool mob_free = mob_space - mob_shift > wall_slop;
+  if (!player_free && !mob_free) {
+    return;
+  }
+  if (!mob_free) {
+    player_share = 1;
+  } else if (!player_free) {
+    player_share = 0;
+  }
+  // Cancel the closing speed and leave a small opening speed, even when the
+  // player's input and the mob's AI continue trying to move toward each other.
+  constexpr double restitution = .25;
+  const double closing = dot(creature.velocity - flower.velocity, normal);
+  const double opening = rules.contact_knockback_speed * (player_free + mob_free);
+  const double impulse = std::max(0., closing + std::max(0., closing) * restitution + opening);
+  player.knockback += normal * (impulse * player_share);
+  mob.knockback = mob.knockback - normal * (impulse * (1 - player_share));
+}
+
 std::optional<double> flight_contact(Vec2 start, Vec2 end, double radius) {
-  const auto dot = [](Vec2 a, Vec2 b) { return a.x * b.x + a.y * b.y; };
   const double outside = dot(start, start) - radius * radius;
   if (outside < 0) {
     return 0;
@@ -636,6 +692,16 @@ void Match::resolve_contacts() {
       attack(second, first);
 
       const auto& pair = interaction(first.view.faction, second.view.faction);
+      if (pair.push && pair.damage && rules_.contact_knockback_speed > 0) {
+        if (first.view.group == Group::player && second.view.mob && !second.projectile) {
+          rebound_player_mob(first, second, rules_);
+          continue;
+        }
+        if (second.view.group == Group::player && first.view.mob && !first.projectile) {
+          rebound_player_mob(second, first, rules_);
+          continue;
+        }
+      }
       // Centipede links may compress, and contacts can separate their bodies.
       // Leech sections overlap intentionally to draw one continuous body.
       const auto movable = [](const detail::Entity& body) {

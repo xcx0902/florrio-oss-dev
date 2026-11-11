@@ -160,6 +160,41 @@ void pursuit_speeds() {
     near(pursuer.velocity.length(), player_speed * ratio, "pursuit speed relative to the player");
   }
 }
+void player_mob_rebound() {
+  const auto live = garden_rules();
+  for (const auto [kind, at_wall] : {std::pair{Mob::spider, false}, {Mob::rock, false},
+                                    {Mob::spider, true}}) {
+    auto rules = arena();
+    rules.contact_knockback_speed = live.contact_knockback_speed;
+    rules.knockback_retention = live.knockback_retention;
+    const double player_x = at_wall ? rules.arena_radius - rules.player.radius : 0;
+    const Vec2 spawn{player_x + (at_wall ? -12.5 : 12.5), 0};
+    Match m({55}, 7, rules);
+    check(m.add_player({1}, {player_x, 0}, {}), "admit player for rebound");
+    steps(m);
+    const auto mob_id = FixtureAccess::spawn(m, kind, Rarity::common, spawn);
+    const auto& player = FixtureAccess::get(m, flower(m)).view;
+    const auto& mob = FixtureAccess::get(m, mob_id).view;
+    check(m.queue({owner(m).life, {1, 0}, false, false}), "keep moving through the collision");
+    steps(m);
+    const double after_hit = player.health;
+    const double contact_x = player.position.x;
+    const double mob_contact_x = mob.position.x;
+    check(after_hit < player.max_health, "initial contact still deals damage");
+    steps(m);
+    const double gap = (mob.position - player.position).length() - mob.radius - player.radius;
+    check(gap > 0 && gap < 2 && player.health == after_hit,
+          "the next tick opens a small gap instead of dealing continuous damage");
+    check(at_wall ? player.position.x == player_x && mob.position.x < mob_contact_x
+                  : player.position.x < contact_x &&
+                        (kind == Mob::rock ? mob.position == spawn : mob.position.x > mob_contact_x),
+          "both movable bodies rebound unless a body is fixed or against the wall");
+    for (int i = 0; i < 10 && player.health == after_hit; ++i) {
+      steps(m);
+    }
+    check(player.health < after_hit, "another collision can deal damage without a cooldown");
+  }
+}
 void poison_and_slow() {
   Match m({3}, 4, arena());
   m.add_player({1}, {}, {Petal::pincer, Petal::pincer});
@@ -999,6 +1034,8 @@ int main() {
     digger_after_ant_hole();
     phase = "pursuit speeds";
     pursuit_speeds();
+    phase = "player and mob rebound";
+    player_mob_rebound();
     phase = "static bodies and Hornet attribution";
     fixed_bodies_and_missile_death();
     phase = "Hornet recoil and missile size";
