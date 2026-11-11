@@ -44,10 +44,22 @@ void place_spawn_segment(EntityView& body, const EntityView& parent, Vec2 direct
 
 double Match::mob_radius(Mob kind, Rarity rarity) const {
   constexpr std::array radii{7., 8., 9.5, 11.5, 14., 17.5};
-  const bool leech = kind == Mob::leech || kind == Mob::leech_segment;
-  // The union of the six overlapping circles at full extension covers
-  // roughly the same area as one ordinary mob of this rarity.
-  return radii.at(static_cast<unsigned>(rarity)) * (leech ? .44 : 1.);
+  const double radius = radii.at(static_cast<unsigned>(rarity));
+  switch (kind) {
+    // Preserve the old ant caste ordering while keeping their full silhouettes
+    // in the same size range as their peers.
+    case Mob::baby_ant: return radius * .55;
+    case Mob::worker_ant:
+    case Mob::soldier_ant:
+    case Mob::fire_ant: return radius * .60;
+    case Mob::ant_hole: return radius * 1.3;
+    case Mob::spider: return radius * .65;
+    case Mob::leech:
+    case Mob::leech_segment:
+      // Six overlapping circles together cover roughly one same-rarity mob.
+      return radius * .44;
+    default: return radius;
+  }
 }
 
 DamageSource Match::damage_source(const detail::Entity& entity) const {

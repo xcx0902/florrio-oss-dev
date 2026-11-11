@@ -98,6 +98,9 @@ EntityId petal(Match& m, unsigned i = 0) {
 void all_variants() {
   unsigned petals = 0, mobs = 0;
   std::array<double, 6> radii{};
+  constexpr std::array compact{Mob::baby_ant, Mob::worker_ant, Mob::soldier_ant,
+                               Mob::queen_ant, Mob::fire_ant, Mob::spider};
+  std::array<std::array<double, 6>, compact.size()> compact_radii{};
   for (const auto& p : catalog::dated().petals) {
     Match m({1}, 3, arena());
     check(m.add_player({1}, {}, {p.kind}, {p.rarity}), "every petal can be equipped");
@@ -127,12 +130,15 @@ void all_variants() {
     const auto& body = FixtureAccess::get(m, id).view;
     near(body.max_health, mob.body.health, "all mob health variants");
     const bool leech = mob.kind == Mob::leech || mob.kind == Mob::leech_segment;
-    auto& size = radii.at(static_cast<unsigned>(mob.rarity));
-    if (!leech) {
+    const auto tier = static_cast<unsigned>(mob.rarity);
+    if (const auto species = std::ranges::find(compact, mob.kind); species != compact.end()) {
+      compact_radii.at(species - compact.begin()).at(tier) = body.radius;
+    } else if (!leech) {
+      auto& size = radii.at(tier);
       if (size == 0) {
         size = body.radius;
       }
-      near(body.radius, size, "ordinary mobs, including Spider, use the full rarity radius");
+      near(body.radius, size, "ordinary mobs use the full rarity radius");
     }
     near(FixtureAccess::get(m, id).rules.contact_damage, mob.body.contact_damage,
          "all mob damage variants");
@@ -143,6 +149,19 @@ void all_variants() {
   check(petals == 270 && mobs == 210, "480 runtime variants exercised");
   check(std::ranges::adjacent_find(radii, std::greater_equal{}) == radii.end(),
         "mob radius increases at every rarity");
+  for (const auto& sizes : compact_radii) {
+    check(std::ranges::adjacent_find(sizes, std::greater_equal{}) == sizes.end(),
+          "ant and spider radii still increase with rarity");
+    for (std::size_t tier = 0; tier < radii.size(); ++tier) {
+      check(sizes[tier] > radii[tier] * .6 && sizes[tier] < radii[tier],
+            "ants and spiders have smaller, comparable collision bodies at each rarity");
+    }
+  }
+  for (std::size_t tier = 0; tier < radii.size(); ++tier) {
+    check(compact_radii[0][tier] < compact_radii[1][tier] &&
+              compact_radii[1][tier] < compact_radii[3][tier],
+          "baby ants are smaller than workers, and queens are larger than workers");
+  }
 }
 
 void pursuit_speeds() {
@@ -168,13 +187,15 @@ void player_mob_rebound() {
     rules.contact_knockback_speed = live.contact_knockback_speed;
     rules.knockback_retention = live.knockback_retention;
     const double player_x = at_wall ? rules.arena_radius - rules.player.radius : 0;
-    const Vec2 spawn{player_x + (at_wall ? -12.5 : 12.5), 0};
     Match m({55}, 7, rules);
     check(m.add_player({1}, {player_x, 0}, {}), "admit player for rebound");
     steps(m);
-    const auto mob_id = FixtureAccess::spawn(m, kind, Rarity::common, spawn);
+    const auto mob_id = FixtureAccess::spawn(m, kind);
     const auto& player = FixtureAccess::get(m, flower(m)).view;
-    const auto& mob = FixtureAccess::get(m, mob_id).view;
+    auto& mob = FixtureAccess::get(m, mob_id).view;
+    const double reach = player.radius + mob.radius;
+    const Vec2 spawn{player_x + (at_wall ? -1 : 1) * (reach + .5), 0};
+    mob.position = spawn;
     check(m.queue({owner(m).life, {1, 0}, false, false}), "keep moving through the collision");
     steps(m);
     const double after_hit = player.health;
