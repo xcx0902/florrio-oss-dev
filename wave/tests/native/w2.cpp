@@ -100,16 +100,29 @@ int main() {
                 std::get<wire::Startup>(*squad_leave).requests.front().action),
         "Original squad Leave has no fields and leaves without a protocol reload");
   wire::Bootstrap play;
-  // Create Squad with request 300, followed by Quick Play with request 128.
+  // New private squad with request 300, followed by Find Public with request 128.
   const auto play_batch = play.receive(bytes("051eab6cd04784e6fd83"));
   check(play_batch && std::holds_alternative<wire::Startup>(*play_batch),
         "Play requests accept multi-byte request numbers");
   const auto& modes = std::get<wire::Startup>(*play_batch).requests;
   check(modes.size() == 2 && std::get<wire::CreateSquad>(modes[0].action).private_room &&
-            !std::get<wire::CreateSquad>(modes[1].action).private_room,
-        "The opcode, not the request number, selects the room mode");
+            std::holds_alternative<wire::FindPublicSquad>(modes[1].action),
+        "The opcode, not the request number, selects the squad action");
   wire::Bootstrap truncated_play;
   check(!truncated_play.receive(bytes("051eab6cfc")), "A truncated Play request is still rejected");
+  for (const auto& [frame, value] :
+       {std::pair{"051eab757c", false}, std::pair{"051eab757d", true}}) {
+    wire::Bootstrap visibility;
+    const auto command = visibility.receive(bytes(frame));
+    check(command && std::get<wire::SetSquadPublic>(
+                         std::get<wire::Startup>(*command).requests.front().action)
+                             .value == value,
+          "The original Public checkbox accepts both boolean states");
+  }
+  for (const auto frame : {"051eab757e", "051eab75"}) {
+    wire::Bootstrap visibility;
+    check(!visibility.receive(bytes(frame)), "Malformed Public checkbox payload rejected");
+  }
 
   app::BootstrapSession early_session("guest-early");
   const auto early = early_session.receive({0x20, 0x1e, 0xb8});

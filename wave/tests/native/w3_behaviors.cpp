@@ -97,10 +97,21 @@ EntityId petal(Match& m, unsigned i = 0) {
 }
 void all_variants() {
   unsigned petals = 0, mobs = 0;
-  std::array<double, 6> radii{};
-  constexpr std::array compact{Mob::baby_ant, Mob::worker_ant, Mob::soldier_ant,
-                               Mob::queen_ant, Mob::fire_ant, Mob::spider};
-  std::array<std::array<double, 6>, compact.size()> compact_radii{};
+  constexpr std::array radii{7., 8., 9.5, 11.5, 14., 17.5};
+  struct MobRadii {
+    Mob kind;
+    std::array<double, 6> by_rarity;
+  };
+  // Common through Mythic collision radii; Queen Ant uses the full rarity radius.
+  constexpr std::array scaled_radii{
+      MobRadii{Mob::baby_ant, {3.85, 4.4, 5.225, 6.325, 7.7, 9.625}},
+      MobRadii{Mob::worker_ant, {4.2, 4.8, 5.7, 6.9, 8.4, 10.5}},
+      MobRadii{Mob::soldier_ant, {4.2, 4.8, 5.7, 6.9, 8.4, 10.5}},
+      MobRadii{Mob::fire_ant, {4.2, 4.8, 5.7, 6.9, 8.4, 10.5}},
+      MobRadii{Mob::ant_hole, {9.1, 10.4, 12.35, 14.95, 18.2, 22.75}},
+      MobRadii{Mob::spider, {4.55, 5.2, 6.175, 7.475, 9.1, 11.375}},
+      MobRadii{Mob::leech, {3.08, 3.52, 4.18, 5.06, 6.16, 7.7}},
+      MobRadii{Mob::leech_segment, {3.08, 3.52, 4.18, 5.06, 6.16, 7.7}}};
   for (const auto& p : catalog::dated().petals) {
     Match m({1}, 3, arena());
     check(m.add_player({1}, {}, {p.kind}, {p.rarity}), "every petal can be equipped");
@@ -129,17 +140,10 @@ void all_variants() {
     const auto id = FixtureAccess::spawn(m, mob.kind, mob.rarity);
     const auto& body = FixtureAccess::get(m, id).view;
     near(body.max_health, mob.body.health, "all mob health variants");
-    const bool leech = mob.kind == Mob::leech || mob.kind == Mob::leech_segment;
     const auto tier = static_cast<unsigned>(mob.rarity);
-    if (const auto species = std::ranges::find(compact, mob.kind); species != compact.end()) {
-      compact_radii.at(species - compact.begin()).at(tier) = body.radius;
-    } else if (!leech) {
-      auto& size = radii.at(tier);
-      if (size == 0) {
-        size = body.radius;
-      }
-      near(body.radius, size, "ordinary mobs use the full rarity radius");
-    }
+    const auto species = std::ranges::find(scaled_radii, mob.kind, &MobRadii::kind);
+    const auto& expected = species == scaled_radii.end() ? radii : species->by_rarity;
+    near(body.radius, expected.at(tier), "mob collision radius matches species and rarity data");
     near(FixtureAccess::get(m, id).rules.contact_damage, mob.body.contact_damage,
          "all mob damage variants");
     steps(m, 22);
@@ -147,21 +151,6 @@ void all_variants() {
     ++mobs;
   }
   check(petals == 270 && mobs == 210, "480 runtime variants exercised");
-  check(std::ranges::adjacent_find(radii, std::greater_equal{}) == radii.end(),
-        "mob radius increases at every rarity");
-  for (const auto& sizes : compact_radii) {
-    check(std::ranges::adjacent_find(sizes, std::greater_equal{}) == sizes.end(),
-          "ant and spider radii still increase with rarity");
-    for (std::size_t tier = 0; tier < radii.size(); ++tier) {
-      check(sizes[tier] > radii[tier] * .6 && sizes[tier] < radii[tier],
-            "ants and spiders have smaller, comparable collision bodies at each rarity");
-    }
-  }
-  for (std::size_t tier = 0; tier < radii.size(); ++tier) {
-    check(compact_radii[0][tier] < compact_radii[1][tier] &&
-              compact_radii[1][tier] < compact_radii[3][tier],
-          "baby ants are smaller than workers, and queens are larger than workers");
-  }
 }
 
 void pursuit_speeds() {

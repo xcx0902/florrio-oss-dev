@@ -157,6 +157,44 @@ void orbit_buttons() {
   garden.step();
   check(std::abs(distance() - rules.orbit_radius) < 1e-8, "Disconnect clears held orbit mode");
 }
+
+void public_squads() {
+  using namespace wave;
+  app::Garden garden(fixtures::wire_garden_rules());
+  auto& a = garden.admit("", 1);
+  auto& b = garden.admit("", 2);
+  auto& desert = garden.admit("", 3, sim::Biome::desert);
+  check(garden.command(a, wire::CreateSquad{true}, {}), "New creates a private squad");
+  const auto code = a.room;
+  check(garden.command(b, wire::FindPublicSquad{}, {}) && b.room != code &&
+            !garden.room(b)->private_room,
+        "Find Public skips private squads and creates a public fallback");
+  check(garden.command(desert, wire::FindPublicSquad{}, {}) &&
+            garden.room(desert)->biome == sim::Biome::desert && desert.room != b.room &&
+            !garden.command(desert, wire::JoinSquad{code}, {}),
+        "Public search and invites cannot mix biomes");
+  check(garden.command(a, wire::SetSquadPublic{true}, {}) && a.room == code &&
+            !garden.room(a)->private_room,
+        "Public toggles the existing squad without changing its invitation");
+  check(garden.command(b, wire::FindPublicSquad{}, {}) && garden.room(a) == garden.room(b),
+        "Find Public joins the existing open squad");
+  auto& c = garden.admit("", 4);
+  check(garden.command(c, wire::FindPublicSquad{}, {}) && c.room != code,
+        "Find Public skips a full squad");
+  check(garden.command(b, wire::Ready{true}, {}) && !garden.room(a)->match,
+        "One ready player cannot start the public match");
+  garden.disconnect(b.token, 2);
+  check(b.room.empty() && !b.ready && garden.room(a)->members.size() == 1,
+        "A disconnected lobby member releases the seat and Ready state");
+  check(garden.command(c, wire::FindPublicSquad{}, {}) && c.room == code,
+        "The public search can fill the released seat");
+  check(garden.command(a, wire::Ready{true}, {}) && garden.command(c, wire::Ready{true}, {}) &&
+            garden.room(a)->match,
+        "All connected members can start the public match");
+  auto& d = garden.admit("", 5);
+  check(garden.command(d, wire::FindPublicSquad{}, {}) && d.room != code,
+        "Find Public skips a started match");
+}
 }  // namespace
 
 int main() {
@@ -250,6 +288,7 @@ int main() {
         "Distinct authoritative match identities");
   session_life_boundary();
   orbit_buttons();
+  public_squads();
   leech_wave_count();
   std::cout
       << "W2 rooms, batched spawns, life bindings, projection removals, reconnect and isolation passed\n";

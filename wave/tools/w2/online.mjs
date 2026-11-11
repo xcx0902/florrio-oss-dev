@@ -51,7 +51,7 @@ function requests(plain) {
       entry.name = r.str();
     } else if (opcode === 3 || opcode === 27) {
       entry.value = r.vu();
-    } else if (opcode === 7) {
+    } else if (opcode === 2 || opcode === 7) {
       entry.value = r.byte();
     } else if (opcode === 4) {
       entry.value = r.byte();
@@ -60,6 +60,11 @@ function requests(plain) {
       entry.buttons = r.vu();
       entry.angle = r.real();
       entry.strength = r.real();
+    } else if (opcode === 12) {
+      entry.equipment = Array.from({ length: 16 }, () => {
+        const type = r.vu();
+        return type | (type ? r.byte() << 8 : 0);
+      });
     } else {
       assert.ok([11, 21, 25, 34, 38].includes(opcode), `Unrecognized original command ${opcode}`);
     }
@@ -130,12 +135,18 @@ function world(plain, baseline) {
     }
     if (mask & 0x200) {
       entity.names = Array.from({ length: 4 }, () => r.str());
-      entity.ready = r.byte();
+      entity.public = r.byte() !== 0;
       entity.labels = Array.from({ length: 4 }, () => r.str());
       entity.teammates = Array.from({ length: 4 }, () => r.word());
       entity.code = r.str();
       r.skip(16);
-      for (let i = 0; i < 64; i += 1) r.vu();
+      entity.squadEquipment = Array.from({ length: 4 }, () => []);
+      for (let slot = 0; slot < 16; ++slot) {
+        for (const slots of entity.squadEquipment) {
+          const type = r.vu();
+          slots.push(type | (type ? r.byte() << 8 : 0));
+        }
+      }
       r.skip(4);
       entity.memberFlags = Array.from({ length: 4 }, () => r.byte());
     }
@@ -164,7 +175,9 @@ function world(plain, baseline) {
     }
     if (mask & 0x8000) {
       r.skip(2);
-      for (let i = 0; i < 280; i += 1) r.vu();
+      for (let i = 0; i < 280; i += 1) {
+        r.vu();
+      }
       r.str();
       entity.cameraY = r.real();
       r.skip(27);
@@ -174,8 +187,12 @@ function world(plain, baseline) {
       entity.control = r.word();
       entity.cameraX = r.real();
       control = entity.control;
-      for (let i = 0; i < 276; i += 1) r.vu();
-      if ((header ^ 0xac) & 8) r.vu();
+      for (let i = 0; i < 276; i += 1) {
+        r.vu();
+      }
+      if ((header ^ 0xac) & 8) {
+        r.vu();
+      }
     }
     if (mask & 0x10000) {
       entity.petal = r.vu();
@@ -249,6 +266,7 @@ export async function client(browser, url, name, storageState) {
   await page.addInitScript(() => {
     window.waveLabels = new Set();
     window.waveLabelTimes = {};
+    window.waveGreenReadyDraws = 0;
     for (const prototype of [
       CanvasRenderingContext2D.prototype,
       globalThis.OffscreenCanvasRenderingContext2D?.prototype,
@@ -258,6 +276,9 @@ export async function client(browser, url, name, storageState) {
         prototype[method] = function (text, ...args) {
           window.waveLabels.add(String(text));
           window.waveLabelTimes[String(text)] = performance.now();
+          if (method === 'fillText' && text === 'Ready' && this.fillStyle === '#66ff66') {
+            ++window.waveGreenReadyDraws;
+          }
           return draw.call(this, text, ...args);
         };
       }

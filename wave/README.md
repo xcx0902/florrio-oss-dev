@@ -100,6 +100,10 @@ npm --prefix wave run test:wire -- --snapshot "$WAVE_SNAPSHOT" --stage W2
 
 测试入口使用单独编译的 `wave_host_fixture`，固定种子与短批次由测试宿主提供，专用端点只推进 W1 时钟。正式 `wave_host` 按所选场景加载规则，不包含测试端点。手动复查时，A 点击 Squad 创建私有房，复制地址栏中的邀请链接到另一隔离浏览器上下文，双方填写昵称并点击 Ready。
 
+Squad 面板显示全员装备的主副槽花瓣与稀有度，已准备的队员显示绿色 Ready。
+勾选 Public 可公开小队；Find Public 加入同场景、有空位且未开局的公开小队，
+找不到时自动创建新的公开小队。当前每队最多两人。
+
 ## W1 · Garden 原生模拟
 
 使用 CMake 3.20+ 和 C++20 编译器，从仓库根目录执行。

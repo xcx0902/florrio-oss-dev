@@ -13,6 +13,8 @@
 
 namespace wave::app {
 namespace {
+constexpr std::size_t squad_capacity = 2;
+
 std::string random_hex(std::size_t count) {
   std::random_device random;
   constexpr char digits[] = "0123456789abcdef";
@@ -406,6 +408,12 @@ const Room* Garden::room(const Member& entry) const {
   return it == rooms_.end() ? nullptr : &it->second;
 }
 
+std::span<const sim::Petal> Garden::default_loadout(std::size_t seat) const {
+  static constexpr std::array basic{sim::Petal::basic, sim::Petal::basic, sim::Petal::basic,
+                                    sim::Petal::basic, sim::Petal::basic};
+  return seat < loadouts_.size() ? std::span<const sim::Petal>(loadouts_[seat]) : basic;
+}
+
 void Garden::disconnect(std::string_view token, std::uint64_t connection) {
   if (!active(token, connection)) {
     return;
@@ -414,6 +422,9 @@ void Garden::disconnect(std::string_view token, std::uint64_t connection) {
   entry.connected = false;
   if (auto it = rooms_.find(entry.room); it != rooms_.end() && it->second.match) {
     it->second.match->queue(sim::Connection{entry.id, false});
+  } else {
+    // A dropped lobby connection must not keep a seat or block everyone's Ready.
+    leave(entry);
   }
 }
 
@@ -435,18 +446,49 @@ void Garden::leave(Member& entry) {
   entry.ready = false;
 }
 
+bool Garden::create_room(Member& entry, bool private_room) {
+  const auto* current = room(entry);
+  if (rooms_.size() >= 32 && (!current || current->members.size() != 1)) {
+    return false;
+  }
+  std::string code;
+  do {
+    code = random_hex(6);
+  } while (rooms_.contains(code));
+  leave(entry);
+  auto& created = rooms_[code];
+  created.code = code;
+  created.private_room = private_room;
+  created.biome = entry.biome;
+  entry.room = code;
+  created.members.push_back(entry.token);
+  return true;
+}
+
 bool Garden::join(Member& entry, std::string_view code) {
   auto it = rooms_.find(code);
   if (entry.room == code) {
     return true;
   }
-  if (it == rooms_.end() || it->second.match || it->second.members.size() >= 2) {
+  if (it == rooms_.end() || it->second.biome != entry.biome || it->second.match ||
+      it->second.members.size() >= squad_capacity) {
     return false;
   }
   leave(entry);
   entry.room = code;
   it->second.members.push_back(entry.token);
   return true;
+}
+
+bool Garden::find_public(Member& entry) {
+  for (const auto& [code, candidate] : rooms_) {
+    if (code != entry.room && !candidate.private_room && candidate.biome == entry.biome &&
+        !candidate.match && candidate.members.size() < squad_capacity) {
+      return join(entry, code);
+    }
+  }
+  // The client waits for the squad code to change before it dismisses Creating.
+  return create_room(entry, false);
 }
 
 void Garden::apply_profile(const store::Profile& profile) {
@@ -712,8 +754,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
   for (const auto& event : room.match->events()) {
     if (const auto* defeat = std::get_if<sim::Defeat>(&event.data)) {
       if ((defeat->group != sim::Group::main_mob && defeat->group != sim::Group::residual) ||
-          !defeat->mob ||
-          defeat->source.faction != sim::Faction::team || !defeat->source.owner ||
+          !defeat->mob || defeat->source.faction != sim::Faction::team || !defeat->source.owner ||
           static_cast<unsigned>(defeat->rarity) >= 6) {
         continue;
       }
@@ -757,7 +798,9 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
             const auto kind = *catalog::client_petal(petal);
             room.drops.push_back({id + ":" + std::to_string(kind),
                                   {kind, static_cast<std::uint8_t>(drop->rarity)},
-                                  defeat->position, ++room.drop_sequence, available_tick});
+                                  defeat->position,
+                                  ++room.drop_sequence,
+                                  available_tick});
             break;
           }
           roll -= drop->probability;
@@ -890,20 +933,15 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
   if (const auto* name = std::get_if<wire::Nickname>(&action)) {
     entry.name = name->value.empty() ? "Flower" : name->value;
   } else if (const auto* create = std::get_if<wire::CreateSquad>(&action)) {
-    if (rooms_.size() >= 32) {
+    return create_room(entry, create->private_room);
+  } else if (const auto* visibility = std::get_if<wire::SetSquadPublic>(&action)) {
+    const auto found = rooms_.find(entry.room);
+    if (found == rooms_.end() || found->second.match) {
       return false;
     }
-    leave(entry);
-    std::string code;
-    do {
-      code = random_hex(6);
-    } while (rooms_.contains(code));
-    auto& room = rooms_[code];
-    room.code = code;
-    room.private_room = create->private_room;
-    room.biome = entry.biome;
-    entry.room = code;
-    room.members.push_back(entry.token);
+    found->second.private_room = !visibility->value;
+  } else if (std::holds_alternative<wire::FindPublicSquad>(action)) {
+    return find_public(entry);
   } else if (const auto* join_room = std::get_if<wire::JoinSquad>(&action)) {
     return join(entry, join_room->code);
   } else if (std::holds_alternative<wire::Leave>(action)) {
@@ -917,7 +955,10 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
     }
     if (entry.room.empty()) {
       // The original Ready button also permits a solo local Garden.
-      if (!command(entry, wire::CreateSquad{false}, {})) {
+      if (!ready->value) {
+        return true;
+      }
+      if (!create_room(entry, true)) {
         return false;
       }
     }
@@ -942,15 +983,15 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
         // Start at floor(2/3 * minimum), with wave one for a fresh squad.
         opening_index = std::max<std::uint64_t>(1, lowest * std::uint64_t{2} / 3) - 1;
       }
-      room.match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_, std::move(rules),
-                                               opening_index);
+      room.match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_,
+                                                std::move(rules), opening_index);
       if (storage_) {
         room.economy_id = random_hex(32);
       }
       for (std::size_t i = 0; i < room.members.size(); ++i) {
         const auto& m = members_.at(room.members[i]);
-        auto selected =
-            i < loadouts_.size() ? loadouts_[i] : std::vector<sim::Petal>(5, sim::Petal::basic);
+        const auto fallback = default_loadout(i);
+        std::vector<sim::Petal> selected(fallback.begin(), fallback.end());
         std::vector<sim::Rarity> rarities;
         if (m.profile && i >= loadouts_.size()) {
           auto equipment = loadout(*m.profile);

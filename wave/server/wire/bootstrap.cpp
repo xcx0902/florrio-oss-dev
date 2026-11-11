@@ -252,13 +252,25 @@ std::optional<Command> read_startup(std::span<const std::uint8_t> bytes) {
         action = JoinSquad{std::move(*code)};
         break;
       }
+      case 2: {  // Native Public checkbox.
+        if (bytes.empty() || bytes.front() > 1) {
+          return std::nullopt;
+        }
+        action = SetSquadPublic{bytes.front() != 0};
+        bytes = bytes.subspan(1);
+        break;
+      }
       case 3:
       case 27: {
-        // $985/$986 send an incrementing Play request number, not a mode byte.
+        // Find Public and New send an incrementing request number ($986/$985).
         if (!read_varint(bytes)) {
           return std::nullopt;
         }
-        action = CreateSquad{opcode == 27};
+        if (opcode == 3) {
+          action = FindPublicSquad{};
+        } else {
+          action = CreateSquad{true};
+        }
         break;
       }
       case 7: {

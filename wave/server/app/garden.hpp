@@ -8,6 +8,7 @@
 #include <deque>
 #include <memory>
 #include <optional>
+#include <span>
 #include <string>
 #include <chrono>
 #include <functional>
@@ -105,6 +106,7 @@ class Garden {
   static constexpr double pickup_distance = 16;
   const Member* member(std::string_view token) const;
   const Room* room(const Member& member) const;
+  std::span<const sim::Petal> default_loadout(std::size_t seat) const;
   const auto& rooms() const { return rooms_; }
   std::uint64_t accepted_inputs = 0;
   std::uint64_t rejected_inputs = 0;
@@ -113,7 +115,9 @@ class Garden {
 
  private:
   void leave(Member& member);
+  bool create_room(Member& member, bool private_room);
   bool join(Member& member, std::string_view code);
+  bool find_public(Member& member);
   bool economy_command(Member&, const wire::ReliableAction&, std::optional<sim::LifeId>,
                        std::string key);
   void apply_profile(const store::Profile&);

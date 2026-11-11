@@ -1,5 +1,6 @@
 #include "wire/garden_projection.hpp"
 #include "catalog/catalog.hpp"
+#include "wire/economy_cache.hpp"
 
 #include <algorithm>
 #include <bit>
@@ -136,9 +137,10 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     // Keep the nearest drops in the old client's bounded entity table.
     const std::size_t drop_limit = 512 - pickups.size();
     if (drops.size() > drop_limit) {
-      const auto flower = player != view->players.end() && player->body
-                              ? std::ranges::find(view->entities, *player->body, &sim::EntityView::id)
-                              : view->entities.end();
+      const auto flower =
+          player != view->players.end() && player->body
+              ? std::ranges::find(view->entities, *player->body, &sim::EntityView::id)
+              : view->entities.end();
       const auto at = flower == view->entities.end() ? sim::Vec2{} : flower->position;
       std::ranges::partial_sort(drops, drops.begin() + drop_limit, {}, [&](const auto* drop) {
         return std::pair{(drop->position - at).length(), drop->serial};
@@ -169,10 +171,13 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
             ghost.record.back() = 0;
           }
           if (ghost.flower) {
-            const auto fallen = std::ranges::find(view->players, *ghost.flower, &sim::PlayerView::id);
+            const auto fallen =
+                std::ranges::find(view->players, *ghost.flower, &sim::PlayerView::id);
             if (fallen != view->players.end() && fallen->death_position) {
-              set_real(ghost.record, ghost.position_offset, fallen->death_position->x * world_scale);
-              set_real(ghost.record, ghost.position_offset + 4, fallen->death_position->y * world_scale);
+              set_real(ghost.record, ghost.position_offset,
+                       fallen->death_position->x * world_scale);
+              set_real(ghost.record, ghost.position_offset + 4,
+                       fallen->death_position->y * world_scale);
               ghost.record.back() = 0;
             }
           }
@@ -220,10 +225,10 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       }
       const bool flower = e.group == sim::Group::player;
       const bool digger = e.mob == sim::Mob::digger;
-      const auto client_mob = e.mob || e.group == sim::Group::ant_hole
-                                  ? std::optional{mob_type(e.mob.value_or(sim::Mob::baby_ant),
-                                                           e.group, e.rarity)}
-                                  : std::nullopt;
+      const auto client_mob =
+          e.mob || e.group == sim::Group::ant_hole
+              ? std::optional{mob_type(e.mob.value_or(sim::Mob::baby_ant), e.group, e.rarity)}
+              : std::nullopt;
       Writer body;
       std::uint32_t mask = 0x400 | 0x1000 | 0x80000;
       if (e.mob != sim::Mob::leech_segment) {
@@ -335,9 +340,14 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         set_real(record.bytes, 8 + position_offset, anchor->position.x * world_scale);
         set_real(record.bytes, 12 + position_offset, anchor->position.y * world_scale);
       }
-      rendered_.insert_or_assign(
-          key, Rendered{record.bytes, 8 + flags_offset, 8 + position_offset, e.max_health,
-                        flower ? std::optional{e.owner->player} : std::nullopt, digger, {}});
+      rendered_.insert_or_assign(key,
+                                 Rendered{record.bytes,
+                                          8 + flags_offset,
+                                          8 + position_offset,
+                                          e.max_health,
+                                          flower ? std::optional{e.owner->player} : std::nullopt,
+                                          digger,
+                                          {}});
       out.bytes.insert(out.bytes.end(), record.bytes.begin(), record.bytes.end());
       if (handle(e.id) == controlled) {
         camera = e.position;
@@ -351,7 +361,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       body.real(position.x * world_scale);
       body.real(position.y * world_scale);
       body.real(16);
-      body.byte(0);  // Generic render flags.
+      body.byte(0);                  // Generic render flags.
       body.byte(collected ? 1 : 0);  // The native pickup renderer shrinks and spins out.
       body.integer(target);
       body.integer(drop.item.kind);
@@ -366,7 +376,8 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       const auto target = std::ranges::find(view->entities, pickup->target, &sim::EntityView::id);
       const auto destination =
           target == view->entities.end() ? pickup->destination : target->position;
-      const double elapsed = std::chrono::duration<double, std::milli>(now - pickup->started).count();
+      const double elapsed =
+          std::chrono::duration<double, std::milli>(now - pickup->started).count();
       const double factor = 1 - std::pow(.8, std::max(0., elapsed) * .06);
       const auto position = pickup->drop.position + (destination - pickup->drop.position) * factor;
       write_drop(pickup->drop, position, target == view->entities.end() ? 0 : handle(target->id),
@@ -377,7 +388,8 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
   Writer profile;
   const auto* saved = viewer.profile ? &*viewer.profile : nullptr;
   profile.byte(saved ? std::min(255u, saved->level) : 1);
-  profile.byte(saved ? 10 : 0);  // $2350/$2348: economic cache + authoritative level/XP.
+  // $2350/$2348: economy and level/XP; $2588: the local Ready toggle.
+  profile.byte((saved ? 10 : 0) | (viewer.ready ? 16 : 0));
   // The first 276 values are legacy craft counters; fresh post-Oct-20 rolls are independent.
   for (unsigned i = 0; i < 276; ++i) {
     profile.integer(0);
@@ -432,16 +444,25 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
 
   if (room) {
     Writer roster;
-    std::uint8_t ready = 0;
     std::array<std::uint32_t, 4> bodies{};
+    std::array<store::Slots, 4> equipment{};
+    std::array<std::uint8_t, 4> member_flags{};
     for (std::size_t i = 0; i < bodies.size(); ++i) {
       const auto* member = i < room->members.size() ? garden.member(room->members[i]) : nullptr;
       roster.text(member ? member->name : "");
       if (!member) {
         continue;
       }
-      if (member->ready) {
-        ready |= 1 << i;
+      member_flags[i] = 1 | (member->ready ? 2 : 0);  // Occupied and Ready ($429).
+      if (member->profile) {
+        equipment[i] = client_equipment(*member->profile);
+      } else {
+        const auto loadout = garden.default_loadout(i);
+        for (std::size_t slot = 0; slot < std::min(loadout.size(), equipment[i].size()); ++slot) {
+          if (const auto kind = catalog::client_petal(loadout[slot])) {
+            equipment[i][slot] = store::Item{*kind, 0};
+          }
+        }
       }
       if (view) {
         const auto teammate = std::ranges::find(view->players, member->id, &sim::PlayerView::id);
@@ -450,7 +471,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         }
       }
     }
-    roster.byte(ready);
+    roster.byte(!room->private_room);
     roster.zeros(4);  // Optional labels.
     for (const auto body : bodies) {
       roster.word(body);  // $954 resolves each teammate's position from this handle.
@@ -460,10 +481,19 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       // $939 compares this ID to the local profile entity, not its flower.
       roster.word(i < room->members.size() && room->members[i] == viewer.token ? 8193 : bodies[i]);
     }
-    roster.zeros(64);  // Optional equipment preview.
+    // $55 reads type vu plus rarity for nonzero types; $136 indexes slot * 4 + member.
+    for (std::size_t slot = 0; slot < store::Slots{}.size(); ++slot) {
+      for (const auto& member_equipment : equipment) {
+        const auto& item = member_equipment[slot];
+        roster.integer(item ? item->kind : 0);
+        if (item) {
+          roster.byte(item->rarity);
+        }
+      }
+    }
     roster.real(0);
-    for (std::size_t i = 0; i < bodies.size(); ++i) {
-      roster.byte(i < room->members.size() ? 1 : 0);
+    for (const auto flags : member_flags) {
+      roster.byte(flags);
     }
     out.record(8194, 0x200, roster);
     had_roster_ = true;
@@ -499,8 +529,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     std::array<std::uint32_t, 216> counts{};
     for (const auto& entity : view->entities) {
       // Leech sections share the head's health and count as one mob with it.
-      if (entity.faction == sim::Faction::garden &&
-          entity.mob != sim::Mob::leech_segment &&
+      if (entity.faction == sim::Faction::garden && entity.mob != sim::Mob::leech_segment &&
           (entity.mob || entity.group == sim::Group::ant_hole)) {
         ++counts[mob_type(entity.mob.value_or(sim::Mob::baby_ant), entity.group, entity.rarity) *
                      6 +

@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { writeFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { client, aim } from './online.mjs';
 import { startHost } from './host.mjs';
@@ -383,7 +385,7 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
         return memory.getUint32(memory.getUint32(4347728, true) + 828, true);
       });
       assert.equal(activeBiome, biome);
-      await pause(450);  // Let the original canvas finish transitioning away from the menu.
+      await pause(450); // Let the original canvas finish transitioning away from the menu.
       const screenshot = `W2-09-${name}.png`;
       await entry.page.screenshot({ path: path.join(output, screenshot) });
       scenes.push({ name, biome, mobs: mobs.map((mob) => mob.mob), screenshot });
@@ -400,6 +402,126 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
   }
 }
 
+export async function publicSquadCase({ browser, snapshot, nativeDir, output, report }) {
+  console.log('W2-13: original Public, Find Public, squad equipment and green Ready');
+  report.cases['W2-13'] = { status: 'failed', kind: 'original-public-squad' };
+  const temporary = await mkdtemp(path.join(tmpdir(), 'wave-squad-'));
+  const database = path.join(temporary, 'profiles.sqlite3');
+  let host;
+  const contexts = [];
+  const roster = (entry) => entry.baseline.get(8194);
+  const open = async (name, token) => {
+    const entry = await client(browser, host.url, name, {
+      cookies: [],
+      origins: [
+        {
+          origin: new URL(host.url).origin,
+          localStorage: [{ name: 'cp6_player_id', value: token }],
+        },
+      ],
+    });
+    contexts.push(entry.context);
+    await pause(700);
+    await entry.page.screenshot({ path: path.join(output, 'W2-13-' + name + '-menu.png') });
+    await entry.page.mouse.click(660, 374);
+    await entry.page.waitForFunction(() => location.hash.startsWith('#wavelocal-'));
+    await pause(700); // Wait for the native panel animation before clicking its controls.
+    await entry.page.screenshot({ path: path.join(output, 'W2-13-' + name + '-lobby.png') });
+    return entry;
+  };
+  try {
+    const seed = (...args) =>
+      JSON.parse(
+        execFileSync(path.join(nativeDir, 'wave_w3_seed'), [database, ...args], {
+          encoding: 'utf8',
+        }),
+      );
+    const first = seed();
+    const second = seed('--behaviors');
+    host = await startHost({ snapshot, nativeDir, port: 0, database });
+    const a = await open('public-host', first.token);
+    let code = roster(a).code;
+    assert.equal(roster(a).public, false);
+    await a.page.mouse.click(338, 290);
+    await until(() => roster(a)?.public, 'The native Public checkbox updates the squad');
+    assert.equal(roster(a).code, code);
+    await a.page.mouse.click(338, 290);
+    await until(() => !roster(a)?.public, 'The native checkbox can make the squad private');
+    await a.page.mouse.click(338, 290);
+    await until(() => roster(a)?.public, 'The squad is public again');
+    await a.page.mouse.click(590, 290);
+    await until(() => roster(a)?.code !== code, 'Find Public falls back to a new public squad');
+    code = roster(a).code;
+    assert.equal(roster(a).public, true);
+    await a.page.waitForFunction((code) => location.hash === '#wavelocal-' + code, code);
+
+    const b = await open('public-joiner', second.token);
+    await b.page.mouse.click(590, 290);
+    await until(
+      () => roster(b)?.code === code && roster(a)?.memberFlags[1] === 1,
+      'Find Public joins the existing squad on the same connection',
+    );
+    await b.page.waitForFunction((code) => location.hash === '#wavelocal-' + code, code);
+    await pause(700);
+    const expected = [
+      [1, 1, 1, 1, 1, 5 | (1 << 8), ...Array(10).fill(0)],
+      second.slots.map((item) => (item ? item[0] | (item[1] << 8) : 0)),
+      Array(16).fill(0),
+      Array(16).fill(0),
+    ];
+    for (const entry of [a, b]) {
+      assert.deepEqual(
+        roster(entry).squadEquipment,
+        expected,
+        'All main and reserve petals retain their kinds and rarities',
+      );
+      const consumed = await entry.page.evaluate(() => {
+        const memory = new DataView(window.Module.asm.Jf.buffer);
+        const u = (at) => memory.getUint32(at, true);
+        const roster = u(u(917864 + 772));
+        return Array.from({ length: 4 }, (_, member) =>
+          Array.from({ length: 16 }, (_, slot) =>
+            memory.getUint16(roster + 248 + 2 * (slot * 4 + member), true),
+          ),
+        );
+      });
+      assert.deepEqual(consumed, expected, 'The original Wasm consumes the complete preview');
+    }
+    await b.page.mouse.click(660, 220);
+    await until(() => roster(a)?.memberFlags[1] === 3, 'A sees the second member ready');
+    assert.ok(!a.current.control && !b.current.control, 'One ready member does not start a match');
+    const screenshot = 'W2-13-public-ready.png';
+    await pause(450);
+    await a.page.screenshot({ path: path.join(output, screenshot) });
+    await a.page.waitForFunction(() => window.waveGreenReadyDraws > 0);
+    await b.page.mouse.click(660, 220);
+    await until(() => roster(a)?.memberFlags[1] === 1, 'The second seat can cancel Ready');
+    assert.deepEqual(
+      b.commands.filter((c) => c.opcode === 7).map((c) => c.value),
+      [1, 0],
+    );
+    for (const entry of [a, b]) {
+      assert.equal(entry.sockets.length, 1);
+      assert.equal(entry.documentLoads.length, 1);
+      assert.deepEqual(entry.errors, []);
+      assert.equal(await entry.page.locator('#wave-connection').isHidden(), true);
+    }
+    await b.context.close();
+    await until(() => roster(a)?.memberFlags[1] === 0, 'The lost connection frees a lobby seat');
+    assert.equal(a.sockets.length, 1);
+    Object.assign(report.cases['W2-13'], {
+      status: 'passed',
+      screenshot,
+      equipment: expected,
+      readyToggle: [1, 0],
+    });
+  } finally {
+    await Promise.all(contexts.map((context) => context.close()));
+    await host?.stop();
+    await rm(temporary, { recursive: true, force: true });
+  }
+}
+
 export async function connectionRecoveryCase({ browser, snapshot, nativeDir, output, report }) {
   console.log('W2-12: same-guest tabs, stalled cache or socket, and explicit reconnect');
   report.cases['W2-12'] = { status: 'failed', kind: 'connection-recovery' };
@@ -412,7 +534,9 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
     const b = await client(browser, host.url, 'second-tab', await a.context.storageState());
     contexts.push(b.context);
     assert.equal(a.guest, b.guest);
-    await banner(a.page).getByText(/another tab/).waitFor();
+    await banner(a.page)
+      .getByText(/another tab/)
+      .waitFor();
     await pause(1100); // The legacy client used to reload 500 ms after a forced disconnect.
     assert.deepEqual([a.documentLoads.length, b.documentLoads.length], [1, 1]);
     assert.deepEqual([a.sockets.length, b.sockets.length], [1, 1]);
@@ -424,7 +548,9 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
       'The reconnect button hands the same guest back to the first tab',
     );
     assert.equal(await a.page.evaluate(() => localStorage.getItem('cp6_player_id')), a.guest);
-    await banner(b.page).getByText(/another tab/).waitFor();
+    await banner(b.page)
+      .getByText(/another tab/)
+      .waitFor();
     await pause(600);
     assert.deepEqual([a.documentLoads.length, b.documentLoads.length], [2, 1]);
     assert.deepEqual([...a.errors, ...b.errors], []);
@@ -432,7 +558,9 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
     const faulty = await browser.newContext({ viewport: { width: 1024, height: 768 } });
     contexts.push(faulty);
     let releaseCache;
-    const blocked = new Promise((resolve) => { releaseCache = resolve; });
+    const blocked = new Promise((resolve) => {
+      releaseCache = resolve;
+    });
     await faulty.route('**/wave/cache/**', async (route) => {
       await blocked;
       await route.fulfill({ status: 503, body: 'Profile temporarily unavailable' });
@@ -447,7 +575,9 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
       window.WebSocket = class extends Native {
         constructor(url, protocols) {
           super(url, protocols);
-          if (new URL(url).pathname !== '/wave/socket') return;
+          if (new URL(url).pathname !== '/wave/socket') {
+            return;
+          }
           window.waveTestSocket = this;
           let stalled = !sessionStorage.getItem('waveTestResumed');
           const buffered = [];
@@ -468,7 +598,9 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
       };
       const draw = CanvasRenderingContext2D.prototype.fillText;
       CanvasRenderingContext2D.prototype.fillText = function (value, ...args) {
-        if (value === 'Ready') window.waveReadyDrawn = true;
+        if (value === 'Ready') {
+          window.waveReadyDrawn = true;
+        }
         return draw.call(this, value, ...args);
       };
     });

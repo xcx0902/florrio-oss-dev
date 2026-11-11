@@ -27,6 +27,10 @@ struct Nickname {
 struct CreateSquad {
   bool private_room;
 };
+struct SetSquadPublic {
+  bool value;
+};
+struct FindPublicSquad {};
 struct Ready {
   bool value;
 };
@@ -54,8 +58,9 @@ struct Swap {
   std::pair<std::uint32_t, std::uint8_t> first_item, second_item;
 };
 
-using ReliableAction = std::variant<std::monostate, Identify, Nickname, CreateSquad, Ready,
-                                    JoinSquad, Move, Leave, Craft, Equip, Swap>;
+using ReliableAction =
+    std::variant<std::monostate, Identify, Nickname, CreateSquad, SetSquadPublic, FindPublicSquad,
+                 Ready, JoinSquad, Move, Leave, Craft, Equip, Swap>;
 struct ReliableRequest {
   std::uint32_t sequence;
   ReliableAction action;
