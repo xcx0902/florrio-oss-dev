@@ -7,6 +7,7 @@ import path from 'node:path';
 import { chromium } from 'playwright-core';
 import { defaultNative, root, startHost } from '../w2/host.mjs';
 import { CaptureCodec, readVu } from '../w2/codec.mjs';
+import { squadCase, realtimeReadyCase, abandonReentryCase } from './squad.mjs';
 const hash = (b) => createHash('sha256').update(b).digest('hex');
 export async function runW3(values) {
   const output = path.resolve(values['output-dir']);
@@ -72,10 +73,11 @@ export async function runW3(values) {
           const plain = codecs[direction].decode(bytes);
           frames.push({ direction, hex: bytes.toString('hex'), plain: plain.toString('hex') });
           if (direction === 'sent' && plain[0] === 1) {
-            const c = { offset: 2 };
-            const sequence = readVu(plain, c),
+            const c = { offset: 1 };
+            const epoch = readVu(plain, c),
+              sequence = readVu(plain, c),
               opcode = readVu(plain, c);
-            requests.push({ sequence, opcode, data: [...plain.subarray(c.offset)] });
+            requests.push({ epoch, sequence, opcode, data: [...plain.subarray(c.offset)] });
           }
         });
       }
@@ -279,6 +281,33 @@ export async function runW3(values) {
       state: launchedState,
     };
     await screenshot(c, 'live-swap');
+    await c.page.mouse.click(24, 24);
+    await c.page.waitForTimeout(600);
+    // A new world repeats startup sequences. A changed Equip must still commit
+    // under its own epoch, and subsequent mouse/keyboard input must remain live.
+    await screenshot(c, 'post-abandon-menu');
+    await c.page.mouse.click(35, 626);
+    await c.page.waitForTimeout(500);
+    await screenshot(c, 'post-abandon-inventory');
+    await c.page.mouse.click(512, 475, { delay: 80 });
+    await c.page.waitForTimeout(150); // Let the native frame consume the slot click before moving.
+    await clickPetal(c, 12, 0);
+    await c.page.waitForTimeout(500);
+    assert.deepEqual(seed(database, token).slots[2], [12, 0]);
+    await c.page.mouse.click(35, 626);
+    await c.page.waitForTimeout(300);
+    await c.page.keyboard.press('Enter');
+    await c.page.waitForTimeout(200);
+    await advance(1);
+    await c.page.waitForFunction(() => {
+      const d = new DataView(Module.asm.Jf.buffer), u = (a) => d.getUint32(a, true);
+      return u(u(u(u(4347728) + 2768)) + 2360) && !d.getUint8(4350150);
+    });
+    await c.page.keyboard.press('Digit2', { delay: 150 });
+    await c.page.waitForTimeout(500);
+    assert.deepEqual(seed(database, token).slots[1], [1, 0]);
+    assert.ok(c.requests.some((r) => r.epoch === 1 && r.opcode === 12));
+    report.cases.postAbandonEquipment = { status: 'passed', slots: seed(database, token).slots };
     await c.page.mouse.click(24, 24);
     await c.page.waitForTimeout(600);
   }
@@ -546,10 +575,27 @@ export async function runW3(values) {
     await mixed.context.close();
     await host.stop();
     host = null;
+    await squadCase({
+      browser, snapshot: values.snapshot, nativeDir: native, temporary, output, report, seed,
+    });
+    await abandonReentryCase({
+      browser, snapshot: values.snapshot, nativeDir: native, temporary, output, report, seed,
+    });
+    await realtimeReadyCase({
+      browser, snapshot: values.snapshot, nativeDir: native, temporary, report, seed,
+    });
     report.status = 'passed';
   } catch (error) {
     report.error = error.stack;
     console.error(error);
+    report.failurePages = [];
+    for (const context of browser?.contexts() ?? []) {
+      for (const page of context.pages()) {
+        const name = `failure-${report.failurePages.length}.png`;
+        report.failurePages.push({ url: page.url(), frames: page.frames().map((f) => f.url()), screenshot: name });
+        await page.screenshot({ path: path.join(output, name) }).catch(() => {});
+      }
+    }
     process.exitCode = 1;
   } finally {
     await browser?.close();

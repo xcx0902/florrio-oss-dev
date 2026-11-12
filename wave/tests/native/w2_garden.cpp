@@ -158,6 +158,53 @@ void orbit_buttons() {
   check(std::abs(distance() - rules.orbit_radius) < 1e-8, "Disconnect clears held orbit mode");
 }
 
+void squad_departure() {
+  using namespace wave;
+  auto rules = fixtures::wire_garden_rules();
+  app::Garden garden(rules);
+  auto& a = garden.admit("", 1);
+  auto& b = garden.admit("", 2);
+  check(garden.command(a, wire::CreateSquad{true}, {}) &&
+            garden.command(b, wire::JoinSquad{a.room}, {}) &&
+            garden.command(a, wire::Ready{true}, {}) &&
+            garden.command(b, wire::Ready{true}, {}), "Departure fixture starts a squad");
+  garden.step();
+  const auto before = garden.room(a)->match->view();
+  const auto old_life = player(before, a.id).life;
+  const auto survivor = player(before, b.id);
+  // Socket loss must retain the same flower for a subsequent reconnect.
+  garden.disconnect(a.token, 1);
+  garden.step();
+  check(player(garden.room(b)->match->view(), a.id).body == player(before, a.id).body,
+        "Temporary disconnect retains the flower in its arena");
+  garden.admit(a.token, 3);
+  garden.step();
+  auto& match = *garden.room(b)->match;
+  check(garden.command(a, wire::Leave{}, {}), "Abandon releases the member's room");
+  check(!garden.room(a) && garden.room(b)->members.size() == 1,
+        "Only the departing member loses its squad seat");
+  // These were valid when queued but must not dereference a departed player.
+  check(match.queue(sim::Departure{a.id}) && match.queue(sim::Connection{a.id, true}) &&
+            match.queue(sim::Input{old_life, {1, 0}}) &&
+            match.queue(sim::Equip{old_life, {sim::Petal::basic}, {}}),
+        "Delayed commands can share the departure tick");
+  garden.step();
+  const auto after = match.view();
+  check(after.id == before.id && after.phase != sim::Phase::ended && after.players.size() == 1 &&
+            player(after, b.id).life == survivor.life && player(after, b.id).body == survivor.body,
+        "The surviving teammate continues the original match and life");
+  check(std::ranges::none_of(after.entities, [&](const auto& entity) {
+          return entity.owner && entity.owner->player == a.id;
+        }), "Abandon removes the flower and every entity owned by the departing life");
+  check(!match.queue(sim::Connection{a.id, true}) && !match.queue(sim::Input{old_life, {1, 0}}),
+        "A permanently departed player cannot reconnect into the old arena");
+  check(garden.command(a, wire::Ready{true}, {}) && garden.room(a) != garden.room(b),
+        "The departing player can start a separate new match");
+  garden.command(a, wire::Leave{}, {});
+  garden.command(b, wire::Leave{}, {});
+  check(garden.rooms().empty(), "The last departure removes the old arena room");
+}
+
 void public_squads() {
   using namespace wave;
   app::Garden garden(fixtures::wire_garden_rules());
@@ -195,10 +242,66 @@ void public_squads() {
   check(garden.command(d, wire::FindPublicSquad{}, {}) && d.room != code,
         "Find Public skips a started match");
 }
+
+void abandoned_room_capacity() {
+  using namespace wave;
+  app::Garden garden(fixtures::wire_garden_rules());
+  for (unsigned i = 0; i < 40; ++i) {
+    auto& member = garden.admit("", i + 1);
+    check(garden.command(member, wire::Ready{true}, {}) && garden.room(member)->match,
+          "Solo Ready still starts after more than 32 disconnected sessions");
+    garden.step();
+    garden.disconnect(member.token, i + 1);
+    garden.step();
+    check(garden.room(member)->match->view().phase == sim::Phase::ended,
+          "The existing last-disconnect rule ends the abandoned match");
+    check(garden.rooms().size() <= 32, "Reclamation keeps the original room capacity");
+  }
+  auto& a = garden.admit("", 100);
+  auto& b = garden.admit("", 101);
+  check(garden.command(a, wire::CreateSquad{true}, {}) &&
+            garden.command(b, wire::JoinSquad{a.room}, {}) &&
+            garden.command(a, wire::Ready{true}, {}) &&
+            garden.command(b, wire::Ready{true}, {}) && garden.room(a)->match,
+        "Squad Ready can use a reclaimed room slot too");
+  const auto code = a.room;
+  const auto token = a.token;
+  garden.step();
+  garden.disconnect(token, 100);
+  garden.step();
+  auto& returning = garden.admit(token, 102);
+  check(returning.room == code && garden.room(returning) == garden.room(b),
+        "A disconnected teammate still returns to the survivor's active match");
+}
+
+void full_room_ready_denial() {
+  using namespace wave;
+  app::Garden garden(fixtures::wire_garden_rules());
+  for (unsigned i = 0; i < 32; ++i) {
+    auto& member = garden.admit("", i + 1);
+    check(garden.command(member, wire::CreateSquad{true}, {}), "Fill occupied lobby capacity");
+  }
+  wire::Bytes hello{48};
+  const std::string build = "b632797f0ee487dd99df460b13bde6d7ce5c9773";
+  hello.insert(hello.end(), build.begin(), build.end());
+  hello.insert(hello.end(), 2, 0);
+  app::GardenSession session(garden, 100);
+  check(!session.receive(hello).close, "A full room list still permits profile admission");
+  // Synthetic encrypted Identify + Ready, using the original command layouts.
+  const auto denied = session.receive(bytes(
+      "051eab7a7d17e38419fb200e2d654423c8af427c8d4a917c51d5160604a5305eaa2a9cecf653"));
+  check(denied.close && denied.frames.back() == wire::Bytes{0, 0},
+        "Denied Ready explicitly opens reconnect instead of leaving native UI waiting forever");
+  check(garden.rooms().size() == 32,
+        "Capacity recovery never evicts a connected lobby or raises the room limit");
+}
 }  // namespace
 
 int main() {
   using namespace wave;
+  squad_departure();
+  abandoned_room_capacity();
+  full_room_ready_denial();
   auto rules = fixtures::wire_garden_rules();
   for (auto& wave : rules.waves) {
     wave.deadline = 100;
@@ -225,6 +328,15 @@ int main() {
   check(view.next_tick == 1 && view.wave.counts.spawned == 2 && view.wave.counts.pending == 4,
         "One room update, first spawn batch only");
   const auto life = player(view, a.id).life;
+  const auto match = view.id;
+  check(garden.command(a, wire::Ready{false}, {}) && !a.ready && b.ready,
+        "Native post-spawn Ready clear is acknowledged independently for each member");
+  check(garden.command(b, wire::Ready{false}, {}) && !b.ready,
+        "Both clients can finish their Ready transition after the match starts");
+  check(garden.command(a, wire::Ready{false}, {}) && a.room == room_code &&
+            garden.room(a) == garden.room(b) && garden.room(a)->match->view().id == match &&
+            player(garden.room(a)->match->view(), a.id).life == life,
+        "Repeated Ready clear preserves the running squad and current life");
   const auto initial = projection.build(garden, a);
   check(initial.control == life && !initial.records.empty(), "Authoritative local life projected");
   check(!garden.command(a, wire::Move{0, 0, 100}, {}),
@@ -252,6 +364,13 @@ int main() {
       garden, a, std::chrono::steady_clock::now() + std::chrono::milliseconds(500));
   check(!expired.removed.empty(), "Faded entities expire and release their handles");
   check(!garden.command(a, wire::Move{0, 0, 100}, life), "Old life rejected while waiting");
+  check(garden.command(a, wire::Continue{}, {}) && a.room == room_code &&
+            garden.room(a) == garden.room(b),
+        "Death Continue keeps the fallen player in the active squad");
+  garden.step();
+  view = garden.room(a)->match->view();
+  check(player(view, a.id).connected && player(view, a.id).state == sim::LifeState::waiting,
+        "Death Continue preserves the connected player for revival");
   while (view.wave.number == 1 || view.phase == sim::Phase::waiting) {
     garden.step();
     view = garden.room(a)->match->view();
@@ -264,6 +383,8 @@ int main() {
         "Fresh acknowledged life regains control");
   const auto reborn = projection.build(garden, a);
   check(reborn.control == next_life, "Respawn profile carries the new controlling reference");
+  check(garden.command(a, wire::Continue{}, {}) && a.room == room_code,
+        "A delayed death Continue cannot remove a revived teammate");
   const auto id = b.id;
   const auto token = b.token;
   garden.disconnect(token, 2);
@@ -286,6 +407,13 @@ int main() {
         "Each room advances once on the host clock");
   check(garden.room(a)->match->view().id != garden.room(c)->match->view().id,
         "Distinct authoritative match identities");
+  for (unsigned i = 0; i < 1000 && garden.room(c)->match->view().phase != sim::Phase::ended; ++i) {
+    garden.step();
+  }
+  check(garden.room(c)->match->view().phase == sim::Phase::ended,
+        "Solo match reaches terminal settlement");
+  check(garden.command(c, wire::Continue{}, {}) && c.room.empty(),
+        "Death Continue leaves a finished match");
   session_life_boundary();
   orbit_buttons();
   public_squads();

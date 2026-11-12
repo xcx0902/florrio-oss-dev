@@ -37,11 +37,13 @@ class GardenSession {
   wire::GardenProjection projection_;
   std::uint32_t acknowledged_ = 0;
   std::uint64_t craft_cursor_ = 0;
+  std::uint64_t match_ = 0;
   std::uint32_t last_tick_ = 0;
   std::uint32_t last_ack_ = 0;
   std::map<std::uint32_t, std::optional<sim::LifeId>> sent_lives_;
   std::optional<sim::LifeId> acknowledged_life_;
   bool greeted_ = false;
+  bool identified_ = false;
   bool closed_ = false;
 };
 

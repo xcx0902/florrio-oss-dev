@@ -108,7 +108,6 @@ void all_variants() {
       MobRadii{Mob::worker_ant, {4.2, 4.8, 5.7, 6.9, 8.4, 10.5}},
       MobRadii{Mob::soldier_ant, {4.2, 4.8, 5.7, 6.9, 8.4, 10.5}},
       MobRadii{Mob::fire_ant, {4.2, 4.8, 5.7, 6.9, 8.4, 10.5}},
-      MobRadii{Mob::ant_hole, {9.1, 10.4, 12.35, 14.95, 18.2, 22.75}},
       MobRadii{Mob::spider, {4.55, 5.2, 6.175, 7.475, 9.1, 11.375}},
       MobRadii{Mob::leech, {3.08, 3.52, 4.18, 5.06, 6.16, 7.7}},
       MobRadii{Mob::leech_segment, {3.08, 3.52, 4.18, 5.06, 6.16, 7.7}}};
@@ -270,6 +269,8 @@ void ground_and_revive() {
     m.add_player({1}, {}, {Petal::yggdrasil});
     m.add_player({2}, {100, 0}, {});
     steps(m);
+    const auto old_life = owner(m, 1).life;
+    const auto wave = m.view().wave.number;
     FixtureAccess::get(m, flower(m, 1)).view.health = 0;
     FixtureAccess::reap(m);
     steps(m);
@@ -281,6 +282,10 @@ void ground_and_revive() {
     check(owner(m, 1).state == LifeState::waiting, "Yggdrasil waits full ground activation");
     steps(m);
     check(owner(m, 1).state == LifeState::alive, "Yggdrasil revives before next wave");
+    check(m.view().wave.number == wave && owner(m, 1).life.generation > old_life.generation,
+          "Yggdrasil gives the teammate a fresh life within the same wave");
+    const auto& revived = FixtureAccess::get(m, flower(m, 1)).view;
+    near(revived.health, revived.max_health * .5, "Yggdrasil restores half health");
     check(FixtureAccess::get(m, flower(m, 1)).view.position == at,
           "revive at dropped leaf location");
   }
@@ -318,6 +323,8 @@ void lightning_and_passives() {
 void biome_progression() {
   for (const auto biome : {Biome::garden, Biome::desert, Biome::ocean}) {
     auto rules = scenario_rules(biome);
+    near(rules.arena_radius, 300., "Every biome uses the default arena radius of 300");
+    near(rules.spawn_points.back().length(), 175., "Spawn rings keep their configured radius");
     rules.special_chance = 0;
     const auto opening = rules.waves.front().eligible;
     const auto unlocked = biome == Biome::garden ? Mob::ant_hole
@@ -770,24 +777,24 @@ void chains() {
 }
 
 void chains_stay_inside_arena() {
-  for (const auto kind : {Mob::centipede, Mob::evil_centipede, Mob::desert_centipede, Mob::leech}) {
+  for (const auto& variant : catalog::dated().mobs) {
+    if (!variant.segments) {
+      continue;
+    }
     auto rules = arena();
     rules.arena_radius = 200;
     rules.spawn_points = {{0, -150}};
     Match m({52}, 1, rules);
     check(m.add_player({1}, {110, 0}, {}), "admit player inside the rim");
     steps(m);
-    const auto root = FixtureAccess::spawn(m, kind, Rarity::mythic, {200, 0});
+    const auto root = FixtureAccess::spawn(m, variant.kind, variant.rarity, {200, 0});
     auto& head = FixtureAccess::get(m, root);
     head.provoked = true;
     const auto start = m.view();
     const auto first = std::ranges::find(start.entities, root, &EntityView::predecessor);
     check(first != start.entities.end(), "spawned first body segment");
     const double spacing = (head.view.position - first->position).length();
-    // Bend the chain at the rim with the first link bunched and the next stretched.
-    FixtureAccess::get(m, first->id).view.position = head.view.position + Vec2{-.1, 1};
-    for (int tick = 0; tick < 20; ++tick) {
-      steps(m);
+    const auto check_chain = [&] {
       for (const auto& e : m.view().entities) {
         if (e.mob) {
           check(e.position.length() + e.radius <= rules.arena_radius + 1e-6,
@@ -795,8 +802,58 @@ void chains_stay_inside_arena() {
         }
         if (e.predecessor) {
           const auto& parent = FixtureAccess::get(m, *e.predecessor).view;
-          check((e.position - parent.position).length() <= spacing + 1e-6,
+          const double distance = (e.position - parent.position).length();
+          check(distance <= e.radius + parent.radius + 1e-6,
+                "every variant's rendered body circles stay joined without gaps");
+          check(distance <= spacing + 1e-6,
                 "turning at the rim keeps each link within reach");
+        }
+      }
+    };
+    check_chain();
+    // Bend the chain at the rim with the first link bunched and the next stretched.
+    FixtureAccess::get(m, first->id).view.position = head.view.position + Vec2{-.1, 1};
+    for (int tick = 0; tick < 20; ++tick) {
+      steps(m);
+      check_chain();
+    }
+  }
+}
+
+void centipede_motion() {
+  for (const auto kind : {Mob::centipede, Mob::evil_centipede, Mob::desert_centipede}) {
+    Match m({53}, 1, arena());
+    m.add_player({1}, {}, {});
+    steps(m);
+    const auto root = FixtureAccess::spawn(m, kind);
+    const auto start = m.view();
+    for (const auto& e : start.entities) {
+      if (e.predecessor) {
+        const auto& parent = FixtureAccess::get(m, *e.predecessor).view;
+        near((e.position - parent.position).length(), e.radius + parent.radius,
+             "Centipede links use the same separation as body contacts");
+      }
+    }
+    // With no movement or external contacts, a chain must not push itself or
+    // its head. The former .85-diameter constraint failed this every tick.
+    FixtureAccess::contacts(m);
+    FixtureAccess::constrain(m);
+    for (const auto& e : start.entities) {
+      if (e.id == root || e.predecessor) {
+        near((FixtureAccess::get(m, e.id).view.position - e.position).length(), 0,
+             "a resting Centipede does not recoil from its own sections");
+      }
+    }
+    FixtureAccess::get(m, root).provoked = true;
+    for (unsigned tick = 0; tick < 600; ++tick) {
+      steps(m);
+      for (const auto& e : m.view().entities) {
+        if (e.predecessor) {
+          const auto& parent = FixtureAccess::get(m, *e.predecessor).view;
+          const auto separation = (e.position - parent.position).length() /
+                                  (e.radius + parent.radius);
+          check(separation > .9 && separation <= 1 + 1e-6,
+                "moving and turning keep Centipede links joined without stacking");
         }
       }
     }
@@ -1056,6 +1113,8 @@ int main() {
     chains();
     phase = "chains at the arena rim";
     chains_stay_inside_arena();
+    phase = "Centipede motion";
+    centipede_motion();
     phase = "Leech shared health";
     leech_shared_health();
     phase = "timing/debts";

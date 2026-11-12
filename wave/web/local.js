@@ -40,7 +40,7 @@
       .91, .98, .91, .83,              // Rock, Cactus, Ladybug, Bee
       1.82, 1.62, 1.62, .82,           // Baby, Worker, Soldier, Queen Ant
       .91, .94, .79,                   // Ant Hole, Beetle, Hornet
-      .85, .85, .85, .85, .85, .85,    // Centipedes and their sections
+      1, 1, 1, 1, 1, 1,               // Centipedes: bodies meet at the collision radius
       1.28, .91, .91,                  // Square, Dark Ladybug, Shiny Ladybug
       1.43, .99, 1.62, .91,            // Spider, Scorpion, Fire Ant, Fire Ant Burrow
       .85, .96, .96, 1.05,             // Sandstorm, Bubble, Acid Bubble, Shell

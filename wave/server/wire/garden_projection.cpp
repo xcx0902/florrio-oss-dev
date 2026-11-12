@@ -506,7 +506,8 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     arena.integer(static_cast<std::uint32_t>(view->arena_radius * 2 * world_scale));
     arena.integer(static_cast<std::uint32_t>(view->arena_radius * 2 * world_scale));
     arena.real(1);
-    arena.byte(0);
+    // $939 treats world+512 bit 1 as terminal; otherwise it waits for revival.
+    arena.byte(view->phase == sim::Phase::ended ? 2 : 0);
     // 0x2000 is the singleton circular arena radius and RGB, not entity health.
     arena.real(view->arena_radius * world_scale);
     for (const auto channel : biome_colors[static_cast<unsigned>(view->biome)]) {

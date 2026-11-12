@@ -43,6 +43,7 @@ struct Move {
   float strength;
 };
 struct Leave {};
+struct Continue {};
 // October $436 and $939/$997; zero kinds omit the rarity byte.
 struct Craft {
   bool all;
@@ -60,7 +61,7 @@ struct Swap {
 
 using ReliableAction =
     std::variant<std::monostate, Identify, Nickname, CreateSquad, SetSquadPublic, FindPublicSquad,
-                 Ready, JoinSquad, Move, Leave, Craft, Equip, Swap>;
+                 Ready, JoinSquad, Move, Leave, Continue, Craft, Equip, Swap>;
 struct ReliableRequest {
   std::uint32_t sequence;
   ReliableAction action;
@@ -74,8 +75,9 @@ struct Startup {
 struct WorldAck {
   std::uint32_t tick;
 };
+struct OldWorld {};
 
-using Command = std::variant<Startup, WorldAck>;
+using Command = std::variant<Startup, WorldAck, OldWorld>;
 
 bool is_hello(std::span<const std::uint8_t> bytes);
 std::optional<std::string> hello_guest(std::span<const std::uint8_t> bytes);
@@ -89,8 +91,11 @@ class Bootstrap {
                  std::span<const std::uint8_t> records, std::span<const std::uint32_t> removed = {},
                  std::span<const std::uint8_t> commands = {});
   Bytes disconnect();
+  void next_world();
+  [[nodiscard]] std::uint32_t epoch() const { return epoch_; }
 
  private:
+  std::uint32_t epoch_ = 0;
   std::uint32_t client_state_ = 0x99df460b;
   std::uint32_t server_state_ = 0x13bde6d7;
 };

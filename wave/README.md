@@ -16,6 +16,9 @@ npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --port 84
 最高通关波按场景分别记录。开局波取队伍在当前场景的最低纪录的 2/3，向下取整，最低第 1 波。
 各场景按旧版 [Waves Wiki](https://official-florrio.fandom.com/wiki/Waves) 解锁怪物种类，
 刷怪完成且剩余主怪不超过 4 只时推进；清场超时也会推进，幸存怪物留场。
+小队中仍有队友存活时，死亡后点击 Continue 会留在队中等待；进入下一波自动满血复活，
+也可由队友的 Yggdrasil 在当前波复活并恢复半血。全队阵亡才进入 GAME OVER。
+三个场景的默认场地半径均为 300。
 新刷出的主怪按当前波次独立抽取稀有度：
 
 | 波次 | Common | Unusual | Rare | Epic | Legendary | Mythic |
@@ -30,7 +33,9 @@ npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --port 84
 波次按需生成，可继续到旧客户端可表示的第 2,147,483,647 波。刷怪数量、清场时长和
 第 61 波之后的强度增幅采用本地复刻参数。剩余怪物面板按一条水蛭计数，身体各节不单列。
 
-同稀有度的怪物共享基础半径；蚂蚁和蜘蛛按旧版体型适当缩小，客户端按实际碰撞半径绘制。
+同稀有度的怪物共享基础半径，蚁穴也使用该默认半径；蚂蚁和蜘蛛按旧版体型适当缩小，
+客户端按实际碰撞半径绘制。
+蜈蚣各变种的节距采用相邻碰撞半径之和，图像主体同步贴合碰撞圆，出生和转弯时保持相接。
 水蛭用六个更小、互相重叠的碰撞圆组成一个连续身体，伸展时整条的面积约等于同级普通怪物。
 蜘蛛和水蛭的追击速度为玩家基础移速的 110%；水母为 90%。
 玩家与怪物迎面碰撞会短暂弹开；撞到蚁穴等固定怪物时，只有玩家回弹。
@@ -103,6 +108,11 @@ npm --prefix wave run test:wire -- --snapshot "$WAVE_SNAPSHOT" --stage W2
 Squad 面板显示全员装备的主副槽花瓣与稀有度，已准备的队员显示绿色 Ready。
 勾选 Public 可公开小队；Find Public 加入同场景、有空位且未开局的公开小队，
 找不到时自动创建新的公开小队。当前每队最多两人。
+Abandon 会移除退出者的花朵及其所属实体；留队者继续原对局，最后一人退出后回收房间。
+临时断线保留对局身份，以便刷新重连。
+
+本轮问题的引入历史、根因、修复与回归记录见
+[Wave 故障复盘（2026-11-11）](docs/bugfix-retrospective-2026-11-11.md)。
 
 ## W1 · Garden 原生模拟
 
@@ -119,7 +129,7 @@ ctest --test-dir build/wave/w1 --output-on-failure --no-tests=error -L '^w1$'
 ### W2 接入
 
 - 宿主为每局分配非零 `MatchId` 和种子，用 `garden_rules()` 创建 `Match`，开局前调用 `add_player()`。测试宿主可改用固定的 `short_garden_rules()`。 [模拟接口](server/sim/match.hpp) · [短波场景](tests/scenarios/garden-w1.hpp)
-- 连接状态使用 `Connection`，移动使用 `Input` 携带当前 `LifeId` 与移动轴。宿主在所属房间顺序调用 `queue()` 和 `step()`。命令按入队顺序在下一次模拟步采纳，移动持续到下一条有效移动指令、断线或该生命结束。
+- 连接状态使用 `Connection`，主动离场使用 `Departure`，移动使用 `Input` 携带当前 `LifeId` 与移动轴。宿主在所属房间顺序调用 `queue()` 和 `step()`。命令按入队顺序在下一次模拟步采纳，移动持续到下一条有效移动指令、断线或该生命结束。
 - 每次 `step()` 成功后读取 `view()` 和 `events()`。`view()` 是独立快照，含地图、当前与上一波计划、玩家状态、实体与花瓣槽。事件带结算 tick，有效期到下次成功的 `step()`，跨 tick 保留时需复制。广播节奏由宿主按 `broadcast_interval` 单独调度。
 - 位置与速度使用场地单位和场地单位/秒，朝向使用弧度，血量使用 HP，冷却与生成计划使用整数 tick。实体句柄含对局、槽位与代次，生命 ID 含对局、存档玩家与生命代次。旧客户端的 ID、字段精度和字节量化由 W2 投影。 [快照与事件类型](server/sim/model.hpp)
 

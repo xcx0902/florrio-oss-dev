@@ -202,6 +202,7 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
     let s = await advance();
     await until(() => entry.current?.control, 'Fixture Ready enters Garden');
     const oldControl = entry.current.control;
+    const oldEpoch = entry.current.epoch;
     const oldMatch = s.rooms[0].match;
     const target = s.rooms[0].entities.find((e) => e.group === 2);
     for (let i = 0; i < 80 && entry.current.control; ++i) {
@@ -259,11 +260,8 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
     s = await advance();
     await until(() => entry.current.control, 'Enter Ready starts a fresh match after death');
     assert.notEqual(s.rooms[0].match, oldMatch);
-    assert.notEqual(
-      entry.current.control,
-      oldControl,
-      'Old dead entity cannot become the new control',
-    );
+    assert.ok(entry.current.epoch > oldEpoch,
+      'A fresh native world separates the new control from the old dead entity');
     const alive = await consumed(entry);
     assert.equal(alive.health, 255);
     assert.equal(s.rooms[0].players[0].state, 1);
@@ -291,6 +289,8 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
       oldMatch,
       newMatch: s.rooms[0].match,
       oldControl,
+      oldEpoch,
+      newEpoch: entry.current.epoch,
       newControl: entry.current.control,
       alive,
       death,

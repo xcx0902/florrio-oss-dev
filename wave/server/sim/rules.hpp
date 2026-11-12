@@ -64,7 +64,7 @@ struct Rules {
   std::string version;
   Timing timing;
   Biome biome = Biome::garden;
-  double arena_radius = 200;
+  double arena_radius = 300;
   BodyRules player;
   std::array<BodyRules, 2> petals;
   Tick petal_reload = 1;

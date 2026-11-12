@@ -342,6 +342,11 @@ struct Connection {
   bool connected;
 };
 
+// Permanent departure is distinct from a reconnectable socket disconnect.
+struct Departure {
+  PlayerId player;
+};
+
 struct Equip {
   LifeId life;
   std::vector<Petal> loadout;

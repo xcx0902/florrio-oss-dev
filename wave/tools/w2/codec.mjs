@@ -79,7 +79,9 @@ export class CaptureCodec {
   }
   decode(bytes) {
     const plain = this.outer(bytes, true);
-    let offset = 2;
+    const header = { offset: 1 };
+    if ([1, 2, 5].includes(plain[0])) readVu(plain, header);
+    let offset = header.offset;
     if (!this.client && plain[0] === 1) {
       const cursor = { offset };
       readVu(plain, cursor);

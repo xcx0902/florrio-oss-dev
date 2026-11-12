@@ -36,12 +36,13 @@ function requests(plain) {
   if (plain[0] !== 1) {
     return [];
   }
-  const r = reader(plain, 2),
+  const r = reader(plain, 1),
+    epoch = r.vu(),
     result = [];
   while (r.cursor.offset < plain.length) {
     const sequence = r.vu(),
       opcode = r.vu(),
-      entry = { sequence, opcode };
+      entry = { epoch, sequence, opcode };
     if (opcode === 13) {
       r.byte();
       entry.identity = [r.str(), r.str(), r.str()];
@@ -77,10 +78,15 @@ function world(plain, baseline) {
   if (plain[0] !== 1) {
     return;
   }
-  const r = reader(plain, 2),
+  const r = reader(plain, 1),
+    epoch = r.vu(),
     tick = r.vu(),
     ack = r.vu(),
     skipLength = r.vu();
+  if (baseline.epoch !== epoch) {
+    baseline.clear();
+    baseline.epoch = epoch;
+  }
   const removalStart = r.cursor.offset;
   const count = r.vu();
   r.byte();
@@ -125,7 +131,7 @@ function world(plain, baseline) {
       entity.width = r.vu();
       entity.height = r.vu();
       r.real();
-      r.byte();
+      entity.roundFlags = r.byte();
     }
     if (mask & 0x80) {
       entity.predecessor = r.word();
@@ -238,7 +244,7 @@ function world(plain, baseline) {
     }
   }
   assert.equal(r.cursor.offset, plain.length);
-  return { tick, ack, control, wave, removed, hits, arcs };
+  return { epoch, tick, ack, control, wave, removed, hits, arcs };
 }
 
 export async function client(browser, url, name, storageState) {
@@ -513,6 +519,21 @@ export async function onlineCases({ browser, snapshot, nativeDir, output, report
       killer,
     );
     report.cases['W2-04'].death = await photograph(a, 'W2-04-death.png');
+    assert.equal(a.baseline.get(8196).roundFlags & 2, 0, 'The squad can still revive A');
+    await a.page.keyboard.press('Enter');
+    await a.page.waitForFunction(() => window.waveLabels.has('You will respawn next wave'));
+    await settle();
+    s = await advance();
+    await settle();
+    assert.equal(roomOf(s).players.find((p) => p.id === aid).state, 0);
+    assert.equal(roomOf(s).players.find((p) => p.id === aid).connected, 1);
+    // Text is cached even when invisible. Read $939's actual UI state instead.
+    const waitingState = await a.page.evaluate(() =>
+      new DataView(window.Module.asm.Jf.buffer).getInt32(839920, true),
+    );
+    assert.equal(waitingState, 1, 'The original death UI stays in its revival state');
+    report.cases['W2-04'].waitingState = waitingState;
+    report.cases['W2-04'].waiting = await photograph(a, 'W2-04-waiting.png');
     const beforeDenied = s.rejectedInputs;
     await a.page.mouse.move(900, 384);
     await settle();

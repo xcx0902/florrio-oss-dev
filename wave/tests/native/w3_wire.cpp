@@ -33,6 +33,7 @@ wire::ReliableAction decode(std::string_view hex) {
 // depending on Session internals or decoding the private profile record body.
 struct SnapshotHeaders {
   std::uint32_t state = 0x13bde6d7;
+  std::uint32_t epoch = 0;
   std::array<std::uint8_t, 100> inverse{};
 
   static std::uint32_t next(std::uint32_t value) {
@@ -77,8 +78,17 @@ struct SnapshotHeaders {
       if (frame[0] != 1) {
         continue;  // Guest-token command shares this cipher state.
       }
-      check(frame.size() >= 4 && frame[1] == 0, "snapshot header is present");
-      std::size_t offset = 2;
+      check(frame.size() >= 4, "snapshot header is present");
+      std::size_t offset = 1;
+      epoch = 0;
+      for (unsigned shift = 0;; shift += 7) {
+        check(offset < frame.size() && shift <= 28, "snapshot epoch varint is present");
+        const auto byte = frame[offset++];
+        epoch |= std::uint32_t{byte & 127u} << shift;
+        if (!(byte & 128)) {
+          break;
+        }
+      }
       do {
         check(offset < frame.size(), "snapshot tick varint is present");
       } while (frame[offset++] & 128);
@@ -91,6 +101,50 @@ struct SnapshotHeaders {
     return acknowledged;
   }
 };
+
+void abandon_reentry() {
+  app::Garden garden;
+  app::GardenSession session(garden, 1);
+  SnapshotHeaders headers;
+  wire::Bytes hello{48};
+  const std::string build = "b632797f0ee487dd99df460b13bde6d7ce5c9773";
+  hello.insert(hello.end(), build.begin(), build.end());
+  hello.insert(hello.end(), 2, 0);
+  check(headers.consume(session.receive(hello)) == 0, "reentry hello is accepted");
+  // Independent CaptureCodec envelopes in cipher order: Identify, Ready,
+  // Abandon + completion, delayed old Ready, fresh Identify, fresh Ready.
+  check(headers.consume(session.receive(bytes("051eab7a7d0486e57d"))) == 1,
+        "initial identity is accepted");
+  check(headers.consume(session.receive(bytes("1705b38352"))) == 2,
+        "initial Ready is acknowledged");
+  check(garden.rooms().size() == 1 && garden.rooms().begin()->second.match,
+        "first Ready creates a match");
+  const auto first = garden.rooms().begin()->second.match->id();
+  check(headers.consume(session.receive(bytes("04c251287eb3"))) == 0 && headers.epoch == 1,
+        "Abandon resets the native world epoch and reliable sequence");
+  check(garden.rooms().empty(), "Abandon leaves the first match");
+  const auto old = session.receive(bytes("0421225936"));
+  check(!old.close && old.frames.empty() && garden.rooms().empty(),
+        "in-flight requests from the abandoned world cannot start another match");
+  check(headers.consume(session.receive(bytes("16cbd1f08108740721"))) == 1 && headers.epoch == 1,
+        "native world initialization reuses the same admitted identity");
+  check(headers.consume(session.receive(bytes("0082fde9c0"))) == 2 && headers.epoch == 1,
+        "Ready after Abandon works on the same connection");
+  check(garden.rooms().size() == 1 && garden.rooms().begin()->second.match &&
+            garden.rooms().begin()->second.match->id() != first,
+        "second Ready creates a distinct playable match");
+
+  wire::Bootstrap wide;
+  for (unsigned i = 0; i < 128; ++i) {
+    wide.next_world();
+  }
+  const auto ready = wide.receive(bytes("059eb87c15ae"));
+  check(ready && std::get<wire::Ready>(std::get<wire::Startup>(*ready).requests[0].action).value,
+        "world epochs remain valid past the single-byte boundary");
+  SnapshotHeaders wide_headers;
+  check(wide_headers.consume({{wide.world(1, 0)}, false}) == 0 && wide_headers.epoch == 128,
+        "multi-byte world epochs preserve the snapshot payload mask boundary");
+}
 
 void session_queue_backpressure() {
   using namespace std::chrono_literals;
@@ -231,6 +285,7 @@ int main() {
             "reserve follows current main-slot count");
     }
     session_queue_backpressure();
+    abandon_reentry();
     std::cout
         << "W3-03/W3-05 economic decoder, bounded fields, original equipment cache and Session backpressure passed\n";
   } catch (const std::exception& e) {

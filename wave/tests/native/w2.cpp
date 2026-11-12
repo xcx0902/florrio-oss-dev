@@ -90,9 +90,9 @@ int main() {
   wire::Bootstrap continued;
   const auto continuation = continued.receive(bytes("051eab62"));
   check(continuation && std::holds_alternative<wire::Startup>(*continuation) &&
-            std::holds_alternative<wire::Leave>(
+            std::holds_alternative<wire::Continue>(
                 std::get<wire::Startup>(*continuation).requests.front().action),
-        "Death Continue leaves the finished match instead of causing a protocol reload");
+        "Death Continue is distinct from leaving the squad");
   wire::Bootstrap squad;
   const auto squad_leave = squad.receive(bytes("051eab51"));
   check(squad_leave && std::holds_alternative<wire::Startup>(*squad_leave) &&

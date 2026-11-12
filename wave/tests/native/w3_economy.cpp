@@ -215,6 +215,15 @@ void commands() {
   ++stale.generation;
   check(!garden.command(member, equipment, stale, "1:3"), "stale-life economic command rejected");
   const auto version = member.profile->version;
+  check(garden.command(member, equipment, {}, "reconnect:startup") &&
+            garden.storage_pending() == 0 && member.profile->version == version &&
+            player(garden, member).life == life,
+        "startup equipment cache can synchronize an active life before its first ACK");
+  auto changed_cache = equipment;
+  changed_cache.slots[0] = {1, 0};
+  check(!garden.command(member, changed_cache, {}, "reconnect:changed") &&
+            !garden.command(member, wire::Craft{false, 2, rose.kind, 0}, {}, "reconnect:craft"),
+        "pre-ACK synchronization cannot change equipment or craft");
   check(garden.command(member, wire::Craft{false, 2, rose.kind, 0}, life, "1:1") &&
             garden.wait_storage(),
         "same reliable key can replay after later equipment commit");

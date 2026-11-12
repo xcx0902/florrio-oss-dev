@@ -23,10 +23,12 @@ class Match {
   }
   bool queue(Input input);
   bool queue(Connection connection);
+  bool queue(Departure departure);
   bool queue(Equip equip);
   bool step();
 
   [[nodiscard]] MatchView view() const;
+  [[nodiscard]] MatchId id() const { return id_; }
   [[nodiscard]] std::span<const Event> events() const { return events_; }
 
  private:
@@ -59,7 +61,7 @@ class Match {
     bool attack_slow = false;
   };
 
-  using Command = std::variant<Input, Connection, Equip>;
+  using Command = std::variant<Input, Connection, Equip, Departure>;
 
   [[nodiscard]] Player* player(PlayerId id);
   [[nodiscard]] EntityId add_entity(EntityView view, BodyRules body);

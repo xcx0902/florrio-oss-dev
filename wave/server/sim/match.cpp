@@ -264,10 +264,30 @@ bool Match::queue(Connection connection) {
   return true;
 }
 
+bool Match::queue(Departure departure) {
+  if (phase_ == Phase::ended || !player(departure.player)) {
+    return false;
+  }
+  commands_.emplace_back(departure);
+  return true;
+}
+
 void Match::apply_commands() {
   for (const auto& command : commands_) {
+    // A departure earlier in this batch may have removed the target already.
+    const auto id = std::visit([](const auto& value) {
+      if constexpr (requires { value.life; }) {
+        return value.life.player;
+      } else {
+        return value.player;
+      }
+    }, command);
+    auto* target = player(id);
+    if (!target) {
+      continue;
+    }
     if (const auto* input = std::get_if<Input>(&command)) {
-      auto& entry = *player(input->life.player);
+      auto& entry = *target;
       if (entry.view.connected && entry.view.life == input->life &&
           entry.view.state == LifeState::alive) {
         const double length = input->move.length();
@@ -282,7 +302,7 @@ void Match::apply_commands() {
         entry.aim_distance = std::min(input->aim_distance, 40.0);
       }
     } else if (const auto* equip = std::get_if<Equip>(&command)) {
-      auto& entry = *player(equip->life.player);
+      auto& entry = *target;
       if (entry.view.connected && entry.view.life == equip->life &&
           entry.view.state == LifeState::alive) {
         auto rarities = equip->rarities;
@@ -291,14 +311,16 @@ void Match::apply_commands() {
         }
         replace_loadout(entry, equip->loadout, std::move(rarities));
       }
-    } else {
-      const auto& connection = std::get<Connection>(command);
-      auto& entry = *player(connection.player);
-      if (entry.view.connected != connection.connected) {
-        entry.view.connected = connection.connected;
+    } else if (const auto* connection = std::get_if<Connection>(&command)) {
+      auto& entry = *target;
+      if (entry.view.connected != connection->connected) {
+        entry.view.connected = connection->connected;
         entry.move = {};
         entry.attack = entry.defend = false;
       }
+    } else {
+      reap_player(*target, LifeState::ended);
+      std::erase_if(players_, [id](const Player& entry) { return entry.view.id == id; });
     }
   }
   commands_.clear();

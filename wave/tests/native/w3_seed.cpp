@@ -6,14 +6,16 @@
 int main(int argc, char** argv) {
   try {
     if (argc < 2 || argc > 3) {
-      throw std::runtime_error("Usage: wave_w3_seed DATABASE [TOKEN]");
+      throw std::runtime_error("Usage: wave_w3_seed DATABASE [TOKEN|--auto|--behaviors|--squad]");
     }
     wave::store::Store store(argv[1], {.allow_test_seed = true});
     const bool automatic = argc == 3 && std::string_view(argv[2]) == "--auto";
     const bool behaviors = argc == 3 && std::string_view(argv[2]) == "--behaviors";
-    auto profile = argc == 3 && !automatic && !behaviors ? store.recover_guest(argv[2]).value()
-                                                         : store.create_guest();
-    if (argc == 2 || automatic || behaviors) {
+    const bool squad = argc == 3 && std::string_view(argv[2]) == "--squad";
+    auto profile = argc == 3 && !automatic && !behaviors && !squad
+                       ? store.recover_guest(argv[2]).value()
+                       : store.create_guest();
+    if (argc == 2 || automatic || behaviors || squad) {
       wave::store::TestSeed seed;
       seed.xp = 150;
       seed.highest_wave = 7;
@@ -40,6 +42,20 @@ int main(int argc, char** argv) {
             {{17, 5}, {43, 0}, {37, 0}, {32, 2}, {36, 0}, {14, 5}, {38, 3}, {8, 4}}};
         for (std::size_t i = 0; i < active.size(); ++i) {
           seed.slots[i] = active[i];
+        }
+      }
+      if (squad) {
+        seed.xp = 4109;
+        seed.highest_wave = 0;
+        seed.slots = {};
+        for (unsigned kind = 1; kind <= 45; ++kind) {
+          for (std::uint8_t rarity = 0; rarity < 6; ++rarity) {
+            seed.inventory[{kind, rarity}] = 10;
+          }
+        }
+        const std::array<unsigned, 10> kinds{29, 22, 22, 22, 33, 22, 33, 33, 33, 22};
+        for (std::size_t i = 0; i < kinds.size(); ++i) {
+          seed.slots[i < 5 ? i : 8 + i - 5] = wave::store::Item{kinds[i], 5};
         }
       }
       seed.discoveries = {{1, 0}, {4, 1}, {12, 2}};

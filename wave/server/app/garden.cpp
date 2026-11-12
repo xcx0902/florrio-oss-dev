@@ -435,7 +435,7 @@ void Garden::leave(Member& entry) {
   auto it = rooms_.find(entry.room);
   if (it != rooms_.end()) {
     if (it->second.match) {
-      it->second.match->queue(sim::Connection{entry.id, false});
+      it->second.match->queue(sim::Departure{entry.id});
     }
     std::erase(it->second.members, entry.token);
     if (it->second.members.empty()) {
@@ -448,6 +448,28 @@ void Garden::leave(Member& entry) {
 
 bool Garden::create_room(Member& entry, bool private_room) {
   const auto* current = room(entry);
+  // Keep disconnected matches available for reconnect, but reclaim finished,
+  // unattended rooms when admission needs a slot. Otherwise 32 past sessions
+  // permanently exhaust the host and Ready is acknowledged without starting.
+  if (rooms_.size() >= 32) {
+    for (auto it = rooms_.begin(); it != rooms_.end() && rooms_.size() >= 32;) {
+      const auto& candidate = it->second;
+      const bool unattended = std::ranges::none_of(candidate.members, [this](const auto& token) {
+        return members_.at(token).connected;
+      });
+      if (&candidate != current && candidate.match && unattended &&
+          candidate.match->view().phase == sim::Phase::ended) {
+        for (const auto& token : candidate.members) {
+          auto& member = members_.at(token);
+          member.room.clear();
+          member.ready = false;
+        }
+        it = rooms_.erase(it);
+      } else {
+        ++it;
+      }
+    }
+  }
   if (rooms_.size() >= 32 && (!current || current->members.size() != 1)) {
     return false;
   }
@@ -516,16 +538,6 @@ bool Garden::economy_command(Member& member, const wire::ReliableAction& action,
   if (!storage_ || !member.profile || !member.connected) {
     return false;
   }
-  auto room = rooms_.find(member.room);
-  if (room != rooms_.end() && room->second.match) {
-    const auto view = room->second.match->view();
-    const auto player = std::ranges::find(view.players, member.id, &sim::PlayerView::id);
-    if (player == view.players.end() || !acknowledged_life || player->life != acknowledged_life ||
-        player->state != sim::LifeState::alive || !player->connected) {
-      return false;
-    }
-  }
-
   const auto* craft = std::get_if<wire::Craft>(&action);
   store::CraftRequest crafting;
   store::EquipRequest equipping;
@@ -595,6 +607,22 @@ bool Garden::economy_command(Member& member, const wire::ReliableAction& action,
     for (const auto& [slot, item] : changes) {
       semantics += std::to_string(slot) + ":" + std::to_string(item ? item->kind : 0) + ":" +
                    std::to_string(item ? item->rarity : 0) + ";";
+    }
+  }
+  const auto room = rooms_.find(member.room);
+  if (room != rooms_.end() && room->second.match) {
+    // The original client resends its cached equipment in the Identify batch,
+    // before it can ACK a life. An unchanged cache is synchronization only;
+    // refreshing an active squad must not reject this startup and loop forever.
+    if (!acknowledged_life && std::holds_alternative<wire::Equip>(action) &&
+        equipping.slots == member.profile->slots) {
+      return true;
+    }
+    const auto view = room->second.match->view();
+    const auto player = std::ranges::find(view.players, member.id, &sim::PlayerView::id);
+    if (player == view.players.end() || !acknowledged_life || player->life != acknowledged_life ||
+        player->state != sim::LifeState::alive || !player->connected) {
+      return false;
     }
   }
   if (key.empty()) {
@@ -946,7 +974,23 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
     return join(entry, join_room->code);
   } else if (std::holds_alternative<wire::Leave>(action)) {
     leave(entry);
+  } else if (std::holds_alternative<wire::Continue>(action)) {
+    const auto* current = room(entry);
+    // Continue acknowledges death; an ongoing squad retains the player for
+    // Yggdrasil or next-wave revival. A delayed Continue also preserves a new life.
+    if (!current || !current->match || current->match->view().phase == sim::Phase::ended) {
+      leave(entry);
+    }
   } else if (const auto* ready = std::get_if<wire::Ready>(&action)) {
+    if (const auto* current = room(entry); current && current->match) {
+      // $991 clears Ready after receiving its flower. This is a lobby-state
+      // acknowledgement, not Leave: echo the cleared bit so $382/$2588 can
+      // finish the native Ready transition instead of retrying it forever.
+      if (!ready->value) {
+        entry.ready = false;
+      }
+      return !ready->value;
+    }
     if (storage_ && !storage_->jobs.empty()) {
       // Original Equip(12) and Ready can share one reliable batch. Admission
       // uses committed equipment only, so defer Ready without waiting in tick.
@@ -963,9 +1007,6 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
       }
     }
     auto& room = rooms_.at(entry.room);
-    if (room.match) {
-      return false;
-    }
     entry.ready = ready->value;
     if (std::ranges::all_of(room.members, [this](const auto& token) {
           const auto& m = members_.at(token);

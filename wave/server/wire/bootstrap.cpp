@@ -7,6 +7,7 @@
 #include <array>
 #include <initializer_list>
 #include <limits>
+#include <stdexcept>
 #include <utility>
 
 namespace wave::wire {
@@ -213,9 +214,11 @@ std::optional<Command> read_startup(std::span<const std::uint8_t> bytes) {
       case 34:  // $456: no-argument completion of the optional pre-roll ad attempt.
         break;
       case 11:  // Original live-game Exit.
-      case 21:  // Original death-screen Continue / Enter.
       case 38:  // Original squad panel close / Leave squad.
         action = Leave{};
+        break;
+      case 21:  // Original death-screen Continue / Enter.
+        action = Continue{};
         break;
       case 13: {
         if (bytes.empty() || bytes.front() != 1) {
@@ -362,8 +365,12 @@ std::optional<Command> Bootstrap::receive(Bytes bytes) {
   transform(bytes, client_inverse, client_state_, (client_state_ & 15) + 1);
   std::span payload = std::span(bytes).subspan(1);
   std::span<const std::uint8_t> header = payload;
-  if (read_varint(header) != 0) {
+  const auto epoch = read_varint(header);
+  if (!epoch || *epoch > epoch_) {
     return std::nullopt;
+  }
+  if (*epoch < epoch_) {
+    return OldWorld{};
   }
   payload = payload.last(header.size());
 
@@ -382,15 +389,19 @@ std::optional<Command> Bootstrap::receive(Bytes bytes) {
 }
 
 Bytes Bootstrap::guest_id(std::string_view id) {
-  Bytes bytes{5, 0, 0, 14};
+  Bytes bytes{5};
+  append_varint(bytes, epoch_);
+  const auto offset = bytes.size();
+  bytes.insert(bytes.end(), {0, 14});
   bytes.insert(bytes.end(), id.begin(), id.end());
   bytes.push_back(0);
-  return seal(std::move(bytes), server_state_, 2);
+  return seal(std::move(bytes), server_state_, offset);
 }
 
 Bytes Bootstrap::world(std::uint32_t tick, std::uint32_t acknowledged_request,
                        bool initial_profile) {
-  Bytes bytes{1, 0};
+  Bytes bytes{1};
+  append_varint(bytes, epoch_);
   append_varint(bytes, tick);
   const auto offset = bytes.size();
   append_varint(bytes, acknowledged_request);
@@ -412,7 +423,8 @@ Bytes Bootstrap::snapshot(std::uint32_t tick, std::uint32_t acknowledged_request
                           std::span<const std::uint8_t> records,
                           std::span<const std::uint32_t> removed,
                           std::span<const std::uint8_t> commands) {
-  Bytes bytes{1, 0};
+  Bytes bytes{1};
+  append_varint(bytes, epoch_);
   append_varint(bytes, tick);
   const auto offset = bytes.size();
   append_varint(bytes, acknowledged_request);
@@ -436,6 +448,13 @@ Bytes Bootstrap::snapshot(std::uint32_t tick, std::uint32_t acknowledged_request
 
 Bytes Bootstrap::disconnect() {
   return {0, 0};
+}
+
+void Bootstrap::next_world() {
+  if (epoch_ == std::numeric_limits<std::uint32_t>::max()) {
+    throw std::runtime_error("Garden wire epoch exhausted");
+  }
+  ++epoch_;
 }
 
 }  // namespace wave::wire

@@ -12,8 +12,10 @@ Tick seconds(const Rules& rules, double value) {
 }
 
 double segment_gap(Mob kind, double radii) {
-  // Overlap the Leech circles to form one body; separate Centipede outlines.
-  return radii * (kind == Mob::leech ? .75 : 1.1);
+  // Match the old linked-body constraint and the contact solver. Shortening a
+  // Centipede link below its collision diameter makes its own sections push
+  // the head backwards every tick. Only Leech sections intentionally overlap.
+  return radii * (kind == Mob::leech ? .75 : 1);
 }
 
 void place_spawn_segment(EntityView& body, const EntityView& parent, Vec2 direction, double gap,
@@ -52,7 +54,6 @@ double Match::mob_radius(Mob kind, Rarity rarity) const {
     case Mob::worker_ant:
     case Mob::soldier_ant:
     case Mob::fire_ant: return radius * .60;
-    case Mob::ant_hole: return radius * 1.3;
     case Mob::spider: return radius * .65;
     case Mob::leech:
     case Mob::leech_segment:
@@ -122,7 +123,11 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
       view.mob = segment->kind;
       view.group = Group::segment;
       const auto& parent = entities_.get(previous)->view;
-      const Vec2 forward{std::cos(parent.heading_rad), std::sin(parent.heading_rad)};
+      // The old Centipede spawns along an arc, rather than a straight row that
+      // the head ploughs through when it first turns towards a player.
+      const double angle = parent.heading_rad -
+                           (kind == Mob::leech ? 0 : std::numbers::pi / 10);
+      const Vec2 forward{std::cos(angle), std::sin(angle)};
       place_spawn_segment(view, parent, forward, gap, rules_.arena_radius);
       auto segment_body = segment->body;
       segment_body.radius = body.radius;

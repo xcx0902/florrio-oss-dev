@@ -28,6 +28,20 @@ Reply GardenSession::superseded() {
 }
 
 wire::Bytes GardenSession::snapshot() {
+  const auto* room = garden_.room(*member_);
+  const auto match = room && room->match ? room->match->id().value : 0;
+  if (match_ && match != match_) {
+    // Abandon sets the native UI's local exit latch. Entity removals do not
+    // clear it; a new wire epoch invokes $587 and resets the entire old world.
+    wire_.next_world();
+    projection_ = {};
+    pending_.clear();
+    received_ = acknowledged_ = last_ack_ = 0;
+    sent_lives_.clear();
+    acknowledged_life_.reset();
+    identified_ = false;
+  }
+  match_ = match;
   if (last_tick_ == std::numeric_limits<std::uint32_t>::max()) {
     throw std::runtime_error("Garden wire tick exhausted");
   }
@@ -77,12 +91,15 @@ Reply GardenSession::drain() {
     const auto& queued = pending_.front();
     const auto& request = queued.request;
     if (std::holds_alternative<wire::Identify>(request.action)) {
-      if (member_) {
+      if (identified_) {
         return reject();
       }
-      member_ = &garden_.admit(requested_guest_, connection_, biome_);
-      craft_cursor_ = member_->craft_sequence;
-      reply.frames.push_back(wire_.guest_id(member_->token));
+      if (!member_) {
+        member_ = &garden_.admit(requested_guest_, connection_, biome_);
+        craft_cursor_ = member_->craft_sequence;
+        reply.frames.push_back(wire_.guest_id(member_->token));
+      }
+      identified_ = true;
     } else if (member_) {
       const bool economic = std::holds_alternative<wire::Craft>(request.action) ||
                             std::holds_alternative<wire::Equip>(request.action) ||
@@ -92,7 +109,8 @@ Reply GardenSession::drain() {
       }
       const bool accepted =
           garden_.command(*member_, request.action, queued.life,
-                          std::to_string(connection_) + ":" + std::to_string(request.sequence));
+                          std::to_string(connection_) + ":" + std::to_string(wire_.epoch()) + ":" +
+                              std::to_string(request.sequence));
       if (!accepted && economic && garden_.storage() &&
           garden_.storage_pending() >= Garden::storage_capacity) {
         break;
@@ -101,6 +119,15 @@ Reply GardenSession::drain() {
       // Close the session so a fresh admission can restore committed state.
       if (!accepted && economic && garden_.storage()) {
         return reject();
+      }
+      if (!accepted) {
+        const auto* ready = std::get_if<wire::Ready>(&request.action);
+        if (ready && ready->value && !garden_.room(*member_)) {
+          // The native Ready screen waits for a controlled flower. A denied
+          // admission has no native error response; use the existing explicit
+          // reconnect path instead of ACKing it into a permanent loading state.
+          return reject();
+        }
       }
     } else if (!std::holds_alternative<std::monostate>(request.action)) {
       return reject();
@@ -139,6 +166,9 @@ Reply GardenSession::receive(wire::Bytes bytes) {
   const auto command = wire_.receive(std::move(bytes));
   if (!command) {
     return reject();
+  }
+  if (std::holds_alternative<wire::OldWorld>(*command)) {
+    return {};
   }
   if (const auto* ack = std::get_if<wire::WorldAck>(&*command)) {
     if (ack->tick > last_tick_) {
