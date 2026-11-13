@@ -11,6 +11,9 @@ wave-reference/
 # Deterministic original-client evidence and its generated complete inventory.
 wave/data/catalogs/20221030/client-tooltips.json
 wave/docs/client-tooltips-20221030.md
+# Generated original-client traces and bridge source retain their captured bytes.
+wave/docs/client-ui/captures/*.json
+wave/docs/client-ui/evidence/asm-index.json
 node_modules/
 build/
 dist-next/

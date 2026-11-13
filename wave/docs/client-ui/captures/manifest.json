@@ -1,0 +1,434 @@
+{
+  "browser": "Chromium 156.0.8078.47",
+  "locale": "en-US",
+  "wasmSha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0",
+  "note": "PNG and JSON are adjacent sampling frames; PRNG/RAF/cursor phases are not frozen. Raw Wasm with localhost protocol fixtures; no historical server-state claims. Local-shell captures include extra host DOM. See README.md.",
+  "captures": [
+    {
+      "name": "html-loading",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "archived-html",
+      "files": {
+        "png": {
+          "file": "html-loading.png",
+          "sha256": "e24fc02376619fd456eb05b94e0571e7fc0321f70ff806e4c843041a1b7639c0",
+          "bytes": 8890
+        },
+        "json": {
+          "file": "html-loading.json",
+          "sha256": "910fc5fa568cce789ab0d4f91caa2473add8beb4e46e7353b770a1cf792f3c26",
+          "bytes": 45
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "menu",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "archived-html",
+      "files": {
+        "png": {
+          "file": "menu.png",
+          "sha256": "a390ff7e30ae11fb44adaf7c41389362dbd11f55a5ae0b9544ffcba0af1e3e39",
+          "bytes": 48468
+        },
+        "json": {
+          "file": "menu.json",
+          "sha256": "a15bf5c3347b9b21ba47f5e07dd0a90d9e35e83e365c62625b8af25f5e5e91c3",
+          "bytes": 106733
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "squad",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "archived-html",
+      "files": {
+        "png": {
+          "file": "squad.png",
+          "sha256": "19dcd7a731bcd2353b182cfc92764c93548744bf1d133b2ed03b37a423fd87ec",
+          "bytes": 71257
+        },
+        "json": {
+          "file": "squad.json",
+          "sha256": "637a8f872f0eda9584b7592e048aed2eda434afb05d702cdab8ad79e36f15d58",
+          "bytes": 170446
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "mobile-portrait",
+      "cssViewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "shell": "archived-html",
+      "files": {
+        "png": {
+          "file": "mobile-portrait.png",
+          "sha256": "04972463740dce8b8003d5e393d8384d99fc25f030a6ab5d136e30129fb51942",
+          "bytes": 96637
+        },
+        "json": {
+          "file": "mobile-portrait.json",
+          "sha256": "b944212fd1a73c3bb79f5326ab5ffc4fd0a64f5e82c1b06819f714313192b50f",
+          "bytes": 95913
+        }
+      },
+      "backingPixels": [
+        780,
+        1688
+      ]
+    },
+    {
+      "name": "inventory",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "inventory.png",
+          "sha256": "7dfa5927ec05382b91a5a240a9b89039d255712976bc44e2e8baf2abccaa0175",
+          "bytes": 70618
+        },
+        "json": {
+          "file": "inventory.json",
+          "sha256": "a46568d92979953cc467e67317937e72dd2dbac33dcc8b5e6660c76364334a3f",
+          "bytes": 197990
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "crafting",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "crafting.png",
+          "sha256": "d08e14c2353fb507bfc56aaa91aa136aacd7a8811122f2a657f8d3de74db70ca",
+          "bytes": 104818
+        },
+        "json": {
+          "file": "crafting.json",
+          "sha256": "a8cba623d046231c1cdd84c55ea844156855bc7d769ca0192174ac089da1c20f",
+          "bytes": 339620
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "crafting-result",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "crafting-result.png",
+          "sha256": "1e1864647739b8b6198b8caceea651006c68c8563255ad23276b4bbe50cc33b0",
+          "bytes": 90103
+        },
+        "json": {
+          "file": "crafting-result.json",
+          "sha256": "e53c889d19078328f0f3f75feb7a96a73e4f3feb0ec07ba0f798d7fc888894bb",
+          "bytes": 346440
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "gallery-tooltip",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "gallery-tooltip.png",
+          "sha256": "ae52bcbca32906a329f4f74ce73e6822e6d934bf374c16ea7e6943fb00cb6f1f",
+          "bytes": 103493
+        },
+        "json": {
+          "file": "gallery-tooltip.json",
+          "sha256": "625078cd2d81ab245a4d58bf4253401f306f9344e22d81e6a76d1688f58db3ef",
+          "bytes": 326449
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "gallery-dense",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "gallery-dense.png",
+          "sha256": "ba229a08ae439a7954c193566022232efa993864382e45d17feab1c04d332c18",
+          "bytes": 115125
+        },
+        "json": {
+          "file": "gallery-dense.json",
+          "sha256": "411fab47b6d9278c8e24c0298104217ffb53732531fc0cb683d6d293ba6cdc84",
+          "bytes": 416848
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "match-hud",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "match-hud.png",
+          "sha256": "8318379e3412f57af3d9e58aefd40254fedd3f6da31761c59aae658bc8138e31",
+          "bytes": 56957
+        },
+        "json": {
+          "file": "match-hud.json",
+          "sha256": "9cd36fbd450fa33267e98bcb20e3f725b88573c41d657696423ddbef732d2b7c",
+          "bytes": 86095
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "death",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "death.png",
+          "sha256": "114e41089042d831c7076c461275ab09cda1a372aaa9f8be4f8c56ce673dcef4",
+          "bytes": 50729
+        },
+        "json": {
+          "file": "death.json",
+          "sha256": "a633eb6cc4b2a931c21b43b338faa8a88db6db39651c1a8ec31df07dd252360e",
+          "bytes": 67559
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "game-over",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "game-over.png",
+          "sha256": "0a28cd241747ed5762aa2805074517a7fe597b9a7bbb2423930bb542f34edeb9",
+          "bytes": 18252
+        },
+        "json": {
+          "file": "game-over.json",
+          "sha256": "91fba5177be60f54e52f823f7819a0843114437b0f29dd758d12f309f60b4adf",
+          "bytes": 36198
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "mobile-controls",
+      "cssViewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "mobile-controls.png",
+          "sha256": "531efe233b8797607332f8cb09b5e11e1be1d2fd7718fb747a9456b31461814c",
+          "bytes": 79311
+        },
+        "json": {
+          "file": "mobile-controls.json",
+          "sha256": "a2e94c2e379e4d20a61bd6b028c66f46948ced024d36ee77c45fa7e3d8b05866",
+          "bytes": 72161
+        }
+      },
+      "backingPixels": [
+        1688,
+        780
+      ]
+    },
+    {
+      "name": "settings",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "settings.png",
+          "sha256": "7208d12f5833b9be8008ae9d3d387a0de59c1dedc4cc79a6283eb796445d0895",
+          "bytes": 78105
+        },
+        "json": {
+          "file": "settings.json",
+          "sha256": "e490648d69c65fa84b3b8ea92e985d8ba0c5d0aab03f475449ebe08220513ff3",
+          "bytes": 106568
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "changelog",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "changelog.png",
+          "sha256": "fcf7b8982c1dcfb369ec33ae740170bf6512a2d357e409cc8b23b2d2c008fc56",
+          "bytes": 109856
+        },
+        "json": {
+          "file": "changelog.json",
+          "sha256": "dbf0dac4ee26fad5715ae2e1fd0db518e92a63abae9688b5784bab3d75df98f2",
+          "bytes": 111503
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "credits",
+      "cssViewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "shell": "local-shell-raw-wasm",
+      "files": {
+        "png": {
+          "file": "credits.png",
+          "sha256": "c542ac88bb7ca670b0c2f0cc4d2e69a0fe6d17c3167b8ff9fea88d838dc0d0b1",
+          "bytes": 71899
+        },
+        "json": {
+          "file": "credits.json",
+          "sha256": "7a175849936bb5cf1de2e22fcc3ba2383979dd9de81063dd36885aa7f4a21587",
+          "bytes": 131296
+        }
+      },
+      "backingPixels": [
+        1024,
+        768
+      ]
+    },
+    {
+      "name": "mobile-settings",
+      "cssViewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "shell": "local-shell-raw-wasm",
+      "ua": "Android Mobile",
+      "files": {
+        "png": {
+          "file": "mobile-settings.png",
+          "sha256": "3bf211eea6cb5d4684f953c92556c8df0dc587ff9fa0e54b4e38ecd2fd5ba605",
+          "bytes": 124287
+        },
+        "json": {
+          "file": "mobile-settings.json",
+          "sha256": "abee9a4cb66792e865039ec1070625c2e8ecb03691b6b034144d740ce9bc5e1f",
+          "bytes": 98282
+        }
+      },
+      "backingPixels": [
+        1688,
+        780
+      ]
+    }
+  ]
+}
