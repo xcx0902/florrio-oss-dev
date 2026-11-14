@@ -295,9 +295,15 @@ void Match::update_orbits() {
       if (!p || p->mechanics.hidden) {
         continue;
       }
+      const auto& equipped = owner.view.petals[i];
+      const auto* occupant = equipped.entity ? entities_.get(*equipped.entity) : nullptr;
+      // A hatchling holds its equipment slot but does not take up an orbit position.
+      // Empty slots still reserve a position during recharge.
+      if (occupant && !occupant->view.petal) {
+        continue;
+      }
       const double weight = p->kind == Petal::light || p->kind == Petal::pollen ? p->particles : 1;
-      if (std::ranges::find(owner.view.petals[i].entities, petal.view.id) !=
-          owner.view.petals[i].entities.end()) {
+      if (std::ranges::find(equipped.entities, petal.view.id) != equipped.entities.end()) {
         before = total;
         if (weight > 1) {
           before += petal.particle_index;
@@ -490,8 +496,6 @@ void Match::update_effects() {
         entity->healing.reset();
       }
     } else if (definition.effect == catalog::Effect::summon && tick_ >= entity->born_tick + delay) {
-      const auto lifetime = rules_.timing.ticks_ceil(Microseconds(
-          static_cast<Microseconds::rep>(definition.mechanics.duration_seconds * 1e6)));
       for (auto& slot : owner.view.petals) {
         const auto equipped = std::ranges::find(slot.entities, id);
         if (equipped == slot.entities.end()) {
@@ -499,10 +503,8 @@ void Match::update_effects() {
         }
         const auto child = spawn_mob(definition.summon_mob, definition.summon_rarity,
                                      entity->view.position, Group::summon, entity->view.owner);
-        auto& hatchling = *entities_.get(child);
-        hatchling.summon_origin = Petal::egg;
-        hatchling.expires = tick_ + lifetime;
-        // The hatchling takes over the slot until it dies or expires.
+        entities_.get(child)->summon_origin = Petal::egg;
+        // The hatchling keeps the slot out of recharge until it dies.
         *equipped = child;
         slot.entity = slot.entities.front();
         entities_.erase(id);

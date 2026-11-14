@@ -912,30 +912,6 @@ void timing_and_debts() {
       near(FixtureAccess::get(m, body).view.health, 9900, "settled debt never repeats");
     }
   }
-  {
-    Match m({22}, 1, arena());
-    m.add_player({1}, {}, {Petal::egg}, {Rarity::mythic});
-    steps(m, 601);
-    std::optional<EntityId> child;
-    for (const auto& e : m.view().entities) {
-      if (FixtureAccess::get(m, e.id).summon_origin == Petal::egg) {
-        child = e.id;
-      }
-    }
-    check(child.has_value(), "Mythic Egg actually hatches");
-    const auto& e = FixtureAccess::get(m, *child);
-    check(e.view.mob == Mob::beetle && e.view.rarity == Rarity::legendary,
-          "Mythic Egg retains observed Legendary contents");
-    const auto lifetime = arena().timing.ticks_ceil(Microseconds(static_cast<Microseconds::rep>(
-        catalog::dated().petal(Petal::egg, Rarity::mythic)->mechanics.duration_seconds * 1e6)));
-    check(e.expires == e.born_tick + lifetime,
-          "summon expiry uses Egg's rarity, not contents rarity");
-    const auto expiry = e.expires;
-    steps(m, expiry - m.view().next_tick);
-    check(FixtureAccess::exists(m, *child), "summon alive immediately before expiry tick");
-    steps(m);
-    check(!FixtureAccess::exists(m, *child), "summon expires exactly at lifetime boundary");
-  }
 }
 void lightning_contacts_and_ant_alert() {
   {

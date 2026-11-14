@@ -312,11 +312,19 @@
     {
       "id": "petal.egg",
       "status": "sourced-behavior",
-      "behavior": "按原 Contents 和激活时间孵化友军；以原 Egg 稀有度保存召唤到期时间。",
+      "behavior": "按原 Contents 和激活时间孵化友军；幼体无时限且不占轨道位置，死亡后 Egg 才开始回充。",
       "sources": [
         {
           "type": "client-tooltip",
           "id": 16
+        },
+        {
+          "type": "repository",
+          "path": "archive/tree/legacy/source/game/server/petals-special.mjs"
+        },
+        {
+          "type": "repository",
+          "path": "archive/tree/legacy/source/game/server/petal-lifecycle.mjs"
         }
       ],
       "manualReview": null

@@ -79,6 +79,8 @@ def main():
                 row['range'] = row['range'] or 40
             if kind == 'uranium':
                 row['areaRadius'] = 50
+            if kind == 'egg':
+                row['durationSeconds'] = 0  # A hatchling survives until defeated.
             if kind == 'stick':
                 row['durationSeconds'] = 10
                 row['areaRadius'] = 45

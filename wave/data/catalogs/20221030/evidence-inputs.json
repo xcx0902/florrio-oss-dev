@@ -138,7 +138,7 @@
     {
       "id": "behavior.review",
       "path": "wave/data/catalogs/20221030/behavior-review.json",
-      "sha256": "e43e164612f15b8da90dbe495e32e89ace1a6fb011829d8c2e8e0066694e704f"
+      "sha256": "c2bc65da606369a18cdd7c27bb96aa835fbb3479916894c5682150ebc8f5e664"
     }
   ],
   "registries": {
@@ -1190,7 +1190,7 @@
     },
     "behavior.review": {
       "file": "behavior-review.json",
-      "sha256": "e43e164612f15b8da90dbe495e32e89ace1a6fb011829d8c2e8e0066694e704f"
+      "sha256": "c2bc65da606369a18cdd7c27bb96aa835fbb3479916894c5682150ebc8f5e664"
     }
   }
 }

@@ -120,7 +120,7 @@
     {
       "id": "behavior.review",
       "path": "wave/data/catalogs/20221030/behavior-review.json",
-      "sha256": "e43e164612f15b8da90dbe495e32e89ace1a6fb011829d8c2e8e0066694e704f"
+      "sha256": "c2bc65da606369a18cdd7c27bb96aa835fbb3479916894c5682150ebc8f5e664"
     }
   ],
   "evidence": [
@@ -9296,7 +9296,7 @@
       "rotationBonus": 0,
       "projectileSpeed": 0,
       "range": 24,
-      "durationSeconds": 15,
+      "durationSeconds": 0,
       "slowMultiplier": 1,
       "healthBonus": 0,
       "clientValues": {
@@ -9318,7 +9318,7 @@
           "rotationBonus": [0, 0],
           "projectileSpeed": [0, 0],
           "range": [12.0, 48],
-          "durationSeconds": [7.5, 30],
+          "durationSeconds": [0, 0],
           "slowMultiplier": [0.5, 1],
           "healthBonus": [0, 0],
           "areaRadius": [0, 0]
@@ -9397,7 +9397,7 @@
       "rotationBonus": 0,
       "projectileSpeed": 0,
       "range": 24,
-      "durationSeconds": 15,
+      "durationSeconds": 0,
       "slowMultiplier": 1,
       "healthBonus": 0,
       "clientValues": {
@@ -9419,7 +9419,7 @@
           "rotationBonus": [0, 0],
           "projectileSpeed": [0, 0],
           "range": [12.0, 48],
-          "durationSeconds": [7.5, 30],
+          "durationSeconds": [0, 0],
           "slowMultiplier": [0.5, 1],
           "healthBonus": [0, 0],
           "areaRadius": [0, 0]
@@ -9498,7 +9498,7 @@
       "rotationBonus": 0,
       "projectileSpeed": 0,
       "range": 24,
-      "durationSeconds": 15,
+      "durationSeconds": 0,
       "slowMultiplier": 1,
       "healthBonus": 0,
       "clientValues": {
@@ -9520,7 +9520,7 @@
           "rotationBonus": [0, 0],
           "projectileSpeed": [0, 0],
           "range": [12.0, 48],
-          "durationSeconds": [7.5, 30],
+          "durationSeconds": [0, 0],
           "slowMultiplier": [0.5, 1],
           "healthBonus": [0, 0],
           "areaRadius": [0, 0]
@@ -9599,7 +9599,7 @@
       "rotationBonus": 0,
       "projectileSpeed": 0,
       "range": 24,
-      "durationSeconds": 15,
+      "durationSeconds": 0,
       "slowMultiplier": 1,
       "healthBonus": 0,
       "clientValues": {
@@ -9621,7 +9621,7 @@
           "rotationBonus": [0, 0],
           "projectileSpeed": [0, 0],
           "range": [12.0, 48],
-          "durationSeconds": [7.5, 30],
+          "durationSeconds": [0, 0],
           "slowMultiplier": [0.5, 1],
           "healthBonus": [0, 0],
           "areaRadius": [0, 0]
@@ -9700,7 +9700,7 @@
       "rotationBonus": 0,
       "projectileSpeed": 0,
       "range": 24,
-      "durationSeconds": 15,
+      "durationSeconds": 0,
       "slowMultiplier": 1,
       "healthBonus": 0,
       "clientValues": {
@@ -9722,7 +9722,7 @@
           "rotationBonus": [0, 0],
           "projectileSpeed": [0, 0],
           "range": [12.0, 48],
-          "durationSeconds": [7.5, 30],
+          "durationSeconds": [0, 0],
           "slowMultiplier": [0.5, 1],
           "healthBonus": [0, 0],
           "areaRadius": [0, 0]
@@ -9801,7 +9801,7 @@
       "rotationBonus": 0,
       "projectileSpeed": 0,
       "range": 24,
-      "durationSeconds": 15,
+      "durationSeconds": 0,
       "slowMultiplier": 1,
       "healthBonus": 0,
       "clientValues": {
@@ -9823,7 +9823,7 @@
           "rotationBonus": [0, 0],
           "projectileSpeed": [0, 0],
           "range": [12.0, 48],
-          "durationSeconds": [7.5, 30],
+          "durationSeconds": [0, 0],
           "slowMultiplier": [0.5, 1],
           "healthBonus": [0, 0],
           "areaRadius": [0, 0]

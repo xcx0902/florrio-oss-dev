@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <numbers>
 #include <set>
 #include <stdexcept>
 #include <limits>
@@ -441,32 +442,53 @@ void web_summon_passive_equip() {
               "Egg uses original Contents kind/rarity independently of equipped rarity");
       }
     }
-    const auto hatchling = *owner(match).petals[0].entity;
     check(summons == 1 && owner(match).petals[0].reload_ticks == 0,
           "hatching replaces Egg without starting recharge");
-    if (rarity == 0) {
-      steps(match, 241);
-      const auto view = match.view();
-      check(owner(match).petals[0].entity == hatchling &&
-                std::ranges::count(view.entities, Group::summon, &EntityView::group) == 1 &&
-                std::ranges::none_of(view.entities, [](const EntityView& e) {
-                  return e.petal == Petal::egg;
-                }),
-            "Egg cannot hatch a second pet while the first is alive");
-      FixtureAccess::kill(match, hatchling);
-      check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 160,
-            "defeating the hatchling starts Egg's four-second recharge");
-      steps(match, 160);
-      check(!owner(match).petals[0].entity, "Egg stays gone during recharge");
-      steps(match, 1);
-      check(petal(match).petal == Petal::egg, "Egg returns after its hatchling's death and recharge");
-    }
+  }
+  {
+    Match match({86}, 5, arena());
+    check(match.add_player({1}, {}, {Petal::basic, Petal::egg, Petal::basic}),
+          "admit Egg between two orbiting petals");
+    steps(match, 1);
+    const auto egg_radius = [&match] {
+      return (petal(match, 1).position - body(match).position).length();
+    };
+    const double idle_radius = egg_radius();
+    constexpr double three_slots = 4 * std::numbers::pi / 3;
+    near(petal(match, 2).heading_rad, three_slots, "unhatched Egg takes an orbit position");
+    check(match.queue(Input{owner(match).life, {}, true, false}), "attack with Egg equipped");
+    steps(match, 1);
+    check(egg_radius() > idle_radius, "Egg extends while attacking");
+    check(match.queue(Input{owner(match).life, {}, false, true}), "defend with Egg equipped");
+    steps(match, 1);
+    check(egg_radius() < idle_radius, "Egg contracts while defending");
+    check(match.queue(Input{owner(match).life, {}, false, false}), "return to idle orbit");
+    steps(match, 78);
+    const auto hatchling = petal(match, 1);
+    check(hatchling.group == Group::summon && owner(match).petals[1].reload_ticks == 0,
+          "hatchling occupies the slot without starting recharge");
+    near(petal(match, 2).heading_rad, std::numbers::pi,
+         "the two remaining petals are opposite each other as soon as Egg hatches");
+    steps(match, 1200);
+    check(owner(match).petals[1].entity == hatchling.id && owner(match).petals[1].reload_ticks == 0,
+          "the same hatchling remains in the slot beyond the former 15-second expiry");
+    near(petal(match, 2).heading_rad, std::numbers::pi,
+         "a live hatchling still does not take up an orbit position");
+    FixtureAccess::kill(match, hatchling.id);
+    check(!owner(match).petals[1].entity && owner(match).petals[1].reload_ticks == 160,
+          "defeating the hatchling starts Egg's four-second recharge");
+    steps(match, 1);
+    near(petal(match, 2).heading_rad, three_slots, "the recharging Egg reserves its orbit position");
+    steps(match, 159);
+    check(!owner(match).petals[1].entity, "Egg stays gone during recharge");
+    steps(match, 1);
+    check(petal(match, 1).petal == Petal::egg, "Egg returns after its hatchling's death and recharge");
   }
   {
     Match match({8}, 5, arena());
     check(match.add_player({1}, {}, {Petal::egg}, {Rarity::mythic}), "admit Egg");
     steps(match, 600);
-    check(owner(match).petals[0].entity.has_value(), "Mythic Egg waits fifteen seconds");
+    check(petal(match).petal == Petal::egg, "Mythic Egg waits fifteen seconds");
     steps(match, 1);
     unsigned summons = 0;
     for (const auto& e : match.view().entities) {
@@ -478,22 +500,7 @@ void web_summon_passive_equip() {
     }
     check(summons == 1 && match.view().wave.counts.alive == 1,
           "summon excluded from wave population accounting");
-    check(owner(match).petals[0].reload_ticks == 0, "Mythic hatch leaves the slot recharged");
-    for (const auto& e : match.view().entities) {
-      if (e.group == Group::main_mob) {
-        FixtureAccess::get(match, e.id).view.health = 1000000;
-      }
-    }
-    const auto unrelated =
-        FixtureAccess::spawn(match, {200, 200}, {.radius = 1, .health = 100}, Faction::team);
-    steps(match, 600);
-    for (const auto& e : match.view().entities) {
-      check(!e.owner || e.group != Group::summon, "owned summon expires after fifteen seconds");
-    }
-    check(FixtureAccess::get(match, unrelated).view.health > 0,
-          "Egg lifetime does not expire unrelated summon-group mobs");
-    check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 160,
-          "hatchling expiry starts Egg's recharge");
+    check(owner(match).petals[0].reload_ticks == 0, "Mythic Egg does not recharge at hatch");
   }
   {
     auto rules = arena();
