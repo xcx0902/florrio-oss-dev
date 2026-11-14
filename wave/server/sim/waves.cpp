@@ -64,10 +64,9 @@ void Match::open_wave(std::size_t index, Tick start) {
   }
   for (std::size_t batch = 0; batch < definition.batches.size(); ++batch) {
     const auto& spec = definition.batches[batch];
-    const auto count = spec.count +
-                       (wave_.special && rules_.progressive_waves && definition.number > 3
-                            ? spec.count / 2
-                            : 0);
+    const auto count =
+        spec.count +
+        (wave_.special && rules_.progressive_waves && definition.number > 3 ? spec.count / 2 : 0);
     for (std::uint32_t n = 0; n < count; ++n) {
       const auto kind = pool[choose(pool.size(), DrawPurpose::mob_kind)];
       const auto rarity =
@@ -230,7 +229,7 @@ void Match::adjudicate() {
     if (rules_.progressive_waves) {
       remaining = std::ranges::count_if(entities_.active(), [this](auto slot) {
         const auto& mob = entities_.at(slot).view;
-        return mob.faction == Faction::garden &&
+        return mob.faction == Faction::hostile &&
                (mob.group == Group::main_mob || mob.group == Group::residual);
       });
     }

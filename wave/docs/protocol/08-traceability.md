@@ -126,8 +126,8 @@ UI/状态副作用。
 | `wave/docs/store-20221030.md` | Store 槽位/持久化 | A |
 | `wave/tests/native/w2_wire.cpp` | 线上回归 | A |
 | `wave/tests/native/w3_wire.cpp` | 经济回归 | A |
-| `wave/server/wire/bootstrap.cpp` | 原版互通实现 | A |
-| `wave/server/wire/garden_projection.cpp` | 组件/命令投影 | A |
+| `wave/server/wire/protocol.cpp` | 原版互通实现 | A |
+| `wave/server/wire/world_projection.cpp` | 组件/命令投影 | A |
 
 ## 6. 复核命令
 

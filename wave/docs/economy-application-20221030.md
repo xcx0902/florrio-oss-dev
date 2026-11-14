@@ -1,17 +1,17 @@
-# Garden application economy · 2022-10-30
+# RoomManager application economy · 2022-10-30
 
-`app::Garden` connects the dated simulation and catalog to SQLite. W1/W2 callers
-can keep constructing `Garden(rules, seed, fixture_loadouts)`; persistence is enabled
-by an optional fourth `std::shared_ptr<store::Store>` argument. This document covers
+`app::RoomManager` connects the simulation and catalog to SQLite. It selects rules
+by biome; tests can provide a rule override and fixed loadouts. Persistence is
+enabled by supplying a `std::shared_ptr<store::Store>`. This document covers
 application behavior. Historical numbers and their evidence levels remain in
 [the catalog record](catalog-20221030.md); schemas, transaction results and crash
 fixtures are in [the Store record](store-20221030.md).
 
 ## Executor and I/O boundary
 
-Garden members, rooms, life checks and completion callbacks belong to one host
-executor. `EconomyQueue` owns one I/O thread. `Garden::step()` and
-`Garden::poll_storage()` do not wait for SQLite; the host must poll before publish
+RoomManager members, rooms, life checks and completion callbacks belong to one host
+executor. `EconomyQueue` owns one I/O thread. `RoomManager::step()` and
+`RoomManager::poll_storage()` do not wait for SQLite; the host must poll before publish
 as well as on its timer, including a manually stepped fixture host.
 
 The application retains at most 64 accepted I/O jobs, including the running job
@@ -25,7 +25,7 @@ or to an invented original-client error opcode. Retried I/O failures use an
 exponential delay from 10 ms to 1 s; polling and simulation never sleep for it.
 
 One simulation tick can produce a settlement batch containing separate kill,
-wave and pickup transactions. When the queue is full, Garden retains one pending
+wave and pickup transactions. When the queue is full, RoomManager retains one pending
 batch per room and pauses that room's subsequent simulation ticks until the batch
 can be queued. Other rooms and host I/O remain callable. A retry after a partially
 committed batch replays its earlier event keys and continues the remaining events.
@@ -41,10 +41,10 @@ drained. Condition-variable waits and retry sleeps prevent a busy loop; every
 five seconds a diagnostic reports that shutdown is still waiting.
 
 Normal Host shutdown explicitly calls `host.drain_storage()` before `io.stop()`,
-on the Garden executor. HTTP `request_profile` completions can capture a
-`Connection` that holds Garden, creating a lifetime chain from a pending job
-through the connection back to Garden. Explicit draining executes and releases
-those callbacks while the host still owns Garden; relying on Garden destruction
+on the RoomManager executor. HTTP `request_profile` completions can capture a
+`Connection` that holds RoomManager, creating a lifetime chain from a pending job
+through the connection back to RoomManager. Explicit draining executes and releases
+those callbacks while the host still owns RoomManager; relying on RoomManager destruction
 alone cannot start the drain when those callbacks keep it alive. The destructor
 remains a final drain safeguard after this explicit host barrier.
 
@@ -60,11 +60,11 @@ Pending jobs and unclaimed drops are memory state; this implementation does not
 journal an entire match for crash recovery. Committed profile changes and Store
 event results survive process exit. Forced process termination can still lose
 uncommitted work; the complete drain guarantee applies to a successful explicit
-host drain or normal Garden destruction.
+host drain or normal RoomManager destruction.
 
 ## Reliable admission and client error feedback
 
-Garden's false return on economic commands can mean queue backpressure or a
+RoomManager's false return on economic commands can mean queue backpressure or a
 terminal validation rejection. The session keeps a bounded deferred reliable
 queue of 256 requests and advances its ACK only through requests admitted to
 that queue; backpressure leaves the blocked command at the admission boundary.
@@ -80,7 +80,7 @@ opcode 35 failure flag with its returned input count.
 After draining deferred commands and polling storage, the session checks these
 errors before publishing a snapshot. Snapshot projection does not independently
 poll storage, so a callback cannot introduce a new error between that check and
-projection. The session and wire layers implement this feedback policy; Garden
+projection. The session and wire layers implement this feedback policy; RoomManager
 continues to expose the committed result and explicit command admission status.
 
 ## Admission and private profiles
@@ -91,7 +91,7 @@ new token. With `admit=false` it performs lookup only. Its callback receives
 `optional<store::Profile>` and runs only from `poll_storage` on the host executor.
 The host can use that result to return the original normal presentation cache
 before starting the original client JavaScript. A successful read primes a bounded
-256-entry admission cache. `Garden::admit` consumes the cached profile and uses
+256-entry admission cache. `RoomManager::admit` consumes the cached profile and uses
 the persistent guest ID and token for the member identity.
 
 The synchronous `admit` signature retains a compatibility fallback for unprimed
@@ -135,7 +135,7 @@ Original UI runtime confirmation is recorded separately by the wire acceptance.
 Craft maps `all=false` to one attempt; `all=true` to an automatic batch bounded by
 Store's 1024-attempt cap, stopping when fewer than five available copies remain.
 Original Autocraft generates these same requests per item/rarity. The wire `keep`
-includes equipped copies. At the job's first execution, Garden subtracts the
+includes equipped copies. At the job's first execution, RoomManager subtracts the
 actual committed count of matching equipped items and passes only the remaining
 unequipped reserve to Store. Thus queued equip→craft ordering does not double
 protect equipped items. The original request semantics, resolved version and
@@ -149,7 +149,7 @@ the match using committed equipment. Leaving or replacing the connection prevent
 an old deferred Ready from admitting that old connection.
 
 `command(..., key)` receives the host connection nonce plus reliable sequence.
-Garden prefixes an OS-random process scope, so restarting local connection and
+RoomManager prefixes an OS-random process scope, so restarting local connection and
 sequence counters does not replay unrelated old work. Exact same-key requests
 reuse their resolved version/request; changed semantics conflict. At most 8192
 resolved command contexts are retained in memory; Store keeps durable results.
@@ -163,7 +163,7 @@ not a claim to reproduce the later December 30 damage-share formula.
 
 | Event                            | Application policy                                                                                                                                                         | Durable key                                             |
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Kill                             | Only garden `main_mob` defeats with known mob/rarity and a team source owned by an eligible current life                                                                   | random match identity / `kill` / victim slot:generation |
+| Kill                             | Only hostile `main_mob` defeats with known mob/rarity and a team source owned by an eligible current life                                                                   | random match identity / `kill` / victim slot:generation |
 | Shared XP/gallery                | Every connected living room member gets the full catalog mob XP and that mob's discovery; fatal source can be petal/projectile/summon, but its life must still be eligible | Same immutable kill recipient set                       |
 | Segments/holes/summons/residuals | No separate root XP, gallery reward or drop roll                                                                                                                           | None                                                    |
 | Drop creation                    | Independent deterministic server PRNG rolls from matching catalog mob-kind/source-rarity rows; only output rarities 0..5                                                   | Victim key plus drop-table row                          |
@@ -174,7 +174,7 @@ Eligibility is frozen at the authoritative tick, before I/O. A player dying in
 that tick is excluded. Sim's terminal-wave cleanup is distinguished from an
 actual player defeat, so clearing the last wave does not remove a survivor's last
 kill eligibility. An ended `LifeChange` carries the body and its final position
-captured before body removal. Garden uses that snapshot for terminal pickup
+captured before body removal. RoomManager uses that snapshot for terminal pickup
 distance, including movement during the final tick and a clear on the first tick;
 it does not substitute the previous tick's position. The root kill ledger and
 Store event key both prevent duplicate settlement. A claimed drop remains reserved
@@ -185,7 +185,7 @@ persisted world representation in this tranche. The wire layer decides their
 visual presentation.
 
 Match reward identities are random independently of process-local numeric
-`MatchId`; a restarted Garden's first match cannot reuse an earlier reward key.
+`MatchId`; a restarted RoomManager's first match cannot reuse an earlier reward key.
 Profile reward replays cannot regress newer cached versions. XP, gallery, inventory
 and highest-wave effects are taken from Store's committed result, never inferred
 from client caches or credited-defeat counters.
@@ -208,7 +208,7 @@ from client caches or credited-defeat counters.
 - A kill committed before a failing wave transaction, followed by whole-batch
   retry with exactly one kill mutation and one completed-wave mutation per guest.
 - Deadline noncompletion, repeated ticks/polls, disconnected/dead/stale-owner
-  exclusions, fresh Store/Garden recovery and restart-safe match identities.
+  exclusions, fresh Store/RoomManager recovery and restart-safe match identities.
 - A first-tick final-wave clear preserving survivor XP, completion and pickup;
   final-tick movement beyond pickup distance preserving XP/completion while
   leaving the drop unclaimed.
@@ -219,11 +219,11 @@ from client caches or credited-defeat counters.
   backoff and no uncommitted profile/result, followed by repair and a complete,
   exactly-once drain of both retained commands.
 
-Verified commands (2026-11-08):
+Run the application and room tests:
 
 ```sh
-cmake --build build/wave/native --target wave_w3_economy wave_w2_garden --parallel 2
-ctest --test-dir build/wave/native --output-on-failure --no-tests=error -R 'W3-economy|W2-GARDEN'
+cmake --build build/wave/native --target wave_w3_economy wave_test_room_session --parallel 2
+ctest --test-dir build/wave/native --output-on-failure --no-tests=error -R 'W3-economy|wave-room_session'
 ```
 
 Standalone C++20 builds use `-Wall -Wextra -Wpedantic -Werror`; a separate

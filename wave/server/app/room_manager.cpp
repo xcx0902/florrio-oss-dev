@@ -1,4 +1,4 @@
-#include "app/garden.hpp"
+#include "app/room_manager.hpp"
 #include "app/economy_queue.hpp"
 #include "catalog/catalog.hpp"
 
@@ -47,7 +47,7 @@ auto loadout(const store::Profile& profile) {
 }
 }  // namespace
 
-struct Garden::StorageState {
+struct RoomManager::StorageState {
   struct CommandState {
     std::optional<store::Command> command;
     std::optional<store::EquipRequest> equip;
@@ -81,8 +81,8 @@ struct Garden::StorageState {
     std::shared_ptr<Batch> pending;
   };
   explicit StorageState(std::shared_ptr<store::Store> value, std::uint32_t seed)
-      : db(std::move(value)), rng(seed), scope("garden:" + random_hex(32)),
-        queue(storage_capacity) {}
+      : db(std::move(value)), rng(seed), scope("rooms:" + random_hex(32)), queue(storage_capacity) {
+  }
   bool add(EconomyQueue::Work work, std::function<void()> finish) {
     if (jobs.size() == storage_capacity) {
       return false;
@@ -133,40 +133,46 @@ struct Garden::StorageState {
   EconomyQueue queue;
 };
 
-Garden::Garden(sim::Rules rules, std::uint32_t seed, std::vector<std::vector<sim::Petal>> loadouts,
-               std::shared_ptr<store::Store> storage)
-    : rules_(std::move(rules)), seed_(seed), loadouts_(std::move(loadouts)) {
+RoomManager::RoomManager(std::optional<sim::Rules> rules_override, std::uint32_t seed,
+                         std::vector<std::vector<sim::Petal>> loadouts,
+                         std::shared_ptr<store::Store> storage)
+    : rules_override_(std::move(rules_override)), seed_(seed), loadouts_(std::move(loadouts)) {
   if (storage) {
     storage_ = std::make_unique<StorageState>(std::move(storage), seed);
   }
 }
 
-Garden::~Garden() {
+const sim::Rules* RoomManager::rules_override_for(sim::Biome biome) const {
+  return rules_override_ && rules_override_->biome == biome ? &*rules_override_ : nullptr;
+}
+
+RoomManager::~RoomManager() {
   try {
     drain_storage();
   } catch (const std::exception& error) {
-    std::fprintf(stderr, "Garden shutdown failed with %zu pending storage jobs: %s\n",
+    std::fprintf(stderr, "Room manager shutdown failed with %zu pending storage jobs: %s\n",
                  storage_pending(), error.what());
     std::fflush(stderr);
     std::terminate();
   } catch (...) {
-    std::fprintf(stderr, "Garden shutdown failed with %zu pending storage jobs: unknown error\n",
+    std::fprintf(stderr,
+                 "Room manager shutdown failed with %zu pending storage jobs: unknown error\n",
                  storage_pending());
     std::fflush(stderr);
     std::terminate();
   }
 }
 
-std::shared_ptr<store::Store> Garden::storage() const {
+std::shared_ptr<store::Store> RoomManager::storage() const {
   return storage_ ? storage_->db : nullptr;
 }
 
-const std::string& Garden::storage_error() const {
+const std::string& RoomManager::storage_error() const {
   static const std::string empty;
   return storage_ ? storage_->error : empty;
 }
 
-std::size_t Garden::storage_pending() const {
+std::size_t RoomManager::storage_pending() const {
   if (!storage_) {
     return 0;
   }
@@ -177,9 +183,9 @@ std::size_t Garden::storage_pending() const {
   return count;
 }
 
-bool Garden::request_profile(std::string token,
-                             std::function<void(std::optional<store::Profile>)> callback,
-                             bool admit) {
+bool RoomManager::request_profile(std::string token,
+                                  std::function<void(std::optional<store::Profile>)> callback,
+                                  bool admit) {
   if (!storage_) {
     return false;
   }
@@ -202,8 +208,8 @@ bool Garden::request_profile(std::string token,
       });
 }
 
-bool Garden::debug_inventory(std::string token, store::Command command, store::Item item,
-                             store::Count count, std::function<void(store::Result)> callback) {
+bool RoomManager::debug_inventory(std::string token, store::Command command, store::Item item,
+                                  store::Count count, std::function<void(store::Result)> callback) {
   if (!storage_) {
     return false;
   }
@@ -228,7 +234,7 @@ bool Garden::debug_inventory(std::string token, store::Command command, store::I
       });
 }
 
-void Garden::poll_storage() {
+void RoomManager::poll_storage() {
   if (!storage_) {
     return;
   }
@@ -281,7 +287,7 @@ void Garden::poll_storage() {
   }
 }
 
-bool Garden::wait_storage(std::chrono::milliseconds timeout) {
+bool RoomManager::wait_storage(std::chrono::milliseconds timeout) {
   const auto deadline = std::chrono::steady_clock::now() + timeout;
   do {
     poll_storage();
@@ -295,7 +301,7 @@ bool Garden::wait_storage(std::chrono::milliseconds timeout) {
   } while (true);
 }
 
-void Garden::drain_storage() {
+void RoomManager::drain_storage() {
   if (!storage_) {
     return;
   }
@@ -312,10 +318,11 @@ void Garden::drain_storage() {
       return;
     }
     if (!storage_->jobs.empty() && storage_->jobs.front()->failures >= 8) {
-      throw std::runtime_error("Garden storage drain exhausted eight attempts: " + storage_->error);
+      throw std::runtime_error("Room manager storage drain exhausted eight attempts: " +
+                               storage_->error);
     }
     if (std::chrono::steady_clock::now() >= report_at) {
-      std::fprintf(stderr, "Garden shutdown waiting for %zu pending storage jobs\n",
+      std::fprintf(stderr, "Room manager shutdown waiting for %zu pending storage jobs\n",
                    storage_pending());
       std::fflush(stderr);
       report_at = std::chrono::steady_clock::now() + std::chrono::seconds(5);
@@ -324,12 +331,12 @@ void Garden::drain_storage() {
   }
 }
 
-Member& Garden::admit(std::string_view token, std::uint64_t connection, sim::Biome biome) {
+Member& RoomManager::admit(std::string_view token, std::uint64_t connection, sim::Biome biome) {
   poll_storage();
   auto found = members_.find(token);
   if (found == members_.end()) {
     if (members_.size() >= 256) {
-      throw std::runtime_error("Garden guest capacity reached");
+      throw std::runtime_error("Room manager guest capacity reached");
     }
     std::optional<store::Profile> profile;
     if (storage_) {
@@ -349,7 +356,7 @@ Member& Garden::admit(std::string_view token, std::uint64_t connection, sim::Bio
               admission->profile = std::move(result);
               admission->done = true;
             })) {
-          throw std::runtime_error("Garden economy queue full during admission");
+          throw std::runtime_error("Room manager economy queue full during admission");
         }
         const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
         while (!admission->done && std::chrono::steady_clock::now() < deadline) {
@@ -359,7 +366,7 @@ Member& Garden::admit(std::string_view token, std::uint64_t connection, sim::Bio
           }
         }
         if (!admission->profile) {
-          throw std::runtime_error("Garden profile admission unavailable");
+          throw std::runtime_error("Room manager profile admission unavailable");
         }
         profile = std::move(admission->profile);
         storage_->admissions.erase(profile->guest_token);
@@ -393,28 +400,28 @@ Member& Garden::admit(std::string_view token, std::uint64_t connection, sim::Bio
   return entry;
 }
 
-const Member* Garden::member(std::string_view token) const {
+const Member* RoomManager::member(std::string_view token) const {
   const auto it = members_.find(token);
   return it == members_.end() ? nullptr : &it->second;
 }
 
-bool Garden::active(std::string_view token, std::uint64_t connection) const {
+bool RoomManager::active(std::string_view token, std::uint64_t connection) const {
   const auto* entry = member(token);
   return entry && entry->connected && entry->connection == connection;
 }
 
-const Room* Garden::room(const Member& entry) const {
+const Room* RoomManager::room(const Member& entry) const {
   const auto it = rooms_.find(entry.room);
   return it == rooms_.end() ? nullptr : &it->second;
 }
 
-std::span<const sim::Petal> Garden::default_loadout(std::size_t seat) const {
+std::span<const sim::Petal> RoomManager::default_loadout(std::size_t seat) const {
   static constexpr std::array basic{sim::Petal::basic, sim::Petal::basic, sim::Petal::basic,
                                     sim::Petal::basic, sim::Petal::basic};
   return seat < loadouts_.size() ? std::span<const sim::Petal>(loadouts_[seat]) : basic;
 }
 
-void Garden::disconnect(std::string_view token, std::uint64_t connection) {
+void RoomManager::disconnect(std::string_view token, std::uint64_t connection) {
   if (!active(token, connection)) {
     return;
   }
@@ -428,7 +435,7 @@ void Garden::disconnect(std::string_view token, std::uint64_t connection) {
   }
 }
 
-void Garden::leave(Member& entry) {
+void RoomManager::leave(Member& entry) {
   if (storage_) {
     storage_->ready.erase(entry.token);
   }
@@ -446,7 +453,7 @@ void Garden::leave(Member& entry) {
   entry.ready = false;
 }
 
-bool Garden::create_room(Member& entry, bool private_room) {
+bool RoomManager::create_room(Member& entry, bool private_room) {
   const auto* current = room(entry);
   // Keep disconnected matches available for reconnect, but reclaim finished,
   // unattended rooms when admission needs a slot. Otherwise 32 past sessions
@@ -454,9 +461,8 @@ bool Garden::create_room(Member& entry, bool private_room) {
   if (rooms_.size() >= 32) {
     for (auto it = rooms_.begin(); it != rooms_.end() && rooms_.size() >= 32;) {
       const auto& candidate = it->second;
-      const bool unattended = std::ranges::none_of(candidate.members, [this](const auto& token) {
-        return members_.at(token).connected;
-      });
+      const bool unattended = std::ranges::none_of(
+          candidate.members, [this](const auto& token) { return members_.at(token).connected; });
       if (&candidate != current && candidate.match && unattended &&
           candidate.match->view().phase == sim::Phase::ended) {
         for (const auto& token : candidate.members) {
@@ -487,7 +493,7 @@ bool Garden::create_room(Member& entry, bool private_room) {
   return true;
 }
 
-bool Garden::join(Member& entry, std::string_view code) {
+bool RoomManager::join(Member& entry, std::string_view code) {
   auto it = rooms_.find(code);
   if (entry.room == code) {
     return true;
@@ -502,7 +508,7 @@ bool Garden::join(Member& entry, std::string_view code) {
   return true;
 }
 
-bool Garden::find_public(Member& entry) {
+bool RoomManager::find_public(Member& entry) {
   for (const auto& [code, candidate] : rooms_) {
     if (code != entry.room && !candidate.private_room && candidate.biome == entry.biome &&
         !candidate.match && candidate.members.size() < squad_capacity) {
@@ -513,7 +519,7 @@ bool Garden::find_public(Member& entry) {
   return create_room(entry, false);
 }
 
-void Garden::apply_profile(const store::Profile& profile) {
+void RoomManager::apply_profile(const store::Profile& profile) {
   const auto found = members_.find(profile.guest_token);
   if (found == members_.end()) {
     return;
@@ -533,8 +539,8 @@ void Garden::apply_profile(const store::Profile& profile) {
   }
 }
 
-bool Garden::economy_command(Member& member, const wire::ReliableAction& action,
-                             std::optional<sim::LifeId> acknowledged_life, std::string key) {
+bool RoomManager::economy_command(Member& member, const wire::ReliableAction& action,
+                                  std::optional<sim::LifeId> acknowledged_life, std::string key) {
   if (!storage_ || !member.profile || !member.connected) {
     return false;
   }
@@ -558,6 +564,8 @@ bool Garden::economy_command(Member& member, const wire::ReliableAction& action,
   } else {
     const auto slots = store::unlocked_main_slots(member.profile->level);
     equipping.slots = member.profile->slots;
+    const auto* rules = rules_override_for(member.biome);
+    const auto* equipment_catalog = rules ? rules->catalog : &catalog::dated();
     const auto assign = [&](std::size_t slot, std::pair<std::uint32_t, std::uint8_t> value) {
       if (value.first == 0) {
         equipping.slots[slot].reset();
@@ -570,8 +578,10 @@ bool Garden::economy_command(Member& member, const wire::ReliableAction& action,
       }
       // Keep registered inventory intact, but do not silently simulate a kind
       // whose authoritative effect has not been implemented yet.
-      if (slot < 8 && (rules_.catalog ? !rules_.catalog->petal(*kind, sim::Rarity(value.second))
-                                      : static_cast<std::size_t>(*kind) >= rules_.petals.size())) {
+      const bool supported =
+          equipment_catalog ? equipment_catalog->petal(*kind, sim::Rarity(value.second)) != nullptr
+                            : static_cast<std::size_t>(*kind) < rules->petals.size();
+      if (slot < 8 && !supported) {
         return false;
       }
       equipping.slots[slot] = store::Item{value.first, value.second};
@@ -718,7 +728,7 @@ bool Garden::economy_command(Member& member, const wire::ReliableAction& action,
       });
 }
 
-void Garden::settle_economy(Room& room, const sim::MatchView& after) {
+void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
   auto& ledger = storage_->ledgers[room.economy_id];
   auto batch = std::make_shared<StorageState::Batch>();
   batch->room = room.code;
@@ -816,7 +826,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
       }
       const auto first_drop = room.drops.size();
       const auto available_tick =
-          event.tick + rules_.timing.ticks_ceil(std::chrono::milliseconds(250));
+          event.tick + sim::Timing{after.step}.ticks_ceil(std::chrono::milliseconds(250));
       for (const auto& [petal, variants] : drop_kinds) {
         // Separate petal kinds roll independently. One roll selects at most one
         // rarity of this kind; probabilities retain the client's original mass.
@@ -898,7 +908,7 @@ void Garden::settle_economy(Room& room, const sim::MatchView& after) {
   flush_economy();
 }
 
-void Garden::flush_economy() {
+void RoomManager::flush_economy() {
   if (!storage_) {
     return;
   }
@@ -914,7 +924,7 @@ void Garden::flush_economy() {
               for (const auto& event : batch->events) {
                 const auto result = db->reward(event);
                 if (result.code != store::Code::ok) {
-                  throw std::runtime_error("Garden reward rejected: " +
+                  throw std::runtime_error("Room reward rejected: " +
                                            std::string(store::code_name(result.code)));
                 }
                 for (const auto& profile : result.profiles) {
@@ -951,8 +961,8 @@ void Garden::flush_economy() {
   });
 }
 
-bool Garden::command(Member& entry, const wire::ReliableAction& action,
-                     std::optional<sim::LifeId> acknowledged_life, std::string key) {
+bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
+                          std::optional<sim::LifeId> acknowledged_life, std::string key) {
   poll_storage();
   if (std::holds_alternative<wire::Craft>(action) || std::holds_alternative<wire::Equip>(action) ||
       std::holds_alternative<wire::Swap>(action)) {
@@ -998,7 +1008,7 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
       return true;
     }
     if (entry.room.empty()) {
-      // The original Ready button also permits a solo local Garden.
+      // Ready without a squad opens a solo room.
       if (!ready->value) {
         return true;
       }
@@ -1012,7 +1022,8 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
           const auto& m = members_.at(token);
           return m.ready && m.connected;
         })) {
-      auto rules = room.biome == sim::Biome::garden ? rules_ : sim::scenario_rules(room.biome);
+      const auto* override_rules = rules_override_for(room.biome);
+      auto rules = override_rules ? *override_rules : sim::scenario_rules(room.biome);
       std::size_t opening_index = 0;
       if (rules.progressive_waves) {
         const auto biome = static_cast<unsigned>(room.biome);
@@ -1040,7 +1051,7 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
           rarities = std::move(equipment.second);
         }
         if (!room.match->add_player(m.id, {double(i) * 24 - 12, 0}, selected, rarities)) {
-          throw std::logic_error("Garden admission failed before tick zero");
+          throw std::logic_error("Room manager admission failed before tick zero");
         }
       }
     }
@@ -1070,7 +1081,7 @@ bool Garden::command(Member& entry, const wire::ReliableAction& action,
   return true;
 }
 
-void Garden::step() {
+void RoomManager::step() {
   poll_storage();
   const auto now = std::chrono::steady_clock::now();
   for (auto& [code, room] : rooms_) {
@@ -1088,7 +1099,12 @@ void Garden::step() {
         settle_economy(room, room.match->view());
       }
       for (const auto& event : room.match->events()) {
-        trace.push_back(event);
+        if (const auto* transition = std::get_if<sim::Transition>(&event.data)) {
+          transitions.emplace_back(event.tick, *transition);
+          if (transitions.size() > 128) {
+            transitions.pop_front();
+          }
+        }
         if (const auto* hit = std::get_if<sim::HealthChange>(&event.data);
             hit && hit->kind != sim::HealthKind::heal) {
           room.hits.push_back({++room.hit_sequence, *hit});
@@ -1101,9 +1117,6 @@ void Garden::step() {
             room.arcs.pop_front();
           }
         }
-      }
-      if (trace.size() > 2048) {
-        trace.erase(trace.begin(), trace.begin() + (trace.size() - 2048));
       }
     }
   }

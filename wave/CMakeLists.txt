@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(florrio_wave LANGUAGES CXX)
 
-include(cmake/GardenEvidence.cmake)
+include(cmake/ScenarioDefaults.cmake)
 find_package(SQLite3 REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
@@ -35,8 +35,8 @@ endif()
 
 add_library(
   wave_wire STATIC
-  server/wire/bootstrap.cpp server/app/bootstrap_session.cpp server/app/garden.cpp
-  server/app/garden_session.cpp server/app/economy_queue.cpp server/wire/garden_projection.cpp
+  server/wire/protocol.cpp server/app/room_manager.cpp server/app/client_session.cpp
+  server/app/economy_queue.cpp server/wire/world_projection.cpp
 )
 target_compile_features(wave_wire PUBLIC cxx_std_20)
 set_target_properties(wave_wire PROPERTIES CXX_EXTENSIONS OFF)
@@ -76,17 +76,14 @@ if(BUILD_TESTING)
                    --check --self-test
   )
   set_tests_properties(W3-catalog-validation PROPERTIES LABELS w3)
-  add_executable(wave_w2 tests/native/w2.cpp)
-  target_link_libraries(wave_w2 PRIVATE wave_wire)
-  set_target_properties(wave_w2 PROPERTIES CXX_EXTENSIONS OFF)
-  add_test(NAME W2-WIRE-BOOTSTRAP COMMAND wave_w2)
-  set_tests_properties(W2-WIRE-BOOTSTRAP PROPERTIES LABELS w2)
-  add_executable(wave_w2_garden tests/native/w2_garden.cpp)
-  target_include_directories(wave_w2_garden PRIVATE tests)
-  target_link_libraries(wave_w2_garden PRIVATE wave_wire)
-  set_target_properties(wave_w2_garden PROPERTIES CXX_EXTENSIONS OFF)
-  add_test(NAME W2-GARDEN COMMAND wave_w2_garden)
-  set_tests_properties(W2-GARDEN PROPERTIES LABELS w2)
+  foreach(suite IN ITEMS protocol room_session)
+    add_executable(wave_test_${suite} tests/native/${suite}.cpp)
+    target_include_directories(wave_test_${suite} PRIVATE tests)
+    target_link_libraries(wave_test_${suite} PRIVATE wave_wire)
+    set_target_properties(wave_test_${suite} PROPERTIES CXX_EXTENSIONS OFF)
+    add_test(NAME wave-${suite} COMMAND wave_test_${suite})
+    set_tests_properties(wave-${suite} PROPERTIES LABELS w2)
+  endforeach()
   if(WAVE_BUILD_HOST)
     add_executable(wave_host_fixture server/net/host.cpp)
     target_compile_definitions(wave_host_fixture PRIVATE WAVE_HOST_TESTING=1)
@@ -95,25 +92,20 @@ if(BUILD_TESTING)
     set_target_properties(wave_host_fixture PROPERTIES CXX_EXTENSIONS OFF)
   endif()
 
-  add_executable(wave_w1 tests/native/w1.cpp)
-  target_link_libraries(wave_w1 PRIVATE wave_sim)
-  set_target_properties(wave_w1 PROPERTIES CXX_EXTENSIONS OFF)
-  set(WAVE_REPORT_DIR
-      "${CMAKE_CURRENT_BINARY_DIR}/reports"
-      CACHE PATH "W1 fixture traces"
-  )
-  file(MAKE_DIRECTORY "${WAVE_REPORT_DIR}")
+  add_executable(wave_test_simulation tests/native/simulation.cpp)
+  target_link_libraries(wave_test_simulation PRIVATE wave_sim)
+  set_target_properties(wave_test_simulation PROPERTIES CXX_EXTENSIONS OFF)
   foreach(
-    fixture IN
-    ITEMS W1-01
-          W1-02
-          W1-03
-          W1-04
-          W1-05
-          W1-06
-          W0-GARDEN
+    case IN
+    ITEMS batches
+          transition
+          blocked-spawn
+          lifecycle
+          combat
+          isolation
+          special-waves
   )
-    add_test(NAME "${fixture}" COMMAND wave_w1 "${fixture}" "${WAVE_REPORT_DIR}/${fixture}.txt")
-    set_tests_properties("${fixture}" PROPERTIES LABELS w1)
+    add_test(NAME sim-${case} COMMAND wave_test_simulation "${case}")
+    set_tests_properties(sim-${case} PROPERTIES LABELS w1)
   endforeach()
 endif()

@@ -32,7 +32,7 @@ void place_spawn_segment(EntityView& body, const EntityView& parent, Vec2 direct
       const double cosine = std::clamp(
           (distance * distance + gap * gap - limit * limit) / (2 * distance * gap), -1., 1.);
       const double sine = std::copysign(std::sqrt((1 - cosine) * (1 + cosine)),
-                                       offset.x * tangent.x + offset.y * tangent.y);
+                                        offset.x * tangent.x + offset.y * tangent.y);
       position = parent.position + (inward * cosine + tangent * sine) * gap;
     }
     // Also handles rounding or an arena too small to fit a full link.
@@ -50,16 +50,20 @@ double Match::mob_radius(Mob kind, Rarity rarity) const {
   switch (kind) {
     // Preserve the old ant caste ordering while keeping their full silhouettes
     // in the same size range as their peers.
-    case Mob::baby_ant: return radius * .55;
+    case Mob::baby_ant:
+      return radius * .55;
     case Mob::worker_ant:
     case Mob::soldier_ant:
-    case Mob::fire_ant: return radius * .60;
-    case Mob::spider: return radius * .65;
+    case Mob::fire_ant:
+      return radius * .60;
+    case Mob::spider:
+      return radius * .65;
     case Mob::leech:
     case Mob::leech_segment:
       // Six overlapping circles together cover roughly one same-rarity mob.
       return radius * .44;
-    default: return radius;
+    default:
+      return radius;
   }
 }
 
@@ -81,7 +85,7 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
   view.position = position;
   view.group = group;
   view.owner = owner;
-  view.faction = owner || kind == Mob::digger ? Faction::team : Faction::garden;
+  view.faction = owner || kind == Mob::digger ? Faction::team : Faction::hostile;
   view.origin_wave = wave;
   auto body = definition.body;
   body.radius = mob_radius(kind, rarity);
@@ -101,8 +105,8 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
   const auto id = add_entity(view, body);
   auto& head = *entities_.get(id);
   head.home_position = head.view.position;
-  head.immovable = definition.ai == catalog::MobAI::stationary ||
-                   definition.ai == catalog::MobAI::spawner;
+  head.immovable =
+      definition.ai == catalog::MobAI::stationary || definition.ai == catalog::MobAI::spawner;
   entities_.get(id)->view.heading_rad =
       std::fmod((id.slot + 1) * 2.399963229728653, 2 * std::numbers::pi);
   entities_.get(id)->action_ready =
@@ -125,8 +129,7 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
       const auto& parent = entities_.get(previous)->view;
       // The old Centipede spawns along an arc, rather than a straight row that
       // the head ploughs through when it first turns towards a player.
-      const double angle = parent.heading_rad -
-                           (kind == Mob::leech ? 0 : std::numbers::pi / 10);
+      const double angle = parent.heading_rad - (kind == Mob::leech ? 0 : std::numbers::pi / 10);
       const Vec2 forward{std::cos(angle), std::sin(angle)};
       place_spawn_segment(view, parent, forward, gap, rules_.arena_radius);
       auto segment_body = segment->body;
@@ -352,8 +355,8 @@ void Match::update_mob_actions() {
       bullet.rarity = rarity;
       // The older engine uses an 11-unit stinger and a 0.4-unit/ms recoil.
       // Convert from client units, then grow the shot with its Hornet's tier.
-      const double missile_radius = (11. / 5) * e->view.radius /
-                                    mob_radius(Mob::hornet, Rarity::common);
+      const double missile_radius =
+          (11. / 5) * e->view.radius / mob_radius(Mob::hornet, Rarity::common);
       const auto forward = delta * (1 / distance);
       bullet.heading_rad = std::atan2(delta.y, delta.x);
       e->view.heading_rad = bullet.heading_rad;
@@ -466,7 +469,7 @@ void Match::update_nests() {
     if (e->spawn_count >= total) {
       const bool alive = std::ranges::any_of(entities_.active(), [&](auto slot) {
         const auto& child = entities_.at(slot);
-        return child.root == id && child.view.faction == Faction::garden && child.view.health > 0;
+        return child.root == id && child.view.faction == Faction::hostile && child.view.health > 0;
       });
       if (!alive && entrance) {
         e->view.health = 0;
@@ -514,7 +517,7 @@ void Match::resolve_cleared_nests() {
   std::erase_if(fallen_ant_holes_, [&](const FallenAntHole& hole) {
     const bool defended = std::ranges::any_of(entities_.active(), [&](auto slot) {
       const auto& child = entities_.at(slot);
-      return child.root == hole.id && child.view.faction == Faction::garden;
+      return child.root == hole.id && child.view.faction == Faction::hostile;
     });
     if (defended) {
       return false;

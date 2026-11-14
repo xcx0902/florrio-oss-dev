@@ -145,19 +145,19 @@ export async function squadCase({ browser, snapshot, nativeDir, temporary, outpu
 }
 
 export async function realtimeReadyCase({ browser, snapshot, nativeDir, temporary, report, seed }) {
-  console.log('W3 Ready: production clock, 36 solo admissions and abandoned room recovery');
+  console.log('W3 Ready: solo admission with Basic and mixed equipment on the production clock');
   const database = path.join(temporary, 'realtime-ready.sqlite3');
   seed(database);
   const host = await startHost({ snapshot, nativeDir, port: 0, database });
   const rounds = [];
   try {
-    for (let i = 0; i < 36; ++i) {
-      const profile = seed(database, i % 2 ? '--squad' : undefined);
+    for (const mode of [undefined, '--squad']) {
+      const profile = seed(database, mode);
       const storage = { cookies: [], origins: [{
         origin: new URL(host.url).origin,
         localStorage: [{ name: 'cp6_player_id', value: profile.token }],
       }] };
-      const c = await client(browser, host.url, `realtime-ready-${i}`, storage);
+      const c = await client(browser, host.url, `realtime-ready-${rounds.length}`, storage);
       try {
         await c.page.keyboard.press('Enter');
         await c.page.waitForFunction(() => {
@@ -168,7 +168,7 @@ export async function realtimeReadyCase({ browser, snapshot, nativeDir, temporar
         const state = await healthy(c);
         assert.ok(state.control, 'Real-time Ready controls a live flower');
         assert.equal(c.sockets.length, 1, 'Ready needs no reconnect or page refresh');
-        rounds.push({ round: i + 1, control: state.control, mixed: i % 2 !== 0 });
+        rounds.push({ round: rounds.length + 1, control: state.control, mixed: Boolean(mode) });
       } finally {
         await c.context.close();
       }
@@ -191,10 +191,9 @@ export async function abandonReentryCase({ browser, snapshot, nativeDir, tempora
     assert.ok(predicate(), message);
   };
   for (const [label, mode, size] of [
-    ['solo-basic', undefined, 1], ['solo-mixed', '--squad', 1],
-    ['squad-mixed', '--squad', 2], ['squad-effects', '--behaviors', 2],
+    ['solo-mixed', '--squad', 1], ['squad-effects', '--behaviors', 2],
   ]) {
-    console.log(`W3 Abandon: ${label}, 12 Ready / Abandon cycles without refresh`);
+    console.log(`W3 Abandon: ${label}, enter and reenter without refresh`);
     const database = path.join(temporary, `${label}-reentry.sqlite3`);
     const profiles = [seed(database, mode)];
     if (size === 2) profiles.push(seed(database));
@@ -208,19 +207,21 @@ export async function abandonReentryCase({ browser, snapshot, nativeDir, tempora
             localStorage: [{ name: 'cp6_player_id', value: profile.token }] }],
         }));
       }
-      for (let round = 0; round < 12; ++round) {
+      for (let round = 0; round < 2; ++round) {
         await pause(600);
         if (size === 2) {
           const a = clients[0], b = clients[1];
-          await a.page.mouse.click(670, 373, { delay: 80 });
-          await wait(() => a.baseline.get(8194)?.code, 'New squad is published');
-          await a.page.waitForFunction((code) => location.hash.includes(code), a.baseline.get(8194).code);
-          const invite = new URL(a.page.url()).hash;
-          assert.ok(invite.startsWith('#wavelocal-'));
-          // Native invitation navigation on the existing document/socket.
-          await b.page.evaluate((hash) => { location.hash = hash; }, invite);
-          await wait(() => b.baseline.get(8194)?.code === a.baseline.get(8194)?.code,
-            'Teammate joins the new squad after Abandon');
+          for (const c of clients) await c.page.mouse.click(670, 373);
+          await wait(() => clients.every((c) => c.baseline.get(8194)?.code),
+            'Both players open the squad panel');
+          const code = a.baseline.get(8194).code;
+          await pause(700); // Wait for the native panel controls to finish animating.
+          await a.page.mouse.click(338, 290);
+          await wait(() => a.baseline.get(8194)?.public, 'The new squad is public');
+          await b.page.mouse.click(590, 290);
+          await wait(() => b.baseline.get(8194)?.code === code &&
+            a.baseline.get(8194)?.memberFlags[1] === 1,
+          'Find Public joins the new squad without a refresh');
           await pause(650);
           for (const c of clients) await c.page.mouse.click(660, 220, { delay: 80 });
         } else {

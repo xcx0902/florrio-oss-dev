@@ -1,4 +1,4 @@
-#include "wire/garden_projection.hpp"
+#include "wire/world_projection.hpp"
 #include "catalog/catalog.hpp"
 #include "wire/economy_cache.hpp"
 
@@ -58,9 +58,9 @@ void set_word(Bytes& bytes, std::size_t offset, std::uint32_t value) {
 void set_real(Bytes& bytes, std::size_t offset, float value) {
   set_word(bytes, offset, std::bit_cast<std::uint32_t>(value));
 }
-std::string player_name(const app::Garden& garden, const app::Room& room, sim::PlayerId id) {
+std::string player_name(const app::RoomManager& rooms, const app::Room& room, sim::PlayerId id) {
   for (const auto& token : room.members) {
-    if (const auto* m = garden.member(token); m && m->id == id) {
+    if (const auto* m = rooms.member(token); m && m->id == id) {
       return m->name;
     }
   }
@@ -76,7 +76,7 @@ std::uint8_t mob_type(sim::Mob mob, sim::Group group, sim::Rarity rarity = sim::
 
 }  // namespace
 
-std::uint32_t GardenProjection::handle(const sim::EntityId& id) {
+std::uint32_t WorldProjection::handle(const sim::EntityId& id) {
   const Key key{id.match.value, id.slot, id.generation};
   if (const auto found = handles_.find(key); found != handles_.end()) {
     return found->second;
@@ -87,7 +87,7 @@ std::uint32_t GardenProjection::handle(const sim::EntityId& id) {
     free_.pop_back();
   } else {
     if (next_slot_ >= 8192) {
-      throw std::runtime_error("Garden projection entity limit");
+      throw std::runtime_error("World projection entity limit");
     }
     slot = next_slot_++;
     if (generations_.size() <= slot) {
@@ -99,11 +99,11 @@ std::uint32_t GardenProjection::handle(const sim::EntityId& id) {
   return result;
 }
 
-GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Member& viewer,
-                                       std::chrono::steady_clock::time_point now) {
-  GardenSnapshot result;
+WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::Member& viewer,
+                                     std::chrono::steady_clock::time_point now) {
+  WorldSnapshot result;
   Writer out;
-  const auto* room = garden.room(viewer);
+  const auto* room = rooms.room(viewer);
   std::optional<sim::MatchView> view;
   if (room && room->match) {
     view = room->match->view();
@@ -191,7 +191,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       const auto slot = it->second & 8191;
       result.removed.push_back(it->second);
       if (++generations_[slot] >= 524288) {
-        throw std::runtime_error("Garden handle exhausted");
+        throw std::runtime_error("World projection handle exhausted");
       }
       free_.push_back(slot);
       rendered_.erase(it->first);
@@ -247,9 +247,9 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         body.byte(0);
         body.byte(0);
         const auto member_it = std::ranges::find_if(room->members, [&](const auto& token) {
-          return garden.member(token)->id == e.owner->player;
+          return rooms.member(token)->id == e.owner->player;
         });
-        const auto* member = member_it == room->members.end() ? nullptr : garden.member(*member_it);
+        const auto* member = member_it == room->members.end() ? nullptr : rooms.member(*member_it);
         body.byte(member && member->profile ? std::min(255u, member->profile->level) : 1);
         body.byte(0);
         const auto& owner =
@@ -284,7 +284,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
           body.integer(static_cast<std::uint32_t>(
               65535 * (1 - std::min(1.0, double(remaining) / std::max<sim::Tick>(1, total)))));
         }
-        body.text(player_name(garden, *room, e.owner->player));
+        body.text(player_name(rooms, *room, e.owner->player));
       }
       const auto angle = static_cast<std::uint16_t>(
           std::fmod((flower ? 0 : e.heading_rad) + 2 * std::numbers::pi, 2 * std::numbers::pi) *
@@ -335,7 +335,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
         // then uses $973/$41's native interpolation on the drawn petal.
         const auto anchor = std::ranges::find(view->entities, *e.anchor, &sim::EntityView::id);
         if (anchor == view->entities.end()) {
-          throw std::runtime_error("Garden petal anchor missing");
+          throw std::runtime_error("World projection petal anchor missing");
         }
         set_real(record.bytes, 8 + position_offset, anchor->position.x * world_scale);
         set_real(record.bytes, 12 + position_offset, anchor->position.y * world_scale);
@@ -448,7 +448,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     std::array<store::Slots, 4> equipment{};
     std::array<std::uint8_t, 4> member_flags{};
     for (std::size_t i = 0; i < bodies.size(); ++i) {
-      const auto* member = i < room->members.size() ? garden.member(room->members[i]) : nullptr;
+      const auto* member = i < room->members.size() ? rooms.member(room->members[i]) : nullptr;
       roster.text(member ? member->name : "");
       if (!member) {
         continue;
@@ -457,7 +457,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
       if (member->profile) {
         equipment[i] = client_equipment(*member->profile);
       } else {
-        const auto loadout = garden.default_loadout(i);
+        const auto loadout = rooms.default_loadout(i);
         for (std::size_t slot = 0; slot < std::min(loadout.size(), equipment[i].size()); ++slot) {
           if (const auto kind = catalog::client_petal(loadout[slot])) {
             equipment[i][slot] = store::Item{*kind, 0};
@@ -530,7 +530,7 @@ GardenSnapshot GardenProjection::build(const app::Garden& garden, const app::Mem
     std::array<std::uint32_t, 216> counts{};
     for (const auto& entity : view->entities) {
       // Leech sections share the head's health and count as one mob with it.
-      if (entity.faction == sim::Faction::garden && entity.mob != sim::Mob::leech_segment &&
+      if (entity.faction == sim::Faction::hostile && entity.mob != sim::Mob::leech_segment &&
           (entity.mob || entity.group == sim::Group::ant_hole)) {
         ++counts[mob_type(entity.mob.value_or(sim::Mob::baby_ant), entity.group, entity.rarity) *
                      6 +

@@ -300,7 +300,8 @@ export async function runW3(values) {
     await c.page.waitForTimeout(200);
     await advance(1);
     await c.page.waitForFunction(() => {
-      const d = new DataView(Module.asm.Jf.buffer), u = (a) => d.getUint32(a, true);
+      const d = new DataView(Module.asm.Jf.buffer),
+        u = (a) => d.getUint32(a, true);
       return u(u(u(u(4347728) + 2768)) + 2360) && !d.getUint8(4350150);
     });
     await c.page.keyboard.press('Digit2', { delay: 150 });
@@ -322,18 +323,22 @@ export async function runW3(values) {
     }).trim()
       ? 'working-tree'
       : 'committed';
-    const files = execFileSync(
-      'git',
-      ['ls-files', '--cached', '--others', '--exclude-standard', '--', 'wave'],
-      { cwd: path.resolve(root, '..'), encoding: 'utf8' },
-    )
-      .trim()
-      .split('\n')
-      .filter(Boolean);
+    const project = path.resolve(root, '..');
+    const files = (mode) =>
+      execFileSync('git', ['ls-files', '-z', ...mode, '--', 'wave'], {
+        cwd: project,
+        encoding: 'utf8',
+      })
+        .split('\0')
+        .filter(Boolean);
+    const deleted = new Set(files(['--deleted']));
+    const sources = [...new Set(files(['--cached', '--others', '--exclude-standard']))]
+      .filter((file) => !deleted.has(file))
+      .sort();
     report.sources = await Promise.all(
-      files.map(async (file) => ({
+      sources.map(async (file) => ({
         file,
-        sha256: hash(await readFile(path.resolve(root, '..', file))),
+        sha256: hash(await readFile(path.join(project, file))),
       })),
     );
     report.native = await Promise.all(
@@ -576,13 +581,30 @@ export async function runW3(values) {
     await host.stop();
     host = null;
     await squadCase({
-      browser, snapshot: values.snapshot, nativeDir: native, temporary, output, report, seed,
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: native,
+      temporary,
+      output,
+      report,
+      seed,
     });
     await abandonReentryCase({
-      browser, snapshot: values.snapshot, nativeDir: native, temporary, output, report, seed,
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: native,
+      temporary,
+      output,
+      report,
+      seed,
     });
     await realtimeReadyCase({
-      browser, snapshot: values.snapshot, nativeDir: native, temporary, report, seed,
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: native,
+      temporary,
+      report,
+      seed,
     });
     report.status = 'passed';
   } catch (error) {
@@ -592,7 +614,11 @@ export async function runW3(values) {
     for (const context of browser?.contexts() ?? []) {
       for (const page of context.pages()) {
         const name = `failure-${report.failurePages.length}.png`;
-        report.failurePages.push({ url: page.url(), frames: page.frames().map((f) => f.url()), screenshot: name });
+        report.failurePages.push({
+          url: page.url(),
+          frames: page.frames().map((f) => f.url()),
+          screenshot: name,
+        });
         await page.screenshot({ path: path.join(output, name) }).catch(() => {});
       }
     }

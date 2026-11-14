@@ -11,7 +11,7 @@
 
 namespace wave::app {
 
-// Work runs on one I/O thread. Completions run only when the Garden executor
+// Work runs on one I/O thread. Completions run only when the room manager executor
 // polls. The bound includes running work and unconsumed completions.
 class EconomyQueue {
  public:

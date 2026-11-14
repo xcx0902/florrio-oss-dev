@@ -5,7 +5,7 @@
 namespace wave::fixtures {
 
 // Synthetic S/S+3/S+10 schedule for native fixtures and the W2 host.
-inline sim::Rules short_garden_rules() {
+inline sim::Rules short_match_rules() {
   using namespace sim;
   Rules rules;
   rules.version = "w1-fixture.1";

@@ -1,4 +1,4 @@
-#include "app/garden.hpp"
+#include "app/room_manager.hpp"
 #include "net/dev_inventory.hpp"
 #include "store/store.hpp"
 
@@ -98,17 +98,17 @@ void queued_edit() {
   options.allow_debug_inventory = true;
   auto db = std::make_shared<Store>(":memory:", options);
   const auto before = db->create_guest();
-  wave::app::Garden garden(wave::sim::garden_rules(), 42, {}, db);
-  auto& member = garden.admit(before.guest_token, 1);
+  wave::app::RoomManager rooms(std::nullopt, 42, {}, db);
+  auto& member = rooms.admit(before.guest_token, 1);
   bool done = false;
-  check(garden.debug_inventory(before.guest_token, {"dev-inventory", "queued", before.version},
-                               {5, 5}, 400,
-                               [&](Result result) {
-                                 check(result.code == Code::ok, "Queued edit commits");
-                                 done = true;
-                               }),
+  check(rooms.debug_inventory(before.guest_token, {"dev-inventory", "queued", before.version},
+                              {5, 5}, 400,
+                              [&](Result result) {
+                                check(result.code == Code::ok, "Queued edit commits");
+                                done = true;
+                              }),
         "Queue accepts edit");
-  check(garden.wait_storage() && done, "Queue completion delivered");
+  check(rooms.wait_storage() && done, "Queue completion delivered");
   check(member.profile->inventory.at({5, 5}) == 400, "Active member receives committed inventory");
   check(db->recover_guest(before.guest_token)->inventory.at({5, 5}) == 400,
         "Database receives edit");

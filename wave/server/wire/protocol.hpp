@@ -66,7 +66,7 @@ struct ReliableRequest {
   std::uint32_t sequence;
   ReliableAction action;
 };
-struct Startup {
+struct ReliableBatch {
   std::uint32_t first_sequence;
   std::uint32_t last_sequence;
   std::vector<ReliableRequest> requests;
@@ -77,16 +77,15 @@ struct WorldAck {
 };
 struct OldWorld {};
 
-using Command = std::variant<Startup, WorldAck, OldWorld>;
+using Command = std::variant<ReliableBatch, WorldAck, OldWorld>;
 
-bool is_hello(std::span<const std::uint8_t> bytes);
 std::optional<std::string> hello_guest(std::span<const std::uint8_t> bytes);
 
-class Bootstrap {
+class Protocol {
  public:
   std::optional<Command> receive(Bytes bytes);
   Bytes guest_id(std::string_view id);
-  Bytes world(std::uint32_t tick, std::uint32_t acknowledged_request, bool initial_profile = false);
+  Bytes greeting(std::uint32_t tick);
   Bytes snapshot(std::uint32_t tick, std::uint32_t acknowledged_request,
                  std::span<const std::uint8_t> records, std::span<const std::uint32_t> removed = {},
                  std::span<const std::uint8_t> commands = {});

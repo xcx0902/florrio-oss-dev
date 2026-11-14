@@ -43,8 +43,8 @@ git show f28fb8e -- wave/web/local.js
 `$3309` 收到更大的 world epoch 时会销毁旧世界并经 `$587` 重新初始化，才会清除该标记。
 仅有“控制花朵非零”的断言会漏掉这个故障。
 
-修复位于 [GardenSession](../server/app/garden_session.cpp) 和
-[Bootstrap](../server/wire/bootstrap.cpp)：
+修复位于 [ClientSession](../server/app/client_session.cpp) 和
+[Protocol](../server/wire/protocol.cpp)：
 
 1. 连接从已有对局离开或切换到另一对局时，递增 world epoch，发送全量新世界。
 2. 清空旧投影、待处理请求、可靠序号、ACK 和生命绑定；新世界启动身份请求复用原成员。
@@ -73,7 +73,7 @@ git show f28fb8e -- wave/web/local.js
 | Abandon/主动离队 | `Departure{player}` | 下一模拟步移除退出者的花朵、花瓣、弹体、召唤物等所属实体，并移除该对局玩家记录。 |
 | 最后一人主动离场 | 删除房间 | 对局对象和该 arena 随房间销毁。 |
 
-`Garden::leave` 释放退出者席位并排入 `Departure`；`Match::apply_commands` 复用生命清理逻辑，
+`RoomManager::leave` 释放退出者席位并排入 `Departure`；`Match::apply_commands` 复用生命清理逻辑，
 随后移除玩家。该步后续若还有针对退出者的延迟输入、连接或装备命令，会安全跳过。
 退出者的新 epoch 清除其客户端旧 arena、波次、小队和控制对象；留队者仍使用原 epoch、原对局、原生命。
 留队者通过原有实体删除/淡出流程看到退出者消失。

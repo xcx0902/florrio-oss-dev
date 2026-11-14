@@ -43,7 +43,7 @@ u8   0               分隔符
 
 - `tick` 之前不掩码；`ack`、删除段、实体、命令全部与 256 字节内层掩码 XOR。
 - 初始 world 可以不带删除段，在 `ack` 后直接写 4 字节零句柄；增量快照才带
-  `remove_len/count/flag/handles/flag`（A，`bootstrap.cpp`）。
+  `remove_len/count/flag/handles/flag`（A，`protocol.cpp`）。
 - 删除段使用“长度 + 数量”双前缀，是为了让客户端在重复 tick 时零解析跳过。
 - `$3309` 收到更大的 epoch 时先析构旧世界并调用 `$587`，再消费新快照。
   原生可靠请求序号从 1 重新开始；服务端同步重置 ACK、生命绑定和投影，丢弃旧
@@ -53,8 +53,8 @@ u8   0               分隔符
   可以在分隔符处直接结束，命令列表为空（A，`w2-bootstrap.md`）。
 
 证据：`$601`（394231–468963）是唯一完整读取该结构的函数；`$3309`
-（1503445–1505525）负责类型分派；`wave/server/wire/bootstrap.cpp` 的
-`world()/snapshot()` 生成同构字节并与原版互通（A）。
+（1503445–1505525）负责类型分派；`wave/server/wire/protocol.cpp` 的
+`greeting()/snapshot()` 生成同构字节并与原版互通（A）。
 
 ## 2. 命令 envelope
 
@@ -71,7 +71,7 @@ u8   0               分隔符
   `$988`；`$988` 在执行副作用前检查该标志（B）。
 - 这与 C→S 的 `seq` 是两套独立计数：S→C 序号由服务端维护，客户端只做单调过滤。
 - 当前服务端投递受击/闪电与经济结果都使用 `tag = 1`（A，
-  `garden_projection.cpp`、`economy-wire-20221030.md` 的 35 示例）。
+  `world_projection.cpp`、`economy-wire-20221030.md` 的 35 示例）。
 
 ## 3. 命令 opcode 总表
 
@@ -180,7 +180,7 @@ u8      strength   0..255
   24 字节事件容器（这不是 0x80000 的 wire 字段）。
 - `$51` 消费该向量，绘制约 150 ms 的闪白/红色衰减（A）。
 - 服务端投影按 `实际伤害 / max_health` 量化到 1..255（A，
-  `garden_projection.cpp`）。
+  `world_projection.cpp`）。
 
 ### 33 · 闪电 Path2D（未绘制）
 

@@ -85,7 +85,7 @@ vu      len
 bytes   len
 ```
 
-- 服务端实现直接跳过这段不透明数据（A，`bootstrap.cpp`）。
+- 服务端实现直接跳过这段不透明数据（A，`protocol.cpp`）。
 - 抓包中位于启动批次最后一条（A）。
 
 ### 17 · 登录/注册（provider + nickname + 两个空串）
@@ -191,7 +191,7 @@ string  room code （NUL 结尾）
 ```
 
 - 构造 `$984`（926556–926795）：`$978(01 <vu len> <code>)`（B）。
-- 服务端读取 `01` + 字符串（A，`bootstrap.cpp`）。
+- 服务端读取 `01` + 字符串（A，`protocol.cpp`）。
 - 真实邀请链接形如 `#wavelocal-<房间码>`（A）。
 
 ### 7 · 准备

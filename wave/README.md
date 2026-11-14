@@ -117,7 +117,7 @@ Abandon 会移除退出者的花朵及其所属实体；留队者继续原对局
 本轮问题的引入历史、根因、修复与回归记录见
 [Wave 故障复盘（2026-11-11）](docs/bugfix-retrospective-2026-11-11.md)。
 
-## W1 · Garden 原生模拟
+## W1 · 原生对局模拟
 
 使用 CMake 3.20+ 和 C++20 编译器，从仓库根目录执行。
 
@@ -127,11 +127,12 @@ cmake --build build/wave/w1 --parallel
 ctest --test-dir build/wave/w1 --output-on-failure --no-tests=error -L '^w1$'
 ```
 
-`wave_sim` 的构建输入都在 `wave/` 中。CMake 从 W0 规则表生成 Garden 配置。CTest 默认把每个用例的事件和状态写到构建目录的 `reports/`，可用 `-DWAVE_REPORT_DIR=<绝对路径>` 指定报告目录。 [规则表](data/evidence/20221030/rules.json) · [执行记录](../wave-goals/01-engine-and-wave-loop.md#w1-执行结果)
+`wave_sim` 覆盖分批生成、切波、死亡复活、战斗、房间隔离和特殊波。测试用固定短波场景验证这些行为，场景的生产参数来自[规则表](data/evidence/20221030/rules.json)。[W1 历史执行记录](../wave-goals/01-engine-and-wave-loop.md#w1-执行结果)
 
-### W2 接入
+### 服务端分工
 
-- 宿主为每局分配非零 `MatchId` 和种子，用 `garden_rules()` 创建 `Match`，开局前调用 `add_player()`。测试宿主可改用固定的 `short_garden_rules()`。 [模拟接口](server/sim/match.hpp) · [短波场景](tests/scenarios/garden-w1.hpp)
+- [RoomManager](server/app/room_manager.hpp) 管理访客和各场景的房间，使用 `scenario_rules(biome)` 创建 [Match](server/sim/match.hpp)。测试可用 [short_match_rules()](tests/scenarios/short_match.hpp) 注入短波规则。
+- [ClientSession](server/app/client_session.hpp) 处理单个客户端的握手、命令和确认；[WorldProjection](server/wire/world_projection.hpp) 把状态转换为原版客户端需要的世界快照。
 - 连接状态使用 `Connection`，主动离场使用 `Departure`，移动使用 `Input` 携带当前 `LifeId` 与移动轴。宿主在所属房间顺序调用 `queue()` 和 `step()`。命令按入队顺序在下一次模拟步采纳，移动持续到下一条有效移动指令、断线或该生命结束。
 - 每次 `step()` 成功后读取 `view()` 和 `events()`。`view()` 是独立快照，含地图、当前与上一波计划、玩家状态、实体与花瓣槽。事件带结算 tick，有效期到下次成功的 `step()`，跨 tick 保留时需复制。广播节奏由宿主按 `broadcast_interval` 单独调度。
 - 位置与速度使用场地单位和场地单位/秒，朝向使用弧度，血量使用 HP，冷却与生成计划使用整数 tick。实体句柄含对局、槽位与代次，生命 ID 含对局、存档玩家与生命代次。旧客户端的 ID、字段精度和字节量化由 W2 投影。 [快照与事件类型](server/sim/model.hpp)
@@ -163,6 +164,6 @@ npm --prefix wave run verify:reference -- --snapshot "$WAVE_SNAPSHOT" --resource
 - [原资源清单](web/resources-20221030.json) 记录原页面的构建前缀、精确归档时刻、可选资源的回放时刻和哈希。第三方广告脚本在原页面验收中拦截。启动壳使用系统备用字体，归档页使用存档 Ubuntu 字体。
 - [首包夹具](data/wire/20221030/bootstrap.json) 分开标记客户端实测出站字节、合成服务端响应和胶水探针。合成发现响应足以推进到首个 socket 帧。合成 `ff` 回包触发 `kUnknown`，历史成功回包和访客状态留给 W2。
 - [证据索引](data/evidence/20221030/sources.json)、[规则表](data/evidence/20221030/rules.json) 与 [录像帧观测](data/evidence/20221030/video-observations.json) 以 UTC 截止点绑定旧修订、原 Wasm 和邻近时期画面。Garden 1–3 波的怪量、时间及批次属于 W1 的复刻设定。
-- [Garden 夹具](tests/scenarios/garden-w0.json) 给 W1 定义类型化输入和预期转移。原生 `W0-GARDEN` 用例验证编入的候选配置和实际生成。
+- [早期 Garden 场景记录](tests/scenarios/garden-w0.json) 用于 W0 证据校验。
 
 [W0 执行记录](../wave-goals/00-baseline-and-evidence.md#w0-执行结果)

@@ -1,19 +1,29 @@
 #pragma once
 
-#include "app/bootstrap_session.hpp"
-#include "app/garden.hpp"
-#include "wire/garden_projection.hpp"
+#include "app/room_manager.hpp"
+#include "wire/world_projection.hpp"
 
 #include <map>
 #include <deque>
 
 namespace wave::app {
 
-class GardenSession {
+enum class CloseReason {
+  protocol_error,
+  superseded
+};
+
+struct Reply {
+  std::vector<wire::Bytes> frames;
+  bool close = false;
+  CloseReason reason = CloseReason::protocol_error;
+};
+
+class ClientSession {
  public:
-  GardenSession(Garden& garden, std::uint64_t connection,
+  ClientSession(RoomManager& rooms, std::uint64_t connection,
                 sim::Biome biome = sim::Biome::garden);
-  ~GardenSession();
+  ~ClientSession();
   Reply receive(wire::Bytes bytes);
   Reply publish();
   Reply reject();
@@ -28,13 +38,13 @@ class GardenSession {
   };
   std::deque<Pending> pending_;
   std::uint32_t received_ = 0;
-  Garden& garden_;
+  RoomManager& rooms_;
   sim::Biome biome_;
   std::uint64_t connection_;
   Member* member_ = nullptr;
   std::string requested_guest_;
-  wire::Bootstrap wire_;
-  wire::GardenProjection projection_;
+  wire::Protocol wire_;
+  wire::WorldProjection projection_;
   std::uint32_t acknowledged_ = 0;
   std::uint64_t craft_cursor_ = 0;
   std::uint64_t match_ = 0;

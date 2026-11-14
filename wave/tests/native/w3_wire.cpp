@@ -1,5 +1,5 @@
-#include "app/garden_session.hpp"
-#include "wire/bootstrap.hpp"
+#include "app/client_session.hpp"
+#include "wire/protocol.hpp"
 #include "wire/economy_cache.hpp"
 #include <algorithm>
 #include <atomic>
@@ -23,10 +23,10 @@ void check(bool v, const char* why) {
   }
 }
 wire::ReliableAction decode(std::string_view hex) {
-  wire::Bootstrap b;
+  wire::Protocol b;
   auto result = b.receive(bytes(hex));
   check(result.has_value(), "economic request decoded");
-  return std::get<wire::Startup>(*result).requests.front().action;
+  return std::get<wire::ReliableBatch>(*result).requests.front().action;
 }
 
 // Independent capture-envelope reader: only inspect the reliable ACK, without
@@ -103,8 +103,8 @@ struct SnapshotHeaders {
 };
 
 void abandon_reentry() {
-  app::Garden garden;
-  app::GardenSession session(garden, 1);
+  app::RoomManager rooms;
+  app::ClientSession session(rooms, 1);
   SnapshotHeaders headers;
   wire::Bytes hello{48};
   const std::string build = "b632797f0ee487dd99df460b13bde6d7ce5c9773";
@@ -117,32 +117,33 @@ void abandon_reentry() {
         "initial identity is accepted");
   check(headers.consume(session.receive(bytes("1705b38352"))) == 2,
         "initial Ready is acknowledged");
-  check(garden.rooms().size() == 1 && garden.rooms().begin()->second.match,
+  check(rooms.rooms().size() == 1 && rooms.rooms().begin()->second.match,
         "first Ready creates a match");
-  const auto first = garden.rooms().begin()->second.match->id();
+  const auto first = rooms.rooms().begin()->second.match->id();
   check(headers.consume(session.receive(bytes("04c251287eb3"))) == 0 && headers.epoch == 1,
         "Abandon resets the native world epoch and reliable sequence");
-  check(garden.rooms().empty(), "Abandon leaves the first match");
+  check(rooms.rooms().empty(), "Abandon leaves the first match");
   const auto old = session.receive(bytes("0421225936"));
-  check(!old.close && old.frames.empty() && garden.rooms().empty(),
+  check(!old.close && old.frames.empty() && rooms.rooms().empty(),
         "in-flight requests from the abandoned world cannot start another match");
   check(headers.consume(session.receive(bytes("16cbd1f08108740721"))) == 1 && headers.epoch == 1,
         "native world initialization reuses the same admitted identity");
   check(headers.consume(session.receive(bytes("0082fde9c0"))) == 2 && headers.epoch == 1,
         "Ready after Abandon works on the same connection");
-  check(garden.rooms().size() == 1 && garden.rooms().begin()->second.match &&
-            garden.rooms().begin()->second.match->id() != first,
+  check(rooms.rooms().size() == 1 && rooms.rooms().begin()->second.match &&
+            rooms.rooms().begin()->second.match->id() != first,
         "second Ready creates a distinct playable match");
 
-  wire::Bootstrap wide;
+  wire::Protocol wide;
   for (unsigned i = 0; i < 128; ++i) {
     wide.next_world();
   }
   const auto ready = wide.receive(bytes("059eb87c15ae"));
-  check(ready && std::get<wire::Ready>(std::get<wire::Startup>(*ready).requests[0].action).value,
+  check(ready &&
+            std::get<wire::Ready>(std::get<wire::ReliableBatch>(*ready).requests[0].action).value,
         "world epochs remain valid past the single-byte boundary");
   SnapshotHeaders wide_headers;
-  check(wide_headers.consume({{wide.world(1, 0)}, false}) == 0 && wide_headers.epoch == 128,
+  check(wide_headers.consume({{wide.greeting(1)}, false}) == 0 && wide_headers.epoch == 128,
         "multi-byte world epochs preserve the snapshot payload mask boundary");
 }
 
@@ -176,9 +177,9 @@ void session_queue_backpressure() {
   seed.inventory[rose] = 15;
   seed.slots = guest.slots;
   const auto initial = db->seed_for_testing(guest.guest_token, seed);
-  std::size_t reads = 0;  // Outlive Garden callbacks during assertion unwinding.
-  app::Garden garden(sim::garden_rules(), 7, {}, db);
-  app::GardenSession session(garden, 1);
+  std::size_t reads = 0;  // Outlive room manager callbacks during assertion unwinding.
+  app::RoomManager rooms(std::nullopt, 7, {}, db);
+  app::ClientSession session(rooms, 1);
   // Release the worker before either owner is destroyed, even on an assertion.
   struct ReleaseOnExit {
     std::shared_ptr<Gate> gate;
@@ -197,36 +198,36 @@ void session_queue_backpressure() {
   // original single-craft duplicate seq2 after the queue drains.
   check(headers.consume(session.receive(bytes("051eab7a7d37e39314e7776d4c15"))) == 1,
         "encrypted identity establishes reliable sequence one");
-  auto& member = garden.admit(initial.guest_token, 1);
+  auto& member = rooms.admit(initial.guest_token, 1);
   gate->armed = true;
-  check(garden.command(member, wire::Craft{false, 0, rose.kind, 0}, {}, "queue-blocker"),
+  check(rooms.command(member, wire::Craft{false, 0, rose.kind, 0}, {}, "queue-blocker"),
         "blocking craft accepted on worker");
   check(gate->reached.get_future().wait_for(2s) == std::future_status::ready,
         "worker reaches blocked transaction");
-  for (std::size_t i = 1; i < app::Garden::storage_capacity; ++i) {
-    check(garden.request_profile(
+  for (std::size_t i = 1; i < app::RoomManager::storage_capacity; ++i) {
+    check(rooms.request_profile(
               initial.guest_token, [&](auto) { ++reads; }, false),
-          "profile read fills remaining Garden capacity");
+          "profile read fills remaining room manager capacity");
   }
-  check(garden.storage_pending() == app::Garden::storage_capacity,
+  check(rooms.storage_pending() == app::RoomManager::storage_capacity,
         "running transaction and queued reads reach exact capacity");
   check(headers.consume(session.receive(bytes("1705b38153e03266"))) == 1,
-        "queue-full craft remains unacknowledged until Garden accepts it");
+        "queue-full craft remains unacknowledged until the room manager accepts it");
   check(headers.consume(session.receive(bytes("04c250267b91e74d"))) == 1,
         "duplicate queued sequence neither replaces the first payload nor advances ACK");
-  check(garden.storage_pending() == app::Garden::storage_capacity && member.profile == initial &&
-            member.craft_results.empty(),
+  check(rooms.storage_pending() == app::RoomManager::storage_capacity &&
+            member.profile == initial && member.craft_results.empty(),
         "backpressure publishes no uncommitted craft result or profile");
 
   gate->open();
-  check(garden.wait_storage(), "accepted blocking craft and reads drain");
-  check(reads == app::Garden::storage_capacity - 1 && member.profile->inventory.at(rose) == 10 &&
-            member.craft_results.size() == 1,
+  check(rooms.wait_storage(), "accepted blocking craft and reads drain");
+  check(reads == app::RoomManager::storage_capacity - 1 &&
+            member.profile->inventory.at(rose) == 10 && member.craft_results.size() == 1,
         "only the blocking craft ran before Session is polled");
   // No client retransmission is needed: publish alone must admit the retained request.
   check(headers.consume(session.publish()) == 2,
         "publish admits retained craft and advances ACK once");
-  check(garden.wait_storage(), "retained reliable craft commits");
+  check(rooms.wait_storage(), "retained reliable craft commits");
   check(headers.consume(session.publish()) == 2, "committed craft retains reliable ACK");
   check(member.profile->inventory.at(rose) == 5 &&
             member.profile->inventory.at(unusual_rose) == 2 &&
@@ -235,7 +236,7 @@ void session_queue_backpressure() {
             member.craft_results.back().second.craft.successes == 1,
         "first queued single-craft semantics commit once despite changed duplicate payload");
   const auto committed = *member.profile;
-  check(headers.consume(session.receive(bytes("0421255b37baa660"))) == 2 && garden.wait_storage(),
+  check(headers.consume(session.receive(bytes("0421255b37baa660"))) == 2 && rooms.wait_storage(),
         "retransmitted accepted sequence is acknowledged without reexecution");
   check(headers.consume(session.publish()) == 2 && member.profile == committed &&
             member.craft_results.size() == 2,
@@ -260,7 +261,7 @@ int main() {
     for (auto malformed : {"051eab727e4583e5", "051eab727c45a8e5", "051eab727c4583e3",
                            "051eab7b7c4586e57d82006d4c152540a1db3b", "051eab727cba791a82fd056d",
                            "051eab6b6c4087ed7c82"}) {
-      wire::Bootstrap b;
+      wire::Protocol b;
       check(!b.receive(bytes(malformed)), "malformed economic request rejected");
     }
     store::Slots slots;

@@ -1,4 +1,4 @@
-#include "app/bootstrap_session.hpp"
+#include "app/client_session.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -30,15 +30,15 @@ int main() {
   wire::Bytes hello{48};
   hello.insert(hello.end(), build.begin(), build.end());
   hello.insert(hello.end(), 2, 0);
-  check(wire::is_hello(hello), "Captured build hello");
+  check(wire::hello_guest(hello) == "", "Captured build hello");
   auto truncated = hello;
   truncated.pop_back();
-  check(!wire::is_hello(truncated), "Truncated build hello");
+  check(!wire::hello_guest(truncated), "Truncated build hello");
   auto wrong_build = hello;
   wrong_build[1] ^= 1;
-  check(!wire::is_hello(wrong_build), "Wrong build hello");
+  check(!wire::hello_guest(wrong_build), "Wrong build hello");
 
-  wire::Bootstrap connection;
+  wire::Protocol connection;
   const auto ack = connection.receive({0x20, 0x1e, 0xb8});
   check(ack && std::holds_alternative<wire::WorldAck>(*ack) &&
             std::get<wire::WorldAck>(*ack).tick == 1,
@@ -47,10 +47,10 @@ int main() {
   check(second && std::holds_alternative<wire::WorldAck>(*second) &&
             std::get<wire::WorldAck>(*second).tick == 2,
         "Second captured world acknowledgement");
-  wire::Bootstrap independent;
+  wire::Protocol independent;
   check(independent.receive({0x20, 0x1e, 0xb8}).has_value(), "Connection cipher isolation");
   check(!independent.receive(wire::Bytes(wire::max_frame_bytes + 1)), "Oversized frame");
-  wire::Bootstrap bad;
+  wire::Protocol bad;
   check(!bad.receive({0x20, 0x1e}), "Truncated acknowledgement");
 
   // Captured from the untouched October client with fixture User-Agent and locale.
@@ -60,81 +60,83 @@ int main() {
             "c8d27c798b356a80986380e42e7dabce056ddfd6eb84743db33ef0d775876f37"
             "80b9dcccf77a824e8692735b2fb90c4f7fdfe028232098598ac6d28dbdfab9b1"
             "9cf4288c50c1775b89");
-  wire::Bootstrap login;
+  wire::Protocol login;
   check(login.receive({0x20, 0x1e, 0xb8}).has_value(), "ACK precedes startup commands");
   const auto startup = login.receive(startup_frame);
-  check(startup && std::holds_alternative<wire::Startup>(*startup), "Captured startup batch");
-  const auto& sequence = std::get<wire::Startup>(*startup);
-  check(sequence.first_sequence == 1 && sequence.last_sequence == 3, "Startup sequence range");
+  check(startup && std::holds_alternative<wire::ReliableBatch>(*startup), "Captured startup batch");
+  const auto& sequence = std::get<wire::ReliableBatch>(*startup);
+  check(sequence.first_sequence == 1 && sequence.last_sequence == 3,
+        "ReliableBatch sequence range");
   check(sequence.requests.size() == 3 &&
             std::holds_alternative<wire::Identify>(sequence.requests[1].action),
         "Preserve the original identification command for session admission");
   check(std::get<wire::Identify>(sequence.requests[1].action).agent == "Wave W2 fixture",
         "Decode the captured client agent without losing its value");
-  wire::Bootstrap malformed;
+  wire::Protocol malformed;
   check(malformed.receive({0x20, 0x1e, 0xb8}).has_value(), "ACK before bad batch");
   auto short_frame = startup_frame;
   short_frame.pop_back();
-  check(!malformed.receive(short_frame), "Startup blob truncated within declared length");
+  check(!malformed.receive(short_frame), "ReliableBatch blob truncated within declared length");
 
   // Synthetic encrypted envelopes for commands observed in the untouched client.
   // Death Continue (21), live Exit (11), squad Leave (38) and ad completion (34).
-  wire::Bootstrap exit;
+  wire::Protocol exit;
   const auto leaving = exit.receive(bytes("051eab7c7e67"));
-  check(leaving && std::holds_alternative<wire::Startup>(*leaving), "Live Exit batch parses");
-  const auto& leave_batch = std::get<wire::Startup>(*leaving);
+  check(leaving && std::holds_alternative<wire::ReliableBatch>(*leaving), "Live Exit batch parses");
+  const auto& leave_batch = std::get<wire::ReliableBatch>(*leaving);
   check(leave_batch.requests.size() == 2 &&
             std::holds_alternative<wire::Leave>(leave_batch.requests[0].action) &&
             std::holds_alternative<std::monostate>(leave_batch.requests[1].action),
         "Exit leaves the match; notification consumes its own reliable sequence");
-  wire::Bootstrap continued;
+  wire::Protocol continued;
   const auto continuation = continued.receive(bytes("051eab62"));
-  check(continuation && std::holds_alternative<wire::Startup>(*continuation) &&
+  check(continuation && std::holds_alternative<wire::ReliableBatch>(*continuation) &&
             std::holds_alternative<wire::Continue>(
-                std::get<wire::Startup>(*continuation).requests.front().action),
+                std::get<wire::ReliableBatch>(*continuation).requests.front().action),
         "Death Continue is distinct from leaving the squad");
-  wire::Bootstrap squad;
+  wire::Protocol squad;
   const auto squad_leave = squad.receive(bytes("051eab51"));
-  check(squad_leave && std::holds_alternative<wire::Startup>(*squad_leave) &&
+  check(squad_leave && std::holds_alternative<wire::ReliableBatch>(*squad_leave) &&
             std::holds_alternative<wire::Leave>(
-                std::get<wire::Startup>(*squad_leave).requests.front().action),
+                std::get<wire::ReliableBatch>(*squad_leave).requests.front().action),
         "Original squad Leave has no fields and leaves without a protocol reload");
-  wire::Bootstrap play;
+  wire::Protocol play;
   // New private squad with request 300, followed by Find Public with request 128.
   const auto play_batch = play.receive(bytes("051eab6cd04784e6fd83"));
-  check(play_batch && std::holds_alternative<wire::Startup>(*play_batch),
+  check(play_batch && std::holds_alternative<wire::ReliableBatch>(*play_batch),
         "Play requests accept multi-byte request numbers");
-  const auto& modes = std::get<wire::Startup>(*play_batch).requests;
+  const auto& modes = std::get<wire::ReliableBatch>(*play_batch).requests;
   check(modes.size() == 2 && std::get<wire::CreateSquad>(modes[0].action).private_room &&
             std::holds_alternative<wire::FindPublicSquad>(modes[1].action),
         "The opcode, not the request number, selects the squad action");
-  wire::Bootstrap truncated_play;
+  wire::Protocol truncated_play;
   check(!truncated_play.receive(bytes("051eab6cfc")), "A truncated Play request is still rejected");
   for (const auto& [frame, value] :
        {std::pair{"051eab757c", false}, std::pair{"051eab757d", true}}) {
-    wire::Bootstrap visibility;
+    wire::Protocol visibility;
     const auto command = visibility.receive(bytes(frame));
     check(command && std::get<wire::SetSquadPublic>(
-                         std::get<wire::Startup>(*command).requests.front().action)
+                         std::get<wire::ReliableBatch>(*command).requests.front().action)
                              .value == value,
           "The original Public checkbox accepts both boolean states");
   }
   for (const auto frame : {"051eab757e", "051eab75"}) {
-    wire::Bootstrap visibility;
+    wire::Protocol visibility;
     check(!visibility.receive(bytes(frame)), "Malformed Public checkbox payload rejected");
   }
 
-  app::BootstrapSession early_session("guest-early");
+  app::RoomManager rooms;
+  app::ClientSession early_session(rooms, 1);
   const auto early = early_session.receive({0x20, 0x1e, 0xb8});
   check(early.close && early.frames == std::vector<wire::Bytes>{{0, 0}}, "Reject early ACK");
-  app::BootstrapSession session("guest-test");
+  app::ClientSession session(rooms, 2);
   const auto greeting = session.receive(hello);
   check(!greeting.close && greeting.frames.size() == 1, "Greet the archive build");
   check(greeting.frames.front() == bytes("29c6f693ae9ff0bb7480b345de"),
         "First world frame accepted by the original client");
   check(session.receive(hello).close, "Reject repeated hello");
 
-  app::BootstrapSession guest("guest-test");
+  app::ClientSession guest(rooms, 3);
   check(!guest.receive(hello).close, "New connection after protocol error");
   check(!guest.receive({0x20, 0x1e, 0xb8}).close, "Accept current world ACK");
   const auto profile = guest.receive(startup_frame);

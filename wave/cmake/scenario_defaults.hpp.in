@@ -4,8 +4,10 @@
 
 namespace wave::sim::detail {
 
-inline void load_garden_evidence(Rules& rules) {
-  const auto seconds = [&rules](int value) { return rules.timing.ticks_ceil(std::chrono::seconds(value)); };
+inline void load_scenario_defaults(Rules& rules) {
+  const auto seconds = [&rules](int value) {
+    return rules.timing.ticks_ceil(std::chrono::seconds(value));
+  };
   rules.version = "@evidence_version@+w1.1";
   rules.remaining_threshold = @threshold@;
   rules.special_chance = @special_chance@;

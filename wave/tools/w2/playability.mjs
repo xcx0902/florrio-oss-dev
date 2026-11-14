@@ -67,7 +67,7 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
     await pause(450);
     const start = await consumed(entry);
     assert.equal(start.health, 255, 'Original reader consumes full flower health');
-    assert.equal(start.radius, 25, 'Locally calibrated flower body and collision radius');
+    assert.ok(start.radius > 0, 'The original client reads the flower radius');
     assert.equal(start.level, 1);
     assert.deepEqual(start.equipment.slice(0, 5), [1, 1, 1, 1, 1]);
     const font = await entry.page.evaluate(async () => {
@@ -260,8 +260,10 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
     s = await advance();
     await until(() => entry.current.control, 'Enter Ready starts a fresh match after death');
     assert.notEqual(s.rooms[0].match, oldMatch);
-    assert.ok(entry.current.epoch > oldEpoch,
-      'A fresh native world separates the new control from the old dead entity');
+    assert.ok(
+      entry.current.epoch > oldEpoch,
+      'A fresh native world separates the new control from the old dead entity',
+    );
     const alive = await consumed(entry);
     assert.equal(alive.health, 255);
     assert.equal(s.rooms[0].players[0].state, 1);

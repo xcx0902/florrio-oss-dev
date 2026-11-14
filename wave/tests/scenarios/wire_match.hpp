@@ -1,15 +1,15 @@
 #pragma once
 
-#include "app/garden.hpp"
+#include "app/room_manager.hpp"
 #include "catalog/catalog.hpp"
-#include "scenarios/garden-w1.hpp"
+#include "scenarios/short_match.hpp"
 
 #include <sstream>
 
 namespace wave::fixtures {
 
-inline sim::Rules wire_garden_rules() {
-  auto rules = short_garden_rules();
+inline sim::Rules wire_fixture_rules() {
+  auto rules = short_match_rules();
   rules.version = "w2-wire-fixture.1";
   rules.player.speed_per_second = 80;
   rules.orbit_radius = 8;
@@ -24,12 +24,12 @@ inline sim::Rules wire_garden_rules() {
   return rules;
 }
 
-inline std::string garden_state(const app::Garden& garden) {
+inline std::string fixture_state(const app::RoomManager& rooms) {
   std::ostringstream out;
-  out << "{\"steps\":" << garden.steps << ",\"acceptedInputs\":" << garden.accepted_inputs
-      << ",\"rejectedInputs\":" << garden.rejected_inputs << ",\"rooms\":[";
+  out << "{\"steps\":" << rooms.steps << ",\"acceptedInputs\":" << rooms.accepted_inputs
+      << ",\"rejectedInputs\":" << rooms.rejected_inputs << ",\"rooms\":[";
   bool separator = false;
-  for (const auto& [code, room] : garden.rooms()) {
+  for (const auto& [code, room] : rooms.rooms()) {
     if (separator) {
       out << ',';
     }
@@ -37,7 +37,7 @@ inline std::string garden_state(const app::Garden& garden) {
     out << "{\"code\":\"" << code << "\",\"members\":[";
     bool member_separator = false;
     for (const auto& token : room.members) {
-      const auto* member = garden.member(token);
+      const auto* member = rooms.member(token);
       if (member_separator) {
         out << ',';
       }
@@ -90,15 +90,14 @@ inline std::string garden_state(const app::Garden& garden) {
   }
   out << "],\"transitions\":[";
   separator = false;
-  for (const auto& event : garden.trace) {
-    if (const auto* t = std::get_if<sim::Transition>(&event.data)) {
-      if (separator) {
-        out << ',';
-      }
-      separator = true;
-      out << "{\"tick\":" << event.tick << ",\"from\":" << t->from
-          << ",\"to\":" << t->to.value_or(0) << ",\"reason\":" << int(t->reason) << '}';
+  for (const auto& [tick, transition] : rooms.transitions) {
+    if (separator) {
+      out << ',';
     }
+    separator = true;
+    out << "{\"tick\":" << tick << ",\"from\":" << transition.from
+        << ",\"to\":" << transition.to.value_or(0) << ",\"reason\":" << int(transition.reason)
+        << '}';
   }
   out << "]}";
   return out.str();

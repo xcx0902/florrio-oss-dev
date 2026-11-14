@@ -63,4 +63,4 @@ ctest --test-dir build/wave/native --output-on-failure --no-tests=error -L '^w1$
 - 完成全部生成结算后，主怪存活数不超过 4 或达到截止可推进。优先判断全灭及最后一人断线，其次判阈值，最后判截止。默认全灭或最后一人断线结束，仍连接的阵亡玩家在下一个合法开波 tick 重生，截止推进也可重生。跨波残怪默认清除，可配置保留。分节、召唤物、穴内怪及残怪单独计数，生成失败和清除不计击败。精确计数和生命周期例外待证。
 - Garden 基础怪物的移动、碰撞、生命、毒、伤害及 Basic/Rose 的轨道、治疗、冷却和重载均为 W1 复刻值。后续按 W3/W5 校准怪物和花瓣数值与行为。
 
-W2 可复用 `MatchView`、逐 tick 事件和短波场景，原版字段映射与真实 WebSocket 由 W2 验收。 [接入说明](../wave/README.md#w2-接入) · [类型化短波场景](../wave/tests/scenarios/garden-w1.hpp)
+W2 可复用 `MatchView`、逐 tick 事件和短波场景，原版字段映射与真实 WebSocket 由 W2 验收。 [接入说明](../wave/README.md#服务端分工) · [类型化短波场景](../wave/tests/scenarios/short_match.hpp)

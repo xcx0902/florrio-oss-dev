@@ -1,6 +1,6 @@
 #include "sim/rules.hpp"
 #include "catalog/catalog.hpp"
-#include "garden_evidence.hpp"
+#include "scenario_defaults.hpp"
 
 #include <numbers>
 #include <stdexcept>
@@ -16,66 +16,28 @@ Tick Timing::ticks_ceil(Microseconds time) const {
 
 Rules scenario_rules(Biome biome) {
   Rules rules;
-  detail::load_garden_evidence(rules);
+  detail::load_scenario_defaults(rules);
   rules.catalog = &catalog::dated();
   rules.biome = biome;
   rules.progressive_waves = true;
   rules.residual = ResidualPolicy::keep;
   // Local display calibration: 5 W1 units projects to a 25-unit flower body.
-  rules.player = {.radius = 5,
-                  .health = 100,
-                  .speed_per_second = 50,
-                  .contact_damage = 2};
+  rules.player = {.radius = 5, .health = 100, .speed_per_second = 50, .contact_damage = 2};
   rules.petals = {{{.radius = 3, .health = 12, .contact_damage = 10},
                    {.radius = 4, .health = 12, .contact_heal = 8}}};
   rules.petal_reload = rules.timing.ticks_ceil(std::chrono::milliseconds(2500));
   rules.mobs = {
-      {Mob::bee,
-       {.radius = 5,
-        .health = 16,
-        .speed_per_second = 37,
-        .contact_damage = 4}},
-      {Mob::ladybug,
-       {.radius = 7,
-        .health = 24,
-        .speed_per_second = 26,
-        .contact_damage = 5}},
-      {Mob::baby_ant,
-       {.radius = 4,
-        .health = 12,
-        .speed_per_second = 34,
-        .contact_damage = 3}},
+      {Mob::bee, {.radius = 5, .health = 16, .speed_per_second = 37, .contact_damage = 4}},
+      {Mob::ladybug, {.radius = 7, .health = 24, .speed_per_second = 26, .contact_damage = 5}},
+      {Mob::baby_ant, {.radius = 4, .health = 12, .speed_per_second = 34, .contact_damage = 3}},
       {Mob::rock, {.radius = 8, .health = 35, .contact_damage = 5}},
-      {Mob::centipede,
-       {.radius = 7,
-        .health = 30,
-        .speed_per_second = 30,
-        .contact_damage = 6}},
-      {Mob::worker_ant,
-       {.radius = 5,
-        .health = 19,
-        .speed_per_second = 36,
-        .contact_damage = 4}},
-      {Mob::dark_ladybug,
-       {.radius = 8,
-        .health = 34,
-        .speed_per_second = 30,
-        .contact_damage = 7}},
+      {Mob::centipede, {.radius = 7, .health = 30, .speed_per_second = 30, .contact_damage = 6}},
+      {Mob::worker_ant, {.radius = 5, .health = 19, .speed_per_second = 36, .contact_damage = 4}},
+      {Mob::dark_ladybug, {.radius = 8, .health = 34, .speed_per_second = 30, .contact_damage = 7}},
       {Mob::evil_centipede,
-       {.radius = 8,
-        .health = 38,
-        .speed_per_second = 32,
-        .contact_damage = 7}},
-      {Mob::soldier_ant,
-       {.radius = 6,
-        .health = 28,
-        .speed_per_second = 35,
-        .contact_damage = 6}},
-      {Mob::spider,
-       {.radius = 7,
-        .health = 32,
-        .speed_per_second = 40,
-        .contact_damage = 6}},
+       {.radius = 8, .health = 38, .speed_per_second = 32, .contact_damage = 7}},
+      {Mob::soldier_ant, {.radius = 6, .health = 28, .speed_per_second = 35, .contact_damage = 6}},
+      {Mob::spider, {.radius = 7, .health = 32, .speed_per_second = 40, .contact_damage = 6}},
       {Mob::hornet,
        {.radius = 6,
         .health = 24,
@@ -109,8 +71,8 @@ Rules scenario_rules(Biome biome) {
       unlocks = {{{bubble, shell, sponge}, {crab}, {starfish, jellyfish}}};
       rules.late_mobs = {leech};
       rules.dangerous_mobs = {starfish, crab, jellyfish};
-      rules.special_groups = {{bubble}, {crab}, {jellyfish}, {leech}, {shell},
-                              {shell, sponge}, {starfish}};
+      rules.special_groups = {{bubble}, {crab},          {jellyfish}, {leech},
+                              {shell},  {shell, sponge}, {starfish}};
       break;
   }
   if (biome != Biome::garden) {
@@ -129,8 +91,6 @@ Rules scenario_rules(Biome biome) {
   return rules;
 }
 
-Rules garden_rules() { return scenario_rules(Biome::garden); }
-
 WaveRules wave_rules_at(const Rules& rules, std::size_t index) {
   if (index < rules.waves.size()) {
     return rules.waves[index];
@@ -147,8 +107,13 @@ WaveRules wave_rules_at(const Rules& rules, std::size_t index) {
     return rules.timing.ticks_ceil(std::chrono::seconds(seconds));
   };
   const auto budget = 10 + std::min(26u, number / 2);
-  return {number, std::move(eligible), wave_rarity(number, 0), budget,
-          {{0, budget / 6}, {ticks(6), budget / 4}, {ticks(13), budget / 4},
+  return {number,
+          std::move(eligible),
+          wave_rarity(number, 0),
+          budget,
+          {{0, budget / 6},
+           {ticks(6), budget / 4},
+           {ticks(13), budget / 4},
            {ticks(21), budget - budget / 6 - 2 * (budget / 4)}},
           ticks(30 + std::min(45u, number))};
 }
@@ -160,12 +125,9 @@ Rarity wave_rarity(std::uint32_t number, double roll) {
   };
   // Percent chances from Common to Mythic. Only new spawns use these weights.
   static constexpr Band bands[]{
-      {6, {75, 25, 0, 0, 0, 0}},
-      {14, {0, 65, 35, 0, 0, 0}},
-      {22, {0, 25, 65, 10, 0, 0}},
-      {30, {0, 10, 25, 55, 10, 0}},
-      {40, {0, 0, 15, 45, 30, 10}},
-      {UINT32_MAX, {0, 0, 0, 30, 50, 20}},
+      {6, {75, 25, 0, 0, 0, 0}},    {14, {0, 65, 35, 0, 0, 0}},
+      {22, {0, 25, 65, 10, 0, 0}},  {30, {0, 10, 25, 55, 10, 0}},
+      {40, {0, 0, 15, 45, 30, 10}}, {UINT32_MAX, {0, 0, 0, 30, 50, 20}},
   };
   const auto& weights = std::ranges::lower_bound(bands, number, {}, &Band::last_wave)->weights;
   unsigned cumulative = 0;

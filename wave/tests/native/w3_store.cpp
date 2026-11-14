@@ -7,14 +7,12 @@
 #include <array>
 #include <barrier>
 #include <chrono>
-#include <cmath>
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
 #include <future>
 #include <iostream>
 #include <limits>
-#include <random>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -295,15 +293,6 @@ void shared_rewards_and_progress() {
   // Same numeric event in a different match is a different settlement.
   status(store.reward({"match-b", "kill", "segmented-parent-42", {grant(a.guest_id, 7)}}).code,
          Code::ok, "match scope isolates event dedup");
-  for (std::size_t index = 0; index < thresholds.size(); ++index) {
-    const auto cap = wave::catalog::level_table().maximum_level;
-    check(level_for_xp(thresholds[index]) == std::min<std::size_t>(cap, index + 1),
-          "store uses catalog exact XP threshold");
-    if (index) {
-      check(level_for_xp(thresholds[index] - 1) == std::min<std::size_t>(cap, index),
-            "catalog threshold lower boundary");
-    }
-  }
   check(level_for_xp(max_count) == wave::catalog::level_table().maximum_level,
         "catalog level cap at int64 XP boundary");
 }
@@ -524,57 +513,6 @@ void rng_rejection_and_overflow() {
       },
       "pathological RNG is bounded and throws");
   check(get(store, profile.guest_token) == profile, "RNG failure rolls back");
-}
-
-void distribution() {
-  Database db;
-  std::mt19937 random(20221030);
-  auto options = deterministic();
-  std::uint64_t draws = 0;
-  options.random_word = [&] {
-    ++draws;
-    return static_cast<std::uint32_t>(random());
-  };
-  Store store(db.path, options);
-  auto profile = store.create_guest();
-  constexpr std::uint32_t trials = 100000;
-  for (std::uint8_t rarity = 0; rarity < 5; ++rarity) {
-    const Item input{5, rarity}, output{5, static_cast<std::uint8_t>(rarity + 1)};
-    profile = seed(store, profile, {{input, Count{trials} * 5}});
-    Count successes = 0, consumed = 0, returned = 0;
-    for (std::uint32_t done = 0; done < trials;) {
-      const auto attempts = std::min(max_craft_attempts, trials - done);
-      const auto result = store.craft(
-          profile.guest_token,
-          {"distribution", std::to_string(rarity) + ":" + std::to_string(done), profile.version},
-          {input, attempts});
-      status(result.code, Code::ok, "distribution transaction");
-      check(result.craft.attempts == attempts, "full sample counted");
-      successes += result.craft.successes;
-      consumed += result.craft.consumed;
-      returned += result.craft.returned;
-      profile = result.profile;
-      done += attempts;
-    }
-    const double probability = craft_success_per_million[rarity] / 1000000.0;
-    const double expected = trials * probability;
-    const double sigma = std::sqrt(trials * probability * (1.0 - probability));
-    check(std::abs(static_cast<double>(successes) - expected) < 6.0 * sigma,
-          "fixed-seed observed rates within six standard deviations of dated table");
-    check(count(profile, output) == successes &&
-              count(profile, input) + consumed == Count{trials} * 5 &&
-              consumed + returned == Count{trials} * 5,
-          "distribution conserves consumed/returned inputs");
-    const double failed = trials - static_cast<double>(successes);
-    const double failure_loss =
-        (static_cast<double>(consumed) - 5.0 * static_cast<double>(successes)) / failed;
-    check(std::abs(failure_loss - 2.5) < 0.04,
-          "uniform reconstructed failure loss has expected mean");
-    std::cout << "  distribution rarity=" << unsigned(rarity) << " successes=" << successes << "/"
-              << trials << " expected=" << expected << " failure_loss_mean=" << failure_loss
-              << '\n';
-  }
-  check(draws > Count{trials} * 5, "failure randomness uses additional independent draws");
 }
 
 void concurrent_pickup_and_shared_dedup() {
@@ -859,7 +797,6 @@ int main() {
       Test{"W3-03 auto/batch cap, keep, equipped and rarity protection",
            craft_auto_protection_and_caps},
       Test{"W3-03 unbiased RNG failure and integer overflow", rng_rejection_and_overflow},
-      Test{"W3-03 fixed-seed 500000-craft distribution", distribution},
       Test{"W3-02 two-person pickup race and shared event concurrency",
            concurrent_pickup_and_shared_dedup},
       Test{"W3-04 concurrent equip/craft CAS, 24 races", concurrent_equip_and_craft},

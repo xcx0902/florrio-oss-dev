@@ -1,13 +1,13 @@
 #pragma once
 
-#include "app/garden.hpp"
+#include "app/room_manager.hpp"
 
 #include <map>
 #include <tuple>
 
 namespace wave::wire {
 
-struct GardenSnapshot {
+struct WorldSnapshot {
   Bytes records;
   Bytes commands;
   std::vector<std::uint32_t> removed;
@@ -15,11 +15,10 @@ struct GardenSnapshot {
 };
 
 // Per-socket baseline. Sim identities never escape as raw client pointers.
-class GardenProjection {
+class WorldProjection {
  public:
-  GardenSnapshot
-  build(const app::Garden& garden, const app::Member& viewer,
-        std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now());
+  WorldSnapshot build(const app::RoomManager& rooms, const app::Member& viewer,
+                      std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now());
 
  private:
   using Key = std::tuple<std::uint64_t, std::uint32_t, std::uint64_t>;

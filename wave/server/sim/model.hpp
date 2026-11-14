@@ -42,9 +42,13 @@ struct EntityId {
 
 enum class Faction {
   team,
-  garden
+  hostile
 };
-enum class Biome : std::uint8_t { garden, desert, ocean };
+enum class Biome : std::uint8_t {
+  garden,
+  desert,
+  ocean
+};
 enum class Group {
   player,
   petal,
@@ -210,7 +214,7 @@ struct MobIdentity {
 struct DamageSource {
   EntityId entity;
   std::optional<LifeId> owner;
-  Faction faction = Faction::garden;
+  Faction faction = Faction::hostile;
   std::optional<EntityId> instigator;
   std::optional<MobIdentity> mob = {};
   bool operator==(const DamageSource&) const = default;
@@ -219,7 +223,7 @@ struct DamageSource {
 struct EntityView {
   EntityId id;
   Group group = Group::main_mob;
-  Faction faction = Faction::garden;
+  Faction faction = Faction::hostile;
   std::optional<Mob> mob;
   std::optional<Petal> petal;
   Rarity rarity = Rarity::common;
@@ -406,8 +410,8 @@ struct Defeat {
   std::uint32_t origin_wave = 0;
 };
 
-using EventData =
-    std::variant<RandomDraw, SpawnEvent, Transition, HealthChange, LifeChange, Defeat, LightningArc>;
+using EventData = std::variant<RandomDraw, SpawnEvent, Transition, HealthChange, LifeChange, Defeat,
+                               LightningArc>;
 struct Event {
   Tick tick;
   EventData data;

@@ -1,34 +1,34 @@
-#include "app/garden_session.hpp"
+#include "app/client_session.hpp"
 
 #include <algorithm>
 #include <limits>
 
 namespace wave::app {
 
-GardenSession::GardenSession(Garden& garden, std::uint64_t connection, sim::Biome biome)
-    : garden_(garden), biome_(biome), connection_(connection) {}
+ClientSession::ClientSession(RoomManager& rooms, std::uint64_t connection, sim::Biome biome)
+    : rooms_(rooms), biome_(biome), connection_(connection) {}
 
-GardenSession::~GardenSession() {
+ClientSession::~ClientSession() {
   if (member_) {
-    garden_.disconnect(member_->token, connection_);
+    rooms_.disconnect(member_->token, connection_);
   }
 }
 
-Reply GardenSession::reject() {
+Reply ClientSession::reject() {
   if (member_) {
-    garden_.disconnect(member_->token, connection_);
+    rooms_.disconnect(member_->token, connection_);
   }
   closed_ = true;
   return {{wire_.disconnect()}, true};
 }
 
-Reply GardenSession::superseded() {
+Reply ClientSession::superseded() {
   closed_ = true;
   return {{}, true, CloseReason::superseded};
 }
 
-wire::Bytes GardenSession::snapshot() {
-  const auto* room = garden_.room(*member_);
+wire::Bytes ClientSession::snapshot() {
+  const auto* room = rooms_.room(*member_);
   const auto match = room && room->match ? room->match->id().value : 0;
   if (match_ && match != match_) {
     // Abandon sets the native UI's local exit latch. Entity removals do not
@@ -43,9 +43,9 @@ wire::Bytes GardenSession::snapshot() {
   }
   match_ = match;
   if (last_tick_ == std::numeric_limits<std::uint32_t>::max()) {
-    throw std::runtime_error("Garden wire tick exhausted");
+    throw std::runtime_error("Client protocol tick exhausted");
   }
-  auto frame = projection_.build(garden_, *member_);
+  auto frame = projection_.build(rooms_, *member_);
   const auto integer = [&](std::uint64_t value) {
     do {
       frame.commands.push_back((value & 127) | (value > 127 ? 128 : 0));
@@ -70,11 +70,11 @@ wire::Bytes GardenSession::snapshot() {
   return wire_.snapshot(last_tick_, acknowledged_, frame.records, frame.removed, frame.commands);
 }
 
-Reply GardenSession::publish() {
+Reply ClientSession::publish() {
   if (closed_ || !member_) {
     return {};
   }
-  if (!garden_.active(member_->token, connection_)) {
+  if (!rooms_.active(member_->token, connection_)) {
     return superseded();
   }
   auto reply = drain();
@@ -84,8 +84,8 @@ Reply GardenSession::publish() {
   return reply;
 }
 
-Reply GardenSession::drain() {
-  garden_.poll_storage();
+Reply ClientSession::drain() {
+  rooms_.poll_storage();
   Reply reply;
   while (!pending_.empty()) {
     const auto& queued = pending_.front();
@@ -95,7 +95,7 @@ Reply GardenSession::drain() {
         return reject();
       }
       if (!member_) {
-        member_ = &garden_.admit(requested_guest_, connection_, biome_);
+        member_ = &rooms_.admit(requested_guest_, connection_, biome_);
         craft_cursor_ = member_->craft_sequence;
         reply.frames.push_back(wire_.guest_id(member_->token));
       }
@@ -104,25 +104,26 @@ Reply GardenSession::drain() {
       const bool economic = std::holds_alternative<wire::Craft>(request.action) ||
                             std::holds_alternative<wire::Equip>(request.action) ||
                             std::holds_alternative<wire::Swap>(request.action);
-      if (economic && garden_.storage() && garden_.storage_pending() >= Garden::storage_capacity) {
+      if (economic && rooms_.storage() &&
+          rooms_.storage_pending() >= RoomManager::storage_capacity) {
         break;
       }
       const bool accepted =
-          garden_.command(*member_, request.action, queued.life,
-                          std::to_string(connection_) + ":" + std::to_string(wire_.epoch()) + ":" +
-                              std::to_string(request.sequence));
-      if (!accepted && economic && garden_.storage() &&
-          garden_.storage_pending() >= Garden::storage_capacity) {
+          rooms_.command(*member_, request.action, queued.life,
+                         std::to_string(connection_) + ":" + std::to_string(wire_.epoch()) + ":" +
+                             std::to_string(request.sequence));
+      if (!accepted && economic && rooms_.storage() &&
+          rooms_.storage_pending() >= RoomManager::storage_capacity) {
         break;
       }
       // No native error enum has been recovered for denied economic actions.
       // Close the session so a fresh admission can restore committed state.
-      if (!accepted && economic && garden_.storage()) {
+      if (!accepted && economic && rooms_.storage()) {
         return reject();
       }
       if (!accepted) {
         const auto* ready = std::get_if<wire::Ready>(&request.action);
-        if (ready && ready->value && !garden_.room(*member_)) {
+        if (ready && ready->value && !rooms_.room(*member_)) {
           // The native Ready screen waits for a controlled flower. A denied
           // admission has no native error response; use the existing explicit
           // reconnect path instead of ACKing it into a permanent loading state.
@@ -133,7 +134,7 @@ Reply GardenSession::drain() {
       return reject();
     }
     // Queue saturation keeps both the request and ACK at this boundary. Invalid
-    // actions are consumed once; accepted mutations are now owned by Garden.
+    // actions are consumed once; accepted mutations are now owned by the room manager.
     acknowledged_ = request.sequence;
     pending_.pop_front();
   }
@@ -147,7 +148,7 @@ Reply GardenSession::drain() {
   return reply;
 }
 
-Reply GardenSession::receive(wire::Bytes bytes) {
+Reply ClientSession::receive(wire::Bytes bytes) {
   if (closed_) {
     return {{}, true};
   }
@@ -158,9 +159,9 @@ Reply GardenSession::receive(wire::Bytes bytes) {
     }
     requested_guest_ = *guest;
     greeted_ = true;
-    return {{wire_.world(++last_tick_, 0)}};
+    return {{wire_.greeting(++last_tick_)}};
   }
-  if (member_ && !garden_.active(member_->token, connection_)) {
+  if (member_ && !rooms_.active(member_->token, connection_)) {
     return superseded();
   }
   const auto command = wire_.receive(std::move(bytes));
@@ -183,7 +184,7 @@ Reply GardenSession::receive(wire::Bytes bytes) {
     }
     return {};
   }
-  const auto& batch = std::get<wire::Startup>(*command);
+  const auto& batch = std::get<wire::ReliableBatch>(*command);
   if (batch.first_sequence > std::uint64_t(received_) + 1) {
     return reject();
   }

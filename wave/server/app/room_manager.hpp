@@ -2,7 +2,7 @@
 
 #include "sim/match.hpp"
 #include "store/store.hpp"
-#include "wire/bootstrap.hpp"
+#include "wire/protocol.hpp"
 
 #include <map>
 #include <deque>
@@ -73,12 +73,13 @@ struct Room {
 
 // Owned by the single Asio executor. A room advances once per host tick,
 // independently of the number of sockets, ACKs, or retransmitted requests.
-class Garden {
+class RoomManager {
  public:
-  explicit Garden(sim::Rules rules = sim::garden_rules(), std::uint32_t seed = 20221030,
-                  std::vector<std::vector<sim::Petal>> loadouts = {},
-                  std::shared_ptr<store::Store> storage = {});
-  ~Garden();
+  explicit RoomManager(std::optional<sim::Rules> rules_override = std::nullopt,
+                       std::uint32_t seed = 20221030,
+                       std::vector<std::vector<sim::Petal>> loadouts = {},
+                       std::shared_ptr<store::Store> storage = {});
+  ~RoomManager();
   Member& admit(std::string_view token, std::uint64_t connection,
                 sim::Biome biome = sim::Biome::garden);
   bool active(std::string_view token, std::uint64_t connection) const;
@@ -86,7 +87,7 @@ class Garden {
   bool command(Member& member, const wire::ReliableAction& action,
                std::optional<sim::LifeId> acknowledged_life, std::string key = "");
   void step();
-  // Call on the Garden executor before publishing too; neither step nor poll
+  // Call on the room manager executor before publishing too; neither step nor poll
   // waits for SQLite. wait_storage is a timed admission/test barrier.
   void poll_storage();
   bool request_profile(std::string token,
@@ -111,9 +112,11 @@ class Garden {
   std::uint64_t accepted_inputs = 0;
   std::uint64_t rejected_inputs = 0;
   std::uint64_t steps = 0;
-  std::vector<sim::Event> trace;
+  // The fixture exposes transitions to the browser integration tests.
+  std::deque<std::pair<sim::Tick, sim::Transition>> transitions;
 
  private:
+  const sim::Rules* rules_override_for(sim::Biome biome) const;
   void leave(Member& member);
   bool create_room(Member& member, bool private_room);
   bool join(Member& member, std::string_view code);
@@ -124,7 +127,7 @@ class Garden {
   void settle_economy(Room&, const sim::MatchView& after);
   void flush_economy();
   struct StorageState;
-  sim::Rules rules_;
+  std::optional<sim::Rules> rules_override_;
   std::uint32_t seed_;
   std::vector<std::vector<sim::Petal>> loadouts_;
   std::uint64_t next_player_ = 0;

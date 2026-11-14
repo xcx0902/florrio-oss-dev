@@ -1,4 +1,4 @@
-#include "wire/bootstrap.hpp"
+#include "wire/protocol.hpp"
 
 #include <bit>
 #include <cmath>
@@ -136,7 +136,7 @@ std::optional<float> read_float(std::span<const std::uint8_t>& bytes) {
   return std::isfinite(value) ? std::optional{value} : std::nullopt;
 }
 
-std::optional<Command> read_startup(std::span<const std::uint8_t> bytes) {
+std::optional<Command> read_reliable_batch(std::span<const std::uint8_t> bytes) {
   const auto first = read_varint(bytes);
   if (!first || *first == 0) {
     return std::nullopt;
@@ -308,7 +308,7 @@ std::optional<Command> read_startup(std::span<const std::uint8_t> bytes) {
     }
     requests.push_back({sequence, std::move(action)});
     if (bytes.empty()) {
-      return Startup{*first, sequence, std::move(requests)};
+      return ReliableBatch{*first, sequence, std::move(requests)};
     }
     const auto next_sequence = read_varint(bytes);
     if (!next_sequence || sequence == std::numeric_limits<std::uint32_t>::max() ||
@@ -328,10 +328,6 @@ Bytes seal(Bytes bytes, std::uint32_t& state, std::size_t masked_offset) {
 
 }  // namespace
 
-bool is_hello(std::span<const std::uint8_t> bytes) {
-  return hello_guest(bytes).has_value();
-}
-
 std::optional<std::string> hello_guest(std::span<const std::uint8_t> bytes) {
   if (bytes.size() < build.size() + 3 || bytes.size() > build.size() + 131 || bytes.front() != 48 ||
       !std::ranges::equal(bytes.subspan(1, build.size()), build)) {
@@ -346,7 +342,7 @@ std::optional<std::string> hello_guest(std::span<const std::uint8_t> bytes) {
   return guest;
 }
 
-std::optional<Command> Bootstrap::receive(Bytes bytes) {
+std::optional<Command> Protocol::receive(Bytes bytes) {
   if (bytes.empty() || bytes.size() > max_frame_bytes || bytes.front() >= client_inverse.size()) {
     return std::nullopt;
   }
@@ -385,10 +381,10 @@ std::optional<Command> Bootstrap::receive(Bytes bytes) {
   }
 
   mask_payload(payload);
-  return read_startup(payload);
+  return read_reliable_batch(payload);
 }
 
-Bytes Bootstrap::guest_id(std::string_view id) {
+Bytes Protocol::guest_id(std::string_view id) {
   Bytes bytes{5};
   append_varint(bytes, epoch_);
   const auto offset = bytes.size();
@@ -398,31 +394,20 @@ Bytes Bootstrap::guest_id(std::string_view id) {
   return seal(std::move(bytes), server_state_, offset);
 }
 
-Bytes Bootstrap::world(std::uint32_t tick, std::uint32_t acknowledged_request,
-                       bool initial_profile) {
+Bytes Protocol::greeting(std::uint32_t tick) {
   Bytes bytes{1};
   append_varint(bytes, epoch_);
   append_varint(bytes, tick);
   const auto offset = bytes.size();
-  append_varint(bytes, acknowledged_request);
-  bytes.insert(bytes.end(), 4, 0);
-  if (initial_profile) {
-    // Entity 8193 uses the full form with the local profile component.
-    constexpr std::array<std::uint8_t, 8> profile{1, 32, 0, 0, 0xcc, 0, 0x80, 0};
-    bytes.insert(bytes.end(), profile.begin(), profile.end());
-    // Match $140's level-one guest default, not an invalid level-zero flower.
-    bytes.push_back(1);
-    bytes.insert(bytes.end(), 606, 0);
-  }
-  // End the entity list and the bundled command section.
-  bytes.insert(bytes.end(), 5, 0);
+  // Zero acknowledged requests, empty removal and entity lists, no commands.
+  bytes.insert(bytes.end(), 10, 0);
   return seal(std::move(bytes), server_state_, offset);
 }
 
-Bytes Bootstrap::snapshot(std::uint32_t tick, std::uint32_t acknowledged_request,
-                          std::span<const std::uint8_t> records,
-                          std::span<const std::uint32_t> removed,
-                          std::span<const std::uint8_t> commands) {
+Bytes Protocol::snapshot(std::uint32_t tick, std::uint32_t acknowledged_request,
+                         std::span<const std::uint8_t> records,
+                         std::span<const std::uint32_t> removed,
+                         std::span<const std::uint8_t> commands) {
   Bytes bytes{1};
   append_varint(bytes, epoch_);
   append_varint(bytes, tick);
@@ -446,13 +431,13 @@ Bytes Bootstrap::snapshot(std::uint32_t tick, std::uint32_t acknowledged_request
   return seal(std::move(bytes), server_state_, offset);
 }
 
-Bytes Bootstrap::disconnect() {
+Bytes Protocol::disconnect() {
   return {0, 0};
 }
 
-void Bootstrap::next_world() {
+void Protocol::next_world() {
   if (epoch_ == std::numeric_limits<std::uint32_t>::max()) {
-    throw std::runtime_error("Garden wire epoch exhausted");
+    throw std::runtime_error("Client protocol epoch exhausted");
   }
   ++epoch_;
 }

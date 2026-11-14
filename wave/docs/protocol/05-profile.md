@@ -6,7 +6,7 @@
 
 本文的结论来自三条独立证据：
 
-- **A**：`wave/server/wire/garden_projection.cpp` 的参考投影按该顺序写字段，
+- **A**：`wave/server/wire/world_projection.cpp` 的参考投影按该顺序写字段，
   且原客户端能正常显示等级、库存、图鉴、镜头与缩放；
 - **A**：W3 `success` / `failure` 用例的 `before`/`after` 给出同一份数据的
   语义快照（`level`、`flags`、`progress`、276 项 `inventory`、27 字节
@@ -115,7 +115,7 @@ body   = 607 字节（flags bit 3 置位时再追加 1 个 vu 经验值）
 
 ## 5. 与服务端投影的对应
 
-`wave/server/wire/garden_projection.cpp` 的 `viewer.profile` 分支：
+`wave/server/wire/world_projection.cpp` 的 `viewer.profile` 分支：
 
 ```text
 level                     1 B

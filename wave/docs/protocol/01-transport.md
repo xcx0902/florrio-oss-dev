@@ -82,18 +82,18 @@ socket `open` 后客户端发送一个**不经过外层变换**的二进制帧�
 证据：
 
 - 参考实现 `wave/tools/w2/codec.mjs`（A，逐字节回归）。
-- 服务端实现 `wave/server/wire/bootstrap.cpp` 的 `permutation/next/transform/seal`
+- 服务端实现 `wave/server/wire/protocol.cpp` 的 `permutation/next/transform/seal`
   （A，与真实客户端互通）。
 - Wasm 侧发送桥 `$2150`（1326187–1326235）与带 9 帧背压的发送队列 `$2153`
   （1326266–1326359）；关闭路径 `$3252`；错误路径 `$3281`（B）。
 - 变换的 LCG/置换常量不在 `client.wasm` 的立即数中（`refs 83875`/`refs
   249858013` 均为空），WAT 侧只看到发送桥和接收回调；实现位于客户端附带的
   m28 IO 层（C，未在本次静态范围内）。因此本节的常量以 `codec.mjs` 的逐字节
-  回归和 `bootstrap.cpp` 的双向互通为准，不能用“WAT 里没有”否定它们。
+  回归和 `protocol.cpp` 的双向互通为准，不能用“WAT 里没有”否定它们。
 
 **明文例外**：只有两类帧不走变换：
 
-- 握手首包 `0x30`：由服务端按 `is_hello`（首字节 + 40 字节构建号）在变换前
+- 握手首包 `0x30`：由服务端按 `hello_guest`（首字节 + 40 字节构建号）在变换前
   识别，客户端也在发送状态机启动前发出；
 - 关闭/错误帧 `0x00`：`00 00` 即 `kUnknown`，由关闭/错误路径直接读取，不按
   数据帧解析（A，`bootstrap.json` 的 `ff`/`00 00` 反例；具体分层为 C）。
@@ -165,7 +165,7 @@ fields       ...
   WAT 第 610 行）（B）。
 - 空批次不发送；有命令时每帧最多打包当前队列。
 - 序号空间按 socket 从 1 递增；服务端只接受严格 `+1`（A，
-  `bootstrap.cpp` 的 `read_startup` 校验）。
+  `protocol.cpp` 的 `read_reliable_batch` 校验）。
 
 ### 5.2 ACK（类型 2）
 
@@ -213,13 +213,13 @@ ack          vu        已消费的客户端序号
 - 删除段整体被长度前缀包住，客户端在重复 tick 时可直接跳过。
 - **初始 world 可以完全省略删除段**，在 `ack` 后直接写 4 字节零句柄；带删除
   的增量快照才写 `length/count/flag/handles/flag`。两种形式原版都接受
-  （A，`bootstrap.cpp` 的 `world()` 与 `snapshot()`）。
+  （A，`protocol.cpp` 的 `greeting()` 与 `snapshot()`）。
 - 实体列表以 4 字节零句柄结束，**之后还有一个分隔字节**；漏掉它会错位读取命令
   并触发 `$988` 的 `unreachable`（A，`w2-bootstrap.md`）。
 - 命令列表末尾的 `0` 可以省略；历史最小空更新在分隔符处直接结束（A）。
 
 证据：`$601`（394231–468963）读取该结构；`$3309` 负责类型分派；
-`wave/server/wire/bootstrap.cpp` 的 `world()/snapshot()` 生成同构字节（A）。
+`wave/server/wire/protocol.cpp` 的 `greeting()/snapshot()` 生成同构字节（A）。
 
 ### 6.2 访客标识（类型 5）
 

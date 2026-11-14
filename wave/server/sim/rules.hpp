@@ -56,9 +56,6 @@ enum class ResidualPolicy {
   discard,
   keep
 };
-enum class Evidence {
-  reconstruction
-};
 
 struct Rules {
   std::string version;
@@ -89,12 +86,10 @@ struct Rules {
   bool advance_on_deadline = true;
   LifecycleRules lifecycle;
   ResidualPolicy residual = ResidualPolicy::discard;
-  Evidence residual_evidence = Evidence::reconstruction;
-  // Null keeps explicitly supplied W1/W2 rules authoritative.
+  // Fixtures may supply their own body rules without a catalog.
   const catalog::Catalog* catalog = nullptr;
 };
 
-[[nodiscard]] Rules garden_rules();
 [[nodiscard]] Rules scenario_rules(Biome biome);
 // The October HUD treats the wave index as a signed integer.
 inline constexpr std::uint32_t max_wave_number = INT32_MAX;

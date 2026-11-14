@@ -1,11 +1,11 @@
-# Generate the typed W1 inputs from the dated W0 rule pack at configure time.
-set(garden_evidence "${CMAKE_CURRENT_SOURCE_DIR}/data/evidence/20221030/rules.json")
+# Generate the base scenario settings, including the Garden schedule and mob pool.
+set(rules_path "${CMAKE_CURRENT_SOURCE_DIR}/data/evidence/20221030/rules.json")
 set_property(
   DIRECTORY
   APPEND
-  PROPERTY CMAKE_CONFIGURE_DEPENDS "${garden_evidence}"
+  PROPERTY CMAKE_CONFIGURE_DEPENDS "${rules_path}"
 )
-file(READ "${garden_evidence}" evidence_json)
+file(READ "${rules_path}" evidence_json)
 string(JSON evidence_version GET "${evidence_json}" version)
 string(JSON rule_count LENGTH "${evidence_json}" rules)
 math(EXPR last_rule "${rule_count} - 1")
@@ -22,7 +22,7 @@ foreach(index RANGE ${last_rule})
   string(JSON "rule_${id}" GET "${evidence_json}" rules ${index})
 endforeach()
 
-function(garden_get output id)
+function(rule_get output id)
   string(JSON value GET "${rule_${id}}" ${ARGN})
   set("${output}"
       "${value}"
@@ -30,8 +30,8 @@ function(garden_get output id)
   )
 endfunction()
 
-function(garden_bool output id)
-  garden_get(value "${id}" ${ARGN})
+function(rule_bool output id)
+  rule_get(value "${id}" ${ARGN})
   if(value)
     set("${output}"
         "true"
@@ -45,7 +45,7 @@ function(garden_bool output id)
   endif()
 endfunction()
 
-function(garden_mobs output names)
+function(mob_enum_values output names)
   string(JSON count LENGTH "${names}")
   math(EXPR last "${count} - 1")
   set(mobs "")
@@ -61,14 +61,14 @@ function(garden_mobs output names)
   )
 endfunction()
 
-garden_get(threshold wave.advance.remaining currentValue)
-garden_get(special_chance wave.special.chance currentValue)
-garden_bool(special_first wave.special.firstWave currentValue)
-garden_bool(next_wave_respawn respawn.nextWave currentValue)
-garden_bool(deadline_advances wave.advance.deadline currentValue deadlineAdvancesAfterSpawn)
-garden_get(starting_wave match.startingWave currentValue freshProfile)
-garden_get(schedule wave.spawn.gardenEarlySchedule currentValue)
-garden_get(groups wave.special.gardenPool candidate)
+rule_get(threshold wave.advance.remaining currentValue)
+rule_get(special_chance wave.special.chance currentValue)
+rule_bool(special_first wave.special.firstWave currentValue)
+rule_bool(next_wave_respawn respawn.nextWave currentValue)
+rule_bool(deadline_advances wave.advance.deadline currentValue deadlineAdvancesAfterSpawn)
+rule_get(starting_wave match.startingWave currentValue freshProfile)
+rule_get(schedule wave.spawn.gardenEarlySchedule currentValue)
+rule_get(groups wave.special.gardenPool candidate)
 
 string(JSON count LENGTH "${schedule}")
 math(EXPR last "${count} - 1")
@@ -79,8 +79,8 @@ foreach(index RANGE ${last})
   if(index EQUAL 0 AND NOT wave EQUAL starting_wave)
     message(FATAL_ERROR "Garden schedule must start at wave ${starting_wave}")
   endif()
-  garden_get(names wave.spawn.gardenEarlyEligibility candidate "${wave}")
-  garden_mobs(new_mobs "${names}")
+  rule_get(names wave.spawn.gardenEarlyEligibility candidate "${wave}")
+  mob_enum_values(new_mobs "${names}")
   list(APPEND eligible ${new_mobs})
   list(JOIN eligible ", " mob_cpp)
 
@@ -126,9 +126,9 @@ math(EXPR last "${count} - 1")
 set(groups_cpp "")
 foreach(index RANGE ${last})
   string(JSON names GET "${groups}" ${index})
-  garden_mobs(mobs "${names}")
+  mob_enum_values(mobs "${names}")
   list(JOIN mobs ", " mob_cpp)
   string(APPEND groups_cpp "      {${mob_cpp}},\n")
 endforeach()
 
-configure_file("${CMAKE_CURRENT_LIST_DIR}/garden_evidence.hpp.in" garden_evidence.hpp @ONLY)
+configure_file("${CMAKE_CURRENT_LIST_DIR}/scenario_defaults.hpp.in" scenario_defaults.hpp @ONLY)

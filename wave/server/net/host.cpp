@@ -1,10 +1,10 @@
 #include "wire/economy_cache.hpp"
-#include "app/garden_session.hpp"
+#include "app/client_session.hpp"
 #ifdef WAVE_HOST_DEVELOPMENT
 #include "net/dev_inventory.hpp"
 #endif
 #ifdef WAVE_HOST_TESTING
-#include "scenarios/garden-w2.hpp"
+#include "scenarios/wire_match.hpp"
 #endif
 
 #include <boost/asio.hpp>
@@ -86,9 +86,9 @@ Resources load(const std::filesystem::path& root) {
 class Connection : public std::enable_shared_from_this<Connection> {
  public:
   Connection(tcp::socket socket, const Resources& resources, const std::string& authority,
-             std::uint64_t& last_guest, std::shared_ptr<wave::app::Garden> garden)
+             std::uint64_t& next_connection_id, std::shared_ptr<wave::app::RoomManager> rooms)
       : socket_(std::move(socket)), resources_(resources), authority_(authority),
-        last_guest_(last_guest), garden_(std::move(garden)) {}
+        next_connection_id_(next_connection_id), rooms_(std::move(rooms)) {}
 
   void publish() {
     if (session_ && upgraded_ && !closing_) {
@@ -130,7 +130,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
         return;
       }
       if (request.method() == http::verb::get) {
-        if (!garden_->request_profile(
+        if (!rooms_->request_profile(
                 std::string(token),
                 [self = shared_from_this()](std::optional<wave::store::Profile> profile) {
                   if (profile) {
@@ -158,7 +158,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
         respond(http::status::bad_request, {"text/plain", "Invalid inventory edit"});
         return;
       }
-      if (!garden_->debug_inventory(
+      if (!rooms_->debug_inventory(
               std::string(token), edit->command, edit->item, edit->count,
               [self = shared_from_this()](wave::store::Result result) {
                 using wave::store::Code;
@@ -180,7 +180,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
 #endif
     constexpr std::string_view cache_path = "/wave/cache/";
     if (target.starts_with(cache_path) && request.method() == http::verb::get) {
-      if (!garden_->storage()) {
+      if (!rooms_->storage()) {
         respond(http::status::not_found, {"text/plain", "No profile store"});
         return;
       }
@@ -190,7 +190,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
         respond(http::status::bad_request, {"text/plain", "Invalid guest token"});
         return;
       }
-      if (!garden_->request_profile(
+      if (!rooms_->request_profile(
               std::string(token),
               [self = shared_from_this()](std::optional<wave::store::Profile> profile) {
                 if (!profile) {
@@ -215,7 +215,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
     }
 #ifdef WAVE_HOST_TESTING
     if (target == "/wave/test/state" && request.method() == http::verb::get) {
-      respond(http::status::ok, {"application/json", wave::fixtures::garden_state(*garden_)});
+      respond(http::status::ok, {"application/json", wave::fixtures::fixture_state(*rooms_)});
       return;
     }
     constexpr std::string_view step_path = "/wave/test/step/";
@@ -230,9 +230,9 @@ class Connection : public std::enable_shared_from_this<Connection> {
         return;
       }
       for (unsigned i = 0; i < count; ++i) {
-        garden_->step();
+        rooms_->step();
       }
-      respond(http::status::ok, {"application/json", wave::fixtures::garden_state(*garden_)});
+      respond(http::status::ok, {"application/json", wave::fixtures::fixture_state(*rooms_)});
       return;
     }
 #endif
@@ -250,10 +250,10 @@ class Connection : public std::enable_shared_from_this<Connection> {
         respond(http::status::forbidden, {"text/plain", "Forbidden"});
         return;
       }
-      session_.emplace(*garden_, ++last_guest_, *biome);
+      session_.emplace(*rooms_, ++next_connection_id_, *biome);
       socket_.next_layer().expires_never();
-      socket_.set_option(ws::stream_base::timeout{
-          std::chrono::seconds(5), ws::stream_base::none(), false});
+      socket_.set_option(
+          ws::stream_base::timeout{std::chrono::seconds(5), ws::stream_base::none(), false});
       // Bound application buffering ourselves. Beast's automatic size failure
       // can tear down TCP before Chromium receives its close frame. Reading
       // only limit + 1 bytes lets async_close drain the remainder and complete
@@ -365,9 +365,9 @@ class Connection : public std::enable_shared_from_this<Connection> {
   ws::stream<beast::tcp_stream> socket_;
   const Resources& resources_;
   const std::string& authority_;
-  std::uint64_t& last_guest_;
-  std::shared_ptr<wave::app::Garden> garden_;
-  std::optional<wave::app::GardenSession> session_;
+  std::uint64_t& next_connection_id_;
+  std::shared_ptr<wave::app::RoomManager> rooms_;
+  std::optional<wave::app::ClientSession> session_;
   beast::flat_buffer buffer_{wave::wire::max_frame_bytes + 1};
 #ifdef WAVE_HOST_DEVELOPMENT
   http::request_parser<http::string_body> parser_;
@@ -404,19 +404,17 @@ class Host {
     }
 #ifdef WAVE_HOST_TESTING
     if (!store) {
-      garden_ = std::make_shared<wave::app::Garden>(
-          wave::fixtures::wire_garden_rules(), 20221030,
+      rooms_ = std::make_shared<wave::app::RoomManager>(
+          wave::fixtures::wire_fixture_rules(), 20221030,
           std::vector<std::vector<wave::sim::Petal>>{
               std::vector<wave::sim::Petal>(5, wave::sim::Petal::rose),
               std::vector<wave::sim::Petal>(5, wave::sim::Petal::basic)});
-    } else {
-      garden_ = std::make_shared<wave::app::Garden>(
-          wave::sim::garden_rules(), 20221030, std::vector<std::vector<wave::sim::Petal>>{}, store);
     }
-#else
-    garden_ = std::make_shared<wave::app::Garden>(
-        wave::sim::garden_rules(), 20221030, std::vector<std::vector<wave::sim::Petal>>{}, store);
 #endif
+    if (!rooms_) {
+      rooms_ = std::make_shared<wave::app::RoomManager>(
+          std::nullopt, 20221030, std::vector<std::vector<wave::sim::Petal>>{}, std::move(store));
+    }
     tick();
   }
 
@@ -428,7 +426,7 @@ class Host {
       std::erase_if(connections_, [](const auto& entry) { return entry.expired(); });
       if (connections_.size() < 32) {
         auto connection = std::make_shared<Connection>(std::move(socket), resources_, authority_,
-                                                       last_guest_, garden_);
+                                                       next_connection_id_, rooms_);
         connections_.push_back(connection);
         connection->start();
       }
@@ -437,7 +435,7 @@ class Host {
   }
 
   const std::string& authority() const { return authority_; }
-  void drain_storage() { garden_->drain_storage(); }
+  void drain_storage() { rooms_->drain_storage(); }
 
  private:
   void tick() {
@@ -447,9 +445,9 @@ class Host {
         return;
       }
 #ifndef WAVE_HOST_TESTING
-      garden_->step();
+      rooms_->step();
 #endif
-      garden_->poll_storage();
+      rooms_->poll_storage();
       if (++ticks_ % 4 == 0)
         for (const auto& weak : connections_) {
           if (auto connection = weak.lock())
@@ -461,8 +459,8 @@ class Host {
   tcp::acceptor acceptor_;
   Resources resources_;
   std::string authority_;
-  std::uint64_t last_guest_ = 0;
-  std::shared_ptr<wave::app::Garden> garden_;
+  std::uint64_t next_connection_id_ = 0;
+  std::shared_ptr<wave::app::RoomManager> rooms_;
   asio::steady_timer timer_;
   std::uint64_t ticks_ = 0;
   std::vector<std::weak_ptr<Connection>> connections_;
@@ -501,7 +499,7 @@ int main(int argc, char** argv) {
     asio::signal_set signals(io, SIGINT, SIGTERM);
     signals.async_wait([&](Error, int) {
       // Drain while connections and their profile callbacks still exist. Some
-      // async HTTP callbacks retain Garden, so destructor-only draining is late.
+      // async HTTP callbacks retain the room manager, so destructor-only draining is late.
       host.drain_storage();
       io.stop();
     });
