@@ -114,22 +114,11 @@ void Match::spawn_due() {
       continue;
     }
     ++slot.attempts;
-    const auto& body = rules_.catalog
-                           ? rules_.catalog->mob(slot.mob, slot.rarity)->body
-                           : std::ranges::find(rules_.mobs, slot.mob, &MobRules::kind)->body;
-    const auto radius = rules_.catalog ? mob_radius(slot.mob, slot.rarity) : body.radius;
-    const auto position = spawn_point(radius);
+    const auto position = spawn_point(mob_radius(slot.mob, slot.rarity));
     SpawnOutcome outcome = SpawnOutcome::blocked;
     std::optional<SpawnFailure> failure;
     if (position) {
-      EntityView mob;
-      mob.mob = slot.mob;
-      mob.rarity = slot.rarity;
-      mob.position = *position;
-      mob.origin_wave = wave_.number;
-      slot.entity = rules_.catalog ? spawn_mob(slot.mob, slot.rarity, *position, Group::main_mob,
-                                               {}, wave_.number)
-                                   : add_entity(mob, body);
+      slot.entity = spawn_mob(slot.mob, slot.rarity, *position, Group::main_mob, {}, wave_.number);
       slot.state = SpawnState::spawned;
       slot.actual_tick = tick_;
       --wave_.counts.pending;

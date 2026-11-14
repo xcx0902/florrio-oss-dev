@@ -131,7 +131,7 @@ ctest --test-dir build/wave/w1 --output-on-failure --no-tests=error -L '^w1$'
 
 ### 服务端分工
 
-- [RoomManager](server/app/room_manager.hpp) 管理访客和各场景的房间，使用 `scenario_rules(biome)` 创建 [Match](server/sim/match.hpp)。测试可用 [short_match_rules()](tests/scenarios/short_match.hpp) 注入短波规则。
+- [RoomManager](server/app/room_manager.hpp) 管理访客和各场景的房间，使用 `scenario_rules(biome)` 创建 [Match](server/sim/match.hpp)。每场对局都引用一份 [Catalog](server/catalog/catalog.hpp)，正式场景使用 2022-10-30 目录；[短波夹具](tests/scenarios/short_match.hpp) 默认也使用该目录，浏览器测试可为固定遭遇提供专用条目。
 - [ClientSession](server/app/client_session.hpp) 处理单个客户端的握手、命令和确认；[WorldProjection](server/wire/world_projection.hpp) 把状态转换为原版客户端需要的世界快照。
 - 连接状态使用 `Connection`，主动离场使用 `Departure`，移动使用 `Input` 携带当前 `LifeId` 与移动轴。宿主在所属房间顺序调用 `queue()` 和 `step()`。命令按入队顺序在下一次模拟步采纳，移动持续到下一条有效移动指令、断线或该生命结束。
 - 每次 `step()` 成功后读取 `view()` 和 `events()`。`view()` 是独立快照，含地图、当前与上一波计划、玩家状态、实体与花瓣槽。事件带结算 tick，有效期到下次成功的 `step()`，跨 tick 保留时需复制。广播节奏由宿主按 `broadcast_interval` 单独调度。

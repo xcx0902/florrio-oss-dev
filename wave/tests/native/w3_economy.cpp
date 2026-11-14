@@ -51,25 +51,16 @@ struct Database {
     }
   }
 };
-sim::Rules rules() {
-  auto result = sim::scenario_rules(sim::Biome::garden);
-  result.catalog = nullptr;  // Deterministic combat fixture; economics uses the dated catalog.
-  result.progressive_waves = false;
-  result.residual = sim::ResidualPolicy::discard;
+sim::Rules rules(const catalog::Catalog& definitions = catalog::dated()) {
+  sim::Rules result(definitions);
+  result.version = "economy-fixture.1";
   result.arena_radius = 500;
   result.player = {.radius = 2, .health = 1000};
-  result.petals[0] = {.radius = 1, .health = 100};
-  result.petals[1] = {.radius = 1, .health = 100};
   result.orbit_rad_per_second = 0;
-  result.contact_knockback_speed = 0;
-  result.special_chance = 0;
-  result.mobs = {{sim::Mob::ladybug, {.radius = 1, .health = 100}},
-                 {sim::Mob::rock, {.radius = 1, .health = 100}}};
   result.waves = {{1, {sim::Mob::ladybug}, sim::Rarity::common, 1, {{0, 1}}, 100},
                   {2, {sim::Mob::rock}, sim::Rarity::common, 1, {{0, 1}}, 16}};
   result.spawn_points = {{400, 0}};
   result.remaining_threshold = 0;
-  result.advance_on_deadline = true;
   return result;
 }
 sim::PlayerView player(const app::RoomManager& rooms, const app::Member& member) {
@@ -435,7 +426,6 @@ void complete_drops_and_magnet() {
         guest = db->seed_for_testing(guest.guest_token, seed);
       }
       auto r = rules();
-      r.catalog = &catalog::dated();
       r.waves[0].rarity = static_cast<sim::Rarity>(tier);
       app::RoomManager rooms(r, 7, {}, db);
       auto& member = rooms.admit(guest.guest_token, 1);
@@ -527,11 +517,16 @@ void terminal_snapshot() {
   const store::Item rose{*catalog::client_petal(sim::Petal::rose), 0};
   const auto xp = catalog::dated().mob(sim::Mob::ladybug, sim::Rarity::common)->xp;
   {
-    auto fixture = rules();
+    static const auto mobs = [] {
+      std::array result{*catalog::dated().mob(sim::Mob::ladybug, sim::Rarity::common)};
+      result.front().body.health = 1;
+      return result;
+    }();
+    static const catalog::Catalog definitions{
+        .version = "terminal-fixture.1", .petals = catalog::dated().petals, .mobs = mobs};
+    auto fixture = rules(definitions);
     fixture.waves.resize(1);
     fixture.spawn_points = {{2, 0}};  // First Basic particle is at -12 +14.
-    fixture.mobs[0].body.health = 1;
-    fixture.petals[0].contact_damage = 10;
     auto db = std::make_shared<store::Store>(":memory:");
     app::RoomManager rooms(fixture, 7, {}, db);
     auto& member = rooms.admit("", 1);

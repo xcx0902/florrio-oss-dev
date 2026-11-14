@@ -277,12 +277,11 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
         }
         // $126/$998: u16 / 65535, 0 = broken, 1 = fully recharged.
         for (std::size_t slot = 0; slot < 8; ++slot) {
-          const auto remaining = slot < owner.petals.size() ? owner.petals[slot].reload_ticks : 0;
-          const auto total = slot < owner.petals.size() && owner.petals[slot].reload_total_ticks
-                                 ? owner.petals[slot].reload_total_ticks
-                                 : view->petal_reload;
-          body.integer(static_cast<std::uint32_t>(
-              65535 * (1 - std::min(1.0, double(remaining) / std::max<sim::Tick>(1, total)))));
+          const auto* petal = slot < owner.petals.size() ? &owner.petals[slot] : nullptr;
+          const double remaining = petal && petal->reload_total_ticks
+                                       ? double(petal->reload_ticks) / petal->reload_total_ticks
+                                       : 0;
+          body.integer(static_cast<std::uint32_t>(65535 * (1 - std::min(1.0, remaining))));
         }
         body.text(player_name(rooms, *room, e.owner->player));
       }

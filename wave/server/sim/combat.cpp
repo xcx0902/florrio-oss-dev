@@ -24,7 +24,16 @@ const Interaction& interaction(Faction source, Faction target) {
   return pve[static_cast<std::size_t>(source)][static_cast<std::size_t>(target)];
 }
 
-double dot(Vec2 a, Vec2 b) { return a.x * b.x + a.y * b.y; }
+constexpr auto heal_travel_time = std::chrono::milliseconds(225);
+
+bool can_receive_healing(const detail::Entity& source, const detail::Entity& target, Tick tick) {
+  return interaction(source.view.faction, target.view.faction).heal && target.view.health > 0 &&
+         target.view.health < target.view.max_health && target.heal_block_until <= tick;
+}
+
+double dot(Vec2 a, Vec2 b) {
+  return a.x * b.x + a.y * b.y;
+}
 
 void rebound_player_mob(detail::Entity& player, detail::Entity& mob, const Rules& rules) {
   auto& flower = player.view;
@@ -44,9 +53,8 @@ void rebound_player_mob(detail::Entity& player, detail::Entity& mob, const Rules
   };
   const double player_space = space_to_wall(flower, normal);
   // Followers are positioned by their chain; they cannot integrate an impulse.
-  const double mob_space = mob.immovable || creature.predecessor
-                               ? 0
-                               : space_to_wall(creature, normal * -1);
+  const double mob_space =
+      mob.immovable || creature.predecessor ? 0 : space_to_wall(creature, normal * -1);
   // Like the original engine, split the response by the bodies' effective mass.
   const double player_mass = flower.radius * flower.radius;
   const double mob_mass = creature.radius * creature.radius;
@@ -54,10 +62,10 @@ void rebound_player_mob(detail::Entity& player, detail::Entity& mob, const Rules
   const double player_shift =
       std::min(player_space, std::max(depth * player_share, depth - mob_space));
   const double mob_shift = std::min(mob_space, depth - player_shift);
-  flower.position = clamp_center(flower.position + normal * player_shift,
-                                 rules.arena_radius, flower.radius);
-  creature.position = clamp_center(creature.position - normal * mob_shift,
-                                   rules.arena_radius, creature.radius);
+  flower.position =
+      clamp_center(flower.position + normal * player_shift, rules.arena_radius, flower.radius);
+  creature.position =
+      clamp_center(creature.position - normal * mob_shift, rules.arena_radius, creature.radius);
 
   // Give the available body the full rebound when the other cannot move away.
   constexpr double wall_slop = 1e-6;
@@ -129,22 +137,8 @@ void Match::move_entities() {
       direction = entity.flight_direction;
     } else if (body.group == Group::player) {
       direction = player(body.owner->player)->move;
-    } else if (rules_.catalog && body.mob) {
+    } else if (body.mob) {
       direction = mob_direction(entity);
-    } else if (entity.rules.speed_per_second > 0 && body.group != Group::petal) {
-      double closest = std::numeric_limits<double>::infinity();
-      for (const auto candidate : active) {
-        const auto& target = entities_.at(candidate).view;
-        if (body.faction == target.faction || target.group == Group::petal) {
-          continue;
-        }
-        const Vec2 delta = target.position - body.position;
-        const double distance = delta.length();
-        if (distance < closest) {
-          closest = distance;
-          direction = distance > 0 ? delta * (1 / distance) : Vec2{};
-        }
-      }
     }
     if (direction != Vec2{}) {
       body.heading_rad = std::atan2(direction.y, direction.x);
@@ -169,16 +163,16 @@ void Match::move_entities() {
     slow *= movement_slow;
     for (const auto area_slot : active) {
       const auto& area = entities_.at(area_slot);
-      if (!area.view.ground_web || area.view.faction == body.faction || body.group == Group::petal ||
-          body.mob == Mob::spider) {
+      if (!area.view.ground_web || area.view.faction == body.faction ||
+          body.group == Group::petal || body.mob == Mob::spider) {
         continue;
       }
-      const auto& definition = *rules_.catalog->petal(Petal::web, area.view.rarity);
-      if (seconds * (tick_ - area.born_tick) >= definition.duration_seconds) {
+      const auto& mechanics = rules_.catalog.petal(Petal::web, area.view.rarity)->mechanics;
+      if (seconds * (tick_ - area.born_tick) >= mechanics.duration_seconds) {
         continue;
       }
       if (overlaps(body.position, body.radius, area.view.position, area.view.radius)) {
-        slow *= rules_.catalog->petal(Petal::web, area.view.rarity)->slow_multiplier;
+        slow *= mechanics.slow_multiplier;
         break;
       }
     }
@@ -187,15 +181,15 @@ void Match::move_entities() {
       speed += entity.flight_impulse * impulse_drag;
       entity.flight_impulse *= impulse_damping;
     }
-    body.velocity = entity.stun_until > tick_
-                        ? Vec2{}
-                        : direction * (speed * slow) + entity.knockback +
-                              entity.recoil * impulse_drag;
+    body.velocity = entity.stun_until > tick_ ? Vec2{}
+                                              : direction * (speed * slow) + entity.knockback +
+                                                    entity.recoil * impulse_drag;
   }
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
     auto& body = entity.view;
-    if ((body.group == Group::petal && !entity.projectile) || body.predecessor || entity.immovable) {
+    if ((body.group == Group::petal && !entity.projectile) || body.predecessor ||
+        entity.immovable) {
       continue;
     }
     auto displacement = body.velocity * seconds;
@@ -238,118 +232,112 @@ void Match::move_entities() {
 void Match::update_orbits() {
   constexpr double turn = 2 * std::numbers::pi;
   const double seconds = std::chrono::duration<double>(rules_.timing.step).count();
-  if (rules_.catalog) {
-    for (auto& owner : players_) {
-      if (owner.orbit_updated == tick_) {
+  for (auto& owner : players_) {
+    if (owner.orbit_updated == tick_) {
+      continue;
+    }
+    double bonus = 0;
+    unsigned yin_yang = 0;
+    for (std::size_t i = 0; i < owner.view.petals.size(); ++i) {
+      if (!owner.view.petals[i].entity) {
         continue;
       }
-      double bonus = 0;
-      unsigned yin_yang = 0;
-      for (std::size_t i = 0; i < owner.view.petals.size(); ++i) {
-        if (!owner.view.petals[i].entity) {
-          continue;
-        }
-        const auto* p =
-            rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
-        bonus += p->rotation_bonus;
-        yin_yang += p->effect == catalog::Effect::yin_yang;
-      }
-      double slow = 1;
-      if (owner.view.body) {
-        for (const auto& effect : entities_.get(*owner.view.body)->slows) {
-          if (effect.until > tick_) {
-            if (effect.slows_attacks) {
-              slow *= effect.multiplier;
-            }
+      const auto* p = rules_.catalog.petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
+      bonus += p->mechanics.rotation_bonus;
+      yin_yang += p->effect == catalog::Effect::yin_yang;
+    }
+    double slow = 1;
+    if (owner.view.body) {
+      for (const auto& effect : entities_.get(*owner.view.body)->slows) {
+        if (effect.until > tick_) {
+          if (effect.slows_attacks) {
+            slow *= effect.multiplier;
           }
         }
       }
-      if (tick_ != 0) {
-        owner.orbit_phase =
-            std::fmod(owner.orbit_phase + (rules_.orbit_rad_per_second + bonus) * slow * seconds *
-                                              (yin_yang == 8       ? 5
-                                               : yin_yang % 3 == 1 ? -1
-                                               : yin_yang % 3 == 2 ? 0
-                                                                   : 1),
-                      turn);
-      }
-      owner.orbit_updated = tick_;
     }
+    if (tick_ != 0) {
+      owner.orbit_phase =
+          std::fmod(owner.orbit_phase + (rules_.orbit_rad_per_second + bonus) * slow * seconds *
+                                            (yin_yang == 8       ? 5
+                                             : yin_yang % 3 == 1 ? -1
+                                             : yin_yang % 3 == 2 ? 0
+                                                                 : 1),
+                    turn);
+    }
+    owner.orbit_updated = tick_;
   }
   for (const auto slot : entities_.active()) {
     auto& petal = entities_.at(slot);
-    if (petal.view.group != Group::petal || petal.projectile || petal.held || petal.view.ground_web ||
-        petal.healing || !petal.view.anchor) {
+    if (petal.view.group != Group::petal || petal.projectile || petal.held ||
+        petal.view.ground_web || !petal.view.anchor) {
+      continue;
+    }
+    if (petal.healing) {
+      if (petal.view.petal == Petal::leaf && tick_ >= petal.healing->arrival) {
+        // Keep the arrived Leaf centered even after the mob's contacts move it.
+        if (const auto* target = entities_.get(petal.healing->recipient)) {
+          petal.view.position = target->view.position;
+        }
+      }
       continue;
     }
     const auto& body = entities_.get(*petal.view.anchor)->view;
     const auto& owner = *player(petal.view.owner->player);
-    const double phase =
-        rules_.catalog ? owner.orbit_phase : rules_.orbit_rad_per_second * seconds * tick_;
     bool third_eye = false;
-    if (rules_.catalog) {
-      for (std::size_t i = 0; i < owner.view.loadout.size(); ++i) {
-        third_eye |=
-            owner.view.loadout[i] == Petal::third_eye && owner.view.petals[i].entity.has_value();
-      }
+    for (std::size_t i = 0; i < owner.view.loadout.size(); ++i) {
+      third_eye |=
+          owner.view.loadout[i] == Petal::third_eye && owner.view.petals[i].entity.has_value();
     }
-    if (rules_.catalog) {
-      double total = 0, before = 0;
-      for (std::size_t i = 0; i < owner.view.loadout.size(); ++i) {
-        const auto* p =
-            rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
-        if (!p || p->mechanics.hidden) {
-          continue;
-        }
-        const double weight =
-            p->kind == Petal::light || p->kind == Petal::pollen ? p->particles : 1;
-        if (std::ranges::find(owner.view.petals[i].entities, petal.view.id) !=
-            owner.view.petals[i].entities.end()) {
-          before = total;
-          if (weight > 1) {
-            before += petal.particle_index;
-          }
-        }
-        total += weight;
+    double total = 0, before = 0;
+    for (std::size_t i = 0; i < owner.view.loadout.size(); ++i) {
+      const auto* p = rules_.catalog.petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
+      if (!p || p->mechanics.hidden) {
+        continue;
       }
-      petal.orbit_offset = total > 0 ? turn * before / total : 0;
+      const double weight = p->kind == Petal::light || p->kind == Petal::pollen ? p->particles : 1;
+      if (std::ranges::find(owner.view.petals[i].entities, petal.view.id) !=
+          owner.view.petals[i].entities.end()) {
+        before = total;
+        if (weight > 1) {
+          before += petal.particle_index;
+        }
+      }
+      total += weight;
     }
+    const double orbit_offset = total > 0 ? turn * before / total : 0;
     const double heading =
-        std::fmod((third_eye ? owner.aim_angle : phase) + petal.orbit_offset, turn);
+        std::fmod((third_eye ? owner.aim_angle : owner.orbit_phase) + orbit_offset, turn);
     const Vec2 offset{std::cos(heading), std::sin(heading)};
-    double radius = rules_.orbit_radius * (owner.defend   ? rules_.defend_orbit_multiplier
-                                           : owner.attack ? rules_.attack_orbit_multiplier
-                                                          : 1);
     Vec2 cluster_offset;
-    if (rules_.catalog) {
-      const auto& p = *rules_.catalog->petal(*petal.view.petal, petal.view.rarity);
-      radius = owner.defend   ? p.mechanics.defend_distance
-               : owner.attack ? p.mechanics.attack_distance
-                              : rules_.orbit_radius;
-      if (p.effect == catalog::Effect::wing && owner.attack && !owner.defend) {
-        radius += (1 + std::sin(seconds * (tick_ - petal.born_tick) * 5)) * 12;
-      }
-      if (third_eye) {
-        radius = owner.aim_distance;
-      }
-      if (p.mechanics.hidden) {
-        radius = 0;
-      }
-      if (p.particles > 1 && p.kind != Petal::light && p.kind != Petal::pollen &&
-          p.kind != Petal::peas && p.kind != Petal::grapes) {
-        // Pack the particles around their slot center. Spacing is in world units,
-        // so attacking or aiming farther away does not stretch the cluster.
-        const bool dahlia = p.kind == Petal::dahlia;
-        // Match the original three-particle Rose ring (11 client units). Put
-        // Dahlia's first petal on the inside so it can heal without crossing the others.
-        const double angle = heading + (dahlia ? std::numbers::pi : 0) +
-                             turn * petal.particle_index / p.particles;
-        const double cluster_radius =
-            dahlia ? 2.2 : p.body.radius * .75 / std::sin(std::numbers::pi / p.particles);
-        cluster_offset = Vec2{std::cos(angle), std::sin(angle)} * cluster_radius;
-      }
+    const auto& p = *rules_.catalog.petal(*petal.view.petal, petal.view.rarity);
+    double radius = owner.defend   ? p.mechanics.defend_distance
+                    : owner.attack ? p.mechanics.attack_distance
+                                   : rules_.orbit_radius;
+    if (p.effect == catalog::Effect::wing && owner.attack && !owner.defend) {
+      radius += (1 + std::sin(seconds * (tick_ - petal.born_tick) * 5)) * 12;
     }
-    petal.view.heading_rad = heading;
+    if (third_eye) {
+      radius = owner.aim_distance;
+    }
+    if (p.mechanics.hidden) {
+      radius = 0;
+    }
+    if (p.particles > 1 && p.kind != Petal::light && p.kind != Petal::pollen &&
+        p.kind != Petal::peas && p.kind != Petal::grapes) {
+      // Pack the particles around their slot center. Spacing is in world units,
+      // so attacking or aiming farther away does not stretch the cluster.
+      const bool dahlia = p.kind == Petal::dahlia;
+      // Match the original three-particle Rose ring (11 client units). Put
+      // Dahlia's first petal on the inside so it can heal without crossing the others.
+      const double angle =
+          heading + (dahlia ? std::numbers::pi : 0) + turn * petal.particle_index / p.particles;
+      const double cluster_radius =
+          dahlia ? 2.2 : p.body.radius * .75 / std::sin(std::numbers::pi / p.particles);
+      cluster_offset = Vec2{std::cos(angle), std::sin(angle)} * cluster_radius;
+    }
+    // Egg art is upright at zero; its position still follows the orbit phase.
+    petal.view.heading_rad = p.kind == Petal::egg ? 0 : heading;
     petal.view.position = body.position + offset * radius + cluster_offset;
   }
 }
@@ -401,17 +389,13 @@ void Match::launch_projectile(detail::Entity& shot, double heading, Microseconds
 }
 
 void Match::update_effects() {
-  if (!rules_.catalog) {
-    return;
-  }
   const double seconds = std::chrono::duration<double>(rules_.timing.step).count();
   // The original Rose closes in over nine 25 ms updates with exponential easing.
   const double heal_step = 1 - std::pow(.8, seconds * 60);
-  const Tick heal_travel = rules_.timing.ticks_ceil(std::chrono::milliseconds(225));
+  const Tick heal_travel = rules_.timing.ticks_ceil(heal_travel_time);
+  const Tick leaf_center_hold = rules_.timing.ticks_ceil(rules_.timing.broadcast_interval);
   const auto can_heal = [this](const detail::Entity& petal, const detail::Entity& target) {
-    const auto& body = target.view;
-    return body.group == Group::player && body.faction == petal.view.faction &&
-           body.health > 0 && body.health < body.max_health && target.heal_block_until <= tick_;
+    return target.view.group == Group::player && can_receive_healing(petal, target, tick_);
   };
   // Reserve healing already on its way, so a small injury only draws one petal.
   std::unordered_map<std::uint32_t, double> incoming_heal;
@@ -423,18 +407,18 @@ void Match::update_effects() {
       const auto* target = entities_.get(entity.healing->recipient);
       if (target && can_heal(entity, *target)) {
         incoming_heal[target->view.id.slot] +=
-            rules_.catalog->petal(*entity.view.petal, entity.view.rarity)->heal;
+            rules_.catalog.petal(*entity.view.petal, entity.view.rarity)->mechanics.heal;
       }
     }
   }
   // Queue effects before contacts; useful healing is consumed when impacts are applied.
   for (const auto id : active) {
     auto* entity = entities_.get(id);
-    if (!entity || entity->projectile || entity->view.ground_web || entity->view.group != Group::petal ||
-        entity->view.health <= 0) {
+    if (!entity || entity->projectile || entity->view.ground_web ||
+        entity->view.group != Group::petal || entity->view.health <= 0) {
       continue;
     }
-    const auto& definition = *rules_.catalog->petal(*entity->view.petal, entity->view.rarity);
+    const auto& definition = *rules_.catalog.petal(*entity->view.petal, entity->view.rarity);
     auto& owner = *player(entity->view.owner->player);
     if (owner.view.life != *entity->view.owner || !owner.view.body) {
       continue;
@@ -445,15 +429,32 @@ void Match::update_effects() {
     const Tick delay = rules_.timing.ticks_ceil(
         Microseconds(static_cast<Microseconds::rep>(definition.activation_seconds * 1000000)));
     if (definition.effect == catalog::Effect::leaf) {
-      impacts_.push_back(
-          {owner_body, source, HealthKind::heal, definition.passive_heal_per_second * seconds});
+      impacts_.push_back({owner_body, source, HealthKind::heal,
+                          definition.mechanics.passive_heal_per_second * seconds});
+      if (!entity->healing) {
+        continue;
+      }
+      const auto [recipient, arrival] = *entity->healing;
+      const auto* target = entities_.get(recipient);
+      if (!target || !can_receive_healing(*entity, *target, tick_)) {
+        entity->healing.reset();
+        continue;
+      }
+      if (tick_ < arrival) {
+        entity->view.position += (target->view.position - entity->view.position) * heal_step;
+      } else if (tick_ - arrival >= leaf_center_hold) {
+        // Publish the Leaf at the mob's center before its disappearance is sent.
+        Impact hit{recipient, source, HealthKind::heal, definition.mechanics.friendly_mob_heal};
+        hit.consume_source = true;
+        impacts_.push_back(hit);
+      }
     } else if ((definition.effect == catalog::Effect::rose ||
                 definition.effect == catalog::Effect::dahlia) &&
                tick_ >= entity->born_tick + delay) {
       if (!entity->healing) {
         // Owner first, then nearest teammate who still needs healing.
         std::optional<EntityId> target;
-        double closest = definition.range;
+        double closest = definition.mechanics.range;
         for (const auto candidate : entities_.active()) {
           const auto& recipient = entities_.at(candidate);
           const auto& body = recipient.view;
@@ -473,7 +474,7 @@ void Match::update_effects() {
         if (!target) {
           continue;
         }
-        incoming_heal[target->slot] += definition.heal;
+        incoming_heal[target->slot] += definition.mechanics.heal;
         entity->healing = detail::HealingPetal{*target, tick_ + heal_travel - 1};
       }
       const auto* target = entities_.get(entity->healing->recipient);
@@ -483,35 +484,38 @@ void Match::update_effects() {
       }
       entity->view.position += (target->view.position - entity->view.position) * heal_step;
       if (tick_ >= entity->healing->arrival) {
-        Impact hit{target->view.id, source, HealthKind::heal, definition.heal};
+        Impact hit{target->view.id, source, HealthKind::heal, definition.mechanics.heal};
         hit.consume_source = true;
         impacts_.push_back(hit);
         entity->healing.reset();
       }
     } else if (definition.effect == catalog::Effect::summon && tick_ >= entity->born_tick + delay) {
-      EntityView summon;
-      summon.group = Group::summon;
-      summon.faction = Faction::team;
-      summon.mob = definition.summon_mob;
-      summon.rarity = definition.summon_rarity;
-      summon.owner = entity->view.owner;
-      summon.position = entity->view.position;
-      // Copy before pool insertion: insert may move its backing storage.
-      const auto lifetime = rules_.timing.ticks_ceil(
-          Microseconds(static_cast<Microseconds::rep>(definition.duration_seconds * 1e6)));
-      consume_petal(id);
-      const auto child =
-          spawn_mob(*summon.mob, summon.rarity, summon.position, Group::summon, summon.owner);
-      entities_.get(child)->summon_origin = Petal::egg;
-      entities_.get(child)->expires = tick_ + lifetime;
+      const auto lifetime = rules_.timing.ticks_ceil(Microseconds(
+          static_cast<Microseconds::rep>(definition.mechanics.duration_seconds * 1e6)));
+      for (auto& slot : owner.view.petals) {
+        const auto equipped = std::ranges::find(slot.entities, id);
+        if (equipped == slot.entities.end()) {
+          continue;
+        }
+        const auto child = spawn_mob(definition.summon_mob, definition.summon_rarity,
+                                     entity->view.position, Group::summon, entity->view.owner);
+        auto& hatchling = *entities_.get(child);
+        hatchling.summon_origin = Petal::egg;
+        hatchling.expires = tick_ + lifetime;
+        // The hatchling takes over the slot until it dies or expires.
+        *equipped = child;
+        slot.entity = slot.entities.front();
+        entities_.erase(id);
+        break;
+      }
     } else if (owner.attack && !owner.defend && tick_ >= entity->born_tick + delay &&
                (definition.effect == catalog::Effect::projectile ||
                 definition.effect == catalog::Effect::poison_projectile ||
                 definition.effect == catalog::Effect::web)) {
       if (definition.kind == Petal::peas || definition.kind == Petal::grapes) {
         // World Peas replace the equipped cluster with four radial children.
-        const double phase = 2 * std::numbers::pi *
-                             (draw(DrawPurpose::projectile_phase) / 4294967296.0);
+        const double phase =
+            2 * std::numbers::pi * (draw(DrawPurpose::projectile_phase) / 4294967296.0);
         auto shot = entity->view;
         const auto center = shot.position;
         shot.split_particle = true;
@@ -533,9 +537,6 @@ void Match::update_effects() {
 }
 
 void Match::finish_projectiles() {
-  if (!rules_.catalog) {
-    return;
-  }
   const auto active = entities_.active();
   for (const auto slot : active) {
     auto& entity = entities_.at(slot);
@@ -543,9 +544,9 @@ void Match::finish_projectiles() {
     if (entity.spent && !entity.projectile && !entity.view.ground_web) {
       consume_petal(id);
     } else if (entity.view.ground_web) {
-      const auto& definition = *rules_.catalog->petal(Petal::web, entity.view.rarity);
+      const auto& definition = *rules_.catalog.petal(Petal::web, entity.view.rarity);
       if (std::chrono::duration<double>(rules_.timing.step).count() * (tick_ - entity.born_tick) >=
-          definition.duration_seconds) {
+          definition.mechanics.duration_seconds) {
         consume_petal(id);
       }
     } else if (entity.projectile &&
@@ -557,7 +558,7 @@ void Match::finish_projectiles() {
         auto web = entity.view;
         web.ground_web = true;
         web.velocity = {};
-        const double radius = rules_.catalog->petal(Petal::web, web.rarity)->area_radius;
+        const double radius = rules_.catalog.petal(Petal::web, web.rarity)->mechanics.area_radius;
         consume_petal(id);
         (void)add_entity(web, {.radius = radius, .health = 1});
       } else {
@@ -575,20 +576,16 @@ void Match::resolve_contacts() {
         source.view.health <= 0 || target.view.health <= 0) {
       return;
     }
-    if (rules_.catalog &&
-        (source.view.mob == Mob::fire_ant_burrow || target.view.mob == Mob::fire_ant_burrow ||
-         (source.view.mob == Mob::ant_hole && source.view.rarity >= Rarity::rare) ||
-         (target.view.mob == Mob::ant_hole && target.view.rarity >= Rarity::rare))) {
+    if (source.view.mob == Mob::fire_ant_burrow || target.view.mob == Mob::fire_ant_burrow ||
+        (source.view.mob == Mob::ant_hole && source.view.rarity >= Rarity::rare) ||
+        (target.view.mob == Mob::ant_hole && target.view.rarity >= Rarity::rare)) {
       return;
     }
     const auto& pair = interaction(source.view.faction, target.view.faction);
-    const auto* definition = rules_.catalog && source.view.petal
-                                 ? rules_.catalog->petal(*source.view.petal, source.view.rarity)
-                                 : nullptr;
+    const auto* definition =
+        source.view.petal ? rules_.catalog.petal(*source.view.petal, source.view.rarity) : nullptr;
     const auto* target_definition =
-        rules_.catalog && target.view.petal
-            ? rules_.catalog->petal(*target.view.petal, target.view.rarity)
-            : nullptr;
+        target.view.petal ? rules_.catalog.petal(*target.view.petal, target.view.rarity) : nullptr;
     if ((definition && definition->mechanics.hidden) ||
         (target_definition && target_definition->mechanics.hidden)) {
       return;
@@ -598,14 +595,14 @@ void Match::resolve_contacts() {
       source.spent = true;
       return;
     }
-    if (definition && definition->effect == catalog::Effect::leaf && pair.heal && target.view.mob &&
-        target.view.health < target.view.max_health) {
-      Impact hit{target.view.id, damage_source(source), HealthKind::heal,
-                 definition->friendly_mob_heal};
-      hit.consume_source = true;
-      impacts_.push_back(hit);
-    } else if (pair.damage && definition && definition->effect == catalog::Effect::lightning &&
-               target.view.group != Group::petal) {
+    if (definition && definition->effect == catalog::Effect::leaf && target.view.mob &&
+        !source.healing && can_receive_healing(source, target, tick_)) {
+      source.healing = detail::HealingPetal{
+          target.view.id, tick_ + rules_.timing.ticks_ceil(heal_travel_time)};
+      return;
+    }
+    if (pair.damage && definition && definition->effect == catalog::Effect::lightning &&
+        target.view.group != Group::petal) {
       chain_attack(target.view.id, damage_source(source), definition->mechanics.chain_damage,
                    definition->mechanics.bounces, 40);
       source.spent = true;
@@ -618,10 +615,6 @@ void Match::resolve_contacts() {
         impacts_.back().amount += std::min(definition->mechanics.damage_limit,
                                            target.view.health * definition->mechanics.damage_ratio);
       }
-    } else if (pair.heal && source.rules.contact_heal > 0 &&
-               target.view.health < target.view.max_health) {
-      impacts_.push_back(
-          {target.view.id, damage_source(source), HealthKind::heal, source.rules.contact_heal});
     } else {
       return;
     }
@@ -630,15 +623,15 @@ void Match::resolve_contacts() {
          definition->effect == catalog::Effect::pincer) &&
         pair.damage) {
       auto& hit = impacts_.back();
-      hit.slow_multiplier = definition->slow_multiplier;
+      hit.slow_multiplier = definition->mechanics.slow_multiplier;
       hit.attack_slow = definition->effect == catalog::Effect::honey;
-      hit.slow_ticks = rules_.timing.ticks_ceil(
-          Microseconds(static_cast<Microseconds::rep>(definition->duration_seconds * 1000000)));
+      hit.slow_ticks = rules_.timing.ticks_ceil(Microseconds(
+          static_cast<Microseconds::rep>(definition->mechanics.duration_seconds * 1000000)));
     }
     if (definition && definition->effect == catalog::Effect::dandelion && pair.damage) {
-      impacts_.back().heal_block_ticks =
-          rules_.timing.ticks_ceil(Microseconds(static_cast<Microseconds::rep>(
-              definition->duration_seconds * (target.view.group == Group::player ? .5 : 1) * 1e6)));
+      impacts_.back().heal_block_ticks = rules_.timing.ticks_ceil(Microseconds(
+          static_cast<Microseconds::rep>(definition->mechanics.duration_seconds *
+                                         (target.view.group == Group::player ? .5 : 1) * 1e6)));
     }
     if (pair.damage && definition && !target.immovable && !target.view.predecessor &&
         (definition->mechanics.knockback > 0 || definition->effect == catalog::Effect::heavy)) {
@@ -662,9 +655,8 @@ void Match::resolve_contacts() {
   for (const auto slot : active) {
     const auto& entity = entities_.at(slot);
     positions.push_back(entity.view.position);
-    travel.push_back(entity.projectile && !entity.held
-                         ? entity.view.position - entity.flight_start
-                         : Vec2{});
+    travel.push_back(entity.projectile && !entity.held ? entity.view.position - entity.flight_start
+                                                       : Vec2{});
   }
   struct FlightContact {
     std::size_t first, second;
@@ -709,9 +701,9 @@ void Match::resolve_contacts() {
       };
       const bool move_first = movable(first);
       const bool move_second = movable(second);
-      const bool same_leech = first.chain_kind == Mob::leech && second.chain_kind == Mob::leech &&
-                              first.root.value_or(first.view.id) ==
-                                  second.root.value_or(second.view.id);
+      const bool same_leech =
+          first.chain_kind == Mob::leech && second.chain_kind == Mob::leech &&
+          first.root.value_or(first.view.id) == second.root.value_or(second.view.id);
       if (pair.push && (move_first || move_second) && !same_leech &&
           first.view.group != Group::petal && second.view.group != Group::petal) {
         const Vec2 normal = distance > 0 ? delta * (1 / distance) : Vec2{1, 0};
@@ -753,18 +745,18 @@ void Match::resolve_contacts() {
 void Match::apply_impacts() {
   for (const auto slot : entities_.active()) {
     auto& entity = entities_.at(slot);
-    for (auto& poison : entity.poisons) {
-      (void)apply_health(entity.view.id, poison.source, HealthKind::poison, poison.amount);
-      --poison.remaining;
+    if (auto& poison = entity.poison) {
+      (void)apply_health(entity.view.id, poison->source, HealthKind::poison, poison->amount);
+      if (--poison->remaining == 0) {
+        poison.reset();
+      }
     }
-    std::erase_if(entity.poisons,
-                  [](const detail::Poison& poison) { return poison.remaining == 0; });
-    entity.view.poisoned = !entity.poisons.empty();
+    entity.view.poisoned = entity.poison.has_value();
     entity.view.slowed = !entity.slows.empty();
     entity.view.heal_blocked = entity.heal_block_until > tick_;
   }
   for (const auto& hit : impacts_) {
-    // Several allies can touch the same Leaf, but only one can consume it.
+    // A consumable effect can only resolve while its source still exists.
     if (hit.consume_source && !entities_.get(hit.source.entity)) {
       continue;
     }
@@ -791,21 +783,10 @@ void Match::apply_impacts() {
       target->heal_block_until = std::max(target->heal_block_until, tick_ + hit.heal_block_ticks);
     }
     if (target->view.health > 0 && hit.poison_ticks > 0 && hit.poison_per_tick > 0) {
-      const detail::Poison poison{hit.source, hit.poison_per_tick, hit.poison_ticks};
-      if (!rules_.catalog) {
-        const auto prior = std::ranges::find(target->poisons, hit.source, &detail::Poison::source);
-        if (prior == target->poisons.end()) {
-          target->poisons.push_back(poison);
-        } else {
-          *prior = poison;
-        }
-      } else {
-        const double remaining = target->poisons.empty() ? 0
-                                                         : target->poisons.front().amount *
-                                                               target->poisons.front().remaining;
-        if (hit.poison_per_tick * hit.poison_ticks >= remaining) {
-          target->poisons = {poison};
-        }
+      const auto& active = target->poison;
+      const double remaining = active ? active->amount * active->remaining : 0;
+      if (hit.poison_per_tick * hit.poison_ticks >= remaining) {
+        target->poison = detail::Poison{hit.source, hit.poison_per_tick, hit.poison_ticks};
       }
     }
   }
@@ -927,7 +908,7 @@ void Match::reap_deaths() {
       victim.view.killer = source.mob;
       reap_player(victim, LifeState::waiting);
     } else {
-      if (body.group == Group::petal) {
+      if (body.group == Group::petal || entity->summon_origin == Petal::egg) {
         detach_petal(id);
       }
       entities_.erase(id);

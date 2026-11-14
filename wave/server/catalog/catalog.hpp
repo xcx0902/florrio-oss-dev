@@ -72,6 +72,16 @@ struct PetalMechanics {
   double speed_multiplier = 1;
   double size_multiplier = 1;
   bool hidden = false;
+  double heal = 0;
+  double passive_heal_per_second = 0;
+  double friendly_mob_heal = 0;
+  double rotation_bonus = 0;
+  double projectile_speed = 0;
+  double range = 0;
+  double duration_seconds = 0;
+  double slow_multiplier = 1;
+  double health_bonus = 0;
+  double area_radius = 0;
 };
 
 enum class MobAI {
@@ -106,16 +116,6 @@ struct PetalDefinition {
   Effect effect;
   unsigned particles;
   double activation_seconds;
-  double heal;
-  double passive_heal_per_second;
-  double friendly_mob_heal;
-  double rotation_bonus;
-  double projectile_speed;
-  double range;
-  double duration_seconds;
-  double slow_multiplier;
-  double health_bonus;
-  double area_radius;
   ClientValues client;
   std::string_view evidenceKey;
   sim::Mob summon_mob = sim::Mob::beetle;

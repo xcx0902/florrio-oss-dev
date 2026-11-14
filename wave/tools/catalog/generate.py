@@ -39,9 +39,19 @@ MECHANICS = ('attack_distance defend_distance shield reflection damage_ratio dam
              'body_damage sponge_seconds speed_multiplier size_multiplier hidden').split()
 BODY = ('radius', 'health', 'speed_per_second', 'contact_damage', 'contact_heal',
         'poison_per_tick', 'poison_ticks')
-FIELDS = ('activationSeconds', 'heal', 'passiveHealPerSecond', 'friendlyMobHeal',
-          'rotationBonus', 'projectileSpeed', 'range', 'durationSeconds',
-          'slowMultiplier', 'healthBonus', 'areaRadius')
+EFFECT_MECHANICS = {
+    'heal': 'heal',
+    'passiveHealPerSecond': 'passive_heal_per_second',
+    'friendlyMobHeal': 'friendly_mob_heal',
+    'rotationBonus': 'rotation_bonus',
+    'projectileSpeed': 'projectile_speed',
+    'range': 'range',
+    'durationSeconds': 'duration_seconds',
+    'slowMultiplier': 'slow_multiplier',
+    'healthBonus': 'health_bonus',
+    'areaRadius': 'area_radius',
+}
+FIELDS = ('activationSeconds', *EFFECT_MECHANICS)
 EFFECTS = set(KINDS) | {'contact', 'projectile', 'poison_projectile', 'summon'}
 
 
@@ -457,7 +467,10 @@ def number(value):
 
 
 def body(row):
-    return '{' + ', '.join(f'.{key} = {number(row[key])}' for key in BODY) + '}'
+    # The archived schema carries this field; the simulation uses catalog effects for healing.
+    require(row['contact_heal'] == 0, 'generic contact healing is unsupported')
+    return '{' + ', '.join(f'.{key} = {number(row[key])}' for key in BODY
+                           if key != 'contact_heal') + '}'
 
 
 def generate(pack):
@@ -473,12 +486,16 @@ def generate(pack):
         client = r['clientValues']
         cv = '{true, ' + str(client['offset12']) + ', ' + str(client['offset16']) + '}' if client else '{}'
         summon = r.get('summon', {'mob': 'beetle', 'rarity': 0})
+        mechanics = [f'.{k} = {number(r["mechanics"][k])}' for k in MECHANICS if k != 'hidden']
+        mechanics.append('.hidden = ' + str(r['mechanics']['hidden']).lower())
+        # The archived pack keeps these effect parameters at the row level.
+        mechanics += [f'.{member} = {number(r[key])}' for key, member in EFFECT_MECHANICS.items()]
         values = [f'sim::Petal::{r["kind"]}', f'sim::Rarity::{pack["rarities"][r["rarity"]]["name"].lower()}',
                   str(r['clientId']), json.dumps(r['name']), body(r['body']), number(r['reloadSeconds']),
-                  'Effect::' + r['effect'], str(r['particles'])] + [number(r[k]) for k in FIELDS] + [cv, json.dumps(r['evidenceKey']),
+                  'Effect::' + r['effect'], str(r['particles']), number(r['activationSeconds']),
+                  cv, json.dumps(r['evidenceKey']),
                   'sim::Mob::' + summon['mob'], 'sim::Rarity::' + pack['rarities'][summon['rarity']]['name'].lower(),
-                  '{' + ', '.join('.' + k + ' = ' + (str(r['mechanics'][k]).lower() if k == 'hidden'
-                                                    else number(r['mechanics'][k])) for k in MECHANICS) + '}']
+                  '{' + ', '.join(mechanics) + '}']
         lines.append('  {' + ', '.join(values) + '},')
     lines += ['};', 'inline const MobDefinition mobs[]{']
     for r in pack['mobs']:

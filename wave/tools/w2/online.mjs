@@ -551,10 +551,15 @@ export async function onlineCases({ browser, snapshot, nativeDir, output, report
           (x, y) => Math.hypot(x.x - body.x, x.y - body.y) - Math.hypot(y.x - body.x, y.y - body.y),
         )[0];
       const length = Math.hypot(body.x - mob.x, body.y - mob.y);
+      // Keep the flower outside the monster's hitbox while its petals reach it.
+      const distance = mob.radius + body.radius + 2;
       await travel(
         b,
         bid,
-        { x: mob.x + ((body.x - mob.x) * 8) / length, y: mob.y + ((body.y - mob.y) * 8) / length },
+        {
+          x: mob.x + ((body.x - mob.x) * distance) / length,
+          y: mob.y + ((body.y - mob.y) * distance) / length,
+        },
         0.6,
       );
       await aim(b);

@@ -14,46 +14,19 @@ Tick Timing::ticks_ceil(Microseconds time) const {
   return time.count() / step.count() + (time.count() % step.count() != 0);
 }
 
+Rules::Rules() : Rules(catalog::dated()) {}
+
+Rules::Rules(const catalog::Catalog& definitions) : catalog(definitions) {}
+
 Rules scenario_rules(Biome biome) {
   Rules rules;
   detail::load_scenario_defaults(rules);
-  rules.catalog = &catalog::dated();
   rules.biome = biome;
   rules.progressive_waves = true;
   rules.residual = ResidualPolicy::keep;
   // Local display calibration: 5 W1 units projects to a 25-unit flower body.
   rules.player = {.radius = 5, .health = 100, .speed_per_second = 50, .contact_damage = 2};
-  rules.petals = {{{.radius = 3, .health = 12, .contact_damage = 10},
-                   {.radius = 4, .health = 12, .contact_heal = 8}}};
-  rules.petal_reload = rules.timing.ticks_ceil(std::chrono::milliseconds(2500));
-  rules.mobs = {
-      {Mob::bee, {.radius = 5, .health = 16, .speed_per_second = 37, .contact_damage = 4}},
-      {Mob::ladybug, {.radius = 7, .health = 24, .speed_per_second = 26, .contact_damage = 5}},
-      {Mob::baby_ant, {.radius = 4, .health = 12, .speed_per_second = 34, .contact_damage = 3}},
-      {Mob::rock, {.radius = 8, .health = 35, .contact_damage = 5}},
-      {Mob::centipede, {.radius = 7, .health = 30, .speed_per_second = 30, .contact_damage = 6}},
-      {Mob::worker_ant, {.radius = 5, .health = 19, .speed_per_second = 36, .contact_damage = 4}},
-      {Mob::dark_ladybug, {.radius = 8, .health = 34, .speed_per_second = 30, .contact_damage = 7}},
-      {Mob::evil_centipede,
-       {.radius = 8, .health = 38, .speed_per_second = 32, .contact_damage = 7}},
-      {Mob::soldier_ant, {.radius = 6, .health = 28, .speed_per_second = 35, .contact_damage = 6}},
-      {Mob::spider, {.radius = 7, .health = 32, .speed_per_second = 40, .contact_damage = 6}},
-      {Mob::hornet,
-       {.radius = 6,
-        .health = 24,
-        .speed_per_second = 44,
-        .contact_damage = 4,
-        .poison_per_tick = 0.5,
-        .poison_ticks = 8}},
-  };
   rules.contact_knockback_speed = 24;
-  // All kinds are available to the scenario schedules.
-  for (const auto& mob : catalog::dated().mobs) {
-    if (mob.rarity == Rarity::common &&
-        std::ranges::find(rules.mobs, mob.kind, &MobRules::kind) == rules.mobs.end()) {
-      rules.mobs.push_back({mob.kind, mob.body});
-    }
-  }
   using enum Mob;
   std::array<std::vector<Mob>, 3> unlocks;
   switch (biome) {

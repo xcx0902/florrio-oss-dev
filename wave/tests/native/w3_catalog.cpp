@@ -211,20 +211,52 @@ void rose_and_leaf() {
     check(match.add_player({1}, {}, {Petal::leaf}, {Rarity::unusual}), "admit Leaf");
     steps(match, 1);
     FixtureAccess::damage(match, *owner(match).body, 10);
-    const auto friendly =
-        FixtureAccess::spawn(match, {14, 0}, {.radius = 1, .health = 50}, Faction::team);
+    const auto start = petal(match);
+    const auto friendly = FixtureAccess::spawn(
+        match, start.position + Vec2{0, -3}, {.radius = 1, .health = 50}, Faction::team);
     const auto other =
         FixtureAccess::spawn(match, {14, 2.25}, {.radius = 1, .health = 50}, Faction::team);
     FixtureAccess::damage(match, friendly, 20);
     FixtureAccess::damage(match, other, 20);
     steps(match, 1);
-    near(body(match).health,
-         90 + catalog::dated().petal(Petal::leaf, Rarity::unusual)->passive_heal_per_second * .025,
+    const auto& leaf = catalog::dated().petal(Petal::leaf, Rarity::unusual)->mechanics;
+    near(body(match).health, 90 + leaf.passive_heal_per_second * .025,
          "Leaf passive heal preserves original formatter precision");
+    near(FixtureAccess::get(match, friendly).view.health, 30, "Leaf does not heal on contact");
+    auto& target = FixtureAccess::get(match, friendly).view;
+    target.position = {24, -5};
+    steps(match, 1);
+    const auto distance = [&] { return (petal(match).position - target.position).length(); };
+    check(petal(match).id == start.id && distance() > 0 &&
+              distance() < (start.position - target.position).length(),
+          "Leaf flies toward the moving recipient instead of returning to orbit");
+    bool reached_center = false;
+    for (unsigned i = 0; i < 20 && owner(match).petals[0].entity; ++i) {
+      reached_center |= petal(match).position == target.position;
+      near(target.health, 30, "Leaf does not heal while it is still in flight");
+      steps(match, 1);
+    }
+    check(reached_center, "Leaf reaches the mob center before it is consumed");
     near(FixtureAccess::get(match, friendly).view.health, 43, "Leaf eaten by friendly mob");
     near(FixtureAccess::get(match, other).view.health, 30, "the same Leaf cannot be eaten twice");
     check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 40,
           "friendly mob consumption reloads Leaf");
+  }
+  {
+    Match match({44}, 5, arena());
+    check(match.add_player({1}, {}, {Petal::leaf}), "admit Leaf for interrupted healing");
+    steps(match, 1);
+    const auto start = petal(match);
+    const auto friendly = FixtureAccess::spawn(
+        match, start.position + Vec2{0, 3}, {.radius = 1, .health = 50}, Faction::team);
+    FixtureAccess::damage(match, friendly, 20);
+    steps(match, 2);
+    check(petal(match).position != start.position, "Leaf starts flying to its recipient");
+    FixtureAccess::kill(match, friendly);
+    steps(match, 1);
+    check(petal(match).id == start.id && petal(match).position == start.position &&
+              owner(match).petals[0].reload_ticks == 0,
+          "Leaf returns to orbit if the recipient dies before arrival");
   }
 }
 void dahlia_orbit_and_heal() {
@@ -382,10 +414,18 @@ void web_summon_passive_equip() {
     }
   }
   for (unsigned rarity = 0; rarity < 5; ++rarity) {
-    Match match({80 + rarity}, 5, arena());
+    auto rules = arena();
+    rules.orbit_rad_per_second = 4;
+    Match match({80 + rarity}, 5, rules);
     check(match.add_player({1}, {}, {Petal::egg}, {Rarity(rarity)}), "admit Egg contents fixture");
-    steps(match, 80);
-    check(owner(match).petals[0].entity.has_value(), "Egg does not hatch before two seconds");
+    steps(match, 1);
+    const auto egg = petal(match);
+    steps(match, 79);
+    const auto orbiting = petal(match);
+    check(orbiting.id == egg.id, "Egg does not hatch before two seconds");
+    check(orbiting.position != egg.position && orbiting.heading_rad == egg.heading_rad &&
+              orbiting.heading_rad == 0,
+          "Egg stays upright as it moves around the player");
     steps(match, 1);
     const std::array kinds{Mob::baby_ant, Mob::worker_ant, Mob::soldier_ant, Mob::beetle,
                            Mob::beetle};
@@ -396,12 +436,31 @@ void web_summon_passive_equip() {
       if (entity.group == Group::summon) {
         ++summons;
         check(entity.mob == kinds[rarity] && entity.rarity == tiers[rarity] &&
-                  entity.owner == owner(match).life,
+                  entity.owner == owner(match).life && entity.faction == Faction::team &&
+                  owner(match).petals[0].entity == entity.id,
               "Egg uses original Contents kind/rarity independently of equipped rarity");
       }
     }
-    check(summons == 1 && owner(match).petals[0].reload_ticks == 160,
-          "each original Egg contents variant consumes its slot and reloads in four seconds");
+    const auto hatchling = *owner(match).petals[0].entity;
+    check(summons == 1 && owner(match).petals[0].reload_ticks == 0,
+          "hatching replaces Egg without starting recharge");
+    if (rarity == 0) {
+      steps(match, 241);
+      const auto view = match.view();
+      check(owner(match).petals[0].entity == hatchling &&
+                std::ranges::count(view.entities, Group::summon, &EntityView::group) == 1 &&
+                std::ranges::none_of(view.entities, [](const EntityView& e) {
+                  return e.petal == Petal::egg;
+                }),
+            "Egg cannot hatch a second pet while the first is alive");
+      FixtureAccess::kill(match, hatchling);
+      check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 160,
+            "defeating the hatchling starts Egg's four-second recharge");
+      steps(match, 160);
+      check(!owner(match).petals[0].entity, "Egg stays gone during recharge");
+      steps(match, 1);
+      check(petal(match).petal == Petal::egg, "Egg returns after its hatchling's death and recharge");
+    }
   }
   {
     Match match({8}, 5, arena());
@@ -419,8 +478,7 @@ void web_summon_passive_equip() {
     }
     check(summons == 1 && match.view().wave.counts.alive == 1,
           "summon excluded from wave population accounting");
-    check(owner(match).petals[0].reload_ticks == 160,
-          "hatch consumes Egg and starts four-second reload");
+    check(owner(match).petals[0].reload_ticks == 0, "Mythic hatch leaves the slot recharged");
     for (const auto& e : match.view().entities) {
       if (e.group == Group::main_mob) {
         FixtureAccess::get(match, e.id).view.health = 1000000;
@@ -428,13 +486,14 @@ void web_summon_passive_equip() {
     }
     const auto unrelated =
         FixtureAccess::spawn(match, {200, 200}, {.radius = 1, .health = 100}, Faction::team);
-    check(match.set_loadout({1}, {}), "stop repeated hatching before lifetime check");
     steps(match, 600);
     for (const auto& e : match.view().entities) {
       check(!e.owner || e.group != Group::summon, "owned summon expires after fifteen seconds");
     }
     check(FixtureAccess::get(match, unrelated).view.health > 0,
           "Egg lifetime does not expire unrelated summon-group mobs");
+    check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 160,
+          "hatchling expiry starts Egg's recharge");
   }
   {
     auto rules = arena();
@@ -444,8 +503,8 @@ void web_summon_passive_equip() {
         match.add_player({1}, {}, {Petal::basic, Petal::faster}, {Rarity::common, Rarity::mythic}),
         "admit Faster");
     steps(match, 2);
-    near(petal(match).heading_rad,
-         (4 + catalog::dated().petal(Petal::faster, Rarity::mythic)->rotation_bonus) * .025,
+    const auto& faster = catalog::dated().petal(Petal::faster, Rarity::mythic)->mechanics;
+    near(petal(match).heading_rad, (4 + faster.rotation_bonus) * .025,
          "Faster changes orbit angular speed with original f32 precision");
     const auto old = petal(match).id;
     check(match.queue(Equip{

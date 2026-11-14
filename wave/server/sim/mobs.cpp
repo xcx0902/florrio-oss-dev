@@ -78,7 +78,7 @@ DamageSource Match::damage_source(const detail::Entity& entity) const {
 
 EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
                           std::optional<LifeId> owner, std::uint32_t wave) {
-  const auto& definition = *rules_.catalog->mob(kind, rarity);
+  const auto& definition = *rules_.catalog.mob(kind, rarity);
   EntityView view;
   view.mob = kind;
   view.rarity = rarity;
@@ -118,7 +118,7 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
       head.view.heading_rad = std::atan2(head.view.position.y, head.view.position.x);
     }
     const double gap = segment_gap(kind, 2 * body.radius);
-    const auto segment = std::ranges::find_if(rules_.catalog->mobs, [&](const auto& m) {
+    const auto segment = std::ranges::find_if(rules_.catalog.mobs, [&](const auto& m) {
       return m.client_id == definition.segment_client_id && m.rarity == rarity;
     });
     auto previous = id;
@@ -151,11 +151,8 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
 }
 
 Vec2 Match::mob_direction(detail::Entity& entity) {
-  if (!rules_.catalog || !entity.view.mob) {
-    return {};
-  }
   const auto& definition =
-      *rules_.catalog->mob(entity.chain_kind.value_or(*entity.view.mob), entity.view.rarity);
+      *rules_.catalog.mob(entity.chain_kind.value_or(*entity.view.mob), entity.view.rarity);
   if (entity.view.predecessor || definition.ai == catalog::MobAI::stationary ||
       definition.ai == catalog::MobAI::spawner) {
     return {};
@@ -276,9 +273,6 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
 }
 
 void Match::update_mob_actions() {
-  if (!rules_.catalog) {
-    return;
-  }
   std::vector<EntityId> active;
   for (const auto slot : entities_.active()) {
     active.push_back(entities_.at(slot).view.id);
@@ -288,7 +282,7 @@ void Match::update_mob_actions() {
     if (!e || !e->view.mob || e->projectile || e->view.health <= 0) {
       continue;
     }
-    const auto& definition = *rules_.catalog->mob(*e->view.mob, e->view.rarity);
+    const auto& definition = *rules_.catalog.mob(*e->view.mob, e->view.rarity);
     if (e->view.predecessor) {
       continue;
     }
@@ -306,7 +300,7 @@ void Match::update_mob_actions() {
     }
     if (e->summon_origin == Petal::stick) {
       const double impulse = 80 * std::chrono::duration<double>(rules_.timing.step).count();
-      const auto& p = *rules_.catalog->petal(Petal::stick, e->view.rarity);
+      const auto& p = *rules_.catalog.petal(Petal::stick, e->view.rarity);
       for (const auto slot : entities_.active()) {
         auto& other = entities_.at(slot);
         if (other.view.faction == e->view.faction || other.view.group == Group::petal ||
@@ -314,7 +308,7 @@ void Match::update_mob_actions() {
           continue;
         }
         const auto delta = other.view.position - e->view.position;
-        if (delta.length() > 0 && delta.length() < p.area_radius) {
+        if (delta.length() > 0 && delta.length() < p.mechanics.area_radius) {
           other.knockback += Vec2{-delta.y, delta.x} * (impulse / delta.length());
         }
       }
@@ -384,7 +378,8 @@ void Match::update_mob_actions() {
       web.owner = e->view.owner;
       web.ground_web = true;
       (void)add_entity(
-          web, {.radius = rules_.catalog->petal(Petal::web, rarity)->area_radius, .health = 1});
+          web,
+          {.radius = rules_.catalog.petal(Petal::web, rarity)->mechanics.area_radius, .health = 1});
     }
   }
 }
@@ -426,9 +421,6 @@ void Match::constrain_segments() {
 }
 
 void Match::update_nests() {
-  if (!rules_.catalog) {
-    return;
-  }
   std::vector<EntityId> active;
   for (const auto slot : entities_.active()) {
     active.push_back(entities_.at(slot).view.id);
@@ -438,7 +430,7 @@ void Match::update_nests() {
     if (!e || !e->view.mob) {
       continue;
     }
-    const auto& definition = *rules_.catalog->mob(*e->view.mob, e->view.rarity);
+    const auto& definition = *rules_.catalog.mob(*e->view.mob, e->view.rarity);
     if (definition.ai != catalog::MobAI::spawner) {
       continue;
     }

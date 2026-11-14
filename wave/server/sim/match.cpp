@@ -1,8 +1,6 @@
 #include "sim/match.hpp"
 #include "catalog/catalog.hpp"
 
-#include <numbers>
-
 namespace wave::sim {
 namespace {
 
@@ -13,39 +11,39 @@ bool nonnegative(double value) {
 bool valid_body(const BodyRules& body) {
   return std::isfinite(body.radius) && body.radius > 0 && std::isfinite(body.health) &&
          body.health > 0 && nonnegative(body.speed_per_second) &&
-         nonnegative(body.contact_damage) && nonnegative(body.contact_heal) &&
-         nonnegative(body.poison_per_tick);
+         nonnegative(body.contact_damage) && nonnegative(body.poison_per_tick);
 }
 
 void validate(const Rules& rules) {
   if (rules.version.empty() || rules.timing.step.count() <= 0 ||
       rules.timing.broadcast_interval.count() <= 0 || !nonnegative(rules.arena_radius) ||
-      rules.arena_radius == 0 || !valid_body(rules.player) ||
-      !std::ranges::all_of(rules.petals, valid_body) || rules.petal_reload == 0 ||
-      !nonnegative(rules.orbit_radius) || !nonnegative(rules.orbit_rad_per_second) ||
-      !nonnegative(rules.attack_orbit_multiplier) || !nonnegative(rules.defend_orbit_multiplier) ||
-      !nonnegative(rules.knockback_retention) || rules.knockback_retention > 1 ||
-      !nonnegative(rules.contact_knockback_speed) || !nonnegative(rules.special_chance) ||
-      rules.special_chance > 1 || rules.waves.empty() || rules.spawn_attempts == 0 ||
-      rules.spawn_points.empty() || rules.spawn_points.size() > std::mt19937::max() ||
+      rules.arena_radius == 0 || !valid_body(rules.player) || !nonnegative(rules.orbit_radius) ||
+      !nonnegative(rules.orbit_rad_per_second) || !nonnegative(rules.knockback_retention) ||
+      rules.knockback_retention > 1 || !nonnegative(rules.contact_knockback_speed) ||
+      !nonnegative(rules.special_chance) || rules.special_chance > 1 || rules.waves.empty() ||
+      rules.spawn_attempts == 0 || rules.spawn_points.empty() ||
+      rules.spawn_points.size() > std::mt19937::max() ||
       !std::ranges::all_of(rules.spawn_points, &Vec2::finite)) {
     throw std::invalid_argument("invalid Wave scenario settings");
   }
 
-  std::vector<Mob> catalog;
-  for (const auto& entry : rules.mobs) {
-    if (!valid_body(entry.body) || std::ranges::find(catalog, entry.kind) != catalog.end()) {
-      throw std::invalid_argument("invalid Wave mob catalog");
+  const auto has_mob = [&](Mob kind, Rarity rarity) {
+    return rules.catalog.mob(kind, rarity) != nullptr;
+  };
+  const auto has_all_rarities = [&](Mob kind) {
+    for (auto tier = static_cast<unsigned>(Rarity::common);
+         tier <= static_cast<unsigned>(Rarity::mythic); ++tier) {
+      if (!has_mob(kind, static_cast<Rarity>(tier))) {
+        return false;
+      }
     }
-    catalog.push_back(entry.kind);
-  }
-
+    return true;
+  };
   std::uint32_t last_number = 0;
   for (const auto& wave : rules.waves) {
     if (wave.number <= last_number || wave.deadline == 0 || wave.eligible.empty() ||
-        !std::ranges::all_of(wave.eligible, [&catalog, &rules, &wave](Mob kind) {
-          return std::ranges::find(catalog, kind) != catalog.end() &&
-                 (!rules.catalog || rules.catalog->mob(kind, wave.rarity));
+        !std::ranges::all_of(wave.eligible, [&](Mob kind) {
+          return rules.progressive_waves ? has_all_rarities(kind) : has_mob(kind, wave.rarity);
         })) {
       throw std::invalid_argument("invalid Wave schedule");
     }
@@ -62,6 +60,9 @@ void validate(const Rules& rules) {
       throw std::invalid_argument("Wave spawn batches do not match the wave budget");
     }
     last_number = wave.number;
+  }
+  if (rules.progressive_waves && !std::ranges::all_of(rules.late_mobs, has_all_rarities)) {
+    throw std::invalid_argument("invalid Wave late mob pool");
   }
 }
 
@@ -89,14 +90,7 @@ bool Match::valid_loadout(const std::vector<Petal>& loadout,
   }
   for (std::size_t i = 0; i < loadout.size(); ++i) {
     const auto rarity = rarities.empty() ? Rarity::common : rarities[i];
-    if (static_cast<unsigned>(rarity) >= 6) {
-      return false;
-    }
-    if (rules_.catalog) {
-      if (!rules_.catalog->can_equip(loadout[i], rarity)) {
-        return false;
-      }
-    } else if (static_cast<std::size_t>(loadout[i]) >= rules_.petals.size()) {
+    if (!rules_.catalog.can_equip(loadout[i], rarity)) {
       return false;
     }
   }
@@ -104,10 +98,7 @@ bool Match::valid_loadout(const std::vector<Petal>& loadout,
 }
 
 BodyRules Match::petal_body(Petal kind, Rarity rarity) const {
-  if (!rules_.catalog) {
-    return rules_.petals.at(static_cast<std::size_t>(kind));
-  }
-  auto body = rules_.catalog->petal(kind, rarity)->body;
+  auto body = rules_.catalog.petal(kind, rarity)->body;
   const double scale = std::chrono::duration<double>(rules_.timing.step).count() / .025;
   body.poison_per_tick *= scale;
   body.poison_ticks = rules_.timing.ticks_ceil(Microseconds(body.poison_ticks * 25000));
@@ -115,14 +106,11 @@ BodyRules Match::petal_body(Petal kind, Rarity rarity) const {
 }
 
 Tick Match::reload_ticks(Petal kind, Rarity rarity) const {
-  if (rules_.catalog && kind == Petal::none) {
+  if (kind == Petal::none) {
     return 0;
   }
-  if (!rules_.catalog) {
-    return rules_.petal_reload;
-  }
   return rules_.timing.ticks_ceil(Microseconds(static_cast<Microseconds::rep>(
-      rules_.catalog->petal(kind, rarity)->reload_seconds * 1000000)));
+      rules_.catalog.petal(kind, rarity)->reload_seconds * 1000000)));
 }
 
 bool Match::add_player(PlayerId id, Vec2 start, std::vector<Petal> loadout,
@@ -187,11 +175,9 @@ void Match::replace_loadout(Player& entry, std::vector<Petal> loadout,
   }
   auto health_bonus = [this](const auto& kinds, const auto& tiers) {
     double bonus = 0;
-    if (rules_.catalog) {
-      for (std::size_t i = 0; i < kinds.size(); ++i) {
-        if (const auto* rule = rules_.catalog->petal(kinds[i], tiers[i])) {
-          bonus += rule->health_bonus;
-        }
+    for (std::size_t i = 0; i < kinds.size(); ++i) {
+      if (const auto* rule = rules_.catalog.petal(kinds[i], tiers[i])) {
+        bonus += rule->mechanics.health_bonus;
       }
     }
     return bonus;
@@ -212,20 +198,6 @@ void Match::replace_loadout(Player& entry, std::vector<Petal> loadout,
   }
   entry.view.loadout = std::move(loadout);
   entry.view.loadout_rarities = std::move(rarities);
-  for (std::size_t i = 0; i < entry.view.petals.size(); ++i) {
-    for (const auto id : entry.view.petals[i].entities) {
-      auto& entity = *entities_.get(id);
-      entity.orbit_offset = 2 * std::numbers::pi * i / entry.view.petals.size();
-      const auto count =
-          rules_.catalog
-              ? rules_.catalog->petal(entry.view.loadout[i], entry.view.loadout_rarities[i])
-                    ->particles
-              : 1;
-      if (count > 1) {
-        entity.orbit_offset += (double(entity.particle_index) - (count - 1) / 2.0) * .12;
-      }
-    }
-  }
   if (entry.view.body) {
     auto& body = entities_.get(*entry.view.body)->view;
     body.max_health += delta;
@@ -275,13 +247,15 @@ bool Match::queue(Departure departure) {
 void Match::apply_commands() {
   for (const auto& command : commands_) {
     // A departure earlier in this batch may have removed the target already.
-    const auto id = std::visit([](const auto& value) {
-      if constexpr (requires { value.life; }) {
-        return value.life.player;
-      } else {
-        return value.player;
-      }
-    }, command);
+    const auto id = std::visit(
+        [](const auto& value) {
+          if constexpr (requires { value.life; }) {
+            return value.life.player;
+          } else {
+            return value.player;
+          }
+        },
+        command);
     auto* target = player(id);
     if (!target) {
       continue;
@@ -348,12 +322,10 @@ void Match::spawn_player(Player& entry) {
   body.owner = entry.view.life;
   body.position = entry.spawn;
   auto player_body = rules_.player;
-  if (rules_.catalog) {
-    for (std::size_t i = 0; i < entry.view.loadout.size(); ++i) {
-      if (const auto* rule =
-              rules_.catalog->petal(entry.view.loadout[i], entry.view.loadout_rarities[i])) {
-        player_body.health += rule->health_bonus;
-      }
+  for (std::size_t i = 0; i < entry.view.loadout.size(); ++i) {
+    if (const auto* rule =
+            rules_.catalog.petal(entry.view.loadout[i], entry.view.loadout_rarities[i])) {
+      player_body.health += rule->mechanics.health_bonus;
     }
   }
   entry.view.body = add_entity(body, player_body);
@@ -371,7 +343,7 @@ void Match::refresh_petals() {
       continue;
     }
     for (std::size_t index = 0; index < entry.view.petals.size(); ++index) {
-      if (rules_.catalog && entry.view.loadout[index] == Petal::none) {
+      if (entry.view.loadout[index] == Petal::none) {
         continue;
       }
       auto& slot = entry.view.petals[index];
@@ -387,10 +359,9 @@ void Match::refresh_petals() {
       petal.anchor = entry.view.body;
       petal.position = entities_.get(*entry.view.body)->view.position;
       petal.rarity = entry.view.loadout_rarities[index];
-      const auto* definition =
-          rules_.catalog ? rules_.catalog->petal(*petal.petal, petal.rarity) : nullptr;
+      const auto& definition = *rules_.catalog.petal(*petal.petal, petal.rarity);
       const bool splits_on_launch = petal.petal == Petal::peas || petal.petal == Petal::grapes;
-      const auto count = definition && !splits_on_launch ? definition->particles : 1;
+      const auto count = splits_on_launch ? 1 : definition.particles;
       if (slot.entities.size() == count) {
         continue;
       }
@@ -402,17 +373,15 @@ void Match::refresh_petals() {
           continue;
         }
         auto body = petal_body(*petal.petal, petal.rarity);
-        if (definition && splits_on_launch) {
-          body.health *= definition->particles;
+        if (splits_on_launch) {
+          body.health *= definition.particles;
         }
         const auto id = add_entity(petal, body);
         slot.entities.push_back(id);
         entities_.get(id)->particle_index = particle;
-        entities_.get(id)->orbit_offset = 2 * std::numbers::pi * index / entry.view.petals.size();
       }
-      std::ranges::sort(slot.entities, {}, [this](EntityId id) {
-        return entities_.get(id)->particle_index;
-      });
+      std::ranges::sort(slot.entities, {},
+                        [this](EntityId id) { return entities_.get(id)->particle_index; });
       slot.entity = slot.entities.front();
     }
   }
@@ -501,7 +470,6 @@ MatchView Match::view() const {
       .broadcast_interval = rules_.timing.broadcast_interval,
       .arena_radius = rules_.arena_radius,
       .biome = rules_.biome,
-      .petal_reload = rules_.petal_reload,
       .phase = phase_,
       .wave = wave_,
       .previous_wave = previous_wave_,
@@ -511,18 +479,16 @@ MatchView Match::view() const {
   for (const auto& entry : players_) {
     view.players.push_back(entry.view);
   }
-  if (rules_.catalog) {
-    view.catalog_version = rules_.catalog->version;
-    view.catalog_sha256 = rules_.catalog->sha256;
-  }
+  view.catalog_version = rules_.catalog.version;
+  view.catalog_sha256 = rules_.catalog.sha256;
   for (const auto slot : entities_.active()) {
     const auto& entity = entities_.at(slot);
     auto& projected = view.entities.emplace_back(entity.view);
     if (projected.mob == Mob::digger && entity.target && entity.stun_until <= tick_ &&
         projected.health >= projected.max_health * .3) {
       const auto* target = entities_.get(*entity.target);
-      projected.digger_attacking = target && target->view.health > 0 &&
-                                   target->view.faction != projected.faction;
+      projected.digger_attacking =
+          target && target->view.health > 0 && target->view.faction != projected.faction;
     }
     ++view.population[static_cast<std::size_t>(projected.group)];
   }

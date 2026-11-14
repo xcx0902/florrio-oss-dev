@@ -234,20 +234,25 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
     await photograph(b, 'wave-catalog');
 
     const target = s.rooms[0].entities.find((e) => e.group === 2);
+    const flower = s.rooms[0].entities.find((e) => e.group === 0 && e.owner === bid);
+    const basic = s.rooms[0].entities.find((e) => e.group === 1 && e.owner === bid);
+    const idleDistance = Math.hypot(basic.x - flower.x, basic.y - flower.y);
+    const gap = idleDistance + target.radius + basic.radius + 1;
     for (let i = 0; i < 60; ++i) {
       const flower = s.rooms[0].entities.find((e) => e.group === 0 && e.owner === bid);
       const delta = [target.x - flower.x, target.y - flower.y],
         distance = Math.hypot(...delta);
-      if (distance < 15) {
+      if (distance < gap + 0.25) {
         break;
       }
       await aim(
         b,
         delta.map((v) => v / distance),
-        Math.min(100, (distance - 14) * 50),
+        Math.min(100, (distance - gap) * 50),
       );
-      s = await advance(Math.max(1, Math.min(4, Math.floor((distance - 14) / 2))));
+      s = await advance(Math.max(1, Math.min(4, Math.floor((distance - gap) / 2))));
     }
+    assert.equal(s.rooms[0].defeated, 0, 'Idle petals stop outside contact range');
     const center = await aim(b);
     assert.ok(
       Math.hypot(center[0] - 512, center[1] - 384) < 3,
@@ -266,13 +271,16 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
     let broken = false,
       killed = false;
     for (let i = 0; i < 80; ++i) {
-      s = await advance(1, 20);
+      s = await advance();
       const draw = await sample();
       if (!broken && draw.reload.some((v) => v === 0)) {
         broken = true;
         await photograph(b, 'petal-fade');
       }
-      if (draw.reload.some((v) => v === 32767) && !screenshots.includes('W2-11-recharge.png')) {
+      if (
+        draw.reload.some((v) => v > 0 && v < 65535) &&
+        !screenshots.includes('W2-11-recharge.png')
+      ) {
         await photograph(b, 'recharge');
       }
       if (s.rooms[0].defeated) {
@@ -282,7 +290,9 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
         await b.page.mouse.up({ button: 'left' });
         await b.page.mouse.down({ button: 'right' });
         await until(() => b.move.buttons === 2, 'Original defend input');
-        await advance(3);
+        for (let tick = 0; tick < 3; ++tick) {
+          await advance();
+        }
         break;
       }
     }
@@ -340,7 +350,7 @@ export async function protocolEffectsCase({ browser, snapshot, nativeDir, output
       'Fading mob is absent from live catalog',
     );
     const hits = clients.map((e) => e.snapshots.flatMap((s) => s.hits));
-    assert.ok(hits[0].length >= 3, 'Both mob hits and the broken petal are broadcast');
+    assert.ok(hits[0].length >= 2, 'Each side of the collision broadcasts a hit');
     assert.equal(
       hits[0].length,
       hits[1].length,

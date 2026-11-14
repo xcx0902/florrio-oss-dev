@@ -252,7 +252,7 @@ struct EntityView {
 struct PetalSlotView {
   std::optional<EntityId> entity;
   Tick reload_ticks = 0;
-  // entity remains the first orbiting particle for W1/W2 consumers.
+  // entity is the first equipped particle, or the hatchling occupying an Egg slot.
   std::vector<EntityId> entities;
   Tick reload_total_ticks = 0;
   bool operator==(const PetalSlotView&) const = default;
@@ -321,7 +321,6 @@ struct MatchView {
   Microseconds broadcast_interval{};
   double arena_radius = 0;
   Biome biome = Biome::garden;
-  Tick petal_reload = 1;
   Phase phase = Phase::waiting;
   WaveView wave;
   std::optional<WaveView> previous_wave;

@@ -39,8 +39,7 @@ struct Entity {
   BodyRules rules;
   Vec2 knockback;
   Vec2 recoil;
-  double orbit_offset = 0;
-  std::vector<Poison> poisons;
+  std::optional<Poison> poison;
   std::optional<DamageSource> fatal_hit;
   Tick born_tick = 0;
   bool projectile = false;

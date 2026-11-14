@@ -12,9 +12,6 @@ Tick ticks(const Rules& rules, double seconds) {
 }
 
 void Match::refresh_passives() {
-  if (!rules_.catalog) {
-    return;
-  }
   for (auto& owner : players_) {
     owner.view.vision_multiplier = owner.view.pickup_multiplier = 1;
     if (!owner.view.body) {
@@ -26,7 +23,7 @@ void Match::refresh_passives() {
       if (!owner.view.petals[i].entity) {
         continue;
       }
-      const auto& p = *rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
+      const auto& p = *rules_.catalog.petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
       owner.view.vision_multiplier =
           std::max(owner.view.vision_multiplier, p.mechanics.vision_multiplier);
       owner.view.pickup_multiplier =
@@ -36,11 +33,11 @@ void Match::refresh_passives() {
       damage = std::max(damage, p.mechanics.body_damage);
     }
     for (std::size_t i = 0; i < owner.view.loadout.size(); ++i) {
-      const auto* p = rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
+      const auto* p = rules_.catalog.petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
       if (p && p->effect == catalog::Effect::starfish &&
           body.view.health < body.view.max_health * .5) {
         impacts_.push_back({body.view.id, damage_source(body), HealthKind::heal,
-                            p->passive_heal_per_second *
+                            p->mechanics.passive_heal_per_second *
                                 std::chrono::duration<double>(rules_.timing.step).count()});
       }
     }
@@ -116,9 +113,8 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
   auto& body = target->view;
   // The head owns the Leech's health. Keep every section's view in sync before
   // processing the next impact, while keeping hit effects on the struck section.
-  auto& health_owner = target->chain_kind == Mob::leech && target->root
-                           ? *entities_.get(*target->root)
-                           : *target;
+  auto& health_owner =
+      target->chain_kind == Mob::leech && target->root ? *entities_.get(*target->root) : *target;
   auto& health = health_owner.view.health;
   const auto set_health = [&](double value) {
     health = value;
@@ -156,14 +152,13 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
     body.shield -= absorbed;
     const double accepted = amount;
     amount -= absorbed;
-    if (!secondary && body.group == Group::player && rules_.catalog && body.owner) {
+    if (!secondary && body.group == Group::player && body.owner) {
       const auto& owner = *player(body.owner->player);
       std::optional<EntityId> sponge;
       double period = 0;
       for (std::size_t i = 0; i < owner.view.petals.size(); ++i) {
         const auto& slot = owner.view.petals[i];
-        const auto* p =
-            rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
+        const auto* p = rules_.catalog.petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
         if (slot.entity && p && p->mechanics.sponge_seconds > period) {
           sponge = slot.entity;
           period = p->mechanics.sponge_seconds;
@@ -184,8 +179,7 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
     }
     if (amount > 0 && !secondary) {
       if (body.mob && *body.mob != Mob::sandstorm && *body.mob != Mob::bubble) {
-        const auto ai = rules_.catalog ? rules_.catalog->mob(*body.mob, body.rarity)->ai
-                                       : catalog::MobAI::chase;
+        const auto ai = rules_.catalog.mob(*body.mob, body.rarity)->ai;
         if (ai != catalog::MobAI::passive || kind == HealthKind::radiation) {
           health_owner.provoked = true;
         }
@@ -216,12 +210,12 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
           target->action_ready = tick_;
         }
       }
-      if (body.group == Group::player && body.owner && rules_.catalog) {
+      if (body.group == Group::player && body.owner) {
         double reflect = 0;
         const auto& owner = *player(body.owner->player);
         for (std::size_t i = 0; i < owner.view.petals.size(); ++i) {
           if (owner.view.petals[i].entity) {
-            reflect += rules_.catalog->petal(owner.view.loadout[i], owner.view.loadout_rarities[i])
+            reflect += rules_.catalog.petal(owner.view.loadout[i], owner.view.loadout_rarities[i])
                            ->mechanics.reflection;
           }
         }
@@ -240,9 +234,9 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
         }
       }
       const auto* attacker = entities_.get(source.entity);
-      if (attacker && rules_.catalog) {
+      if (attacker) {
         if (attacker->view.petal && attacker->view.owner) {
-          const auto& p = *rules_.catalog->petal(*attacker->view.petal, attacker->view.rarity);
+          const auto& p = *rules_.catalog.petal(*attacker->view.petal, attacker->view.rarity);
           if (p.mechanics.heal_ratio > 0) {
             auto* owner = player(attacker->view.owner->player);
             if (owner && owner->view.life == *attacker->view.owner && owner->view.body) {
@@ -251,7 +245,7 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
             }
           }
         } else if (attacker->view.mob) {
-          const auto& m = *rules_.catalog->mob(*attacker->view.mob, attacker->view.rarity);
+          const auto& m = *rules_.catalog.mob(*attacker->view.mob, attacker->view.rarity);
           if (m.lifesteal > 0) {
             (void)apply_health(source.entity, source, HealthKind::heal,
                                std::min(amount, m.lifesteal), true);
@@ -286,9 +280,6 @@ void Match::flush_sponge(EntityId id) {
 }
 
 void Match::update_special_effects() {
-  if (!rules_.catalog) {
-    return;
-  }
   const double dt = std::chrono::duration<double>(rules_.timing.step).count();
   const auto active = entities_.active();
   for (const auto slot : active) {
@@ -324,13 +315,14 @@ void Match::update_special_effects() {
     if (!owner || owner->view.life != *e->view.owner || !owner->view.body) {
       continue;
     }
-    const auto& p = *rules_.catalog->petal(*e->view.petal, e->view.rarity);
+    const auto& p = *rules_.catalog.petal(*e->view.petal, e->view.rarity);
     const auto source = damage_source(*e);
     const auto owner_id = *owner->view.body;
     const auto origin = entities_.get(owner_id)->view.position;
     const auto delay = ticks(rules_, p.activation_seconds);
     if (p.effect == catalog::Effect::yucca && owner->defend) {
-      impacts_.push_back({owner_id, source, HealthKind::heal, p.passive_heal_per_second * dt});
+      impacts_.push_back(
+          {owner_id, source, HealthKind::heal, p.mechanics.passive_heal_per_second * dt});
     }
     if (p.effect == catalog::Effect::bubble && owner->defend && tick_ >= e->born_tick + delay) {
       Vec2 direction = origin - e->view.position;
@@ -340,7 +332,7 @@ void Match::update_special_effects() {
       consume_petal(target);
     } else if (p.effect == catalog::Effect::shell && tick_ >= e->born_tick + delay) {
       std::optional<EntityId> recipient;
-      double nearest = p.range;
+      double nearest = p.mechanics.range;
       for (const auto candidate : entities_.active()) {
         const auto& t = entities_.at(candidate).view;
         if (t.group != Group::player || t.faction != e->view.faction || t.health <= 0 ||
@@ -395,7 +387,7 @@ void Match::update_special_effects() {
       for (const auto candidate : entities_.active()) {
         auto& t = entities_.at(candidate);
         if (t.view.group == Group::petal || t.view.health <= 0 ||
-            (t.view.position - e->view.position).length() > p.area_radius) {
+            (t.view.position - e->view.position).length() > p.mechanics.area_radius) {
           continue;
         }
         if (t.view.faction != source.faction) {
@@ -414,7 +406,7 @@ void Match::update_special_effects() {
       const auto wind = spawn_mob(Mob::sandstorm, rarity, position, Group::summon, life);
       auto& tornado = *entities_.get(wind);
       tornado.summon_origin = Petal::stick;
-      tornado.expires = tick_ + ticks(rules_, p.duration_seconds);
+      tornado.expires = tick_ + ticks(rules_, p.mechanics.duration_seconds);
     } else if ((p.effect == catalog::Effect::pollen || p.effect == catalog::Effect::dandelion ||
                 p.effect == catalog::Effect::pearl) &&
                tick_ >= e->born_tick + delay &&
@@ -428,8 +420,8 @@ void Match::update_special_effects() {
       }
       e->projectile = true;
       e->flight_start = e->view.position;
-      e->range_left = p.range;
-      e->flight_speed = p.projectile_speed;
+      e->range_left = p.mechanics.range;
+      e->flight_speed = p.mechanics.projectile_speed;
       e->expires = p.effect == catalog::Effect::pearl ? 0 : tick_ + ticks(rules_, 5);
       e->held = p.effect == catalog::Effect::pearl;
       e->view.anchor.reset();

@@ -176,12 +176,11 @@ void poison_and_slow() {
   FixtureAccess::poison(m, mob, petal(m), 2, 100);
   FixtureAccess::poison(m, mob, petal(m, 1), 1, 10);
   auto& t = FixtureAccess::get(m, mob);
-  check(t.poisons.size() == 1 && t.poisons[0].amount == 2 && t.poisons[0].remaining == 99,
+  check(t.poison && t.poison->amount == 2 && t.poison->remaining == 99,
         "weaker poison cannot replace remaining stronger poison");
   FixtureAccess::poison(m, mob, petal(m, 1), 3, 100);
-  check(t.poisons.size() == 1 && t.poisons[0].source.entity == petal(m, 1),
-        "stronger poison replaces attribution");
-  t.poisons.clear();
+  check(t.poison && t.poison->source.entity == petal(m, 1), "stronger poison replaces attribution");
+  t.poison.reset();
   for (auto id : {petal(m), petal(m, 1)}) {
     FixtureAccess::get(m, id).view.position = t.view.position;
   }
@@ -523,7 +522,8 @@ void remaining_petals() {
     steps(m);
     const auto id = flower(m);
     FixtureAccess::get(m, id).view.health = 4000;
-    const auto rate = catalog::dated().petal(kind, Rarity::common)->passive_heal_per_second * .025;
+    const auto rate =
+        catalog::dated().petal(kind, Rarity::common)->mechanics.passive_heal_per_second * .025;
     steps(m);
     near(FixtureAccess::get(m, id).view.health, kind == Petal::yucca ? 4000 : 4000 + rate,
          "conditional healing uses correct activation");
@@ -927,10 +927,9 @@ void timing_and_debts() {
     check(e.view.mob == Mob::beetle && e.view.rarity == Rarity::legendary,
           "Mythic Egg retains observed Legendary contents");
     const auto lifetime = arena().timing.ticks_ceil(Microseconds(static_cast<Microseconds::rep>(
-        catalog::dated().petal(Petal::egg, Rarity::mythic)->duration_seconds * 1e6)));
+        catalog::dated().petal(Petal::egg, Rarity::mythic)->mechanics.duration_seconds * 1e6)));
     check(e.expires == e.born_tick + lifetime,
           "summon expiry uses Egg's rarity, not contents rarity");
-    check(m.equip({1}, 0, Petal::none), "remove Egg after hatch");
     const auto expiry = e.expires;
     steps(m, expiry - m.view().next_tick);
     check(FixtureAccess::exists(m, *child), "summon alive immediately before expiry tick");

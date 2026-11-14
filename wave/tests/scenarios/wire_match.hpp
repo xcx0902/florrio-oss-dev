@@ -9,15 +9,44 @@
 namespace wave::fixtures {
 
 inline sim::Rules wire_fixture_rules() {
-  auto rules = short_match_rules();
+  using namespace sim;
+  // Fixed encounters keep the original client death and survivor tests reproducible.
+  static const auto mobs = [] {
+    const auto source = catalog::dated().mobs;
+    std::vector result(source.begin(), source.end());
+    for (auto& mob : result) {
+      if (mob.rarity != Rarity::common || (mob.kind != Mob::bee && mob.kind != Mob::ladybug)) {
+        continue;
+      }
+      mob.body.health = 10;
+      mob.body.speed_per_second = 0;
+      mob.body.contact_damage = 100;
+      mob.ai = catalog::MobAI::stationary;
+    }
+    return result;
+  }();
+  static const auto petals = [] {
+    const auto source = catalog::dated().petals;
+    std::vector result(source.begin(), source.end());
+    for (auto& petal : result) {
+      if (petal.kind == Petal::basic && petal.rarity == Rarity::common) {
+        // Observe the full break/recharge cycle in a few manual steps.
+        petal.reload_seconds = .05;
+        petal.mechanics.attack_distance = 15;
+      }
+      if (petal.kind == Petal::rose && petal.rarity == Rarity::common) {
+        petal.body.contact_damage = 0;
+      }
+    }
+    return result;
+  }();
+  static const catalog::Catalog definitions{
+      .version = "wire-fixture.1", .petals = petals, .mobs = mobs};
+  auto rules = short_match_rules(definitions);
   rules.version = "w2-wire-fixture.1";
   rules.player.speed_per_second = 80;
-  rules.orbit_radius = 8;
+  rules.orbit_radius = 10;
   rules.orbit_rad_per_second = 4;
-  rules.petals[0].radius = 2;
-  for (auto& mob : rules.mobs) {
-    mob.body.contact_damage = 100;
-  }
   for (auto& wave : rules.waves) {
     wave.deadline = 20000;
   }

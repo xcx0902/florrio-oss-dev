@@ -271,8 +271,28 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
     stableConnection(entry, before);
     const screenshot = 'W2-08-rejoined.png';
     await entry.page.screenshot({ path: path.join(output, screenshot) });
-    // Travel along an empty bearing to the actual W1 circular boundary.
-    await aim(entry, [-1 / Math.hypot(1, 0.3), -0.3 / Math.hypot(1, 0.3)]);
+    await aim(entry);
+    s = await advance(3);
+    // Pick a route after both batches spawn so this checks the arena boundary.
+    const room = s.rooms[0];
+    const flower = room.entities.find((e) => e.group === 0);
+    const mobs = room.entities.filter((e) => e.group === 2);
+    const bearing = Array.from({ length: 16 }, (_, i) => {
+      const angle = (i * Math.PI) / 8;
+      const x = Math.cos(angle),
+        y = Math.sin(angle);
+      const clearance = Math.min(
+        ...mobs.map((mob) => {
+          const dx = mob.x - flower.x,
+            dy = mob.y - flower.y;
+          const along = Math.max(0, dx * x + dy * y);
+          return Math.hypot(dx - along * x, dy - along * y) - mob.radius - flower.radius;
+        }),
+      );
+      return { direction: [x, y], clearance };
+    }).sort((a, b) => b.clearance - a.clearance)[0];
+    assert.ok(bearing.clearance > 0, 'Fixture has an unobstructed route to the arena edge');
+    await aim(entry, bearing.direction);
     await advance(100);
     await pause(500);
     assert.ok(entry.current.control, 'Flower survives travel to the boundary');

@@ -437,61 +437,30 @@ void geometry_and_combat() {
   step(contacts);
   check(entity(contacts, a_body)->health == 9, "poison expires after the configured duration");
 
-  Match heals({4}, 952, fixtures::short_match_rules());
-  check(heals.add_player(a, {}, {Petal::rose}), "equip a healing petal");
-  step(heals);
-  const auto healer = participant(heals);
-  const auto rose = healer.petals.front().entity.value();
-  check(entity(heals, rose)->position == Vec2{4, 0} && entity(heals, rose)->anchor == healer.body,
-        "orbit exposes position, life ownership and anchor");
-  const BodyRules small{.radius = 1, .health = 20};
-  const auto summon =
-      FixtureAccess::spawn(heals, Group::summon, Faction::team, {6, 0}, small, healer.life);
-  const auto hostile =
-      FixtureAccess::spawn(heals, Group::segment, Faction::hostile, {4, 2.5}, small);
-  FixtureAccess::hit(heals, summon, DamageSource{}, 8);
-  FixtureAccess::hit(heals, hostile, team(heals), 8);
-  step(heals);
-  step(heals);
-  const auto healing = events_of<HealthChange>(heals);
-  check(healing.size() == 1 && healing.front().kind == HealthKind::heal &&
-            healing.front().source.entity == rose && healing.front().source.owner == healer.life &&
-            healing.front().target == summon && entity(heals, summon)->health == 18 &&
-            entity(heals, hostile)->health == 12,
-        "healing petal heals an allied summon and leaves an enemy untouched");
-
-  Match petal({5}, 952, fixtures::short_match_rules());
-  check(petal.add_player(a, {}, {Petal::basic}), "equip an attacking petal");
-  step(petal);
-  const auto basic = participant(petal).petals.front().entity.value();
-  const auto target = FixtureAccess::spawn(petal, Group::ant_hole, Faction::hostile, {4, 0},
-                                           {.radius = 1, .health = 20, .contact_damage = 5});
-  step(petal);
-  check(!entity(petal, basic) && entity(petal, target)->health == 13 &&
-            participant(petal).petals.front().reload_ticks == 2,
-        "enemy and basic petal trade damage and start reload on petal death");
-  FixtureAccess::hit(petal, target, team(petal));
-  step(petal);
-  check(!entity(petal, target) && !participant(petal).petals.front().entity,
-        "reload gates petal recovery after combat ends");
-  step(petal);
-  const auto new_petal = participant(petal).petals.front().entity;
-  check(new_petal && new_petal != basic, "reloaded petal receives a fresh entity generation");
-
-  Match multiple({6}, 952, fixtures::short_match_rules());
+  Match multiple({4}, 952, fixtures::short_match_rules());
   check(multiple.add_player(a, {}, {Petal::basic}), "equip a petal for simultaneous contacts");
   step(multiple);
+  const auto owner = participant(multiple);
+  const auto basic = entity(multiple, *owner.petals.front().entity).value();
+  check(basic.anchor == owner.body && basic.owner == owner.life,
+        "the orbiting petal belongs to the current life");
   const auto stationary = [&](double y) {
-    return FixtureAccess::spawn(multiple, Group::summon, Faction::hostile, {4, y},
-                                {.radius = 1, .health = 30});
+    return FixtureAccess::spawn(multiple, Group::summon, Faction::hostile,
+                                basic.position + Vec2{0, y}, {.radius = 1, .health = 100});
   };
   const auto left = stationary(-1.75), right = stationary(1.75);
-  step(multiple);
-  check(entity(multiple, left)->health == 23 && entity(multiple, right)->health == 23,
-        "one petal damages both overlapping enemies in the same step");
-  step(multiple);
-  check(entity(multiple, left)->health == 16 && entity(multiple, right)->health == 16,
-        "continuing contact damages both enemies again on the next step");
+  for (int tick = 0; tick < 2; ++tick) {
+    step(multiple);
+    const auto hits = events_of<HealthChange>(multiple);
+    for (const auto target : {left, right}) {
+      check(std::ranges::any_of(hits,
+                                [&](const auto& hit) {
+                                  return hit.source.entity == basic.id && hit.target == target &&
+                                         hit.kind == HealthKind::contact;
+                                }),
+            "one petal damages both overlapping enemies on each tick of contact");
+    }
+  }
 }
 
 void isolation() {

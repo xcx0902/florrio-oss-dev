@@ -2,8 +2,6 @@
 
 #include "sim/model.hpp"
 
-#include <array>
-
 namespace wave::catalog {
 struct Catalog;
 }
@@ -21,14 +19,8 @@ struct BodyRules {
   double health = 1;
   double speed_per_second = 0;
   double contact_damage = 0;
-  double contact_heal = 0;
   double poison_per_tick = 0;
   Tick poison_ticks = 0;
-};
-
-struct MobRules {
-  Mob kind;
-  BodyRules body;
 };
 
 struct Batch {
@@ -58,21 +50,21 @@ enum class ResidualPolicy {
 };
 
 struct Rules {
+  Rules();
+  explicit Rules(const catalog::Catalog& catalog);
+  Rules(const catalog::Catalog&&) = delete;
+
+  // The immutable catalog and its entries must outlive the match.
+  const catalog::Catalog& catalog;
   std::string version;
   Timing timing;
   Biome biome = Biome::garden;
   double arena_radius = 300;
   BodyRules player;
-  std::array<BodyRules, 2> petals;
-  Tick petal_reload = 1;
   double orbit_radius = 14;
-  // Explicit local reconstruction; defending takes priority when both buttons are held.
-  double attack_orbit_multiplier = 1.8;
-  double defend_orbit_multiplier = 0.6;
   double orbit_rad_per_second = 4;
   double knockback_retention = 0.75;
   double contact_knockback_speed = 0;
-  std::vector<MobRules> mobs;
   std::vector<WaveRules> waves;
   bool progressive_waves = false;
   std::vector<Mob> late_mobs;
@@ -86,8 +78,6 @@ struct Rules {
   bool advance_on_deadline = true;
   LifecycleRules lifecycle;
   ResidualPolicy residual = ResidualPolicy::discard;
-  // Fixtures may supply their own body rules without a catalog.
-  const catalog::Catalog* catalog = nullptr;
 };
 
 [[nodiscard]] Rules scenario_rules(Biome biome);

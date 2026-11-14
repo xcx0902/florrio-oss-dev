@@ -565,7 +565,7 @@ bool RoomManager::economy_command(Member& member, const wire::ReliableAction& ac
     const auto slots = store::unlocked_main_slots(member.profile->level);
     equipping.slots = member.profile->slots;
     const auto* rules = rules_override_for(member.biome);
-    const auto* equipment_catalog = rules ? rules->catalog : &catalog::dated();
+    const auto& equipment_catalog = rules ? rules->catalog : catalog::dated();
     const auto assign = [&](std::size_t slot, std::pair<std::uint32_t, std::uint8_t> value) {
       if (value.first == 0) {
         equipping.slots[slot].reset();
@@ -578,10 +578,7 @@ bool RoomManager::economy_command(Member& member, const wire::ReliableAction& ac
       }
       // Keep registered inventory intact, but do not silently simulate a kind
       // whose authoritative effect has not been implemented yet.
-      const bool supported =
-          equipment_catalog ? equipment_catalog->petal(*kind, sim::Rarity(value.second)) != nullptr
-                            : static_cast<std::size_t>(*kind) < rules->petals.size();
-      if (slot < 8 && !supported) {
+      if (slot < 8 && !equipment_catalog.petal(*kind, sim::Rarity(value.second))) {
         return false;
       }
       equipping.slots[slot] = store::Item{value.first, value.second};
