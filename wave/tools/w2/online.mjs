@@ -113,6 +113,11 @@ function world(plain, baseline) {
     if (mask & 1) {
       r.byte();
     }
+    if (mask & 2) {
+      entity.mode = r.byte();
+      entity.serverLabel = r.str();
+      entity.rotation = r.vu();
+    }
     if (mask & 0x20) {
       entity.flowerState = [r.byte(), r.byte(), r.byte(), r.byte()];
       if ((header ^ 0xac) & 8) {

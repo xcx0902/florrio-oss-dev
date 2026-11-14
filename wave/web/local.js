@@ -141,35 +141,6 @@
 
   const gardenDiscovery = '/endpoint/florrio-waves-0/findEach/';
   const rotatingDiscovery = '/endpoint/florrio-waves-1/findEach/';
-  let ocean = new URLSearchParams(location.search).get('biome') === 'ocean';
-  if (ocean) {
-    localStorage.setItem('florrio_gamemode', '1');
-  }
-  let biome =
-    localStorage.getItem('florrio_gamemode') === '1' ? (ocean ? 'ocean' : 'desert') : 'garden';
-  const selector = document.createElement('select');
-  selector.setAttribute('aria-label', 'Wave biome');
-  selector.style.cssText =
-    'position:fixed;top:8px;left:168px;z-index:10;padding:3px 6px;' +
-    'font:600 13px Ubuntu,sans-serif;color:white;background:#202020b8;' +
-    'border:1px solid #ffffff70;border-radius:4px;color-scheme:dark';
-  for (const name of ['Garden', 'Desert', 'Ocean']) {
-    selector.add(new Option(name, name.toLowerCase()));
-  }
-  selector.value = biome;
-  const switchBiome = (name) => {
-    localStorage.setItem('florrio_gamemode', name === 'garden' ? '0' : '1');
-    const url = new URL(location.href);
-    if (name === 'ocean') {
-      url.searchParams.set('biome', 'ocean');
-    } else {
-      url.searchParams.delete('biome');
-    }
-    url.hash = '';
-    location.replace(url);
-  };
-  selector.addEventListener('change', () => switchBiome(selector.value));
-  document.body.append(selector);
   const suspended = new WeakSet();
   let modeNotice;
   function unsupportedMode() {
@@ -181,10 +152,15 @@
     const title = document.createElement('h1');
     title.textContent = 'PvP unavailable';
     const description = document.createElement('p');
-    description.textContent = 'Choose Garden, Desert, or Ocean to play Waves.';
+    description.textContent = 'Choose Garden or the current Waves rotation.';
     const recover = document.createElement('button');
     recover.textContent = 'Return to Garden';
-    recover.addEventListener('click', () => switchBiome('garden'));
+    recover.addEventListener('click', () => {
+      localStorage.setItem('florrio_gamemode', '0');
+      const url = new URL(location.href);
+      url.hash = '';
+      location.replace(url);
+    });
     modeNotice.append(title, description, recover);
     document.body.append(modeNotice);
     modeNotice.addEventListener('cancel', (event) => event.preventDefault());
@@ -216,19 +192,10 @@
     }
     const garden = original === `https://api.n.m28.io${gardenDiscovery}`;
     const rotating = original === `https://api.n.m28.io${rotatingDiscovery}`;
-    if (method === 'GET' && (garden || rotating)) {
-      if (garden && ocean) {
-        const url = new URL(location.href);
-        url.searchParams.delete('biome');
-        history.replaceState(history.state, '', url);
-        ocean = false;
-      }
-      biome = garden ? 'garden' : ocean ? 'ocean' : 'desert';
-      selector.value = biome;
-    }
     const local =
       method === 'GET' &&
-      (garden || rotating || original === 'https://api.n.m28.io/server/wavelocal');
+      (garden || rotating || original === 'https://api.n.m28.io/server/wavelocal' ||
+        original === 'https://api.n.m28.io/server/waverotation');
     return open.call(this, method, local ? new URL(original).pathname : url, ...options);
   };
   XMLHttpRequest.prototype.send = function (...args) {
@@ -243,9 +210,12 @@
 
     constructor(url, protocols) {
       const original = new URL(url, location.href).href;
-      const local =
+      const garden =
         original === 'ws://127.0.0.1:443/' || original === 'wss://wavelocal.s.m28n.net/';
-      const suffix = biome === 'garden' ? '' : `/${biome}`;
+      const rotating =
+        original === 'ws://127.0.0.2:443/' || original === 'wss://waverotation.s.m28n.net/';
+      const local = garden || rotating;
+      const suffix = rotating ? '/rotating' : '';
       super(local ? `ws://${location.host}/wave/socket${suffix}` : url, protocols);
       if (!local) {
         return;

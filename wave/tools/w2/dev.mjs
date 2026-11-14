@@ -9,6 +9,7 @@ const { values } = parseArgs({
     snapshot: { type: 'string', default: process.env.WAVE_SNAPSHOT },
     'native-dir': { type: 'string', default: process.env.WAVE_NATIVE_DIR ?? defaultNative },
     port: { type: 'string', default: '8478' },
+    rotation: { type: 'string', default: process.env.WAVE_ROTATION ?? 'desert' },
     database: {
       type: 'string',
       default: process.env.WAVE_DATABASE ?? path.join(defaultNative, '../saves/profiles.sqlite3'),
@@ -30,6 +31,7 @@ const host = await startHost({
   port: values.port,
   database: values.database,
   development: true,
+  rotation: values.rotation,
 });
 const stop = () => host.stop();
 process.once('SIGINT', stop);

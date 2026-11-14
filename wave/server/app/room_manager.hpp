@@ -78,7 +78,8 @@ class RoomManager {
   explicit RoomManager(std::optional<sim::Rules> rules_override = std::nullopt,
                        std::uint32_t seed = 20221030,
                        std::vector<std::vector<sim::Petal>> loadouts = {},
-                       std::shared_ptr<store::Store> storage = {});
+                       std::shared_ptr<store::Store> storage = {},
+                       sim::Biome rotating_biome = sim::Biome::desert);
   ~RoomManager();
   Member& admit(std::string_view token, std::uint64_t connection,
                 sim::Biome biome = sim::Biome::garden);
@@ -109,6 +110,7 @@ class RoomManager {
   const Room* room(const Member& member) const;
   std::span<const sim::Petal> default_loadout(std::size_t seat) const;
   const auto& rooms() const { return rooms_; }
+  sim::Biome rotating_biome() const { return rotating_biome_; }
   std::uint64_t accepted_inputs = 0;
   std::uint64_t rejected_inputs = 0;
   std::uint64_t steps = 0;
@@ -130,6 +132,7 @@ class RoomManager {
   std::optional<sim::Rules> rules_override_;
   std::uint32_t seed_;
   std::vector<std::vector<sim::Petal>> loadouts_;
+  sim::Biome rotating_biome_;
   std::uint64_t next_player_ = 0;
   std::uint64_t next_match_ = 0;
   std::map<std::string, Member, std::less<>> members_;

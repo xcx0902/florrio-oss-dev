@@ -15,7 +15,13 @@ cmake --build build/wave/native --parallel
 npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --port 8478
 ```
 
-左上角的场景菜单可切换 Garden、Desert 和 Ocean，三个场景共享访客存档。
+使用原版 Canvas 菜单的 Garden 和轮换场景按钮切换，三个场景共享访客存档。
+第二个按钮由服务端决定显示 Desert 或 Ocean，默认 Desert；启动时加
+`--rotation ocean`（或设置 `WAVE_ROTATION=ocean`）提供 Ocean。
+例如 `npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --rotation ocean`。
+直接运行原生宿主时同样使用 `WAVE_ROTATION=desert|ocean`。
+切换模式不刷新页面；移除了额外的 DOM 场景下拉框，`?biome=...` 不再决定场景。
+原版只有一个 Desert/Ocean 共用槽位，没有同时自由选择两者的按钮；本地宿主不推定历史轮换周期。
 最高通关波按场景分别记录。开局波取队伍在当前场景的最低纪录的 2/3，向下取整，最低第 1 波。
 各场景按旧版 [Waves Wiki](https://official-florrio.fandom.com/wiki/Waves) 解锁怪物种类，
 刷怪完成且剩余主怪不超过 4 只时推进；清场超时也会推进，幸存怪物留场。

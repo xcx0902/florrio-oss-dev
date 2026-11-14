@@ -21,7 +21,9 @@ export async function startHost({
   database,
   craftRoll,
   development = false,
+  rotation = 'desert',
 }) {
+  assert.ok(['desert', 'ocean'].includes(rotation), 'Rotation must be desert or ocean');
   assert.ok(!(fixture && development), 'Development and fixture hosts are separate');
   assert.ok(snapshot, 'Pass --snapshot or set WAVE_SNAPSHOT');
   const manifest = JSON.parse(await readFile(path.join(web, 'resources-20221030.json')));
@@ -107,6 +109,7 @@ export async function startHost({
       ],
       {
         stdio: ['ignore', 'pipe', 'inherit'],
+        env: { ...process.env, WAVE_ROTATION: rotation },
       },
     );
     const lines = createInterface({ input: child.stdout });

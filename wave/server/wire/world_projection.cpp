@@ -103,6 +103,14 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
                                      std::chrono::steady_clock::time_point now) {
   WorldSnapshot result;
   Writer out;
+  // $601 stores mode at world+60 and rotation at world+76. $939 uses
+  // rotation parity for the native Desert/Ocean button; $441 caches it.
+  Writer server;
+  server.byte(viewer.biome == sim::Biome::garden ? 0 : 1);
+  // Distinct IDs let a fresh invite resolve its mode before receiving metadata.
+  server.text(viewer.biome == sim::Biome::garden ? "wavelocal" : "waverotation");
+  server.integer(rooms.rotating_biome() == sim::Biome::ocean ? 1 : 0);
+  out.record(8198, 0x2, server);
   const auto* room = rooms.room(viewer);
   std::optional<sim::MatchView> view;
   if (room && room->match) {

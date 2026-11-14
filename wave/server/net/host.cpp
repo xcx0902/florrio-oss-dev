@@ -15,6 +15,7 @@
 #include <charconv>
 #include <chrono>
 #include <csignal>
+#include <cstdlib>
 #include <deque>
 #include <filesystem>
 #include <fstream>
@@ -77,9 +78,11 @@ Resources load(const std::filesystem::path& root) {
       "/endpoint/florrio-waves-0/findEach/",
       Resource{"application/json", R"({"servers":{"us":{"id":"wavelocal","ipv4":"127.0.0.1"}}})"});
   resources.emplace("/endpoint/florrio-waves-1/findEach/",
-                    resources.at("/endpoint/florrio-waves-0/findEach/"));
+                    Resource{"application/json", R"({"servers":{"us":{"id":"waverotation","ipv4":"127.0.0.2"}}})"});
   resources.emplace("/server/wavelocal",
                     Resource{"application/json", R"({"id":"wavelocal","ipv4":"127.0.0.1"})"});
+  resources.emplace("/server/waverotation",
+                    Resource{"application/json", R"({"id":"waverotation","ipv4":"127.0.0.2"})"});
   return resources;
 }
 
@@ -241,10 +244,10 @@ class Connection : public std::enable_shared_from_this<Connection> {
       return;
     }
     using wave::sim::Biome;
-    const auto biome = target == "/wave/socket"          ? std::optional{Biome::garden}
-                       : target == "/wave/socket/desert" ? std::optional{Biome::desert}
-                       : target == "/wave/socket/ocean"  ? std::optional{Biome::ocean}
-                                                         : std::nullopt;
+    const auto biome = target == "/wave/socket" ? std::optional{Biome::garden}
+                       : target == "/wave/socket/rotating"
+                           ? std::optional{rooms_->rotating_biome()}
+                           : std::nullopt;
     if (biome && ws::is_upgrade(request)) {
       if (request[http::field::origin] != "http://" + authority_ || buffer_.size() != 0) {
         respond(http::status::forbidden, {"text/plain", "Forbidden"});
@@ -268,7 +271,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
       });
       return;
     }
-    // Biome selection can be part of the entry URL; asset routes remain exact.
+    // Entry-page query parameters do not select the biome; asset routes remain exact.
     const auto resource_target = target.starts_with("/?") ? std::string_view{"/"} : target;
     if (const auto resource = resources_.find(resource_target); resource != resources_.end()) {
       respond(http::status::ok, resource->second);
@@ -384,7 +387,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
 class Host {
  public:
   Host(asio::io_context& io, unsigned short port, Resources resources, const std::string& database,
-       std::optional<std::uint32_t> craft_roll = {})
+       wave::sim::Biome rotating_biome, std::optional<std::uint32_t> craft_roll = {})
       : acceptor_(io, {asio::ip::address_v4::loopback(), port}), resources_(std::move(resources)),
         authority_("localhost:" + std::to_string(acceptor_.local_endpoint().port())), timer_(io) {
     std::shared_ptr<wave::store::Store> store;
@@ -408,12 +411,14 @@ class Host {
           wave::fixtures::wire_fixture_rules(), 20221030,
           std::vector<std::vector<wave::sim::Petal>>{
               std::vector<wave::sim::Petal>(5, wave::sim::Petal::rose),
-              std::vector<wave::sim::Petal>(5, wave::sim::Petal::basic)});
+              std::vector<wave::sim::Petal>(5, wave::sim::Petal::basic)},
+          nullptr, rotating_biome);
     }
 #endif
     if (!rooms_) {
       rooms_ = std::make_shared<wave::app::RoomManager>(
-          std::nullopt, 20221030, std::vector<std::vector<wave::sim::Petal>>{}, std::move(store));
+          std::nullopt, 20221030, std::vector<std::vector<wave::sim::Petal>>{}, std::move(store),
+          rotating_biome);
     }
     tick();
   }
@@ -495,7 +500,14 @@ int main(int argc, char** argv) {
       throw std::runtime_error("Unexpected argument");
     }
 #endif
-    Host host(io, port, load(argv[1]), argc > 3 ? argv[3] : "", craft_roll);
+    const char* rotation_env = std::getenv("WAVE_ROTATION");
+    const std::string_view rotation = rotation_env ? rotation_env : "desert";
+    if (rotation != "desert" && rotation != "ocean") {
+      throw std::runtime_error("WAVE_ROTATION must be desert or ocean");
+    }
+    const auto rotating_biome =
+        rotation == "ocean" ? wave::sim::Biome::ocean : wave::sim::Biome::desert;
+    Host host(io, port, load(argv[1]), argc > 3 ? argv[3] : "", rotating_biome, craft_roll);
     asio::signal_set signals(io, SIGINT, SIGTERM);
     signals.async_wait([&](Error, int) {
       // Drain while connections and their profile callbacks still exist. Some

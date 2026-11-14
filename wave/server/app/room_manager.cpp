@@ -135,8 +135,12 @@ struct RoomManager::StorageState {
 
 RoomManager::RoomManager(std::optional<sim::Rules> rules_override, std::uint32_t seed,
                          std::vector<std::vector<sim::Petal>> loadouts,
-                         std::shared_ptr<store::Store> storage)
-    : rules_override_(std::move(rules_override)), seed_(seed), loadouts_(std::move(loadouts)) {
+                         std::shared_ptr<store::Store> storage, sim::Biome rotating_biome)
+    : rules_override_(std::move(rules_override)), seed_(seed), loadouts_(std::move(loadouts)),
+      rotating_biome_(rotating_biome) {
+  if (rotating_biome != sim::Biome::desert && rotating_biome != sim::Biome::ocean) {
+    throw std::invalid_argument("Waves rotation must be Desert or Ocean");
+  }
   if (storage) {
     storage_ = std::make_unique<StorageState>(std::move(storage), seed);
   }

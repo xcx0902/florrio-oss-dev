@@ -336,10 +336,12 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
 }
 
 export async function biomeSelectionCase({ browser, snapshot, nativeDir, output, report }) {
-  const host = await startHost({ snapshot, nativeDir, port: 0 });
+  const temporary = await mkdtemp(path.join(tmpdir(), 'wave-native-biomes-'));
+  const database = path.join(temporary, 'profiles.sqlite3');
+  let host = await startHost({ snapshot, nativeDir, port: 0, database });
   let entry;
   try {
-    console.log('W2-09: original client switches between Desert, Ocean and Garden');
+    console.log('W2-09: native Garden button and server-selected Desert/Ocean rotation');
     report.cases['W2-09'] = { status: 'failed', kind: 'original-mode-selection' };
     entry = await client(browser, host.url, 'mode-recovery');
     await pause(700);
@@ -372,28 +374,52 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
     await entry.page.screenshot({ path: path.join(output, squad) });
     Object.assign(report.cases['W2-10'], { status: 'passed', screenshot: squad });
     const scenes = [];
-    for (const [name, biome, rgb, pool] of [
-      ['desert', 1, [211, 196, 113], [2, 16, 17, 25]],
-      ['ocean', 2, [53, 140, 195], [26, 28, 33]],
-      ['garden', 0, [30, 167, 97], [1, 3, 4, 5]],
-    ]) {
+    const origin = new URL(host.url).origin;
+    const saved = await (await fetch(host.url + `wave/cache/${entry.guest}`)).json();
+    async function selectMode(mode) {
       const connections = entry.sockets.length;
-      const selector = entry.page.getByRole('combobox', { name: 'Wave biome' });
-      await selector.selectOption(name);
+      const loads = entry.documentLoads.length;
+      await entry.page.mouse.click(mode ? 440 : 375, 406);
       await until(
-        () => entry.sockets.length === connections + 1 && entry.baseline.has(8193),
-        `Original client connects to ${name}`,
+        () => entry.sockets.length === connections + 1 && entry.baseline.get(8198)?.mode === mode,
+        `Native mode ${mode} connects`,
       );
+      await pause(700);
       assert.equal(
         new URL(entry.sockets.at(-1)).pathname,
-        biome ? `/wave/socket/${name}` : '/wave/socket',
+        mode ? '/wave/socket/rotating' : '/wave/socket',
       );
+      assert.equal(entry.documentLoads.length, loads, 'Native mode selection keeps the document');
       assert.equal(
-        await entry.page.evaluate(() => localStorage.getItem('cp6_player_id')),
-        entry.guest,
+        await entry.page.evaluate(() => localStorage.getItem('florrio_gamemode')),
+        String(mode),
       );
-      await entry.page.waitForFunction(() => window.waveLabels.has('Ready'));
-      await pause(600);
+    }
+    async function enterScene(name, biome, rotation, rgb, pool) {
+      assert.equal(await entry.page.locator('select').count(), 0, 'No injected biome selector');
+      assert.equal(new URL(entry.page.url()).search, '', 'No biome query parameter');
+      assert.equal(entry.baseline.get(8198)?.rotation, rotation);
+      await entry.page.evaluate(() => window.waveLabels.clear());
+      await entry.page.waitForFunction(
+        (label) => window.waveLabels.has(label),
+        rotation ? 'Ocean' : 'Desert',
+      );
+      // The rotating button selects mode 1; clicking it again cannot flip its biome.
+      const connections = entry.sockets.length;
+      if (biome) {
+        await entry.page.mouse.click(440, 406);
+        await pause(350);
+        assert.equal(entry.sockets.length, connections, 'Selected rotation is not a toggle');
+      }
+      const memory = await entry.page.evaluate(() => {
+        const view = new DataView(window.Module.asm.Jf.buffer);
+        const world = view.getUint32(4347728, true);
+        return { mode: view.getUint8(world + 60), rotation: view.getUint32(world + 76, true) };
+      });
+      assert.deepEqual(memory, { mode: biome ? 1 : 0, rotation });
+      const menu = `W2-09-${name}-menu.png`;
+      await entry.page.screenshot({ path: path.join(output, menu) });
+      await entry.page.mouse.move(512, 384);
       await entry.page.keyboard.press('Enter');
       await until(
         () => entry.current?.control && entry.baseline.get(8197)?.biome === biome,
@@ -410,9 +436,73 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
       await pause(450); // Let the original canvas finish transitioning away from the menu.
       const screenshot = `W2-09-${name}.png`;
       await entry.page.screenshot({ path: path.join(output, screenshot) });
-      scenes.push({ name, biome, mobs: mobs.map((mob) => mob.mob), screenshot });
+      assert.equal(
+        await entry.page.evaluate(() => localStorage.getItem('cp6_player_id')),
+        entry.guest,
+      );
+      const profile = await (await fetch(host.url + `wave/cache/${entry.guest}`)).json();
+      assert.equal(profile.equipped, saved.equipped, 'Equipment persists across native modes');
+      assert.deepEqual(entry.errors, []);
+      scenes.push({
+        name, biome, rotation, memory, mobs: mobs.map((mob) => mob.mob), menu, screenshot,
+      });
+      await entry.page.mouse.click(18, 18);
+      await until(() => !entry.current.control && !entry.baseline.has(8197), 'Exit to native menu');
+      await pause(700);
     }
-    assert.ok(entry.requests.every((url) => new URL(url).origin === new URL(host.url).origin));
+    async function inviteRotation(rotation) {
+      await entry.page.mouse.click(660, 408);
+      await entry.page.waitForFunction(() => location.hash.startsWith('#waverotation-'));
+      const invite = entry.page.url();
+      const peer = await client(browser, invite, 'fresh-rotation-invite');
+      try {
+        await until(
+          () => entry.baseline.get(8194)?.memberFlags[1] === 1 && peer.baseline.has(8194),
+          'Fresh native invite joins the same rotating squad',
+        );
+        assert.equal(peer.baseline.get(8194).code, entry.baseline.get(8194).code);
+        assert.equal(peer.baseline.get(8198).mode, 1);
+        assert.equal(peer.baseline.get(8198).rotation, rotation);
+        assert.equal(peer.sockets.length, 1, 'Invitation selects the mode on the first connection');
+        assert.equal(new URL(peer.sockets.at(-1)).pathname, '/wave/socket/rotating');
+        assert.equal(
+          await peer.page.evaluate(() => localStorage.getItem('florrio_gamemode')),
+          '1',
+        );
+        assert.ok(peer.requests.every((url) => new URL(url).origin === origin));
+        assert.deepEqual(peer.errors, []);
+      } finally {
+        await peer.context.close();
+      }
+      await pause(700);
+      await entry.page.mouse.click(697, 296);
+      await until(() => !entry.baseline.has(8194), 'Close rotating squad');
+      await pause(700);
+      return new URL(invite).hash;
+    }
+    await selectMode(1);
+    await enterScene('desert', 1, 0, [211, 196, 113], [2, 16, 17, 25]);
+    scenes.at(-1).invite = await inviteRotation(0);
+    await selectMode(0);
+    await enterScene('garden', 0, 0, [30, 167, 97], [1, 3, 4, 5]);
+    await selectMode(1);
+    const loads = entry.documentLoads.length;
+    // Change the host's rotation, retaining the origin, mode-1 cache and saved profile.
+    const port = Number(new URL(host.url).port);
+    await host.stop();
+    host = await startHost({ snapshot, nativeDir, port, database, rotation: 'ocean' });
+    await entry.page.reload();
+    await until(() => entry.baseline.get(8198)?.rotation === 1, 'Server announces Ocean rotation');
+    await pause(700);
+    assert.equal(entry.documentLoads.length, loads + 1, 'Only the deliberate host restart reloads');
+    assert.equal(await entry.page.evaluate(() => localStorage.getItem('florrio_gamemode')), '1');
+    await enterScene('ocean', 2, 1, [53, 140, 195], [26, 28, 33]);
+    scenes.at(-1).invite = await inviteRotation(1);
+    await selectMode(0);
+    assert.equal(entry.baseline.get(8198).rotation, 1, 'Garden also publishes the active rotation');
+    await selectMode(1);
+    assert.equal(entry.baseline.get(8198).rotation, 1, 'Native Ocean selection survives Garden');
+    assert.ok(entry.requests.every((url) => new URL(url).origin === origin));
     assert.deepEqual(entry.errors, []);
     Object.assign(report.cases['W2-09'], { status: 'passed', scenes });
   } finally {
@@ -421,6 +511,7 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
       await entry.context.close();
     }
     await host.stop();
+    await rm(temporary, { recursive: true, force: true });
   }
 }
 
@@ -627,9 +718,7 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
       };
     });
     await Promise.all([page.waitForRequest('**/wave/cache/**'), page.goto(host.url)]);
-    const selector = page.getByRole('combobox', { name: 'Wave biome' });
-    await selector.focus();
-    assert.ok(await selector.evaluate((element) => document.activeElement === element));
+    assert.equal(await page.locator('select').count(), 0, 'Page stays responsive without a selector');
     releaseCache();
     const recovery = banner(page);
     await recovery.getByText(/Could not load your saved profile/).waitFor();
