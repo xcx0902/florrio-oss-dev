@@ -98,6 +98,34 @@ void squad_opening_wave() {
         "opening wave is floor(two thirds of the lowest Ocean record)");
 }
 
+void rarity_kill_xp() {
+  Database file;
+  auto db = std::make_shared<store::Store>(file.path.string());
+  constexpr std::array<store::Count, 6> kill_xp{1, 4, 16, 64, 256, 1024};
+  for (std::size_t rarity = 0; rarity < kill_xp.size(); ++rarity) {
+    auto fixture = rules();
+    fixture.waves = {{1, {sim::Mob::ladybug}, sim::Rarity(rarity), 1, {{0, 1}}, 100}};
+    const auto guest = db->create_guest();
+    app::RoomManager rooms(fixture, 7, {}, db);
+    auto& member = rooms.admit(guest.guest_token, rarity + 1);
+    check(rooms.command(member, wire::Ready{true}, {}), "rarity XP fixture starts");
+    rooms.step();
+    auto& match = *rooms.room(member)->match;
+    const auto view = match.view();
+    const auto root =
+        std::ranges::find(view.entities, sim::Group::main_mob, &sim::EntityView::group);
+    check(root != view.entities.end() && root->rarity == sim::Rarity(rarity),
+          "rarity XP fixture spawns the requested mob");
+    sim::FixtureAccess::kill(match, root->id, player(rooms, member).life);
+    rooms.step();
+    check(rooms.wait_storage() && member.profile->xp == kill_xp[rarity],
+          "each rarity kill credits its exact XP");
+    rooms.step();
+    check(rooms.wait_storage() && db->recover_guest(guest.guest_token)->xp == kill_xp[rarity],
+          "each rarity kill persists once in SQLite");
+  }
+}
+
 void queue_bound() {
   app::EconomyQueue queue(2);
   std::promise<void> started, release;
@@ -693,6 +721,7 @@ int main() {
   try {
     queue_bound();
     squad_opening_wave();
+    rarity_kill_xp();
     commands();
     command_faults();
     economy();

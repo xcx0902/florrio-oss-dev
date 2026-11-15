@@ -98,7 +98,10 @@ void mapping() {
     check(catalog::client_petal(p.kind, p.rarity) == p.client_id && p.evidenceKey.size(),
           "every emitted petal mapped");
   }
+  constexpr std::array<std::uint64_t, 6> kill_xp{1, 4, 16, 64, 256, 1024};
   for (const auto& m : c.mobs) {
+    check(m.xp == kill_xp.at(static_cast<std::size_t>(m.rarity)),
+          "all mob variants award the configured rarity XP");
     check(catalog::client_mob(m.kind, m.rarity) == m.client_id, "every emitted mob mapped");
     check(catalog::client_mob(m.kind, m.rarity, Group::summon) == m.client_id, "summon mapping");
     check(catalog::client_mob(m.kind, m.rarity, Group::ant_hole) ==

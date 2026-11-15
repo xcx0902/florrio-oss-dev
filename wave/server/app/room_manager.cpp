@@ -392,7 +392,11 @@ Member& RoomManager::admit(std::string_view token, std::uint64_t connection, sim
     }
   }
   auto& entry = found->second;
-  if (entry.biome != biome) {
+  const auto* previous = room(entry);
+  if (entry.biome != biome ||
+      (previous && previous->match && previous->match->view().phase == sim::Phase::ended)) {
+    // A closed client cannot finish Continue/Leave for an ended match. Restore
+    // its lobby on admission so the next Ready can create a fresh match.
     leave(entry);
     entry.biome = biome;
   }

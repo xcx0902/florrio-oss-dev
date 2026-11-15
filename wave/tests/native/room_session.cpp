@@ -250,6 +250,42 @@ void public_squads() {
         "Find Public skips a started match");
 }
 
+void disconnected_match_reentry() {
+  using namespace wave;
+  app::RoomManager rooms(fixtures::wire_fixture_rules());
+  auto& member = rooms.admit("", 1);
+  const auto token = member.token;
+  const auto id = member.id;
+  for (std::uint64_t connection = 1; connection <= 3; ++connection) {
+    check(rooms.command(member, wire::Ready{true}, {}), "Returning guest can Ready a solo match");
+    rooms.step();
+    const auto old_match = rooms.room(member)->match->id();
+    if (connection != 2) {
+      check(rooms.command(member, wire::Ready{false}, {}), "Native client clears Ready after spawn");
+    }
+    rooms.disconnect(token, connection);
+    rooms.step();
+    check(rooms.room(member)->match->view().phase == sim::Phase::ended,
+          "Closing the last socket ends the solo match");
+    auto& returning = rooms.admit(token, connection + 1);
+    check(returning.id == id && returning.token == token && returning.connected,
+          "Reopening preserves the guest identity");
+    check(returning.room.empty() && !returning.ready && rooms.rooms().empty(),
+          "Reopening releases the ended match and its stale Ready state");
+    check(!wire::WorldProjection{}.build(rooms, returning).control,
+          "Reopening projects the lobby instead of the ended arena");
+    rooms.disconnect(token, connection);
+    check(rooms.active(token, connection + 1), "A delayed old-socket close cannot drop the new one");
+    check(rooms.command(returning, wire::Ready{true}, {}) &&
+              rooms.room(returning)->match->id() != old_match,
+          "Ready after reopening creates a fresh match");
+    rooms.step();
+    check(wire::WorldProjection{}.build(rooms, returning).control.has_value(),
+          "The fresh match supplies a controlled flower");
+    rooms.command(returning, wire::Leave{}, {});
+  }
+}
+
 void abandoned_room_capacity() {
   using namespace wave;
   app::RoomManager rooms(fixtures::wire_fixture_rules());
@@ -307,6 +343,7 @@ void full_room_ready_denial() {
 int main() {
   using namespace wave;
   squad_departure();
+  disconnected_match_reentry();
   abandoned_room_capacity();
   full_room_ready_denial();
   auto rules = fixtures::wire_fixture_rules();

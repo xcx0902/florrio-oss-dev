@@ -14,6 +14,7 @@ import {
   publicSquadCase,
 } from './playability.mjs';
 import { protocolEffectsCase } from './protocol-effects.mjs';
+import { disconnectReentryCase } from './disconnect-reentry.mjs';
 
 const { values } = parseArgs({
   options: {
@@ -91,6 +92,7 @@ const sources = [
   'tools/w2/online.mjs',
   'tools/w2/playability.mjs',
   'tools/w2/protocol-effects.mjs',
+  'tools/w2/disconnect-reentry.mjs',
   'web/ubuntu-700.css',
   'web/ubuntu-LICENCE.txt',
   'web/4iCv6KVjbNBYlgoCxCvjvWyNL4U.woff2',
@@ -117,6 +119,7 @@ const openCases = [
   'W2-11',
   'W2-12',
   'W2-13',
+  'W2-14',
 ];
 
 async function observeLabels(page) {
@@ -420,6 +423,13 @@ try {
       report,
     });
     await connectionRecoveryCase({
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: values['native-dir'],
+      output,
+      report,
+    });
+    await disconnectReentryCase({
       browser,
       snapshot: values.snapshot,
       nativeDir: values['native-dir'],

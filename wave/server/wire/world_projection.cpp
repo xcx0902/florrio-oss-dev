@@ -533,7 +533,8 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
     }
     wave.byte(static_cast<std::uint8_t>(255 * std::clamp(clearing, 0.0, 1.0)));
     wave.integer(view->wave.number ? view->wave.number - 1 : 0);
-    wave.integer(static_cast<unsigned>(view->biome));
+    // The original HUD reserves biome 2 for Swamp; Ocean is 3 on the wire.
+    wave.integer(view->biome == sim::Biome::ocean ? 3 : static_cast<unsigned>(view->biome));
     std::array<std::uint32_t, 216> counts{};
     for (const auto& entity : view->entities) {
       // Leech sections share the head's health and count as one mob with it.

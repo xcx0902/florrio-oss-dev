@@ -433,7 +433,14 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
         return memory.getUint32(memory.getUint32(4347728, true) + 828, true);
       });
       assert.equal(activeBiome, biome);
-      await pause(450); // Let the original canvas finish transitioning away from the menu.
+      // Wait for the native menu to stop drawing before checking the wave HUD.
+      await entry.page.waitForFunction(() => performance.now() - window.waveLabelTimes.Ready > 250);
+      await entry.page.evaluate(() => window.waveLabels.clear());
+      await entry.page.waitForFunction(() => window.waveLabels.has('Wave 1'));
+      const hudLabels = await entry.page.evaluate(() => [...window.waveLabels]);
+      const label = name[0].toUpperCase() + name.slice(1);
+      assert.ok(hudLabels.includes(label), `Native wave HUD displays ${label}`);
+      assert.ok(!hudLabels.includes('Swamp'), 'Ocean never displays the native Swamp label');
       const screenshot = `W2-09-${name}.png`;
       await entry.page.screenshot({ path: path.join(output, screenshot) });
       assert.equal(
@@ -444,7 +451,7 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
       assert.equal(profile.equipped, saved.equipped, 'Equipment persists across native modes');
       assert.deepEqual(entry.errors, []);
       scenes.push({
-        name, biome, rotation, memory, mobs: mobs.map((mob) => mob.mob), menu, screenshot,
+        name, biome, rotation, memory, hudLabels, mobs: mobs.map((mob) => mob.mob), menu, screenshot,
       });
       await entry.page.mouse.click(18, 18);
       await until(() => !entry.current.control && !entry.baseline.has(8197), 'Exit to native menu');
@@ -496,7 +503,7 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
     await pause(700);
     assert.equal(entry.documentLoads.length, loads + 1, 'Only the deliberate host restart reloads');
     assert.equal(await entry.page.evaluate(() => localStorage.getItem('florrio_gamemode')), '1');
-    await enterScene('ocean', 2, 1, [53, 140, 195], [26, 28, 33]);
+    await enterScene('ocean', 3, 1, [53, 140, 195], [26, 28, 33]);
     scenes.at(-1).invite = await inviteRotation(1);
     await selectMode(0);
     assert.equal(entry.baseline.get(8198).rotation, 1, 'Garden also publishes the active rotation');
