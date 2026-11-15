@@ -404,7 +404,8 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
   for (unsigned i = 0; i < 4; ++i) {
     profile.integer(0);
   }
-  profile.text("");
+  // $939 displays profile+2252 in Settings; an empty value leaves "(logging in)".
+  profile.text("User ID: " + viewer.token.substr(0, 12));
   profile.real(camera.y * world_scale);
   std::array<std::uint8_t, 27> gallery{};  // $3750: 216 mob-kind/rarity discovery bits.
   if (saved) {

@@ -15,6 +15,7 @@ import {
 } from './playability.mjs';
 import { protocolEffectsCase } from './protocol-effects.mjs';
 import { disconnectReentryCase } from './disconnect-reentry.mjs';
+import { guestSettings } from './settings.mjs';
 
 const { values } = parseArgs({
   options: {
@@ -93,6 +94,7 @@ const sources = [
   'tools/w2/playability.mjs',
   'tools/w2/protocol-effects.mjs',
   'tools/w2/disconnect-reentry.mjs',
+  'tools/w2/settings.mjs',
   'web/ubuntu-700.css',
   'web/ubuntu-LICENCE.txt',
   'web/4iCv6KVjbNBYlgoCxCvjvWyNL4U.woff2',
@@ -280,7 +282,19 @@ async function browserCase(browser, host, label) {
       !events.some(({ text }) => text?.includes('wasm streaming compile failed')),
       'The client must load without falling back to the unadapted Wasm',
     );
-    Object.assign(report.cases[label], { guest, labels, screenshot, status: 'passed' });
+    const settings = await guestSettings(page, guest);
+    const settingsScreenshot = `${label}-settings.png`;
+    await page.waitForTimeout(450);
+    await page.screenshot({ path: path.join(output, settingsScreenshot) });
+    assert.deepEqual(errors, []);
+    Object.assign(report.cases[label], {
+      guest,
+      labels,
+      screenshot,
+      settings,
+      settingsScreenshot,
+      status: 'passed',
+    });
     return guest;
   } finally {
     await context.close();
