@@ -7,6 +7,9 @@
     "node": ">=22"
   },
   "scripts": {
+    "start": "node tools/deploy/serve.mjs",
+    "test:capacity": "node tools/deploy/test-capacity.mjs",
+    "test:deploy": "node tools/deploy/smoke.mjs",
     "dev": "node tools/w2/dev.mjs",
     "test:wire": "node tools/w2/test-wire.mjs",
     "test:dev": "node tools/dev/test-inventory.mjs",

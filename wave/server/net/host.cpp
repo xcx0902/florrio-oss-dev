@@ -35,6 +35,43 @@ namespace ws = beast::websocket;
 using tcp = asio::ip::tcp;
 using Error = boost::system::error_code;
 
+std::size_t env_limit(const char* name, std::size_t fallback, std::size_t maximum) {
+  const char* raw = std::getenv(name);
+  if (!raw) {
+    return fallback;
+  }
+  const std::string_view text(raw);
+  std::size_t value = 0;
+  const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value);
+  if (error != std::errc{} || end != text.data() + text.size() || !value || value > maximum) {
+    throw std::runtime_error(std::string("Invalid capacity setting: ") + name);
+  }
+  return value;
+}
+
+struct HostPolicy {
+  std::vector<std::string> origins;
+  std::size_t max_connections = env_limit("WAVE_MAX_CONNECTIONS", 128, 4096);
+  std::size_t max_sockets = env_limit("WAVE_MAX_PLAYERS", 32, 256);
+  std::size_t sockets = 0;
+  double last_step_ms = 0;
+  double max_step_ms = 0;
+  unsigned admissions = 0;
+  std::chrono::steady_clock::time_point admission_window = std::chrono::steady_clock::now();
+
+  bool origin_allowed(std::string_view origin) const {
+    return std::ranges::find(origins, origin) != origins.end();
+  }
+  bool admit_profile() {
+    const auto now = std::chrono::steady_clock::now();
+    if (now - admission_window >= std::chrono::seconds(1)) {
+      admission_window = now;
+      admissions = 0;
+    }
+    return ++admissions <= 64;
+  }
+};
+
 struct Resource {
   std::string content_type;
   std::string body;
@@ -78,7 +115,8 @@ Resources load(const std::filesystem::path& root) {
       "/endpoint/florrio-waves-0/findEach/",
       Resource{"application/json", R"({"servers":{"us":{"id":"wavelocal","ipv4":"127.0.0.1"}}})"});
   resources.emplace("/endpoint/florrio-waves-1/findEach/",
-                    Resource{"application/json", R"({"servers":{"us":{"id":"waverotation","ipv4":"127.0.0.2"}}})"});
+                    Resource{"application/json",
+                             R"({"servers":{"us":{"id":"waverotation","ipv4":"127.0.0.2"}}})"});
   resources.emplace("/server/wavelocal",
                     Resource{"application/json", R"({"id":"wavelocal","ipv4":"127.0.0.1"})"});
   resources.emplace("/server/waverotation",
@@ -89,13 +127,25 @@ Resources load(const std::filesystem::path& root) {
 class Connection : public std::enable_shared_from_this<Connection> {
  public:
   Connection(tcp::socket socket, const Resources& resources, const std::string& authority,
-             std::uint64_t& next_connection_id, std::shared_ptr<wave::app::RoomManager> rooms)
+             std::uint64_t& next_connection_id, std::shared_ptr<wave::app::RoomManager> rooms,
+             std::shared_ptr<HostPolicy> policy)
       : socket_(std::move(socket)), resources_(resources), authority_(authority),
-        next_connection_id_(next_connection_id), rooms_(std::move(rooms)) {}
+        next_connection_id_(next_connection_id), rooms_(std::move(rooms)),
+        policy_(std::move(policy)), admission_timer_(socket_.get_executor()) {}
+
+  ~Connection() {
+    if (reserved_) {
+      --policy_->sockets;
+    }
+  }
 
   void publish() {
     if (session_ && upgraded_ && !closing_) {
-      enqueue(session_->publish());
+      try {
+        enqueue(session_->publish());
+      } catch (const std::exception&) {
+        abort();
+      }
     }
   }
 
@@ -110,17 +160,42 @@ class Connection : public std::enable_shared_from_this<Connection> {
     http::async_read(socket_.next_layer(), buffer_, parser_,
                      [self = shared_from_this()](Error error, std::size_t) {
                        if (!error) {
-                         self->http_request();
+                         try {
+                           self->http_request();
+                         } catch (const std::exception&) {
+                           self->respond(http::status::service_unavailable,
+                                         {"text/plain", "Service temporarily unavailable"});
+                         }
                        }
                      });
   }
 
  private:
+  void abort() {
+    closing_ = true;
+    admission_timer_.cancel();
+    session_.reset();
+    Error ignored;
+    socket_.next_layer().socket().close(ignored);
+  }
+
   void http_request() {
     const auto& request = parser_.get();
     const std::string_view target = request.target();
     if (request[http::field::host] != authority_) {
       respond(http::status::bad_request, {"text/plain", "Bad request"});
+      return;
+    }
+    if (target == "/healthz" && request.method() == http::verb::get) {
+      respond(http::status::ok,
+              {"application/json",
+               "{\"status\":\"ok\",\"players\":" + std::to_string(policy_->sockets) +
+                   ",\"maxPlayers\":" + std::to_string(policy_->max_sockets) +
+                   ",\"guests\":" + std::to_string(rooms_->guest_count()) +
+                   ",\"rooms\":" + std::to_string(rooms_->rooms().size()) +
+                   ",\"storagePending\":" + std::to_string(rooms_->storage_pending()) +
+                   ",\"lastStepMs\":" + std::to_string(policy_->last_step_ms) +
+                   ",\"maxStepMs\":" + std::to_string(policy_->max_step_ms) + "}"});
       return;
     }
 #ifdef WAVE_HOST_DEVELOPMENT
@@ -183,6 +258,10 @@ class Connection : public std::enable_shared_from_this<Connection> {
 #endif
     constexpr std::string_view cache_path = "/wave/cache/";
     if (target.starts_with(cache_path) && request.method() == http::verb::get) {
+      if (!policy_->admit_profile()) {
+        respond(http::status::too_many_requests, {"text/plain", "Please retry shortly"});
+        return;
+      }
       if (!rooms_->storage()) {
         respond(http::status::not_found, {"text/plain", "No profile store"});
         return;
@@ -244,19 +323,31 @@ class Connection : public std::enable_shared_from_this<Connection> {
       return;
     }
     using wave::sim::Biome;
-    const auto biome = target == "/wave/socket" ? std::optional{Biome::garden}
-                       : target == "/wave/socket/rotating"
-                           ? std::optional{rooms_->rotating_biome()}
-                           : std::nullopt;
+    const auto biome = target == "/wave/socket"            ? std::optional{Biome::garden}
+                       : target == "/wave/socket/rotating" ? std::optional{rooms_->rotating_biome()}
+                                                           : std::nullopt;
     if (biome && ws::is_upgrade(request)) {
-      if (request[http::field::origin] != "http://" + authority_ || buffer_.size() != 0) {
+      if (!policy_->origin_allowed(request[http::field::origin]) || buffer_.size() != 0) {
         respond(http::status::forbidden, {"text/plain", "Forbidden"});
         return;
       }
+      if (policy_->sockets >= policy_->max_sockets) {
+        respond(http::status::service_unavailable,
+                {"text/plain", "Server is full. Please retry later"});
+        return;
+      }
+      reserved_ = true;
+      ++policy_->sockets;
       session_.emplace(*rooms_, ++next_connection_id_, *biome);
       socket_.next_layer().expires_never();
       socket_.set_option(
-          ws::stream_base::timeout{std::chrono::seconds(5), ws::stream_base::none(), false});
+          ws::stream_base::timeout{std::chrono::seconds(5), std::chrono::seconds(30), true});
+      admission_timer_.expires_after(std::chrono::seconds(10));
+      admission_timer_.async_wait([self = shared_from_this()](Error error) {
+        if (!error && (!self->session_ || !self->session_->identified())) {
+          self->abort();
+        }
+      });
       // Bound application buffering ourselves. Beast's automatic size failure
       // can tear down TCP before Chromium receives its close frame. Reading
       // only limit + 1 bytes lets async_close drain the remainder and complete
@@ -283,6 +374,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
   void respond(http::status status, const Resource& resource) {
     response_.result(status);
     response_.version(parser_.get().version());
+    response_.keep_alive(false);
     response_.set(http::field::content_type, resource.content_type);
     response_.set(http::field::cache_control, "no-store");
     response_.set("X-Content-Type-Options", "nosniff");
@@ -296,8 +388,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
     socket_.async_read_some(buffer_, wave::wire::max_frame_bytes + 1 - buffer_.size(),
                             [self = shared_from_this()](Error error, std::size_t) {
                               if (error) {
-                                self->closing_ = true;
-                                self->session_.reset();
+                                self->abort();
                                 return;
                               }
                               if (self->buffer_.size() > wave::wire::max_frame_bytes) {
@@ -310,13 +401,30 @@ class Connection : public std::enable_shared_from_this<Connection> {
                                 self->read_frame();
                                 return;
                               }
-                              if (self->socket_.got_binary()) {
-                                const auto data = self->buffer_.data();
-                                const auto* first = static_cast<const std::uint8_t*>(data.data());
-                                self->enqueue(
-                                    self->session_->receive({first, first + data.size()}));
-                              } else {
-                                self->enqueue(self->session_->reject());
+                              const auto now = std::chrono::steady_clock::now();
+                              if (now - self->frame_window_ >= std::chrono::seconds(1)) {
+                                self->frame_window_ = now;
+                                self->frames_ = 0;
+                              }
+                              if (++self->frames_ > 120) {
+                                self->abort();
+                                return;
+                              }
+                              try {
+                                if (self->socket_.got_binary()) {
+                                  const auto data = self->buffer_.data();
+                                  const auto* first = static_cast<const std::uint8_t*>(data.data());
+                                  self->enqueue(
+                                      self->session_->receive({first, first + data.size()}));
+                                } else {
+                                  self->enqueue(self->session_->reject());
+                                }
+                                if (self->session_ && self->session_->identified()) {
+                                  self->admission_timer_.cancel();
+                                }
+                              } catch (const std::exception&) {
+                                self->abort();
+                                return;
                               }
                               self->buffer_.consume(self->buffer_.size());
                               if (!self->closing_) {
@@ -370,6 +478,11 @@ class Connection : public std::enable_shared_from_this<Connection> {
   const std::string& authority_;
   std::uint64_t& next_connection_id_;
   std::shared_ptr<wave::app::RoomManager> rooms_;
+  std::shared_ptr<HostPolicy> policy_;
+  asio::steady_timer admission_timer_;
+  bool reserved_ = false;
+  unsigned frames_ = 0;
+  std::chrono::steady_clock::time_point frame_window_ = std::chrono::steady_clock::now();
   std::optional<wave::app::ClientSession> session_;
   beast::flat_buffer buffer_{wave::wire::max_frame_bytes + 1};
 #ifdef WAVE_HOST_DEVELOPMENT
@@ -390,6 +503,26 @@ class Host {
        wave::sim::Biome rotating_biome, std::optional<std::uint32_t> craft_roll = {})
       : acceptor_(io, {asio::ip::address_v4::loopback(), port}), resources_(std::move(resources)),
         authority_("localhost:" + std::to_string(acceptor_.local_endpoint().port())), timer_(io) {
+    policy_->origins.push_back("http://" + authority_);
+    if (const char* origins_env = std::getenv("WAVE_ALLOWED_ORIGINS")) {
+      std::string_view origins(origins_env);
+      while (!origins.empty()) {
+        const auto comma = origins.find(',');
+        const auto origin = origins.substr(0, comma);
+        const auto prefix = origin.starts_with("https://")  ? 8u
+                            : origin.starts_with("http://") ? 7u
+                                                            : 0u;
+        if (!prefix || origin.size() <= prefix ||
+            origin.substr(prefix).find_first_of("/ ?#@\\\t\r\n") != std::string_view::npos) {
+          throw std::runtime_error("Invalid WAVE_ALLOWED_ORIGINS");
+        }
+        policy_->origins.emplace_back(origin);
+        if (comma == std::string_view::npos) {
+          break;
+        }
+        origins.remove_prefix(comma + 1);
+      }
+    }
     std::shared_ptr<wave::store::Store> store;
     if (!database.empty()) {
       wave::store::Options options;
@@ -418,7 +551,10 @@ class Host {
     if (!rooms_) {
       rooms_ = std::make_shared<wave::app::RoomManager>(
           std::nullopt, 20221030, std::vector<std::vector<wave::sim::Petal>>{}, std::move(store),
-          rotating_biome);
+          rotating_biome,
+          wave::app::RoomLimits{
+              env_limit("WAVE_MAX_GUESTS", 256, 65536), env_limit("WAVE_MAX_ROOMS", 32, 256),
+              std::chrono::seconds(env_limit("WAVE_RECONNECT_SECONDS", 300, 3600))});
     }
     tick();
   }
@@ -429,9 +565,9 @@ class Host {
         return;
       }
       std::erase_if(connections_, [](const auto& entry) { return entry.expired(); });
-      if (connections_.size() < 32) {
+      if (connections_.size() < policy_->max_connections) {
         auto connection = std::make_shared<Connection>(std::move(socket), resources_, authority_,
-                                                       next_connection_id_, rooms_);
+                                                       next_connection_id_, rooms_, policy_);
         connections_.push_back(connection);
         connection->start();
       }
@@ -450,9 +586,16 @@ class Host {
         return;
       }
 #ifndef WAVE_HOST_TESTING
+      const auto started = std::chrono::steady_clock::now();
       rooms_->step();
+      policy_->last_step_ms =
+          std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - started)
+              .count();
+      policy_->max_step_ms = std::max(policy_->max_step_ms, policy_->last_step_ms);
 #endif
       rooms_->poll_storage();
+      if (ticks_ % 40 == 0)
+        rooms_->reap_disconnected();
       if (++ticks_ % 4 == 0)
         for (const auto& weak : connections_) {
           if (auto connection = weak.lock())
@@ -463,6 +606,7 @@ class Host {
   }
   tcp::acceptor acceptor_;
   Resources resources_;
+  std::shared_ptr<HostPolicy> policy_ = std::make_shared<HostPolicy>();
   std::string authority_;
   std::uint64_t next_connection_id_ = 0;
   std::shared_ptr<wave::app::RoomManager> rooms_;

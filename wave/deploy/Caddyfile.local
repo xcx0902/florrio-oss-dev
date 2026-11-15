@@ -1,0 +1,21 @@
+{
+	admin 127.0.0.1:2020
+	persist_config off
+	skip_install_trust
+	auto_https disable_redirects
+}
+
+http://localhost:8080 {
+	bind 127.0.0.1
+	reverse_proxy 127.0.0.1:8480 {
+		header_up Host localhost:8480
+	}
+}
+
+https://localhost:8443 {
+	bind 127.0.0.1
+	tls internal
+	reverse_proxy 127.0.0.1:8480 {
+		header_up Host localhost:8480
+	}
+}

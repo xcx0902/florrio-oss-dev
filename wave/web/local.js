@@ -1,6 +1,6 @@
-// Keep the October build on loopback while preserving its original URL checks.
+// Serve the October client through same-origin HTTP(S), preserving its URL checks.
 (() => {
-  if (location.protocol !== 'http:' || location.hostname !== 'localhost') {
+  if (location.protocol !== 'http:' && location.protocol !== 'https:') {
     return;
   }
 
@@ -27,33 +27,81 @@
   const radiusRatio = (base) => [...radius, 0x2a, 2, 8, ...f32(base), 0x95];
   const scaleBasis = (factor) => [
     ...[0, 4, 8, 12].flatMap((offset) => [
-      0x20, 1, 0x20, 1, 0x2a, 2, offset, // &matrix, matrix[offset]
-      ...factor, 0x94, 0x38, 2, offset,  // multiply and store f32
+      0x20,
+      1,
+      0x20,
+      1,
+      0x2a,
+      2,
+      offset, // &matrix, matrix[offset]
+      ...factor,
+      0x94,
+      0x38,
+      2,
+      offset, // multiply and store f32
     ]),
-    0x20, 1, 0x41, 1, 0x3a, 0, 48,     // mark canvas transform dirty
+    0x20,
+    1,
+    0x41,
+    1,
+    0x3a,
+    0,
+    48, // mark canvas transform dirty
   ];
   const mobArt = () => {
     // Match the solid body to the collision diameter; keep native proportions
     // and decorations. Linked Leech art is calibrated inside $1795 instead.
     const scales = [
-      1,                               // Reserved ID 0
-      .91, .98, .91, .83,              // Rock, Cactus, Ladybug, Bee
-      1.82, 1.62, 1.62, .82,           // Baby, Worker, Soldier, Queen Ant
-      .91, .94, .79,                   // Ant Hole, Beetle, Hornet
-      1, 1, 1, 1, 1, 1,               // Centipedes: bodies meet at the collision radius
-      1.28, .91, .91,                  // Square, Dark Ladybug, Shiny Ladybug
-      1.43, .99, 1.62, .91,            // Spider, Scorpion, Fire Ant, Fire Ant Burrow
-      .85, .96, .96, 1.05,             // Sandstorm, Bubble, Acid Bubble, Shell
-      .62, .91, .95, .82, .82,         // Starfish, Crab, Jellyfish, Digger, Sponge
+      1, // Reserved ID 0
+      0.91,
+      0.98,
+      0.91,
+      0.83, // Rock, Cactus, Ladybug, Bee
+      1.82,
+      1.62,
+      1.62,
+      0.82, // Baby, Worker, Soldier, Queen Ant
+      0.91,
+      0.94,
+      0.79, // Ant Hole, Beetle, Hornet
+      1,
+      1,
+      1,
+      1,
+      1,
+      1, // Centipedes: bodies meet at the collision radius
+      1.28,
+      0.91,
+      0.91, // Square, Dark Ladybug, Shiny Ladybug
+      1.43,
+      0.99,
+      1.62,
+      0.91, // Spider, Scorpion, Fire Ant, Fire Ant Burrow
+      0.85,
+      0.96,
+      0.96,
+      1.05, // Sandstorm, Bubble, Acid Bubble, Shell
+      0.62,
+      0.91,
+      0.95,
+      0.82,
+      0.82, // Starfish, Crab, Jellyfish, Digger, Sponge
     ];
     const fixed = new Set([5, 6, 7, 8, 18, 23]);
     return [
-      ...f32(1), 0x21, 12,             // $12 is scratch f32 in the mob draw branch
-      ...scales.flatMap((scale, id) => id ? branch(typeIs(id), [
-        ...f32(scale),
-        ...(fixed.has(id) ? [...radiusRatio(35), 0x94] : []),
-        0x21, 12,
-      ]) : []),
+      ...f32(1),
+      0x21,
+      12, // $12 is scratch f32 in the mob draw branch
+      ...scales.flatMap((scale, id) =>
+        id
+          ? branch(typeIs(id), [
+              ...f32(scale),
+              ...(fixed.has(id) ? [...radiusRatio(35), 0x94] : []),
+              0x21,
+              12,
+            ])
+          : [],
+      ),
       ...scaleBasis([0x20, 12]),
     ];
   };
@@ -194,7 +242,9 @@
     const rotating = original === `https://api.n.m28.io${rotatingDiscovery}`;
     const local =
       method === 'GET' &&
-      (garden || rotating || original === 'https://api.n.m28.io/server/wavelocal' ||
+      (garden ||
+        rotating ||
+        original === 'https://api.n.m28.io/server/wavelocal' ||
         original === 'https://api.n.m28.io/server/waverotation');
     return open.call(this, method, local ? new URL(original).pathname : url, ...options);
   };
@@ -216,10 +266,12 @@
         original === 'ws://127.0.0.2:443/' || original === 'wss://waverotation.s.m28n.net/';
       const local = garden || rotating;
       const suffix = rotating ? '/rotating' : '';
-      super(local ? `ws://${location.host}/wave/socket${suffix}` : url, protocols);
+      const scheme = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      super(local ? `${scheme}//${location.host}/wave/socket${suffix}` : url, protocols);
       if (!local) {
         return;
       }
+      // eslint-disable-next-line @typescript-eslint/no-this-alias -- Recovery follows the active socket instance.
       activeSocket = this;
       Object.defineProperty(this, 'url', { value: original });
       // These listeners run before the October handlers. Its two-byte fatal
@@ -229,8 +281,11 @@
           event.stopImmediatePropagation();
           return;
         }
-        if (event.data instanceof ArrayBuffer && event.data.byteLength === 2 &&
-            new DataView(event.data).getUint16(0) === 0) {
+        if (
+          event.data instanceof ArrayBuffer &&
+          event.data.byteLength === 2 &&
+          new DataView(event.data).getUint16(0) === 0
+        ) {
           event.stopImmediatePropagation();
           showRecovery('The server ended this session. Reconnect to restore your saved profile.');
           return;
@@ -298,8 +353,12 @@
       lastPacket = performance.now();
     });
     setInterval(() => {
-      if (!stopped && !document.hidden && !modeNotice?.open &&
-          performance.now() - lastPacket >= 10000) {
+      if (
+        !stopped &&
+        !document.hidden &&
+        !modeNotice?.open &&
+        performance.now() - lastPacket >= 10000
+      ) {
         showRecovery('No response from the game server. Reconnect to try again.', false);
       }
     }, 1000);

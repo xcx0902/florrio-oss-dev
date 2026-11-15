@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { once } from 'node:events';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createInterface } from 'node:readline';
@@ -22,6 +22,9 @@ export async function startHost({
   craftRoll,
   development = false,
   rotation = 'desert',
+  webRoot,
+  environment = {},
+  assembleOnly = false,
 }) {
   assert.ok(['desert', 'ocean'].includes(rotation), 'Rotation must be desert or ocean');
   assert.ok(!(fixture && development), 'Development and fixture hosts are separate');
@@ -32,11 +35,23 @@ export async function startHost({
       const body = await readFile(path.join(snapshot, file));
       assert.equal(body.length, bytes, `${file} byte count`);
       assert.equal(createHash('sha256').update(body).digest('hex'), sha256, `${file} SHA-256`);
+      if (file === 'client.js') {
+        // The pinned client only starts its offline mode for localhost. Scope
+        // this adaptation to that one Wasm hostname import; real page URLs,
+        // discovery, assets and sockets keep their deployed origin.
+        const source = body.toString('utf8');
+        const hostname = '146708:()=>K(location.hostname)';
+        assert.equal(source.split(hostname).length, 2, 'Pinned hostname import is unique');
+        return { file, body: source.replace(hostname, '146708:()=>K("localhost")') };
+      }
       return { file, body };
     }),
   );
 
-  const directory = await mkdtemp(path.join(tmpdir(), 'florrio-wave-'));
+  const directory = webRoot
+    ? path.resolve(webRoot)
+    : await mkdtemp(path.join(tmpdir(), 'florrio-wave-'));
+  await mkdir(directory, { recursive: true });
   let child;
   let cleanup;
   function stop() {
@@ -48,7 +63,9 @@ export async function startHost({
           await closed;
         }
       } finally {
-        await rm(directory, { recursive: true, force: true });
+        if (!webRoot) {
+          await rm(directory, { recursive: true, force: true });
+        }
       }
     })();
     return cleanup;
@@ -96,6 +113,10 @@ export async function startHost({
     await Promise.all(
       resources.map(({ file, body }) => writeFile(path.join(directory, file), body)),
     );
+    if (assembleOnly) {
+      assert.ok(webRoot, 'Assembly without a host requires an explicit persistent web root');
+      return { directory, snapshot: manifest.snapshot };
+    }
     child = spawn(
       path.resolve(
         nativeDir,
@@ -109,7 +130,7 @@ export async function startHost({
       ],
       {
         stdio: ['ignore', 'pipe', 'inherit'],
-        env: { ...process.env, WAVE_ROTATION: rotation },
+        env: { ...process.env, ...environment, WAVE_ROTATION: rotation },
       },
     );
     const lines = createInterface({ input: child.stdout });

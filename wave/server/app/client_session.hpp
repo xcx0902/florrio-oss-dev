@@ -24,9 +24,12 @@ class ClientSession {
   ClientSession(RoomManager& rooms, std::uint64_t connection,
                 sim::Biome biome = sim::Biome::garden);
   ~ClientSession();
+  ClientSession(const ClientSession&) = delete;
+  ClientSession& operator=(const ClientSession&) = delete;
   Reply receive(wire::Bytes bytes);
   Reply publish();
   Reply reject();
+  bool identified() const { return identified_; }
 
  private:
   Reply superseded();

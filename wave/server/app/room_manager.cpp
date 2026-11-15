@@ -135,9 +135,13 @@ struct RoomManager::StorageState {
 
 RoomManager::RoomManager(std::optional<sim::Rules> rules_override, std::uint32_t seed,
                          std::vector<std::vector<sim::Petal>> loadouts,
-                         std::shared_ptr<store::Store> storage, sim::Biome rotating_biome)
+                         std::shared_ptr<store::Store> storage, sim::Biome rotating_biome,
+                         RoomLimits limits)
     : rules_override_(std::move(rules_override)), seed_(seed), loadouts_(std::move(loadouts)),
-      rotating_biome_(rotating_biome) {
+      rotating_biome_(rotating_biome), limits_(limits) {
+  if (!limits_.guests || !limits_.rooms || limits_.reconnect_grace.count() < 0) {
+    throw std::invalid_argument("Invalid room capacity limits");
+  }
   if (rotating_biome != sim::Biome::desert && rotating_biome != sim::Biome::ocean) {
     throw std::invalid_argument("Waves rotation must be Desert or Ocean");
   }
@@ -339,7 +343,10 @@ Member& RoomManager::admit(std::string_view token, std::uint64_t connection, sim
   poll_storage();
   auto found = members_.find(token);
   if (found == members_.end()) {
-    if (members_.size() >= 256) {
+    if (members_.size() >= limits_.guests) {
+      reap_disconnected(true);
+    }
+    if (members_.size() >= limits_.guests) {
       throw std::runtime_error("Room manager guest capacity reached");
     }
     std::optional<store::Profile> profile;
@@ -435,11 +442,39 @@ void RoomManager::disconnect(std::string_view token, std::uint64_t connection) {
   }
   auto& entry = members_.find(token)->second;
   entry.connected = false;
+  entry.disconnected_at = std::chrono::steady_clock::now();
   if (auto it = rooms_.find(entry.room); it != rooms_.end() && it->second.match) {
     it->second.match->queue(sim::Connection{entry.id, false});
   } else {
     // A dropped lobby connection must not keep a seat or block everyone's Ready.
     leave(entry);
+  }
+}
+
+void RoomManager::reap_disconnected(bool pressure, std::chrono::steady_clock::time_point now) {
+  // Pending transactions may still reference a member or match ledger.
+  if (storage_pending()) {
+    return;
+  }
+  for (auto it = members_.begin(); it != members_.end();) {
+    auto& entry = it->second;
+    const auto* previous = room(entry);
+    const bool finished =
+        previous && previous->match && previous->match->view().phase == sim::Phase::ended;
+    if (!entry.connected && entry.session_refs == 0 &&
+        ((pressure && (entry.room.empty() || finished)) ||
+         now - entry.disconnected_at >= limits_.reconnect_grace)) {
+      leave(entry);
+      it = members_.erase(it);
+    } else {
+      ++it;
+    }
+  }
+  if (storage_) {
+    std::erase_if(storage_->ledgers, [this](const auto& ledger) {
+      return std::ranges::none_of(
+          rooms_, [&](const auto& room) { return room.second.economy_id == ledger.first; });
+    });
   }
 }
 
@@ -466,8 +501,8 @@ bool RoomManager::create_room(Member& entry, bool private_room) {
   // Keep disconnected matches available for reconnect, but reclaim finished,
   // unattended rooms when admission needs a slot. Otherwise 32 past sessions
   // permanently exhaust the host and Ready is acknowledged without starting.
-  if (rooms_.size() >= 32) {
-    for (auto it = rooms_.begin(); it != rooms_.end() && rooms_.size() >= 32;) {
+  if (rooms_.size() >= limits_.rooms) {
+    for (auto it = rooms_.begin(); it != rooms_.end() && rooms_.size() >= limits_.rooms;) {
       const auto& candidate = it->second;
       const bool unattended = std::ranges::none_of(
           candidate.members, [this](const auto& token) { return members_.at(token).connected; });
@@ -484,7 +519,7 @@ bool RoomManager::create_room(Member& entry, bool private_room) {
       }
     }
   }
-  if (rooms_.size() >= 32 && (!current || current->members.size() != 1)) {
+  if (rooms_.size() >= limits_.rooms && (!current || current->members.size() != 1)) {
     return false;
   }
   std::string code;

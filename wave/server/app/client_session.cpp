@@ -11,6 +11,7 @@ ClientSession::ClientSession(RoomManager& rooms, std::uint64_t connection, sim::
 ClientSession::~ClientSession() {
   if (member_) {
     rooms_.disconnect(member_->token, connection_);
+    --member_->session_refs;
   }
 }
 
@@ -96,6 +97,7 @@ Reply ClientSession::drain() {
       }
       if (!member_) {
         member_ = &rooms_.admit(requested_guest_, connection_, biome_);
+        ++member_->session_refs;
         craft_cursor_ = member_->craft_sequence;
         reply.frames.push_back(wire_.guest_id(member_->token));
       }

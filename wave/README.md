@@ -1,5 +1,8 @@
 # Florr.io Wave 2022-10-30
 
+公共预览的 Caddy 配置、容量限制、本地／公网验收及 macOS 服务部署见
+[公共预览部署](deploy/README.md)。
+
 原版 UI 的绘制取证、功能规格、重建方案与逐像素验收矩阵见
 [client-ui 文档索引](docs/client-ui/README.md)。
 

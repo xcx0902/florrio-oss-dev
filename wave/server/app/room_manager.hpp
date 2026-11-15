@@ -27,6 +27,14 @@ struct Member {
   std::optional<store::Profile> profile;
   std::deque<std::pair<std::uint64_t, store::Result>> craft_results;
   std::uint64_t craft_sequence = 0;
+  std::size_t session_refs = 0;
+  std::chrono::steady_clock::time_point disconnected_at{};
+};
+
+struct RoomLimits {
+  std::size_t guests = 256;
+  std::size_t rooms = 32;
+  std::chrono::seconds reconnect_grace{300};
 };
 
 struct Room {
@@ -79,12 +87,18 @@ class RoomManager {
                        std::uint32_t seed = 20221030,
                        std::vector<std::vector<sim::Petal>> loadouts = {},
                        std::shared_ptr<store::Store> storage = {},
-                       sim::Biome rotating_biome = sim::Biome::desert);
+                       sim::Biome rotating_biome = sim::Biome::desert, RoomLimits limits = {});
   ~RoomManager();
   Member& admit(std::string_view token, std::uint64_t connection,
                 sim::Biome biome = sim::Biome::garden);
   bool active(std::string_view token, std::uint64_t connection) const;
   void disconnect(std::string_view token, std::uint64_t connection);
+  // Only unreferenced, disconnected members can be evicted. Durable profiles
+  // remain in SQLite; live match seats retain a bounded reconnect grace.
+  void
+  reap_disconnected(bool pressure = false,
+                    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now());
+  std::size_t guest_count() const { return members_.size(); }
   bool command(Member& member, const wire::ReliableAction& action,
                std::optional<sim::LifeId> acknowledged_life, std::string key = "");
   void step();
@@ -133,6 +147,7 @@ class RoomManager {
   std::uint32_t seed_;
   std::vector<std::vector<sim::Petal>> loadouts_;
   sim::Biome rotating_biome_;
+  RoomLimits limits_;
   std::uint64_t next_player_ = 0;
   std::uint64_t next_match_ = 0;
   std::map<std::string, Member, std::less<>> members_;
