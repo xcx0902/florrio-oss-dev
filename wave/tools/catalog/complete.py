@@ -7,7 +7,7 @@ Running this tool is idempotent and preserves existing reconstruction settings.
 import copy
 import json
 from pathlib import Path
-from generate import client_adoptions
+from generate import client_adoptions, mob_movement, movement_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / 'data/catalogs/20221030'
@@ -33,6 +33,8 @@ FIELD_MAP = {'Heal': 'heal', 'Flower Health': 'healthBonus', 'Duration': 'durati
 
 def main():
     pack = json.loads((DATA / 'catalog.json').read_text())
+    movement_source = movement_evidence()
+    pack.setdefault('mobMovementPlayerSpeed', 50)
     observed = json.loads((DATA / 'client-tooltips.json').read_text())
     review = {e['id']: e for e in json.loads((DATA / 'behavior-review.json').read_text())['entries']}
     existing = {(r['kind'], r['rarity']): r for r in pack['petals']}
@@ -138,15 +140,14 @@ def main():
             row = copy.deepcopy(mob_existing.get((kind, v['rarity']), {}))
             fields = {f['label']: f for f in v['fields']}
             health = fields.get('Health', {'value': v['baseHealth'] * v['healthMultiplier']})
-            body = row.get('body', dict(radius=6, health=1, speed_per_second=30,
+            body = row.get('body', dict(radius=6, health=1, speed_per_second=0,
                                        contact_damage=1, contact_heal=0, poison_per_tick=0,
                                        poison_ticks=0))
             body.update(health=health.get('range', [health['value']])[0],
                         contact_damage=fields.get('Damage', {'value': v['baseDamage'] * v['damageMultiplier']})['value'])
-            if kind in stationary:
-                body['speed_per_second'] = 0
-            if kind == 'desert_centipede':
-                body['speed_per_second'] = 55
+            speed, movement, movement_provenance = mob_movement(kind, pack['mobMovementPlayerSpeed'], movement_source)
+            body['speed_per_second'] = speed
+            row['movement'] = movement
             # Hornet bullets, not the hornet body, carry the ranged attack.
             if kind == 'hornet':
                 body.update(poison_per_tick=0, poison_ticks=0)
@@ -160,7 +161,7 @@ def main():
             row.update(kind=kind, rarity=v['rarity'], clientId=mob['id'],
                        segmentClientId=mob['id'] + 1 if mob['id'] in (12, 14, 16, 34) else 0,
                        body=body, summon=kind in ('beetle', 'baby_ant', 'worker_ant', 'soldier_ant'),
-                       evidenceKey='behavior.full', xp=2 ** v['rarity'], ai=ai,
+                       evidenceKey='behavior.full', xp=row.get('xp', 2 ** v['rarity']), ai=ai,
                        segments=5 if mob['id'] in (12, 14, 16, 34) else 0,
                        parentClientId=parents.get(mob['id'], 0),
                        reviewRequired=review['mob.' + kind]['status'] == 'manual-review')
@@ -173,6 +174,7 @@ def main():
                                     adoptedFields=list(client_adoptions('mobs', row, v)),
                                     behaviorKey='mob.' + kind,
                                     unknowns=[review['mob.' + kind]['manualReview']] if review['mob.' + kind]['manualReview'] else [])
+            row['provenance']['movement'] = movement_provenance
             pack['mobs'].append(row)
     if not any(e['id'] == 'behavior.full' for e in pack['evidence']):
         pack['evidence'].append(dict(id='behavior.full', sources=['client.tooltips', 'wiki.hornet',

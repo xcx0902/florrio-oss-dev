@@ -51,6 +51,10 @@ struct FixtureAccess {
     ++m.wave_.counts.alive;
   }
   static void plan(Match& m, std::uint32_t number) { m.open_wave(number - 1, m.tick_); }
+  static void move_at_age(Match& m, EntityId id, Tick age) {
+    m.tick_ = get(m, id).born_tick + age;
+    m.move_entities();
+  }
 };
 }
 namespace {
@@ -108,14 +112,92 @@ void catalog_variants_spawn() {
     }
   }
   for (const auto& mob : catalog::dated().mobs) {
-    Match match({2}, 9, arena());
+    auto rules = arena();
+    rules.player.speed_per_second = 73;
+    Match match({2}, 9, rules);
     check(match.add_player({1}, {}, {}), "admit player for mob spawn");
     const auto id = FixtureAccess::spawn(match, mob.kind, mob.rarity);
     steps(match);
     const auto& entity = FixtureAccess::get(match, id).view;
     check(entity.rarity == mob.rarity && entity.position.finite() && entity.max_health > 0,
           "catalog mob spawns with valid state and selected rarity");
+    near(FixtureAccess::get(match, id).rules.speed_per_second, mob.body.speed_per_second,
+         "every mob rarity retains its catalog speed with a custom player speed");
   }
+}
+
+void catalog_movement() {
+  struct Profile {
+    Mob kind;
+    double idle;
+    double chase;
+    double frequency;
+    double power;
+  };
+  const Profile profiles[]{
+      {Mob::ladybug, 20, 48, 2.0000000949949026, 2},
+      {Mob::bee, 20, 48, 2.8723683208227158, .5},
+      {Mob::hornet, 14, 48, 2.8723683208227158, .5},
+      {Mob::centipede, 4, 48, 0, 1},
+      {Mob::evil_centipede, 3.2, 48, 0, 1},
+      {Mob::square, 4, 48, 0, 1},
+      {Mob::spider, 20, 57.6, 2.0000000949949026, 2},
+      {Mob::desert_centipede, 4, 48, 0, 1},
+      {Mob::scorpion, 4, 48, 0, 1},
+      {Mob::jellyfish, 4, 48, 0, 1},
+      {Mob::leech, 4, 48, 0, 1},
+  };
+  for (const auto step : {Microseconds{25000}, Microseconds{50000}}) {
+    for (const auto& p : profiles) {
+      auto rules = arena();
+      rules.timing.step = step;
+      Match m({56}, 7, rules);
+      m.add_player({1}, {}, {});
+      steps(m);
+      const auto id = FixtureAccess::spawn(m, p.kind, Rarity::common, {400, 0});
+      auto& mob = FixtureAccess::get(m, id);
+      const auto start = mob.view.position;
+      FixtureAccess::move_at_age(m, id, 0);
+      near(mob.view.velocity.length(), p.frequency ? 0 : p.idle,
+           "idle starts at the original envelope minimum or constant speed");
+      FixtureAccess::move_at_age(m, id, rules.timing.ticks_ceil(std::chrono::seconds(1)));
+      const double envelope = p.frequency ? std::pow(.5 - .5 * std::cos(p.frequency), p.power) : 1;
+      near(mob.view.velocity.length(), p.idle * envelope,
+           "idle velocity uses the original coefficient and species speed envelope");
+      check((mob.view.position - start).length() > 0, "catalog idle speed moves the body");
+      mob.view.position = {110, 0};
+      mob.provoked = true;
+      FixtureAccess::move_at_age(m, id, rules.timing.ticks_ceil(std::chrono::seconds(1)));
+      near(mob.view.velocity.length(), p.chase, "pursuit preserves the original mob/player ratio");
+      check(mob.target == flower(m) && mob.view.velocity.x < 0, "pursuit selects the player");
+      if (p.kind == Mob::hornet) {
+        mob.view.position = {65, 0};
+        FixtureAccess::move_at_age(m, id, 0);
+        near(mob.view.velocity.length(), 8, "Hornet strafe uses original 0.4/2.5 player ratio");
+        near(mob.view.velocity.x, 0, "Hornet strafe is tangent to the target");
+      }
+    }
+  }
+  Match m({57}, 7, arena());
+  m.add_player({1}, {}, {});
+  steps(m);
+  const auto queen = FixtureAccess::spawn(m, Mob::queen_ant, Rarity::common, {400, 0});
+  auto& q = FixtureAccess::get(m, queen);
+  q.returning = true;
+  q.home_position = {600, 0};
+  FixtureAccess::move_at_age(m, queen, 0);
+  near(q.view.velocity.x, 48, "Queen returns at catalog chase speed");
+  const auto beetle = FixtureAccess::spawn(m, Mob::beetle, Rarity::common, {100, 0});
+  auto& b = FixtureAccess::get(m, beetle);
+  b.view.owner = owner(m).life;
+  b.view.faction = Faction::team;
+  FixtureAccess::move_at_age(m, beetle, 0);
+  near(b.view.velocity.x, -48, "owned mobs follow at catalog chase speed");
+  const auto digger = FixtureAccess::spawn(m, Mob::digger, Rarity::common, {-400, 0});
+  auto& d = FixtureAccess::get(m, digger);
+  d.view.health = d.view.max_health * .1;
+  FixtureAccess::move_at_age(m, digger, 0);
+  near(d.view.velocity.x, -48, "Digger retreats at original generic chase speed");
 }
 
 void pursuit() {
@@ -684,7 +766,9 @@ void chains() {
     FixtureAccess::get(m, segments[1]).view.health = 0;
     FixtureAccess::reap(m);
     const auto tail_start = FixtureAccess::get(m, segments[2]).view.position;
-    steps(m, 15);
+    // The original-ratio wander speeds are 4/3.2 units per second. Observe a
+    // full second so initial fragment contacts cannot consume most of the run.
+    steps(m, arena().timing.ticks_ceil(std::chrono::seconds(1)));
     const auto tail = FixtureAccess::get(m, segments[2]).view;
     check(front.predecessor == root && !tail.predecessor &&
               FixtureAccess::get(m, segments[3]).view.predecessor == tail.id &&
@@ -981,6 +1065,8 @@ int main() {
   const char* phase = "all variants";
   try {
     catalog_variants_spawn();
+    phase = "catalog movement ratios and states";
+    catalog_movement();
     phase = "poison/slow";
     poison_and_slow();
     phase = "health";

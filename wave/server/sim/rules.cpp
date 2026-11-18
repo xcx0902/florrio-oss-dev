@@ -25,7 +25,10 @@ Rules scenario_rules(Biome biome) {
   rules.progressive_waves = true;
   rules.residual = ResidualPolicy::keep;
   // Local display calibration: 5 W1 units projects to a 25-unit flower body.
-  rules.player = {.radius = 5, .health = 100, .speed_per_second = 50, .contact_damage = 2};
+  rules.player = {.radius = 5,
+                  .health = 100,
+                  .speed_per_second = catalog::mob_movement_player_speed_per_second,
+                  .contact_damage = 2};
   rules.contact_knockback_speed = 24;
   using enum Mob;
   std::array<std::vector<Mob>, 3> unlocks;

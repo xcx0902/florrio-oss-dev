@@ -1,0 +1,231 @@
+{
+  "source": "archive/tree/legacy/upstream/sp_server.wasm",
+  "sha256": "75e51b2c50c9f6ca6f3b5232a0a89b396f8b0c14c0268dceece87641aacbe46d",
+  "player": {
+    "coefficient": 2.5,
+    "evidence": "sp_server.wat: spServerThink, player control impulse (f32 2.5 * modifiers * dt * 0.001)"
+  },
+  "defaultProfile": "square",
+  "antWaveFrequencyRangePerMs": [
+    0.0018,
+    0.0022
+  ],
+  "antWaveEvidence": "function_208: (0.9 + random * 9.313225746154786e-11) * 0.002; random is in [1, 2147483646]",
+  "note": "Square copies the generic 92-byte AI settings without speed overrides. Coefficients are f32 impulses, not world units per second. The common integration cancels in mob/player ratios.",
+  "mobs": {
+    "spider": {
+      "initializer": 697,
+      "ai": {
+        "idle": 1,
+        "chase": 2.880000114440918,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0020000000949949026,
+        "wavePower": 2
+      }
+    },
+    "shiny_ladybug": {
+      "initializer": 698,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0020000000949949026,
+        "wavePower": 2
+      }
+    },
+    "dark_ladybug": {
+      "initializer": 699,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0020000000949949026,
+        "wavePower": 2
+      }
+    },
+    "square": {
+      "initializer": 700,
+      "ai": {
+        "idle": 0.20000000298023224,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": false,
+        "waveFrequencyPerMs": 0,
+        "wavePower": 1
+      }
+    },
+    "evil_centipede_segment": {
+      "initializer": 701,
+      "ai": {
+        "idle": 0.1599999964237213,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": false,
+        "waveFrequencyPerMs": 0,
+        "wavePower": 1
+      }
+    },
+    "evil_centipede": {
+      "initializer": 702,
+      "ai": {
+        "idle": 0.1599999964237213,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": false,
+        "waveFrequencyPerMs": 0,
+        "wavePower": 1
+      }
+    },
+    "centipede_segment": {
+      "initializer": 703,
+      "ai": {
+        "idle": 0.20000000298023224,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": false,
+        "waveFrequencyPerMs": 0,
+        "wavePower": 1
+      }
+    },
+    "centipede": {
+      "initializer": 704,
+      "ai": {
+        "idle": 0.20000000298023224,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": false,
+        "waveFrequencyPerMs": 0,
+        "wavePower": 1
+      }
+    },
+    "hornet": {
+      "initializer": 705,
+      "ai": {
+        "idle": 0.699999988079071,
+        "chase": 2.4000000953674316,
+        "strafe": 0.4000000059604645,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0028723683208227158,
+        "wavePower": 0.5
+      }
+    },
+    "massive_beetle": {
+      "initializer": 706,
+      "ai": {
+        "idle": 1.100000023841858,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0020000000949949026,
+        "wavePower": 2
+      }
+    },
+    "beetle": {
+      "initializer": 707,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0020000000949949026,
+        "wavePower": 2
+      }
+    },
+    "ant_hole": {
+      "initializer": 708,
+      "ai": null
+    },
+    "queen_ant": {
+      "initializer": 709,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0019440209725871682,
+        "wavePower": 2
+      }
+    },
+    "soldier_ant": {
+      "initializer": 710,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0019440209725871682,
+        "wavePower": 2
+      }
+    },
+    "worker_ant": {
+      "initializer": 711,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0019440209725871682,
+        "wavePower": 2
+      }
+    },
+    "baby_ant": {
+      "initializer": 712,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0019440209725871682,
+        "wavePower": 2
+      }
+    },
+    "bee": {
+      "initializer": 713,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0028723683208227158,
+        "wavePower": 0.5
+      }
+    },
+    "massive_ladybug": {
+      "initializer": 714,
+      "ai": {
+        "idle": 0.20000000298023224,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0010000000474974513,
+        "wavePower": 2
+      }
+    },
+    "ladybug": {
+      "initializer": 715,
+      "ai": {
+        "idle": 1,
+        "chase": 2.4000000953674316,
+        "strafe": 0,
+        "waveEnabled": true,
+        "waveFrequencyPerMs": 0.0020000000949949026,
+        "wavePower": 2
+      }
+    },
+    "cactus": {
+      "initializer": 716,
+      "ai": null
+    },
+    "boulder": {
+      "initializer": 717,
+      "ai": null
+    },
+    "rock": {
+      "initializer": 718,
+      "ai": null
+    }
+  }
+}

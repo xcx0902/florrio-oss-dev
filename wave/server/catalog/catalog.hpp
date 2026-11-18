@@ -123,6 +123,14 @@ struct PetalDefinition {
   PetalMechanics mechanics;
 };
 
+struct MobMovement {
+  double idle_speed_per_second = 0;
+  double strafe_speed_per_second = 0;
+  double idle_wave_frequency_min = 0;  // Radians per second; zero disables the envelope.
+  double idle_wave_frequency_max = 0;
+  double idle_wave_power = 1;
+};
+
 struct MobDefinition {
   sim::Mob kind;
   sim::Rarity rarity;
@@ -141,6 +149,7 @@ struct MobDefinition {
   double lightning_damage = 0;
   unsigned lightning_bounces = 0;
   double lifesteal = 0;
+  MobMovement movement;
 };
 
 struct Catalog {

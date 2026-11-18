@@ -1,9 +1,15 @@
 # October 30, 2022 catalog and original tooltip evidence
 
-`catalog.json` (`20221030-w3.2`) is the authoritative simulation input;
+`catalog.json` (`20221030-w3.3`) is the authoritative simulation input;
 `server/catalog/generated.hpp` is its deterministic C++ projection. It implements
-12 kinds of petals and 12 kinds of mobs across six rarities. The complete identity
+45 kinds of nonempty petals and 35 mob identities across six rarities. The complete identity
 registry has 46 petal rows (None plus 45 nonempty kinds) and 35 mob IDs.
+
+Mob movement now adopts original World PvP mob/player ratios. See
+[movement policy and values](../../../docs/mob-movement-20221030.md) and the hash-pinned
+[original initializer observations](world-pvp-movement.json). Unmatched mobile species
+use the original generic AI defaults. `mobMovementPlayerSpeed` supplies the shared
+player speed basis; per-row `movement` holds idle/strafe speeds and idle envelopes.
 
 - [Full tooltip inventory](../../../docs/client-tooltips-20221030.md): every original petal/mob ID, all six rarities, descriptions, all displayed stats, cooldowns, orbit counts and complete mob/petal rarity drop matrices.
 - [client-tooltips.json](client-tooltips.json): 480 variants with verbatim lines, exact formatter f32 arguments, health ranges, displayed poison rates, constructor/virtual-function locators, cached gallery text, 210 drop panels, 782 percentage labels and 2160 calculated candidate combinations including hidden/unavailable outcomes.
@@ -37,10 +43,11 @@ Changes to evidence require updating its pinned hashes and regenerating the cata
 `evidence-inputs.json` is itself hash-pinned in the generator and pins the full
 tooltip record. Ordinary checks need only this package, including
 `client-tooltips.json`; no original Wasm, reports or wiki cache is needed. The
-standalone source directory can have any name. `--self-test` rejects 30 malformed
+standalone source directory can have any name. `--self-test` rejects 42 malformed
 catalogs and checks portability, stale output and evidence integrity.
-Explicit `--verify-evidence` requires an evidence root, verifies all 17 original
-source hashes and both snapshot files, and never silently skips a missing file.
+Explicit `--verify-evidence` requires an evidence root, verifies all 19 catalog
+source hashes, both snapshot files and the original World PvP server, and never
+silently skips a missing file.
 
 Displayed stats and cooldown getters are observations; applying them in the
 simulation is explicit adoption. `provenance.adoptedFields` enumerates those

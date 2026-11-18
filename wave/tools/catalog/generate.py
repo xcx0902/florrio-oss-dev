@@ -23,6 +23,7 @@ PACK = SOURCE_DIR / 'data/catalogs/20221030/catalog.json'
 HEADER = SOURCE_DIR / 'server/catalog/generated.hpp'
 EVIDENCE_INPUTS = PACK.with_name('evidence-inputs.json')
 EVIDENCE_SHA256 = 'bd00e2db587ef35bc877231acac94b7bd14aa7e0968e36c0c39cb01a96532125'
+MOVEMENT_SHA256 = '9a4abcaed22345a780660ad70f3779dd11f5f5b5604892cb5c4b02dbe2bb7a75'
 KINDS = tuple(('basic light rock square rose stinger iris wing missile grapes cactus '
                'faster bubble pollen dandelion egg antennae heavy yin_yang web honey '
                'leaf salt rice corn sand pincer yucca magnet yggdrasil starfish pearl '
@@ -39,6 +40,8 @@ MECHANICS = ('attack_distance defend_distance shield reflection damage_ratio dam
              'body_damage sponge_seconds speed_multiplier size_multiplier hidden').split()
 BODY = ('radius', 'health', 'speed_per_second', 'contact_damage', 'contact_heal',
         'poison_per_tick', 'poison_ticks')
+MOVEMENT = ('idle_speed_per_second', 'strafe_speed_per_second',
+            'idle_wave_frequency_min', 'idle_wave_frequency_max', 'idle_wave_power')
 EFFECT_MECHANICS = {
     'heal': 'heal',
     'passiveHealPerSecond': 'passive_heal_per_second',
@@ -88,6 +91,34 @@ def bundled_evidence():
     inputs = json.loads(checked_bytes(EVIDENCE_INPUTS, EVIDENCE_SHA256, 'bundled evidence'))
     require(inputs['schemaVersion'] == 1, 'unsupported bundled evidence version')
     return inputs
+
+
+def movement_evidence():
+    return json.loads(checked_bytes(PACK.with_name('world-pvp-movement.json'),
+                                    MOVEMENT_SHA256, 'world PvP movement evidence'))
+
+
+def mob_movement(kind, player_speed, evidence):
+    """Adopt original mob/player ratios; unmatched mobile species use generic AI."""
+    same_species = kind in evidence['mobs']
+    fixed = kind in {'fire_ant_burrow', 'sponge'}
+    profile = kind if same_species else evidence['defaultProfile']
+    ai = None if fixed else evidence['mobs'][profile]['ai']
+    provenance = dict(source='world-pvp-movement.json', profile=profile if not fixed else 'stationary',
+                      policy='same-species' if same_species else 'stationary' if fixed else 'default-ai')
+    if ai is None:
+        return 0, dict(zip(MOVEMENT, [0, 0, 0, 0, 1])), provenance
+    # Recover the short decimal constants represented by the original f32 fields.
+    # The unrounded memory observations remain in the hash-pinned evidence file.
+    scale = player_speed / evidence['player']['coefficient']
+    speed = lambda value: round(float(format(abs(value), '.7g')) * scale, 9)
+    frequency = ai['waveFrequencyPerMs'] * 1000 if ai['waveEnabled'] else 0
+    frequency_min = frequency_max = frequency
+    if kind in {'baby_ant', 'worker_ant', 'soldier_ant', 'queen_ant'}:
+        frequency_min, frequency_max = [v * 1000 for v in evidence['antWaveFrequencyRangePerMs']]
+    movement = dict(zip(MOVEMENT, [speed(ai['idle']), speed(ai['strafe']),
+                                  frequency_min, frequency_max, ai['wavePower']]))
+    return speed(ai['chase']), movement, provenance
 
 
 def tooltip_evidence(inputs):
@@ -224,7 +255,10 @@ def validate(pack, inputs=None):
         inputs = bundled_evidence()
     tooltips = tooltip_evidence(inputs)
     behaviors = behavior_evidence(inputs)
+    movement_source = movement_evidence()
     walk(pack)
+    require(type(pack.get('mobMovementPlayerSpeed')) in (int, float) and
+            pack['mobMovementPlayerSpeed'] > 0, 'invalid movement player speed basis')
     require(pack['schemaVersion'] == 1 and pack['version'] == '20221030-w3.3', 'unlocked version')
     require(pack['cutoffUtc'] == '2022-10-30T21:00:58Z', 'unlocked historical cutoff')
     reference = inputs['reference']
@@ -314,6 +348,15 @@ def validate(pack, inputs=None):
                     require(row['summon']['mob'] in MOBS and 0 <= row['summon']['rarity'] < 6,
                             'invalid original Egg contents')
             else:
+                speed, movement, provenance = mob_movement(row['kind'], pack['mobMovementPlayerSpeed'], movement_source)
+                configured = row.get('movement', {})
+                require(set(configured) == set(MOVEMENT) and
+                        all(type(value) in (int, float) and value >= 0 for value in configured.values()) and
+                        configured['idle_wave_power'] > 0, 'invalid mob movement settings')
+                require(row['body']['speed_per_second'] == speed and
+                        configured == movement and
+                        row['provenance'].get('movement') == provenance,
+                        'mob movement adoption drift')
                 require(type(row['xp']) is int and row['xp'] >= 0, 'invalid mob XP')
                 require(row['segmentClientId'] == 0 or row['segmentClientId'] in registry,
                         'unknown segment reference')
@@ -458,8 +501,10 @@ def verify_external(pack, inputs, evidence_root, snapshot=None):
         require(all(s in text for s in fragment['snippets']), 'external wiki excerpt drift')
     primary = original['primary.changelog'].decode()
     require(all(s['text'] in primary for s in inputs['primarySnippets']), 'external primary excerpt drift')
+    movement = movement_evidence()
+    checked_bytes(external_path(root, movement['source']), movement['sha256'], 'external world PvP server')
     print(f'Full external evidence verified: {len(original)} sources, '
-          f'{len(snapshot_bytes)} snapshot files; no missing inputs skipped')
+          f'{len(snapshot_bytes)} snapshot files and original world PvP server; no missing inputs skipped')
 
 
 def number(value):
@@ -524,10 +569,12 @@ def generate(pack):
             f'sim::Rarity::{pack["rarities"][r["rarity"]]["name"].lower()}', str(r['clientId']),
             str(r['segmentClientId']), body(r['body']), str(r['summon']).lower(), json.dumps(r['evidenceKey']), str(r['xp']),
             'MobAI::' + r['ai'], str(r['segments']), str(r['parentClientId']), str(r['reviewRequired']).lower(),
-            *[str(r[k]) for k in ['missileHealth', 'missileDamage', 'lightningDamage', 'lightningBounces', 'lifesteal']]])
+            *[str(r[k]) for k in ['missileHealth', 'missileDamage', 'lightningDamage', 'lightningBounces', 'lifesteal']],
+            [f'.{k} = {number(r["movement"][k])}' for k in MOVEMENT]])
     lines += ['  ' + row + ',' for row in aligned_initializers(rows)]
     lines += ['};', '}  // namespace wave::catalog::detail', 'namespace wave::catalog {',
               'inline std::span<const PetalRegistryEntry> petal_registry() { return detail::registry; }',
+              'inline constexpr double mob_movement_player_speed_per_second = ' + number(pack['mobMovementPlayerSpeed']) + ';',
               'inline const Catalog& dated() {', '  static const Catalog result{' + ', '.join([
               json.dumps(pack['version']), json.dumps(digest), json.dumps(pack['clientBuildHash']),
               json.dumps(pack['clientWasmSha256']), 'detail::petals', 'detail::mobs']) + '};',
@@ -598,6 +645,12 @@ def self_test(pack):
         lambda p: p['mobs'][0].update(reviewRequired=False),
         lambda p: p['mobs'][0].update(parentClientId=99),
         lambda p: p['drops']['entries'].pop(),
+        lambda p: p.update(mobMovementPlayerSpeed=0),
+        lambda p: p['mobs'][120]['body'].update(speed_per_second=55),
+        lambda p: p['mobs'][18]['movement'].update(idle_speed_per_second=99),
+        lambda p: p['mobs'][60]['movement'].update(strafe_speed_per_second=9),
+        lambda p: p['mobs'][18]['movement'].update(idle_wave_power=-1),
+        lambda p: p['mobs'][18]['provenance']['movement'].update(policy='default-ai'),
     ]
     for mutate in mutations:
         candidate = copy.deepcopy(pack)
@@ -628,7 +681,7 @@ def portable_self_test(pack):
         shutil.copyfile(EVIDENCE_INPUTS, bundled)
         tooltip = data / 'client-tooltips.json'
         shutil.copyfile(PACK.with_name('client-tooltips.json'), tooltip)
-        for name in ['behavior-wiki-snapshots.json', 'behavior-review.json']:
+        for name in ['behavior-wiki-snapshots.json', 'behavior-review.json', 'world-pvp-movement.json']:
             shutil.copyfile(PACK.with_name(name), data / name)
         header.write_text(generate(pack))
 
@@ -648,7 +701,7 @@ def portable_self_test(pack):
         require(result.returncode != 0 and 'client tooltip evidence hash mismatch' in result.stderr,
                 'tampered tooltip evidence unexpectedly accepted')
         shutil.copyfile(PACK.with_name('client-tooltips.json'), tooltip)
-        for name in ['behavior-wiki-snapshots.json', 'behavior-review.json']:
+        for name in ['behavior-wiki-snapshots.json', 'behavior-review.json', 'world-pvp-movement.json']:
             path = data / name
             path.write_bytes(path.read_bytes() + b' ')
             result = run()
@@ -674,7 +727,7 @@ def portable_self_test(pack):
         result = run('--snapshot', str(root))
         require(result.returncode != 0 and 'require --verify-evidence' in result.stderr,
                 'snapshot argument unexpectedly ignored')
-    print('Renamed standalone package passed; eight integrity/explicit-evidence failures rejected')
+    print('Renamed standalone package passed; nine integrity/explicit-evidence failures rejected')
 
 
 def main():

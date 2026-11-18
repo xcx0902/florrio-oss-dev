@@ -89,11 +89,6 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
   view.origin_wave = wave;
   auto body = definition.body;
   body.radius = mob_radius(kind, rarity);
-  if (kind == Mob::spider || kind == Mob::leech) {
-    body.speed_per_second = rules_.player.speed_per_second * 1.1;
-  } else if (kind == Mob::jellyfish) {
-    body.speed_per_second = rules_.player.speed_per_second * .9;
-  }
   // Continue scaling health and damage in waves past 61.
   const double strength =
       rules_.progressive_waves && wave > 61 ? 1 + std::log1p((wave - 61) / 100.0) : 1;
@@ -134,7 +129,6 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
       place_spawn_segment(view, parent, forward, gap, rules_.arena_radius);
       auto segment_body = segment->body;
       segment_body.radius = body.radius;
-      segment_body.speed_per_second = body.speed_per_second;
       segment_body.health = kind == Mob::leech ? body.health : segment_body.health * strength;
       segment_body.contact_damage *= strength;
       segment_body.poison_per_tick *= scale;
@@ -157,6 +151,12 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
       definition.ai == catalog::MobAI::spawner) {
     return {};
   }
+  // move_entities applies the body's catalog chase speed. Other states select
+  // their catalog speed relative to that same basis, so slows still apply once.
+  const auto& movement = definition.movement;
+  const auto speed_ratio = [&](double speed) {
+    return definition.body.speed_per_second > 0 ? speed / definition.body.speed_per_second : 0;
+  };
   const bool owned = entity.view.owner.has_value();
   bool aggressive =
       owned || entity.provoked ||
@@ -222,7 +222,7 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
     }
     const auto direction = delta * (1 / distance);
     if (definition.ai == catalog::MobAI::ranged && distance < 100) {
-      return Vec2{-direction.y, direction.x} * .17;
+      return Vec2{-direction.y, direction.x} * speed_ratio(movement.strafe_speed_per_second);
     }
     return direction;
   }
@@ -264,12 +264,22 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
       }
     }
     entity.wander_heading = std::remainder(base, 2 * std::numbers::pi);
-    return direction * (evil ? .32 : .4);
+    return direction * speed_ratio(movement.idle_speed_per_second);
   }
   const double angle =
       entity.view.heading_rad + .3 * std::chrono::duration<double>(rules_.timing.step).count();
-  const double pulse = .15 + .25 * (1 + std::cos(time * 2));
-  return Vec2{std::cos(angle), std::sin(angle)} * pulse;
+  // Keep a stable per-entity phase rate for the original ants' frequency range.
+  // Wave uses its deterministic entity identity instead of the PvP RNG stream.
+  const double variant = std::fmod((entity.view.id.slot + 1) * .6180339887498949, 1.);
+  const double frequency =
+      movement.idle_wave_frequency_min +
+      variant * (movement.idle_wave_frequency_max - movement.idle_wave_frequency_min);
+  const double pulse = frequency > 0
+                           ? std::pow(std::clamp(.5 - .5 * std::cos(time * frequency), 0., 1.),
+                                      movement.idle_wave_power)
+                           : 1;
+  return Vec2{std::cos(angle), std::sin(angle)} *
+         (speed_ratio(movement.idle_speed_per_second) * pulse);
 }
 
 void Match::update_mob_actions() {
