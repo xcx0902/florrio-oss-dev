@@ -1,24 +1,40 @@
 // Offline acceptance setup/readback. Built only with BUILD_TESTING, never linked into the host.
+#include "sim/model.hpp"
 #include "store/store.hpp"
 #include <sqlite3.h>
+#include <charconv>
 #include <iostream>
 #include <stdexcept>
 int main(int argc, char** argv) {
   try {
     if (argc < 2 || argc > 3) {
-      throw std::runtime_error("Usage: wave_w3_seed DATABASE [TOKEN|--auto|--behaviors|--squad]");
+      throw std::runtime_error(
+          "Usage: wave_w3_seed DATABASE [TOKEN|--auto|--behaviors|--squad|--garden-wave=N]");
     }
     wave::store::Store store(argv[1], {.allow_test_seed = true});
     const bool automatic = argc == 3 && std::string_view(argv[2]) == "--auto";
     const bool behaviors = argc == 3 && std::string_view(argv[2]) == "--behaviors";
     const bool squad = argc == 3 && std::string_view(argv[2]) == "--squad";
-    auto profile = argc == 3 && !automatic && !behaviors && !squad
+    const std::string_view argument = argc == 3 ? argv[2] : "";
+    constexpr std::string_view garden_option = "--garden-wave=";
+    const bool matchmaking = argument.starts_with(garden_option);
+    auto profile = argc == 3 && !automatic && !behaviors && !squad && !matchmaking
                        ? store.recover_guest(argv[2]).value()
                        : store.create_guest();
-    if (argc == 2 || automatic || behaviors || squad) {
+    if (argc == 2 || automatic || behaviors || squad || matchmaking) {
       wave::store::TestSeed seed;
       seed.xp = 150;
       seed.highest_wave = 7;
+      if (matchmaking) {
+        const auto progress = argument.substr(garden_option.size());
+        auto& garden = seed.highest_waves[static_cast<unsigned>(wave::sim::Biome::garden)];
+        const auto [end, error] =
+            std::from_chars(progress.data(), progress.data() + progress.size(), garden);
+        if (error != std::errc{} || end != progress.data() + progress.size()) {
+          throw std::runtime_error("Invalid Garden wave");
+        }
+        seed.highest_wave = garden;
+      }
       seed.inventory = {{{1, 0}, 5}, {{5, 0}, 40}, {{5, 1}, 20}, {{12, 0}, 4},
                         {{6, 2}, 8}, {{44, 1}, 8}, {{20, 2}, 10}};
       for (unsigned i = 0; i < 5; ++i) {

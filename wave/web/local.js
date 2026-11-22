@@ -109,8 +109,70 @@
     const missile = branch(typeIs(9), branch(radius, scaleBasis(radiusRatio(15))));
     const mobs = branch(radius, mobArt());
     const leech = [...f32(-2.5), 0x92]; // Account for the native 2.5-unit outer stroke.
+    // $988 opcode 18 already bounds and reads a NUL string. Preserve its world
+    // pointer and duplicate flag before the string reader reuses those locals.
+    const noticeStart = [0x20, 5, 0x20, 11, 0x6a, 0x22, 4, 0x21, 1];
+    // The snapshot reader passes the inner world pointer (world + 8).
+    const saveNoticeContext = [0x20, 0, 0x41, 8, 0x6b, 0x21, 16, 0x20, 2, 0x21, 15];
+    const noticeEnd = [0x20, 1, 0x20, 4, 0x6b, 0x22, 0, 0x41, 0x70, 0x4f, 0x0d, 10];
+    const lobbyErrorReset = [0x41, 0, 0x21, 10, 0x20, 8, 0x41, 1, 0x71, 0x45, 0x0d, 3];
+    const clearJoin = branch(
+      [0x20, 16, 0x28, 2, ...uleb(22176), 0x41, 3, 0x46],
+      [
+        0x10,
+        ...uleb(1341), // Clear the rejected invite.
+        0x20,
+        16,
+        0x41,
+        ...uleb(22176),
+        0x6a,
+        0x10,
+        ...uleb(819), // Restore the roster's URL.
+      ],
+    );
+    const showNotice = branch(
+      [
+        0x20,
+        15,
+        0x45, // Execute only a new command.
+        0x20,
+        1,
+        0x20,
+        11,
+        0x6b,
+        0x20,
+        9,
+        0x49,
+        0x71, // Terminator is within the frame.
+      ],
+      [
+        ...clearJoin,
+        0x20,
+        16,
+        0x41,
+        4,
+        0x36,
+        2,
+        ...uleb(22176), // Native lobby error state.
+        0x20,
+        16,
+        0x41,
+        ...uleb(22180),
+        0x6a,
+        0x20,
+        4,
+        0x20,
+        1,
+        0x20,
+        4,
+        0x6b,
+        0x10,
+        ...uleb(420), // Native string assignment.
+      ],
+    );
     const rendererGrowth = missile.length + mobs.length;
-    const growth = rendererGrowth + leech.length;
+    const noticeGrowth = saveNoticeContext.length + showNotice.length;
+    const growth = rendererGrowth + leech.length + noticeGrowth;
     const petalBranch = [0x20, 2, 0x28, 2, 108, 0x22, 0, 0x04, 0x40];
     const mobBranch = [0x20, 2, 0x28, 2, 124, 0x22, 0, 0x45, 0x0d, 0];
     const idleBranch = [0x02, 0x40, 0x02, 0x40, 0x20, 11, 0x45, 0x0d, 0];
@@ -120,8 +182,14 @@
       [580942, uleb(8411), uleb(8411 + rendererGrowth)], // $597 body size
       [580944 + 4921, petalBranch, [...petalBranch, ...missile]],
       [580944 + 8174, mobBranch, [...mobBranch, ...mobs]],
+      [1409456, uleb(14021), uleb(14021 + noticeGrowth)], // $988 body size
+      [1409458 + 1791, noticeStart, [...saveNoticeContext, ...noticeStart]],
+      [1409458 + 1871, noticeEnd, [...showNotice, ...noticeEnd]],
       // Always take $991's existing path that clears the AFK deadline.
       [1436535 + 4217, idleBranch, [0x02, 0x40, 0x02, 0x40, 0x41, 0, 0x45, 0x0d, 0]],
+      // Keep state 4 visible until the next lobby action instead of clearing it
+      // in the update loop before the native canvas can draw the message.
+      [1436535 + 6910, lobbyErrorReset, [...lobbyErrorReset.slice(0, -1), 6]],
       [1736840, uleb(8141), uleb(8141 + leech.length)], // $1795 body size
       [1736842 + 2931, leechRadius, [...leech, ...leechRadius]],
     ];

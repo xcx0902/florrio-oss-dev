@@ -13,7 +13,8 @@ class Match {
   Match(const Match&) = delete;
   Match& operator=(const Match&) = delete;
 
-  // Admission before tick zero. Connections and life-scoped inputs apply on the next step.
+  // Late entrants can play as soon as they join a live wave.
+  [[nodiscard]] std::optional<std::uint32_t> late_join_wave(PlayerId id) const;
   bool add_player(PlayerId id, Vec2 start = {}, std::vector<Petal> loadout = {Petal::basic},
                   std::vector<Rarity> rarities = {});
   bool equip(PlayerId id, std::vector<Petal> loadout, std::vector<Rarity> rarities = {});
@@ -29,6 +30,7 @@ class Match {
 
   [[nodiscard]] MatchView view() const;
   [[nodiscard]] MatchId id() const { return id_; }
+  [[nodiscard]] Phase phase() const { return phase_; }
   [[nodiscard]] std::span<const Event> events() const { return events_; }
 
  private:

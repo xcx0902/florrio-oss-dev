@@ -132,8 +132,8 @@
       ],
       "confidence": "已证实",
       "currentValue": "highest-eligible",
-      "acceptanceIds": ["W4-PUBLIC-HIGHEST"],
-      "notes": "最高合格波优先。资格的细节、平局和迟入时点待 W4。"
+      "acceptanceIds": ["W4-PUBLIC-HIGHEST", "W4-02"],
+      "notes": "原件内嵌日志 42914 说明已通关该波即可加入。本地由未入队的 Ready 触发，按同场景最高通关波判断，排除满员和私房，同波按房间创建顺序。Find Public 匹配等待大厅。"
     },
     {
       "id": "match.startingWave",
@@ -159,10 +159,62 @@
       ],
       "confidence": "未确认",
       "currentValue": {
-        "freshProfile": 1
+        "freshProfile": 1,
+        "formula": "max(1, floor(2 * min(squadHighestCompletedWaves) / 3))"
       },
       "acceptanceIds": ["W0-GARDEN-START", "W4-START-WAVE"],
-      "notes": "新档用第 1 波作为 W1 复刻设定。组队公式待校准。"
+      "notes": "公式是复刻设定。原件日志 44916 确认开局会考虑各队员的最高通关记录，具体系数待历史校准。"
+    },
+    {
+      "id": "match.squad.capacity",
+      "scope": "小队席位",
+      "dateWindow": {
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": 4,
+      "unit": "席",
+      "sources": [{ "id": "snapshot.wasm", "locator": "0x200 roster 读取四个席位" }],
+      "confidence": "重建",
+      "currentValue": 4,
+      "acceptanceIds": ["W4-01", "W4-03"],
+      "notes": "四个席位由原版 roster 字段验证，本地服务端采用相同的公开和私有容量。"
+    },
+    {
+      "id": "match.public.lateJoin",
+      "scope": "公开局迟入",
+      "dateWindow": {
+        "fromDate": "2022-08-05",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": null,
+      "unit": "控制权生效时点",
+      "sources": [{ "id": "log.client", "locator": "42914 记录加入已运行公开局" }],
+      "confidence": "未确认",
+      "currentValue": "加入时立即生成于当前波",
+      "acceptanceIds": ["W4-04"],
+      "notes": "当前波立即可控是项目设定。原件日志未给出迟入生成时点。"
+    },
+    {
+      "id": "match.modeRotation",
+      "scope": "Desert/Ocean 场景轮换",
+      "dateWindow": {
+        "fromDate": "2022-08-02",
+        "throughUtc": "2022-10-30T21:00:58Z"
+      },
+      "candidate": { "periodHours": 24 },
+      "unit": "场景和轮换周期",
+      "sources": [
+        { "id": "log.client", "locator": "43717 记录 PvE 场景每 24 小时轮换" },
+        { "id": "snapshot.wasm", "locator": "0x2 元数据中轮换编号的奇偶决定 Desert/Ocean" }
+      ],
+      "confidence": "已证实",
+      "currentValue": {
+        "setting": "WAVE_ROTATION",
+        "default": "desert",
+        "choices": ["desert", "ocean"]
+      },
+      "acceptanceIds": ["W2-09", "W4-02"],
+      "notes": "本地按宿主启动设定固定轮换场景。原件日志记录每日轮换，具体切换时刻待校准。"
     },
     {
       "id": "craft.rng.mode",

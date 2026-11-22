@@ -13,8 +13,6 @@
 
 namespace wave::app {
 namespace {
-constexpr std::size_t squad_capacity = 2;
-
 std::string random_hex(std::size_t count) {
   std::random_device random;
   constexpr char digits[] = "0123456789abcdef";
@@ -401,9 +399,11 @@ Member& RoomManager::admit(std::string_view token, std::uint64_t connection, sim
   auto& entry = found->second;
   const auto* previous = room(entry);
   if (entry.biome != biome ||
-      (previous && previous->match && previous->match->view().phase == sim::Phase::ended)) {
-    // A closed client cannot finish Continue/Leave for an ended match. Restore
-    // its lobby on admission so the next Ready can create a fresh match.
+      (previous && !entry.connected &&
+       std::chrono::steady_clock::now() - entry.disconnected_at >= limits_.reconnect_grace) ||
+      (previous && previous->match && previous->match->phase() == sim::Phase::ended)) {
+    // A closed client cannot finish Continue/Leave for an ended match.
+    // Expired reservations likewise return to the lobby on admission.
     leave(entry);
     entry.biome = biome;
   }
@@ -459,8 +459,7 @@ void RoomManager::reap_disconnected(bool pressure, std::chrono::steady_clock::ti
   for (auto it = members_.begin(); it != members_.end();) {
     auto& entry = it->second;
     const auto* previous = room(entry);
-    const bool finished =
-        previous && previous->match && previous->match->view().phase == sim::Phase::ended;
+    const bool finished = previous && previous->match && previous->match->phase() == sim::Phase::ended;
     if (!entry.connected && entry.session_refs == 0 &&
         ((pressure && (entry.room.empty() || finished)) ||
          now - entry.disconnected_at >= limits_.reconnect_grace)) {
@@ -484,11 +483,20 @@ void RoomManager::leave(Member& entry) {
   }
   auto it = rooms_.find(entry.room);
   if (it != rooms_.end()) {
-    if (it->second.match) {
-      it->second.match->queue(sim::Departure{entry.id});
+    auto& room = it->second;
+    if (room.match) {
+      room.match->queue(sim::Departure{entry.id});
+    } else if (room.members.front() == entry.token) {
+      // The next member takes ownership and confirms the new lobby lineup.
+      for (const auto& token : room.members) {
+        members_.at(token).ready = false;
+        if (storage_) {
+          storage_->ready.erase(token);
+        }
+      }
     }
-    std::erase(it->second.members, entry.token);
-    if (it->second.members.empty()) {
+    std::erase(room.members, entry.token);
+    if (room.members.empty()) {
       rooms_.erase(it);
     }
   }
@@ -507,7 +515,7 @@ bool RoomManager::create_room(Member& entry, bool private_room) {
       const bool unattended = std::ranges::none_of(
           candidate.members, [this](const auto& token) { return members_.at(token).connected; });
       if (&candidate != current && candidate.match && unattended &&
-          candidate.match->view().phase == sim::Phase::ended) {
+          candidate.match->phase() == sim::Phase::ended) {
         for (const auto& token : candidate.members) {
           auto& member = members_.at(token);
           member.room.clear();
@@ -529,37 +537,99 @@ bool RoomManager::create_room(Member& entry, bool private_room) {
   leave(entry);
   auto& created = rooms_[code];
   created.code = code;
+  created.version = ++next_room_;
   created.private_room = private_room;
   created.biome = entry.biome;
+  created.members.reserve(Room::capacity);
   entry.room = code;
   created.members.push_back(entry.token);
   return true;
 }
 
-bool RoomManager::join(Member& entry, std::string_view code) {
+JoinResult RoomManager::join_squad(Member& entry, std::string_view code) {
   auto it = rooms_.find(code);
+  if (it == rooms_.end() || it->second.biome != entry.biome ||
+      (it->second.match && it->second.match->phase() == sim::Phase::ended)) {
+    return JoinResult::unavailable;
+  }
   if (entry.room == code) {
-    return true;
+    return JoinResult::joined;
   }
-  if (it == rooms_.end() || it->second.biome != entry.biome || it->second.match ||
-      it->second.members.size() >= squad_capacity) {
-    return false;
+  auto& target = it->second;
+  if (target.members.size() >= Room::capacity) {
+    return JoinResult::full;
   }
+  if (target.match) {
+    return JoinResult::started;
+  }
+  enter(entry, target);
+  return JoinResult::joined;
+}
+
+void RoomManager::enter(Member& entry, Room& target) {
   leave(entry);
-  entry.room = code;
-  it->second.members.push_back(entry.token);
-  return true;
+  entry.room = target.code;
+  target.members.push_back(entry.token);
+}
+
+bool RoomManager::add_player(const Member& member, sim::Match& match, std::size_t seat) const {
+  const auto start = sim::Vec2{double(seat) * 24 - 12, 0};
+  if (member.profile && seat >= loadouts_.size()) {
+    auto [petals, rarities] = loadout(*member.profile);
+    return match.add_player(member.id, start, std::move(petals), std::move(rarities));
+  }
+  const auto fallback = default_loadout(seat);
+  return match.add_player(member.id, start, {fallback.begin(), fallback.end()});
 }
 
 bool RoomManager::find_public(Member& entry) {
-  for (const auto& [code, candidate] : rooms_) {
+  Room* lobby = nullptr;
+  for (auto& [code, candidate] : rooms_) {
     if (code != entry.room && !candidate.private_room && candidate.biome == entry.biome &&
-        !candidate.match && candidate.members.size() < squad_capacity) {
-      return join(entry, code);
+        !candidate.match && candidate.members.size() < Room::capacity &&
+        (!lobby || candidate.version < lobby->version)) {
+      lobby = &candidate;
     }
+  }
+  if (lobby) {
+    enter(entry, *lobby);
+    return true;
   }
   // The client waits for the squad code to change before it dismisses Creating.
   return create_room(entry, false);
+}
+
+bool RoomManager::join_running_public(Member& entry) {
+  const auto biome = static_cast<unsigned>(entry.biome);
+  const auto best = entry.profile ? entry.profile->highest_waves.at(biome) : 0u;
+  if (best == 0) {
+    return false;
+  }
+  Room* running = nullptr;
+  std::uint32_t highest = 0;
+  // The oldest room wins ties. Selection and admission both run on
+  // the room executor, so no second request can claim the same free seat.
+  for (auto& [code, candidate] : rooms_) {
+    if (!candidate.match || candidate.private_room || candidate.biome != entry.biome ||
+        candidate.members.size() >= Room::capacity) {
+      continue;
+    }
+    const auto wave = candidate.match->late_join_wave(entry.id);
+    if (wave && *wave <= best &&
+        (!running || *wave > highest ||
+         (*wave == highest && candidate.version < running->version)) &&
+        std::ranges::any_of(candidate.members, [this](const auto& token) {
+          return members_.at(token).connected;
+        })) {
+      running = &candidate;
+      highest = *wave;
+    }
+  }
+  if (!running || !add_player(entry, *running->match, running->members.size())) {
+    return false;
+  }
+  enter(entry, *running);
+  return true;
 }
 
 void RoomManager::apply_profile(const store::Profile& profile) {
@@ -1014,21 +1084,22 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
     return create_room(entry, create->private_room);
   } else if (const auto* visibility = std::get_if<wire::SetSquadPublic>(&action)) {
     const auto found = rooms_.find(entry.room);
-    if (found == rooms_.end() || found->second.match) {
+    if (found == rooms_.end() || found->second.match ||
+        found->second.members.front() != entry.token) {
       return false;
     }
     found->second.private_room = !visibility->value;
   } else if (std::holds_alternative<wire::FindPublicSquad>(action)) {
     return find_public(entry);
   } else if (const auto* join_room = std::get_if<wire::JoinSquad>(&action)) {
-    return join(entry, join_room->code);
+    return join_squad(entry, join_room->code) == JoinResult::joined;
   } else if (std::holds_alternative<wire::Leave>(action)) {
     leave(entry);
   } else if (std::holds_alternative<wire::Continue>(action)) {
     const auto* current = room(entry);
     // Continue acknowledges death; an ongoing squad retains the player for
     // Yggdrasil or next-wave revival. A delayed Continue also preserves a new life.
-    if (!current || !current->match || current->match->view().phase == sim::Phase::ended) {
+    if (!current || !current->match || current->match->phase() == sim::Phase::ended) {
       leave(entry);
     }
   } else if (const auto* ready = std::get_if<wire::Ready>(&action)) {
@@ -1048,11 +1119,14 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
       return true;
     }
     if (entry.room.empty()) {
-      // Ready without a squad opens a solo room.
       if (!ready->value) {
         return true;
       }
-      if (!create_room(entry, true)) {
+      if (join_running_public(entry)) {
+        entry.ready = true;
+        return true;
+      }
+      if (!create_room(entry, false)) {
         return false;
       }
     }
@@ -1075,25 +1149,17 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
         // Start at floor(2/3 * minimum), with wave one for a fresh squad.
         opening_index = std::max<std::uint64_t>(1, lowest * std::uint64_t{2} / 3) - 1;
       }
-      room.match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_,
-                                                std::move(rules), opening_index);
-      if (storage_) {
-        room.economy_id = random_hex(32);
-      }
+      auto match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_,
+                                               std::move(rules), opening_index);
       for (std::size_t i = 0; i < room.members.size(); ++i) {
-        const auto& m = members_.at(room.members[i]);
-        const auto fallback = default_loadout(i);
-        std::vector<sim::Petal> selected(fallback.begin(), fallback.end());
-        std::vector<sim::Rarity> rarities;
-        if (m.profile && i >= loadouts_.size()) {
-          auto equipment = loadout(*m.profile);
-          selected = std::move(equipment.first);
-          rarities = std::move(equipment.second);
-        }
-        if (!room.match->add_player(m.id, {double(i) * 24 - 12, 0}, selected, rarities)) {
+        if (!add_player(members_.at(room.members[i]), *match, i)) {
           throw std::logic_error("Room manager admission failed before tick zero");
         }
       }
+      if (storage_) {
+        room.economy_id = random_hex(32);
+      }
+      room.match = std::move(match);
     }
   } else if (const auto* move = std::get_if<wire::Move>(&action)) {
     const auto it = rooms_.find(entry.room);

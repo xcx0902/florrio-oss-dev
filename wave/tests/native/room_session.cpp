@@ -233,8 +233,9 @@ void public_squads() {
   check(rooms.command(b, wire::FindPublicSquad{}, {}) && rooms.room(a) == rooms.room(b),
         "Find Public joins the existing open squad");
   auto& c = rooms.admit("", 4);
-  check(rooms.command(c, wire::FindPublicSquad{}, {}) && c.room != code,
-        "Find Public skips a full squad");
+  check(rooms.command(c, wire::FindPublicSquad{}, {}) && c.room == code,
+        "Find Public can fill the third seat");
+  rooms.command(c, wire::Leave{}, {});
   check(rooms.command(b, wire::Ready{true}, {}) && !rooms.room(a)->match,
         "One ready player cannot start the public match");
   rooms.disconnect(b.token, 2);
@@ -359,8 +360,6 @@ int main() {
   const auto room_code = a.room;
   check(!rooms.command(b, wire::JoinSquad{"missing"}, {}), "Unknown invite denied");
   check(rooms.command(b, wire::JoinSquad{room_code}, {}), "Join by original room code");
-  auto& c = rooms.admit("", 3);
-  check(!rooms.command(c, wire::JoinSquad{room_code}, {}), "Local two-seat capacity");
   check(rooms.command(a, wire::Ready{true}, {}), "First ready");
   check(!rooms.room(a)->match, "First player cannot start an unready two-person room");
   check(rooms.command(b, wire::Ready{true}, {}), "Second ready starts shared match");
@@ -444,6 +443,7 @@ int main() {
   check(player(rooms.room(a)->match->view(), id).connected,
         "Old socket teardown cannot disconnect replacement");
   const auto first_tick = rooms.room(a)->match->view().next_tick;
+  auto& c = rooms.admit("", 3);
   check(rooms.command(c, wire::CreateSquad{true}, {}) && rooms.command(c, wire::Ready{true}, {}),
         "Second isolated room starts");
   rooms.step();

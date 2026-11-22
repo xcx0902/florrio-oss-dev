@@ -236,6 +236,7 @@ function world(plain, baseline) {
   }
   const hits = [];
   const arcs = [];
+  const notices = [];
   assert.equal(r.byte(), 0, '$601 delimiter after the u32 entity terminator');
   // The captured initial empty world ends at the delimiter (implicit empty list).
   for (let envelope = r.cursor.offset < plain.length ? r.vu() : 0; envelope; envelope = r.vu()) {
@@ -243,16 +244,18 @@ function world(plain, baseline) {
     const opcode = r.vu();
     if (opcode === 33) {
       arcs.push([r.real(), r.real(), r.real(), r.real()]);
+    } else if (opcode === 18) {
+      notices.push(r.str());
     } else {
       assert.equal(opcode, 32, 'Recovered native hit event');
       hits.push({ id: r.word(), strength: r.byte() });
     }
   }
   assert.equal(r.cursor.offset, plain.length);
-  return { epoch, tick, ack, control, wave, removed, hits, arcs };
+  return { epoch, tick, ack, control, wave, removed, hits, arcs, notices };
 }
 
-export async function client(browser, url, name, storageState) {
+export async function client(browser, url, name, storageState, readyLabels = ['Ready', 'Wave 3']) {
   const context = await browser.newContext({
     viewport: { width: 1024, height: 768 },
     locale: 'en-US',
@@ -348,10 +351,9 @@ export async function client(browser, url, name, storageState) {
   });
   await page.goto(url);
   await page.waitForFunction(
-    () =>
-      localStorage.getItem('cp6_player_id') &&
-      (window.waveLabels.has('Ready') || window.waveLabels.has('Wave 3')),
-    null,
+    (labels) =>
+      localStorage.getItem('cp6_player_id') && labels.some((label) => window.waveLabels.has(label)),
+    readyLabels,
     { timeout: 8000 },
   );
   result.guest = await page.evaluate(() => localStorage.getItem('cp6_player_id'));

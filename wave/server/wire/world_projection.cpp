@@ -452,9 +452,9 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
 
   if (room) {
     Writer roster;
-    std::array<std::uint32_t, 4> bodies{};
-    std::array<store::Slots, 4> equipment{};
-    std::array<std::uint8_t, 4> member_flags{};
+    std::array<std::uint32_t, app::Room::capacity> bodies{};
+    std::array<store::Slots, app::Room::capacity> equipment{};
+    std::array<std::uint8_t, app::Room::capacity> member_flags{};
     for (std::size_t i = 0; i < bodies.size(); ++i) {
       const auto* member = i < room->members.size() ? rooms.member(room->members[i]) : nullptr;
       roster.text(member ? member->name : "");

@@ -81,7 +81,7 @@ HTTPS/WSS；该规则不代理或暴露后端 8480。Cloudflare A 记录使用 D
 | ------------------------ | -----------: | --------------------------------------------------- |
 | `WAVE_MAX_PLAYERS`       |           32 | 同时占用的 WebSocket 名额，含尚未完成身份握手的连接 |
 | `WAVE_MAX_CONNECTIONS`   |          128 | 包括 HTTP 加载在内的总连接上限                      |
-| `WAVE_MAX_ROOMS`         |           32 | 单进程房间上限，每队仍为两人                        |
+| `WAVE_MAX_ROOMS`         |           32 | 单进程房间上限，每队最多四人                        |
 | `WAVE_MAX_GUESTS`        |          256 | 内存访客缓存上限，独立于 SQLite 的累计存档数        |
 | `WAVE_RECONNECT_SECONDS` |          300 | 断线对局身份的保留时间                              |
 | `WAVE_ALLOWED_ORIGINS`   | 本机宿主地址 | 额外允许的完整 Origin，逗号分隔                     |

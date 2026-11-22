@@ -48,6 +48,7 @@ class ClientSession {
   std::string requested_guest_;
   wire::Protocol wire_;
   wire::WorldProjection projection_;
+  std::string_view squad_notice_;
   std::uint32_t acknowledged_ = 0;
   std::uint64_t craft_cursor_ = 0;
   std::uint64_t match_ = 0;

@@ -47,6 +47,14 @@ wire::Bytes ClientSession::snapshot() {
     throw std::runtime_error("Client protocol tick exhausted");
   }
   auto frame = projection_.build(rooms_, *member_);
+  if (!squad_notice_.empty()) {
+    // The Wave runtime routes the October reader's opcode 18 string to the
+    // native lobby status. A reliable retry does not enqueue it again.
+    frame.commands.insert(frame.commands.end(), {1, 18});
+    frame.commands.insert(frame.commands.end(), squad_notice_.begin(), squad_notice_.end());
+    frame.commands.push_back(0);
+    squad_notice_ = {};
+  }
   const auto integer = [&](std::uint64_t value) {
     do {
       frame.commands.push_back((value & 127) | (value > 127 ? 128 : 0));
@@ -102,6 +110,21 @@ Reply ClientSession::drain() {
         reply.frames.push_back(wire_.guest_id(member_->token));
       }
       identified_ = true;
+    } else if (const auto* join = std::get_if<wire::JoinSquad>(&request.action); member_ && join) {
+      switch (rooms_.join_squad(*member_, join->code)) {
+        case JoinResult::joined:
+          squad_notice_ = {};
+          break;
+        case JoinResult::unavailable:
+          squad_notice_ = "Squad doesn't exist";
+          break;
+        case JoinResult::full:
+          squad_notice_ = "Squad is full";
+          break;
+        case JoinResult::started:
+          squad_notice_ = "Squad has already started";
+          break;
+      }
     } else if (member_) {
       const bool economic = std::holds_alternative<wire::Craft>(request.action) ||
                             std::holds_alternative<wire::Equip>(request.action) ||
@@ -122,6 +145,15 @@ Reply ClientSession::drain() {
       // Close the session so a fresh admission can restore committed state.
       if (!accepted && economic && rooms_.storage()) {
         return reject();
+      }
+      if (std::holds_alternative<wire::FindPublicSquad>(request.action)) {
+        squad_notice_ = accepted ? "" : "No public squad available";
+      } else if (std::holds_alternative<wire::CreateSquad>(request.action)) {
+        squad_notice_ = accepted ? "" : "Could not create squad";
+      } else if (std::holds_alternative<wire::SetSquadPublic>(request.action)) {
+        squad_notice_ = accepted ? "" : "Could not change squad visibility";
+      } else if (std::holds_alternative<wire::Leave>(request.action)) {
+        squad_notice_ = {};
       }
       if (!accepted) {
         const auto* ready = std::get_if<wire::Ready>(&request.action);

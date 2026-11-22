@@ -113,15 +113,27 @@ Tick Match::reload_ticks(Petal kind, Rarity rarity) const {
       rules_.catalog.petal(kind, rarity)->reload_seconds * 1000000)));
 }
 
+std::optional<std::uint32_t> Match::late_join_wave(PlayerId id) const {
+  if (!wave_.number || phase_ == Phase::ended ||
+      std::ranges::any_of(players_, [id](const Player& player) { return player.view.id == id; }) ||
+      std::ranges::none_of(players_, [](const Player& player) {
+        return player.view.connected && player.view.state == LifeState::alive;
+      })) {
+    return std::nullopt;
+  }
+  return wave_.number;
+}
+
 bool Match::add_player(PlayerId id, Vec2 start, std::vector<Petal> loadout,
                        std::vector<Rarity> rarities) {
-  if (tick_ != 0 || id.value == 0 || player(id) || !start.finite() ||
+  if (id.value == 0 || (tick_ ? !late_join_wave(id) : player(id) != nullptr) || !start.finite() ||
       !valid_loadout(loadout, rarities)) {
     return false;
   }
   Player entry;
   entry.view.id = id;
-  entry.view.life = {id_, id, 0};
+  // A guest who left can join again. Start beyond its prior life generations.
+  entry.view.life = {id_, id, tick_ ? tick_ * 2 : 0};
   entry.view.petals.resize(loadout.size());
   entry.petal_ready.resize(loadout.size());
   entry.view.loadout = std::move(loadout);
@@ -131,6 +143,9 @@ bool Match::add_player(PlayerId id, Vec2 start, std::vector<Petal> loadout,
   entry.view.loadout_rarities = std::move(rarities);
   entry.spawn = clamp_center(start, rules_.arena_radius, rules_.player.radius);
   players_.push_back(std::move(entry));
+  if (tick_) {
+    spawn_player(players_.back());
+  }
   return true;
 }
 

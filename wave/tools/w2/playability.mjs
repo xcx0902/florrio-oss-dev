@@ -451,7 +451,14 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
       assert.equal(profile.equipped, saved.equipped, 'Equipment persists across native modes');
       assert.deepEqual(entry.errors, []);
       scenes.push({
-        name, biome, rotation, memory, hudLabels, mobs: mobs.map((mob) => mob.mob), menu, screenshot,
+        name,
+        biome,
+        rotation,
+        memory,
+        hudLabels,
+        mobs: mobs.map((mob) => mob.mob),
+        menu,
+        screenshot,
       });
       await entry.page.mouse.click(18, 18);
       await until(() => !entry.current.control && !entry.baseline.has(8197), 'Exit to native menu');
@@ -472,10 +479,7 @@ export async function biomeSelectionCase({ browser, snapshot, nativeDir, output,
         assert.equal(peer.baseline.get(8198).rotation, rotation);
         assert.equal(peer.sockets.length, 1, 'Invitation selects the mode on the first connection');
         assert.equal(new URL(peer.sockets.at(-1)).pathname, '/wave/socket/rotating');
-        assert.equal(
-          await peer.page.evaluate(() => localStorage.getItem('florrio_gamemode')),
-          '1',
-        );
+        assert.equal(await peer.page.evaluate(() => localStorage.getItem('florrio_gamemode')), '1');
         assert.ok(peer.requests.every((url) => new URL(url).origin === origin));
         assert.deepEqual(peer.errors, []);
       } finally {
@@ -699,7 +703,7 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
             return;
           }
           window.waveTestSocket = this;
-          let stalled = !sessionStorage.getItem('waveTestResumed');
+          let stalled = false;
           const buffered = [];
           this.addEventListener('message', (event) => {
             if (stalled) {
@@ -707,9 +711,11 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
               buffered.push(event.data);
             }
           });
+          window.waveTestStall = () => {
+            stalled = true;
+          };
           window.waveTestResume = () => {
             stalled = false;
-            sessionStorage.setItem('waveTestResumed', '1');
             for (const data of buffered.splice(0)) {
               this.dispatchEvent(new MessageEvent('message', { data }));
             }
@@ -725,13 +731,21 @@ export async function connectionRecoveryCase({ browser, snapshot, nativeDir, out
       };
     });
     await Promise.all([page.waitForRequest('**/wave/cache/**'), page.goto(host.url)]);
-    assert.equal(await page.locator('select').count(), 0, 'Page stays responsive without a selector');
+    assert.equal(
+      await page.locator('select').count(),
+      0,
+      'Page stays responsive without a selector',
+    );
     releaseCache();
     const recovery = banner(page);
     await recovery.getByText(/Could not load your saved profile/).waitFor();
     await faulty.unroute('**/wave/cache/**');
     const retry = recovery.getByRole('button', { name: 'Reconnect' });
-    await retry.click();
+    await Promise.all([page.waitForEvent('domcontentloaded'), retry.click()]);
+    // Start the stall after identity admission so the host's handshake timer
+    // cannot close the socket before the browser's idle watchdog fires.
+    await page.waitForFunction(() => window.waveReadyDrawn);
+    await page.evaluate(() => window.waveTestStall());
     await recovery.getByText(/No response from the game server/).waitFor({ timeout: 15000 });
     assert.equal(loads, 2, 'A silent socket leaves the page available for recovery');
     await page.evaluate(() => window.waveTestResume());

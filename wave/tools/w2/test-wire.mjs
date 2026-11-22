@@ -27,12 +27,17 @@ const { values } = parseArgs({
     'bootstrap-only': { type: 'boolean' },
   },
 });
-if (values.stage === 'W3') {
-  const { runW3 } = await import('../w3/test-wire.mjs');
-  if (!process.argv.includes('--output-dir')) {
-    values['output-dir'] = path.join(root, '../reports/wave/W3');
+if (values.stage === 'W3' || values.stage === 'W4') {
+  if (!process.argv.some((arg) => arg === '--output-dir' || arg.startsWith('--output-dir='))) {
+    values['output-dir'] = path.join(root, '../reports/wave', values.stage);
   }
-  await runW3(values);
+  if (values.stage === 'W3') {
+    const { runW3 } = await import('../w3/test-wire.mjs');
+    await runW3(values);
+  } else {
+    const { runW4 } = await import('../w4/test-wire.mjs');
+    await runW4(values);
+  }
   process.exit(process.exitCode ?? 0);
 }
 assert.equal(values.stage, 'W2');
@@ -376,12 +381,27 @@ try {
     { encoding: 'utf8' },
   );
   report.nativeBinary = hash(await readFile(path.resolve(values['native-dir'], 'wave_host')));
-  host = await startHost({ snapshot: values.snapshot, nativeDir: values['native-dir'], port: 0 });
+  host = await startHost({
+    snapshot: values.snapshot,
+    nativeDir: values['native-dir'],
+    port: 0,
+    // The malformed-frame burst tests protocol closes while older handshakes drain.
+    environment: { WAVE_MAX_PLAYERS: '64' },
+  });
   report.snapshot = host.snapshot;
   for (const { file, sha256 } of host.snapshot) {
     const response = await fetch(host.url + file);
     assert.ok(response.ok);
-    assert.equal(hash(Buffer.from(await response.arrayBuffer())), sha256);
+    const body = Buffer.from(await response.arrayBuffer());
+    if (file === 'client.js') {
+      // The host substitutes the single hostname import for the local route.
+      const siteImport = '146708:()=>K("localhost")';
+      const served = body.toString('utf8');
+      assert.equal(served.split(siteImport).length, 2);
+      assert.equal(hash(served.replace(siteImport, '146708:()=>K(location.hostname)')), sha256);
+    } else {
+      assert.equal(hash(body), sha256);
+    }
   }
   report.productionTestEndpoints = {
     state: (await fetch(host.url + 'wave/test/state')).status,

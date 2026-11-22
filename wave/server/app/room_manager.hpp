@@ -15,6 +15,8 @@
 
 namespace wave::app {
 
+enum class JoinResult { joined, unavailable, full, started };
+
 struct Member {
   sim::PlayerId id;
   std::string token;
@@ -38,7 +40,9 @@ struct RoomLimits {
 };
 
 struct Room {
+  static constexpr std::size_t capacity = 4;
   std::string code;
+  std::uint64_t version = 0;
   bool private_room = true;
   sim::Biome biome = sim::Biome::garden;
   std::vector<std::string> members;
@@ -101,6 +105,7 @@ class RoomManager {
   std::size_t guest_count() const { return members_.size(); }
   bool command(Member& member, const wire::ReliableAction& action,
                std::optional<sim::LifeId> acknowledged_life, std::string key = "");
+  JoinResult join_squad(Member& member, std::string_view code);
   void step();
   // Call on the room manager executor before publishing too; neither step nor poll
   // waits for SQLite. wait_storage is a timed admission/test barrier.
@@ -135,8 +140,10 @@ class RoomManager {
   const sim::Rules* rules_override_for(sim::Biome biome) const;
   void leave(Member& member);
   bool create_room(Member& member, bool private_room);
-  bool join(Member& member, std::string_view code);
+  void enter(Member& member, Room& room);
+  bool add_player(const Member& member, sim::Match& match, std::size_t seat) const;
   bool find_public(Member& member);
+  bool join_running_public(Member& member);
   bool economy_command(Member&, const wire::ReliableAction&, std::optional<sim::LifeId>,
                        std::string key);
   void apply_profile(const store::Profile&);
@@ -149,6 +156,7 @@ class RoomManager {
   sim::Biome rotating_biome_;
   RoomLimits limits_;
   std::uint64_t next_player_ = 0;
+  std::uint64_t next_room_ = 0;
   std::uint64_t next_match_ = 0;
   std::map<std::string, Member, std::less<>> members_;
   std::map<std::string, Room, std::less<>> rooms_;
