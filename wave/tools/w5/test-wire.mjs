@@ -185,8 +185,26 @@ export async function runW5(values) {
     assert.equal(a.baseline.get(8195).flowers, 2);
     assert.ok(a.baseline.get(8195).leaders.includes(8193));
     assert.ok(a.sockets.some((url) => url.endsWith('/wave/socket/pvp')));
-    await scenario('duel', aid);
-    await step();
+    await scenario('pvp-wound', bid);
+    s = await step();
+    const opponentHealth = () => [...a.baseline.values()].find((entity) => entity.name === 'PVP B');
+    await until(
+      () => opponentHealth()?.health === 127,
+      'The opponent health update reaches the other PvP client',
+    );
+    assert.equal(opponentHealth().healthFlags & 2, 2);
+    assert.equal(
+      [...b.baseline.values()].find((entity) => entity.name === 'PVP A').healthFlags & 2,
+      2,
+    );
+    report.cases['W5-PVP-HEALTH'] = {
+      status: 'passed',
+      health: opponentHealth().health,
+      screenshot: await picture(a, 'pvp-opponent-health'),
+    };
+    await scenario('duel-edge', aid);
+    s = await step();
+    pvp = roomOf(s, 1);
     await until(
       () => a.baseline.get(8195)?.scores[0] === 300,
       'Native ranking receives victim score',
@@ -216,6 +234,31 @@ export async function runW5(values) {
     await a.page.mouse.up();
     await stop(a);
     assert.notEqual(playerOf(pvp, bid).state, 1, 'Original player input defeats the opponent');
+    const killerControl = a.current.control;
+    const atKill = bodyOf(pvp, aid);
+    s = await step();
+    pvp = roomOf(s, 1);
+    const afterKill = bodyOf(pvp, aid);
+    assert.ok(
+      Math.hypot(afterKill.x - atKill.x, afterKill.y - atKill.y) <= 1.3,
+      'The shrinking PvP field cannot accelerate the killer at the old edge',
+    );
+    assert.ok(pvp.arenaRadius >= Math.hypot(afterKill.x, afterKill.y) + afterKill.radius - 1e-4);
+    assert.equal(a.current.control, killerControl, 'The killer retains the same controlled flower');
+    await until(
+      () =>
+        Math.hypot(
+          a.baseline.get(8193).cameraX / 5 - afterKill.x,
+          a.baseline.get(8193).cameraY / 5 - afterKill.y,
+        ) < 0.01,
+      'The killer camera stays with its authoritative flower',
+    );
+    report.cases['W5-PVP-KILL-MOVEMENT'] = {
+      status: 'passed',
+      before: atKill,
+      after: afterKill,
+      screenshot: await picture(a, 'pvp-kill-position'),
+    };
     assert.ok(playerOf(pvp, aid).score > 10);
     const defeatedScore = playerOf(pvp, aid).score;
     assert.ok(
@@ -262,6 +305,81 @@ export async function runW5(values) {
       inventoryBefore: inventoryCount(profiles[0]),
       inventoryAfter: inventoryCount(after),
       screenshot: await picture(a, 'pvp-picked-up'),
+    };
+
+    console.log('W5: walking outward follows the shrinking PvP boundary without oscillation');
+    await aim(a, [1, 0]);
+    s = await step(20);
+    pvp = roomOf(s, 1);
+    const resizeSamples = [];
+    for (let sample = 0; sample < 8; sample += 1) {
+      const previousRadius = pvp.arenaRadius;
+      const previousBody = bodyOf(pvp, aid);
+      s = await step(4);
+      pvp = roomOf(s, 1);
+      const body = bodyOf(pvp, aid);
+      assert.ok(
+        Math.abs(pvp.arenaRadius - (previousRadius - 1)) < 0.001,
+        'The field shrinks by ten units per second despite outward movement',
+      );
+      assert.ok(
+        Math.hypot(body.x, body.y) <= Math.hypot(previousBody.x, previousBody.y) + 0.001,
+        'Walking outward cannot bounce the flower away from the shrinking edge',
+      );
+      assert.ok(
+        Math.abs(Math.hypot(body.x, body.y) + body.radius - pvp.arenaRadius) < 0.001,
+        'The outward-moving flower remains on the current boundary',
+      );
+      resizeSamples.push({ radius: pvp.arenaRadius, x: body.x, y: body.y });
+    }
+    await stop(a);
+    report.cases['W5-PVP-SMOOTH-RESIZE'] = {
+      status: 'passed',
+      samples: resizeSamples,
+      screenshot: await picture(a, 'pvp-smooth-resize'),
+    };
+
+    console.log('W5: death Continue and Ready rejoin the running PvP field without reload');
+    const beforeReentry = {
+      sockets: b.sockets.length,
+      loads: b.documentLoads.length,
+      epoch: b.current.epoch,
+      life: playerOf(pvp, bid).life,
+      match: pvp.match,
+    };
+    const firstContinue = b.commands.length;
+    await b.page.keyboard.press('Enter');
+    await until(
+      () => !b.baseline.has(8196),
+      'PvP Continue leaves the defeated seat and returns to the menu world',
+    );
+    assert.ok(
+      b.commands.slice(firstContinue).some((command) => command.opcode === 34),
+      'PvP Continue sends ad completion directly',
+    );
+    assert.ok(
+      !b.commands.slice(firstContinue).some((command) => command.opcode === 21),
+      'PvP skips the Waves settlement command',
+    );
+    await pause(700);
+    await b.page.keyboard.press('Enter');
+    await until(
+      async () => roomOf(await state(), 1)?.members.some((member) => member.id === bid),
+      'Ready admits the defeated guest to the running PvP field',
+    );
+    s = await step();
+    pvp = roomOf(s, 1);
+    await until(() => b.current?.control, 'Ready supplies a new controlled PvP flower');
+    assert.equal(pvp.match, beforeReentry.match, 'The survivor keeps the same public field');
+    assert.equal(playerOf(pvp, bid).state, 1);
+    assert.ok(playerOf(pvp, bid).life > beforeReentry.life);
+    assert.ok(b.current.epoch > beforeReentry.epoch);
+    assert.equal(b.sockets.length, beforeReentry.sockets, 'PvP reentry keeps its socket');
+    assert.equal(b.documentLoads.length, beforeReentry.loads, 'PvP reentry keeps its page');
+    assert.equal(playerOf(pvp, bid).score, 0, 'The new PvP life starts with zero score');
+    report.cases['W5-PVP-REENTRY'] = {
+      status: 'passed',
+      screenshot: await picture(b, 'pvp-rejoined'),
     };
 
     console.log('W5: native squad, split field/interior visibility and timeout return');

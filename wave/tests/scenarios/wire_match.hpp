@@ -40,9 +40,25 @@ struct FixtureAccess {
           h.deadline_tick = match.tick_ + 1;
         }
       }
-    } else if (action == "duel") {
+    } else if (action == "pvp-wound") {
       if (match.rules_.mode != Mode::pvp) {
         return false;
+      }
+      const auto opponent = std::ranges::find_if(match.players_, [id](const auto& player) {
+        return player.view.id != id && player.view.body;
+      });
+      if (opponent == match.players_.end()) {
+        return false;
+      }
+      const auto source = match.damage_source(*match.entities_.get(*opponent->view.body));
+      (void)match.apply_health(body->view.id, source, HealthKind::contact, body->view.health / 2);
+    } else if (action == "duel" || action == "duel-edge") {
+      if (match.rules_.mode != Mode::pvp) {
+        return false;
+      }
+      if (action == "duel-edge") {
+        // Stage the duel in an already expanded field; normal resizing stays in update_pvp.
+        match.arena_radius_ = pvp_arena_radius(2);
       }
       unsigned n = 0;
       for (auto& participant : match.players_) {
@@ -53,7 +69,7 @@ struct FixtureAccess {
         if (!flower) {
           continue;
         }
-        flower->view.position = Vec2{n ? 26.0 : 0.0, 0};
+        flower->view.position = Vec2{(action == "duel-edge" ? 300.0 : 0.0) + (n ? 26.0 : 0.0), 0};
         flower->view.health = n ? 1 : flower->view.max_health;
         participant.move = {};
         participant.attack = participant.defend = false;

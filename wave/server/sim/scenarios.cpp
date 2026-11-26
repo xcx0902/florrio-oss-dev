@@ -187,7 +187,12 @@ void Match::update_pvp() {
   const auto population = std::ranges::count_if(players_, [](const Player& p) {
     return p.view.connected && p.view.state == LifeState::alive;
   });
-  arena_radius_ = pvp_arena_radius(population);
+  const auto target = pvp_arena_radius(population);
+  const auto change = rules_.pvp_arena_resize_speed_per_second *
+                      std::chrono::duration<double>(rules_.timing.step).count();
+  // Keep boundary motion independent of player movement and tick frequency.
+  // A population change reverses direction from the current radius without a snap.
+  arena_radius_ += std::clamp(target - arena_radius_, -change, change);
   for (const auto slot : entities_.active()) {
     auto& e = entities_.at(slot);
     e.view.position = clamp_center(e.view.position, area_radius(e.view.area), e.view.radius);

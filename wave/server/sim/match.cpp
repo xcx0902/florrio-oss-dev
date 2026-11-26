@@ -22,8 +22,10 @@ void validate(const Rules& rules) {
       rules.knockback_retention > 1 || !nonnegative(rules.contact_knockback_speed) ||
       !nonnegative(rules.ant_hole_radius) || rules.ant_hole_radius == 0 ||
       rules.ant_hole_duration.count() <= 0 || rules.pvp_spawn_interval.count() <= 0 ||
-      rules.pvp_mob_limit == 0 || !nonnegative(rules.special_chance) || rules.special_chance > 1 ||
-      rules.waves.empty() || rules.spawn_attempts == 0 || rules.spawn_points.empty() ||
+      !nonnegative(rules.pvp_arena_resize_speed_per_second) ||
+      rules.pvp_arena_resize_speed_per_second == 0 || rules.pvp_mob_limit == 0 ||
+      !nonnegative(rules.special_chance) || rules.special_chance > 1 || rules.waves.empty() ||
+      rules.spawn_attempts == 0 || rules.spawn_points.empty() ||
       rules.spawn_points.size() > std::mt19937::max() ||
       !std::ranges::all_of(rules.spawn_points, &Vec2::finite)) {
     throw std::invalid_argument("invalid Wave scenario settings");

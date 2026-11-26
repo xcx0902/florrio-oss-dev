@@ -86,8 +86,8 @@ int main() {
   const auto& leave_batch = std::get<wire::ReliableBatch>(*leaving);
   check(leave_batch.requests.size() == 2 &&
             std::holds_alternative<wire::Leave>(leave_batch.requests[0].action) &&
-            std::holds_alternative<std::monostate>(leave_batch.requests[1].action),
-        "Exit leaves the match; notification consumes its own reliable sequence");
+            std::holds_alternative<wire::AdComplete>(leave_batch.requests[1].action),
+        "Exit and ad completion retain distinct actions and reliable sequences");
   wire::Protocol continued;
   const auto continuation = continued.receive(bytes("051eab62"));
   check(continuation && std::holds_alternative<wire::ReliableBatch>(*continuation) &&

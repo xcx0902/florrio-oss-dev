@@ -84,6 +84,7 @@ struct Rules {
   bool pause_when_all_inside = true;
   Microseconds pvp_spawn_interval = std::chrono::seconds(2);
   std::size_t pvp_mob_limit = 24;
+  double pvp_arena_resize_speed_per_second = 10;
 };
 
 [[nodiscard]] Rules scenario_rules(Biome biome);

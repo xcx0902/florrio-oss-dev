@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <stdexcept>
 
@@ -37,6 +38,9 @@ struct FixtureAccess {
   static void reap(Match& m) { m.reap_deaths(); }
   static void holes(Match& m) { m.update_ant_holes(); }
   static void seed(Match& m, unsigned seed) { m.rng_.seed(seed); }
+  static void disable_pvp_spawns(Match& m) {
+    m.pvp_spawn_ready_ = std::numeric_limits<Tick>::max();
+  }
   static void deadline(Match& m, std::uint32_t area, Tick tick) {
     std::ranges::find(m.ant_holes_, area, &AntHoleView::area)->deadline_tick = tick;
   }
@@ -323,13 +327,10 @@ void pvp_spawning_resize_magnet() {
   near(FixtureAccess::player(m).pickup_multiplier, 1, "PvP Magnet never extends pickup range");
   check(m.add_player({2}, {100, 0}, {}), "PvP permits live join without wave qualification");
   step(m);
-  near(m.view().arena_radius, 340, "second living player grows field");
-  FixtureAccess::move(m, {1}, {335, 0});
+  near(m.view().arena_radius, 300.25, "second living player starts gradual field growth");
   m.queue(Departure{{2}});
   step(m);
-  near(m.view().arena_radius, 300, "departure shrinks field");
-  check(FixtureAccess::entity(m, FixtureAccess::body(m)).view.position.length() <= 295.000001,
-        "shrinking field clamps existing positions");
+  near(m.view().arena_radius, 300, "departure reverses growth without overshooting the baseline");
   step(m, 12);
   unsigned mobs = 0;
   for (const auto& e : m.view().entities) {
@@ -413,7 +414,142 @@ void pvp_reconnect() {
         "PvP reconnect preserves score, equipment, and physical life");
   m.queue(Connection{{2}, true});
   step(m);
-  near(m.view().arena_radius, 340, "reconnected players grow field again");
+  near(m.view().arena_radius, 300.25, "reconnected players restart gradual field growth");
+}
+void pvp_smooth_resize() {
+  for (const auto duration : {Microseconds{12500}, Microseconds{25000}, Microseconds{50000}}) {
+    for (const double speed : {7., 10.}) {
+      for (const auto outward : {Vec2{1, 0}, Vec2{.6, .8}}) {
+        auto rules = pvp_arena();
+        rules.timing.step = duration;
+        rules.pvp_arena_resize_speed_per_second = speed;
+        rules.player.speed_per_second = 50;
+        Match m({17}, 7, rules);
+        FixtureAccess::disable_pvp_spawns(m);
+        check(m.add_player({1}, {}, {}) && m.add_player({2}, {100, 0}, {}), "two resize seats");
+        const auto second = rules.timing.ticks_ceil(std::chrono::seconds(1));
+        const auto change = speed * std::chrono::duration<double>(duration).count();
+        step(m, second);
+        near(m.view().arena_radius, 300 + speed, "growth covers the same distance in one second");
+        step(m, second * 6);
+        near(m.view().arena_radius, 340, "growth stops at the population target without overshoot");
+        FixtureAccess::move(m, {1}, outward * 335);
+        const auto body = FixtureAccess::body(m);
+        check(m.queue(Departure{{2}}) && m.queue(Input{FixtureAccess::player(m).life, outward}),
+              "leave while the survivor keeps walking outward at the edge");
+        for (Tick tick = 0; tick < second; ++tick) {
+          const auto before = FixtureAccess::entity(m, body).view.position;
+          step(m);
+          const auto& flower = FixtureAccess::entity(m, body).view;
+          near(m.view().arena_radius, 340 - (tick + 1) * change, "shrink keeps a fixed speed");
+          near(flower.position.length(), m.view().arena_radius - flower.radius,
+               "outward input stays on the moving boundary");
+          near((flower.position - before).length(), change,
+               "outward input cannot cause a jump or oscillation during shrink");
+        }
+        check(m.add_player({3}, {100, 0}, {}), "a new player reverses an unfinished shrink");
+        const auto reversing_at = m.view().arena_radius;
+        step(m, second / 2);
+        near(m.view().arena_radius, reversing_at + speed / 2,
+             "expansion resumes at the same speed from the current radius");
+        check(m.queue(Departure{{3}}), "the target can reverse again before growth finishes");
+        for (Tick tick = 0; tick < second * 6; ++tick) {
+          const auto radius = m.view().arena_radius;
+          const auto before = FixtureAccess::entity(m, body).view.position;
+          step(m);
+          const auto& flower = FixtureAccess::entity(m, body).view;
+          check(m.view().arena_radius <= radius && radius - m.view().arena_radius <= change + 1e-6,
+                "every shrink step remains bounded, including the final partial step");
+          near(flower.position.length(), m.view().arena_radius - flower.radius,
+               "the outward-moving flower follows the boundary until it stops");
+          check((flower.position - before).length() <= change + 1e-6,
+                "the edge cannot add a burst of movement");
+        }
+        near(m.view().arena_radius, 300, "shrink reaches and stays at the target");
+      }
+    }
+  }
+}
+void pvp_kill_preserves_movement() {
+  for (const bool moving : {false, true}) {
+    auto rules = pvp_arena();
+    rules.player.speed_per_second = 50;
+    Match m({16}, 7, rules);
+    FixtureAccess::disable_pvp_spawns(m);
+    check(m.add_player({1}, {100, 0}, {}) && m.add_player({2}, {}, {}), "two PvP flowers");
+    step(m, 160);
+    FixtureAccess::move(m, {1}, {330, 0});
+    const auto life = FixtureAccess::player(m).life;
+    const auto body = FixtureAccess::body(m);
+    FixtureAccess::hit(m, FixtureAccess::body(m, {2}), body, 1e9);
+    step(m);
+    check(FixtureAccess::player(m, {2}).state == LifeState::ended, "opponent is defeated");
+    check(m.queue(Input{life, moving ? Vec2{-1, 0} : Vec2{}}), "keep the same movement input");
+    for (unsigned tick = 0; tick < 12; ++tick) {
+      const auto before = FixtureAccess::entity(m, body).view.position;
+      step(m);
+      const auto& after = FixtureAccess::entity(m, body).view;
+      near((after.position - before).length(), moving ? 1.25 : 0,
+           "a kill cannot accelerate or move the survivor during field shrink");
+      near(after.velocity.length(), moving ? 50 : 0, "normal movement speed after a kill");
+      check(after.position.length() + after.radius <= m.view().arena_radius + 1e-6,
+            "the shrinking field still contains the survivor");
+    }
+    FixtureAccess::move(m, {1}, {280, 0});
+    step(m, 160);
+    near(m.view().arena_radius, 300, "the field eventually reaches the smaller population target");
+  }
+}
+void pvp_death_reentry() {
+  for (const bool shared : {false, true}) {
+    for (const bool advance_departure : {false, true}) {
+      app::RoomManager rooms(pvp_arena());
+      auto& a = rooms.admit("", 1, Biome::garden, Mode::pvp);
+      check(rooms.command(a, wire::Ready{true}, {}), "PvP Ready starts a life");
+      const auto code = a.room;
+      check(rooms.command(a, wire::AdComplete{}, {}) && a.room == code,
+            "pre-game ad completion preserves the waiting PvP seat");
+      auto& b = rooms.admit("", 2, Biome::garden, Mode::pvp);
+      if (shared) {
+        check(rooms.command(b, wire::Ready{true}, {}) && b.room == code,
+              "survivor joins the same public field");
+      }
+      rooms.step();
+      auto& match = *rooms.room(a)->match;
+      const auto match_id = match.id();
+      const auto life = FixtureAccess::player(match, a.id).life;
+      check(rooms.command(a, wire::AdComplete{}, life) && a.room == code,
+            "ad completion preserves a living PvP player");
+      FixtureAccess::player(match, a.id).score = 99;
+      FixtureAccess::entity(match, FixtureAccess::body(match, a.id)).view.health = 0;
+      rooms.step();
+      check(FixtureAccess::player(match, a.id).state == LifeState::ended,
+            "PvP death ends only the defeated life");
+      check(rooms.command(a, wire::AdComplete{}, {}) && a.room.empty() && !a.ready,
+            "native PvP Continue releases the dead seat without command 21");
+      check(rooms.command(a, wire::AdComplete{}, {}) && a.room.empty(),
+            "repeated completion at the menu is harmless");
+      if (advance_departure) {
+        rooms.step();
+      }
+      check(rooms.command(a, wire::Ready{true}, {}), "Ready works after PvP death Continue");
+      rooms.step();
+      auto& rejoined = *rooms.room(a)->match;
+      const auto& player = FixtureAccess::player(rejoined, a.id);
+      check(player.state == LifeState::alive && player.body && player.life != life &&
+                player.score == 0,
+            "reentry supplies a fresh living flower with zero score");
+      check(!rejoined.queue(Input{life, {1, 0}}), "old-life input cannot control the new flower");
+      const auto room = a.room;
+      check(rooms.command(a, wire::AdComplete{}, {}) && a.room == room,
+            "delayed ad completion cannot remove the new life");
+      if (shared) {
+        check(room == code && rejoined.id() == match_id &&
+                  FixtureAccess::player(rejoined, b.id).state == LifeState::alive,
+              "reentry keeps the survivor and the running public field");
+      }
+    }
+  }
 }
 void pvp_economy_entry() {
   store::Options opts;
@@ -613,6 +749,7 @@ void parameters() {
             << ",\"diggerPercent\":" << detail::w5_digger_percent
             << ",\"pvpBaseRadius\":" << pvp_arena_radius(1)
             << ",\"pvpAdditionalRadius\":" << pvp_arena_radius(2) - pvp_arena_radius(1)
+            << ",\"pvpArenaResizeSpeed\":" << r.pvp_arena_resize_speed_per_second
             << ",\"pvpWaveEquivalent\":" << detail::w5_pvp_wave_equivalent << ",\"pvpMobPool\":[";
   bool comma = false;
   for (const auto mob : detail::w5_pvp_mob_pool) {
@@ -672,6 +809,9 @@ int main(int argc, char** argv) {
     run(pvp_combat_score, {"W5-PVP-COMBAT", "W5-PVP-SCORE"});
     run(pvp_spawning_resize_magnet, {"W5-PVP-SPAWNING", "W5-PVP-RESIZE", "W5-PVP-MAGNET"});
     run(pvp_boundaries, {"W5-PVP-BASIC-BOUNDARIES"});
+    run(pvp_smooth_resize, {"W5-PVP-SMOOTH-RESIZE"});
+    run(pvp_kill_preserves_movement, {"W5-PVP-KILL-MOVEMENT"});
+    run(pvp_death_reentry, {"W5-PVP-REENTRY"});
     run(
         [] {
           pvp_economy_entry();

@@ -226,8 +226,8 @@ function world(plain, baseline) {
       entity.rarity = r.byte();
     }
     if (mask & 0x200000) {
-      r.byte();
-      r.byte();
+      entity.healthStyle = r.byte();
+      entity.healthFlags = r.byte();
       entity.health = r.byte();
     }
     if (mask & 0x400000) {

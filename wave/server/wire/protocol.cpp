@@ -211,7 +211,9 @@ std::optional<Command> read_reliable_batch(std::span<const std::uint8_t> bytes) 
         break;
       }
       case 25:
-      case 34:  // $456: no-argument completion of the optional pre-roll ad attempt.
+        break;
+      case 34:  // $456: completion of the optional ad attempt, also PvP death Continue.
+        action = AdComplete{};
         break;
       case 11:  // Original live-game Exit.
       case 38:  // Original squad panel close / Leave squad.

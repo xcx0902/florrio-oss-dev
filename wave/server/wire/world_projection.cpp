@@ -340,10 +340,12 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
         body.byte(static_cast<std::uint8_t>(e.rarity));
       }
       const bool mob_bar = e.mob && e.rarity >= sim::Rarity::legendary && !e.predecessor;
+      const bool opponent_bar =
+          flower && view->mode == sim::Mode::pvp && e.owner->player != viewer.id;
       if (flower || digger || mob_bar) {
         mask |= 0x200000;
         body.byte(0);
-        body.byte(mob_bar ? 2 : 0);  // $991: draw the native world-space health bar.
+        body.byte(mob_bar || opponent_bar ? 2 : 0);  // $991: native world-space health bar.
         const auto health =
             static_cast<std::uint8_t>(255 * std::clamp(e.health / e.max_health, 0.0, 1.0));
         // $1738 draws crossed eyes for zero health, even without a visible bar.

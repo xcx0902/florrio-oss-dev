@@ -79,6 +79,7 @@
       "arenaScaling": {
         "baseRadius": 300,
         "additionalRadius": 40,
+        "resizeSpeedPerSecond": 10,
         "formula": "baseRadius + additionalRadius * sqrt(max(0, connectedLivingPlayers - 1))"
       },
       "equipmentInheritance": "profile-loadout",
@@ -518,13 +519,14 @@
       "currentValue": {
         "baseRadius": 300,
         "additionalRadius": 40,
+        "resizeSpeedPerSecond": 10,
         "formula": "baseRadius + additionalRadius * sqrt(max(0, connectedLivingPlayers - 1))"
       },
       "unit": "模拟单位",
       "confidence": "重建",
       "sources": ["w5.log", "w5.design"],
       "acceptanceIds": ["W5-PVP-RESIZE"],
-      "notes": "日志证实随玩家人数变化；精确函数及计数口径未确认。缩小场地时把现存实体约束在新边界内。"
+      "notes": "日志证实随玩家人数变化；精确函数及计数口径未确认。按本地要求以每秒10模拟单位匀速缩小或扩大，到目标即停止；边缘实体随移动边界约束，不因玩家向外移动而反复调整半径。"
     },
     {
       "id": "pvp.equipment.inheritance",

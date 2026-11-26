@@ -44,6 +44,7 @@ struct Move {
 };
 struct Leave {};
 struct Continue {};
+struct AdComplete {};
 // October $436 and $939/$997; zero kinds omit the rarity byte.
 struct Craft {
   bool all;
@@ -61,7 +62,7 @@ struct Swap {
 
 using ReliableAction =
     std::variant<std::monostate, Identify, Nickname, CreateSquad, SetSquadPublic, FindPublicSquad,
-                 Ready, JoinSquad, Move, Leave, Continue, Craft, Equip, Swap>;
+                 Ready, JoinSquad, Move, Leave, Continue, AdComplete, Craft, Equip, Swap>;
 struct ReliableRequest {
   std::uint32_t sequence;
   ReliableAction action;

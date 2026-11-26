@@ -221,6 +221,7 @@ try {
     diggerPercent: ant.diggerChance * 100,
     pvpBaseRadius: pvp.arenaScaling.baseRadius,
     pvpAdditionalRadius: pvp.arenaScaling.additionalRadius,
+    pvpArenaResizeSpeed: pvp.arenaScaling.resizeSpeedPerSecond,
   };
   for (const [name, expected] of Object.entries(actualExpected)) {
     assert.deepEqual(

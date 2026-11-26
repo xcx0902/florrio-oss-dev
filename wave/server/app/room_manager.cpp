@@ -1258,6 +1258,17 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
         current->match->phase() == sim::Phase::ended) {
       leave(entry);
     }
+  } else if (std::holds_alternative<wire::AdComplete>(action)) {
+    // PvP Continue goes straight through $456 and sends 34 without 21. Release
+    // only a defeated seat: ad completion can also arrive before play or late.
+    if (const auto* current = room(entry);
+        current && current->match && current->mode == sim::Mode::pvp) {
+      const auto view = current->match->view();
+      const auto player = std::ranges::find(view.players, entry.id, &sim::PlayerView::id);
+      if (player != view.players.end() && player->state == sim::LifeState::ended) {
+        leave(entry);
+      }
+    }
   } else if (const auto* ready = std::get_if<wire::Ready>(&action)) {
     if (const auto* current = room(entry); current && current->match) {
       // $991 clears Ready after receiving its flower. This is a lobby-state
