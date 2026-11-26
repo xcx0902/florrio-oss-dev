@@ -16,6 +16,7 @@ import {
 import { protocolEffectsCase } from './protocol-effects.mjs';
 import { disconnectReentryCase } from './disconnect-reentry.mjs';
 import { guestSettings } from './settings.mjs';
+import { antArtCase } from './ant-art.mjs';
 
 const { values } = parseArgs({
   options: {
@@ -103,6 +104,7 @@ const sources = [
   'tools/w2/protocol-effects.mjs',
   'tools/w2/disconnect-reentry.mjs',
   'tools/w2/settings.mjs',
+  'tools/w2/ant-art.mjs',
   'web/ubuntu-700.css',
   'web/ubuntu-LICENCE.txt',
   'web/4iCv6KVjbNBYlgoCxCvjvWyNL4U.woff2',
@@ -433,6 +435,7 @@ try {
   assert.notEqual(a, b);
   report.cases['W2-06'].status = 'passed';
   await replayLobby(browser, host);
+  await antArtCase({ browser, host, snapshot: values.snapshot, output, report });
   report.status = 'bootstrap-passed';
   if (!values['bootstrap-only']) {
     report.fixtureBinary = hash(

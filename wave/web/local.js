@@ -87,6 +87,7 @@
       0.82,
       0.82, // Starfish, Crab, Jellyfish, Digger, Sponge
     ];
+    const ants = new Set([5, 6, 7, 8, 23]);
     const fixed = new Set([5, 6, 7, 8, 18, 23]);
     return [
       ...f32(1),
@@ -97,6 +98,28 @@
           ? branch(typeIs(id), [
               ...f32(scale),
               ...(fixed.has(id) ? [...radiusRatio(35), 0x94] : []),
+              // $1604 also scales world ants by rarity (1 .. 5) using the
+              // pinned f32 table at 62960. Cancel that native multiplier:
+              // the wire radius already includes the server's tier scaling.
+              ...(ants.has(id)
+                ? [
+                    0x41,
+                    ...uleb(62960),
+                    0x20,
+                    0,
+                    0x2d,
+                    0,
+                    10, // mob component rarity
+                    0x41,
+                    2,
+                    0x74,
+                    0x6a,
+                    0x2a,
+                    2,
+                    0,
+                    0x95, // divide by $1604's native rarity scale
+                  ]
+                : []),
               0x21,
               12,
             ])
