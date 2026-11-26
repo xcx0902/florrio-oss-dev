@@ -335,6 +335,155 @@ export async function playabilityCases({ browser, snapshot, nativeDir, output, r
   }
 }
 
+export async function gameOverReentryCase({ browser, snapshot, nativeDir, output, report }) {
+  console.log(
+    'W2-15: Continue while a teammate lives, last survivor disconnects, Game Over and Ready',
+  );
+  const host = await startHost({ snapshot, nativeDir, port: 0, fixture: true });
+  const entries = [];
+  const evidence = { status: 'failed', kind: 'squad-game-over-reentry' };
+  report.cases['W2-15'] = evidence;
+  const state = async () => (await fetch(host.url + 'wave/test/state')).json();
+  const advance = async (ticks = 1) => {
+    const response = await fetch(host.url + `wave/test/step/${ticks}`, { method: 'POST' });
+    assert.ok(response.ok);
+    const value = await response.json();
+    await pause(120);
+    return value;
+  };
+  const roomOf = (s, id) => s.rooms.find((r) => r.players?.some((p) => p.id === id));
+  async function die(entry, id) {
+    let s = await state();
+    const target = roomOf(s, id).entities.find((e) => e.group === 2);
+    assert.ok(target, 'A stationary contact-damage mob remains for the squad wipe');
+    for (let i = 0; i < 80; ++i) {
+      const flower = roomOf(s, id).entities.find((e) => e.group === 0 && e.owner === id);
+      if (!flower) {
+        break;
+      }
+      const dx = target.x - flower.x;
+      const dy = target.y - flower.y;
+      const distance = Math.hypot(dx, dy);
+      await aim(entry, [dx / distance, dy / distance], Math.min(200, distance * 50));
+      s = await advance(Math.max(1, Math.min(6, Math.floor(distance / 2))));
+    }
+    await until(() => !entry.current.control, 'Real contact damage removes the controlled flower');
+    return s;
+  }
+  try {
+    const a = await client(browser, host.url, 'game-over-waiting');
+    entries.push(a);
+    await pause(700);
+    await a.page.mouse.click(632, 402);
+    await a.page.waitForFunction(() => location.hash.startsWith('#wavelocal-'));
+    const b = await client(browser, host.url + new URL(a.page.url()).hash, 'game-over-survivor');
+    entries.push(b);
+    await pause(700);
+    await a.page.keyboard.press('Enter');
+    await b.page.keyboard.press('Enter');
+    await until(async () => (await state()).rooms.some((r) => r.match), 'Both teammates Ready');
+    let s = await advance();
+    await until(
+      () => a.current?.control && b.current?.control,
+      'Both clients control their flowers',
+    );
+    await pause(700);
+    const [aid, bid] = s.rooms[0].members.map((m) => m.id);
+    const oldMatch = s.rooms[0].match;
+    const oldEpoch = a.current.epoch;
+    const before = { sockets: a.sockets.length, documents: a.documentLoads.length };
+    await aim(b);
+    s = await die(a, aid);
+    assert.equal(roomOf(s, aid).players.find((p) => p.id === aid).state, 0);
+    await pause(1100);
+    await a.page.keyboard.press('Enter');
+    await a.page.waitForFunction(() => {
+      const memory = new DataView(window.Module.asm.Jf.buffer);
+      return memory.getInt32(839920, true) === 1;
+    });
+    await until(
+      () => a.commands.some((c) => c.opcode === 21),
+      'Early Continue enters revival waiting',
+    );
+    const first = a.commands.length;
+    await b.context.close();
+    await pause(200);
+    s = await advance();
+    assert.equal(
+      roomOf(s, aid).phase,
+      3,
+      'Losing the last connected survivor ends the squad match',
+    );
+    await until(
+      () => a.baseline.get(8196)?.roundFlags & 2,
+      'The waiting client receives Game Over',
+    );
+    await pause(1900);
+    await a.page.screenshot({ path: path.join(output, 'W2-15-game-over.png') });
+    await a.page.keyboard.press('Enter');
+    await until(
+      () => a.commands.slice(first).some((c) => c.opcode === 34),
+      'Game Over Continue sends ad completion',
+    );
+    assert.ok(
+      !a.commands.slice(first).some((c) => c.opcode === 21),
+      'The waiting client does not send another death Continue after the squad wipe',
+    );
+    await until(() => !a.baseline.has(8196), 'Game Over dismissal releases the ended arena');
+    s = await state();
+    assert.ok(!s.rooms.some((r) => r.members.some((m) => m.id === aid)));
+    assert.equal(roomOf(s, bid).match, oldMatch, 'The other teammate retains its result');
+    await pause(700);
+    await a.page.keyboard.press('Enter');
+    await until(
+      async () => (await state()).rooms.some((r) => r.match !== oldMatch && r.match),
+      'Ready creates a fresh match after the squad wipe',
+    );
+    s = await advance();
+    await until(() => a.current.control, 'Ready controls a new flower without refreshing');
+    assert.ok(a.current.epoch > oldEpoch);
+    assert.equal((await consumed(a)).health, 255);
+    await pause(700);
+    await aim(a, [0, 1]);
+    const from = a.baseline.get(a.current.control).y;
+    await advance(2);
+    await until(
+      () => a.baseline.get(a.current.control)?.y > from + 5,
+      'The new flower responds to original mouse input',
+    );
+    assert.equal(a.sockets.length, before.sockets, 'Game Over reentry requires no reconnect');
+    // Leaving a squad clears the invitation hash, which is a same-document navigation.
+    assert.equal(a.documentLoads.length, before.documents, 'Game Over reentry requires no reload');
+    assert.deepEqual(a.errors, []);
+    assert.deepEqual(b.errors, []);
+    await a.page.screenshot({ path: path.join(output, 'W2-15-rejoined.png') });
+    Object.assign(evidence, {
+      status: 'passed',
+      oldMatch,
+      newMatch: roomOf(s, aid).match,
+      oldEpoch,
+      newEpoch: a.current.epoch,
+    });
+  } finally {
+    for (const entry of entries) {
+      await entry.page
+        .screenshot({ path: path.join(output, `W2-15-${entry.name}.png`) })
+        .catch(() => {});
+      evidence[entry.name] = {
+        commands: entry.commands,
+        snapshots: entry.snapshots,
+        errors: entry.errors,
+      };
+      await entry.context.close();
+    }
+    await host.stop();
+    await writeFile(
+      path.join(output, 'game-over-reentry.json'),
+      JSON.stringify(evidence, null, 2) + '\n',
+    );
+  }
+}
+
 export async function biomeSelectionCase({ browser, snapshot, nativeDir, output, report }) {
   const temporary = await mkdtemp(path.join(tmpdir(), 'wave-native-biomes-'));
   const database = path.join(temporary, 'profiles.sqlite3');

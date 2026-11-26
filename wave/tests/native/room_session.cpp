@@ -318,6 +318,66 @@ void abandoned_room_capacity() {
         "A disconnected teammate still returns to the survivor's active match");
 }
 
+void game_over_reentry() {
+  using namespace wave;
+  for (const bool continued : {false, true}) {
+    app::RoomManager rooms(fixtures::wire_fixture_rules(), 20221030, {{sim::Petal::rose}});
+    auto& a = rooms.admit("", 1);
+    auto& b = rooms.admit("", 2);
+    check(rooms.command(a, wire::CreateSquad{true}, {}) &&
+              rooms.command(b, wire::JoinSquad{a.room}, {}) &&
+              rooms.command(a, wire::Ready{true}, {}) && rooms.command(b, wire::Ready{true}, {}),
+          "Game Over fixture starts a shared match");
+    const auto code = a.room;
+    rooms.step();
+    auto view = rooms.room(a)->match->view();
+    const auto match = view.id;
+    const auto life = player(view, a.id).life;
+    rooms.command(a, wire::Ready{false}, {});
+    check(rooms.command(a, wire::AdComplete{}, {}) && a.room == code,
+          "Ad completion cannot remove a living Waves player");
+    const auto target =
+        *std::ranges::find(view.entities, sim::Group::main_mob, &sim::EntityView::group);
+    for (unsigned i = 0; i < 50 && player(view, a.id).state == sim::LifeState::alive; ++i) {
+      const auto body =
+          std::ranges::find(view.entities, *player(view, a.id).body, &sim::EntityView::id);
+      const auto delta = target.position - body->position;
+      rooms.command(a, wire::Move{0, float(std::atan2(delta.y, delta.x)), 100}, life);
+      rooms.step();
+      view = rooms.room(a)->match->view();
+    }
+    check(player(view, a.id).state == sim::LifeState::waiting,
+          "The first teammate dies while the squad is still running");
+    if (continued) {
+      check(rooms.command(a, wire::Continue{}, {}) && a.room == code,
+            "Early Continue retains the fallen teammate for revival");
+    }
+    check(rooms.command(a, wire::AdComplete{}, {}) && a.room == code,
+          "Ad completion cannot remove a teammate waiting for revival");
+    rooms.disconnect(b.token, 2);
+    rooms.step();
+    check(rooms.room(a)->match->phase() == sim::Phase::ended,
+          "The squad ends after its last survivor disconnects");
+    // $939 can advance from waiting/death to GAME OVER without another 21.
+    check(rooms.command(a, wire::AdComplete{}, {}) && a.room.empty() && !a.ready,
+          "Game Over dismissal releases an ended Waves match even without a terminal Continue");
+    check(b.room == code && rooms.room(b)->match->id() == match,
+          "Dismissing Game Over preserves the other teammate's result");
+    check(rooms.command(a, wire::AdComplete{}, {}) && a.room.empty(),
+          "Repeated Game Over completion is harmless in the lobby");
+    check(rooms.command(a, wire::Ready{true}, {}) && rooms.room(a)->match->id() != match,
+          "Ready after Game Over creates a fresh match");
+    const auto next = rooms.room(a)->match->id();
+    check(rooms.command(a, wire::AdComplete{}, {}) && rooms.room(a)->match->id() == next,
+          "A delayed ad completion preserves the new match before its first tick");
+    rooms.step();
+    check(wire::WorldProjection{}.build(rooms, a).control.has_value(),
+          "The next Ready projects a controllable flower");
+    check(rooms.command(a, wire::AdComplete{}, {}) && rooms.room(a)->match->id() == next,
+          "A delayed ad completion preserves a new living flower");
+  }
+}
+
 void full_room_ready_denial() {
   using namespace wave;
   app::RoomManager rooms(fixtures::wire_fixture_rules());
@@ -346,6 +406,7 @@ int main() {
   squad_departure();
   disconnected_match_reentry();
   abandoned_room_capacity();
+  game_over_reentry();
   full_room_ready_denial();
   auto rules = fixtures::wire_fixture_rules();
   for (auto& wave : rules.waves) {

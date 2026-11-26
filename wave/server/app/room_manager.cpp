@@ -1259,14 +1259,18 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
       leave(entry);
     }
   } else if (std::holds_alternative<wire::AdComplete>(action)) {
-    // PvP Continue goes straight through $456 and sends 34 without 21. Release
-    // only a defeated seat: ad completion can also arrive before play or late.
-    if (const auto* current = room(entry);
-        current && current->match && current->mode == sim::Mode::pvp) {
-      const auto view = current->match->view();
-      const auto player = std::ranges::find(view.players, entry.id, &sim::PlayerView::id);
-      if (player != view.players.end() && player->state == sim::LifeState::ended) {
+    // A Waves player who already sent Continue while waiting for revival can
+    // reach GAME OVER without another 21. Both that screen and PvP Continue
+    // finish through $456 (34). Keep live matches safe from delayed completions.
+    if (const auto* current = room(entry); current && current->match) {
+      if (current->match->phase() == sim::Phase::ended) {
         leave(entry);
+      } else if (current->mode == sim::Mode::pvp) {
+        const auto view = current->match->view();
+        const auto player = std::ranges::find(view.players, entry.id, &sim::PlayerView::id);
+        if (player != view.players.end() && player->state == sim::LifeState::ended) {
+          leave(entry);
+        }
       }
     }
   } else if (const auto* ready = std::get_if<wire::Ready>(&action)) {

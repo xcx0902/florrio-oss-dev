@@ -12,6 +12,7 @@ import {
   biomeSelectionCase,
   connectionRecoveryCase,
   publicSquadCase,
+  gameOverReentryCase,
 } from './playability.mjs';
 import { protocolEffectsCase } from './protocol-effects.mjs';
 import { disconnectReentryCase } from './disconnect-reentry.mjs';
@@ -132,6 +133,7 @@ const openCases = [
   'W2-12',
   'W2-13',
   'W2-14',
+  'W2-15',
 ];
 
 async function observeLabels(page) {
@@ -442,6 +444,13 @@ try {
       await readFile(path.resolve(values['native-dir'], 'wave_host_fixture')),
     );
     await playabilityCases({
+      browser,
+      snapshot: values.snapshot,
+      nativeDir: values['native-dir'],
+      output,
+      report,
+    });
+    await gameOverReentryCase({
       browser,
       snapshot: values.snapshot,
       nativeDir: values['native-dir'],
