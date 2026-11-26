@@ -34,6 +34,7 @@ class WorldProjection {
   };
   std::map<Key, Rendered> rendered_;
   std::uint64_t match_ = 0;
+  std::uint32_t area_ = 0;
   std::uint64_t hit_cursor_ = 0;
   std::uint64_t arc_cursor_ = 0;
   std::uint64_t drop_cursor_ = 0;
@@ -42,6 +43,8 @@ class WorldProjection {
   std::uint32_t next_slot_ = 16;
   bool had_roster_ = false;
   bool had_world_ = false;
+  bool had_wave_ = false;
+  bool had_leaderboard_ = false;
   std::uint32_t handle(const sim::EntityId& id);
 };
 

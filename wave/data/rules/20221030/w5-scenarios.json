@@ -1,0 +1,621 @@
+{
+  "schemaVersion": 1,
+  "version": "20221030-w5.scenarios.1",
+  "cutoffUtc": "2022-10-30T21:00:58Z",
+  "scope": ["ant-hole", "standalone-pvp"],
+  "status": "implementation-input; confidence is independent of test pass",
+  "confidencePolicy": {
+    "已证实": "目标期原日志或同期资料明确的离散行为；不覆盖未给出的精确数值。",
+    "重建": "根据同期社区条目或显式本地取值实现，缺少独立原服务器证据。",
+    "未确认": "史料未能确定条件；当前行为是可追溯复刻设定。"
+  },
+  "parameters": {
+    "antHole": {
+      "minimumRarity": 2,
+      "shape": "circle",
+      "radius": 150,
+      "durationSeconds": 180,
+      "capacity": 4,
+      "gardenPopulation": {
+        "baby": 5,
+        "worker": 8,
+        "soldier": 26,
+        "queen": 1
+      },
+      "gardenRarity": {
+        "queen": "entrance",
+        "others": "rare"
+      },
+      "firePopulation": 50,
+      "fireHighRarityCounts": {
+        "rare": 50,
+        "epic": 3,
+        "legendary": 2,
+        "mythic": 1
+      },
+      "fireCommonRelease": 30,
+      "diggerChance": 0.02,
+      "closeTransfer": "all-survivors",
+      "pauseMainWave": "all-living-connected-players-inside",
+      "spawnPosition": "seeded-random",
+      "lifeTransfer": "preserve"
+    },
+    "pvp": {
+      "freeForAll": true,
+      "waveEquivalent": 18,
+      "mobPool": [
+        "bee",
+        "hornet",
+        "baby_ant",
+        "worker_ant",
+        "soldier_ant",
+        "rock",
+        "ladybug",
+        "dark_ladybug",
+        "beetle",
+        "spider"
+      ],
+      "spawnMode": "continuous",
+      "magnetPickupMultiplier": 1,
+      "lootOwnership": "one-collector",
+      "basicThresholds": [
+        {
+          "score": 100,
+          "rarity": "unusual"
+        },
+        {
+          "score": 1000,
+          "rarity": "rare"
+        },
+        {
+          "score": 13000,
+          "rarity": "epic"
+        },
+        {
+          "score": 100000,
+          "rarity": "legendary"
+        }
+      ],
+      "arenaScaling": {
+        "baseRadius": 300,
+        "additionalRadius": 40,
+        "formula": "baseRadius + additionalRadius * sqrt(max(0, connectedLivingPlayers - 1))"
+      },
+      "equipmentInheritance": "profile-loadout",
+      "scoreFormula": "catalog-xp-plus-defeated-score",
+      "minimumLevel": 15,
+      "spawnIntervalSeconds": 2,
+      "mobLimit": 24
+    },
+    "backgrounds": {
+      "garden": [30, 167, 97],
+      "desert": [222, 207, 124],
+      "ocean": [87, 133, 186],
+      "pvp": [77, 94, 86],
+      "antHole": [181, 133, 0],
+      "fireAntBurrow": [181, 45, 0]
+    }
+  },
+  "sources": [
+    {
+      "id": "w5.log",
+      "type": "primary-changelog",
+      "independenceGroup": "florr-in-game-log",
+      "path": "wave-reference/20221030/client.wasm",
+      "sha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0",
+      "url": "https://raw.githubusercontent.com/AstRatJP/florr.io-files/main/i18n/en_US/changelog.txt",
+      "dates": ["2022-07-13", "2022-08-18", "2022-09-13"],
+      "notes": "2026-11-25 再查在线转录；原件内嵌对应字符串亦存在。转录与原件计同一证据。"
+    },
+    {
+      "id": "w5.ant-hole",
+      "type": "cutoff-wiki-revision",
+      "independenceGroup": "english-fandom-community",
+      "title": "Ant Hole",
+      "revision": 2081,
+      "timestamp": "2022-10-08T08:26:29Z",
+      "url": "https://official-florrio.fandom.com/wiki/Ant_Hole?oldid=2081",
+      "path": "wave/data/catalogs/20221030/behavior-wiki-snapshots.json",
+      "selector": "pages.Ant Hole.response.query.pages.379.revisions[0]",
+      "sha256": "a1ef5939111e931afa73cdd51132d9a7e6ed45d02d36d3d45fd441b31ecfd080"
+    },
+    {
+      "id": "w5.fire-ant-burrow",
+      "type": "cutoff-wiki-revision",
+      "independenceGroup": "english-fandom-community",
+      "title": "Fire Ant Burrow",
+      "revision": 2449,
+      "timestamp": "2022-10-28T03:52:56Z",
+      "url": "https://official-florrio.fandom.com/wiki/Fire_Ant_Burrow?oldid=2449",
+      "path": "wave/data/catalogs/20221030/behavior-wiki-snapshots.json",
+      "selector": "pages.Fire Ant Burrow.response.query.pages.997.revisions[0]",
+      "sha256": "a1ef5939111e931afa73cdd51132d9a7e6ed45d02d36d3d45fd441b31ecfd080"
+    },
+    {
+      "id": "w5.digger",
+      "type": "cutoff-wiki-revision",
+      "independenceGroup": "english-fandom-community",
+      "title": "Digger",
+      "revision": 2485,
+      "timestamp": "2022-10-29T21:43:07Z",
+      "url": "https://official-florrio.fandom.com/wiki/Digger?oldid=2485",
+      "path": "wave/data/catalogs/20221030/behavior-wiki-snapshots.json",
+      "selector": "pages.Digger.response.query.pages",
+      "sha256": "a1ef5939111e931afa73cdd51132d9a7e6ed45d02d36d3d45fd441b31ecfd080"
+    },
+    {
+      "id": "w5.pvp",
+      "type": "cutoff-wiki-revision",
+      "independenceGroup": "english-fandom-community",
+      "title": "PvP",
+      "revision": 2067,
+      "timestamp": "2022-10-06T23:01:47Z",
+      "url": "https://official-florrio.fandom.com/wiki/PvP?oldid=2067",
+      "path": "reports/wave/W0/wiki/pvp-older.json",
+      "sha256": "7c34277c180ece0598dae498a0add2720b5d698f992b7c209ccb45219486dc6f"
+    },
+    {
+      "id": "w5.waves",
+      "type": "cutoff-wiki-revision",
+      "independenceGroup": "english-fandom-community",
+      "title": "Waves",
+      "revision": 1789,
+      "timestamp": "2022-09-11T16:54:53Z",
+      "url": "https://official-florrio.fandom.com/wiki/Waves?oldid=1789",
+      "path": "reports/wave/W0/wiki/waves-older.json",
+      "sha256": "0b8a7325f0d13d14572b32eb56af9a3656ead976b06d79cdb71869c965986840"
+    },
+    {
+      "id": "w5.ant-hole-trivia",
+      "type": "retrospective-history",
+      "independenceGroup": "english-fandom-community",
+      "url": "https://official-florrio.fandom.com/wiki/Ant_Hole#Trivia",
+      "observed": "2026-11-25",
+      "notes": "搜索缓存记述 2023-01-19 以前 Rare+ 圆形内部。只采用历史形状描述，不采用当前怪物数值。"
+    },
+    {
+      "id": "w5.design",
+      "type": "reconstruction-design",
+      "independenceGroup": "wave-project",
+      "path": "wave-goals/05-scenarios-and-historical-calibration.md",
+      "notes": "缺少历史精确值时明确采用复刻参数，不把可运行实现升级为历史已证实。"
+    },
+    {
+      "id": "w5.client-pvp-level",
+      "type": "primary-artifact-analysis",
+      "independenceGroup": "snapshot-20221030",
+      "path": "wave-reference/20221030/client.wasm",
+      "sha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0",
+      "captureUtc": "2022-10-30T21:00:58Z",
+      "locator": "$977 cached_pvp_unlocked; table slot159→$3411; profile level byte >14",
+      "analysis": "wave/docs/protocol/10-w5-scenarios.md",
+      "notes": "原客户端入口锁定条件；服务端同步验证，不依赖客户端隐藏按钮。"
+    },
+    {
+      "id": "w5.clientPalette",
+      "type": "original-client-runtime",
+      "independenceGroup": "original-client-20221030",
+      "path": "wave/data/wire/20221030/w5-backgrounds.json",
+      "sha256": "cd818b708e890923c6fcfcb7eba7db2ba87c9618c61e4e25e557d5cb4a22ceb3",
+      "url": "https://florr.io/",
+      "notes": "Pinned original client idle menus and mob outer-disc fills; the menu-to-field / disc-to-interior mapping follows the user specification."
+    }
+  ],
+  "rules": [
+    {
+      "id": "ant.enter.minimumRarity",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.minimumRarity",
+      "currentValue": 2,
+      "unit": "稀有度序号(C=0)",
+      "confidence": "已证实",
+      "sources": ["w5.ant-hole", "w5.fire-ant-burrow"],
+      "acceptanceIds": ["W5-ANT-ENTER"],
+      "notes": "Rare+ 接触进入，洞本体不可被花瓣攻击。Common/Unusual 沿用外部释放行为。"
+    },
+    {
+      "id": "ant.interior.shape",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.shape",
+      "currentValue": "circle",
+      "unit": "形状",
+      "confidence": "重建",
+      "sources": ["w5.ant-hole-trivia"],
+      "acceptanceIds": ["W5-ANT-ENTER"],
+      "notes": "后写历史条目明确以 2023-01-19 为形状变化边界；没有同期服务器几何记录。"
+    },
+    {
+      "id": "ant.interior.radius",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.radius",
+      "currentValue": 150,
+      "unit": "模拟单位",
+      "confidence": "重建",
+      "sources": ["w5.design"],
+      "acceptanceIds": ["W5-ANT-ENTER"],
+      "notes": "圆形内部的精确半径未确认；采用主场半径的一半。",
+      "candidate": [100, 250]
+    },
+    {
+      "id": "ant.interior.duration",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.durationSeconds",
+      "currentValue": 180,
+      "unit": "秒",
+      "confidence": "重建",
+      "sources": ["w5.log", "w5.ant-hole"],
+      "acceptanceIds": ["W5-ANT-TIMEOUT"],
+      "notes": "2022-08-18 日志只确认已存在计时；旧 Wiki 明称时长未知。180秒是复刻设定。",
+      "candidate": [60, 300]
+    },
+    {
+      "id": "ant.interior.capacity",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.capacity",
+      "currentValue": 4,
+      "unit": "玩家",
+      "confidence": "重建",
+      "sources": ["w5.design"],
+      "acceptanceIds": ["W5-ANT-SPLIT"],
+      "notes": "同一洞允许当前四席小队成员进入；未找到独立于小队的容量证据。",
+      "candidate": [1, 4]
+    },
+    {
+      "id": "ant.garden.population",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.gardenPopulation",
+      "currentValue": {
+        "baby": 5,
+        "worker": 8,
+        "soldier": 26,
+        "queen": 1
+      },
+      "unit": "只",
+      "confidence": "重建",
+      "sources": ["w5.ant-hole"],
+      "acceptanceIds": ["W5-ANT-RARITY"],
+      "notes": "同期条目把这些带问号数量写在C/U外部释放段，迁用为Rare+内部40只属复刻。"
+    },
+    {
+      "id": "ant.garden.rarity",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.gardenRarity",
+      "currentValue": {
+        "queen": "entrance",
+        "others": "rare"
+      },
+      "unit": "稀有度",
+      "confidence": "已证实",
+      "sources": ["w5.log", "w5.ant-hole"],
+      "acceptanceIds": ["W5-ANT-RARITY"],
+      "notes": "Queen跟随入口稀有度；Baby/Worker/Soldier固定Rare，不能随洞升至Epic+。"
+    },
+    {
+      "id": "ant.fire.population",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.firePopulation",
+      "currentValue": 50,
+      "unit": "只",
+      "confidence": "重建",
+      "sources": ["w5.fire-ant-burrow"],
+      "acceptanceIds": ["W5-ANT-FIRE"],
+      "notes": "截止前社区条目直接记载50只；无独立原始服务器证据。"
+    },
+    {
+      "id": "ant.fire.highRarityCounts",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.fireHighRarityCounts",
+      "currentValue": {
+        "rare": 50,
+        "epic": 3,
+        "legendary": 2,
+        "mythic": 1
+      },
+      "unit": "只",
+      "confidence": "重建",
+      "sources": ["w5.fire-ant-burrow"],
+      "acceptanceIds": ["W5-ANT-FIRE"],
+      "notes": "E/L/M洞各有3/2/1只与洞同级，其余Rare；Rare洞全部Rare。"
+    },
+    {
+      "id": "ant.fire.commonRelease",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.fireCommonRelease",
+      "currentValue": 30,
+      "unit": "只",
+      "confidence": "重建",
+      "sources": ["w5.fire-ant-burrow"],
+      "acceptanceIds": ["W5-ANT-FIRE"],
+      "notes": "C/U接近入口释放30只后消失，无可攻击本体；触发距离与展开方式仍为复刻。"
+    },
+    {
+      "id": "ant.digger.chance",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.diggerChance",
+      "currentValue": 0.02,
+      "unit": "概率",
+      "confidence": "重建",
+      "sources": ["w5.digger"],
+      "acceptanceIds": ["W5-ANT-DIGGER"],
+      "notes": "同期Digger条目记载2%，在首位玩家进入时抽取一次且与洞同级；不是清完洞后抽取。"
+    },
+    {
+      "id": "ant.close.transfer",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.closeTransfer",
+      "currentValue": "all-survivors",
+      "unit": "实体",
+      "confidence": "已证实",
+      "sources": ["w5.ant-hole", "w5.fire-ant-burrow"],
+      "acceptanceIds": ["W5-ANT-CLEAR", "W5-ANT-TIMEOUT"],
+      "notes": "清空或超时关闭入口，把玩家及幸存怪物、花瓣和地面物体传回主场。清空不把友军算作未清敌人。"
+    },
+    {
+      "id": "ant.wave.pause",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.pauseMainWave",
+      "currentValue": "all-living-connected-players-inside",
+      "unit": "条件",
+      "confidence": "未确认",
+      "sources": ["w5.waves", "w5.design"],
+      "acceptanceIds": ["W5-ANT-SPLIT", "W5-ANT-TIMEOUT"],
+      "notes": "旧条目只说洞内可能阻止推进，未给必要充分条件。采用全体存活连线玩家在洞内时暂停主波刷怪和波时钟；全局tick及洞时钟继续。"
+    },
+    {
+      "id": "ant.spawn.position",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.spawnPosition",
+      "currentValue": "seeded-random",
+      "unit": "位置",
+      "confidence": "重建",
+      "sources": ["w5.fire-ant-burrow", "w5.design"],
+      "acceptanceIds": ["W5-ANT-ENTER"],
+      "notes": "火蚁穴旧条目描述随机出生。Garden也采用确定性随机安全点；精确分布和出生保护未确认。"
+    },
+    {
+      "id": "ant.life.transfer",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "antHole.lifeTransfer",
+      "currentValue": "preserve",
+      "unit": "生命/档案",
+      "confidence": "重建",
+      "sources": ["w5.design"],
+      "acceptanceIds": ["W5-ANT-LIFECYCLE"],
+      "notes": "传送保留PlayerId、血量、装备和档案，更新LifeId的控制代际以拒绝传送前确认的旧输入；死亡和断线恢复边界采用本地明确规则。"
+    },
+    {
+      "id": "pvp.friendlyFire",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.freeForAll",
+      "currentValue": true,
+      "unit": "开关",
+      "confidence": "已证实",
+      "sources": ["w5.pvp"],
+      "acceptanceIds": ["W5-PVP-COMBAT"],
+      "notes": "独立FFA，无小队；敌方花朵及其召唤物可互相造成伤害。"
+    },
+    {
+      "id": "pvp.spawn.waveEquivalent",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.waveEquivalent",
+      "currentValue": 18,
+      "unit": "PvE波次",
+      "confidence": "已证实",
+      "sources": ["w5.log"],
+      "acceptanceIds": ["W5-PVP-SPAWNING"],
+      "notes": "9月日志确认约等于第18波；本地采用第18波稀有度抽样，怪数、间隔和权重另属复刻。"
+    },
+    {
+      "id": "pvp.spawn.pool",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.mobPool",
+      "currentValue": [
+        "bee",
+        "hornet",
+        "baby_ant",
+        "worker_ant",
+        "soldier_ant",
+        "rock",
+        "ladybug",
+        "dark_ladybug",
+        "beetle",
+        "spider"
+      ],
+      "unit": "怪种",
+      "confidence": "重建",
+      "sources": ["w5.pvp"],
+      "acceptanceIds": ["W5-PVP-SPAWNING"],
+      "notes": "截止前条目虽称9种但实际列10种；采用逐项列表，不含Ocean怪种和蚁穴。"
+    },
+    {
+      "id": "pvp.spawn.mode",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.spawnMode",
+      "currentValue": "continuous",
+      "unit": "生成策略",
+      "confidence": "已证实",
+      "sources": ["w5.pvp"],
+      "acceptanceIds": ["W5-PVP-SPAWNING"],
+      "notes": "持续随机生成，不按波次推进或清波复活。"
+    },
+    {
+      "id": "pvp.pickup.magnet",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.magnetPickupMultiplier",
+      "currentValue": 1,
+      "unit": "倍率",
+      "confidence": "已证实",
+      "sources": ["w5.log"],
+      "acceptanceIds": ["W5-PVP-MAGNET"],
+      "notes": "只关闭Magnet拾取范围加成，不据此取消Magnet的其他作用。"
+    },
+    {
+      "id": "pvp.loot.ownership",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.lootOwnership",
+      "currentValue": "one-collector",
+      "unit": "归属",
+      "confidence": "已证实",
+      "sources": ["w5.pvp"],
+      "acceptanceIds": ["W5-PVP-ECONOMY"],
+      "notes": "同一地面掉落只能被一位玩家取得，不能套用PvE全队共享奖励。"
+    },
+    {
+      "id": "pvp.basic.thresholds",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.basicThresholds",
+      "currentValue": [
+        {
+          "score": 100,
+          "rarity": "unusual"
+        },
+        {
+          "score": 1000,
+          "rarity": "rare"
+        },
+        {
+          "score": 13000,
+          "rarity": "epic"
+        },
+        {
+          "score": 100000,
+          "rarity": "legendary"
+        }
+      ],
+      "unit": "分",
+      "confidence": "重建",
+      "sources": ["w5.log", "w5.pvp", "w5.design"],
+      "acceptanceIds": ["W5-PVP-BASIC-BOUNDARIES"],
+      "notes": "日志只证实按分数掉Basic；旧Wiki写约100/约1000、Epic约13000?且待证明，Legendary阈值未知。精确边界均为复刻，100000无史料；低于100不掉Basic；不掉Common/Mythic。"
+    },
+    {
+      "id": "pvp.arena.scaling",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.arenaScaling",
+      "currentValue": {
+        "baseRadius": 300,
+        "additionalRadius": 40,
+        "formula": "baseRadius + additionalRadius * sqrt(max(0, connectedLivingPlayers - 1))"
+      },
+      "unit": "模拟单位",
+      "confidence": "重建",
+      "sources": ["w5.log", "w5.design"],
+      "acceptanceIds": ["W5-PVP-RESIZE"],
+      "notes": "日志证实随玩家人数变化；精确函数及计数口径未确认。缩小场地时把现存实体约束在新边界内。"
+    },
+    {
+      "id": "pvp.equipment.inheritance",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.equipmentInheritance",
+      "currentValue": "profile-loadout",
+      "unit": "装备",
+      "confidence": "重建",
+      "sources": ["w5.design"],
+      "acceptanceIds": ["W5-PVP-ECONOMY"],
+      "notes": "沿用当前访客档案的已提交装备；独立对局分数与PvE最高波隔离。未找到10月进入资格和装备继承限制的直接证据。"
+    },
+    {
+      "id": "pvp.score.formula",
+      "scope": "W5 蚁穴和独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.scoreFormula",
+      "currentValue": "catalog-xp-plus-defeated-score",
+      "unit": "分",
+      "confidence": "重建",
+      "sources": ["w5.pvp", "w5.design"],
+      "acceptanceIds": ["W5-PVP-SCORE"],
+      "notes": "社区条目只确认击败怪物和玩家增长分数；精确增量、玩家分数转移比例待确认。此字段须与实际实现一同冻结。"
+    },
+    {
+      "id": "pvp.entry.minimumLevel",
+      "scope": "W5 独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.minimumLevel",
+      "currentValue": 15,
+      "unit": "等级",
+      "confidence": "已证实",
+      "sources": ["w5.client-pvp-level"],
+      "acceptanceIds": ["W5-PVP-ENTRY"],
+      "notes": "原件profile等级 byte >14 才解锁PvP；服务端也拒绝等级不足者进入。"
+    },
+    {
+      "id": "pvp.spawn.interval",
+      "scope": "W5 独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.spawnIntervalSeconds",
+      "currentValue": 2,
+      "unit": "秒",
+      "confidence": "重建",
+      "sources": ["w5.design"],
+      "acceptanceIds": ["W5-PVP-SPAWNING"],
+      "notes": "持续生成的具体间隔缺少历史服务器记录，采用2秒。"
+    },
+    {
+      "id": "pvp.spawn.limit",
+      "scope": "W5 独立 PvP",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "parameter": "pvp.mobLimit",
+      "currentValue": 24,
+      "unit": "只主怪",
+      "confidence": "重建",
+      "sources": ["w5.design"],
+      "acceptanceIds": ["W5-PVP-SPAWNING"],
+      "notes": "人数与怪物密度的精确对应缺少证据，当前采用固定24只主怪上限。"
+    },
+    {
+      "id": "scene.backgrounds",
+      "parameter": "backgrounds",
+      "scope": "Garden/Desert/Ocean/PvP and corresponding ant-hole interiors",
+      "unit": "sRGB u8 RGB",
+      "targetDate": "2022-10-30T21:00:58Z",
+      "currentValue": {
+        "garden": [30, 167, 97],
+        "desert": [222, 207, 124],
+        "ocean": [87, 133, 186],
+        "pvp": [77, 94, 86],
+        "antHole": [181, 133, 0],
+        "fireAntBurrow": [181, 45, 0]
+      },
+      "candidate": {
+        "garden": [30, 167, 97],
+        "desert": [222, 207, 124],
+        "ocean": [87, 133, 186],
+        "pvp": [77, 94, 86],
+        "antHole": [181, 133, 0],
+        "fireAntBurrow": [181, 45, 0]
+      },
+      "confidence": "已证实",
+      "sources": ["w5.clientPalette"],
+      "acceptanceIds": ["W5-COLORS"],
+      "notes": "RGB values observed from the pinned original client. Main fields use their idle menu color; interiors use the corresponding entrance outer-disc fill, irrespective of the mother biome."
+    }
+  ],
+  "accessNotes": [
+    "2026-11-25 原始日志转录可访问；Ant_Hole/PvP旧修订直接网页访问受Fandom限制，采用仓库既存且有修订身份的完整MediaWiki响应。",
+    "现代Ant_Hole只用明确带2023-01-19边界的历史说明；不采用现代Hel、Ultra/Super、迷宫或吸收规则。"
+  ]
+}

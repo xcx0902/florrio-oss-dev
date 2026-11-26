@@ -5,8 +5,9 @@
 
 namespace wave::app {
 
-ClientSession::ClientSession(RoomManager& rooms, std::uint64_t connection, sim::Biome biome)
-    : rooms_(rooms), biome_(biome), connection_(connection) {}
+ClientSession::ClientSession(RoomManager& rooms, std::uint64_t connection, sim::Biome biome,
+                             sim::Mode mode)
+    : rooms_(rooms), biome_(biome), mode_(mode), connection_(connection) {}
 
 ClientSession::~ClientSession() {
   if (member_) {
@@ -104,7 +105,7 @@ Reply ClientSession::drain() {
         return reject();
       }
       if (!member_) {
-        member_ = &rooms_.admit(requested_guest_, connection_, biome_);
+        member_ = &rooms_.admit(requested_guest_, connection_, biome_, mode_);
         ++member_->session_refs;
         craft_cursor_ = member_->craft_sequence;
         reply.frames.push_back(wire_.guest_id(member_->token));

@@ -192,6 +192,10 @@
       [1436535 + 6910, lobbyErrorReset, [...lobbyErrorReset.slice(0, -1), 6]],
       [1736840, uleb(8141), uleb(8141 + leech.length)], // $1795 body size
       [1736842 + 2931, leechRadius, [...leech, ...leechRadius]],
+      // $3424 constructs Ocean's full-screen tint RGBA (50,96,168,80).
+      // Its alpha would recolor the requested menu / ant-hole background.
+      // Keep the signed-LEB width and disable only this native tint layer.
+      [2268863, [0x41, 0xb2, 0xc0, 0xa1, 0x85, 0x05], [0x41, 0xb2, 0xc0, 0xa1, 0x85, 0x00]],
     ];
     const result = new Uint8Array(wasm.length + growth);
     let input = 0;
@@ -257,71 +261,22 @@
 
   const gardenDiscovery = '/endpoint/florrio-waves-0/findEach/';
   const rotatingDiscovery = '/endpoint/florrio-waves-1/findEach/';
-  const suspended = new WeakSet();
-  let modeNotice;
-  function unsupportedMode() {
-    if (modeNotice) {
-      return;
-    }
-    modeNotice = document.createElement('dialog');
-    modeNotice.id = 'wave-mode-notice';
-    const title = document.createElement('h1');
-    title.textContent = 'PvP unavailable';
-    const description = document.createElement('p');
-    description.textContent = 'Choose Garden or the current Waves rotation.';
-    const recover = document.createElement('button');
-    recover.textContent = 'Return to Garden';
-    recover.addEventListener('click', () => {
-      localStorage.setItem('florrio_gamemode', '0');
-      const url = new URL(location.href);
-      url.hash = '';
-      location.replace(url);
-    });
-    modeNotice.append(title, description, recover);
-    document.body.append(modeNotice);
-    modeNotice.addEventListener('cancel', (event) => event.preventDefault());
-    modeNotice.showModal();
-    recover.focus();
-  }
-  for (const type of ['keydown', 'keyup']) {
-    window.addEventListener(
-      type,
-      (event) => {
-        if (modeNotice?.open) {
-          event.stopImmediatePropagation();
-        }
-      },
-      true,
-    );
-  }
   const open = XMLHttpRequest.prototype.open;
-  const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.open = function (method, url, ...options) {
     const original = String(url);
-    suspended.delete(this);
-    if (method === 'GET' && original === 'https://api.n.m28.io/endpoint/florrio-pvp/findEach/') {
-      // Suspend this unavailable discovery, without invoking the original
-      // client's network-error retry callback or contacting the retired API.
-      suspended.add(this);
-      unsupportedMode();
-      return open.call(this, method, gardenDiscovery, ...options);
-    }
     const garden = original === `https://api.n.m28.io${gardenDiscovery}`;
     const rotating = original === `https://api.n.m28.io${rotatingDiscovery}`;
+    const pvp = original === 'https://api.n.m28.io/endpoint/florrio-pvp/findEach/';
     const local =
       method === 'GET' &&
       (garden ||
         rotating ||
+        pvp ||
         original === 'https://api.n.m28.io/server/wavelocal' ||
-        original === 'https://api.n.m28.io/server/waverotation');
+        original === 'https://api.n.m28.io/server/waverotation' ||
+        original === 'https://api.n.m28.io/server/wavepvp');
     return open.call(this, method, local ? new URL(original).pathname : url, ...options);
   };
-  XMLHttpRequest.prototype.send = function (...args) {
-    if (!suspended.has(this)) {
-      return send.apply(this, args);
-    }
-  };
-
   const NativeSocket = window.WebSocket;
   window.WebSocket = class extends NativeSocket {
     #intentionalClose = false;
@@ -332,8 +287,9 @@
         original === 'ws://127.0.0.1:443/' || original === 'wss://wavelocal.s.m28n.net/';
       const rotating =
         original === 'ws://127.0.0.2:443/' || original === 'wss://waverotation.s.m28n.net/';
-      const local = garden || rotating;
-      const suffix = rotating ? '/rotating' : '';
+      const pvp = original === 'ws://127.0.0.3:443/' || original === 'wss://wavepvp.s.m28n.net/';
+      const local = garden || rotating || pvp;
+      const suffix = pvp ? '/pvp' : rotating ? '/rotating' : '';
       const scheme = location.protocol === 'https:' ? 'wss:' : 'ws:';
       super(local ? `${scheme}//${location.host}/wave/socket${suffix}` : url, protocols);
       if (!local) {
@@ -402,6 +358,7 @@
         localStorage.setItem('cached_level', profile.level);
         localStorage.setItem('cached_num_petals', profile.numPetals);
         localStorage.setItem('cached_equipped', profile.equipped);
+        localStorage.setItem('cached_pvp_unlocked', profile.pvpUnlocked);
       } else if (cached.status !== 404) {
         throw new Error('Wave profile cache is unavailable');
       }
@@ -421,12 +378,7 @@
       lastPacket = performance.now();
     });
     setInterval(() => {
-      if (
-        !stopped &&
-        !document.hidden &&
-        !modeNotice?.open &&
-        performance.now() - lastPacket >= 10000
-      ) {
+      if (!stopped && !document.hidden && performance.now() - lastPacket >= 10000) {
         showRecovery('No response from the game server. Reconnect to try again.', false);
       }
     }, 1000);

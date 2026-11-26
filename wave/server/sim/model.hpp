@@ -40,7 +40,8 @@ struct EntityId {
   bool operator==(const EntityId&) const = default;
 };
 
-enum class Faction {
+// PvP flowers and their summons use distinct values starting at 2.
+enum class Faction : std::uint64_t {
   team,
   hostile
 };
@@ -48,6 +49,10 @@ enum class Biome : std::uint8_t {
   garden,
   desert,
   ocean
+};
+enum class Mode : std::uint8_t {
+  waves,
+  pvp
 };
 enum class Group {
   player,
@@ -217,6 +222,7 @@ struct DamageSource {
   Faction faction = Faction::hostile;
   std::optional<EntityId> instigator;
   std::optional<MobIdentity> mob = {};
+  std::uint32_t area = 0;
   bool operator==(const DamageSource&) const = default;
 };
 
@@ -246,6 +252,7 @@ struct EntityView {
   bool digger_attacking = false;
   std::optional<MobIdentity> damage_mob;
   std::optional<EntityId> predecessor;
+  std::uint32_t area = 0;
   bool operator==(const EntityView&) const = default;
 };
 
@@ -272,6 +279,11 @@ struct PlayerView {
   double pickup_multiplier = 1;
   std::optional<Vec2> death_position;
   std::optional<MobIdentity> killer;
+  std::uint32_t area = 0;
+  std::uint64_t score = 0;
+  std::optional<PlayerId> killer_player;
+  // Control epochs within one physical life may change during area transfers.
+  std::uint64_t life_start_generation = 0;
   bool operator==(const PlayerView&) const = default;
 };
 
@@ -313,6 +325,17 @@ struct WaveView {
   bool operator==(const WaveView&) const = default;
 };
 
+struct AntHoleView {
+  std::uint32_t area = 0;
+  EntityId entrance;
+  Mob kind = Mob::ant_hole;
+  Rarity rarity = Rarity::rare;
+  Vec2 position;
+  double radius = 150;
+  Tick deadline_tick = 0;
+  Tick start_tick = 0;
+};
+
 struct MatchView {
   MatchId id;
   std::uint32_t seed = 0;
@@ -329,6 +352,8 @@ struct MatchView {
   std::array<std::size_t, static_cast<std::size_t>(Group::count)> population{};
   std::string catalog_version;
   std::string catalog_sha256;
+  Mode mode = Mode::waves;
+  std::vector<AntHoleView> ant_holes;
 };
 
 struct Input {
@@ -389,6 +414,7 @@ struct HealthChange {
 struct LightningArc {
   Vec2 from;
   Vec2 to;
+  std::uint32_t area = 0;
 };
 
 struct LifeChange {
@@ -407,10 +433,18 @@ struct Defeat {
   Rarity rarity = Rarity::common;
   Vec2 position;
   std::uint32_t origin_wave = 0;
+  std::uint32_t area = 0;
+  std::uint64_t victim_score = 0;
+  bool natural_summon = false;
+};
+
+struct AreaClosed {
+  std::uint32_t area;
+  Vec2 position;
 };
 
 using EventData = std::variant<RandomDraw, SpawnEvent, Transition, HealthChange, LifeChange, Defeat,
-                               LightningArc>;
+                               LightningArc, AreaClosed>;
 struct Event {
   Tick tick;
   EventData data;

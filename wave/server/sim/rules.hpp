@@ -78,9 +78,21 @@ struct Rules {
   bool advance_on_deadline = true;
   LifecycleRules lifecycle;
   ResidualPolicy residual = ResidualPolicy::discard;
+  Mode mode = Mode::waves;
+  double ant_hole_radius = 150;
+  Microseconds ant_hole_duration = std::chrono::seconds(180);
+  bool pause_when_all_inside = true;
+  Microseconds pvp_spawn_interval = std::chrono::seconds(2);
+  std::size_t pvp_mob_limit = 24;
 };
 
 [[nodiscard]] Rules scenario_rules(Biome biome);
+[[nodiscard]] Rules pvp_rules();
+[[nodiscard]] unsigned pvp_minimum_level();
+[[nodiscard]] std::array<std::uint8_t, 3> scene_background(Mode mode, Biome biome,
+                                                           std::optional<Mob> interior = {});
+[[nodiscard]] double pvp_arena_radius(std::size_t players);
+[[nodiscard]] std::optional<Rarity> pvp_basic_rarity(std::uint64_t score);
 // The October HUD treats the wave index as a signed integer.
 inline constexpr std::uint32_t max_wave_number = INT32_MAX;
 [[nodiscard]] WaveRules wave_rules_at(const Rules& rules, std::size_t index);

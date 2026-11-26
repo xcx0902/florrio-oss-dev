@@ -235,11 +235,7 @@ const clients = [],
   samples = [];
 let movement;
 try {
-  for (const route of [
-    '/wave/dev/inventory/' + 'a'.repeat(64),
-    '/wave/test/state',
-    '/dev-inventory.js',
-  ]) {
+  for (const route of ['/wave/dev/inventory/' + 'a'.repeat(64), '/wave/test/state', '/dev.js']) {
     assert.equal(
       (await request(route)).status,
       404,

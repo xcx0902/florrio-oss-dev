@@ -73,19 +73,27 @@ DamageSource Match::damage_source(const detail::Entity& entity) const {
   if (const auto kind = entity.chain_kind ? entity.chain_kind : view.mob) {
     mob = MobIdentity{*kind, view.rarity};
   }
-  return {view.id, view.owner, view.faction, view.damage_origin, mob};
+  return {view.id, view.owner, view.faction, view.damage_origin, mob, view.area};
 }
 
 EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
-                          std::optional<LifeId> owner, std::uint32_t wave) {
+                          std::optional<LifeId> owner, std::uint32_t wave, std::uint32_t area) {
   const auto& definition = *rules_.catalog.mob(kind, rarity);
   EntityView view;
+  view.area = area;
+  if (owner) {
+    if (auto* p = player(owner->player)) {
+      view.area = p->view.area;
+    }
+  }
   view.mob = kind;
   view.rarity = rarity;
   view.position = position;
   view.group = group;
   view.owner = owner;
-  view.faction = owner || kind == Mob::digger ? Faction::team : Faction::hostile;
+  view.faction = owner                 ? player_faction(owner->player)
+                 : kind == Mob::digger ? Faction::team
+                                       : Faction::hostile;
   view.origin_wave = wave;
   auto body = definition.body;
   body.radius = mob_radius(kind, rarity);
@@ -126,7 +134,7 @@ EntityId Match::spawn_mob(Mob kind, Rarity rarity, Vec2 position, Group group,
       // the head ploughs through when it first turns towards a player.
       const double angle = parent.heading_rad - (kind == Mob::leech ? 0 : std::numbers::pi / 10);
       const Vec2 forward{std::cos(angle), std::sin(angle)};
-      place_spawn_segment(view, parent, forward, gap, rules_.arena_radius);
+      place_spawn_segment(view, parent, forward, gap, area_radius(view.area));
       auto segment_body = segment->body;
       segment_body.radius = body.radius;
       segment_body.health = kind == Mob::leech ? body.health : segment_body.health * strength;
@@ -167,7 +175,7 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
   if (definition.ai == catalog::MobAI::digger && entity.view.health < entity.view.max_health * .3) {
     entity.target.reset();
     const auto distance = entity.view.position.length();
-    return distance >= rules_.arena_radius - entity.view.radius - 1 ? Vec2{}
+    return distance >= area_radius(entity.view.area) - entity.view.radius - 1 ? Vec2{}
            : distance > 0 ? entity.view.position * (1 / distance)
                           : Vec2{1, 0};
   }
@@ -182,8 +190,8 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
     entity.target = prior->view.anchor;
     prior = entities_.get(*entity.target);
   }
-  if (!aggressive || !prior || prior->view.faction == entity.view.faction ||
-      prior->view.health <= 0 ||
+  if (!aggressive || !prior || prior->view.area != entity.view.area ||
+      prior->view.faction == entity.view.faction || prior->view.health <= 0 ||
       (prior->view.position - entity.view.position).length() > alert_range * 1.5 ||
       (queen && (entity.view.position - home).length() > alert_range * 1.5)) {
     if (queen && entity.target) {
@@ -202,8 +210,8 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
     double nearest = alert_range;
     for (const auto slot : entities_.active()) {
       const auto& target = entities_.at(slot).view;
-      if (target.faction == entity.view.faction || target.group == Group::petal ||
-          target.health <= 0) {
+      if (target.area != entity.view.area || target.faction == entity.view.faction ||
+          target.group == Group::petal || target.health <= 0) {
         continue;
       }
       const double distance = (target.position - entity.view.position).length();
@@ -255,7 +263,7 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
     const double angle = base + wobble;
     Vec2 direction{std::cos(angle), std::sin(angle)};
     const double distance = entity.view.position.length();
-    if (distance > 0 && distance >= rules_.arena_radius - entity.view.radius - 2) {
+    if (distance > 0 && distance >= area_radius(entity.view.area) - entity.view.radius - 2) {
       const auto normal = entity.view.position * (1 / distance);
       const double outward = normal.x * direction.x + normal.y * direction.y;
       if (outward > 0) {
@@ -313,8 +321,8 @@ void Match::update_mob_actions() {
       const auto& p = *rules_.catalog.petal(Petal::stick, e->view.rarity);
       for (const auto slot : entities_.active()) {
         auto& other = entities_.at(slot);
-        if (other.view.faction == e->view.faction || other.view.group == Group::petal ||
-            other.immovable || other.view.predecessor) {
+        if (other.view.area != e->view.area || other.view.faction == e->view.faction ||
+            other.view.group == Group::petal || other.immovable || other.view.predecessor) {
           continue;
         }
         const auto delta = other.view.position - e->view.position;
@@ -351,6 +359,7 @@ void Match::update_mob_actions() {
       }
       e->action_ready = tick_ + seconds(rules_, 2 / attack_scale);
       EntityView bullet;
+      bullet.area = e->view.area;
       bullet.group = Group::petal;
       bullet.petal = Petal::missile;
       bullet.faction = e->view.faction;
@@ -380,6 +389,7 @@ void Match::update_mob_actions() {
     } else if (*e->view.mob == Mob::spider && rarity >= Rarity::legendary) {
       e->action_ready = tick_ + seconds(rules_, 2 / attack_scale);
       EntityView web;
+      web.area = e->view.area;
       web.group = Group::petal;
       web.petal = Petal::web;
       web.rarity = rarity;
@@ -420,7 +430,7 @@ void Match::constrain_segments() {
       if (distance > gap) {
         body.position = previous->position - delta * (gap / distance);
       }
-      body.position = clamp_center(body.position, rules_.arena_radius, body.radius);
+      body.position = clamp_center(body.position, area_radius(body.area), body.radius);
       const auto facing = previous->position - body.position;
       if (facing != Vec2{}) {
         body.heading_rad = std::atan2(facing.y, facing.x);
@@ -457,9 +467,13 @@ void Match::update_nests() {
     }
     const bool fire = e->view.mob == Mob::fire_ant_burrow;
     const bool entrance = rarity >= Rarity::rare;
+    if (entrance) {
+      continue;
+    }
     const bool nearby = std::ranges::any_of(entities_.active(), [&](auto slot) {
       const auto& p = entities_.at(slot).view;
-      return p.group == Group::player && (p.position - position).length() < 35;
+      return p.area == e->view.area && p.group == Group::player &&
+             (p.position - position).length() < 35;
     });
     if ((fire || entrance) && !nearby && !e->spawn_count) {
       continue;
@@ -511,24 +525,7 @@ void Match::update_nests() {
       burrow.view.health = 0;
       burrow.fatal_hit = damage_source(burrow);
     }
-    // W3 runs nest encounters in this arena; W5 owns interior transfers.
   }
-}
-
-void Match::resolve_cleared_nests() {
-  std::erase_if(fallen_ant_holes_, [&](const FallenAntHole& hole) {
-    const bool defended = std::ranges::any_of(entities_.active(), [&](auto slot) {
-      const auto& child = entities_.at(slot);
-      return child.root == hole.id && child.view.faction == Faction::hostile;
-    });
-    if (defended) {
-      return false;
-    }
-    if (choose(100, DrawPurpose::digger_spawn) < 2) {
-      (void)spawn_mob(Mob::digger, hole.rarity, hole.position, Group::summon);
-    }
-    return true;
-  });
 }
 
 }  // namespace wave::sim

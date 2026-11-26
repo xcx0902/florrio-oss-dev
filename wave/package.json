@@ -12,9 +12,10 @@
     "test:deploy": "node tools/deploy/smoke.mjs",
     "dev": "node tools/w2/dev.mjs",
     "test:wire": "node tools/w2/test-wire.mjs",
-    "test:dev": "node tools/dev/test-inventory.mjs",
+    "test:dev": "node tools/dev/test.mjs",
     "verify:reference": "node tools/reference/verify.mjs",
-    "fetch:archive": "node tools/reference/fetch-archive.mjs"
+    "fetch:archive": "node tools/reference/fetch-archive.mjs",
+    "test:history": "node tools/w5/test-history.mjs"
   },
   "devDependencies": {
     "binaryen": "132.0.0",

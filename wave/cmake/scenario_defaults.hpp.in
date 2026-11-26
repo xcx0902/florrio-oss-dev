@@ -2,7 +2,31 @@
 
 #include "sim/rules.hpp"
 
+#include <array>
+#include <cstdint>
+#include <string_view>
+
 namespace wave::sim::detail {
+
+inline constexpr std::string_view w5_rules_version = "@w5_version@";
+inline constexpr std::string_view w5_parameters_json = R"w5(@w5_parameters_json@)w5";
+inline constexpr unsigned w5_ant_baby_count = @w5_ant_baby_count@;
+inline constexpr unsigned w5_ant_worker_count = @w5_ant_worker_count@;
+inline constexpr unsigned w5_ant_soldier_count = @w5_ant_soldier_count@;
+inline constexpr unsigned w5_ant_queen_count = @w5_ant_queen_count@;
+inline constexpr unsigned w5_fire_count = @w5_fire_count@;
+inline constexpr unsigned w5_digger_percent = static_cast<unsigned>(@w5_digger_chance@ * 100);
+inline constexpr double w5_pvp_base_radius = @w5_pvp_base_radius@;
+inline constexpr double w5_pvp_radius_per_sqrt_player = @w5_pvp_radius_per_sqrt_player@;
+inline constexpr unsigned w5_pvp_minimum_level = @w5_pvp_minimum_level@;
+inline constexpr unsigned w5_pvp_wave_equivalent = @w5_pvp_wave_equivalent@;
+inline constexpr std::array<Mob, @w5_pvp_pool_count@> w5_pvp_mob_pool = {
+    @w5_pvp_pool_cpp@};
+inline constexpr std::array<std::uint64_t, 4> w5_pvp_basic_thresholds = {
+    @w5_pvp_basic_thresholds@};
+
+inline constexpr std::array<std::array<std::uint8_t, 3>, 6> w5_background_colors{{
+@w5_background_colors@}};
 
 inline void load_scenario_defaults(Rules& rules) {
   const auto seconds = [&rules](int value) {
@@ -18,6 +42,11 @@ inline void load_scenario_defaults(Rules& rules) {
 @waves_cpp@  };
   rules.special_groups = {
 @groups_cpp@  };
+  rules.ant_hole_radius = @w5_ant_radius@;
+  rules.ant_hole_duration = std::chrono::seconds(@w5_ant_duration@);
+  rules.pause_when_all_inside = @w5_pause_all_inside@;
+  rules.pvp_spawn_interval = std::chrono::seconds(@w5_pvp_spawn_interval@);
+  rules.pvp_mob_limit = @w5_pvp_mob_limit@;
 }
 
 }  // namespace wave::sim::detail

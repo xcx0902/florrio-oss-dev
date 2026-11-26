@@ -240,6 +240,33 @@ bool RoomManager::debug_inventory(std::string token, store::Command command, sto
       });
 }
 
+bool RoomManager::debug_progress(std::string token, store::Command command,
+                                 store::DebugProgressRequest request,
+                                 std::function<void(store::Result)> callback) {
+  if (!storage_) {
+    return false;
+  }
+  const auto db = storage_->db;
+  auto result = std::make_shared<store::Result>();
+  auto latest = std::make_shared<std::optional<store::Profile>>();
+  return storage_->add(
+      [db, token, command = std::move(command), request, result, latest] {
+        *result = db->debug_set_progress(token, command, request);
+        *latest = db->recover_guest(token);
+      },
+      [this, result, latest, callback = std::move(callback)] {
+        if (*latest) {
+          apply_profile(**latest);
+          auto& cache = storage_->admissions;
+          cache[(**latest).guest_token] = **latest;
+          if (cache.size() > 256) {
+            cache.erase(cache.begin());
+          }
+        }
+        callback(std::move(*result));
+      });
+}
+
 void RoomManager::poll_storage() {
   if (!storage_) {
     return;
@@ -337,7 +364,8 @@ void RoomManager::drain_storage() {
   }
 }
 
-Member& RoomManager::admit(std::string_view token, std::uint64_t connection, sim::Biome biome) {
+Member& RoomManager::admit(std::string_view token, std::uint64_t connection, sim::Biome biome,
+                           sim::Mode mode) {
   poll_storage();
   auto found = members_.find(token);
   if (found == members_.end()) {
@@ -398,7 +426,7 @@ Member& RoomManager::admit(std::string_view token, std::uint64_t connection, sim
   }
   auto& entry = found->second;
   const auto* previous = room(entry);
-  if (entry.biome != biome ||
+  if (entry.mode != mode || entry.biome != biome ||
       (previous && !entry.connected &&
        std::chrono::steady_clock::now() - entry.disconnected_at >= limits_.reconnect_grace) ||
       (previous && previous->match && previous->match->phase() == sim::Phase::ended)) {
@@ -406,6 +434,7 @@ Member& RoomManager::admit(std::string_view token, std::uint64_t connection, sim
     // Expired reservations likewise return to the lobby on admission.
     leave(entry);
     entry.biome = biome;
+    entry.mode = mode;
   }
   entry.connection = connection;
   entry.connected = true;
@@ -459,7 +488,8 @@ void RoomManager::reap_disconnected(bool pressure, std::chrono::steady_clock::ti
   for (auto it = members_.begin(); it != members_.end();) {
     auto& entry = it->second;
     const auto* previous = room(entry);
-    const bool finished = previous && previous->match && previous->match->phase() == sim::Phase::ended;
+    const bool finished =
+        previous && previous->match && previous->match->phase() == sim::Phase::ended;
     if (!entry.connected && entry.session_refs == 0 &&
         ((pressure && (entry.room.empty() || finished)) ||
          now - entry.disconnected_at >= limits_.reconnect_grace)) {
@@ -540,6 +570,8 @@ bool RoomManager::create_room(Member& entry, bool private_room) {
   created.version = ++next_room_;
   created.private_room = private_room;
   created.biome = entry.biome;
+  created.mode = entry.mode;
+  created.loot_rng.seed(seed_ ^ (entry.mode == sim::Mode::pvp ? 0x505650u : 0u));
   created.members.reserve(Room::capacity);
   entry.room = code;
   created.members.push_back(entry.token);
@@ -548,7 +580,7 @@ bool RoomManager::create_room(Member& entry, bool private_room) {
 
 JoinResult RoomManager::join_squad(Member& entry, std::string_view code) {
   auto it = rooms_.find(code);
-  if (it == rooms_.end() || it->second.biome != entry.biome ||
+  if (it == rooms_.end() || it->second.biome != entry.biome || it->second.mode != entry.mode ||
       (it->second.match && it->second.match->phase() == sim::Phase::ended)) {
     return JoinResult::unavailable;
   }
@@ -586,7 +618,8 @@ bool RoomManager::find_public(Member& entry) {
   Room* lobby = nullptr;
   for (auto& [code, candidate] : rooms_) {
     if (code != entry.room && !candidate.private_room && candidate.biome == entry.biome &&
-        !candidate.match && candidate.members.size() < Room::capacity &&
+        candidate.mode == entry.mode && !candidate.match &&
+        candidate.members.size() < Room::capacity &&
         (!lobby || candidate.version < lobby->version)) {
       lobby = &candidate;
     }
@@ -600,6 +633,9 @@ bool RoomManager::find_public(Member& entry) {
 }
 
 bool RoomManager::join_running_public(Member& entry) {
+  if (entry.mode == sim::Mode::pvp) {
+    return join_pvp(entry);
+  }
   const auto biome = static_cast<unsigned>(entry.biome);
   const auto best = entry.profile ? entry.profile->highest_waves.at(biome) : 0u;
   if (best == 0) {
@@ -611,16 +647,15 @@ bool RoomManager::join_running_public(Member& entry) {
   // the room executor, so no second request can claim the same free seat.
   for (auto& [code, candidate] : rooms_) {
     if (!candidate.match || candidate.private_room || candidate.biome != entry.biome ||
-        candidate.members.size() >= Room::capacity) {
+        candidate.mode != entry.mode || candidate.members.size() >= Room::capacity) {
       continue;
     }
     const auto wave = candidate.match->late_join_wave(entry.id);
     if (wave && *wave <= best &&
         (!running || *wave > highest ||
          (*wave == highest && candidate.version < running->version)) &&
-        std::ranges::any_of(candidate.members, [this](const auto& token) {
-          return members_.at(token).connected;
-        })) {
+        std::ranges::any_of(candidate.members,
+                            [this](const auto& token) { return members_.at(token).connected; })) {
       running = &candidate;
       highest = *wave;
     }
@@ -629,6 +664,43 @@ bool RoomManager::join_running_public(Member& entry) {
     return false;
   }
   enter(entry, *running);
+  return true;
+}
+
+bool RoomManager::join_pvp(Member& entry) {
+  if (entry.profile && entry.profile->level < sim::pvp_minimum_level()) {
+    return false;
+  }
+  if (const auto* current = room(entry); current && current->match) {
+    return false;
+  }
+  for (auto& [code, candidate] : rooms_) {
+    if (candidate.mode != sim::Mode::pvp || !candidate.match ||
+        candidate.match->phase() == sim::Phase::ended || candidate.members.size() >= 32) {
+      continue;
+    }
+    if (!add_player(entry, *candidate.match, candidate.members.size())) {
+      continue;
+    }
+    enter(entry, candidate);
+    entry.ready = true;
+    return true;
+  }
+  if (!create_room(entry, false)) {
+    return false;
+  }
+  auto& created = rooms_.at(entry.room);
+  auto rules = rules_override_ && rules_override_->mode == sim::Mode::pvp ? *rules_override_
+                                                                          : sim::pvp_rules();
+  created.match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_ ^ 0x505650u,
+                                               std::move(rules));
+  if (!add_player(entry, *created.match, 0)) {
+    throw std::logic_error("PvP admission failed");
+  }
+  if (storage_) {
+    created.economy_id = random_hex(32);
+  }
+  entry.ready = true;
   return true;
 }
 
@@ -849,6 +921,8 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
     sim::LifeId life;
     sim::EntityId body;
     double pickup_multiplier = 1;
+    std::uint32_t area = 0;
+    std::uint64_t life_start_generation = 0;
   };
   std::vector<Eligible> eligible;
   // Eligibility is a snapshot at the authoritative event tick, not at the
@@ -896,19 +970,72 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
     if (died) {
       continue;
     }
-    eligible.push_back({&member, *position, player->life, *body, player->pickup_multiplier});
+    eligible.push_back({&member, *position, player->life, *body, player->pickup_multiplier,
+                        player->area, player->life_start_generation});
   }
 
+  std::set<std::uint32_t> closed_areas;
   for (const auto& event : room.match->events()) {
+    if (const auto* closed = std::get_if<sim::AreaClosed>(&event.data)) {
+      closed_areas.insert(closed->area);
+    }
+  }
+  const auto current_area = [&](std::uint32_t area) {
+    return closed_areas.contains(area) ? 0u : area;
+  };
+  for (const auto& event : room.match->events()) {
+    if (const auto* closed = std::get_if<sim::AreaClosed>(&event.data)) {
+      for (auto& drop : room.drops) {
+        if (drop.area != closed->area) {
+          continue;
+        }
+        drop.area = 0;
+        drop.position = sim::clamp_center(closed->position + drop.position, after.arena_radius, 4);
+      }
+      for (auto& pickup : room.pickups) {
+        if (pickup.drop.area == closed->area) {
+          pickup.drop.area = 0;
+          pickup.drop.position =
+              sim::clamp_center(closed->position + pickup.drop.position, after.arena_radius, 4);
+          pickup.destination =
+              sim::clamp_center(closed->position + pickup.destination, after.arena_radius, 4);
+        }
+      }
+    }
     if (const auto* defeat = std::get_if<sim::Defeat>(&event.data)) {
-      if ((defeat->group != sim::Group::main_mob && defeat->group != sim::Group::residual) ||
-          !defeat->mob || defeat->source.faction != sim::Faction::team || !defeat->source.owner ||
+      if (room.mode == sim::Mode::pvp && defeat->group == sim::Group::player) {
+        const auto rarity = sim::pvp_basic_rarity(defeat->victim_score);
+        const auto id = "player:" + entity_key(defeat->entity);
+        if (rarity && ledger.roots.insert(id).second) {
+          room.drops.push_back(
+              {id,
+               {*catalog::client_petal(sim::Petal::basic), static_cast<std::uint8_t>(*rarity)},
+               defeat->position,
+               ++room.drop_sequence,
+               event.tick + sim::Timing{after.step}.ticks_ceil(std::chrono::milliseconds(250)),
+               false,
+               defeat->area});
+        }
+        continue;
+      }
+      const bool portal_closed =
+          defeat->mob == sim::Mob::fire_ant_burrow ||
+          (defeat->rarity >= sim::Rarity::rare && defeat->mob == sim::Mob::ant_hole);
+      if ((defeat->group != sim::Group::main_mob && defeat->group != sim::Group::residual &&
+           !defeat->natural_summon) ||
+          !defeat->mob ||
+          (!portal_closed &&
+           (defeat->source.faction == sim::Faction::hostile || !defeat->source.owner)) ||
           static_cast<unsigned>(defeat->rarity) >= 6) {
         continue;
       }
-      const auto owner = std::ranges::find_if(
-          eligible, [&](const Eligible& e) { return e.life == *defeat->source.owner; });
-      if (owner == eligible.end()) {
+      const auto owner = std::ranges::find_if(eligible, [&](const Eligible& e) {
+        return defeat->source.owner && e.member->id == defeat->source.owner->player &&
+               e.life.match == defeat->source.owner->match &&
+               defeat->source.owner->generation >= e.life_start_generation &&
+               defeat->source.owner->generation <= e.life.generation;
+      });
+      if (owner == eligible.end() && !portal_closed) {
         continue;
       }
       const auto id = entity_key(defeat->entity);
@@ -922,12 +1049,19 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
       store::RewardEvent reward{room.economy_id, "kill", id, {}};
       for (const auto& e : eligible) {
         store::Reward recipient;
+        if (e.area != current_area(defeat->area) ||
+            (room.mode == sim::Mode::pvp &&
+             (owner == eligible.end() || e.member != owner->member))) {
+          continue;
+        }
         recipient.guest_id = e.member->profile->guest_id;
         recipient.xp = mob->xp;
         recipient.discoveries.insert({mob->client_id, static_cast<std::uint8_t>(defeat->rarity)});
         reward.recipients.push_back(std::move(recipient));
       }
-      batch->events.push_back(std::move(reward));
+      if (!reward.recipients.empty()) {
+        batch->events.push_back(std::move(reward));
+      }
       std::map<sim::Petal, std::vector<const catalog::DropDefinition*>> drop_kinds;
       for (const auto& drop : catalog::drop_table()) {
         if (drop.mob == *defeat->mob && drop.mob_rarity == defeat->rarity) {
@@ -940,7 +1074,7 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
       for (const auto& [petal, variants] : drop_kinds) {
         // Separate petal kinds roll independently. One roll selects at most one
         // rarity of this kind; probabilities retain the client's original mass.
-        double roll = double(storage_->rng()) / 4294967296.0;
+        double roll = double(room.loot_rng()) / 4294967296.0;
         for (const auto* drop : variants) {
           if (roll < drop->probability) {
             const auto kind = *catalog::client_petal(petal);
@@ -948,7 +1082,9 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
                                   {kind, static_cast<std::uint8_t>(drop->rarity)},
                                   defeat->position,
                                   ++room.drop_sequence,
-                                  available_tick});
+                                  available_tick,
+                                  false,
+                                  defeat->area});
             break;
           }
           roll -= drop->probability;
@@ -961,8 +1097,11 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
         for (std::size_t i = 0; i < count; ++i) {
           const double angle = std::numbers::pi * (.5 + 2. * i / count);
           const sim::Vec2 offset{spread * std::cos(angle), spread * std::sin(angle)};
+          const auto hole =
+              std::ranges::find(after.ant_holes, defeat->area, &sim::AntHoleView::area);
+          const auto radius = hole == after.ant_holes.end() ? after.arena_radius : hole->radius;
           room.drops[first_drop + i].position =
-              sim::clamp_center(defeat->position + offset, after.arena_radius, 4);
+              sim::clamp_center(defeat->position + offset, radius, 4);
         }
       }
     } else if (const auto* transition = std::get_if<sim::Transition>(&event.data)) {
@@ -984,6 +1123,16 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
     }
   }
 
+  if (room.mode == sim::Mode::pvp) {
+    // Population can shrink the arena after a kill. Cards must remain reachable.
+    for (auto& drop : room.drops) {
+      drop.position = sim::clamp_center(drop.position, after.arena_radius, 4);
+    }
+    for (auto& pickup : room.pickups) {
+      pickup.drop.position = sim::clamp_center(pickup.drop.position, after.arena_radius, 4);
+      pickup.destination = sim::clamp_center(pickup.destination, after.arena_radius, 5);
+    }
+  }
   for (auto& drop : room.drops) {
     if (drop.claimed ||
         (after.phase != sim::Phase::ended && after.next_tick <= drop.available_tick)) {
@@ -992,6 +1141,9 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
     const Eligible* nearest = nullptr;
     double distance = std::numeric_limits<double>::infinity();
     for (const auto& e : eligible) {
+      if (e.area != drop.area) {
+        continue;
+      }
       const double candidate = (e.position - drop.position).length();
       if (candidate > pickup_distance * e.pickup_multiplier) {
         continue;
@@ -1081,6 +1233,9 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
   if (const auto* name = std::get_if<wire::Nickname>(&action)) {
     entry.name = name->value.empty() ? "Flower" : name->value;
   } else if (const auto* create = std::get_if<wire::CreateSquad>(&action)) {
+    if (entry.mode == sim::Mode::pvp) {
+      return false;
+    }
     return create_room(entry, create->private_room);
   } else if (const auto* visibility = std::get_if<wire::SetSquadPublic>(&action)) {
     const auto found = rooms_.find(entry.room);
@@ -1090,7 +1245,7 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
     }
     found->second.private_room = !visibility->value;
   } else if (std::holds_alternative<wire::FindPublicSquad>(action)) {
-    return find_public(entry);
+    return entry.mode == sim::Mode::pvp ? false : find_public(entry);
   } else if (const auto* join_room = std::get_if<wire::JoinSquad>(&action)) {
     return join_squad(entry, join_room->code) == JoinResult::joined;
   } else if (std::holds_alternative<wire::Leave>(action)) {
@@ -1099,7 +1254,8 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
     const auto* current = room(entry);
     // Continue acknowledges death; an ongoing squad retains the player for
     // Yggdrasil or next-wave revival. A delayed Continue also preserves a new life.
-    if (!current || !current->match || current->match->phase() == sim::Phase::ended) {
+    if (!current || !current->match || current->mode == sim::Mode::pvp ||
+        current->match->phase() == sim::Phase::ended) {
       leave(entry);
     }
   } else if (const auto* ready = std::get_if<wire::Ready>(&action)) {
@@ -1117,6 +1273,9 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
       // uses committed equipment only, so defer Ready without waiting in tick.
       storage_->ready[entry.token] = {ready->value, entry.connection};
       return true;
+    }
+    if (entry.mode == sim::Mode::pvp && ready->value) {
+      return join_pvp(entry);
     }
     if (entry.room.empty()) {
       if (!ready->value) {
@@ -1150,7 +1309,7 @@ bool RoomManager::command(Member& entry, const wire::ReliableAction& action,
         opening_index = std::max<std::uint64_t>(1, lowest * std::uint64_t{2} / 3) - 1;
       }
       auto match = std::make_unique<sim::Match>(sim::MatchId{++next_match_}, seed_,
-                                               std::move(rules), opening_index);
+                                                std::move(rules), opening_index);
       for (std::size_t i = 0; i < room.members.size(); ++i) {
         if (!add_player(members_.at(room.members[i]), *match, i)) {
           throw std::logic_error("Room manager admission failed before tick zero");

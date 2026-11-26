@@ -21,8 +21,8 @@ struct Reply {
 
 class ClientSession {
  public:
-  ClientSession(RoomManager& rooms, std::uint64_t connection,
-                sim::Biome biome = sim::Biome::garden);
+  ClientSession(RoomManager& rooms, std::uint64_t connection, sim::Biome biome = sim::Biome::garden,
+                sim::Mode mode = sim::Mode::waves);
   ~ClientSession();
   ClientSession(const ClientSession&) = delete;
   ClientSession& operator=(const ClientSession&) = delete;
@@ -43,6 +43,7 @@ class ClientSession {
   std::uint32_t received_ = 0;
   RoomManager& rooms_;
   sim::Biome biome_;
+  sim::Mode mode_;
   std::uint64_t connection_;
   Member* member_ = nullptr;
   std::string requested_guest_;

@@ -47,6 +47,7 @@ class Match {
     std::vector<Tick> petal_ready;
     double orbit_phase = 0;
     Tick orbit_updated = std::numeric_limits<Tick>::max();
+    Tick portal_ready = 0;
   };
 
   struct Impact {
@@ -86,11 +87,17 @@ class Match {
   [[nodiscard]] double mob_radius(Mob kind, Rarity rarity) const;
   [[nodiscard]] DamageSource damage_source(const detail::Entity& entity) const;
   void update_nests();
-  void resolve_cleared_nests();
+  [[nodiscard]] double area_radius(std::uint32_t area) const;
+  [[nodiscard]] Faction player_faction(PlayerId id) const;
+  void update_ant_holes();
+  void close_ant_hole(std::uint32_t area);
+  void transfer_player(Player& player, std::uint32_t area, Vec2 position);
+  [[nodiscard]] bool main_paused() const;
+  void update_pvp();
   [[nodiscard]] Vec2 mob_direction(detail::Entity& entity);
   [[nodiscard]] EntityId spawn_mob(Mob kind, Rarity rarity, Vec2 position,
                                    Group group = Group::main_mob, std::optional<LifeId> owner = {},
-                                   std::uint32_t wave = 0);
+                                   std::uint32_t wave = 0, std::uint32_t area = 0);
   [[nodiscard]] double apply_health(EntityId target, const DamageSource& source, HealthKind kind,
                                     double amount, bool secondary = false);
   void chain_attack(EntityId first, const DamageSource& source, double damage, unsigned bounces,
@@ -126,16 +133,14 @@ class Match {
   std::vector<Command> commands_;
   std::vector<Impact> impacts_;
   std::vector<Event> events_;
-  struct FallenAntHole {
-    EntityId id;
-    Rarity rarity;
-    Vec2 position;
-  };
-  std::vector<FallenAntHole> fallen_ant_holes_;
   std::size_t wave_index_ = 0;
   WaveView wave_;
   std::optional<WaveView> previous_wave_;
   std::optional<TransitionReason> arrival_;
+  std::vector<AntHoleView> ant_holes_;
+  std::uint32_t next_area_ = 0;
+  double arena_radius_ = 300;
+  Tick pvp_spawn_ready_ = 0;
 };
 
 }  // namespace wave::sim

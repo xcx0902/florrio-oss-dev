@@ -1,5 +1,5 @@
 #wave-dev-toggle,
-#wave-dev-inventory {
+#wave-dev {
   font:
     14px/1.5 system-ui,
     sans-serif;
@@ -18,7 +18,7 @@
   cursor: pointer;
 }
 
-#wave-dev-inventory {
+#wave-dev {
   width: min(600px, calc(100vw - 52px));
   max-height: calc(100vh - 70px);
   box-sizing: border-box;
@@ -30,42 +30,47 @@
   box-shadow: 0 20px 80px #0008;
 }
 
-#wave-dev-inventory::backdrop {
+#wave-dev::backdrop {
   background: #07130fb3;
 }
 
-#wave-dev-inventory header,
-#wave-dev-inventory .wave-dev-actions {
+#wave-dev header,
+#wave-dev .wave-dev-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
 }
 
-#wave-dev-inventory h1 {
+#wave-dev h1 {
   margin: 0;
   font-size: 22px;
 }
 
-#wave-dev-inventory p {
+#wave-dev h2 {
+  margin: 24px 0 8px;
+  font-size: 17px;
+}
+
+#wave-dev p {
   color: #b7cbc0;
 }
 
-#wave-dev-inventory form {
+#wave-dev form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
   margin: 20px 0;
 }
 
-#wave-dev-inventory label {
+#wave-dev label {
   display: grid;
   gap: 6px;
 }
 
-#wave-dev-inventory input,
-#wave-dev-inventory select,
-#wave-dev-inventory button {
+#wave-dev input,
+#wave-dev select,
+#wave-dev button {
   min-height: 38px;
   box-sizing: border-box;
   border: 1px solid #547567;
@@ -76,60 +81,60 @@
   font: inherit;
 }
 
-#wave-dev-inventory button {
+#wave-dev button {
   cursor: pointer;
 }
 
-#wave-dev-inventory button[type='submit'] {
+#wave-dev button[type='submit'] {
   border-color: #98dfa0;
   color: #0d2116;
   background: #9de0a6;
   font-weight: 700;
 }
 
-#wave-dev-inventory button:disabled {
+#wave-dev button:disabled {
   opacity: 0.5;
   cursor: wait;
 }
 
-#wave-dev-inventory .wave-dev-wide {
+#wave-dev .wave-dev-wide {
   grid-column: 1 / -1;
 }
 
-#wave-dev-inventory [role='status'] {
+#wave-dev [role='status'] {
   min-height: 24px;
   margin: 0;
   color: #d4e7d9;
 }
 
-#wave-dev-inventory table {
+#wave-dev table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
   text-align: left;
 }
 
-#wave-dev-inventory th,
-#wave-dev-inventory td {
+#wave-dev th,
+#wave-dev td {
   padding: 9px 4px;
   border-bottom: 1px solid #345043;
 }
 
-#wave-dev-inventory td:last-child {
+#wave-dev td:last-child {
   text-align: right;
 }
 
-#wave-dev-inventory caption {
+#wave-dev caption {
   text-align: left;
   font-weight: 700;
 }
 
 @media (max-width: 460px) {
-  #wave-dev-inventory {
+  #wave-dev {
     padding: 16px;
   }
 
-  #wave-dev-inventory form {
+  #wave-dev form {
     grid-template-columns: 1fr;
   }
 }

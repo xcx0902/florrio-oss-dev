@@ -27,16 +27,19 @@ const { values } = parseArgs({
     'bootstrap-only': { type: 'boolean' },
   },
 });
-if (values.stage === 'W3' || values.stage === 'W4') {
+if (['W3', 'W4', 'W5'].includes(values.stage)) {
   if (!process.argv.some((arg) => arg === '--output-dir' || arg.startsWith('--output-dir='))) {
     values['output-dir'] = path.join(root, '../reports/wave', values.stage);
   }
   if (values.stage === 'W3') {
     const { runW3 } = await import('../w3/test-wire.mjs');
     await runW3(values);
-  } else {
+  } else if (values.stage === 'W4') {
     const { runW4 } = await import('../w4/test-wire.mjs');
     await runW4(values);
+  } else {
+    const { runW5 } = await import('../w5/test-wire.mjs');
+    await runW5(values);
   }
   process.exit(process.exitCode ?? 0);
 }

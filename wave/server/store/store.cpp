@@ -891,6 +891,43 @@ Result Store::debug_set_inventory(std::string_view token, const Command& command
   });
 }
 
+Result Store::debug_set_progress(std::string_view token, const Command& command,
+                                 const DebugProgressRequest& request) {
+  if (!impl_->options.allow_debug_progress) {
+    Result result;
+    result.code = Code::protected_item;
+    return result;
+  }
+  Encoder fingerprint;
+  fingerprint.s("debug-progress.v1");
+  fingerprint.n(command.expected_version);
+  fingerprint.n(request.xp);
+  fingerprint.n(request.level);
+  for (const auto wave : request.highest_waves) {
+    fingerprint.n(wave);
+  }
+  return impl_->command(token, command, fingerprint.bytes, [&](Result& result) {
+    if (request.xp > sql_max || request.level != level_for_xp(request.xp) ||
+        std::ranges::any_of(request.highest_waves, [](auto wave) {
+          return wave > static_cast<std::uint32_t>(std::numeric_limits<std::int32_t>::max());
+        })) {
+      return Code::invalid_request;
+    }
+    auto& profile = result.profile;
+    profile.xp = request.xp;
+    profile.level = request.level;
+    profile.highest_waves = request.highest_waves;
+    profile.highest_wave = std::ranges::max(request.highest_waves);
+    const auto unlocked = unlocked_main_slots(profile.level);
+    for (std::size_t i = 0; i < profile.slots.size(); ++i) {
+      if (i % 8 >= unlocked) {
+        profile.slots[i].reset();
+      }
+    }
+    return Code::ok;
+  });
+}
+
 RewardResult Store::reward(const RewardEvent& event) {
   std::lock_guard guard(impl_->mutex);
   RewardResult result;

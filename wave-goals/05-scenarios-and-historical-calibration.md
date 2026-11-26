@@ -44,3 +44,51 @@ npm --prefix wave run test:wire -- --snapshot "$WAVE_SNAPSHOT" --stage W5
 ```
 
 交接 Garden、Desert、Ocean、蚁穴和 PvP 的规则版本、证据覆盖、实测通过项和原客户端联机结果。缺史料参数写明采用值、候选范围和升级证据。 [执行记录](README.md#执行记录)
+
+## 蚁穴与独立 PvP 执行结果（2026-11-26）
+
+本次完成 **05.3、05.4**，以及对应的 `w5` / `test:history` / 原客户端联机门禁。
+05.1 的完整波次曲线校准和 05.2 的三场景逐项历史验收继续保留为后续工作，不将整个 W5 关闭。
+
+- Rare+ 普通蚁穴和火蚁穴通过接触进入独立圆形内部。四席小队可分处主场和洞内，
+  实体、碰撞、仇恨、治疗、闪电和掉落按区域隔离。血量、装备和档案保留，切场更新控制代际，
+  旧快照输入不能越区执行。洞内死亡、进出时断线恢复、反复进入、最后守卫、清空及超时都有夹具。
+  全部存活连线玩家入洞时暂停主波刷怪和波时钟；关闭后传出幸存实体及掉落。
+- 普通洞内 Queen 与入口同级，其余三种蚂蚁固定 Rare；火蚁穴按日期规则配置 50 只及 E/L/M 的 3/2/1 只同级火蚁。
+  Digger 仅在 Rare+ 首次入洞时抽取 2%，普通洞和火蚁穴均覆盖；移除 W3 的低稀有清场代理。
+  C/U 外放野生守卫和入口关闭按目录各结算一次 XP、图鉴及掉落，玩家召唤物不重复获得野生收益。
+- 原生 PvP 菜单使用独立发现/socket 与 mode 2，服务端验证等级 15；独立公开房间提供持续刷怪、
+  玩家互伤、个人死亡/返回、装备继承、排行榜和 Basic 拾取。Magnet 拾取倍率固定 1。
+  地图收缩将实体与掉落夹回可达范围；同时互杀先冻结败者分数，旧生命的毒不会归给重入的新生命。
+  PvP 与 PvE 的模拟、随机和波次进度隔离，库存收益按独立事件键持久化。
+- 按本次配色要求，Garden / Desert / Ocean / PvP 与原客户端菜单同色：
+  `#1ea761` / `#decf7c` / `#5785ba` / `#4d5e56`。
+  普通蚁穴与火蚁穴内部使用对应入口外圈色 `#b58500` / `#b52d00`，不取母场 biome 色。
+  原件 Ocean 的额外全屏滤色在已有运行时兼容适配中关闭，使最终像素也与要求一致。
+  [冻结配色](../wave/data/wire/20221030/w5-backgrounds.json) · [原件定位与字节适配](../wave/docs/protocol/10-w5-scenarios.md)
+
+| 验收             | 实测结果                                                                                                    | 报告                                                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 原生回归         | 19/19 CTest 条目通过；W5 输出 17 个实际通过的验收 ID                                                        | [native.log](../reports/wave/W5/native.log)                                                                                                            |
+| 历史规则门禁     | 29/29 采用值、编译参数、来源哈希和用例关联通过；其中 10 项已证实、18 项重建、1 项未确认                     | [history.json](../reports/wave/W5/history.json)                                                                                                        |
+| 原版联机         | Chrome 158.0.8127.37，双人进洞/两区可见集/返回、PvP 进场/交战/击杀/排名/拾取/离场，以及六种最终背景像素通过 | [wire.json](../reports/wave/W5/wire.json)                                                                                                              |
+| 既有联机回归     | W2、W3、W4 原客户端流程通过                                                                                 | [W2](../reports/wave/W5/regression-W2/wire.json) · [W3](../reports/wave/W5/regression-W3/wire.json) · [W4](../reports/wave/W5/regression-W4/wire.json) |
+| 内存与未定义行为 | W5 通过 ASan/UBSan；macOS 不支持 LSan，使用 `detect_leaks=0`                                                | [sanitized.log](../reports/wave/W5/sanitized.log)                                                                                                      |
+| 独立源码构建     | 临时目录仅复制 `wave/`，`WAVE_BUILD_HOST=OFF`，19/19 原生用例通过                                           | [standalone.log](../reports/wave/W5/standalone.log)                                                                                                    |
+
+实际命令与退出码登记在 [验证汇总](../reports/wave/W5/verification.json)。复核入口：
+
+```sh
+cmake --build build/wave/native --parallel
+ctest --test-dir build/wave/native --output-on-failure --no-tests=error
+npm --prefix wave run test:history -- --stage W5
+npm --prefix wave run test:wire -- --snapshot "$PWD/wave-reference/20221030" --stage W5
+```
+
+源码基于 `aabb24b` 加本次工作区变更，完整源文件 SHA-256、组合摘要及宿主二进制摘要记录在
+`wire.json`；历史规则为 `20221030-w5.scenarios.1`。原件 Wasm SHA-256 为
+`68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0`。
+180 秒、洞半径 150、Garden 守卫总数、全员入洞暂停条件、PvP 地图函数和精确 Basic 分数阈值
+仍按[证据边界](../wave/docs/w5-scenarios-20221030.md)标明采用值；测试通过不提高其历史置信度。
+洞内沿用母场原生场景名及 Wave 数字，原生蓝条显示剩余计时；专用历史倒计时字段尚未确定。
+异区队友保留小队名字/装备但不发送花朵位置，原版头像会呈无生命样式，服务端生命状态保持正确。

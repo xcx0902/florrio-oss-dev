@@ -540,63 +540,36 @@ void digger_after_ant_hole() {
             "Digger is absent from every ordinary spawn pool");
     }
   }
-  for (const auto [rarity, wins_roll] :
-       {std::pair{Rarity::common, true}, std::pair{Rarity::rare, true},
-        std::pair{Rarity::rare, false}}) {
+  // W5 replaces the W3 clear-time proxy with the dated first-entry rule.
+  // Common/Unusual nests cannot be entered and must never roll a Digger.
+  for (const auto rarity : {Rarity::common, Rarity::unusual}) {
     Match m({53}, 1, arena());
     check(m.add_player({1}, {}, {}), "admit the ant hole fixture player");
     steps(m);
-    // The first draw after resetting the generator lands in the required bucket.
-    std::uint32_t seed = 0;
-    while ((std::mt19937(seed)() % 100 < 2) != wins_roll) {
-      ++seed;
-    }
-    FixtureAccess::seed(m, seed);
     const auto hole = FixtureAccess::spawn(m, Mob::ant_hole, rarity, {25, 0});
-    const auto nest_position = FixtureAccess::get(m, hole).view.position;
-    if (rarity == Rarity::common) {
-      FixtureAccess::hit(m, hole, flower(m), 1e5);
-    }
-    const auto rolls = [&] {
-      return std::ranges::count_if(m.events(), [](const auto& e) {
-        const auto* draw = std::get_if<RandomDraw>(&e.data);
-        return draw && draw->purpose == DrawPurpose::digger_spawn;
-      });
-    };
+    FixtureAccess::hit(m, hole, flower(m), 1e5);
     steps(m);
-    std::vector<EntityId> defenders;
+    unsigned defenders = 0;
     for (const auto& e : m.view().entities) {
       if (FixtureAccess::get(m, e.id).root == hole) {
-        defenders.push_back(e.id);
+        ++defenders;
+        FixtureAccess::get(m, e.id).view.health = 0;
       }
     }
-    check(defenders.size() == 40 && rolls() == 0, "the nest releases defenders before any roll");
-    check(FixtureAccess::exists(m, hole) == (rarity >= Rarity::rare),
-          "early destruction of a Common hole does not forget its defenders");
-    for (std::size_t i = 1; i < defenders.size(); ++i) {
-      FixtureAccess::get(m, defenders[i]).view.health = 0;
-    }
-    for (int tick = 0; tick < 20; ++tick) {
-      steps(m);
-      check(rolls() == 0, "no Digger roll while even one defender survives");
-    }
-    FixtureAccess::get(m, defenders.front()).view.health = 0;
+    check(defenders == 40, "small nests still release their defenders");
     steps(m);
-    check(!FixtureAccess::exists(m, hole) && rolls() == 1, "clearing the nest rolls once");
     const auto view = m.view();
-    const auto digger = std::ranges::find(view.entities, Mob::digger, &EntityView::mob);
-    check((digger != view.entities.end()) == wins_roll, "the roll controls whether Digger spawns");
-    if (wins_roll) {
-      check(digger->position == nest_position && digger->rarity == rarity &&
-                digger->faction == Faction::team && digger->health == digger->max_health,
-            "Digger appears at the cleared nest with full health as an ally");
-    }
-    for (int tick = 0; tick < 12; ++tick) {
-      steps(m);
-      check(rolls() == 0, "a cleared nest cannot roll again");
-    }
+    check(std::ranges::none_of(view.entities, [](const auto& e) { return e.mob == Mob::digger; }),
+          "clearing a small nest does not spawn a Digger");
+    check(std::ranges::none_of(m.events(),
+                               [](const auto& e) {
+                                 const auto* d = std::get_if<RandomDraw>(&e.data);
+                                 return d && d->purpose == DrawPurpose::digger_spawn;
+                               }),
+          "Digger RNG belongs exclusively to a Rare+ first entry");
   }
 }
+
 void remaining_petals() {
   for (auto kind : {Petal::yucca, Petal::starfish}) {
     Match m({10}, 1, arena());

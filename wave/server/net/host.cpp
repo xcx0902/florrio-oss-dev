@@ -1,7 +1,7 @@
 #include "wire/economy_cache.hpp"
 #include "app/client_session.hpp"
 #ifdef WAVE_HOST_DEVELOPMENT
-#include "net/dev_inventory.hpp"
+#include "net/dev.hpp"
 #endif
 #ifdef WAVE_HOST_TESTING
 #include "scenarios/wire_match.hpp"
@@ -99,8 +99,8 @@ Resources load(const std::filesystem::path& root) {
       File{"/client.js", "client.js", "text/javascript; charset=utf-8"},
       File{"/client.wasm", "client.wasm", "application/wasm"},
 #ifdef WAVE_HOST_DEVELOPMENT
-      File{"/dev-inventory.js", "dev-inventory.js", "text/javascript; charset=utf-8"},
-      File{"/dev-inventory.css", "dev-inventory.css", "text/css; charset=utf-8"},
+      File{"/dev.js", "dev.js", "text/javascript; charset=utf-8"},
+      File{"/dev.css", "dev.css", "text/css; charset=utf-8"},
 #endif
   };
   Resources resources;
@@ -117,6 +117,11 @@ Resources load(const std::filesystem::path& root) {
   resources.emplace("/endpoint/florrio-waves-1/findEach/",
                     Resource{"application/json",
                              R"({"servers":{"us":{"id":"waverotation","ipv4":"127.0.0.2"}}})"});
+  resources.emplace(
+      "/endpoint/florrio-pvp/findEach/",
+      Resource{"application/json", R"({"servers":{"us":{"id":"wavepvp","ipv4":"127.0.0.3"}}})"});
+  resources.emplace("/server/wavepvp",
+                    Resource{"application/json", R"({"id":"wavepvp","ipv4":"127.0.0.3"})"});
   resources.emplace("/server/wavelocal",
                     Resource{"application/json", R"({"id":"wavelocal","ipv4":"127.0.0.1"})"});
   resources.emplace("/server/waverotation",
@@ -200,8 +205,10 @@ class Connection : public std::enable_shared_from_this<Connection> {
     }
 #ifdef WAVE_HOST_DEVELOPMENT
     constexpr std::string_view debug_path = "/wave/dev/inventory/";
-    if (target.starts_with(debug_path)) {
-      const auto token = target.substr(debug_path.size());
+    constexpr std::string_view progress_path = "/wave/dev/progress/";
+    if (target.starts_with(debug_path) || target.starts_with(progress_path)) {
+      const bool progress = target.starts_with(progress_path);
+      const auto token = target.substr(progress ? progress_path.size() : debug_path.size());
       if (token.size() != 64 ||
           token.find_first_not_of("0123456789abcdef") != std::string_view::npos) {
         respond(http::status::bad_request, {"text/plain", "Invalid guest token"});
@@ -231,26 +238,41 @@ class Connection : public std::enable_shared_from_this<Connection> {
         respond(http::status::forbidden, {"text/plain", "Forbidden origin"});
         return;
       }
-      const auto edit = wave::dev::parse_inventory_edit(request.body());
-      if (request[http::field::content_type] != "application/x-www-form-urlencoded" || !edit) {
-        respond(http::status::bad_request, {"text/plain", "Invalid inventory edit"});
+      if (request[http::field::content_type] != "application/x-www-form-urlencoded") {
+        respond(http::status::bad_request, {"text/plain", "Invalid edit content type"});
         return;
       }
-      if (!rooms_->debug_inventory(
-              std::string(token), edit->command, edit->item, edit->count,
-              [self = shared_from_this()](wave::store::Result result) {
-                using wave::store::Code;
-                const auto status =
-                    result.code == Code::ok              ? http::status::ok
-                    : result.code == Code::unknown_guest ? http::status::not_found
-                    : result.code == Code::version_conflict || result.code == Code::key_conflict
-                        ? http::status::conflict
-                        : http::status::bad_request;
-                self->respond(
-                    status,
-                    {"application/json",
-                     "{\"code\":\"" + std::string(wave::store::code_name(result.code)) + "\"}"});
-              })) {
+      auto callback = [self = shared_from_this()](wave::store::Result result) {
+        using wave::store::Code;
+        const auto status =
+            result.code == Code::ok              ? http::status::ok
+            : result.code == Code::unknown_guest ? http::status::not_found
+            : result.code == Code::version_conflict || result.code == Code::key_conflict
+                ? http::status::conflict
+                : http::status::bad_request;
+        self->respond(status,
+                      {"application/json",
+                       "{\"code\":\"" + std::string(wave::store::code_name(result.code)) + "\"}"});
+      };
+      bool queued = false;
+      if (progress) {
+        const auto edit = wave::dev::parse_progress_edit(request.body());
+        if (!edit) {
+          respond(http::status::bad_request, {"text/plain", "Invalid progress edit"});
+          return;
+        }
+        queued = rooms_->debug_progress(std::string(token), edit->command, edit->progress,
+                                        std::move(callback));
+      } else {
+        const auto edit = wave::dev::parse_inventory_edit(request.body());
+        if (!edit) {
+          respond(http::status::bad_request, {"text/plain", "Invalid inventory edit"});
+          return;
+        }
+        queued = rooms_->debug_inventory(std::string(token), edit->command, edit->item, edit->count,
+                                         std::move(callback));
+      }
+      if (!queued) {
         respond(http::status::service_unavailable, {"text/plain", "Profile queue full"});
       }
       return;
@@ -286,6 +308,10 @@ class Connection : public std::enable_shared_from_this<Connection> {
                          wave::wire::equipped_cache(wave::wire::client_equipment(*profile)) +
                          "\",\"inventory\":\"" + wave::wire::inventory_cache(profile->inventory) +
                          "\",\"level\":\"" + wave::wire::signed_cache(profile->level) +
+                         "\",\"pvpUnlocked\":\"" +
+                         wave::wire::original_cache(
+                             {static_cast<std::uint8_t>(profile->level >= 15)},
+                             "cached_pvp_unlocked") +
                          "\",\"numPetals\":\"" +
                          wave::wire::signed_cache(wave::store::unlocked_main_slots(profile->level),
                                                   "cached_num_petals") +
@@ -298,6 +324,28 @@ class Connection : public std::enable_shared_from_this<Connection> {
 #ifdef WAVE_HOST_TESTING
     if (target == "/wave/test/state" && request.method() == http::verb::get) {
       respond(http::status::ok, {"application/json", wave::fixtures::fixture_state(*rooms_)});
+      return;
+    }
+    constexpr std::string_view scenario_path = "/wave/test/w5/";
+    if (target.starts_with(scenario_path) && request.method() == http::verb::post) {
+      const auto argument = target.substr(scenario_path.size());
+      const auto slash = argument.find('/');
+      const auto action = argument.substr(0, slash);
+      const auto raw =
+          slash == std::string_view::npos ? std::string_view{} : argument.substr(slash + 1);
+      std::uint64_t id = 0;
+      const auto [end, error] = std::from_chars(raw.data(), raw.data() + raw.size(), id);
+      bool accepted = false;
+      if (error == std::errc{} && end == raw.data() + raw.size()) {
+        for (const auto& [code, room] : rooms_->rooms()) {
+          if (room.match && wave::sim::FixtureAccess::scenario(*room.match, action, {id})) {
+            accepted = true;
+            break;
+          }
+        }
+      }
+      respond(accepted ? http::status::ok : http::status::bad_request,
+              {"application/json", wave::fixtures::fixture_state(*rooms_)});
       return;
     }
     constexpr std::string_view step_path = "/wave/test/step/";
@@ -325,6 +373,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
     using wave::sim::Biome;
     const auto biome = target == "/wave/socket"            ? std::optional{Biome::garden}
                        : target == "/wave/socket/rotating" ? std::optional{rooms_->rotating_biome()}
+                       : target == "/wave/socket/pvp"      ? std::optional{Biome::garden}
                                                            : std::nullopt;
     if (biome && ws::is_upgrade(request)) {
       if (!policy_->origin_allowed(request[http::field::origin]) || buffer_.size() != 0) {
@@ -338,7 +387,9 @@ class Connection : public std::enable_shared_from_this<Connection> {
       }
       reserved_ = true;
       ++policy_->sockets;
-      session_.emplace(*rooms_, ++next_connection_id_, *biome);
+      session_.emplace(*rooms_, ++next_connection_id_, *biome,
+                       target == "/wave/socket/pvp" ? wave::sim::Mode::pvp
+                                                    : wave::sim::Mode::waves);
       socket_.next_layer().expires_never();
       socket_.set_option(
           ws::stream_base::timeout{std::chrono::seconds(5), std::chrono::seconds(30), true});
@@ -528,6 +579,7 @@ class Host {
       wave::store::Options options;
 #ifdef WAVE_HOST_DEVELOPMENT
       options.allow_debug_inventory = true;
+      options.allow_debug_progress = true;
 #endif
 #ifdef WAVE_HOST_TESTING
       if (craft_roll) {

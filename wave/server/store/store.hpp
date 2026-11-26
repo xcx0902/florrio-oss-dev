@@ -84,6 +84,12 @@ struct CraftRequest {
   std::uint8_t highest_output_rarity = 5;
 };
 
+struct DebugProgressRequest {
+  Count xp = 0;
+  std::uint32_t level = 1;
+  std::array<std::uint32_t, 3> highest_waves{};  // Garden, Desert, Ocean.
+};
+
 struct CraftSummary {
   std::uint32_t attempts = 0;
   std::uint32_t successes = 0;
@@ -144,6 +150,7 @@ struct Options {
   int busy_timeout_ms = 5000;
   bool allow_test_seed = false;
   bool allow_debug_inventory = false;  // Enabled only by the dedicated development host.
+  bool allow_debug_progress = false;
   // Uniform independent 32-bit words. Empty selects OS entropy. Called only
   // for new craft attempts, never for replay or guest credentials.
   std::function<std::uint32_t()> random_word;
@@ -192,6 +199,10 @@ class Store {
   // Exact owned count, including equipment. Excess equipped copies are removed
   // in slot order (main before reserve); all other profile fields are preserved.
   [[nodiscard]] Result debug_set_inventory(std::string_view token, const Command&, Item, Count);
+  // XP and level must agree with the dated table. Lowering level clears locked
+  // equipment slots without removing owned copies; wave records are exact values.
+  [[nodiscard]] Result debug_set_progress(std::string_view token, const Command&,
+                                          const DebugProgressRequest&);
   // Disabled by default; no production handouts or guest-name fixture heuristics.
   [[nodiscard]] Profile seed_for_testing(std::string_view token, const TestSeed&);
   [[nodiscard]] int schema_version();

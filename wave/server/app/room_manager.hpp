@@ -15,7 +15,12 @@
 
 namespace wave::app {
 
-enum class JoinResult { joined, unavailable, full, started };
+enum class JoinResult {
+  joined,
+  unavailable,
+  full,
+  started
+};
 
 struct Member {
   sim::PlayerId id;
@@ -26,6 +31,7 @@ struct Member {
   bool connected = false;
   bool ready = false;
   sim::Biome biome = sim::Biome::garden;
+  sim::Mode mode = sim::Mode::waves;
   std::optional<store::Profile> profile;
   std::deque<std::pair<std::uint64_t, store::Result>> craft_results;
   std::uint64_t craft_sequence = 0;
@@ -45,6 +51,7 @@ struct Room {
   std::uint64_t version = 0;
   bool private_room = true;
   sim::Biome biome = sim::Biome::garden;
+  sim::Mode mode = sim::Mode::waves;
   std::vector<std::string> members;
   std::unique_ptr<sim::Match> match;
   struct Hit {
@@ -67,6 +74,7 @@ struct Room {
     std::uint64_t serial;
     sim::Tick available_tick;
     bool claimed = false;
+    std::uint32_t area = 0;
   };
   std::deque<Drop> drops;
   struct Pickup {
@@ -81,6 +89,7 @@ struct Room {
   // Independent of the process-local MatchId: durable reward keys never repeat
   // when a host restarts with match number one again.
   std::string economy_id;
+  std::mt19937 loot_rng;
 };
 
 // Owned by the single Asio executor. A room advances once per host tick,
@@ -94,7 +103,7 @@ class RoomManager {
                        sim::Biome rotating_biome = sim::Biome::desert, RoomLimits limits = {});
   ~RoomManager();
   Member& admit(std::string_view token, std::uint64_t connection,
-                sim::Biome biome = sim::Biome::garden);
+                sim::Biome biome = sim::Biome::garden, sim::Mode mode = sim::Mode::waves);
   bool active(std::string_view token, std::uint64_t connection) const;
   void disconnect(std::string_view token, std::uint64_t connection);
   // Only unreferenced, disconnected members can be evicted. Durable profiles
@@ -115,6 +124,9 @@ class RoomManager {
                        bool admit = true);
   bool debug_inventory(std::string token, store::Command command, store::Item item,
                        store::Count count, std::function<void(store::Result)> callback);
+  bool debug_progress(std::string token, store::Command command,
+                      store::DebugProgressRequest request,
+                      std::function<void(store::Result)> callback);
   bool wait_storage(std::chrono::milliseconds timeout = std::chrono::seconds(5));
   // Shutdown barrier: no deadline for slow successful I/O. Throws after eight
   // failed attempts on one job, retaining pending work for an explicit retry.
@@ -144,6 +156,7 @@ class RoomManager {
   bool add_player(const Member& member, sim::Match& match, std::size_t seat) const;
   bool find_public(Member& member);
   bool join_running_public(Member& member);
+  bool join_pvp(Member& member);
   bool economy_command(Member&, const wire::ReliableAction&, std::optional<sim::LifeId>,
                        std::string key);
   void apply_profile(const store::Profile&);

@@ -20,8 +20,10 @@ void validate(const Rules& rules) {
       rules.arena_radius == 0 || !valid_body(rules.player) || !nonnegative(rules.orbit_radius) ||
       !nonnegative(rules.orbit_rad_per_second) || !nonnegative(rules.knockback_retention) ||
       rules.knockback_retention > 1 || !nonnegative(rules.contact_knockback_speed) ||
-      !nonnegative(rules.special_chance) || rules.special_chance > 1 || rules.waves.empty() ||
-      rules.spawn_attempts == 0 || rules.spawn_points.empty() ||
+      !nonnegative(rules.ant_hole_radius) || rules.ant_hole_radius == 0 ||
+      rules.ant_hole_duration.count() <= 0 || rules.pvp_spawn_interval.count() <= 0 ||
+      rules.pvp_mob_limit == 0 || !nonnegative(rules.special_chance) || rules.special_chance > 1 ||
+      rules.waves.empty() || rules.spawn_attempts == 0 || rules.spawn_points.empty() ||
       rules.spawn_points.size() > std::mt19937::max() ||
       !std::ranges::all_of(rules.spawn_points, &Vec2::finite)) {
     throw std::invalid_argument("invalid Wave scenario settings");
@@ -70,7 +72,7 @@ void validate(const Rules& rules) {
 
 Match::Match(MatchId id, std::uint32_t seed, Rules rules, std::size_t opening_index)
     : id_(id), seed_(seed), rules_(std::move(rules)), entities_(id), rng_(seed),
-      wave_index_(opening_index) {
+      wave_index_(opening_index), arena_radius_(rules_.arena_radius) {
   if (id.value == 0) {
     throw std::invalid_argument("Wave match identity must be nonzero");
   }
@@ -114,18 +116,32 @@ Tick Match::reload_ticks(Petal kind, Rarity rarity) const {
 }
 
 std::optional<std::uint32_t> Match::late_join_wave(PlayerId id) const {
-  if (!wave_.number || phase_ == Phase::ended ||
+  if ((rules_.mode != Mode::pvp && !wave_.number) || phase_ == Phase::ended ||
       std::ranges::any_of(players_, [id](const Player& player) { return player.view.id == id; }) ||
-      std::ranges::none_of(players_, [](const Player& player) {
-        return player.view.connected && player.view.state == LifeState::alive;
-      })) {
+      (rules_.mode != Mode::pvp && std::ranges::none_of(players_, [](const Player& player) {
+         return player.view.connected && player.view.state == LifeState::alive;
+       }))) {
     return std::nullopt;
   }
-  return wave_.number;
+  return rules_.mode == Mode::pvp ? 1 : wave_.number;
 }
 
 bool Match::add_player(PlayerId id, Vec2 start, std::vector<Petal> loadout,
                        std::vector<Rarity> rarities) {
+  // Continue and a new Ready can arrive before the next simulation tick. Reuse
+  // the same public PvP field after an acknowledged, permanent departure.
+  const bool departing = std::ranges::any_of(commands_, [id](const Command& command) {
+    const auto* departure = std::get_if<Departure>(&command);
+    return departure && departure->player == id;
+  });
+  if (const auto* previous = player(id); previous && rules_.mode == Mode::pvp &&
+                                         previous->view.state == LifeState::ended && departing) {
+    std::erase_if(players_, [id](const Player& p) { return p.view.id == id; });
+    std::erase_if(commands_, [id](const Command& command) {
+      const auto* departure = std::get_if<Departure>(&command);
+      return departure && departure->player == id;
+    });
+  }
   if (id.value == 0 || (tick_ ? !late_join_wave(id) : player(id) != nullptr) || !start.finite() ||
       !valid_loadout(loadout, rarities)) {
     return false;
@@ -141,7 +157,7 @@ bool Match::add_player(PlayerId id, Vec2 start, std::vector<Petal> loadout,
     rarities.resize(entry.view.loadout.size(), Rarity::common);
   }
   entry.view.loadout_rarities = std::move(rarities);
-  entry.spawn = clamp_center(start, rules_.arena_radius, rules_.player.radius);
+  entry.spawn = clamp_center(start, arena_radius_, rules_.player.radius);
   players_.push_back(std::move(entry));
   if (tick_) {
     spawn_player(players_.back());
@@ -317,7 +333,7 @@ void Match::apply_commands() {
 
 EntityId Match::add_entity(EntityView view, BodyRules body) {
   if (!view.ground_web) {
-    view.position = clamp_center(view.position, rules_.arena_radius, body.radius);
+    view.position = clamp_center(view.position, area_radius(view.area), body.radius);
   }
   view.radius = body.radius;
   view.health = view.max_health = body.health;
@@ -331,9 +347,11 @@ EntityId Match::add_entity(EntityView view, BodyRules body) {
 void Match::spawn_player(Player& entry) {
   entry.attack = entry.defend = false;
   ++entry.view.life.generation;
+  entry.view.life_start_generation = entry.view.life.generation;
   EntityView body;
   body.group = Group::player;
-  body.faction = Faction::team;
+  body.faction = player_faction(entry.view.id);
+  body.area = entry.view.area;
   body.owner = entry.view.life;
   body.position = entry.spawn;
   auto player_body = rules_.player;
@@ -347,6 +365,7 @@ void Match::spawn_player(Player& entry) {
   entry.view.state = LifeState::alive;
   entry.view.death_position.reset();
   entry.view.killer.reset();
+  entry.view.killer_player.reset();
   std::ranges::fill(entry.petal_ready, tick_);
   emit(LifeChange{entry.view.life, entry.view.body, LifeState::alive,
                   entities_.get(*entry.view.body)->view.position});
@@ -368,7 +387,8 @@ void Match::refresh_petals() {
       }
       EntityView petal;
       petal.group = Group::petal;
-      petal.faction = Faction::team;
+      petal.faction = player_faction(entry.view.id);
+      petal.area = entry.view.area;
       petal.petal = entry.view.loadout[index];
       petal.owner = entry.view.life;
       petal.anchor = entry.view.body;
@@ -438,6 +458,14 @@ bool Match::step() {
   }
   events_.clear();
   apply_commands();
+  if (phase_ == Phase::waiting && rules_.mode == Mode::pvp) {
+    for (auto& entry : players_) {
+      if (entry.view.connected && entry.view.state == LifeState::waiting) {
+        spawn_player(entry);
+      }
+    }
+    phase_ = Phase::clearing;
+  }
   if (phase_ == Phase::waiting) {
     const bool opening = wave_.number == 0;
     if (opening) {
@@ -456,7 +484,23 @@ bool Match::step() {
   }
   refresh_petals();
   refresh_passives();
-  spawn_due();
+  const bool paused = main_paused();
+  if (rules_.mode == Mode::pvp) {
+    update_pvp();
+  } else if (paused) {
+    ++wave_.start_tick;
+    ++wave_.deadline_tick;
+    if (wave_.spawn_complete_tick) {
+      ++*wave_.spawn_complete_tick;
+    }
+    for (auto& slot : wave_.plan) {
+      if (slot.state == SpawnState::pending) {
+        ++slot.due_tick;
+      }
+    }
+  } else {
+    spawn_due();
+  }
   move_entities();
   constrain_segments();
   update_mob_actions();
@@ -468,7 +512,7 @@ bool Match::step() {
   update_nests();
   finish_projectiles();
   reap_deaths();
-  resolve_cleared_nests();
+  update_ant_holes();
   constrain_segments();
   update_orbits();
   adjudicate();
@@ -483,7 +527,7 @@ MatchView Match::view() const {
       .next_tick = tick_,
       .step = rules_.timing.step,
       .broadcast_interval = rules_.timing.broadcast_interval,
-      .arena_radius = rules_.arena_radius,
+      .arena_radius = arena_radius_,
       .biome = rules_.biome,
       .phase = phase_,
       .wave = wave_,
@@ -491,6 +535,8 @@ MatchView Match::view() const {
       .players = {},
       .entities = {},
   };
+  view.mode = rules_.mode;
+  view.ant_holes = ant_holes_;
   for (const auto& entry : players_) {
     view.players.push_back(entry.view);
   }

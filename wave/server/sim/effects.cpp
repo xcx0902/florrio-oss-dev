@@ -41,10 +41,14 @@ void Match::refresh_passives() {
                                 std::chrono::duration<double>(rules_.timing.step).count()});
       }
     }
+    if (rules_.mode == Mode::pvp) {
+      owner.view.pickup_multiplier = 1;
+    }
     body.rules.speed_per_second = rules_.player.speed_per_second * speed;
     body.rules.contact_damage = damage;
     body.view.radius = rules_.player.radius * size;
-    body.view.position = clamp_center(body.view.position, rules_.arena_radius, body.view.radius);
+    body.view.position =
+        clamp_center(body.view.position, area_radius(body.view.area), body.view.radius);
   }
 }
 
@@ -57,7 +61,7 @@ void Match::chain_attack(EntityId first, const DamageSource& source, double dama
   for (unsigned hop = 0; current && hop <= bounces; ++hop) {
     const auto* hit = entities_.get(*current);
     if (!hit || hit->view.group == Group::petal || hit->view.health <= 0 ||
-        hit->view.faction == source.faction) {
+        (emitter && hit->view.area != emitter->view.area) || hit->view.faction == source.faction) {
       break;
     }
     const auto intended = *current;
@@ -75,7 +79,7 @@ void Match::chain_attack(EntityId first, const DamageSource& source, double dama
     }
     auto& struck = *entities_.get(*current);
     if (from && *from != struck.view.position) {
-      emit(LightningArc{*from, struck.view.position});
+      emit(LightningArc{*from, struck.view.position, struck.view.area});
     }
     from = struck.view.position;
     struck.stun_until = tick_ + ticks(rules_, .1);
@@ -86,7 +90,8 @@ void Match::chain_attack(EntityId first, const DamageSource& source, double dama
     double nearest = range;
     for (const auto slot : entities_.active()) {
       const auto& target = entities_.at(slot).view;
-      if (target.faction == source.faction || target.health <= 0 || target.group == Group::petal ||
+      if (target.area != struck.view.area || target.faction == source.faction ||
+          target.health <= 0 || target.group == Group::petal ||
           std::ranges::find(visited, target.id) != visited.end()) {
         continue;
       }
@@ -199,8 +204,9 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
             body.mob == Mob::ant_hole) {
           for (const auto slot : entities_.active()) {
             auto& ally = entities_.at(slot);
-            if (ally.view.mob == Mob::worker_ant && ally.view.faction == body.faction &&
-                ally.view.health > 0 && (ally.view.position - body.position).length() <= 60) {
+            if (ally.view.area == body.area && ally.view.mob == Mob::worker_ant &&
+                ally.view.faction == body.faction && ally.view.health > 0 &&
+                (ally.view.position - body.position).length() <= 60) {
               ally.provoked = true;
               ally.target = attacker;
             }
@@ -335,8 +341,8 @@ void Match::update_special_effects() {
       double nearest = p.mechanics.range;
       for (const auto candidate : entities_.active()) {
         const auto& t = entities_.at(candidate).view;
-        if (t.group != Group::player || t.faction != e->view.faction || t.health <= 0 ||
-            t.shield >= p.mechanics.shield) {
+        if (t.area != e->view.area || t.group != Group::player || t.faction != e->view.faction ||
+            t.health <= 0 || t.shield >= p.mechanics.shield) {
           continue;
         }
         const auto distance = (t.position - origin).length();
@@ -354,9 +360,11 @@ void Match::update_special_effects() {
         impacts_.push_back(hit);
       }
     } else if (p.effect == catalog::Effect::yggdrasil) {
-      const bool waiting = std::ranges::any_of(players_, [](const Player& p) {
-        return p.view.connected && p.view.state == LifeState::waiting;
-      });
+      const bool waiting =
+          rules_.mode != Mode::pvp && std::ranges::any_of(players_, [&](const Player& p) {
+            return p.view.area == e->view.area && p.view.connected &&
+                   p.view.state == LifeState::waiting;
+          });
       if (!waiting) {
         e->held = false;
         continue;
@@ -369,7 +377,8 @@ void Match::update_special_effects() {
         continue;
       }
       for (auto& dead : players_) {
-        if (dead.view.connected && dead.view.state == LifeState::waiting) {
+        if (dead.view.area == e->view.area && dead.view.connected &&
+            dead.view.state == LifeState::waiting) {
           const auto position = e->view.position;
           consume_petal(target);
           const auto spawn = dead.spawn;
@@ -386,7 +395,7 @@ void Match::update_special_effects() {
       e->action_ready = tick_ + std::max<Tick>(1, delay);
       for (const auto candidate : entities_.active()) {
         auto& t = entities_.at(candidate);
-        if (t.view.group == Group::petal || t.view.health <= 0 ||
+        if (t.view.area != e->view.area || t.view.group == Group::petal || t.view.health <= 0 ||
             (t.view.position - e->view.position).length() > p.mechanics.area_radius) {
           continue;
         }

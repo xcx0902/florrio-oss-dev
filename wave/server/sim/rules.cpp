@@ -120,4 +120,52 @@ Rarity wave_rarity(std::uint32_t number, double roll) {
   return selected;
 }
 
+Rules pvp_rules() {
+  auto rules = scenario_rules(Biome::garden);
+  rules.mode = Mode::pvp;
+  rules.version = std::string(detail::w5_rules_version) + "+pvp";
+  rules.progressive_waves = false;
+  rules.special_chance = 0;
+  rules.lifecycle.respawn_next_wave = false;
+  rules.lifecycle.end_on_team_wipe = false;
+  rules.lifecycle.end_on_last_disconnect = false;
+  rules.pause_when_all_inside = false;
+  return rules;
+}
+
+std::array<std::uint8_t, 3> scene_background(Mode mode, Biome biome, std::optional<Mob> interior) {
+  const auto index = interior == Mob::ant_hole          ? 4u
+                     : interior == Mob::fire_ant_burrow ? 5u
+                     : mode == Mode::pvp                ? 3u
+                                                        : static_cast<unsigned>(biome);
+  return detail::w5_background_colors.at(index);
+}
+
+unsigned pvp_minimum_level() {
+  return detail::w5_pvp_minimum_level;
+}
+
+double pvp_arena_radius(std::size_t players) {
+  // Only the population dependency is historical; this curve is a dated remake setting.
+  return detail::w5_pvp_base_radius +
+         detail::w5_pvp_radius_per_sqrt_player * std::sqrt(double(players > 0 ? players - 1 : 0));
+}
+
+std::optional<Rarity> pvp_basic_rarity(std::uint64_t score) {
+  // Old Wiki gives approximate U/R/E bounds; the L bound is a remake setting.
+  if (score >= detail::w5_pvp_basic_thresholds[3]) {
+    return Rarity::legendary;
+  }
+  if (score >= detail::w5_pvp_basic_thresholds[2]) {
+    return Rarity::epic;
+  }
+  if (score >= detail::w5_pvp_basic_thresholds[1]) {
+    return Rarity::rare;
+  }
+  if (score >= detail::w5_pvp_basic_thresholds[0]) {
+    return Rarity::unusual;
+  }
+  return std::nullopt;
+}
+
 }  // namespace wave::sim

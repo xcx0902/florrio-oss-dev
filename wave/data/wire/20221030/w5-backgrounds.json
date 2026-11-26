@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "snapshotSha256": "68094577a0ac1254fcffedbb46c0181d90893bd063e3eafa76489bba2776e7b0",
+  "observedDate": "2026-11-26",
+  "colors": {
+    "garden": [30, 167, 97],
+    "desert": [222, 207, 124],
+    "ocean": [87, 133, 186],
+    "pvp": [77, 94, 86],
+    "antHole": [181, 133, 0],
+    "fireAntBurrow": [181, 45, 0]
+  },
+  "observation": {
+    "mainFields": "Original client idle menu canvas, dominant background RGB for mode 0 / rotation 0, mode 1 / rotation 0 or 1, and mode 2. PvP static consumer $939 uses RGB 77,94,86.",
+    "interiors": "Original Ant Hole and Fire Ant Burrow outer disc fill styles #b58500 / #b52d00. Interior background adopts that corresponding disc color as requested.",
+    "rawReports": ["reports/wave/W5/menu-colors.json", "reports/wave/W5/hole-colors.json"],
+    "oceanOverlay": {
+      "constructor": "original $3424 (WABT function 3782)",
+      "rgba": [50, 96, 168, 80],
+      "originalConstant": 1353211954,
+      "runtimeEdit": {
+        "offset": 2268863,
+        "before": "41b2c0a18505",
+        "after": "41b2c0a18500"
+      },
+      "reason": "Disable the native full-screen Ocean tint so the final visible main-field and interior backgrounds match the requested palette."
+    }
+  }
+}

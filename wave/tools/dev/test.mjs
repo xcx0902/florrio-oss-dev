@@ -17,12 +17,12 @@ const { values } = parseArgs({
       default:
         process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     },
-    'output-dir': { type: 'string', default: path.resolve(root, '../reports/wave/DEV-inventory') },
+    'output-dir': { type: 'string', default: path.resolve(root, '../reports/wave/DEV') },
   },
 });
 const output = path.resolve(values['output-dir']);
 await mkdir(output, { recursive: true });
-const temporary = await mkdtemp(path.join(tmpdir(), 'wave-dev-inventory-'));
+const temporary = await mkdtemp(path.join(tmpdir(), 'wave-dev-'));
 const database = path.join(temporary, 'save.sqlite3');
 const report = {
   status: 'failed',
@@ -73,15 +73,14 @@ try {
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(host.url);
   await page.waitForFunction(() => window.Module?.asm?.Jf);
-  await page.getByRole('button', { name: '库存调试 · DEV' }).click();
+  await page.getByRole('button', { name: '存档调试 · DEV' }).click();
   const panel = page.getByRole('dialog');
   const save = panel.getByRole('button', { name: '保存并刷新' });
   await save.waitFor();
-  await page.waitForFunction(
-    () => !document.querySelector('#wave-dev-inventory [type="submit"]').disabled,
-  );
+  await page.waitForFunction(() => !document.querySelector('#wave-dev [type="submit"]').disabled);
   assert.equal(await panel.locator('select[name="kind"] option').count(), 45);
   const api = '/wave/dev/inventory/' + seeded.token;
+  const progressApi = '/wave/dev/progress/' + seeded.token;
   const current = () => page.evaluate(async (api) => (await fetch(api)).json(), api);
   const initial = await current();
   const bad = await page.evaluate(
@@ -126,6 +125,59 @@ try {
   });
   assert.equal(forbidden.status, 403);
   report.cases.validation = { status: 'passed', ...bad, foreignOrigin: forbidden.status };
+  const badProgress = await page.evaluate(
+    async ({ api, version }) => {
+      const params = {
+        xp: '100',
+        level: '2',
+        garden: '3',
+        desert: '4',
+        ocean: '5',
+        version,
+        key: 'bad-progress',
+      };
+      const post = async (changes) =>
+        (
+          await fetch(api, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ ...params, ...changes }),
+          })
+        ).status;
+      return {
+        negative: await post({ xp: '-1' }),
+        overflow: await post({ xp: '9223372036854775808' }),
+        mismatch: await post({ level: '1' }),
+        levelCap: await post({ level: '256' }),
+        waveOverflow: await post({ ocean: '2147483648' }),
+        stale: await post({ version: '0' }),
+      };
+    },
+    { api: progressApi, version: initial.version },
+  );
+  assert.deepEqual(badProgress, {
+    negative: 400,
+    overflow: 400,
+    mismatch: 400,
+    levelCap: 400,
+    waveOverflow: 400,
+    stale: 409,
+  });
+  assert.deepEqual(await current(), initial);
+  const forbiddenProgress = await fetch(host.url + progressApi.slice(1), {
+    method: 'POST',
+    headers: {
+      Origin: 'https://example.invalid',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'xp=0&level=1&garden=0&desert=0&ocean=0&version=0&key=forbidden',
+  });
+  assert.equal(forbiddenProgress.status, 403);
+  report.cases.progressValidation = {
+    status: 'passed',
+    ...badProgress,
+    foreignOrigin: forbiddenProgress.status,
+  };
 
   async function edit(kind, rarity, count) {
     await panel.locator('[name="kind"]').selectOption(String(kind));
@@ -137,9 +189,7 @@ try {
     assert.equal(await input.inputValue(), String(count));
     await Promise.all([page.waitForEvent('load'), save.click()]);
     await page.waitForFunction(() => window.Module?.asm?.Jf);
-    await page.waitForFunction(
-      () => !document.querySelector('#wave-dev-inventory [type="submit"]').disabled,
-    );
+    await page.waitForFunction(() => !document.querySelector('#wave-dev [type="submit"]').disabled);
   }
   await edit(5, 5, 500);
   let saved = await current();
@@ -183,9 +233,7 @@ try {
   await panel.getByRole('button', { name: '编辑 Mythic Rose', exact: true }).click();
   await panel.getByRole('button', { name: '数量设为 0' }).click();
   await Promise.all([page.waitForEvent('load'), save.click()]);
-  await page.waitForFunction(
-    () => !document.querySelector('#wave-dev-inventory [type="submit"]').disabled,
-  );
+  await page.waitForFunction(() => !document.querySelector('#wave-dev [type="submit"]').disabled);
   assert.ok(!(await current()).inventory.some(([k, r]) => k === 5 && r === 5));
   report.cases.remove = { status: 'passed' };
   const final = JSON.parse(
@@ -197,6 +245,71 @@ try {
   assert.equal(final.highestWave, seeded.highestWave);
   assert.deepEqual(final.discoveries, seeded.discoveries);
   assert.equal(final.token, seeded.token);
+  const inventoryBeforeProgress = (await current()).inventory;
+  const progressForm = panel.locator('[data-progress]');
+  async function saveProgress() {
+    await Promise.all([
+      page.waitForEvent('load'),
+      progressForm.getByRole('button', { name: '保存进度并刷新' }).click(),
+    ]);
+    await page.waitForFunction(() => window.Module?.asm?.Jf);
+    await page.waitForFunction(
+      () => !document.querySelector('[data-progress] [type="submit"]').disabled,
+    );
+  }
+  await progressForm.locator('[name="xp"]').fill('900');
+  assert.equal(await progressForm.locator('[name="level"]').inputValue(), '4');
+  await progressForm.locator('[name="garden"]').fill('12');
+  await progressForm.locator('[name="desert"]').fill('33');
+  await progressForm.locator('[name="ocean"]').fill('61');
+  await saveProgress();
+  saved = await current();
+  assert.equal(saved.xp, '900');
+  assert.equal(saved.level, 4);
+  assert.deepEqual(saved.highestWaves, [12, 33, 61]);
+  assert.deepEqual(saved.inventory, inventoryBeforeProgress);
+  await progressForm.locator('[name="level"]').fill('15');
+  assert.equal(await progressForm.locator('[name="xp"]').inputValue(), '19600');
+  await saveProgress();
+  assert.equal((await current()).level, 15);
+  assert.equal((await current()).xp, '19600');
+  const maximumXp = '9223372036854775807';
+  await progressForm.locator('[name="xp"]').fill(maximumXp);
+  assert.equal(await progressForm.locator('[name="level"]').inputValue(), '255');
+  await saveProgress();
+  assert.equal((await current()).xp, maximumXp);
+  assert.equal(await progressForm.locator('[name="xp"]').inputValue(), maximumXp);
+  await progressForm.locator('[name="level"]').fill('1');
+  assert.equal(await progressForm.locator('[name="xp"]').inputValue(), '0');
+  await progressForm.locator('[name="garden"]').fill('0');
+  await progressForm.locator('[name="desert"]').fill('2');
+  await progressForm.locator('[name="ocean"]').fill('1');
+  await saveProgress();
+  saved = await current();
+  assert.equal(saved.xp, '0');
+  assert.equal(saved.level, 1);
+  assert.deepEqual(saved.highestWaves, [0, 2, 1]);
+  const finalProgress = JSON.parse(
+    execFileSync(path.join(values['native-dir'], 'wave_w3_seed'), [database, seeded.token], {
+      encoding: 'utf8',
+    }),
+  );
+  assert.equal(finalProgress.xp, 0);
+  assert.equal(finalProgress.level, 1);
+  assert.equal(finalProgress.highestWave, 2);
+  assert.deepEqual(finalProgress.highestWaves, [0, 2, 1]);
+  assert.deepEqual(finalProgress.inventory, final.inventory);
+  assert.deepEqual(finalProgress.discoveries, final.discoveries);
+  report.cases.progress = {
+    status: 'passed',
+    xp: saved.xp,
+    level: saved.level,
+    highestWaves: saved.highestWaves,
+    maximumXp,
+  };
+  await page.screenshot({ path: path.join(output, 'progress-final.png') });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: path.join(output, 'progress-mobile.png') });
   assert.deepEqual(errors, []);
   await page.screenshot({ path: path.join(output, 'inventory-final.png') });
   await context.close();
@@ -208,11 +321,13 @@ try {
     database,
   });
   const html = await (await fetch(host.url)).text();
-  assert.ok(!html.includes('dev-inventory'));
-  for (const path of ['dev-inventory.js', 'dev-inventory.css', api.slice(1)]) {
+  assert.ok(!html.includes('src="dev.js"'));
+  assert.ok(!html.includes('href="dev.css"'));
+  for (const path of ['dev.js', 'dev.css', api.slice(1), progressApi.slice(1)]) {
     assert.equal((await fetch(host.url + path)).status, 404);
   }
   assert.equal((await fetch(host.url + api.slice(1), { method: 'POST' })).status, 400);
+  assert.equal((await fetch(host.url + progressApi.slice(1), { method: 'POST' })).status, 400);
   report.cases.productionIsolation = { status: 'passed' };
   report.native = await Promise.all(
     ['wave_host', 'wave_host_dev'].map(async (file) => ({
@@ -224,7 +339,7 @@ try {
   );
   report.status = 'passed';
   console.log(
-    'PASS development inventory: original UI, exact counts, equipment, durable save and production isolation',
+    'PASS development profile: inventory, XP/level sync, biome records, durable save and production isolation',
   );
 } catch (error) {
   report.error = error.stack;
@@ -233,6 +348,6 @@ try {
 } finally {
   await browser?.close();
   await host?.stop();
-  await writeFile(path.join(output, 'inventory.json'), JSON.stringify(report, null, 2) + '\n');
+  await writeFile(path.join(output, 'dev.json'), JSON.stringify(report, null, 2) + '\n');
   await rm(temporary, { recursive: true, force: true });
 }

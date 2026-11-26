@@ -87,12 +87,12 @@ void Match::open_wave(std::size_t index, Tick start) {
 std::optional<Vec2> Match::spawn_point(double radius) {
   const auto start = choose(rules_.spawn_points.size(), DrawPurpose::spawn_point);
   for (std::size_t offset = 0; offset < rules_.spawn_points.size(); ++offset) {
-    const auto candidate =
-        clamp_center(rules_.spawn_points[(start + offset) % rules_.spawn_points.size()],
-                     rules_.arena_radius, radius);
+    const auto candidate = clamp_center(
+        rules_.spawn_points[(start + offset) % rules_.spawn_points.size()], arena_radius_, radius);
     const bool blocked = std::ranges::any_of(entities_.active(), [&](std::uint32_t slot) {
       const auto& body = entities_.at(slot).view;
-      return body.group != Group::petal && overlaps(candidate, radius, body.position, body.radius);
+      return body.area == 0 && body.group != Group::petal &&
+             overlaps(candidate, radius, body.position, body.radius);
     });
     if (!blocked) {
       return candidate;
@@ -211,14 +211,14 @@ void Match::adjudicate() {
     transition(TransitionReason::team_wipe, false);
   } else if (!connected && rules_.lifecycle.end_on_last_disconnect) {
     transition(TransitionReason::last_disconnect, false);
-  } else if (phase_ == Phase::clearing) {
+  } else if (rules_.mode != Mode::pvp && !main_paused() && phase_ == Phase::clearing) {
     const bool next = wave_index_ + 1 < rules_.waves.size() ||
                       (rules_.progressive_waves && wave_.number < max_wave_number);
     auto remaining = wave_.counts.alive;
     if (rules_.progressive_waves) {
       remaining = std::ranges::count_if(entities_.active(), [this](auto slot) {
         const auto& mob = entities_.at(slot).view;
-        return mob.faction == Faction::hostile &&
+        return mob.area == 0 && mob.faction == Faction::hostile &&
                (mob.group == Group::main_mob || mob.group == Group::residual);
       });
     }

@@ -14,20 +14,16 @@ struct Interaction {
   bool heal;
 };
 
-// Rows are source faction, columns are target faction.
-constexpr Interaction pve[2][2]{
-    {{true, false, true}, {true, true, false}},
-    {{true, true, false}, {true, false, true}},
-};
-
 const Interaction& interaction(Faction source, Faction target) {
-  return pve[static_cast<std::size_t>(source)][static_cast<std::size_t>(target)];
+  static constexpr Interaction friendly{true, false, true}, enemy{true, true, false};
+  return source == target ? friendly : enemy;
 }
 
 constexpr auto heal_travel_time = std::chrono::milliseconds(225);
 
 bool can_receive_healing(const detail::Entity& source, const detail::Entity& target, Tick tick) {
-  return interaction(source.view.faction, target.view.faction).heal && target.view.health > 0 &&
+  return interaction(source.view.faction, target.view.faction).heal &&
+         source.view.area == target.view.area && target.view.health > 0 &&
          target.view.health < target.view.max_health && target.heal_block_until <= tick;
 }
 
@@ -35,7 +31,8 @@ double dot(Vec2 a, Vec2 b) {
   return a.x * b.x + a.y * b.y;
 }
 
-void rebound_player_mob(detail::Entity& player, detail::Entity& mob, const Rules& rules) {
+void rebound_player_mob(detail::Entity& player, detail::Entity& mob, const Rules& rules,
+                        double arena_radius) {
   auto& flower = player.view;
   auto& creature = mob.view;
   const auto delta = flower.position - creature.position;
@@ -46,7 +43,7 @@ void rebound_player_mob(detail::Entity& player, detail::Entity& mob, const Rules
   }
   const auto normal = distance > 0 ? delta * (1 / distance) : Vec2{1, 0};
   const auto space_to_wall = [&](const EntityView& body, Vec2 away) {
-    const double limit = std::max(0., rules.arena_radius - body.radius);
+    const double limit = std::max(0., arena_radius - body.radius);
     const double radial = dot(body.position, away);
     const double remaining = std::max(0., limit * limit - dot(body.position, body.position));
     return std::sqrt(radial * radial + remaining) - radial;
@@ -63,9 +60,9 @@ void rebound_player_mob(detail::Entity& player, detail::Entity& mob, const Rules
       std::min(player_space, std::max(depth * player_share, depth - mob_space));
   const double mob_shift = std::min(mob_space, depth - player_shift);
   flower.position =
-      clamp_center(flower.position + normal * player_shift, rules.arena_radius, flower.radius);
+      clamp_center(flower.position + normal * player_shift, arena_radius, flower.radius);
   creature.position =
-      clamp_center(creature.position - normal * mob_shift, rules.arena_radius, creature.radius);
+      clamp_center(creature.position - normal * mob_shift, arena_radius, creature.radius);
 
   // Give the available body the full rebound when the other cannot move away.
   constexpr double wall_slop = 1e-6;
@@ -163,8 +160,9 @@ void Match::move_entities() {
     slow *= movement_slow;
     for (const auto area_slot : active) {
       const auto& area = entities_.at(area_slot);
-      if (!area.view.ground_web || area.view.faction == body.faction ||
-          body.group == Group::petal || body.mob == Mob::spider) {
+      if (!area.view.ground_web || area.view.area != body.area ||
+          area.view.faction == body.faction || body.group == Group::petal ||
+          body.mob == Mob::spider) {
         continue;
       }
       const auto& mechanics = rules_.catalog.petal(Petal::web, area.view.rarity)->mechanics;
@@ -199,7 +197,7 @@ void Match::move_entities() {
       displacement = displacement * (entity.range_left / distance);
     }
     const auto next = body.position + displacement;
-    const auto clamped = clamp_center(next, rules_.arena_radius, body.radius);
+    const auto clamped = clamp_center(next, area_radius(body.area), body.radius);
     if (next != clamped) {
       const double distance = clamped.length();
       if (distance == 0) {
@@ -599,8 +597,8 @@ void Match::resolve_contacts() {
     }
     if (definition && definition->effect == catalog::Effect::leaf && target.view.mob &&
         !source.healing && can_receive_healing(source, target, tick_)) {
-      source.healing = detail::HealingPetal{
-          target.view.id, tick_ + rules_.timing.ticks_ceil(heal_travel_time)};
+      source.healing =
+          detail::HealingPetal{target.view.id, tick_ + rules_.timing.ticks_ceil(heal_travel_time)};
       return;
     }
     if (pair.damage && definition && definition->effect == catalog::Effect::lightning &&
@@ -669,6 +667,17 @@ void Match::resolve_contacts() {
     auto& first = entities_.at(active[a]);
     for (std::size_t b = a + 1; b < active.size(); ++b) {
       auto& second = entities_.at(active[b]);
+      if (first.view.area != second.view.area) {
+        continue;
+      }
+      // Entrances have no collision response; contact is handled by the transfer system.
+      const auto portal = [](const EntityView& e) {
+        return e.rarity >= Rarity::rare &&
+               (e.mob == Mob::ant_hole || e.mob == Mob::fire_ant_burrow);
+      };
+      if (portal(first.view) || portal(second.view)) {
+        continue;
+      }
       const Vec2 delta = positions[b] - positions[a];
       const double radius = first.view.radius + second.view.radius;
       if (travel[a] != Vec2{} || travel[b] != Vec2{}) {
@@ -688,11 +697,11 @@ void Match::resolve_contacts() {
       const auto& pair = interaction(first.view.faction, second.view.faction);
       if (pair.push && pair.damage && rules_.contact_knockback_speed > 0) {
         if (first.view.group == Group::player && second.view.mob && !second.projectile) {
-          rebound_player_mob(first, second, rules_);
+          rebound_player_mob(first, second, rules_, area_radius(first.view.area));
           continue;
         }
         if (second.view.group == Group::player && first.view.mob && !first.projectile) {
-          rebound_player_mob(second, first, rules_);
+          rebound_player_mob(second, first, rules_, area_radius(second.view.area));
           continue;
         }
       }
@@ -712,13 +721,13 @@ void Match::resolve_contacts() {
         const Vec2 shift = normal * (depth / (move_first + move_second));
         const Vec2 impulse = normal * (pair.damage ? rules_.contact_knockback_speed : 0);
         if (move_first) {
-          first.view.position =
-              clamp_center(first.view.position - shift, rules_.arena_radius, first.view.radius);
+          first.view.position = clamp_center(first.view.position - shift,
+                                             area_radius(first.view.area), first.view.radius);
           first.knockback = first.knockback - impulse;
         }
         if (move_second) {
-          second.view.position =
-              clamp_center(second.view.position + shift, rules_.arena_radius, second.view.radius);
+          second.view.position = clamp_center(second.view.position + shift,
+                                              area_radius(second.view.area), second.view.radius);
           second.knockback += impulse;
         }
       }
@@ -803,10 +812,15 @@ void Match::reap_deaths() {
     }
   }
   std::vector<EntityId> dead;
+  std::unordered_map<std::uint64_t, std::uint64_t> defeated_scores;
   for (const auto slot : entities_.active()) {
     const auto& entity = entities_.at(slot).view;
     if (entity.health == 0) {
       dead.push_back(entity.id);
+      if (entity.group == Group::player && entity.owner) {
+        defeated_scores.emplace(entity.owner->player.value,
+                                player(entity.owner->player)->view.score);
+      }
     }
   }
   for (const auto id : dead) {
@@ -821,9 +835,6 @@ void Match::reap_deaths() {
     }
     auto body = entity->view;
     const auto source = entity->fatal_hit.value_or(DamageSource{});
-    if (body.mob == Mob::ant_hole && entity->spawn_count > 0) {
-      fallen_ant_holes_.push_back({id, body.rarity, body.position});
-    }
     if (entity->chain_kind && entity->chain_kind != Mob::leech) {
       const auto root = entity->root.value_or(id);
       std::optional<EntityId> successor;
@@ -891,24 +902,51 @@ void Match::reap_deaths() {
       }
     }
     std::optional<PlayerId> credit;
-    if (body.group == Group::main_mob && body.origin_wave == wave_.number) {
+    if (rules_.mode == Mode::waves && body.area == 0 && body.group == Group::main_mob &&
+        body.origin_wave == wave_.number) {
       --wave_.counts.alive;
       ++wave_.counts.defeated;
     }
-    if ((body.group == Group::main_mob || body.group == Group::residual) && source.owner &&
-        source.faction == Faction::team) {
-      if (auto* entry = player(source.owner->player)) {
+    const bool natural_summon = body.group == Group::summon && body.faction == Faction::hostile &&
+                                !body.owner && body.mob && entity->root;
+    if ((body.group == Group::main_mob || body.group == Group::residual || natural_summon) &&
+        source.owner && source.faction != Faction::hostile) {
+      if (auto* entry = player(source.owner->player);
+          entry && source.owner->match == entry->view.life.match &&
+          source.owner->generation >= entry->view.life_start_generation &&
+          source.owner->generation <= entry->view.life.generation) {
         ++entry->view.credited_defeats;
         credit = entry->view.id;
       }
     }
+    std::uint64_t victim_score = 0;
+    if (rules_.mode == Mode::pvp) {
+      auto* killer = source.owner ? player(source.owner->player) : nullptr;
+      if (body.group == Group::player) {
+        victim_score = defeated_scores.at(body.owner->player.value);
+      }
+      if (killer && source.owner == killer->view.life &&
+          (!body.owner || body.owner->player != killer->view.id)) {
+        const auto* mob = body.mob ? rules_.catalog.mob(*body.mob, body.rarity) : nullptr;
+        const auto points = body.group == Group::player ? victim_score
+                            : mob && (body.group == Group::main_mob ||
+                                      body.group == Group::residual || natural_summon)
+                                ? mob->xp
+                                : 0;
+        killer->view.score += std::min<std::uint64_t>(points, UINT32_MAX - killer->view.score);
+        if (body.group == Group::player) {
+          credit = killer->view.id;
+        }
+      }
+    }
     emit(Defeat{id, body.group, source, credit, body.mob, body.rarity, body.position,
-                body.origin_wave});
+                body.origin_wave, body.area, victim_score, natural_summon});
     if (body.group == Group::player) {
       auto& victim = *player(body.owner->player);
       victim.view.death_position = body.position;
       victim.view.killer = source.mob;
-      reap_player(victim, LifeState::waiting);
+      victim.view.killer_player = source.owner ? std::optional{source.owner->player} : std::nullopt;
+      reap_player(victim, rules_.mode == Mode::pvp ? LifeState::ended : LifeState::waiting);
     } else {
       if (body.group == Group::petal || entity->summon_origin == Petal::egg) {
         detach_petal(id);

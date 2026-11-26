@@ -18,8 +18,14 @@ target_link_libraries(wave_store PUBLIC SQLite::SQLite3 Threads::Threads)
 set_target_properties(wave_store PROPERTIES CXX_EXTENSIONS OFF)
 
 add_library(
-  wave_sim STATIC server/sim/combat.cpp server/sim/effects.cpp server/sim/mobs.cpp
-                  server/sim/match.cpp server/sim/rules.cpp server/sim/waves.cpp
+  wave_sim STATIC
+  server/sim/combat.cpp
+  server/sim/effects.cpp
+  server/sim/mobs.cpp
+  server/sim/match.cpp
+  server/sim/rules.cpp
+  server/sim/waves.cpp
+  server/sim/scenarios.cpp
 )
 add_dependencies(wave_sim wave_catalog_check)
 target_compile_features(wave_sim PUBLIC cxx_std_20)
@@ -58,15 +64,20 @@ endif()
 
 include(CTest)
 if(BUILD_TESTING)
+  add_executable(wave_w5_scenarios tests/native/w5_scenarios.cpp)
+  target_include_directories(wave_w5_scenarios PRIVATE tests "${CMAKE_CURRENT_BINARY_DIR}")
+  target_link_libraries(wave_w5_scenarios PRIVATE wave_wire)
+  add_test(NAME W5-scenarios COMMAND wave_w5_scenarios)
+  set_tests_properties(W5-scenarios PROPERTIES LABELS w5)
   add_executable(wave_test_capacity tests/native/capacity.cpp)
   target_include_directories(wave_test_capacity PRIVATE tests)
   target_link_libraries(wave_test_capacity PRIVATE wave_wire)
   add_test(NAME wave-capacity COMMAND wave_test_capacity)
   set_tests_properties(wave-capacity PROPERTIES LABELS "w2;capacity")
-  add_executable(wave_dev_inventory tests/native/dev_inventory.cpp)
-  target_link_libraries(wave_dev_inventory PRIVATE wave_wire)
-  add_test(NAME DEV-inventory COMMAND wave_dev_inventory)
-  set_tests_properties(DEV-inventory PROPERTIES LABELS dev)
+  add_executable(wave_dev tests/native/dev.cpp)
+  target_link_libraries(wave_dev PRIVATE wave_wire)
+  add_test(NAME DEV COMMAND wave_dev)
+  set_tests_properties(DEV PROPERTIES LABELS dev)
   add_executable(wave_w3_seed tests/native/w3_seed.cpp)
   target_link_libraries(wave_w3_seed PRIVATE wave_store)
   foreach(suite IN ITEMS catalog behaviors store economy wire)
@@ -94,7 +105,11 @@ if(BUILD_TESTING)
   target_link_libraries(wave_w4_squads PRIVATE wave_wire)
   add_test(NAME W4-squads COMMAND wave_w4_squads)
   set_tests_properties(W4-squads PROPERTIES LABELS w4)
-  set_property(TEST W3-economy wave-room_session APPEND PROPERTY LABELS w4)
+  set_property(
+    TEST W3-economy wave-room_session
+    APPEND
+    PROPERTY LABELS w4
+  )
   if(WAVE_BUILD_HOST)
     add_executable(wave_host_fixture server/net/host.cpp)
     target_compile_definitions(wave_host_fixture PRIVATE WAVE_HOST_TESTING=1)

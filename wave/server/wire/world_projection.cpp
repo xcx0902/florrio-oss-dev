@@ -13,9 +13,6 @@ namespace wave::wire {
 namespace {
 // Shared scale for world positions, collision radii, camera and arena.
 constexpr double world_scale = 5;
-// The Desert sand is sampled from the original recording in reports/wave/W0.
-constexpr std::array<std::array<std::uint8_t, 3>, 3> biome_colors{
-    {{30, 167, 97}, {211, 196, 113}, {53, 140, 195}}};
 
 struct Writer {
   Bytes bytes;
@@ -106,9 +103,11 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
   // $601 stores mode at world+60 and rotation at world+76. $939 uses
   // rotation parity for the native Desert/Ocean button; $441 caches it.
   Writer server;
-  server.byte(viewer.biome == sim::Biome::garden ? 0 : 1);
+  server.byte(viewer.mode == sim::Mode::pvp ? 2 : viewer.biome == sim::Biome::garden ? 0 : 1);
   // Distinct IDs let a fresh invite resolve its mode before receiving metadata.
-  server.text(viewer.biome == sim::Biome::garden ? "wavelocal" : "waverotation");
+  server.text(viewer.mode == sim::Mode::pvp        ? "wavepvp"
+              : viewer.biome == sim::Biome::garden ? "wavelocal"
+                                                   : "waverotation");
   server.integer(rooms.rotating_biome() == sim::Biome::ocean ? 1 : 0);
   out.record(8198, 0x2, server);
   const auto* room = rooms.room(viewer);
@@ -125,7 +124,13 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
   const auto player = view ? std::ranges::find(view->players, viewer.id, &sim::PlayerView::id)
                            : std::vector<sim::PlayerView>::const_iterator{};
   std::set<Key> live;
-  const auto visible = [](const sim::EntityView& e) {
+  std::set<Key> other_areas;
+  const auto area = view && player != view->players.end() ? player->area : 0;
+  const bool area_changed = area != area_;
+  const auto visible = [area](const sim::EntityView& e) {
+    if (e.area != area) {
+      return false;
+    }
     const auto* p = e.petal ? catalog::dated().petal(*e.petal, e.rarity) : nullptr;
     return !p || !p->mechanics.hidden;
   };
@@ -134,13 +139,16 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
   if (view && room) {
     for (const auto& pickup : room->pickups) {
       const Key key{match, UINT32_MAX, pickup.drop.serial};
-      if (now < pickup.started + app::Room::Pickup::duration && handles_.contains(key)) {
+      if (pickup.drop.area == area && now < pickup.started + app::Room::Pickup::duration &&
+          handles_.contains(key)) {
         pickups.push_back(&pickup);
         live.insert(key);
       }
     }
     for (const auto& drop : room->drops) {
-      drops.push_back(&drop);
+      if (drop.area == area) {
+        drops.push_back(&drop);
+      }
     }
     // Keep the nearest drops in the old client's bounded entity table.
     const std::size_t drop_limit = 512 - pickups.size();
@@ -161,6 +169,9 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
   }
   if (view) {
     for (const auto& e : view->entities) {
+      if (e.area != area) {
+        other_areas.emplace(e.id.match.value, e.id.slot, e.id.generation);
+      }
       if (!visible(e)) {
         continue;
       }
@@ -170,7 +181,8 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
   for (auto it = handles_.begin(); it != handles_.end();) {
     if (!live.contains(it->first)) {
       const auto cached = rendered_.find(it->first);
-      if (view && match == match_ && cached != rendered_.end()) {
+      if (view && match == match_ && !area_changed && !other_areas.contains(it->first) &&
+          cached != rendered_.end()) {
         auto& ghost = cached->second;
         if (!ghost.expires) {
           ghost.expires = now + std::chrono::milliseconds(400);
@@ -320,7 +332,11 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
       if (client_mob) {
         mask |= 0x100000;
         body.byte(*client_mob);
-        body.byte(e.faction == sim::Faction::team ? 1 : 0);  // Native yellow ally palette.
+        // PvP owns a faction per flower; only this viewer's summons are allies.
+        body.byte((view->mode == sim::Mode::waves && e.faction == sim::Faction::team) ||
+                          (e.owner && e.owner->player == viewer.id)
+                      ? 1
+                      : 0);
         body.byte(static_cast<std::uint8_t>(e.rarity));
       }
       const bool mob_bar = e.mob && e.rarity >= sim::Rarity::legendary && !e.predecessor;
@@ -335,7 +351,8 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
       }
       Writer record;
       const Key key{e.id.match.value, e.id.slot, e.id.generation};
-      record.record(handle(e.id), mask, body, flower, e.ground_web && !rendered_.contains(key));
+      record.record(handle(e.id), mask, body, flower,
+                    area_changed || (e.ground_web && !rendered_.contains(key)));
       if (e.petal && e.anchor && !rendered_.contains(key)) {
         // $601 snaps all first-frame poses, including duplicate records.
         // Establish the flower center for one broadcast; the next orbit pose
@@ -422,11 +439,18 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
   // $601 -> profile+2316; $3384 uses 1920/scale and 1080/scale for the view bounds.
   profile.real(view && player != view->players.end() ? 1 / player->vision_multiplier : 1);
   // $939 copies profile+2320 into the native death screen's killer label.
-  profile.text(view && player != view->players.end() && player->killer
-                   ? catalog::mob_name(mob_type(player->killer->kind, sim::Group::main_mob,
-                                                player->killer->rarity))
-                   : std::string_view{});
-  profile.real(0);
+  const auto killer_name =
+      view && room && player != view->players.end() && player->killer_player
+          ? player_name(rooms, *room, *player->killer_player)
+      : view && player != view->players.end() && player->killer
+          ? std::string(catalog::mob_name(
+                mob_type(player->killer->kind, sim::Group::main_mob, player->killer->rarity)))
+          : std::string{};
+  profile.text(killer_name);
+  // $939 appends the local player when outside the top ten, using this score.
+  profile.real(view && view->mode == sim::Mode::pvp && player != view->players.end()
+                   ? static_cast<float>(std::min<std::uint64_t>(player->score, UINT32_MAX))
+                   : 0);
   profile.word(controlled);
   profile.real(camera.x * world_scale);
   for (unsigned kind = 0; kind < 46; ++kind) {
@@ -450,7 +474,7 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
   }
   out.record(8193, 0x8000, profile, saved != nullptr);
 
-  if (room) {
+  if (room && viewer.mode != sim::Mode::pvp) {
     Writer roster;
     std::array<std::uint32_t, app::Room::capacity> bodies{};
     std::array<store::Slots, app::Room::capacity> equipment{};
@@ -474,7 +498,7 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
       }
       if (view) {
         const auto teammate = std::ranges::find(view->players, member->id, &sim::PlayerView::id);
-        if (teammate != view->players.end() && teammate->body) {
+        if (teammate != view->players.end() && teammate->body && teammate->area == area) {
           bodies[i] = handle(*teammate->body);
         }
       }
@@ -510,53 +534,120 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
     had_roster_ = false;
   }
   if (view) {
+    const auto hole = std::ranges::find(view->ant_holes, area, &sim::AntHoleView::area);
+    const auto radius = area && hole != view->ant_holes.end() ? hole->radius : view->arena_radius;
     Writer arena;
-    arena.integer(static_cast<std::uint32_t>(view->arena_radius * 2 * world_scale));
-    arena.integer(static_cast<std::uint32_t>(view->arena_radius * 2 * world_scale));
+    arena.integer(static_cast<std::uint32_t>(radius * 2 * world_scale));
+    arena.integer(static_cast<std::uint32_t>(radius * 2 * world_scale));
     arena.real(1);
     // $939 treats world+512 bit 1 as terminal; otherwise it waits for revival.
-    arena.byte(view->phase == sim::Phase::ended ? 2 : 0);
+    arena.byte(view->phase == sim::Phase::ended ||
+                       (view->mode == sim::Mode::pvp && player != view->players.end() &&
+                        player->state != sim::LifeState::alive)
+                   ? 2
+                   : 0);
     // 0x2000 is the singleton circular arena radius and RGB, not entity health.
-    arena.real(view->arena_radius * world_scale);
-    for (const auto channel : biome_colors[static_cast<unsigned>(view->biome)]) {
+    arena.real(radius * world_scale);
+    // Match each native idle menu; interiors use their entrance's outer-disc
+    // color independently of the mother biome (dated client palette).
+    const auto color = sim::scene_background(
+        view->mode, view->biome,
+        area && hole != view->ant_holes.end() ? std::optional{hole->kind} : std::nullopt);
+    for (const auto channel : color) {
       arena.byte(channel);
     }
     out.record(8196, 16 | 0x2000, arena);
-    Writer wave;
-    // $828 overlays the red clearing timer on the blue spawning bar.
-    // Do not start red while any scheduled spawn is still pending.
-    double clearing = 0;
-    if (view->wave.spawn_complete_tick) {
-      const auto start = *view->wave.spawn_complete_tick;
-      const double duration = view->wave.deadline_tick - start;
-      const auto tick = view->next_tick ? view->next_tick - 1 : 0;
-      clearing = duration > 0 ? (tick - start) / duration : 1;
-    }
-    wave.byte(static_cast<std::uint8_t>(255 * std::clamp(clearing, 0.0, 1.0)));
-    wave.integer(view->wave.number ? view->wave.number - 1 : 0);
-    // The original HUD reserves biome 2 for Swamp; Ocean is 3 on the wire.
-    wave.integer(view->biome == sim::Biome::ocean ? 3 : static_cast<unsigned>(view->biome));
-    std::array<std::uint32_t, 216> counts{};
-    for (const auto& entity : view->entities) {
-      // Leech sections share the head's health and count as one mob with it.
-      if (entity.faction == sim::Faction::hostile && entity.mob != sim::Mob::leech_segment &&
-          (entity.mob || entity.group == sim::Group::ant_hole)) {
-        ++counts[mob_type(entity.mob.value_or(sim::Mob::baby_ant), entity.group, entity.rarity) *
-                     6 +
-                 static_cast<std::size_t>(entity.rarity)];
+    if (view->mode != sim::Mode::pvp) {
+      Writer wave;
+      // $828 overlays the red clearing timer on the blue spawning bar.
+      // Do not start red while any scheduled spawn is still pending.
+      double clearing = 0;
+      if (!area && view->wave.spawn_complete_tick) {
+        const auto start = *view->wave.spawn_complete_tick;
+        const double duration = view->wave.deadline_tick - start;
+        const auto tick = view->next_tick ? view->next_tick - 1 : 0;
+        clearing = duration > 0 ? (tick - start) / duration : 1;
       }
+      wave.byte(static_cast<std::uint8_t>(255 * std::clamp(clearing, 0.0, 1.0)));
+      wave.integer(view->wave.number ? view->wave.number - 1 : 0);
+      // The original HUD reserves biome 2 for Swamp; Ocean is 3 on the wire.
+      wave.integer(view->biome == sim::Biome::ocean ? 3 : static_cast<unsigned>(view->biome));
+      std::array<std::uint32_t, 216> counts{};
+      for (const auto& entity : view->entities) {
+        // Leech sections share the head's health and count as one mob with it.
+        if (entity.area == area && entity.faction == sim::Faction::hostile &&
+            entity.mob != sim::Mob::leech_segment &&
+            (entity.mob || entity.group == sim::Group::ant_hole)) {
+          ++counts[mob_type(entity.mob.value_or(sim::Mob::baby_ant), entity.group, entity.rarity) *
+                       6 +
+                   static_cast<std::size_t>(entity.rarity)];
+        }
+      }
+      for (const auto count : counts) {
+        wave.integer(count);
+      }
+      const auto& c = view->wave.counts;
+      // The original client has no identified ant-hole timer text field. Keep
+      // the native wave HUD, with its blue bar showing remaining instance time.
+      wave.byte(area && hole != view->ant_holes.end()
+                    ? static_cast<std::uint8_t>(
+                          255 * std::clamp(double(hole->deadline_tick > view->next_tick
+                                                      ? hole->deadline_tick - view->next_tick
+                                                      : 0) /
+                                               std::max<sim::Tick>(1, hole->deadline_tick -
+                                                                          hole->start_tick),
+                                           0.0, 1.0))
+                : c.planned ? static_cast<std::uint8_t>(255.0 * (c.planned - c.pending) / c.planned)
+                            : 0);
+      out.record(8197, 2048, wave);
+      had_wave_ = true;
+    } else if (had_wave_) {
+      result.removed.push_back(8197);
+      had_wave_ = false;
     }
-    for (const auto count : counts) {
-      wave.integer(count);
-    }
-    const auto& c = view->wave.counts;
-    wave.byte(c.planned ? static_cast<std::uint8_t>(255.0 * (c.planned - c.pending) / c.planned)
-                        : 0);
-    out.record(8197, 2048, wave);
     had_world_ = true;
   } else if (had_world_) {
-    result.removed.insert(result.removed.end(), {8196, 8197});
+    result.removed.push_back(8196);
+    if (had_wave_) {
+      result.removed.push_back(8197);
+      had_wave_ = false;
+    }
     had_world_ = false;
+  }
+  if (view && room && view->mode == sim::Mode::pvp) {
+    std::vector<const sim::PlayerView*> ranking;
+    for (const auto& p : view->players) {
+      if (p.connected && p.body && p.state == sim::LifeState::alive) {
+        ranking.push_back(&p);
+      }
+    }
+    std::ranges::sort(ranking, [](const auto* a, const auto* b) {
+      return a->score != b->score ? a->score > b->score : a->id.value < b->id.value;
+    });
+    const auto flower_count = ranking.size();
+    ranking.resize(std::min<std::size_t>(10, ranking.size()));
+    const auto score = [](std::uint64_t value) {
+      return static_cast<std::uint32_t>(std::min<std::uint64_t>(value, UINT32_MAX));
+    };
+    Writer board;
+    board.integer(flower_count);
+    for (std::size_t i = 0; i < 10; ++i) {
+      board.integer(i < ranking.size() ? score(ranking[i]->score) : 0);
+    }
+    for (std::size_t i = 0; i < 10; ++i) {
+      // $939 compares the local row against the profile entity, as in the roster.
+      board.word(i < ranking.size() ? ranking[i]->id == viewer.id ? 8193 : handle(*ranking[i]->body)
+                                    : 0);
+    }
+    board.byte(ranking.size());
+    for (std::size_t i = 0; i < 10; ++i) {
+      board.text(i < ranking.size() ? player_name(rooms, *room, ranking[i]->id) : "");
+    }
+    out.record(8195, 0x8, board);
+    had_leaderboard_ = true;
+  } else if (had_leaderboard_) {
+    result.removed.push_back(8195);
+    had_leaderboard_ = false;
   }
   Writer commands;
   if (view && room) {
@@ -578,7 +669,7 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
     }
     hit_cursor_ = room->hit_sequence;
     for (const auto& arc : room->arcs) {
-      if (arc.sequence <= arc_cursor_) {
+      if (arc.sequence <= arc_cursor_ || arc.effect.area != area) {
         continue;
       }
       commands.integer(1);
@@ -591,6 +682,7 @@ WorldSnapshot WorldProjection::build(const app::RoomManager& rooms, const app::M
     arc_cursor_ = room->arc_sequence;
   }
   match_ = match;
+  area_ = area;
   result.commands = std::move(commands.bytes);
   result.records = std::move(out.bytes);
   return result;

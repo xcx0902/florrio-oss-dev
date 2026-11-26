@@ -107,7 +107,7 @@ function world(plain, baseline) {
       break;
     }
     const header = r.byte();
-    assert.ok([0xcc, 0xce, 0xc4].includes(header));
+    assert.ok([0xcc, 0xce, 0xc4, 0xc6].includes(header));
     const mask = r.byte() | (r.byte() << 8) | (r.byte() << 16),
       entity = { id, mask, arriving: ((header ^ 0xac) & 2) !== 0 };
     if (mask & 1) {
@@ -130,7 +130,10 @@ function world(plain, baseline) {
     }
     if (mask & 8) {
       entity.flowers = r.vu();
-      r.skip(61);
+      entity.scores = Array.from({ length: 10 }, () => r.vu());
+      entity.leaders = Array.from({ length: 10 }, () => r.word());
+      entity.leaderCount = r.byte();
+      entity.leaderNames = Array.from({ length: 10 }, () => r.str());
     }
     if (mask & 16) {
       entity.width = r.vu();
@@ -194,7 +197,7 @@ function world(plain, baseline) {
       r.skip(27);
       entity.zoom = r.real();
       entity.killer = r.str();
-      r.real();
+      entity.score = r.real();
       entity.control = r.word();
       entity.cameraX = r.real();
       control = entity.control;

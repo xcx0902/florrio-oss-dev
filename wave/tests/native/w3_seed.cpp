@@ -9,19 +9,20 @@ int main(int argc, char** argv) {
   try {
     if (argc < 2 || argc > 3) {
       throw std::runtime_error(
-          "Usage: wave_w3_seed DATABASE [TOKEN|--auto|--behaviors|--squad|--garden-wave=N]");
+          "Usage: wave_w3_seed DATABASE [TOKEN|--auto|--behaviors|--squad|--w5|--garden-wave=N]");
     }
     wave::store::Store store(argv[1], {.allow_test_seed = true});
     const bool automatic = argc == 3 && std::string_view(argv[2]) == "--auto";
     const bool behaviors = argc == 3 && std::string_view(argv[2]) == "--behaviors";
     const bool squad = argc == 3 && std::string_view(argv[2]) == "--squad";
+    const bool scenarios = argc == 3 && std::string_view(argv[2]) == "--w5";
     const std::string_view argument = argc == 3 ? argv[2] : "";
     constexpr std::string_view garden_option = "--garden-wave=";
     const bool matchmaking = argument.starts_with(garden_option);
-    auto profile = argc == 3 && !automatic && !behaviors && !squad && !matchmaking
+    auto profile = argc == 3 && !automatic && !behaviors && !squad && !scenarios && !matchmaking
                        ? store.recover_guest(argv[2]).value()
                        : store.create_guest();
-    if (argc == 2 || automatic || behaviors || squad || matchmaking) {
+    if (argc == 2 || automatic || behaviors || squad || scenarios || matchmaking) {
       wave::store::TestSeed seed;
       seed.xp = 150;
       seed.highest_wave = 7;
@@ -74,13 +75,26 @@ int main(int argc, char** argv) {
           seed.slots[i < 5 ? i : 8 + i - 5] = wave::store::Item{kinds[i], 5};
         }
       }
+      if (scenarios) {
+        seed.xp = 100 * 14 * 14;
+        seed.highest_wave = 0;
+        seed.highest_waves = {};
+        seed.inventory = {{{1, 0}, 5}, {{29, 0}, 1}};
+        seed.slots = {};
+        for (unsigned i = 0; i < 5; ++i) {
+          seed.slots[i] = wave::store::Item{1, 0};
+        }
+        seed.slots[8] = wave::store::Item{29, 0};
+      }
       seed.discoveries = {{1, 0}, {4, 1}, {12, 2}};
       profile = store.seed_for_testing(profile.guest_token, seed);
     }
     std::cout << "{\"token\":\"" << profile.guest_token << "\",\"version\":" << profile.version
               << ",\"xp\":" << profile.xp << ",\"level\":" << profile.level
-              << ",\"highestWave\":" << profile.highest_wave << ",\"sqliteVersion\":\""
-              << sqlite3_libversion() << "\",\"inventory\":[";
+              << ",\"highestWave\":" << profile.highest_wave << ",\"highestWaves\":["
+              << profile.highest_waves[0] << ',' << profile.highest_waves[1] << ','
+              << profile.highest_waves[2] << "],\"sqliteVersion\":\"" << sqlite3_libversion()
+              << "\",\"inventory\":[";
     bool comma = false;
     for (const auto& [item, count] : profile.inventory) {
       if (comma) {

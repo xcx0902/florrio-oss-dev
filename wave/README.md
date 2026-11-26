@@ -6,6 +6,25 @@
 原版 UI 的绘制取证、功能规格、重建方案与逐像素验收矩阵见
 [client-ui 文档索引](docs/client-ui/README.md)。
 
+## W5 · 蚁穴与独立 PvP
+
+Rare+ 蚁穴接触进入独立内部，保留血量、装备和档案。清空或超时后，玩家、幸存怪物、
+花瓣和地面掉落返回主场；全部存活连线玩家在洞内时暂停主波刷怪及波时钟。
+普通蚁穴和火蚁穴分别使用其本体外圈色 `#b58500`、`#b52d00`。
+
+原版 PvP 入口要求等级 15，使用独立匹配、持续刷怪、玩家互伤和原生排行榜。
+Basic 按败者分数分档，Magnet 不扩大拾取范围；收益只归拾取者，PvE 最高波不受影响。
+主场 Garden、Desert、Ocean、PvP 的底色采用原版入场前菜单颜色。
+计时、地图函数、精确分数阈值等未确认参数见[规则与证据边界](docs/w5-scenarios-20221030.md)。
+
+```sh
+ctest --test-dir build/wave/native --output-on-failure -L '^w5$'
+npm --prefix wave run test:history -- --stage W5
+npm --prefix wave run test:wire -- --snapshot "$PWD/wave-reference/20221030" --stage W5
+```
+
+此项完成 W5 的蚁穴与独立 PvP 子集；三场景和波次曲线的完整历史校准继续按计划验收。
+
 ## W3 · 目录、经济与存档
 
 W3 接入日期固定的目录、花瓣效果、击杀 XP/掉落拾取、装备、原版制作界面和独立
@@ -53,17 +72,21 @@ npm --prefix wave run dev -- --snapshot "$PWD/wave-reference/20221030" --port 84
 玩家与怪物迎面碰撞会短暂弹开；撞到蚁穴等固定怪物时，只有玩家回弹。
 Hornet 从头部发射导弹并向后回弹；导弹随稀有度变大。Wave 连接不会因挂机而断开。
 分节怪物沿用主引擎的跟随方式：身体朝向前一节，拉远时才收紧，每一节仍留在圆形场地内。
-普通和邪恶蜈蚣断节后会各自移动。击败蚁穴和它的全部守卫后，有 2% 概率出现友方 Digger。
+普通和邪恶蜈蚣断节后会各自移动。Rare+ 蚁穴首次有人进入时，有 2% 概率出现同级友方 Digger。
 
 默认存档是 `build/wave/saves/profiles.sqlite3`；可用 `--database /absolute/path/save.sqlite3`
 或 `WAVE_DATABASE` 指定。关闭临时网页或重启宿主不会删除数据库。访客凭证在原版
 `cp6_player_id`，新浏览器上下文仅带该凭证即可恢复库存、主副槽、等级和图鉴。
 新档只有五个 Common Basic。测试使用独立离线种子工具，正式宿主没有发物端点。
 
-`npm run dev` 会额外构建并使用 `wave_host_dev`，右下角提供“库存调试 · DEV”。
+`npm run dev` 会额外构建并使用 `wave_host_dev`，右下角提供“存档调试 · DEV”。
 面板支持全部 45 种花瓣、Common–Mythic 六个稀有度，可添加、修改总数或设为 0 删除。
 数量包含已装备副本；调低数量时优先保留主槽，自动卸下超额装备。点击“保存并刷新”
-后事务写入当前访客存档并重新加载原版界面，XP、图鉴和最高波保持原值。
+后事务写入当前访客存档并重新加载原版界面。
+面板还支持修改当前总计 XP、LEVEL（1–255）以及 Garden、Desert、Ocean 各自的最高波次
+（0–2,147,483,647）。总 XP 与等级按现有经验表联动；修改等级会将 XP 设为该等级起点。
+降级时自动卸下未解锁主副槽的装备，花瓣仍保留在库存。三个最高波纪录支持调高、调低和归零，
+影响下次开局波次；点击“保存进度并刷新”写入当前访客存档。
 全部 45 种花瓣现可正常装备，历史行为不确定项见人工核查清单。
 
 调试宿主是默认构建之外的显式目标，只在开发启动时构建；正式 `wave_host` 及
@@ -83,7 +106,7 @@ npm --prefix wave run test:wire -- --snapshot "$PWD/wave-reference/20221030" --s
 行为按截止前 Wiki 修订、同仓库 World PvP 的顺序取证；不明确的特殊攻击和复刻参数有
 [中文人工核查清单](docs/behavior-review-20221030.md)与
 [机器规则](data/catalogs/20221030/behavior-review.json)。
-Rare+ 巢穴目前采用同场遭遇代理，子区域传送归 W5。闪电、地面掉落、Peas/Grapes
+Rare+ 蚁穴与火蚁穴已接入独立圆形内部、计时、区域隔离和清空／超时传出。闪电、地面掉落、Peas/Grapes
 飞行弹体和 Egg 友军使用原版绘制；护盾/毒状态图形仍待协议核查。
 `W3-behaviors` 覆盖全变体和特殊效果。
 [完整数值全表](docs/client-tooltips-20221030.md) ·
