@@ -974,34 +974,16 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
                         player->area, player->life_start_generation});
   }
 
-  std::set<std::uint32_t> closed_areas;
+  std::map<std::uint32_t, sim::Vec2> closed_areas;
   for (const auto& event : room.match->events()) {
     if (const auto* closed = std::get_if<sim::AreaClosed>(&event.data)) {
-      closed_areas.insert(closed->area);
+      closed_areas[closed->area] = closed->position;
     }
   }
   const auto current_area = [&](std::uint32_t area) {
     return closed_areas.contains(area) ? 0u : area;
   };
   for (const auto& event : room.match->events()) {
-    if (const auto* closed = std::get_if<sim::AreaClosed>(&event.data)) {
-      for (auto& drop : room.drops) {
-        if (drop.area != closed->area) {
-          continue;
-        }
-        drop.area = 0;
-        drop.position = sim::clamp_center(closed->position + drop.position, after.arena_radius, 4);
-      }
-      for (auto& pickup : room.pickups) {
-        if (pickup.drop.area == closed->area) {
-          pickup.drop.area = 0;
-          pickup.drop.position =
-              sim::clamp_center(closed->position + pickup.drop.position, after.arena_radius, 4);
-          pickup.destination =
-              sim::clamp_center(closed->position + pickup.destination, after.arena_radius, 4);
-        }
-      }
-    }
     if (const auto* defeat = std::get_if<sim::Defeat>(&event.data)) {
       if (room.mode == sim::Mode::pvp && defeat->group == sim::Group::player) {
         const auto rarity = sim::pvp_basic_rarity(defeat->victim_score);
@@ -1120,6 +1102,24 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
         reward.recipients.push_back(std::move(recipient));
       }
       batch->events.push_back(std::move(reward));
+    }
+  }
+
+  // Include loot created by the last guard's death in this tick, regardless of
+  // event ordering. Interior coordinates are discarded when returning outside.
+  for (const auto& [area, position] : closed_areas) {
+    for (auto& drop : room.drops) {
+      if (drop.area == area) {
+        drop.area = 0;
+        drop.position = sim::clamp_center(position, after.arena_radius, 4);
+      }
+    }
+    for (auto& pickup : room.pickups) {
+      if (pickup.drop.area == area) {
+        pickup.drop.area = 0;
+        pickup.drop.position = sim::clamp_center(position, after.arena_radius, 4);
+        pickup.destination = sim::clamp_center(position, after.arena_radius, 5);
+      }
     }
   }
 

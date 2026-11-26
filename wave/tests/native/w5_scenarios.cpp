@@ -76,9 +76,10 @@ Rules arena() {
   r.contact_knockback_speed = 0;
   return r;
 }
-std::uint32_t enter(Match& m, Rarity rarity = Rarity::rare, Mob kind = Mob::ant_hole) {
-  FixtureAccess::move(m, {1}, {});
-  FixtureAccess::spawn(m, kind, rarity);
+std::uint32_t enter(Match& m, Rarity rarity = Rarity::rare, Mob kind = Mob::ant_hole,
+                    Vec2 at = {}) {
+  FixtureAccess::move(m, {1}, at);
+  FixtureAccess::spawn(m, kind, rarity, at);
   FixtureAccess::holes(m);
   return FixtureAccess::player(m).area;
 }
@@ -160,16 +161,24 @@ void ant_split_lifecycle() {
   check(FixtureAccess::player(m).area == 0 && !FixtureAccess::player(m).body,
         "closed interior returns dead player's reservation");
 }
-void ant_close(bool timeout) {
+void ant_close(bool timeout, Mob kind = Mob::ant_hole, Vec2 entrance = {120, -80}) {
   auto r = arena();
   r.ant_hole_duration = std::chrono::milliseconds(100);
   Match m({3}, 9, r);
   m.add_player({1}, {}, {Petal::basic});
   step(m);
-  const auto area = enter(m);
+  const auto area = enter(m, Rarity::rare, kind, entrance);
   check(area != 0, "enter timed cave");
   const auto life = FixtureAccess::player(m).life;
   const auto body = FixtureAccess::body(m);
+  const auto digger = FixtureAccess::spawn(m, Mob::digger, Rarity::rare, {-70, 55}, area);
+  FixtureAccess::entity(m, digger).view.group = Group::summon;
+  const auto summon = FixtureAccess::summon(m, {1});
+  for (const auto id : {digger, summon}) {
+    auto& e = FixtureAccess::entity(m, id);
+    e.view.health = e.view.max_health = 1e9;
+    e.rules.contact_damage = 0;
+  }
   std::vector<EntityId> guards;
   for (const auto& e : m.view().entities) {
     if (e.area == area && e.faction == Faction::hostile && e.mob) {
@@ -198,8 +207,26 @@ void ant_close(bool timeout) {
         "return preserves player body");
   check(FixtureAccess::player(m).life.generation > life.generation,
         "return invalidates old input epoch");
+  near((FixtureAccess::entity(m, body).view.position -
+        clamp_center(entrance, m.view().arena_radius, r.player.radius))
+           .length(),
+       0, "player returns to the entrance");
+  const auto returned = m.view();
+  for (const auto id : {digger, summon}) {
+    check(std::ranges::find(returned.entities, id, &EntityView::id) != returned.entities.end(),
+          "Digger and owned summon survive closure");
+  }
   for (const auto& e : m.view().entities) {
     check(e.area == 0, "all entities return with players");
+    if (e.id == digger || e.id == summon || std::ranges::find(guards, e.id) != guards.end()) {
+      near((e.position - clamp_center(entrance, returned.arena_radius, e.radius)).length(), 0,
+           "surviving cave mobs return to the entrance within the arena");
+      const auto& state = FixtureAccess::entity(m, e.id);
+      check(e.velocity == Vec2{} && state.knockback == Vec2{} && state.recoil == Vec2{},
+            "return clears interior movement impulses");
+      check(state.home_position == e.position && state.flight_start == e.position && !state.target,
+            "returned mobs use their outside position and reacquire targets");
+    }
   }
   check(m.view().wave.counts.alive == 1, "interior deaths do not decrement main wave population");
   check(!m.queue(Input{life, {1, 0}}), "stale cave input rejected after return");
@@ -624,7 +651,7 @@ void pvp_economy_entry() {
         "PvE matchmaking isolated");
   (void)before;
 }
-void ant_economy() {
+void ant_economy(bool timeout = false, Mob kind = Mob::ant_hole) {
   auto db = std::make_shared<store::Store>(":memory:");
   app::RoomManager rooms(arena(), 42, {}, db);
   auto& a = rooms.admit("", 1);
@@ -632,29 +659,77 @@ void ant_economy() {
   rooms.step();
   check(rooms.wait_storage(), "initial profile settled");
   auto& m = *rooms.room(a)->match;
-  FixtureAccess::move(m, a.id, {});
-  FixtureAccess::spawn(m, Mob::ant_hole, Rarity::rare);
+  const Vec2 entrance{120, -80};
+  FixtureAccess::move(m, a.id, entrance);
+  const auto portal = FixtureAccess::spawn(m, kind, Rarity::rare, entrance);
+  const auto portal_loot =
+      std::to_string(portal.slot) + ":" + std::to_string(portal.generation) + ":";
   FixtureAccess::holes(m);
   const auto area = FixtureAccess::player(m, a.id).area;
   check(area != 0, "persistent player enters cave");
   const auto xp_before = a.profile->xp;
-  std::uint64_t expected_xp = catalog::dated().mob(Mob::ant_hole, Rarity::rare)->xp;
+  std::uint64_t expected_xp = catalog::dated().mob(kind, Rarity::rare)->xp;
+  bool killed_guard = false;
   for (const auto& e : m.view().entities) {
-    if (e.area == area && e.mob && e.faction == Faction::hostile) {
+    if (e.area == area && e.mob && e.faction == Faction::hostile && (!timeout || !killed_guard)) {
       expected_xp += catalog::dated().mob(*e.mob, e.rarity)->xp;
       FixtureAccess::hit(m, e.id, FixtureAccess::body(m, a.id), 1e12);
+      killed_guard = true;
     }
+  }
+  if (timeout) {
+    FixtureAccess::deadline(m, area, m.view().next_tick);
   }
   auto& room = const_cast<app::Room&>(*rooms.room(a));
   const store::Item returned{1, 4};
+  room.drops.push_back({"test-pending-card",
+                        returned,
+                        {-80, 60},
+                        ++room.drop_sequence,
+                        m.view().next_tick + 100,
+                        false,
+                        area});
   room.drops.push_back(
-      {"test-returned-card", returned, {25, 0}, ++room.drop_sequence, 0, false, area});
+      {"test-returned-card", returned, {65, -75}, ++room.drop_sequence, 0, false, area});
+  room.pickups.push_back(
+      {{"test-returned-pickup", returned, {70, -40}, ++room.drop_sequence, 0, true, area},
+       FixtureAccess::body(m, a.id),
+       {-50, 30},
+       std::chrono::steady_clock::now()});
+  room.drops.push_back({"test-outside-card",
+                        returned,
+                        {-180, -120},
+                        ++room.drop_sequence,
+                        m.view().next_tick + 100,
+                        false,
+                        0});
   rooms.step();
   check(rooms.wait_storage(), "last-guard reward settles with return");
   check(m.view().ant_holes.empty() && a.profile->xp == xp_before + expected_xp,
         "last guard grants XP even though return changes the control epoch");
   check(std::ranges::all_of(room.drops, [](const auto& d) { return d.area == 0; }),
         "closure transfers ground cards to main world");
+  unsigned cave_loot = 0;
+  for (const auto& drop : room.drops) {
+    if (drop.id == "test-outside-card") {
+      check(drop.position == Vec2{-180, -120}, "closure leaves outside drops in place");
+    } else if (!drop.id.starts_with(portal_loot)) {
+      near((drop.position - entrance).length(), 0,
+           "existing and same-tick cave loot returns to the entrance");
+      if (!drop.id.starts_with("test-")) {
+        ++cave_loot;
+      }
+    }
+  }
+  if (!timeout) {
+    check(cave_loot > 0, "closing tick creates catalog loot as well as existing cards");
+  }
+  check(!room.pickups.empty() && room.pickups.front().drop.area == 0,
+        "closure returns in-flight pickups to the main world");
+  near((room.pickups.front().drop.position - entrance).length(), 0,
+       "in-flight pickup starts at the entrance");
+  near((room.pickups.front().destination - entrance).length(), 0,
+       "in-flight pickup destination returns to the entrance");
   for (unsigned i = 0; i < 3; ++i) {
     rooms.step();
     check(rooms.wait_storage(), "returned pickup settles");
@@ -795,10 +870,23 @@ int main(int argc, char** argv) {
     run(
         [] {
           ant_close(false);
+          ant_close(false, Mob::fire_ant_burrow);
+          ant_close(false, Mob::ant_hole, {290, 0});
+          ant_close(false, Mob::fire_ant_burrow, {290, 0});
           ant_economy();
+          ant_economy(false, Mob::fire_ant_burrow);
         },
         {"W5-ANT-CLEAR"});
-    run([] { ant_close(true); }, {"W5-ANT-TIMEOUT"});
+    run(
+        [] {
+          ant_close(true);
+          ant_close(true, Mob::fire_ant_burrow);
+          ant_close(true, Mob::ant_hole, {290, 0});
+          ant_close(true, Mob::fire_ant_burrow, {290, 0});
+          ant_economy(true);
+          ant_economy(true, Mob::fire_ant_burrow);
+        },
+        {"W5-ANT-TIMEOUT"});
     run(
         [] {
           ant_fire();

@@ -68,23 +68,32 @@ void Match::close_ant_hole(std::uint32_t area) {
     return;
   }
   const auto hole = *found;
-  const auto return_at =
-      clamp_center(hole.position + Vec2{25, 0}, arena_radius_, rules_.player.radius);
+  // Player transfers also move owned entities. Keep the contents so summons
+  // and projectiles return to the entrance rather than retaining cave offsets.
+  std::vector<std::uint32_t> contents;
+  for (const auto slot : entities_.active()) {
+    const auto& e = entities_.at(slot);
+    if (e.view.area == area && e.view.group != Group::player &&
+        (e.view.group != Group::petal || e.projectile || e.view.ground_web)) {
+      contents.push_back(slot);
+    }
+  }
+  const auto return_at = clamp_center(hole.position, arena_radius_, rules_.player.radius);
   for (auto& p : players_) {
     if (p.view.area == area) {
       transfer_player(p, 0, return_at);
     }
   }
-  for (const auto slot : entities_.active()) {
+  for (const auto slot : contents) {
     auto& e = entities_.at(slot);
-    if (e.view.area != area) {
-      continue;
-    }
     e.view.area = 0;
-    e.view.position = clamp_center(hole.position + e.view.position, arena_radius_, e.view.radius);
+    e.view.position = clamp_center(hole.position, arena_radius_, e.view.radius);
     e.home_position = e.view.position;
     e.flight_start = e.view.position;
+    e.view.velocity = {};
+    e.knockback = e.recoil = {};
     e.target.reset();
+    e.healing.reset();
     if (e.view.group == Group::main_mob) {
       e.view.group = Group::residual;
     }
