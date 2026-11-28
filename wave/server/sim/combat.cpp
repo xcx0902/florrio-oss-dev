@@ -433,8 +433,6 @@ void Match::update_effects() {
     const Tick delay = rules_.timing.ticks_ceil(
         Microseconds(static_cast<Microseconds::rep>(definition.activation_seconds * 1000000)));
     if (definition.effect == catalog::Effect::leaf) {
-      impacts_.push_back({owner_body, source, HealthKind::heal,
-                          definition.mechanics.passive_heal_per_second * seconds});
       if (!entity->healing) {
         continue;
       }

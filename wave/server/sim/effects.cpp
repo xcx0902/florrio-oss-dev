@@ -33,9 +33,14 @@ void Match::refresh_passives() {
       damage = std::max(damage, p.mechanics.body_damage);
     }
     for (std::size_t i = 0; i < owner.view.loadout.size(); ++i) {
+      // Leaf/Yucca keep regenerating after their first charge, even while
+      // broken. Replacing the equipment resets the first-charge gate.
       const auto* p = rules_.catalog.petal(owner.view.loadout[i], owner.view.loadout_rarities[i]);
-      if (p && p->effect == catalog::Effect::starfish &&
-          body.view.health < body.view.max_health * .5) {
+      if (p && ((p->effect == catalog::Effect::starfish &&
+                 body.view.health < body.view.max_health * .5) ||
+                (owner.petal_charged_once[i] &&
+                 (p->effect == catalog::Effect::leaf ||
+                  (p->effect == catalog::Effect::yucca && owner.defend))))) {
         impacts_.push_back({body.view.id, damage_source(body), HealthKind::heal,
                             p->mechanics.passive_heal_per_second *
                                 std::chrono::duration<double>(rules_.timing.step).count()});
@@ -283,7 +288,6 @@ void Match::flush_sponge(EntityId id) {
 }
 
 void Match::update_special_effects() {
-  const double dt = std::chrono::duration<double>(rules_.timing.step).count();
   const auto active = entities_.active();
   for (const auto slot : active) {
     auto* e = entities_.get(entities_.at(slot).view.id);
@@ -323,10 +327,6 @@ void Match::update_special_effects() {
     const auto owner_id = *owner->view.body;
     const auto origin = entities_.get(owner_id)->view.position;
     const auto delay = ticks(rules_, p.activation_seconds);
-    if (p.effect == catalog::Effect::yucca && owner->defend) {
-      impacts_.push_back(
-          {owner_id, source, HealthKind::heal, p.mechanics.passive_heal_per_second * dt});
-    }
     if (p.effect == catalog::Effect::bubble && owner->defend && tick_ >= e->born_tick + delay) {
       Vec2 direction = origin - e->view.position;
       const auto length = direction.length();

@@ -678,6 +678,75 @@ void gradual_nest_releases() {
   }
 }
 
+void healing_after_first_charge() {
+  for (const auto kind : {Petal::yucca, Petal::leaf}) {
+    for (const auto step_ms : {25, 50}) {
+      auto rules = arena();
+      rules.timing.step = std::chrono::milliseconds(step_ms);
+      Match m({59}, 1, rules);
+      m.add_player({1}, {}, {Petal::none, Petal::basic});
+      steps(m);
+      auto& body = FixtureAccess::get(m, flower(m));
+      body.view.health = 4000;
+      m.queue({owner(m).life, {}, false, true});
+      const auto charge = [&](Rarity rarity) {
+        const auto before = body.view.health;
+        check(m.equip({1}, 0, kind, rarity), "equip regeneration petal");
+        const auto reload = owner(m).petals[0].reload_ticks;
+        check(reload > 0, "newly equipped regeneration petal needs its first charge");
+        steps(m, reload);
+        near(body.view.health, before, "regeneration waits for the first completed charge");
+        check(!owner(m).petals[0].entity, "regeneration petal is still initially charging");
+        steps(m);
+        check(owner(m).petals[0].entity.has_value(), "first charge produces the petal");
+        const double rate =
+            catalog::dated().petal(kind, rarity)->mechanics.passive_heal_per_second * step_ms /
+            1000.;
+        near(body.view.health, before + rate, "regeneration starts on the first charged tick");
+        return rate;
+      };
+      const auto rate = charge(Rarity::common);
+      // An unrelated equipment change must not restart this slot's first charge.
+      check(m.equip({1}, 1, Petal::light), "change another equipment slot");
+      auto before = body.view.health;
+      steps(m);
+      near(body.view.health, before + rate, "unchanged regeneration slot keeps healing");
+      FixtureAccess::get(m, petal(m)).view.health = 0;
+      FixtureAccess::reap(m);
+      check(!owner(m).petals[0].entity && owner(m).petals[0].reload_ticks > 0,
+            "broken regeneration petal is recharging");
+      before = body.view.health;
+      steps(m, 3);
+      near(body.view.health, before + rate * 3, "regeneration continues throughout recharge");
+      check(!owner(m).petals[0].entity, "healing does not require a restored petal entity");
+      // Equipping the same item preserves its active regeneration during recharge.
+      check(m.equip({1}, 0, kind), "keep the same regeneration item equipped");
+      before = body.view.health;
+      steps(m);
+      near(body.view.health, before + rate, "unchanged recharging item keeps regeneration");
+      if (kind == Petal::yucca) {
+        m.queue({owner(m).life, {}, false, false});
+        before = body.view.health;
+        steps(m);
+        near(body.view.health, before, "Yucca still requires defense during recharge");
+        m.queue({owner(m).life, {}, false, true});
+      }
+      body.heal_block_until = m.view().next_tick + 2;
+      before = body.view.health;
+      steps(m, 2);
+      near(body.view.health, before, "healing suppression still blocks regeneration");
+      steps(m);
+      near(body.view.health, before + rate, "regeneration resumes when suppression expires");
+      charge(Rarity::rare);
+      check(m.equip({1}, 0, Petal::none), "unequip regeneration petal");
+      before = body.view.health;
+      steps(m);
+      near(body.view.health, before, "unequipping stops regeneration");
+      charge(Rarity::common);
+    }
+  }
+}
+
 void remaining_petals() {
   for (auto kind : {Petal::yucca, Petal::starfish}) {
     Match m({10}, 1, arena());
@@ -1181,6 +1250,7 @@ int main() {
     phase = "Hornet recoil";
     hornet_recoil();
     phase = "remaining petals";
+    healing_after_first_charge();
     remaining_petals();
     phase = "chains";
     chains();

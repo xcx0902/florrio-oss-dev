@@ -154,6 +154,7 @@ bool Match::add_player(PlayerId id, Vec2 start, std::vector<Petal> loadout,
   entry.view.life = {id_, id, tick_ ? tick_ * 2 : 0};
   entry.view.petals.resize(loadout.size());
   entry.petal_ready.resize(loadout.size());
+  entry.petal_charged_once.resize(loadout.size());
   entry.view.loadout = std::move(loadout);
   if (rarities.empty()) {
     rarities.resize(entry.view.loadout.size(), Rarity::common);
@@ -219,12 +220,14 @@ void Match::replace_loadout(Player& entry, std::vector<Petal> loadout,
                        health_bonus(entry.view.loadout, entry.view.loadout_rarities);
   entry.view.petals.resize(loadout.size());
   entry.petal_ready.resize(loadout.size());
+  entry.petal_charged_once.resize(loadout.size());
   for (std::size_t i = 0; i < loadout.size(); ++i) {
     if (i < old_count && entry.view.loadout[i] == loadout[i] &&
         entry.view.loadout_rarities[i] == rarities[i]) {
       continue;
     }
     const auto reload = reload_ticks(loadout[i], rarities[i]);
+    entry.petal_charged_once[i] = false;
     entry.petal_ready[i] = tick_ + reload;
     entry.view.petals[i].reload_ticks = reload;
     entry.view.petals[i].reload_total_ticks = reload;
@@ -369,6 +372,7 @@ void Match::spawn_player(Player& entry) {
   entry.view.killer.reset();
   entry.view.killer_player.reset();
   std::ranges::fill(entry.petal_ready, tick_);
+  std::fill(entry.petal_charged_once.begin(), entry.petal_charged_once.end(), false);
   emit(LifeChange{entry.view.life, entry.view.body, LifeState::alive,
                   entities_.get(*entry.view.body)->view.position});
 }
@@ -387,6 +391,7 @@ void Match::refresh_petals() {
       if (slot.reload_ticks != 0) {
         continue;
       }
+      entry.petal_charged_once[index] = true;
       EntityView petal;
       petal.group = Group::petal;
       petal.faction = player_faction(entry.view.id);

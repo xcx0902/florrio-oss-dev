@@ -245,6 +245,10 @@ void rose_and_leaf() {
     near(FixtureAccess::get(match, other).view.health, 30, "the same Leaf cannot be eaten twice");
     check(!owner(match).petals[0].entity && owner(match).petals[0].reload_ticks == 40,
           "friendly mob consumption reloads Leaf");
+    const auto health_after_consumption = body(match).health;
+    steps(match, 1);
+    near(body(match).health, health_after_consumption + leaf.passive_heal_per_second * .025,
+         "Leaf keeps healing its owner while recharging after friendly mob consumption");
   }
   {
     Match match({44}, 5, arena());

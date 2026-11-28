@@ -45,6 +45,7 @@ class Match {
     double aim_angle = 0;
     double aim_distance = 13;
     std::vector<Tick> petal_ready;
+    std::vector<bool> petal_charged_once;
     double orbit_phase = 0;
     Tick orbit_updated = std::numeric_limits<Tick>::max();
     Tick portal_ready = 0;
