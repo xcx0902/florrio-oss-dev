@@ -256,7 +256,7 @@ void ant_fire() {
     step(m);
     const auto area = enter(m, Rarity(tier), Mob::fire_ant_burrow);
     if (tier < 2) {
-      step(m);
+      step(m, 300);
     }
     unsigned count = 0, high = 0;
     for (const auto& e : m.view().entities) {
@@ -774,6 +774,10 @@ void fire_economy() {
                          small ? Vec2{20, 0} : Vec2{});
     if (small) {
       rooms.step();
+      FixtureAccess::move(m, a.id, {600, 600});
+      for (unsigned n = 0; n < 300; ++n) {
+        rooms.step();
+      }
       check(rooms.wait_storage(), "small burrow release settled");
       const auto before = a.profile->xp;
       unsigned guards = 0;

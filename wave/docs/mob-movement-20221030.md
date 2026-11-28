@@ -81,5 +81,6 @@ ctest --test-dir build/wave/native --output-on-failure
 ```
 
 生成器校验全部 210 个 mob 条目的比例、包络和来源。原生回归测试检查自定义玩家速度下
-不发生生成覆盖，以及 25/50ms 两种步长的实际游荡、追击、Hornet 绕行、Queen 返回、
-召唤物跟随与 Digger 逃离速度。
+不发生生成覆盖，以及 25/50ms 两种步长的实际游荡、追击、Hornet 绕行、
+召唤物跟随与 Digger 逃离速度。Queen 取消距离脱战和强制归巢，回归检查远距离持续追击。
+小蚁穴的逐只出洞另覆盖两种步长、Common/Unusual、两种蚁穴及致命一击后的完整释放。

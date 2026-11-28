@@ -55,15 +55,15 @@ struct Entity {
   std::optional<EntityId> root;
   std::optional<Mob> chain_kind;
   std::optional<double> wander_heading;
+  bool leaving_nest = false;
   Tick action_ready = 0;
   Tick heal_block_until = 0;
   Tick shield_until = 0;
   Tick expires = 0;
   Tick stun_until = 0;
-  unsigned spawn_count = 0;
+  unsigned spawn_count = 0;  // Includes ants already queued for release.
   std::optional<Petal> summon_origin;
   Vec2 home_position;
-  bool returning = false;
   bool provoked = false;
   bool held = false;
   double flight_speed = 0;

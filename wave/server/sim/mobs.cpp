@@ -165,6 +165,13 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
   const auto speed_ratio = [&](double speed) {
     return definition.body.speed_per_second > 0 ? speed / definition.body.speed_per_second : 0;
   };
+  if (entity.leaving_nest) {
+    const auto* nest = entity.root ? entities_.get(*entity.root) : nullptr;
+    if (!nest || (entity.view.position - nest->view.position).length() >=
+                     entity.view.radius + nest->view.radius) {
+      entity.leaving_nest = false;
+    }
+  }
   const bool owned = entity.view.owner.has_value();
   bool aggressive =
       owned || entity.provoked ||
@@ -182,8 +189,6 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
   const double alert_range = *entity.view.mob == Mob::soldier_ant ? 60
                              : *entity.view.mob == Mob::queen_ant ? 80
                                                                   : 120;
-  const auto* nest = entity.root ? entities_.get(*entity.root) : nullptr;
-  const auto home = nest ? nest->view.position : entity.home_position;
   const bool queen = entity.view.mob == Mob::queen_ant;
   const auto* prior = entity.target ? entities_.get(*entity.target) : nullptr;
   if (prior && prior->view.group == Group::petal && prior->view.anchor) {
@@ -192,19 +197,8 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
   }
   if (!aggressive || !prior || prior->view.area != entity.view.area ||
       prior->view.faction == entity.view.faction || prior->view.health <= 0 ||
-      (prior->view.position - entity.view.position).length() > alert_range * 1.5 ||
-      (queen && (entity.view.position - home).length() > alert_range * 1.5)) {
-    if (queen && entity.target) {
-      entity.returning = true;
-    }
+      (!queen && (prior->view.position - entity.view.position).length() > alert_range * 1.5)) {
     entity.target.reset();
-  }
-  if (entity.returning) {
-    const auto delta = home - entity.view.position;
-    if (delta.length() > 10) {
-      return delta * (1 / delta.length());
-    }
-    entity.returning = false;
   }
   if (aggressive && !entity.target) {
     double nearest = alert_range;
@@ -238,14 +232,6 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
     const auto* owner = player(entity.view.owner->player);
     if (owner && owner->view.body) {
       const auto delta = entities_.get(*owner->view.body)->view.position - entity.view.position;
-      if (delta.length() > 35) {
-        return delta * (1 / delta.length());
-      }
-    }
-  }
-  if (entity.root && *entity.view.mob == Mob::queen_ant) {
-    if (const auto* nest = entities_.get(*entity.root)) {
-      const auto delta = nest->view.position - entity.view.position;
       if (delta.length() > 35) {
         return delta * (1 / delta.length());
       }
@@ -441,91 +427,87 @@ void Match::constrain_segments() {
 }
 
 void Match::update_nests() {
-  std::vector<EntityId> active;
+  // Queue health-triggered releases before reaping deaths. The queue outlives
+  // a lethal hit, so destroying a nest cannot cancel its remaining ants.
   for (const auto slot : entities_.active()) {
-    active.push_back(entities_.at(slot).view.id);
-  }
-  for (const auto id : active) {
-    auto* e = entities_.get(id);
-    if (!e || !e->view.mob) {
+    auto& e = entities_.at(slot);
+    if ((e.view.mob != Mob::ant_hole && e.view.mob != Mob::fire_ant_burrow) ||
+        e.view.rarity >= Rarity::rare) {
       continue;
     }
-    const auto& definition = *rules_.catalog.mob(*e->view.mob, e->view.rarity);
-    if (definition.ai != catalog::MobAI::spawner) {
+    const bool fire = e.view.mob == Mob::fire_ant_burrow;
+    const bool nearby = std::ranges::any_of(entities_.active(), [&](auto other) {
+      const auto& p = entities_.at(other).view;
+      return p.area == e.view.area && p.group == Group::player &&
+             (p.position - e.view.position).length() < 35;
+    });
+    if (fire ? (!nearby && !e.spawn_count) : !e.provoked) {
       continue;
     }
-    if (e->view.health > 0 && tick_ < e->action_ready) {
+    const unsigned total = fire ? 30 : 40;
+    const unsigned desired =
+        fire || e.view.health <= e.view.max_health / 3
+            ? total
+            : static_cast<unsigned>((1 - e.view.health / e.view.max_health) * (total - 1)) + 1;
+    if (desired <= e.spawn_count) {
       continue;
     }
-    const auto position = e->view.position;
-    const auto rarity = e->view.rarity;
     double attack_scale = 1;
-    for (const auto& slow : e->slows) {
+    for (const auto& slow : e.slows) {
       if (slow.until > tick_ && slow.slows_attacks) {
         attack_scale *= slow.multiplier;
       }
     }
-    const bool fire = e->view.mob == Mob::fire_ant_burrow;
-    const bool entrance = rarity >= Rarity::rare;
-    if (entrance) {
+    auto pending = std::ranges::find(nest_releases_, e.view.id, &NestRelease::nest);
+    if (pending == nest_releases_.end()) {
+      nest_releases_.push_back({e.view.id, e.view.position, e.view.area, e.view.rarity, fire,
+                                e.view.owner, e.target, e.spawn_count, desired, e.action_ready,
+                                seconds(rules_, .1 / attack_scale)});
+    } else {
+      pending->end = desired;
+      pending->target = e.target;
+    }
+    e.spawn_count = desired;
+  }
+  for (auto& release : nest_releases_) {
+    if (tick_ < release.ready) {
       continue;
     }
-    const bool nearby = std::ranges::any_of(entities_.active(), [&](auto slot) {
-      const auto& p = entities_.at(slot).view;
-      return p.area == e->view.area && p.group == Group::player &&
-             (p.position - position).length() < 35;
-    });
-    if ((fire || entrance) && !nearby && !e->spawn_count) {
-      continue;
-    }
-    if (!fire && !entrance && !e->provoked) {
-      continue;
-    }
-    const unsigned total = fire ? (entrance ? 50 : 30) : 40;
-    if (e->spawn_count >= total) {
-      const bool alive = std::ranges::any_of(entities_.active(), [&](auto slot) {
-        const auto& child = entities_.at(slot);
-        return child.root == id && child.view.faction == Faction::hostile && child.view.health > 0;
-      });
-      if (!alive && entrance) {
-        e->view.health = 0;
-        e->fatal_hit = damage_source(*e);
+    auto* nest = entities_.get(release.nest);
+    if (nest) {
+      double attack_scale = 1;
+      for (const auto& slow : nest->slows) {
+        if (slow.until > tick_ && slow.slows_attacks) {
+          attack_scale *= slow.multiplier;
+        }
       }
-      continue;
+      release.interval = seconds(rules_, .1 / attack_scale);
     }
-    const unsigned desired =
-        fire || entrance || e->view.health <= e->view.max_health / 3
-            ? total
-            : static_cast<unsigned>((1 - e->view.health / e->view.max_health) * (total - 1)) + 1;
-    const unsigned count = desired > e->spawn_count ? desired - e->spawn_count : 0;
-    const auto first = e->spawn_count;
-    const auto life = e->view.owner;
-    const auto target = e->target;
-    const auto radius = e->view.radius;
-    e->spawn_count += count;
-    e->action_ready = tick_ + seconds(rules_, .25 / attack_scale);
-    for (unsigned n = first; n < first + count; ++n) {
-      const auto kind = fire             ? Mob::fire_ant
-                        : n == total - 1 ? Mob::queen_ant
-                        : n < 5          ? Mob::baby_ant
-                        : n < 13         ? Mob::worker_ant
-                                         : Mob::soldier_ant;
-      auto tier = entrance && kind != Mob::queen_ant ? Rarity::rare : rarity;
-      if (fire && entrance && rarity >= Rarity::epic && n < 6u - static_cast<unsigned>(rarity)) {
-        tier = rarity;
+    const auto n = release.next++;
+    const auto kind = release.fire ? Mob::fire_ant
+                      : n == 39    ? Mob::queen_ant
+                      : n < 5      ? Mob::baby_ant
+                      : n < 13     ? Mob::worker_ant
+                                   : Mob::soldier_ant;
+    const auto child = spawn_mob(kind, release.rarity, release.position, Group::summon,
+                                 release.owner, 0, release.area);
+    auto& ant = *entities_.get(child);
+    ant.root = release.nest;
+    ant.leaving_nest = true;
+    if (kind != Mob::baby_ant) {
+      ant.provoked = true;
+      ant.target = release.target;
+    }
+    release.ready = tick_ + release.interval;
+    if (nest) {
+      nest->action_ready = release.ready;
+      if (release.fire && release.next == release.end) {
+        nest->view.health = 0;
+        nest->fatal_hit = damage_source(*nest);
       }
-      const auto offset = Vec2{std::cos(n * 2.4), std::sin(n * 2.4)} * (radius + 7 + n * .5);
-      const auto child = spawn_mob(kind, tier, position + offset, Group::summon, life);
-      entities_.get(child)->root = id;
-      entities_.get(child)->provoked = true;
-      entities_.get(child)->target = target;
-    }
-    if (!entrance && fire) {
-      auto& burrow = *entities_.get(id);
-      burrow.view.health = 0;
-      burrow.fatal_hit = damage_source(burrow);
     }
   }
+  std::erase_if(nest_releases_, [](const auto& r) { return r.next == r.end; });
 }
 
 }  // namespace wave::sim

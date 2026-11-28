@@ -171,6 +171,7 @@ void Match::settle_wave(bool advancing) {
       ++wave_.counts.carried;
     } else {
       const auto root = entity->view.id;
+      std::erase_if(nest_releases_, [root](const auto& r) { return r.nest == root; });
       const auto active = entities_.active();
       for (const auto child : active) {
         if (entities_.at(child).root == root) {

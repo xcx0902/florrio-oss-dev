@@ -212,9 +212,6 @@ double Match::apply_health(EntityId id, const DamageSource& source, HealthKind k
             }
           }
         }
-        if (body.mob == Mob::ant_hole) {
-          target->action_ready = tick_;
-        }
       }
       if (body.group == Group::player && body.owner) {
         double reflect = 0;

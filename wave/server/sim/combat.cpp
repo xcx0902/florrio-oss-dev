@@ -678,6 +678,11 @@ void Match::resolve_contacts() {
       if (portal(first.view) || portal(second.view)) {
         continue;
       }
+      // An ant walks through its own opening instead of being pushed to its rim.
+      if ((first.leaving_nest && first.root == second.view.id) ||
+          (second.leaving_nest && second.root == first.view.id)) {
+        continue;
+      }
       const Vec2 delta = positions[b] - positions[a];
       const double radius = first.view.radius + second.view.radius;
       if (travel[a] != Vec2{} || travel[b] != Vec2{}) {

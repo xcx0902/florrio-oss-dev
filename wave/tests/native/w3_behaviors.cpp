@@ -51,6 +51,7 @@ struct FixtureAccess {
     ++m.wave_.counts.alive;
   }
   static void plan(Match& m, std::uint32_t number) { m.open_wave(number - 1, m.tick_); }
+  static Vec2 direction(Match& m, EntityId id) { return m.mob_direction(get(m, id)); }
   static void move_at_age(Match& m, EntityId id, Tick age) {
     m.tick_ = get(m, id).born_tick + age;
     m.move_entities();
@@ -183,10 +184,10 @@ void catalog_movement() {
   steps(m);
   const auto queen = FixtureAccess::spawn(m, Mob::queen_ant, Rarity::common, {400, 0});
   auto& q = FixtureAccess::get(m, queen);
-  q.returning = true;
+  q.target = flower(m);
   q.home_position = {600, 0};
   FixtureAccess::move_at_age(m, queen, 0);
-  near(q.view.velocity.x, 48, "Queen returns at catalog chase speed");
+  near(q.view.velocity.x, -48, "Queen pursues a distant target at catalog chase speed");
   const auto beetle = FixtureAccess::spawn(m, Mob::beetle, Rarity::common, {100, 0});
   auto& b = FixtureAccess::get(m, beetle);
   b.view.owner = owner(m).life;
@@ -523,6 +524,9 @@ void monsters() {
   const auto burrow = FixtureAccess::spawn(m, Mob::fire_ant_burrow, Rarity::common, {0, 20});
   near(FixtureAccess::hit(m, burrow, flower(m), 100000), 0, "Fire Ant Burrow is invulnerable");
   steps(m, 22);
+  check(FixtureAccess::exists(m, burrow), "burrow remains while its ants emerge over time");
+  FixtureAccess::get(m, flower(m)).view.position = {600, 600};
+  steps(m, 300);
   check(!FixtureAccess::exists(m, burrow), "nearby burrow releases ants then disappears");
   unsigned ants = 0;
   for (const auto& e : m.view().entities) {
@@ -546,9 +550,9 @@ void digger_after_ant_hole() {
     Match m({53}, 1, arena());
     check(m.add_player({1}, {}, {}), "admit the ant hole fixture player");
     steps(m);
-    const auto hole = FixtureAccess::spawn(m, Mob::ant_hole, rarity, {25, 0});
+    const auto hole = FixtureAccess::spawn(m, Mob::ant_hole, rarity, {-400, 0});
     FixtureAccess::hit(m, hole, flower(m), 1e5);
-    steps(m);
+    steps(m, 400);
     unsigned defenders = 0;
     for (const auto& e : m.view().entities) {
       if (FixtureAccess::get(m, e.id).root == hole) {
@@ -567,6 +571,110 @@ void digger_after_ant_hole() {
                                  return d && d->purpose == DrawPurpose::digger_spawn;
                                }),
           "Digger RNG belongs exclusively to a Rare+ first entry");
+  }
+}
+
+void gradual_nest_releases() {
+  for (const auto rarity : {Rarity::common, Rarity::unusual}) {
+    for (const bool fire : {false, true}) {
+      for (const auto step_ms : {25, 50}) {
+        auto rules = arena();
+        rules.timing.step = std::chrono::milliseconds(step_ms);
+        Match m({58}, 1, rules);
+        m.add_player({1}, {}, {});
+        steps(m);
+        const Vec2 opening = step_ms == 25 ? Vec2{0, 30} : Vec2{rules.arena_radius - 10, 0};
+        FixtureAccess::get(m, flower(m)).view.position = opening + Vec2{-20, 0};
+        const auto check_movement = [&](EntityId id) {
+          auto& ant = FixtureAccess::get(m, id);
+          auto& player_body = FixtureAccess::get(m, flower(m)).view;
+          const auto saved_position = player_body.position;
+          player_body.position = opening + Vec2{-20, 0};
+          const auto direction = FixtureAccess::direction(m, id);
+          if (ant.view.mob == Mob::baby_ant) {
+            check(!ant.provoked && !ant.target && direction.length() < .01,
+                  "released Baby Ant immediately uses its passive movement envelope");
+          } else {
+            check(ant.provoked && ant.target == flower(m),
+                  "released aggressive ant immediately targets the player");
+            near(direction.x, -1, "aggressive ant heads straight toward its target");
+            near(direction.y, 0, "aggressive ant has no outward release detour");
+          }
+          player_body.position = saved_position;
+        };
+        const auto hole =
+            FixtureAccess::spawn(m, fire ? Mob::fire_ant_burrow : Mob::ant_hole, rarity, opening);
+        if (!fire) {
+          FixtureAccess::hit(m, hole, flower(m), FixtureAccess::get(m, hole).view.max_health * .1);
+        }
+        steps(m);
+        const auto first_view = m.view();
+        std::vector<EntityId> ants;
+        for (const auto& e : first_view.entities) {
+          if (FixtureAccess::get(m, e.id).root == hole) {
+            ants.push_back(e.id);
+            check(e.position == opening, "first ant starts at the opening");
+          }
+        }
+        check(ants.size() == 1, "a triggered small nest initially emits one ant");
+        auto& first = FixtureAccess::get(m, ants.front());
+        check(fire || (!first.provoked && !first.target), "released Baby Ant stays passive");
+        check_movement(ants.front());
+        steps(m);
+        const double distance = (first.view.position - opening).length();
+        check(distance > 0 && distance <= first.rules.speed_per_second * step_ms / 1000. + 1e-6,
+              "ant walks out instead of being pushed or teleported outside the nest");
+        if (fire) {
+          near(first.view.velocity.x, -first.rules.speed_per_second,
+               "released Fire Ant immediately chases at its normal pursuit speed");
+          near(first.view.velocity.y, 0, "Fire Ant has no initial sideways run");
+        } else {
+          check(first.view.velocity.length() < 1,
+                "Baby Ant is not forced to run out at chase speed");
+        }
+        FixtureAccess::get(m, flower(m)).view.position = {600, 600};
+        if (!fire) {
+          // Extend an in-progress release with a lethal hit. Reaping the nest
+          // must neither burst the queue nor discard its remaining inhabitants.
+          FixtureAccess::hit(m, hole, flower(m), 1e5);
+        }
+        std::vector<EntityId> seen{ants.front()};
+        Tick last_birth = first.born_tick;
+        unsigned babies = fire ? 0 : 1, workers = 0, soldiers = 0, queens = 0;
+        const auto interval = rules.timing.ticks_ceil(std::chrono::milliseconds(100));
+        const unsigned total = fire ? 30 : 40;
+        for (Tick n = 0; n < total * interval; ++n) {
+          steps(m);
+          for (const auto& e : m.view().entities) {
+            auto& ant = FixtureAccess::get(m, e.id);
+            if (ant.root != hole || std::ranges::find(seen, e.id) != seen.end()) {
+              continue;
+            }
+            check(e.position == opening, "each ant emerges from the same opening");
+            check(ant.born_tick - last_birth == interval, "release emits one ant every 100 ms");
+            check(e.rarity == rarity && e.area == 0, "small nest preserves ant rarity and area");
+            check_movement(e.id);
+            if (e.mob == Mob::baby_ant) {
+              check(!ant.provoked && !ant.target, "every released Baby Ant remains unprovoked");
+              ++babies;
+            }
+            workers += e.mob == Mob::worker_ant;
+            soldiers += e.mob == Mob::soldier_ant;
+            queens += e.mob == Mob::queen_ant;
+            seen.push_back(e.id);
+            last_birth = ant.born_tick;
+          }
+        }
+        check(seen.size() == total, "gradual release preserves the full population");
+        check(fire || (babies == 5 && workers == 8 && soldiers == 26 && queens == 1),
+              "lethal release preserves all four ant castes");
+        check(!FixtureAccess::exists(m, hole), "destroyed nest or emptied fire burrow is reaped");
+        if (!fire) {
+          check(!first.provoked && !first.target,
+                "Baby Ant keeps its passive behavior after release");
+        }
+      }
+    }
   }
 }
 
@@ -1029,8 +1137,18 @@ void lightning_contacts_and_ant_alert() {
     q.target = flower(m);
     q.view.position = {-250, 0};
     steps(m);
-    check(q.returning && !q.target && q.view.velocity.x > 0,
-          "Queen Ant drops distant target and returns home");
+    check(q.target == flower(m) && q.view.velocity.x > 0,
+          "Queen Ant retains a target beyond 120 units");
+    q.view.position = {-500, 0};
+    FixtureAccess::get(m, flower(m)).view.position = {-550, 0};
+    steps(m);
+    check(q.target == flower(m) && q.view.velocity.x < 0,
+          "Queen Ant pursues beyond 120 units from its birthplace");
+    q.root = FixtureAccess::spawn(m, Mob::ant_hole, Rarity::common, {-100, 0});
+    q.target.reset();
+    FixtureAccess::get(m, flower(m)).view.position = {500, 0};
+    FixtureAccess::move_at_age(m, queen, 0);
+    near(q.view.velocity.length(), 0, "idle Queen has no forced return to its nest");
   }
 }
 }
@@ -1052,6 +1170,8 @@ int main() {
     monsters();
     phase = "Digger after clearing an Ant Hole";
     digger_after_ant_hole();
+    phase = "gradual small nest releases";
+    gradual_nest_releases();
     phase = "mob pursuit";
     pursuit();
     phase = "player and mob rebound";

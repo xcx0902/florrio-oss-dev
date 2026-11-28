@@ -64,6 +64,21 @@ class Match {
     bool attack_slow = false;
   };
 
+  // A destroyed small nest still releases its remaining inhabitants over time.
+  struct NestRelease {
+    EntityId nest;
+    Vec2 position;
+    std::uint32_t area;
+    Rarity rarity;
+    bool fire;
+    std::optional<LifeId> owner;
+    std::optional<EntityId> target;
+    unsigned next;
+    unsigned end;
+    Tick ready;
+    Tick interval;
+  };
+
   using Command = std::variant<Input, Connection, Equip, Departure>;
 
   [[nodiscard]] Player* player(PlayerId id);
@@ -138,6 +153,7 @@ class Match {
   std::optional<WaveView> previous_wave_;
   std::optional<TransitionReason> arrival_;
   std::vector<AntHoleView> ant_holes_;
+  std::vector<NestRelease> nest_releases_;
   std::uint32_t next_area_ = 0;
   double arena_radius_ = 300;
   Tick pvp_spawn_ready_ = 0;
