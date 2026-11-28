@@ -974,10 +974,10 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
                         player->area, player->life_start_generation});
   }
 
-  std::map<std::uint32_t, sim::Vec2> closed_areas;
+  std::map<std::uint32_t, sim::AreaClosed> closed_areas;
   for (const auto& event : room.match->events()) {
     if (const auto* closed = std::get_if<sim::AreaClosed>(&event.data)) {
-      closed_areas[closed->area] = closed->position;
+      closed_areas[closed->area] = *closed;
     }
   }
   const auto current_area = [&](std::uint32_t area) {
@@ -1106,19 +1106,19 @@ void RoomManager::settle_economy(Room& room, const sim::MatchView& after) {
   }
 
   // Include loot created by the last guard's death in this tick, regardless of
-  // event ordering. Interior coordinates are discarded when returning outside.
-  for (const auto& [area, position] : closed_areas) {
+  // event ordering. Use the same scaled layout as the returning entities.
+  for (const auto& [area, closed] : closed_areas) {
     for (auto& drop : room.drops) {
       if (drop.area == area) {
         drop.area = 0;
-        drop.position = sim::clamp_center(position, after.arena_radius, 4);
+        drop.position = closed.return_position(drop.position, after.arena_radius, 4);
       }
     }
     for (auto& pickup : room.pickups) {
       if (pickup.drop.area == area) {
         pickup.drop.area = 0;
-        pickup.drop.position = sim::clamp_center(position, after.arena_radius, 4);
-        pickup.destination = sim::clamp_center(position, after.arena_radius, 5);
+        pickup.drop.position = closed.return_position(pickup.drop.position, after.arena_radius, 4);
+        pickup.destination = closed.return_position(pickup.destination, after.arena_radius, 5);
       }
     }
   }

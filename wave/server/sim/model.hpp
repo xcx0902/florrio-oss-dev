@@ -441,6 +441,13 @@ struct Defeat {
 struct AreaClosed {
   std::uint32_t area;
   Vec2 position;
+  double interior_radius;
+
+  [[nodiscard]] Vec2 return_position(Vec2 inside, double arena_radius, double body_radius) const {
+    constexpr double return_radius = 40;
+    const auto offset = clamp_center(inside * (return_radius / interior_radius), return_radius, 0);
+    return clamp_center(position + offset, arena_radius, body_radius);
+  }
 };
 
 using EventData = std::variant<RandomDraw, SpawnEvent, Transition, HealthChange, LifeChange, Defeat,

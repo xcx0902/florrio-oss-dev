@@ -161,8 +161,10 @@ void ant_split_lifecycle() {
   check(FixtureAccess::player(m).area == 0 && !FixtureAccess::player(m).body,
         "closed interior returns dead player's reservation");
 }
-void ant_close(bool timeout, Mob kind = Mob::ant_hole, Vec2 entrance = {120, -80}) {
+void ant_close(bool timeout, Mob kind = Mob::ant_hole, Vec2 entrance = {120, -80},
+               double interior_radius = 150) {
   auto r = arena();
+  r.ant_hole_radius = interior_radius;
   r.ant_hole_duration = std::chrono::milliseconds(100);
   Match m({3}, 9, r);
   m.add_player({1}, {}, {Petal::basic});
@@ -185,8 +187,11 @@ void ant_close(bool timeout, Mob kind = Mob::ant_hole, Vec2 entrance = {120, -80
       guards.push_back(e.id);
     }
   }
+  MatchView before_return;
   if (timeout) {
-    step(m, 5);
+    step(m, 4);
+    before_return = m.view();
+    FixtureAccess::holes(m);
     check(!m.view().ant_holes.size(), "deadline closes interior");
     check(std::ranges::any_of(m.view().entities,
                               [](const auto& e) { return e.group == Group::residual; }),
@@ -200,6 +205,7 @@ void ant_close(bool timeout, Mob kind = Mob::ant_hole, Vec2 entrance = {120, -80
     check(m.view().ant_holes.size() == 1, "last guard keeps interior open");
     FixtureAccess::entity(m, guards[0]).view.health = 0;
     FixtureAccess::reap(m);
+    before_return = m.view();
     FixtureAccess::holes(m);
     check(m.view().ant_holes.empty(), "last guard closes interior");
   }
@@ -207,10 +213,16 @@ void ant_close(bool timeout, Mob kind = Mob::ant_hole, Vec2 entrance = {120, -80
         "return preserves player body");
   check(FixtureAccess::player(m).life.generation > life.generation,
         "return invalidates old input epoch");
+  const auto expected_position = [&](const EntityView& e) {
+    const auto before = std::ranges::find(before_return.entities, e.id, &EntityView::id);
+    check(before != before_return.entities.end(), "returned entity existed in the cave");
+    return clamp_center(entrance + before->position * (40 / interior_radius), m.view().arena_radius,
+                        e.radius);
+  };
   near((FixtureAccess::entity(m, body).view.position -
-        clamp_center(entrance, m.view().arena_radius, r.player.radius))
+        expected_position(FixtureAccess::entity(m, body).view))
            .length(),
-       0, "player returns to the entrance");
+       0, "player keeps its scaled cave position around the entrance");
   const auto returned = m.view();
   for (const auto id : {digger, summon}) {
     check(std::ranges::find(returned.entities, id, &EntityView::id) != returned.entities.end(),
@@ -219,8 +231,10 @@ void ant_close(bool timeout, Mob kind = Mob::ant_hole, Vec2 entrance = {120, -80
   for (const auto& e : m.view().entities) {
     check(e.area == 0, "all entities return with players");
     if (e.id == digger || e.id == summon || std::ranges::find(guards, e.id) != guards.end()) {
-      near((e.position - clamp_center(entrance, returned.arena_radius, e.radius)).length(), 0,
-           "surviving cave mobs return to the entrance within the arena");
+      near((e.position - expected_position(e)).length(), 0,
+           "surviving cave mobs retain their relative layout at the entrance");
+      check((e.position - entrance).length() <= 40.000001,
+            "returned mob centers stay within 40 units of the entrance");
       const auto& state = FixtureAccess::entity(m, e.id);
       check(e.velocity == Vec2{} && state.knockback == Vec2{} && state.recoil == Vec2{},
             "return clears interior movement impulses");
@@ -651,9 +665,11 @@ void pvp_economy_entry() {
         "PvE matchmaking isolated");
   (void)before;
 }
-void ant_economy(bool timeout = false, Mob kind = Mob::ant_hole) {
+void ant_economy(bool timeout = false, Mob kind = Mob::ant_hole, double interior_radius = 150) {
   auto db = std::make_shared<store::Store>(":memory:");
-  app::RoomManager rooms(arena(), 42, {}, db);
+  auto rules = arena();
+  rules.ant_hole_radius = interior_radius;
+  app::RoomManager rooms(rules, 42, {}, db);
   auto& a = rooms.admit("", 1);
   check(rooms.command(a, wire::Ready{true}, {}), "start persistent cave match");
   rooms.step();
@@ -689,8 +705,9 @@ void ant_economy(bool timeout = false, Mob kind = Mob::ant_hole) {
                         m.view().next_tick + 100,
                         false,
                         area});
-  room.drops.push_back(
-      {"test-returned-card", returned, {65, -75}, ++room.drop_sequence, 0, false, area});
+  room.drops.push_back({"test-returned-card", returned,
+                        FixtureAccess::entity(m, FixtureAccess::body(m, a.id)).view.position,
+                        ++room.drop_sequence, 0, false, area});
   room.pickups.push_back(
       {{"test-returned-pickup", returned, {70, -40}, ++room.drop_sequence, 0, true, area},
        FixtureAccess::body(m, a.id),
@@ -714,8 +731,12 @@ void ant_economy(bool timeout = false, Mob kind = Mob::ant_hole) {
     if (drop.id == "test-outside-card") {
       check(drop.position == Vec2{-180, -120}, "closure leaves outside drops in place");
     } else if (!drop.id.starts_with(portal_loot)) {
-      near((drop.position - entrance).length(), 0,
-           "existing and same-tick cave loot returns to the entrance");
+      check((drop.position - entrance).length() <= 40.000001,
+            "existing and same-tick cave loot stays within 40 units of the entrance");
+      if (drop.id == "test-pending-card") {
+        near((drop.position - (entrance + Vec2{-80, 60} * (40 / interior_radius))).length(), 0,
+             "existing drops retain their scaled cave position");
+      }
       if (!drop.id.starts_with("test-")) {
         ++cave_loot;
       }
@@ -726,10 +747,12 @@ void ant_economy(bool timeout = false, Mob kind = Mob::ant_hole) {
   }
   check(!room.pickups.empty() && room.pickups.front().drop.area == 0,
         "closure returns in-flight pickups to the main world");
-  near((room.pickups.front().drop.position - entrance).length(), 0,
-       "in-flight pickup starts at the entrance");
-  near((room.pickups.front().destination - entrance).length(), 0,
-       "in-flight pickup destination returns to the entrance");
+  near((room.pickups.front().drop.position - (entrance + Vec2{70, -40} * (40 / interior_radius)))
+           .length(),
+       0, "in-flight pickup keeps its scaled starting position");
+  near((room.pickups.front().destination - (entrance + Vec2{-50, 30} * (40 / interior_radius)))
+           .length(),
+       0, "in-flight pickup keeps its scaled destination");
   for (unsigned i = 0; i < 3; ++i) {
     rooms.step();
     check(rooms.wait_storage(), "returned pickup settles");
@@ -869,22 +892,24 @@ int main(int argc, char** argv) {
     run(ant_split_lifecycle, {"W5-ANT-SPLIT", "W5-ANT-LIFECYCLE"});
     run(
         [] {
-          ant_close(false);
-          ant_close(false, Mob::fire_ant_burrow);
-          ant_close(false, Mob::ant_hole, {290, 0});
-          ant_close(false, Mob::fire_ant_burrow, {290, 0});
-          ant_economy();
-          ant_economy(false, Mob::fire_ant_burrow);
+          for (const auto kind : {Mob::ant_hole, Mob::fire_ant_burrow}) {
+            ant_close(false, kind);
+            ant_close(false, kind, {290, 0});
+            ant_close(false, kind, {120, -80}, 200);
+            ant_economy(false, kind);
+            ant_economy(false, kind, 200);
+          }
         },
         {"W5-ANT-CLEAR"});
     run(
         [] {
-          ant_close(true);
-          ant_close(true, Mob::fire_ant_burrow);
-          ant_close(true, Mob::ant_hole, {290, 0});
-          ant_close(true, Mob::fire_ant_burrow, {290, 0});
-          ant_economy(true);
-          ant_economy(true, Mob::fire_ant_burrow);
+          for (const auto kind : {Mob::ant_hole, Mob::fire_ant_burrow}) {
+            ant_close(true, kind);
+            ant_close(true, kind, {290, 0});
+            ant_close(true, kind, {120, -80}, 200);
+            ant_economy(true, kind);
+            ant_economy(true, kind, 200);
+          }
         },
         {"W5-ANT-TIMEOUT"});
     run(

@@ -68,26 +68,29 @@ void Match::close_ant_hole(std::uint32_t area) {
     return;
   }
   const auto hole = *found;
-  // Player transfers also move owned entities. Keep the contents so summons
-  // and projectiles return to the entrance rather than retaining cave offsets.
-  std::vector<std::uint32_t> contents;
+  const AreaClosed closed{area, hole.position, hole.radius};
+  // Capture the scaled positions before player transfers also move their
+  // summons and projectiles, preserving the original layout for all contents.
+  std::vector<std::pair<std::uint32_t, Vec2>> contents;
   for (const auto slot : entities_.active()) {
     const auto& e = entities_.at(slot);
     if (e.view.area == area && e.view.group != Group::player &&
         (e.view.group != Group::petal || e.projectile || e.view.ground_web)) {
-      contents.push_back(slot);
+      contents.emplace_back(slot,
+                            closed.return_position(e.view.position, arena_radius_, e.view.radius));
     }
   }
-  const auto return_at = clamp_center(hole.position, arena_radius_, rules_.player.radius);
   for (auto& p : players_) {
     if (p.view.area == area) {
+      const auto inside = p.view.body ? entities_.get(*p.view.body)->view.position : Vec2{};
+      const auto return_at = closed.return_position(inside, arena_radius_, rules_.player.radius);
       transfer_player(p, 0, return_at);
     }
   }
-  for (const auto slot : contents) {
+  for (const auto& [slot, position] : contents) {
     auto& e = entities_.at(slot);
     e.view.area = 0;
-    e.view.position = clamp_center(hole.position, arena_radius_, e.view.radius);
+    e.view.position = position;
     e.home_position = e.view.position;
     e.flight_start = e.view.position;
     e.view.velocity = {};
@@ -105,7 +108,7 @@ void Match::close_ant_hole(std::uint32_t area) {
     entrance->fatal_hit = damage_source(*entrance);
   }
   std::erase_if(ant_holes_, [area](const auto& h) { return h.area == area; });
-  emit(AreaClosed{area, hole.position});
+  emit(closed);
   reap_deaths();
 }
 
