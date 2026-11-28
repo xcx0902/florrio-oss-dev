@@ -10,6 +10,43 @@ CA，安装脚本不会将它加入系统信任；自动验证使用对应 `root
 通过 Cloudflare DNS-01 申请和续期受信任证书，不依赖公网 80/443。浏览器地址需要
 保留 `https://` 和 `:18443`。实际部署与验收记录见 [STATUS.md](STATUS.md)。
 
+## 一键更新当前版本
+
+已有本页所述 macOS / Caddy 在线环境时，从仓库根目录执行：
+
+```sh
+# 在仓库根目录，发布当前工作区（包含未提交修改）。
+npm run deploy:wave
+# 或使用 wave 包入口。
+npm --prefix wave run deploy
+
+# 查看计划，不修改文件或服务。
+npm run deploy:wave -- --dry-run
+# 只构建、测试和装配，暂不更新在线服务。
+npm run deploy:wave -- --prepare-only
+```
+
+脚本按顺序执行 Release 构建、原生 CTest、部署恢复测试、原件哈希校验和全新目录装配，
+全部通过后才停止后端。等待旧进程完全退出和存档队列排空后，使用 SQLite backup 接口
+备份正式存档，再替换程序与网页并通过 launchd 自动启动。保留现有 LaunchAgent 的配置、
+容量和环境变量；已有 Caddy 继续代理新版后端，无须每次更新重新安装系统代理或输入管理员密码。
+
+启动或后端健康检查失败时，自动恢复上版程序、网页、发布记录和 LaunchAgent 并重新启动。
+回退不会覆盖当前数据库，避免丢失重启期间已提交的存档；不支持跨不兼容数据库迁移自动回退。
+公网验证失败时保留已经健康运行的后端，命令返回失败并提示检查 Caddy、DNS 或网络。
+检查涵盖公网 `/healthz` 及页面、`local.js` 与本次装配的哈希一致性，HTTPS 保留正常证书校验。
+
+正式存档和上一版文件保存在运行目录的私有 `backups/<时间戳>/` 中；构建产物及版本摘要在
+`build/wave/preview/releases/`，最近成功发布记录为 `build/wave/preview/last-deploy.json`。
+记录包含 Git revision、工作区是否有未提交变更、程序及主要网页资源 SHA-256。
+备份和产物不会自动清理。重启会中断内存中的对局，已提交的存档保留。
+
+可通过 `--snapshot PATH` / `WAVE_SNAPSHOT` 指定原件目录，默认 `wave-reference/20221030`；
+`--native-dir PATH` / `WAVE_NATIVE_DIR` 指定构建目录；`--jobs N` 指定编译并行度（默认 6）；
+`--url https://域名:端口/` 指定发布后的公网验证地址。路径参数相对当前命令所在目录解析。
+发布命令会锁定本仓库构建目录，安装器另行锁定运行目录，防止并发覆盖；若进程被强制终止，
+确认没有部署进程后才可手动删除对应 `.deploy.lock` 目录。首次部署仍需先完成下文 Caddy 配置。
+
 ## 构建和装配
 
 ```sh

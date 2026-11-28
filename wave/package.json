@@ -7,6 +7,8 @@
     "node": ">=22"
   },
   "scripts": {
+    "deploy": "node tools/deploy/deploy.mjs",
+    "test:deploy-script": "node --test tools/deploy/install-backend-macos.test.mjs",
     "start": "node tools/deploy/serve.mjs",
     "test:capacity": "node tools/deploy/test-capacity.mjs",
     "test:deploy": "node tools/deploy/smoke.mjs",

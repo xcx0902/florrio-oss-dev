@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "deploy:wave": "node wave/tools/deploy/deploy.mjs",
     "build": "npm run build:dist-next",
     "setup:format": "node tools/setup-format-tools.mjs",
     "format": "node tools/format.mjs",
