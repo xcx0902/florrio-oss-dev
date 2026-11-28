@@ -143,6 +143,7 @@ class Match {
   const Rules rules_;
   detail::EntityPool entities_;
   std::mt19937 rng_;
+  std::mt19937 movement_rng_;  // Wandering must not consume wave/drop draws.
   Tick tick_ = 0;
   Phase phase_ = Phase::waiting;
   std::vector<Player> players_;

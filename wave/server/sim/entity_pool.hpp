@@ -55,6 +55,8 @@ struct Entity {
   std::optional<EntityId> root;
   std::optional<Mob> chain_kind;
   std::optional<double> wander_heading;
+  double wander_speed = 0;
+  Tick wander_ready = 0;
   bool leaving_nest = false;
   Tick action_ready = 0;
   Tick heal_block_until = 0;

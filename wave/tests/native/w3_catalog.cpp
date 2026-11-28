@@ -181,11 +181,11 @@ void rose_and_leaf() {
     FixtureAccess::damage(match, *owner(match).body, 1);
     steps(match, 39);
     near(body(match).health, 99, "rose waits one second");
-    near(petal(match).position.length(), 13, "rose does not expand on attack");
+    near(petal(match).position.length(), 14, "rose does not expand on attack");
     steps(match, 1);
     near(body(match).health, 99, "rose does not heal before reaching the player");
-    check(petal(match).position.length() < 13, "rose visibly leaves its orbit");
-    near(petal(match, 1).position.length(), 13, "spare rose stays in orbit");
+    check(petal(match).position.length() < 14, "rose visibly leaves its orbit");
+    near(petal(match, 1).position.length(), 14, "spare rose stays in orbit");
     steps(match, 7);
     check(petal(match).position.length() < 1, "rose closes in on the player");
     steps(match, 1);

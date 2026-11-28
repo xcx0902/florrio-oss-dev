@@ -165,6 +165,40 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
   const auto speed_ratio = [&](double speed) {
     return definition.body.speed_per_second > 0 ? speed / definition.body.speed_per_second : 0;
   };
+  const auto random = [this] {
+    return double(movement_rng_()) / (double(std::mt19937::max()) + 1);
+  };
+  const auto turn_at_wall = [&](Vec2 direction, double speed) {
+    const auto position = entity.view.position;
+    const double distance = position.length();
+    const double step = std::chrono::duration<double>(rules_.timing.step).count();
+    const double limit = std::max(0., area_radius(entity.view.area) - entity.view.radius);
+    const double travel = speed * step;
+    const auto next = position + direction * travel;
+    if (distance > 0 && travel > 0 && next.length() > limit) {
+      // Pick a fresh inward heading, with enough room for this tick's full step.
+      const double cosine =
+          (distance * distance + travel * travel - limit * limit) / (2 * distance * travel);
+      const double spread = std::min(std::numbers::pi / 3, std::acos(std::clamp(cosine, -1., 1.)));
+      const double angle = std::atan2(-position.y, -position.x) + (2 * random() - 1) * spread;
+      direction = {std::cos(angle), std::sin(angle)};
+    }
+    return direction;
+  };
+  if (definition.ai == catalog::MobAI::sandstorm) {
+    // Wild and Stick-created storms share the same untargeted random walk.
+    entity.target.reset();
+    if (!entity.wander_heading || tick_ >= entity.wander_ready) {
+      entity.wander_heading = random() * 2 * std::numbers::pi;
+      entity.wander_speed = random() * movement.idle_speed_per_second;
+      entity.wander_ready = tick_ + seconds(rules_, .5 + random());
+    }
+    const double speed = std::min(entity.wander_speed, definition.body.speed_per_second);
+    const auto direction =
+        turn_at_wall({std::cos(*entity.wander_heading), std::sin(*entity.wander_heading)}, speed);
+    entity.wander_heading = std::atan2(direction.y, direction.x);
+    return direction * speed_ratio(speed);
+  }
   if (entity.leaving_nest) {
     const auto* nest = entity.root ? entities_.get(*entity.root) : nullptr;
     if (!nest || (entity.view.position - nest->view.position).length() >=
@@ -173,12 +207,9 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
     }
   }
   const bool owned = entity.view.owner.has_value();
-  bool aggressive =
+  const bool aggressive =
       owned || entity.provoked ||
       (definition.ai != catalog::MobAI::passive && definition.ai != catalog::MobAI::neutral);
-  if (definition.ai == catalog::MobAI::sandstorm && !owned) {
-    aggressive = false;
-  }
   if (definition.ai == catalog::MobAI::digger && entity.view.health < entity.view.max_health * .3) {
     entity.target.reset();
     const auto distance = entity.view.position.length();
@@ -226,7 +257,9 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
     if (definition.ai == catalog::MobAI::ranged && distance < 100) {
       return Vec2{-direction.y, direction.x} * speed_ratio(movement.strafe_speed_per_second);
     }
-    return direction;
+    return entity.chain_kind == Mob::desert_centipede
+               ? turn_at_wall(direction, definition.body.speed_per_second)
+               : direction;
   }
   if (owned) {
     const auto* owner = player(entity.view.owner->player);
@@ -239,6 +272,13 @@ Vec2 Match::mob_direction(detail::Entity& entity) {
   }
   const double time =
       std::chrono::duration<double>(rules_.timing.step).count() * (tick_ - entity.born_tick);
+  if (entity.chain_kind == Mob::desert_centipede) {
+    const double angle = entity.wander_heading.value_or(entity.view.heading_rad);
+    const auto direction =
+        turn_at_wall({std::cos(angle), std::sin(angle)}, movement.idle_speed_per_second);
+    entity.wander_heading = std::atan2(direction.y, direction.x);
+    return direction * speed_ratio(movement.idle_speed_per_second);
+  }
   if (entity.chain_kind == Mob::centipede || entity.chain_kind == Mob::evil_centipede) {
     // The engine's Centipede profile adds a slow sine to its base heading.
     const bool evil = entity.chain_kind == Mob::evil_centipede;
@@ -411,6 +451,16 @@ void Match::constrain_segments() {
       const auto delta = previous->position - body.position;
       const auto distance = delta.length();
       const double gap = segment_gap(*root.chain_kind, previous->radius + body.radius);
+      if (root.chain_kind == Mob::desert_centipede) {
+        // Its faster patrol and wall turns need full spacing: extension-only
+        // links can pile up faster than one contact pass separates them.
+        const Vec2 forward =
+            distance > 0 ? delta
+                         : Vec2{std::cos(previous->heading_rad), std::sin(previous->heading_rad)};
+        place_spawn_segment(body, *previous, forward, gap, area_radius(body.area));
+        previous = &body;
+        continue;
+      }
       // As in engine/src/sim/movement.cpp, a link limits extension only.
       // A compressed link can stay put as its predecessor moves into a turn.
       if (distance > gap) {

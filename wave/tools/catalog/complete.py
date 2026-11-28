@@ -108,6 +108,10 @@ def main():
             if kind == 'soil':
                 m.update(speed_multiplier=.9, size_multiplier=1.15)
             m['hidden'] = kind in ('antennae', 'third_eye', 'cutter')
+            # Orbit distances are local gameplay settings, not tooltip adoptions.
+            for key in ('attack_distance', 'defend_distance'):
+                if key in row.get('mechanics', {}):
+                    m[key] = row['mechanics'][key]
             row['mechanics'] = m
             row['clientValues'] = dict(offset12=body['damage'], offset16=body['health']) if body else None
             row['evidenceKey'] = 'petal.' + kind if 'petal.' + kind in {e['id'] for e in pack['evidence']} else 'behavior.full'
@@ -145,7 +149,11 @@ def main():
                                        poison_ticks=0))
             body.update(health=health.get('range', [health['value']])[0],
                         contact_damage=fields.get('Damage', {'value': v['baseDamage'] * v['damageMultiplier']})['value'])
-            speed, movement, movement_provenance = mob_movement(kind, pack['mobMovementPlayerSpeed'], movement_source)
+            movement_provenance = row.get('provenance', {}).get('movement', {})
+            if movement_provenance.get('policy') == 'local-override':
+                speed, movement = body['speed_per_second'], row['movement']
+            else:
+                speed, movement, movement_provenance = mob_movement(kind, pack['mobMovementPlayerSpeed'], movement_source)
             body['speed_per_second'] = speed
             row['movement'] = movement
             # Hornet bullets, not the hornet body, carry the ranged attack.

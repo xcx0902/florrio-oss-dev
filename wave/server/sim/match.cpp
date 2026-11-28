@@ -74,7 +74,7 @@ void validate(const Rules& rules) {
 
 Match::Match(MatchId id, std::uint32_t seed, Rules rules, std::size_t opening_index)
     : id_(id), seed_(seed), rules_(std::move(rules)), entities_(id), rng_(seed),
-      wave_index_(opening_index), arena_radius_(rules_.arena_radius) {
+      movement_rng_(seed), wave_index_(opening_index), arena_radius_(rules_.arena_radius) {
   if (id.value == 0) {
     throw std::invalid_argument("Wave match identity must be nonzero");
   }

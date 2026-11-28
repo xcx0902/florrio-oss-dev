@@ -2984,7 +2984,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -3081,7 +3081,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -3178,7 +3178,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -3275,7 +3275,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -3372,7 +3372,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -3469,7 +3469,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -11673,7 +11673,7 @@
       },
       "areaRadius": 10,
       "mechanics": {
-        "attack_distance": 26.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -11771,7 +11771,7 @@
       },
       "areaRadius": 12,
       "mechanics": {
-        "attack_distance": 26.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -11869,7 +11869,7 @@
       },
       "areaRadius": 14,
       "mechanics": {
-        "attack_distance": 26.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -11967,7 +11967,7 @@
       },
       "areaRadius": 16,
       "mechanics": {
-        "attack_distance": 26.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -12065,7 +12065,7 @@
       },
       "areaRadius": 18,
       "mechanics": {
-        "attack_distance": 26.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -12163,7 +12163,7 @@
       },
       "areaRadius": 40,
       "mechanics": {
-        "attack_distance": 26.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -16916,7 +16916,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -17013,7 +17013,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -17110,7 +17110,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -17207,7 +17207,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -17304,7 +17304,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -17401,7 +17401,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22168,7 +22168,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22267,7 +22267,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22366,7 +22366,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22465,7 +22465,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22564,7 +22564,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22663,7 +22663,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22761,7 +22761,7 @@
       },
       "areaRadius": 50,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22859,7 +22859,7 @@
       },
       "areaRadius": 50,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -22957,7 +22957,7 @@
       },
       "areaRadius": 50,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23055,7 +23055,7 @@
       },
       "areaRadius": 50,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23153,7 +23153,7 @@
       },
       "areaRadius": 50,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23251,7 +23251,7 @@
       },
       "areaRadius": 50,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23350,7 +23350,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23449,7 +23449,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23548,7 +23548,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23647,7 +23647,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23746,7 +23746,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -23845,7 +23845,7 @@
       },
       "areaRadius": 0,
       "mechanics": {
-        "attack_distance": 13.0,
+        "attack_distance": 14.0,
         "defend_distance": 8.0,
         "shield": 0,
         "reflection": 0,
@@ -32052,7 +32052,7 @@
       "body": {
         "radius": 6,
         "health": 50,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 10,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32093,11 +32093,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32112,7 +32113,7 @@
       "body": {
         "radius": 6,
         "health": 80,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 11,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32153,11 +32154,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32172,7 +32174,7 @@
       "body": {
         "radius": 6,
         "health": 125,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 13,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32213,11 +32215,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32232,7 +32235,7 @@
       "body": {
         "radius": 6,
         "health": 200,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 16,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32273,11 +32276,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32292,7 +32296,7 @@
       "body": {
         "radius": 6,
         "health": 1250,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 20,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32333,11 +32337,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32352,7 +32357,7 @@
       "body": {
         "radius": 6,
         "health": 2500,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 25,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32393,11 +32398,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32412,7 +32418,7 @@
       "body": {
         "radius": 6,
         "health": 50,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 10,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32451,11 +32457,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32470,7 +32477,7 @@
       "body": {
         "radius": 6,
         "health": 80,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 11,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32509,11 +32516,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32528,7 +32536,7 @@
       "body": {
         "radius": 6,
         "health": 125,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 13,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32567,11 +32575,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32586,7 +32595,7 @@
       "body": {
         "radius": 6,
         "health": 200,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 16,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32625,11 +32634,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32644,7 +32654,7 @@
       "body": {
         "radius": 6,
         "health": 1250,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 20,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32683,11 +32693,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -32702,7 +32713,7 @@
       "body": {
         "radius": 6,
         "health": 2500,
-        "speed_per_second": 48.0,
+        "speed_per_second": 75.0,
         "contact_damage": 25,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -32741,11 +32752,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: idle and provoked movement both use 75 sim units/s; choose random inward headings at arena walls."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 75.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -35208,7 +35220,7 @@
       "body": {
         "radius": 6,
         "health": 50,
-        "speed_per_second": 48.0,
+        "speed_per_second": 60.0,
         "contact_damage": 40,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -35247,11 +35259,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: random wandering at up to 60 sim units/s, including Stick summons."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 60.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -35266,7 +35279,7 @@
       "body": {
         "radius": 6,
         "health": 80,
-        "speed_per_second": 48.0,
+        "speed_per_second": 60.0,
         "contact_damage": 44,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -35305,11 +35318,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: random wandering at up to 60 sim units/s, including Stick summons."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 60.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -35324,7 +35338,7 @@
       "body": {
         "radius": 6,
         "health": 125,
-        "speed_per_second": 48.0,
+        "speed_per_second": 60.0,
         "contact_damage": 52,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -35363,11 +35377,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: random wandering at up to 60 sim units/s, including Stick summons."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 60.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -35382,7 +35397,7 @@
       "body": {
         "radius": 6,
         "health": 200,
-        "speed_per_second": 48.0,
+        "speed_per_second": 60.0,
         "contact_damage": 64,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -35421,11 +35436,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: random wandering at up to 60 sim units/s, including Stick summons."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 60.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -35440,7 +35456,7 @@
       "body": {
         "radius": 6,
         "health": 1250,
-        "speed_per_second": 48.0,
+        "speed_per_second": 60.0,
         "contact_damage": 80,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -35479,11 +35495,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: random wandering at up to 60 sim units/s, including Stick summons."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 60.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,
@@ -35498,7 +35515,7 @@
       "body": {
         "radius": 6,
         "health": 2500,
-        "speed_per_second": 48.0,
+        "speed_per_second": 60.0,
         "contact_damage": 100,
         "contact_heal": 0,
         "poison_per_tick": 0,
@@ -35537,11 +35554,12 @@
         "movement": {
           "source": "world-pvp-movement.json",
           "profile": "square",
-          "policy": "default-ai"
+          "policy": "local-override",
+          "reason": "Local gameplay tuning: random wandering at up to 60 sim units/s, including Stick summons."
         }
       },
       "movement": {
-        "idle_speed_per_second": 4.0,
+        "idle_speed_per_second": 60.0,
         "strafe_speed_per_second": 0.0,
         "idle_wave_frequency_min": 0,
         "idle_wave_frequency_max": 0,

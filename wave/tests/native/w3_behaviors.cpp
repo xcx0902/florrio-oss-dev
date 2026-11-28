@@ -39,6 +39,7 @@ struct FixtureAccess {
   static void reap(Match& m) { m.reap_deaths(); }
   static void constrain(Match& m) { m.constrain_segments(); }
   static void seed(Match& m, std::uint32_t seed) { m.rng_.seed(seed); }
+  static auto wave_rng(const Match& m) { return m.rng_; }
   static void chain(Match& m, EntityId target, EntityId source, unsigned hops) {
     const auto s = get(m, source).view;
     m.chain_attack(target, {source, s.owner, s.faction}, 10, hops, 40);
@@ -143,7 +144,7 @@ void catalog_movement() {
       {Mob::evil_centipede, 3.2, 48, 0, 1},
       {Mob::square, 4, 48, 0, 1},
       {Mob::spider, 20, 57.6, 2.0000000949949026, 2},
-      {Mob::desert_centipede, 4, 48, 0, 1},
+      {Mob::desert_centipede, 75, 75, 0, 1},
       {Mob::scorpion, 4, 48, 0, 1},
       {Mob::jellyfish, 4, 48, 0, 1},
       {Mob::leech, 4, 48, 0, 1},
@@ -199,6 +200,147 @@ void catalog_movement() {
   d.view.health = d.view.max_health * .1;
   FixtureAccess::move_at_age(m, digger, 0);
   near(d.view.velocity.x, -48, "Digger retreats at original generic chase speed");
+}
+
+void desert_movement() {
+  for (const auto step : {Microseconds{25000}, Microseconds{50000}}) {
+    for (unsigned tier = 0; tier < 6; ++tier) {
+      auto rules = arena();
+      rules.timing.step = step;
+      Match m({60}, 7, rules);
+      m.add_player({1}, {}, {});
+      steps(m);
+      const auto id = FixtureAccess::spawn(m, Mob::desert_centipede, Rarity(tier), {400, 0});
+      auto& head = FixtureAccess::get(m, id);
+      FixtureAccess::hit(m, id, flower(m), 1);
+      check(!head.provoked && !head.target,
+            "hitting the Desert Centipede head does not provoke it");
+      FixtureAccess::move_at_age(m, id, 0);
+      near(head.view.velocity.length(), 75, "Desert Centipede patrols at 75 units per second");
+      head.view.position = {rules.arena_radius - head.view.radius - .1, 0};
+      head.view.heading_rad = 0;
+      head.wander_heading = 0;
+      for (Tick age = 1; age <= 20; ++age) {
+        FixtureAccess::move_at_age(m, id, age);
+        near(head.view.velocity.length(), 75, "wall turns preserve patrol speed");
+        check(head.view.velocity.x < 0,
+              "Desert Centipede turns inward instead of sticking to the wall");
+      }
+      head.view.position = {110, 0};
+      FixtureAccess::hit(m, id, flower(m), 1, HealthKind::radiation);
+      check(head.provoked && head.target == flower(m),
+            "Uranium provokes the Desert Centipede head");
+      FixtureAccess::move_at_age(m, id, 21);
+      near(head.view.velocity.length(), 75, "provocation does not change Desert Centipede speed");
+      check(head.view.velocity.x < 0, "provoked Desert Centipede pursues its attacker");
+    }
+  }
+}
+
+void sandstorm_wandering() {
+  for (const auto step : {Microseconds{25000}, Microseconds{50000}}) {
+    for (unsigned tier = 0; tier < 6; ++tier) {
+      for (const bool stick : {false, true}) {
+        auto rules = arena();
+        rules.timing.step = step;
+        Match m({61}, 7, rules), replay({61}, 7, rules);
+        EntityId storm, repeated;
+        for (auto* match : {&m, &replay}) {
+          match->add_player({1}, {}, {});
+          steps(*match);
+          const auto id = FixtureAccess::spawn(*match, Mob::sandstorm, Rarity(tier), {400, 0});
+          auto& entity = FixtureAccess::get(*match, id);
+          if (stick) {
+            entity.view.owner = owner(*match).life;
+            entity.view.faction = Faction::team;
+            entity.summon_origin = Petal::stick;
+          }
+          entity.provoked = true;
+          entity.target = flower(*match);
+          (match == &m ? storm : repeated) = id;
+        }
+        const auto wave_rng = FixtureAccess::wave_rng(m);
+        double lowest = 60, highest = 0;
+        std::set<double> headings;
+        const Tick duration = rules.timing.ticks_ceil(std::chrono::seconds(8));
+        for (Tick age = 0; age < duration; ++age) {
+          FixtureAccess::move_at_age(m, storm, age);
+          FixtureAccess::move_at_age(replay, repeated, age);
+          const auto& entity = FixtureAccess::get(m, storm);
+          const auto& again = FixtureAccess::get(replay, repeated);
+          const double speed = entity.view.velocity.length();
+          check(speed >= 0 && speed <= 60 + 1e-6,
+                "wild and Stick storms stay within 60 units per second");
+          check(!entity.target,
+                "Sandstorm wanders instead of pursuing a target or following its owner");
+          lowest = std::min(lowest, speed);
+          highest = std::max(highest, speed);
+          headings.insert(entity.view.heading_rad);
+          check(entity.view.position == again.view.position &&
+                    entity.view.velocity == again.view.velocity,
+                "random wandering is reproducible with the same match seed");
+        }
+        check(highest - lowest > 1 && headings.size() > 2,
+              "Sandstorm changes both speed and direction");
+        check(FixtureAccess::wave_rng(m) == wave_rng,
+              "wandering leaves wave and drop randomness untouched");
+        auto& entity = FixtureAccess::get(m, storm);
+        entity.view.position = {rules.arena_radius - entity.view.radius - .1, 0};
+        entity.wander_heading = 0;
+        entity.wander_speed = 60;
+        entity.wander_ready = entity.born_tick + duration + 10;
+        FixtureAccess::move_at_age(m, storm, duration);
+        near(entity.view.velocity.length(), 60,
+             "Sandstorm keeps its speed when turning at the wall");
+        check(entity.view.velocity.x < 0, "Sandstorm turns toward the arena interior");
+      }
+    }
+  }
+}
+
+void random_wall_turns() {
+  for (const auto [kind, stick] :
+       {std::pair{Mob::desert_centipede, false}, {Mob::sandstorm, false}, {Mob::sandstorm, true}}) {
+    Match m({62}, 7, arena()), replay({62}, 7, arena());
+    EntityId id, repeated;
+    for (auto* match : {&m, &replay}) {
+      match->add_player({1}, {}, {});
+      steps(*match);
+      const auto spawned = FixtureAccess::spawn(*match, kind);
+      auto& entity = FixtureAccess::get(*match, spawned);
+      if (stick) {
+        entity.view.owner = owner(*match).life;
+        entity.view.faction = Faction::team;
+        entity.summon_origin = Petal::stick;
+      }
+      (match == &m ? id : repeated) = spawned;
+    }
+    const auto wave_rng = FixtureAccess::wave_rng(m);
+    std::set<double> headings;
+    for (Tick age = 0; age < 16; ++age) {
+      for (auto* match : {&m, &replay}) {
+        const auto mob = match == &m ? id : repeated;
+        auto& entity = FixtureAccess::get(*match, mob);
+        entity.view.position = {arena().arena_radius - entity.view.radius - .1, 0};
+        entity.view.heading_rad = 0;
+        entity.wander_heading = 0;
+        entity.wander_speed = 60;
+        entity.wander_ready = entity.born_tick + 100;
+        FixtureAccess::move_at_age(*match, mob, age);
+      }
+      const auto& body = FixtureAccess::get(m, id).view;
+      near(body.velocity.length(), kind == Mob::sandstorm ? 60 : 75,
+           "random wall turns keep the current movement speed");
+      check(body.velocity.x < 0 && body.position.length() + body.radius <= arena().arena_radius,
+            "random wall turns take the full step inside the arena");
+      check(body.velocity == FixtureAccess::get(replay, repeated).view.velocity,
+            "random wall turns are reproducible with the same seed");
+      headings.insert(body.heading_rad);
+    }
+    check(headings.size() > 1, "repeated identical wall contacts choose different headings");
+    check(FixtureAccess::wave_rng(m) == wave_rng,
+          "wall turns leave wave and drop randomness untouched");
+  }
 }
 
 void pursuit() {
@@ -1227,6 +1369,12 @@ int main() {
     catalog_variants_spawn();
     phase = "catalog movement ratios and states";
     catalog_movement();
+    phase = "Desert Centipede speed, walls and provocation";
+    desert_movement();
+    phase = "Sandstorm random movement";
+    sandstorm_wandering();
+    phase = "random wall turns";
+    random_wall_turns();
     phase = "poison/slow";
     poison_and_slow();
     phase = "health";

@@ -353,10 +353,19 @@ def validate(pack, inputs=None):
                 require(set(configured) == set(MOVEMENT) and
                         all(type(value) in (int, float) and value >= 0 for value in configured.values()) and
                         configured['idle_wave_power'] > 0, 'invalid mob movement settings')
-                require(row['body']['speed_per_second'] == speed and
-                        configured == movement and
-                        row['provenance'].get('movement') == provenance,
-                        'mob movement adoption drift')
+                configured_provenance = row['provenance'].get('movement', {})
+                if configured_provenance.get('policy') == 'local-override':
+                    # Keep local gameplay tuning in the catalog, distinct from
+                    # the immutable world-PvP observations it replaces.
+                    reason = configured_provenance.get('reason')
+                    require(isinstance(reason, str) and bool(reason.strip()),
+                            'local movement override needs a reason')
+                    require(configured_provenance == dict(provenance, policy='local-override', reason=reason),
+                            'local movement override provenance drift')
+                else:
+                    require(row['body']['speed_per_second'] == speed and
+                            configured == movement and configured_provenance == provenance,
+                            'mob movement adoption drift')
                 require(type(row['xp']) is int and row['xp'] >= 0, 'invalid mob XP')
                 require(row['segmentClientId'] == 0 or row['segmentClientId'] in registry,
                         'unknown segment reference')
@@ -651,6 +660,8 @@ def self_test(pack):
         lambda p: p['mobs'][60]['movement'].update(strafe_speed_per_second=9),
         lambda p: p['mobs'][18]['movement'].update(idle_wave_power=-1),
         lambda p: p['mobs'][18]['provenance']['movement'].update(policy='default-ai'),
+        lambda p: next(r for r in p['mobs'] if r['kind'] == 'sandstorm')['provenance']['movement'].update(reason=''),
+        lambda p: next(r for r in p['mobs'] if r['kind'] == 'desert_centipede')['provenance']['movement'].update(source='missing'),
     ]
     for mutate in mutations:
         candidate = copy.deepcopy(pack)
